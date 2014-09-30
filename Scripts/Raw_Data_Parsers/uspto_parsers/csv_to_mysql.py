@@ -5,7 +5,7 @@ def mysql_upload(host,username,password,dbname,folder):
     
     
    
-    inp = open(folder+'patent.csv','rb').read().split("\r\n")
+    inp = open(os.path.join(folder,'patent.csv'),'rb').read().split("\r\n")
     del inp[0]
     del inp[-1]
     duplicates = {}
@@ -47,7 +47,7 @@ def mysql_upload(host,username,password,dbname,folder):
     mergersdata = {}
     diri = os.listdir(folder)
     for d in diri:
-        infile = csv.reader(file(folder+d,'rb'))
+        infile = csv.reader(file(os.path.join(folder,d),'rb'))
         head = infile.next()
         if d == "patent.csv":
             idelem = 0

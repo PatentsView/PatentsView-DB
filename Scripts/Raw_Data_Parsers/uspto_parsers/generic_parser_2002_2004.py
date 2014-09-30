@@ -10,39 +10,39 @@ def parse_patents(fd,fd2):
     diri = os.listdir(fd)
     
     #Rewrite files and write headers to them
-    appfile = open(fd2+'application.csv','wb')
+    appfile = open(os.path.join(fd2,'application.csv'),'wb')
     app = csv.writer(appfile)
     app.writerow(['id','patent_id','type','number','country','date'])
     
-    rawlocfile = open(fd2+'rawlocation.csv','wb')
+    rawlocfile = open(os.path.join(fd2,'rawlocation.csv'),'wb')
     rawloc = csv.writer(rawlocfile)
     rawloc.writerow(['id','location_id','city','state','country'])
     
-    rawinvfile = open(fd2+'rawinventor.csv','wb')
+    rawinvfile = open(os.path.join(fd2,'rawinventor.csv'),'wb')
     rawinv = csv.writer(rawinvfile)
     rawinv.writerow(['uuid','patent_id','inventor_id','rawlocation_id','name_first','name_last','sequence'])
     
-    rawassgfile = open(fd2+'rawassignee.csv','wb')
+    rawassgfile = open(os.path.join(fd2,'rawassignee.csv'),'wb')
     rawassg = csv.writer(rawassgfile)
     rawassg.writerow(['uuid','patent_id','assignee_id','rawlocation_id','type','name_first','name_last','organization','residence','nationality','sequence'])
     
-    ipcrfile = open(fd2+'ipc.csv','wb')
+    ipcrfile = open(os.path.join(fd2,'ipc.csv'),'wb')
     ipcr = csv.writer(ipcrfile)
     ipcr.writerow(['uuid','patent_id','classification_level','section','subclass','main_group','subgroup','symbol_position','classification_value','classification_status','classification_data_source','action_date','ipc_version_indicator','sequence'])
     
-    patfile = csv.writer(open(fd2+'patent.csv','ab'))
+    patfile = open(os.path.join(fd2,'patent.csv'),'ab')
     pat = csv.writer(patfile)
     pat.writerow(['id','type','number','country','date','abstract','title','kind','num_claims'])
     
-    uspatentcitfile = csv.writer(open(fd2+'uspatentcitation.csv','ab'))
+    uspatentcitfile = open(os.path.join(fd2,'uspatentcitation.csv'),'ab')
     uspatcit = csv.writer(uspatentcitfile)
     uspatcit.writerow(['uuid','patent_id','citation_id','date','name','kind','number','country','category','sequence'])
     
-    otherreffile = csv.writer(open(fd2+'otherreference.csv','ab'))
+    otherreffile = open(os.path.join(fd2,'otherreference.csv'),'ab')
     otherref = csv.writer(otherreffile)
     otherref.writerow(['uuid','patent_id','text','sequence'])
     
-    rawlawyerfile = csv.writer(open(fd2+'rawlawyer.csv','ab'))
+    rawlawyerfile = open(os.path.join(fd2,'rawlawyer.csv'),'ab')
     rawlawyer = csv.writer(rawlawyerfile)
     rawlawyer.writerow(['uuid','lawyer_id','patent_id','name_first','name_last','organization','country','sequence'])
     
@@ -504,63 +504,63 @@ def parse_patents(fd,fd2):
             
             patentdata[patent_id] = ['TAKE FROM KIND',updnum,'US',issdate,abst,title,re.sub('\d$','',updnum[0:2]),numclaims]
             
-            patfile = csv.writer(open(fd2+'patent.csv','ab'))
+            patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'))
             for k,v in patentdata.items():
                 patfile.writerow([k]+v)
             
-            appfile = csv.writer(open(fd2+'application.csv','ab'))
+            appfile = csv.writer(open(os.path.join(fd2,'application.csv'),'ab'))
             for k,v in application.items():
                 appfile.writerow([k]+v)
             
-            rawlocfile = csv.writer(open(fd2+'rawlocation.csv','ab'))
+            rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'))
             for k,v in rawlocation.items():
                 rawlocfile.writerow([k]+v)
             
-            rawinvfile = csv.writer(open(fd2+'rawinventor.csv','ab'))
+            rawinvfile = csv.writer(open(os.path.join(fd2,'rawinventor.csv'),'ab'))
             for k,v in rawinventor.items():
                 rawinvfile.writerow([k]+v)
             
-            rawassgfile = csv.writer(open(fd2+'rawassignee.csv','ab'))
+            rawassgfile = csv.writer(open(os.path.join(fd2,'rawassignee.csv'),'ab'))
             for k,v in rawassignee.items():
                 rawassgfile.writerow([k]+v)
             
             """
-            usappcitfile = csv.writer(open(fd2+'usapplicationcitation.csv','ab'))
+            usappcitfile = csv.writer(open(os.path.join(fd2,'usapplicationcitation.csv'),'ab'))
             for k,v in usappcitation.items():
                 usappcitfile.writerow([k]+v)
             """
             
-            ipcrfile = csv.writer(open(fd2+'ipcr.csv','ab'))
+            ipcrfile = csv.writer(open(os.path.join(fd2,'ipcr.csv'),'ab'))
             for k,v in ipcr.items():
                 ipcrfile.writerow([k]+v)
             
             """
-            mainclassfile = csv.writer(open(fd2+'original_mainclass.csv','ab'))
+            mainclassfile = csv.writer(open(os.path.join(fd2,'original_mainclass.csv'),'ab'))
             for k,v in mainclassdata.items():
                 mainclassfile.writerow([k]+v)
             
-            subclassfile = csv.writer(open(fd2+'original_subclass.csv','ab'))
+            subclassfile = csv.writer(open(os.path.join(fd2,'original_subclass.csv'),'ab'))
             for k,v in subclassdata.items():
                 subclassfile.writerow([k]+v)
             """
-            uspatentcitfile = csv.writer(open(fd2+'uspatentcitation.csv','ab'))
+            uspatentcitfile = csv.writer(open(os.path.join(fd2,'uspatentcitation.csv'),'ab'))
             for k,v in uspatentcitation.items():
                 uspatentcitfile.writerow([k]+v)
             
             """
-            foreigncitfile = csv.writer(open(fd2+'foreigncitation.csv','ab'))
+            foreigncitfile = csv.writer(open(os.path.join(fd2,'foreigncitation.csv'),'ab'))
             for k,v in foreigncitation.items():
                 foreigncitfile.writerow([k]+v)
             """
-            otherreffile = csv.writer(open(fd2+'otherreference.csv','ab'))
+            otherreffile = csv.writer(open(os.path.join(fd2,'otherreference.csv'),'ab'))
             for k,v in otherreference.items():
                 otherreffile.writerow([k]+v)
             
-            rawlawyerfile = csv.writer(open(fd2+'rawlawyer.csv','ab'))
+            rawlawyerfile = csv.writer(open(os.path.join(fd2,'rawlawyer.csv'),'ab'))
             for k,v in rawlawyer.items():
                 rawlawyerfile.writerow([k]+v)
             """
-            crossreffile = csv.writer(open(fd2+'crossreferenceclass_XCL.csv','ab'))
+            crossreffile = csv.writer(open(os.path.join(fd2,'crossreferenceclass_XCL.csv'),'ab'))
             for k,v in crossrefclassdata.items():
                 crossreffile.writerow([k]+v)
             """
