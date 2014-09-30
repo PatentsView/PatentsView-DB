@@ -9,6 +9,55 @@ def parse_patents(fd,fd2):
     fd2+='/'
     diri = os.listdir(fd)
     
+    #Rewrite files and write headers to them
+    appfile = open(fd2+'application.csv','wb')
+    app = csv.writer(appfile)
+    app.writerow(['id','patent_id','type','number','country','date'])
+    
+    rawlocfile = open(fd2+'rawlocation.csv','wb')
+    rawloc = csv.writer(rawlocfile)
+    rawloc.writerow(['id','location_id','city','state','country'])
+    
+    rawinvfile = open(fd2+'rawinventor.csv','wb')
+    rawinv = csv.writer(rawinvfile)
+    rawinv.writerow(['uuid','patent_id','inventor_id','rawlocation_id','name_first','name_last','sequence'])
+    
+    rawassgfile = open(fd2+'rawassignee.csv','wb')
+    rawassg = csv.writer(rawassgfile)
+    rawassg.writerow(['uuid','patent_id','assignee_id','rawlocation_id','type','name_first','name_last','organization','residence','nationality','sequence'])
+    
+    ipcrfile = open(fd2+'ipc.csv','wb')
+    ipcr = csv.writer(ipcrfile)
+    ipcr.writerow(['uuid','patent_id','classification_level','section','subclass','main_group','subgroup','symbol_position','classification_value','classification_status','classification_data_source','action_date','ipc_version_indicator','sequence'])
+    
+    patfile = csv.writer(open(fd2+'patent.csv','ab'))
+    pat = csv.writer(patfile)
+    pat.writerow(['id','type','number','country','date','abstract','title','kind','num_claims'])
+    
+    uspatentcitfile = csv.writer(open(fd2+'uspatentcitation.csv','ab'))
+    uspatcit = csv.writer(uspatentcitfile)
+    uspatcit.writerow(['uuid','patent_id','citation_id','date','name','kind','number','country','category','sequence'])
+    
+    otherreffile = csv.writer(open(fd2+'otherreference.csv','ab'))
+    otherref = csv.writer(otherreffile)
+    otherref.writerow(['uuid','patent_id','text','sequence'])
+    
+    rawlawyerfile = csv.writer(open(fd2+'rawlawyer.csv','ab'))
+    rawlawyer = csv.writer(rawlawyerfile)
+    rawlawyer.writerow(['uuid','lawyer_id','patent_id','name_first','name_last','organization','country','sequence'])
+    
+    
+    appfile.close()
+    rawlocfile.close()
+    rawinvfile.close()
+    rawassgfile.close()
+    ipcrfile.close()
+    otherreffile.close()
+    patfile.close()
+    rawlawyerfile.close()
+    uspatentcitfile.close()
+    
+    
     ### !For loggroups the last one will never be parsed but needs to be valid and required for parsing everything before it!
     loggroups = ['B100','B200', 'B510','B521','B522','B540','B561','B562','B570','B580','B721','B731','B732US','B741','SDOAB','CL']
     numi = 0
@@ -167,7 +216,7 @@ def parse_patents(fd,fd2):
             except:
                 pass
             
-            patent_id = updnum
+            patent_id = id_generator()
             
             application[appnum[:2]+'/'+appnum[2:]] = [patent_id,apptype,appnum,patcountry,appdate]
             
