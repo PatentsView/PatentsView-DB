@@ -49,13 +49,20 @@ def mysql_upload(host,username,password,dbname,folder):
     for d in diri:
         infile = csv.reader(file(os.path.join(folder,d),'rb'))
         head = infile.next()
+        nullid = None
         if d == "patent.csv":
             idelem = 0
         else:
             idelem = head.index('patent_id')
+        if d == 'rawassignee.csv' or d == 'rawinventor.csv':
+            nullid = 2
+        if d == 'rawlawyer.csv' or d == 'rawlocation.csv':
+            nullid = 1
         for i in infile:
             towrite = [re.sub('"','',item) for item in i]
             towrite = [re.sub("'",'',w) for w in towrite]
+            if nullid:
+                towrite[nullid] = 'NULL'
             try:
                 gg = duplicates[i[idelem]]
                 duplicdata[i[idelem]] = towrite  
