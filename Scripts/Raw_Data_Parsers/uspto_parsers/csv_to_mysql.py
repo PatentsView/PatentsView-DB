@@ -50,19 +50,34 @@ def mysql_upload(host,username,password,dbname,folder):
     diri = os.listdir(folder)
     del diri[diri.index('patent.csv')]
     diri.insert(0,'patent.csv')
+    del diri[diri.index('rawlocation.csv')]
+    diri.insert(2,'rawlocation.csv')
+    
+    rawlocchek = {}
+    cursor.execute('select id from rawlocation')
+    locids = [f[0] for f in cursor.fetchall()]
+    for l in locids:
+        rawlocchek[l.lower()] = 1
     
     for d in diri:
+        print d
         infile = csv.reader(file(os.path.join(folder,d),'rb'))
         head = infile.next()
         nullid = None
         if d == "patent.csv":
             idelem = 0
         else:
-            idelem = head.index('patent_id')
+            try:
+                idelem = head.index('patent_id')
+            except:
+                idelem = None
         if d == 'rawassignee.csv' or d == 'rawinventor.csv':
             nullid = 2
         if d == 'rawlawyer.csv' or d == 'rawlocation.csv':
             nullid = 1
+        checkifexists = None
+        if d == 'rawlocation.csv':
+            checkifexists = 1
         for i in infile:
             towrite = [re.sub('"','',item) for item in i]
             towrite = [re.sub("'",'',w) for w in towrite]
@@ -88,19 +103,29 @@ def mysql_upload(host,username,password,dbname,folder):
                                 if mergersdata[gg][nu] == "NULL":
                                     mergersdata[gg][nu] = towrite[nu]
                         except:
-                            query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
-                            query.replace(",'NULL'",",NULL")
-                            cursor.execute(query)
-    
+                            if checkifexists:
+                                try:
+                                    gg = rawlocchek[towrite[0].lower()]
+                                except:
+                                    query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
+                                    query = query.replace(",'NULL'",",NULL")
+                                    cursor.execute(query)
+                            else:
+                                query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
+                                query = query.replace(",'NULL'",",NULL")
+                                cursor.execute(query)
+            
     
         for v in mergersdata.values():
             query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
-            query.replace(",'NULL'",",NULL")
+            query = query.replace(",'NULL'",",NULL")
             cursor.execute(query)
         
         for v in duplicdata.values():
             query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
-            query.replace(",'NULL'",",NULL")
+            query = query.replace(",'NULL'",",NULL")
             cursor.execute(query)
-        
+
     mydb.commit()
+
+    print "ALL GOOD"

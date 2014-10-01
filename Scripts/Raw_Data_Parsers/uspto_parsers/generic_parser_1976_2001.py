@@ -10,7 +10,12 @@ def parse_patents(fd,fd2):
     fd+='/'
     fd2+='/'
     diri = os.listdir(fd)
-    
+
+    #Remove all files from output dir before writing
+    outdir = os.listdir(fd2)
+    for oo in outdir:
+        os.remove(os.path.join(fd2,oo))
+
     #Rewrite files and write headers to them
     appfile = open(os.path.join(fd2,'application.csv'),'wb')
     app = csv.writer(appfile)
@@ -67,6 +72,7 @@ def parse_patents(fd,fd2):
     loggroups = ['PATN','INVT','ASSG','PRIR','REIS','RLAP','CLAS','UREF','FREF','OREF','LREP','PCTA','ABST','GOVT','PARN','BSUM','DRWD','DETD','CLMS','DCLM']
     
     numii = 0
+    rawlocation = {}
     for d in diri:
         print d
         infile = open(os.path.join(fd,d)).read().split('PATN')
@@ -131,7 +137,6 @@ def parse_patents(fd,fd2):
             rawassignee = {}
             rawinventor = {}
             rawlawyer = {}
-            rawlocation = {}
             subclassdata = {}
             usappcitation = {}
             uspatentcitation = {}
@@ -222,10 +227,7 @@ def parse_patents(fd,fd2):
                         if line.startswith("ZIP"):
                             invtzip = re.search('ZIP\s+(.*?)$',line).group(1)
                     
-                    try:
-                        gg = rawlocation[invtcity+'|'+invtstate+'|'+invtcountry]
-                    except:
-                        rawlocation[invtcity+'|'+invtstate+'|'+invtcountry] = [invtcity,invtstate,invtcountry]
+                    rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [invtcity+'|'+invtstate+'|'+invtcountry,"NULL",invtcity,invtstate,invtcountry]
                     
                     rawinventor[id_generator()] = [patent_id,patent_id+'-'+str(n),invtcity+'|'+invtstate+'|'+invtcountry,fname,lname,str(n)]
             except:
@@ -269,11 +271,8 @@ def parse_patents(fd,fd2):
                         
                         if line.startswith("COD"):
                             assgtype = re.search("COD\s+(.*?)$",line).group(1)
-                    try:
-                        gg = rawlocation[assgcity+'|'+assgstate+'|'+assgcountry]
-                    except:
-                        rawlocation[assgcity+'|'+assgstate+'|'+assgcountry] = [assgcity,assgstate,assgcountry]
-                    
+                
+                    rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [assgcity+'|'+assgstate+'|'+assgcountry,"NULL",assgcity,assgstate,assgcountry]
                     rawassignee[id_generator()] = [patent_id,'ASSG'+patent_id+'-'+str(n),assgcity+'|'+assgstate+'|'+assgcountry,assgtype,assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
             except:
                 pass
@@ -461,10 +460,6 @@ def parse_patents(fd,fd2):
             for k,v in application.items():
                 appfile.writerow([k]+v)
             
-            rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'))
-            for k,v in rawlocation.items():
-                rawlocfile.writerow([k]+v)
-            
             rawinvfile = csv.writer(open(os.path.join(fd2,'rawinventor.csv'),'ab'))
             for k,v in rawinventor.items():
                 rawinvfile.writerow([k]+v)
@@ -510,4 +505,10 @@ def parse_patents(fd,fd2):
           except:
               print i
               
+    rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'))
+    for k,v in rawlocation.items():
+        rawlocfile.writerow(v)
+            
+
     print numii
+

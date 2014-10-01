@@ -8,6 +8,11 @@ def parse_patents(fd,fd2):
     fd+='/'
     fd2+='/'
     diri = os.listdir(fd)
+
+    #Remove all files from output dir before writing
+    outdir = os.listdir(fd2)
+    for oo in outdir:
+        os.remove(os.path.join(fd2,oo))
     
     #Rewrite files and write headers to them
     appfile = open(os.path.join(fd2,'application.csv'),'wb')
@@ -26,7 +31,7 @@ def parse_patents(fd,fd2):
     rawassg = csv.writer(rawassgfile)
     rawassg.writerow(['uuid','patent_id','assignee_id','rawlocation_id','type','name_first','name_last','organization','residence','nationality','sequence'])
     
-    ipcrfile = open(os.path.join(fd2,'ipc.csv'),'wb')
+    ipcrfile = open(os.path.join(fd2,'ipcr.csv'),'wb')
     ipcr = csv.writer(ipcrfile)
     ipcr.writerow(['uuid','patent_id','classification_level','section','subclass','main_group','subgroup','symbol_position','classification_value','classification_status','classification_data_source','action_date','ipc_version_indicator','sequence'])
     
@@ -62,6 +67,10 @@ def parse_patents(fd,fd2):
     loggroups = ['B100','B200', 'B510','B521','B522','B540','B561','B562','B570','B580','B721','B731','B732US','B741','SDOAB','CL']
     numi = 0
     num = 0
+    
+    #Rawlocation should write after all else is done to prevent duplicate values
+    rawlocation = {}
+    
     for d in diri:
         print d
         infile = open(fd+d,'rb').read().split('<!DOCTYPE')
@@ -125,7 +134,6 @@ def parse_patents(fd,fd2):
             rawassignee = {}
             rawinventor = {}
             rawlawyer = {}
-            rawlocation = {}
             subclassdata = {}
             usappcitation = {}
             uspatentcitation = {}
@@ -179,16 +187,13 @@ def parse_patents(fd,fd2):
                 patent = avail_fields['B200'].split('\n')
                 for line in patent:
                     if line.startswith('<B210>'):
-                        appnum = re.search('(?<=<PDAT>)\w+',line).group()[:6]
-                        if len(appnum) != 6:
-                            appnum = 'NULL'
-                            #data['appnum'] = appnum
+                        appnum = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
                         #print appnum
                     if line.startswith('<B211US>'):
-                        apptype = re.search('(?<=\<PDAT>)\w+',line).group()
+                        apptype = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
                         #print apptype
                     if line.startswith('<B220>'):
-                        appdate = re.search('(?<=\<PDAT>)\w+',line).group()
+                        appdate = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
                         appdate = appdate[:4]+'-'+appdate[4:6]+'-'+appdate[6:]
                         #print appdate
             except:
@@ -260,10 +265,8 @@ def parse_patents(fd,fd2):
                         if line.startswith("<PCODE>"):
                             invtzip = re.search('<PCODE><PDAT>(.*?)</PDAT>',line).group(1)
                             #print invtzip
-                    try:
-                        gg = rawlocation[invtcity+'|'+invtstate+'|'+invtcountry]
-                    except:
-                        rawlocation[invtcity+'|'+invtstate+'|'+invtcountry] = [invtcity,invtstate,invtcountry]
+                
+                    rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [invtcity+'|'+invtstate+'|'+invtcountry,"NULL",invtcity,invtstate,invtcountry]
                     
                     rawinventor[id_generator()] = [patent_id,patent_id+'-'+str(n),invtcity+'|'+invtstate+'|'+invtcountry,fname,lname,str(n)]
             except:
@@ -314,11 +317,7 @@ def parse_patents(fd,fd2):
                             except:
                                 pass
                         
-                    try:
-                        gg = rawlocation[assgcity+'|'+assgstate+'|'+assgcountry]
-                        
-                    except:
-                        rawlocation[assgcity+'|'+assgstate+'|'+assgcountry] = [assgcity,assgstate,assgcountry]
+                    rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [assgcity+'|'+assgstate+'|'+assgcountry,"NULL",assgcity,assgstate,assgcountry]
                     
                     rawassignee[id_generator()] = [patent_id,'ASSG'+patent_id+'-'+str(n),assgcity+'|'+assgstate+'|'+assgcountry,assgtype,assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
             except:
@@ -512,9 +511,6 @@ def parse_patents(fd,fd2):
             for k,v in application.items():
                 appfile.writerow([k]+v)
             
-            rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'))
-            for k,v in rawlocation.items():
-                rawlocfile.writerow([k]+v)
             
             rawinvfile = csv.writer(open(os.path.join(fd2,'rawinventor.csv'),'ab'))
             for k,v in rawinventor.items():
@@ -567,4 +563,8 @@ def parse_patents(fd,fd2):
           except:
              print i
     
+    rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'))
+    for k,v in rawlocation.items():
+        rawlocfile.writerow(v)
+            
     print numi
