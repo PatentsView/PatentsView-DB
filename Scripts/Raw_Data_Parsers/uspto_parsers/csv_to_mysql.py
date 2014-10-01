@@ -88,13 +88,19 @@ def mysql_upload(host,username,password,dbname,folder):
                                 if mergersdata[gg][nu] == "NULL":
                                     mergersdata[gg][nu] = towrite[nu]
                         except:
-                            cursor.execute("insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')")
+                            query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
+                            query.replace(",'NULL'",",NULL")
+                            cursor.execute(query)
     
     
         for v in mergersdata.values():
-            cursor.execute("insert into "+d.replace('.csv','')+" values ('"+"','".join(v)+"')")
+            query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
+            query.replace(",'NULL'",",NULL")
+            cursor.execute(query)
         
         for v in duplicdata.values():
-            cursor.execute("insert into "+d.replace('.csv','')+" values ('"+"','".join(v)+"')")
+            query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
+            query.replace(",'NULL'",",NULL")
+            cursor.execute(query)
         
     mydb.commit()
