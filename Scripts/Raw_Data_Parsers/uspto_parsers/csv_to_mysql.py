@@ -43,9 +43,14 @@ def mysql_upload(host,username,password,dbname,folder):
     
     #Empty the allpatents container to free up memory - not needed any more
     allpatents = {}
+    
+    
     duplicdata = {}
     mergersdata = {}
     diri = os.listdir(folder)
+    del diri[diri.index('patent.csv')]
+    diri.insert(0,'patent.csv')
+    
     for d in diri:
         infile = csv.reader(file(os.path.join(folder,d),'rb'))
         head = infile.next()
