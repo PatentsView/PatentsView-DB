@@ -1,10 +1,8 @@
+import csv
+import MySQLdb
+import re,os,random,string
+
 def mysql_upload(host,username,password,dbname,folder):
-    import csv
-    import MySQLdb
-    import re,os
-    
-    
-   
     inp = open(os.path.join(folder,'patent.csv'),'rb').read().split("\r\n")
     del inp[0]
     del inp[-1]
@@ -129,3 +127,92 @@ def mysql_upload(host,username,password,dbname,folder):
     mydb.commit()
 
     print "ALL GOOD"
+
+
+def upload_uspc(host,username,password,dbname,folder):
+    
+    def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
+    
+    mydb = MySQLdb.connect(host=host,
+        user=username,
+        passwd=password,
+        db=dbname)
+    cursor = mydb.cursor()
+    
+    #Dump mainclass and subclass if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
+    cursor.execute('select id from mainclass')
+    ids = [f[0] for f in cursor.fetchall()]
+    for i in ids:
+        cursor.execute('DELETE FROM mainclass where id="'+i+'"')
+    cursor.execute('select id from subclass')
+    ids = [f[0] for f in cursor.fetchall()]
+    for i in ids:
+        cursor.execute('DELETE FROM subclass where id="'+i+'"')
+        
+    mydb.commit()
+
+    #Upload mainclass data
+    mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
+    for m in mainclass:
+        towrite = [re.sub('"','',item) for item in m]
+        towrite = [re.sub("'",'',w) for w in towrite]
+        query = "insert into mainclass values ('"+"','".join(towrite)+"')"
+        query = query.replace(",'NULL'",",NULL")
+        cursor.execute(query)
+ 
+    #Upload subclass data
+    subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
+    exist = {}
+    for m in subclass:
+        towrite = [re.sub('"','',item) for item in m]
+        towrite = [re.sub("'",'',w) for w in towrite]
+        try:
+            gg = exist[towrite[0]]
+        except:
+            exist[towrite[0]] = 1
+            query = "insert into subclass values ('"+"','".join(towrite)+"')"
+            query = query.replace(",'NULL'",",NULL")
+            cursor.execute(query)
+        
+    mydb.commit()
+    
+    # Get all patent numbers in the current database not to upload full USPC table going back to 19th century
+    cursor.execute('select id,number from patent')
+    patnums = {}
+    for field in cursor.fetchall():
+        patnums[field[1]] = field[0]
+    
+    
+    #Update USPC table because the field length does not match in Berkeley schema
+    cursor.execute('ALTER TABLE uspc MODIFY mainclass_id varchar(20)')
+    cursor.execute('ALTER TABLE uspc MODIFY subclass_id varchar(20)')
+    
+    #Create USPC table off full master classification list
+    uspc_full = csv.reader(file(os.path.join(folder,'USPC_patent_classes_data.csv'),'rb'))
+    errorlog = open(os.path.join(folder,'upload_error.log','w'))
+    for m in uspc_full:
+        try:
+            gg = patnums[m[0]]
+            towrite = [re.sub('"','',item) for item in m]
+            towrite = [re.sub("'",'',w) for w in towrite]
+            towrite.insert(0,id_generator())
+            towrite[1] = gg
+            for t in range(len(towrite)):
+                try:
+                    gg = int(towrite[t])
+                    towrite[t] = str(int(towrite[t]))
+                except:
+                    pass
+            towrite[3] = towrite[2]+'/'+re.sub('^0+','',towrite[3])
+            try:
+                query = "insert into uspc values ('"+"','".join(towrite)+"')"
+                query = query.replace(",'NULL'",",NULL")
+                cursor.execute(query)
+            except:
+                print>>errorlog,' '.join(towrite+[m[0]])
+        except:
+            pass
+    
+    errorlog.close()
+    mydb.commit()    
