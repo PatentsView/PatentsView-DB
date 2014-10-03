@@ -35,23 +35,44 @@ def parse_patents(fd,fd2):
     ipcr = csv.writer(ipcrfile)
     ipcr.writerow(['uuid','patent_id','classification_level','section','subclass','main_group','subgroup','symbol_position','classification_value','classification_status','classification_data_source','action_date','ipc_version_indicator','sequence'])
     
-    patfile = open(os.path.join(fd2,'patent.csv'),'ab')
+    patfile = open(os.path.join(fd2,'patent.csv'),'wb')
     pat = csv.writer(patfile)
     pat.writerow(['id','type','number','country','date','abstract','title','kind','num_claims'])
     
-    uspatentcitfile = open(os.path.join(fd2,'uspatentcitation.csv'),'ab')
+    foreigncitfile = open(os.path.join(fd2,'foreigncitation.csv'),'wb')
+    foreigncit = csv.writer(foreigncitfile)
+    foreigncit.writerow(['uuid','patent_id','date','kind','number','country','category','sequence'])
+    
+    uspatentcitfile = open(os.path.join(fd2,'uspatentcitation.csv'),'wb')
     uspatcit = csv.writer(uspatentcitfile)
     uspatcit.writerow(['uuid','patent_id','citation_id','date','name','kind','number','country','category','sequence'])
-    
-    otherreffile = open(os.path.join(fd2,'otherreference.csv'),'ab')
+    """
+    usappcitfile = open(os.path.join(fd2,'usapplicationcitation.csv'),'wb')
+    usappcit = csv.writer(usappcitfile)
+    usappcit.writerow(['uuid','patent_id','application_id','date','name','kind','number','country','category','sequence'])
+    """
+    uspcfile = open(os.path.join(fd2,'uspc.csv'),'wb')
+    uspcc = csv.writer(uspcfile)
+    uspcc.writerow(['uuid','patent_id','mainclass_id','subclass_id','sequence'])
+
+    otherreffile = open(os.path.join(fd2,'otherreference.csv'),'wb')
     otherref = csv.writer(otherreffile)
     otherref.writerow(['uuid','patent_id','text','sequence'])
     
-    rawlawyerfile = open(os.path.join(fd2,'rawlawyer.csv'),'ab')
+    rawlawyerfile = open(os.path.join(fd2,'rawlawyer.csv'),'wb')
     rawlawyer = csv.writer(rawlawyerfile)
     rawlawyer.writerow(['uuid','lawyer_id','patent_id','name_first','name_last','organization','country','sequence'])
+
+    mainclassfile = open(os.path.join(fd2,'mainclass.csv'),'wb')
+    mainclass = csv.writer(mainclassfile)
+    mainclass.writerow(['id','title','text'])
+
+    subclassfile = open(os.path.join(fd2,'subclass.csv'),'wb')
+    subclass = csv.writer(subclassfile)
+    subclass.writerow(['id','title','text'])
     
-    
+    mainclassfile.close()
+    subclassfile.close()
     appfile.close()
     rawlocfile.close()
     rawinvfile.close()
@@ -61,6 +82,9 @@ def parse_patents(fd,fd2):
     patfile.close()
     rawlawyerfile.close()
     uspatentcitfile.close()
+    uspcfile.close()
+    foreigncitfile.close()
+    #usappcitfile.close()
     
     
     ### !For loggroups the last one will never be parsed but needs to be valid and required for parsing everything before it!
@@ -68,8 +92,10 @@ def parse_patents(fd,fd2):
     numi = 0
     num = 0
     
-    #Rawlocation should write after all else is done to prevent duplicate values
+    #Rawlocation, mainclass and subclass should write after all else is done to prevent duplicate values
     rawlocation = {}
+    mainclassdata = {}
+    subclassdata = {}
     
     for d in diri:
         print d
@@ -125,7 +151,6 @@ def parse_patents(fd,fd2):
             location = {}
             location_assignee = {}
             location_inventor = {}
-            mainclassdata = {}
             otherreference = {}
             patentdata = {}
             patent_assignee = {}
@@ -134,13 +159,10 @@ def parse_patents(fd,fd2):
             rawassignee = {}
             rawinventor = {}
             rawlawyer = {}
-            subclassdata = {}
             usappcitation = {}
             uspatentcitation = {}
             uspc = {}
             usreldoc = {}
-            crossrefclassdata = {}
-            
             
             ###                PARSERS FOR LOGICAL GROUPS                  ###
             #PATN
@@ -365,10 +387,11 @@ def parse_patents(fd,fd2):
                 num = 0
                 classes = avail_fields['B521']
                 origclass = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
-                origmainclass = origclass[0:3]
-                origsubclass = origclass[3:]
-                mainclassdata[id_generator()] = [patent_id,origmainclass]
-                subclassdata[id_generator()] = [patent_id,origsubclass]    
+                origmainclass = re.sub("\s+",'',origclass[0:3])
+                origsubclass = re.sub('\s+','',origclass[3:])
+                uspc[id_generator()] = [patent_id,origmainclass,origmainclass+'/'+origsubclass,'0']
+                mainclassdata[origmainclass] = [origmainclass,'NULL','NULL']
+                subclassdata[origmainclass+'/'+origsubclass] = [origmainclass+'/'+origsubclass,'NULL','NULL']
             except:
                 pass
                            
@@ -381,10 +404,11 @@ def parse_patents(fd,fd2):
                     crossrefmain = "NULL"
                     crossrefsub = "NULL"
                     crossrefclass = re.search('<PDAT>(.*?)</PDAT>',classes[n]).group(1)
-                    crossrefmain = crossrefclass[:3]
-                    crossrefsub = crossrefclass[3:]
-                    crossrefclassdata[id_generator()] = [patent_id,crossrefmain,crossrefsub]
-                        
+                    crossrefmain = re.sub('\s+','',crossrefclass[:3])
+                    crossrefsub = re.sub('\s+','',crossrefclass[3:])
+                    uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(n)]
+                    mainclassdata[crossrefmain] = [crossrefmain,'NULL','NULL']
+                    subclassdata[crossrefmain+'/'+crossrefsub] = [crossrefmain+'/'+crossrefsub,'NULL','NULL']
             except:
                 pass
     
@@ -393,10 +417,13 @@ def parse_patents(fd,fd2):
             refpatname = 'NULL'
             refpatdate = 'NULL'
             refpatclass = 'NULL'
+            refpatcountry = 'US'
                     
             try:
                 uspatref = avail_fields['B561'].split("\n\n\n\n\n")
                 uspatref = [a for a in uspatref if a != ">\r\n<"]
+                uspatseq = 0
+                forpatseq = 0
                 for n in range(len(uspatref)):
                     for line in uspatref[n].split("\n"):
                         if line.startswith('<DOC>'):
@@ -409,6 +436,9 @@ def parse_patents(fd,fd2):
                             else:
                                 refpatdate = refpatdate[:4]+'-'+refpatdate[4:6]+'-01'
                         
+                        if line.startswith('<CTRY>'):
+                            refpatcountry = re.search('<CTRY><PDAT>(.*?)</PDAT>',line).group(1)
+                        
                         if line.startswith('<NAM>'):
                             refpatname = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
                             
@@ -416,8 +446,14 @@ def parse_patents(fd,fd2):
                             refpatclass = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
                             citedby = re.search('<CITED-BY-(.*?)/>',line).group(1)
                             citedby = 'cited by '+citedby.lower()
-                            
-                    uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,refpatname,re.sub('\d$','',refpatnum[:2]),refpatnum,'US',citedby,str(n)]
+                        
+                    if refpatcountry != 'US':
+                        foreigncitation[id_generator()] = [patent_id,refpatdate,'NULL',refpatnum,refpatcountry,citedby,str(forpatseq)]
+                        forpatseq+=1
+                    else:
+                        uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,refpatname,re.sub('\d$','',refpatnum[:2]),refpatnum,refpatcountry,citedby,str(uspatseq)]
+                        uspatseq+=1
+                        
             except:
                 pass
             
@@ -425,42 +461,21 @@ def parse_patents(fd,fd2):
             try:
                 otherreflist = avail_fields['B562'].split('\n\n\n\n\n')
                 otherreflist = [a for a in otherreflist if a != ">\r\n<"]
+                otherrefseq = 0
+                appcitseq = 0
                 for n in range(len(otherreflist)):
                     otherref = 'NULL'
                     otherref = re.search('<PDAT>(.*?)</PDAT>',otherreflist[n]).group(1)
-                    otherreference[id_generator()] = [patent_id,otherref,str(n)]
+                    appcit = re.search('applicationgggg',otherref)
+                    if appcit:
+                        usappcitation[id_generator()] = [patent_id,appcit.group(2).replace(' ',''),appcit.group(4),appcit.group(1),appcit.group(3),appcit.group(2).replace('US ',''),'US','NULL',str(appcitseq)]
+                        appcitseq+=1
+                    else:
+                        otherreference[id_generator()] = [patent_id,otherref,str(otherrefseq)]
+                        otherrefseq+=1
+                    
             except:
                 pass
-            
-            """
-            #Foreign reference - can be several
-            try:
-                foreignref = avail_fields[''].split('\n\n\n\n\n')
-                for n in range(len(foreignref)):
-                    forrefpatnum = 'NULL'
-                    forrefpatdate = 'NULL'
-                    forrefpatcountry = 'NULL'
-                    forrefpatclass = 'NULL'
-                    for line in foreignref[n].split("\n"):
-                        if line.startswith('PNO'):
-                            forrefpatnum = re.search('PNO\s+(.*?)$',line).group(1)
-                        
-                        if line.startswith('ISD'):
-                            forrefpatdate = re.search('ISD\s+(.*?)$',line).group(1)
-                            if forrefpatdate[6:]!='00':
-                                forrefpatdate = refpatdate[:4]+'-'+refpatdate[4:6]+'-'+refpatdate[6:]
-                            else:
-                                forrefpatdate = refpatdate[:4]+'-'+refpatdate[4:6]+'-01'
-                            
-                        if line.startswith('CNT'):
-                            forrefpatcountry = re.search('CNT\s+(.*?)$',line).group(1)
-                            
-                        if line.startswith('ICL'):
-                            forrefpatclass = re.search('ICL\s+(.*?)$',line).group(1) 
-                    foreigncitation[id_generator()] = [patent_id,forrefpatdate,"TAKE KIND FROM PATENT NUMBER?",forrefpatnum,forrefpatcountry,forrefpatclass,str(n)] 
-            except:
-                pass
-            """
             
             #Legal information - can be several
             try:
@@ -519,7 +534,6 @@ def parse_patents(fd,fd2):
             rawassgfile = csv.writer(open(os.path.join(fd2,'rawassignee.csv'),'ab'))
             for k,v in rawassignee.items():
                 rawassgfile.writerow([k]+v)
-            
             """
             usappcitfile = csv.writer(open(os.path.join(fd2,'usapplicationcitation.csv'),'ab'))
             for k,v in usappcitation.items():
@@ -530,24 +544,18 @@ def parse_patents(fd,fd2):
             for k,v in ipcr.items():
                 ipcrfile.writerow([k]+v)
             
-            """
-            mainclassfile = csv.writer(open(os.path.join(fd2,'original_mainclass.csv'),'ab'))
-            for k,v in mainclassdata.items():
-                mainclassfile.writerow([k]+v)
+            uspcfile = csv.writer(open(os.path.join(fd2,'uspc.csv'),'ab'))
+            for k,v in uspc.items():
+                uspcfile.writerow([k]+v)
             
-            subclassfile = csv.writer(open(os.path.join(fd2,'original_subclass.csv'),'ab'))
-            for k,v in subclassdata.items():
-                subclassfile.writerow([k]+v)
-            """
             uspatentcitfile = csv.writer(open(os.path.join(fd2,'uspatentcitation.csv'),'ab'))
             for k,v in uspatentcitation.items():
                 uspatentcitfile.writerow([k]+v)
             
-            """
             foreigncitfile = csv.writer(open(os.path.join(fd2,'foreigncitation.csv'),'ab'))
             for k,v in foreigncitation.items():
                 foreigncitfile.writerow([k]+v)
-            """
+            
             otherreffile = csv.writer(open(os.path.join(fd2,'otherreference.csv'),'ab'))
             for k,v in otherreference.items():
                 otherreffile.writerow([k]+v)
@@ -555,16 +563,22 @@ def parse_patents(fd,fd2):
             rawlawyerfile = csv.writer(open(os.path.join(fd2,'rawlawyer.csv'),'ab'))
             for k,v in rawlawyer.items():
                 rawlawyerfile.writerow([k]+v)
-            """
-            crossreffile = csv.writer(open(os.path.join(fd2,'crossreferenceclass_XCL.csv'),'ab'))
-            for k,v in crossrefclassdata.items():
-                crossreffile.writerow([k]+v)
-            """
+            
           except:
              print i
     
     rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'))
     for k,v in rawlocation.items():
         rawlocfile.writerow(v)
+
+    mainclassfile = csv.writer(open(os.path.join(fd2,'mainclass.csv'),'ab'))
+    for k,v in mainclassdata.items():
+        mainclassfile.writerow(v)
+    
+    subclassfile = csv.writer(open(os.path.join(fd2,'subclass.csv'),'ab'))
+    for k,v in subclassdata.items():
+        subclassfile.writerow(v)
+            
+
             
     print numi

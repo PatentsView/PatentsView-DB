@@ -57,6 +57,19 @@ def mysql_upload(host,username,password,dbname,folder):
     for l in locids:
         rawlocchek[l.lower()] = 1
     
+    mainclasschek = {}
+    cursor.execute('select id from mainclass')
+    locids = [f[0] for f in cursor.fetchall()]
+    for l in locids:
+        mainclasschek[l.lower()] = 1
+    
+    subclasschek = {}
+    cursor.execute('select id from subclass')
+    locids = [f[0] for f in cursor.fetchall()]
+    for l in locids:
+        subclasschek[l.lower()] = 1
+    
+    
     for d in diri:
         print d
         infile = csv.reader(file(os.path.join(folder,d),'rb'))
@@ -76,6 +89,10 @@ def mysql_upload(host,username,password,dbname,folder):
         checkifexists = None
         if d == 'rawlocation.csv':
             checkifexists = 1
+        if d == 'mainclass.csv':
+            checkifexists = 2
+        if d == "subclass.csv":
+            checkifexists = 3
         for i in infile:
             towrite = [re.sub('"','',item) for item in i]
             towrite = [re.sub("'",'',w) for w in towrite]
@@ -103,7 +120,12 @@ def mysql_upload(host,username,password,dbname,folder):
                         except:
                             if checkifexists:
                                 try:
-                                    gg = rawlocchek[towrite[0].lower()]
+                                    if checkifexists == 1:
+                                        gg = rawlocchek[towrite[0].lower()]
+                                    if checkifexists == 2:
+                                        gg = mainclasschek[towrite[0].lower()]
+                                    if checkifexists == 3:
+                                        gg = subclasschek[towrite[0].lower()]
                                 except:
                                     query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
                                     query = query.replace(",'NULL'",",NULL")
@@ -140,24 +162,65 @@ def upload_uspc(host,username,password,dbname,folder):
         db=dbname)
     cursor = mydb.cursor()
     
-    #Dump mainclass and subclass if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
-    cursor.execute('select id from mainclass')
-    ids = [f[0] for f in cursor.fetchall()]
-    for i in ids:
-        cursor.execute('DELETE FROM mainclass where id="'+i+'"')
-    cursor.execute('select id from subclass')
-    ids = [f[0] for f in cursor.fetchall()]
-    for i in ids:
-        cursor.execute('DELETE FROM subclass where id="'+i+'"')
-        
+    #Create tables for current classification if they do not exist - mainclass_current, subclass_current and uspc_current
+    cursor.execute("""
+    -- Dumping structure for table PatentsProcessorGrant.mainclass_current
+        CREATE TABLE IF NOT EXISTS `mainclass_current` (
+          `id` varchar(20) COLLATE latin1_general_ci NOT NULL,
+          `title` varchar(256) COLLATE latin1_general_ci DEFAULT NULL,
+          `text` varchar(256) COLLATE latin1_general_ci DEFAULT NULL,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;""")
     mydb.commit()
-
+    cursor.execute("""
+    -- Dumping structure for table PatentsProcessorGrant.subclass_current
+        CREATE TABLE IF NOT EXISTS `subclass_current` (
+          `id` varchar(20) COLLATE latin1_general_ci NOT NULL,
+          `title` varchar(256) COLLATE latin1_general_ci DEFAULT NULL,
+          `text` varchar(256) COLLATE latin1_general_ci DEFAULT NULL,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+    """)
+    mydb.commit()
+    cursor.execute("""
+    -- Dumping structure for table PatentsProcessorGrant.uspc_current
+        CREATE TABLE IF NOT EXISTS `uspc_current` (
+          `uuid` varchar(36) COLLATE latin1_general_ci NOT NULL,
+          `patent_id` varchar(20) COLLATE latin1_general_ci DEFAULT NULL,
+          `mainclass_id` varchar(10) COLLATE latin1_general_ci DEFAULT NULL,
+          `subclass_id` varchar(10) COLLATE latin1_general_ci DEFAULT NULL,
+          `sequence` int(11) DEFAULT NULL,
+          PRIMARY KEY (`uuid`),
+          KEY `patent_id` (`patent_id`),
+          KEY `mainclass_id` (`mainclass_id`),
+          KEY `subclass_id` (`subclass_id`),
+          KEY `ix_uspc_sequence` (`sequence`),
+          CONSTRAINT `uspc_current_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `patent` (`id`),
+          CONSTRAINT `uspc_current_ibfk_2` FOREIGN KEY (`mainclass_id`) REFERENCES `mainclass_current` (`id`),
+          CONSTRAINT `uspc_current_ibfk_3` FOREIGN KEY (`subclass_id`) REFERENCES `subclass_current` (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+    """)
+    
+    mydb.commit()
+    
+    #Dump mainclass_current, subclass_current and uspc_current if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
+    cursor.execute('select id from mainclass_current')
+    ids = [f[0] for f in cursor.fetchall()]
+    for i in ids:
+        cursor.execute('DELETE FROM mainclass_current where id="'+i+'"')
+    cursor.execute('select id from subclass_current')
+    ids = [f[0] for f in cursor.fetchall()]
+    for i in ids:
+        cursor.execute('DELETE FROM subclass_current where id="'+i+'"')
+            
+    mydb.commit()
+    
     #Upload mainclass data
     mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
     for m in mainclass:
         towrite = [re.sub('"','',item) for item in m]
         towrite = [re.sub("'",'',w) for w in towrite]
-        query = "insert into mainclass values ('"+"','".join(towrite)+"')"
+        query = "insert into mainclass_current values ('"+"','".join(towrite)+"')"
         query = query.replace(",'NULL'",",NULL")
         cursor.execute(query)
  
@@ -171,7 +234,7 @@ def upload_uspc(host,username,password,dbname,folder):
             gg = exist[towrite[0]]
         except:
             exist[towrite[0]] = 1
-            query = "insert into subclass values ('"+"','".join(towrite)+"')"
+            query = "insert into subclass_current values ('"+"','".join(towrite)+"')"
             query = query.replace(",'NULL'",",NULL")
             cursor.execute(query)
         
@@ -183,14 +246,9 @@ def upload_uspc(host,username,password,dbname,folder):
     for field in cursor.fetchall():
         patnums[field[1]] = field[0]
     
-    
-    #Update USPC table because the field length does not match in Berkeley schema
-    cursor.execute('ALTER TABLE uspc MODIFY mainclass_id varchar(20)')
-    cursor.execute('ALTER TABLE uspc MODIFY subclass_id varchar(20)')
-    
     #Create USPC table off full master classification list
     uspc_full = csv.reader(file(os.path.join(folder,'USPC_patent_classes_data.csv'),'rb'))
-    errorlog = open(os.path.join(folder,'upload_error.log','w'))
+    errorlog = open(os.path.join(folder,'upload_error.log'),'w')
     for m in uspc_full:
         try:
             gg = patnums[m[0]]
@@ -206,7 +264,7 @@ def upload_uspc(host,username,password,dbname,folder):
                     pass
             towrite[3] = towrite[2]+'/'+re.sub('^0+','',towrite[3])
             try:
-                query = "insert into uspc values ('"+"','".join(towrite)+"')"
+                query = "insert into uspc_current values ('"+"','".join(towrite)+"')"
                 query = query.replace(",'NULL'",",NULL")
                 cursor.execute(query)
             except:

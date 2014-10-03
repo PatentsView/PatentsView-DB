@@ -37,27 +37,40 @@ def parse_patents(fd,fd2):
     ipcr = csv.writer(ipcrfile)
     ipcr.writerow(['uuid','patent_id','classification_level','section','subclass','main_group','subgroup','symbol_position','classification_value','classification_status','classification_data_source','action_date','ipc_version_indicator','sequence'])
     
-    patfile = open(os.path.join(fd2,'patent.csv'),'ab')
+    patfile = open(os.path.join(fd2,'patent.csv'),'wb')
     pat = csv.writer(patfile)
     pat.writerow(['id','type','number','country','date','abstract','title','kind','num_claims'])
     
-    uspatentcitfile = open(os.path.join(fd2,'uspatentcitation.csv'),'ab')
+    uspatentcitfile = open(os.path.join(fd2,'uspatentcitation.csv'),'wb')
     uspatcit = csv.writer(uspatentcitfile)
     uspatcit.writerow(['uuid','patent_id','citation_id','date','name','kind','number','country','category','sequence'])
     
-    foreigncitfile = open(os.path.join(fd2,'foreigncitation.csv'),'ab')
+    foreigncitfile = open(os.path.join(fd2,'foreigncitation.csv'),'wb')
     foreigncit = csv.writer(foreigncitfile)
     foreigncit.writerow(['uuid','patent_id','date','kind','number','country','category','sequence'])
     
-    otherreffile = open(os.path.join(fd2,'otherreference.csv'),'ab')
+    otherreffile = open(os.path.join(fd2,'otherreference.csv'),'wb')
     otherref = csv.writer(otherreffile)
     otherref.writerow(['uuid','patent_id','text','sequence'])
     
-    rawlawyerfile = open(os.path.join(fd2,'rawlawyer.csv'),'ab')
+    rawlawyerfile = open(os.path.join(fd2,'rawlawyer.csv'),'wb')
     rawlawyer = csv.writer(rawlawyerfile)
     rawlawyer.writerow(['uuid','lawyer_id','patent_id','name_first','name_last','organization','country','sequence'])
     
+    uspcfile = open(os.path.join(fd2,'uspc.csv'),'wb')
+    uspcc = csv.writer(uspcfile)
+    uspcc.writerow(['uuid','patent_id','mainclass_id','subclass_id','sequence'])
+
+    mainclassfile = open(os.path.join(fd2,'mainclass.csv'),'wb')
+    mainclass = csv.writer(mainclassfile)
+    mainclass.writerow(['id','title','text'])
+
+    subclassfile = open(os.path.join(fd2,'subclass.csv'),'wb')
+    subclass = csv.writer(subclassfile)
+    subclass.writerow(['id','title','text'])
     
+    mainclassfile.close()
+    subclassfile.close()
     appfile.close()
     rawlocfile.close()
     rawinvfile.close()
@@ -68,11 +81,15 @@ def parse_patents(fd,fd2):
     patfile.close()
     rawlawyerfile.close()
     uspatentcitfile.close()
+    uspcfile.close()
     
     loggroups = ['PATN','INVT','ASSG','PRIR','REIS','RLAP','CLAS','UREF','FREF','OREF','LREP','PCTA','ABST','GOVT','PARN','BSUM','DRWD','DETD','CLMS','DCLM']
     
     numii = 0
     rawlocation = {}
+    mainclassdata = {}
+    subclassdata = {}
+
     for d in diri:
         print d
         infile = open(os.path.join(fd,d)).read().split('PATN')
@@ -119,30 +136,18 @@ def parse_patents(fd,fd2):
             
             # Create containers based on existing Berkeley DB schema (not all are currently used - possible compatibility issues)
             application = {}
-            assignee = {}
             claims = {}
             foreigncitation = {}
-            inventor = {}
             ipcr = {}
-            lawyer = {}
-            location = {}
-            location_assignee = {}
-            location_inventor = {}
-            mainclassdata = {}
             otherreference = {}
             patentdata = {}
-            patent_assignee = {}
-            patent_inventor = {}
-            patent_lawyer = {}
             rawassignee = {}
             rawinventor = {}
             rawlawyer = {}
-            subclassdata = {}
             usappcitation = {}
             uspatentcitation = {}
             uspc = {}
             usreldoc = {}
-            crossrefclassdata = {}
             
             
             
@@ -277,6 +282,7 @@ def parse_patents(fd,fd2):
             except:
                 pass
             
+            crossclass = 1
             #CLAS - should be several
             try:
                 num = 0
@@ -326,19 +332,23 @@ def parse_patents(fd,fd2):
                         origmainclass = 'NULL'
                         origsubclass = 'NULL'
                         origclass = re.search('OCL\s+(.*?)$',line).group(1)
-                        origmainclass = origclass[0:3]
-                        origsubclass = origclass[3:]
-                        mainclassdata[id_generator()] = [patent_id,origmainclass]
-                        subclassdata[id_generator()] = [patent_id,origsubclass]
+                        origmainclass = re.sub('\s+','',origclass[0:3])
+                        origsubclass = re.sub('\s+','',origclass[3:])
+                        uspc[id_generator()] = [patent_id,origmainclass, origmainclass+'/'+origsubclass,'0']
+                        mainclassdata[origmainclass] = [origmainclass,"NULL","NULL"]
+                        subclassdata[origmainclass+'/'+origsubclass] = [origmainclass+'/'+origsubclass,"NULL","NULL"]
                         #print line
                         
                     if line.startswith("XCL"):
                         crossrefmain = "NULL"
                         crossrefsub = "NULL"
                         crossrefclass = re.search('XCL\s+(.*?)$',line).group(1)
-                        crossrefmain = crossrefclass[:3]
-                        crossrefsub = crossrefclass[3:]
-                        crossrefclassdata[id_generator()] = [patent_id,crossrefmain,crossrefsub]
+                        crossrefmain = re.sub('\s+','',crossrefclass[:3])
+                        crossrefsub = re.sub('\s+','',crossrefclass[3:])
+                        uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(crossclass)]
+                        mainclassdata[crossrefmain] = [crossrefmain,"NULL","NULL"]
+                        subclassdata[crossrefmain+'/'+crossrefsub] = [crossrefmain+'/'+crossrefsub,"NULL","NULL"]
+                        crossclass+=1
                         
             except:
                 pass
@@ -468,20 +478,14 @@ def parse_patents(fd,fd2):
             for k,v in rawassignee.items():
                 rawassgfile.writerow([k]+v)
             
-            
             ipcrfile = csv.writer(open(os.path.join(fd2,'ipcr.csv'),'ab'))
             for k,v in ipcr.items():
                 ipcrfile.writerow([k]+v)
             
-            """
-            mainclassfile = csv.writer(open(os.path.join(fd2,'original_mainclass.csv'),'ab'))
-            for k,v in mainclassdata.items():
-                mainclassfile.writerow([k]+v)
+            uspcfile = csv.writer(open(os.path.join(fd2,'uspc.csv'),'ab'))
+            for k,v in uspc.items():
+                uspcfile.writerow([k]+v)
             
-            subclassfile = csv.writer(open(os.path.join(fd2,'original_subclass.csv'),'ab'))
-            for k,v in subclassdata.items():
-                subclassfile.writerow([k]+v)
-            """
             uspatentcitfile = csv.writer(open(os.path.join(fd2,'uspatentcitation.csv'),'ab'))
             for k,v in uspatentcitation.items():
                 uspatentcitfile.writerow([k]+v)
@@ -497,11 +501,6 @@ def parse_patents(fd,fd2):
             rawlawyerfile = csv.writer(open(os.path.join(fd2,'rawlawyer.csv'),'ab'))
             for k,v in rawlawyer.items():
                 rawlawyerfile.writerow([k]+v)
-            """
-            crossreffile = csv.writer(open(os.path.join(fd2,'crossreferenceclass_XCL.csv'),'ab'))
-            for k,v in crossrefclassdata.items():
-                crossreffile.writerow([k]+v)
-            """
           except:
               print i
               
@@ -509,6 +508,13 @@ def parse_patents(fd,fd2):
     for k,v in rawlocation.items():
         rawlocfile.writerow(v)
             
-
+    mainclassfile = csv.writer(open(os.path.join(fd2,'mainclass.csv'),'ab'))
+    for k,v in mainclassdata.items():
+        mainclassfile.writerow(v)
+    
+    subclassfile = csv.writer(open(os.path.join(fd2,'subclass.csv'),'ab'))
+    for k,v in subclassdata.items():
+        subclassfile.writerow(v)
+            
     print numii
 
