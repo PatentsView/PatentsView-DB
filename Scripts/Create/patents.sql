@@ -415,8 +415,8 @@ CREATE TABLE IF NOT EXISTS `uspatentcitation` (
 CREATE TABLE IF NOT EXISTS `uspc` (
   `uuid` varchar(36) COLLATE latin1_general_ci NOT NULL,
   `patent_id` varchar(20) COLLATE latin1_general_ci DEFAULT NULL,
-  `mainclass_id` varchar(10) COLLATE latin1_general_ci DEFAULT NULL,
-  `subclass_id` varchar(10) COLLATE latin1_general_ci DEFAULT NULL,
+  `mainclass_id` varchar(20) COLLATE latin1_general_ci DEFAULT NULL,
+  `subclass_id` varchar(20) COLLATE latin1_general_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`),
