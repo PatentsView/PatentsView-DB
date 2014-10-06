@@ -386,7 +386,7 @@ def parse_patents(fd,fd2):
             try:
                 num = 0
                 classes = avail_fields['B521']
-                origclass = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
+                origclass = re.search('<PDAT>(.*?)</PDAT>',line).group(1).upper()
                 origmainclass = re.sub("\s+",'',origclass[0:3])
                 origsubclass = re.sub('\s+','',origclass[3:])
                 uspc[id_generator()] = [patent_id,origmainclass,origmainclass+'/'+origsubclass,'0']
@@ -403,7 +403,7 @@ def parse_patents(fd,fd2):
                 for n in range(len(classes)):
                     crossrefmain = "NULL"
                     crossrefsub = "NULL"
-                    crossrefclass = re.search('<PDAT>(.*?)</PDAT>',classes[n]).group(1)
+                    crossrefclass = re.search('<PDAT>(.*?)</PDAT>',classes[n]).group(1).upper()
                     crossrefmain = re.sub('\s+','',crossrefclass[:3])
                     crossrefsub = re.sub('\s+','',crossrefclass[3:])
                     uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(n)]
