@@ -79,38 +79,37 @@ def uspc_table(fd):
                 outp2.writerow([i[0]+'/'+i[1],i[2],"NULL"])
     
     #Get patent-class pairs
-    inp = open(os.path.join(fd,patclassfile)).read().split("\n")
     outp = csv.writer(open(os.path.join(fd,'USPC_patent_classes_data.csv'),'wb'))
-    del inp[-1]
     pats = {}
-    for i in inp:
-        patentnum = i[:7]
-        mainclass = re.sub('^0+','',i[7:10])
-        subclass = i[10:-1]
-        if subclass[3:] != '000':
-            try:
-                temp = int(subclass[3:])
-                if re.search('[A-Z]{3}',subclass[:3]) is None:
-                    subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
-                else:
-                    subclass = re.sub('^0+','',subclass[:3])+re.sub('^0+','',subclass[3:])
-            except:
-                if len(re.sub('0+','',subclass[3:])) > 1:
-                    subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
-                else:
-                    subclass = re.sub('^0+','',subclass[:3])+re.sub('0+','',subclass[3:])    
-        else:
-            subclass = re.sub('^0+','',subclass[:3])
-        if i[-1] == 'O':
-            outp.writerow([patentnum,mainclass,subclass,'0'])
-        else:
-            try:
-                gg = pats[patentnum]
-                outp.writerow([str(patentnum),mainclass,subclass,str(gg)])
-                pats[patentnum]+=1
-            except:
-                pats[patentnum] = 2
-                outp.writerow([str(patentnum),mainclass,subclass,'1'])
+    with open(os.path.join(fd,patclassfile)) as inp:
+        for i in inp:
+            patentnum = i[:7]
+            mainclass = re.sub('^0+','',i[7:10])
+            subclass = i[10:-1]
+            if subclass[3:] != '000':
+                try:
+                    temp = int(subclass[3:])
+                    if re.search('[A-Z]{3}',subclass[:3]) is None:
+                        subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
+                    else:
+                        subclass = re.sub('^0+','',subclass[:3])+re.sub('^0+','',subclass[3:])
+                except:
+                    if len(re.sub('0+','',subclass[3:])) > 1:
+                        subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
+                    else:
+                        subclass = re.sub('^0+','',subclass[:3])+re.sub('0+','',subclass[3:])    
+            else:
+                subclass = re.sub('^0+','',subclass[:3])
+            if i[-1] == 'O':
+                outp.writerow([patentnum,mainclass,subclass,'0'])
+            else:
+                try:
+                    gg = pats[patentnum]
+                    outp.writerow([str(patentnum),mainclass,subclass,str(gg)])
+                    pats[patentnum]+=1
+                except:
+                    pats[patentnum] = 2
+                    outp.writerow([str(patentnum),mainclass,subclass,'1'])
         
         
     
