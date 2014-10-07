@@ -10,7 +10,6 @@ def uspc_table(fd):
     
     #Classes Index File parsing for class/subclass text
     classidx = open(os.path.join(fd, classindxfile)).read().split("\n")
-    outp = csv.writer(open(os.path.join(fd,'patent_classes_text.csv'),'wb'))
     data = {}
     for n in range(len(classidx)):
         classname = re.sub('[\.\s]+$','',classidx[n][21:])
@@ -51,17 +50,13 @@ def uspc_table(fd):
             data[mainclass+' '+subclass] = classname
         
             
-    for k,v in data.items():
-        outp.writerow(k.split(" ")+[v])
-    
     
     # Create subclass and mainclass tables out of current output
-    inp = csv.reader(file(os.path.join(fd,'patent_classes_text.csv'),'rb'))
-    inp.next()
     outp1 = csv.writer(open(os.path.join(fd,'mainclass.csv'),'wb'))
     outp2 = csv.writer(open(os.path.join(fd,'subclass.csv'),'wb'))
     exist = {}
-    for i in inp:
+    for k,v in data.items():
+        i = k.split(' ')+[v]
         try:
             if i[1] == '':
                 outp1.writerow([i[0],i[2],"NULL"])
