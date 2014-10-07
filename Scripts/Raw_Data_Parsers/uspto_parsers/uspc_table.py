@@ -85,7 +85,7 @@ def uspc_table(fd):
         for i in inp:
             patentnum = i[:7]
             mainclass = re.sub('^0+','',i[7:10])
-            subclass = i[10:-1]
+            subclass = i[10:-2]
             if subclass[3:] != '000':
                 try:
                     temp = int(subclass[3:])
@@ -100,7 +100,7 @@ def uspc_table(fd):
                         subclass = re.sub('^0+','',subclass[:3])+re.sub('0+','',subclass[3:])    
             else:
                 subclass = re.sub('^0+','',subclass[:3])
-            if i[-1] == 'O':
+            if i[-2] == 'O':
                 outp.writerow([patentnum,mainclass,subclass,'0'])
             else:
                 try:

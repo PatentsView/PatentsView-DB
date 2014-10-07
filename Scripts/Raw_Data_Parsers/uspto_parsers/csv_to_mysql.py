@@ -212,7 +212,10 @@ def upload_uspc(host,username,password,dbname,folder):
     ids = [f[0] for f in cursor.fetchall()]
     for i in ids:
         cursor.execute('DELETE FROM subclass_current where id="'+i+'"')
-            
+    cursor.execute('select uuid from uspc_current')
+    ids = [f[0] for f in cursor.fetchall()]
+    for i in ids:
+        cursor.execute('DELETE FROM uspc_current where uuid="'+i+'"')
     mydb.commit()
     
     #Upload mainclass data
