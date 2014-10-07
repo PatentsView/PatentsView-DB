@@ -3,9 +3,9 @@ def uspc_table(fd):
     fd+='/'
     diri = os.listdir(fd)
     for d in diri:
-        if d.startswith('ctaf'):
+        if re.search('ctaf.*?txt',d):
             classindxfile = d
-        if d.startswith('mcfpat'):
+        if re.search('mcfpat.*?txt',d):
             patclassfile = d
     
     #Classes Index File parsing for class/subclass text
