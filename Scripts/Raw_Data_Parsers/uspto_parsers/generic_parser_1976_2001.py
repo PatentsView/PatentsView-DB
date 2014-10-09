@@ -418,11 +418,20 @@ def parse_patents(fd,fd2):
             try:
                 otherreflist = avail_fields['OREF'].split('\n\n\n\n\n')
                 for n in range(len(otherreflist)):
-                    otherref = 'NULL'
-                    otherref = re.sub('\s+',' ',otherreflist[n])
-                    otherref = re.sub('^\s+[A-Z]+\s+','',otherref)
-                    #print otherref
-                    otherreference[id_generator()] = [patent_id,otherref,str(n)]
+                    if re.search('PAL ',otherreflist[n]):
+                        allrefs = otherreflist[n].split('PAL ')
+                        for a in range(len(allrefs)):
+                            otherref = 'NULL'
+                            otherref = re.sub('\s+',' ',allrefs[a])
+                            otherref = re.sub('^\s+[A-Z]+\s+','',otherref)
+                            #print otherref
+                            otherreference[id_generator()] = [patent_id,otherref,str(a)]
+                    else:
+                        otherref = 'NULL'
+                        otherref = re.sub('\s+',' ',otherreflist[n])
+                        otherref = re.sub('^\s+[A-Z]+\s+','',otherref)
+                        #print otherref
+                        otherreference[id_generator()] = [patent_id,otherref,str(n)]
             except:
                 pass
             
