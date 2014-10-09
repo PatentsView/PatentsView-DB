@@ -334,6 +334,8 @@ def parse_patents(fd,fd2):
                         origclass = re.search('OCL\s+(.*?)$',line).group(1).upper()
                         origmainclass = re.sub('\s+','',origclass[0:3])
                         origsubclass = re.sub('\s+','',origclass[3:])
+                        if len(origsubclass) > 3:
+                            origsubclass = origsubclass[:3]+'.'+origsubclass[3:]
                         uspc[id_generator()] = [patent_id,origmainclass, origmainclass+'/'+origsubclass,'0']
                         mainclassdata[origmainclass] = [origmainclass,"NULL","NULL"]
                         subclassdata[origmainclass+'/'+origsubclass] = [origmainclass+'/'+origsubclass,"NULL","NULL"]
@@ -345,6 +347,8 @@ def parse_patents(fd,fd2):
                         crossrefclass = re.search('XCL\s+(.*?)$',line).group(1).upper()
                         crossrefmain = re.sub('\s+','',crossrefclass[:3])
                         crossrefsub = re.sub('\s+','',crossrefclass[3:])
+                        if len(crossrefsub) > 3:
+                            crossrefsub = crossrefsub[:3]+'.'+crossrefsub[3:]
                         uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(crossclass)]
                         mainclassdata[crossrefmain] = [crossrefmain,"NULL","NULL"]
                         subclassdata[crossrefmain+'/'+crossrefsub] = [crossrefmain+'/'+crossrefsub,"NULL","NULL"]
