@@ -7,6 +7,17 @@ def parse_patents(fd,fd2):
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
     
+    
+    type_kind = {'1': ["A","utility"],
+                 '2': ["E","reissue"],
+                 '3': ["I5","TVPP"],
+                 '4': ["S","design"],
+                 '5': ["I4","defensive publication"],
+                 '6': ["P","plant"],
+                 '7': ["H","statutory invention registration"]
+                 }    
+    
+    
     fd+='/'
     fd2+='/'
     diri = os.listdir(fd)
@@ -165,44 +176,64 @@ def parse_patents(fd,fd2):
                 patent = avail_fields['PATN'].split('\n')
                 for line in patent:
                     if line.startswith("WKU"):
-                        patnum = re.search('(?<=\s)\w+',line).group()
+                        patnum = re.search('WKU\s+(.*?)$',line).group(1)
                         updnum = re.sub('^H0','H',patnum)[:8]
                         updnum = re.sub('^RE0','RE',updnum)[:8]
+                        updnum = re.sub('^PP0','PP',updnum)[:8]
                         updnum = re.sub('^PP0','PP',updnum)[:8]
                         updnum = re.sub('^D0', 'D', updnum)[:8]
                         updnum = re.sub('^T0', 'T', updnum)[:8]
                         if len(patnum) > 7 and patnum.startswith('0'):
                             updnum = patnum[1:8]
                         #data['patnum'] = updnum
+                        #print updnum
+                    if line.startswith('SRC'):
+                        seriescode = re.search('SRC\s+(.*?)$',line).group(1)
+                        try:
+                            gg = int(seriescode)
+                            if len(seriescode) == 1:
+                                seriescode = '0'+seriescode
+                        except:
+                            pass
                     if line.startswith('APN'):
-                        appnum = re.search('(?<=\s)\w+',line).group()[:6]
+                        appnum = re.search('APN\s+(.*?)$',line).group(1)[:6]
                         if len(appnum) != 6:
                             appnum = 'NULL'
                             #data['appnum'] = appnum
                     if line.startswith('APT'):
-                        apptype = re.search('(?<=\s)\w+',line).group()
+                        apptype = re.search('APT\s+(.*?)$',line).group(1)
                     if line.startswith('APD'):
-                        appdate = re.search('(?<=\s)\w+',line).group()
+                        appdate = re.search('APD\s+(.*?)$',line).group(1)
                         appdate = appdate[:4]+'-'+appdate[4:6]+'-'+appdate[6:]
                         #print appdate
                     if line.startswith('TTL'):
-                        title = re.search('TTL\s+(.*)$',line).group(1)
+                        title = re.search('TTL\s+(.*?)ISD',avail_fields['PATN'],re.DOTALL).group(1)
+                        title = re.sub('[\n\t\r\f]+','',title)
+                        title = re.sub('\s+$','',title)
+                        title = re.sub('\s+',' ',title)
                     if line.startswith('ISD'):
-                        issdate = re.search('(?<=\s)\w+',line).group()
-                        if issdate[6:] != "00":
-                            issdate = issdate[:4]+'-'+issdate[4:6]+'-'+issdate[6:]
+                        issdate = re.search('ISD\s+(.*?)$',line).group(1)
+                        if issdate[6:] == "00":
+                            day = '01'
                         else:
-                            issdate = issdate[:4]+'-'+issdate[4:6]+'-'+'01'
+                            day = issdate[6:]
+                        if issdate[4:6] == "00":
+                            month = '01'
+                        else:
+                            month = issdate[4:6]
                         year = issdate[:4]
+                        issdate = year+'-'+month+'-'+day
                         #print issdate
                     if line.startswith("NCL"):
-                        numclaims = re.search('(?<=\s)\w+',line).group()
+                        numclaims = re.search('NCL\s+(.*?)$',line).group(1)
             except:
                 pass
             
-            patent_id = id_generator()
+            patent_id = updnum
             
-            application[appnum[:2]+'/'+appnum[2:]] = [patent_id,apptype,appnum,'US',appdate]
+            if int(appdate[:4]) >= 1992 and seriescode == "D":
+                seriescode = "29"
+            application[seriescode+'/'+appnum] = [patent_id,seriescode,seriescode+appnum,'US',appdate]
             
             #INVT - can be several
             try:
@@ -228,13 +259,18 @@ def parse_patents(fd,fd2):
                         
                         if line.startswith("CNT"):
                             invtcountry = re.search('CNT\s+(.*?)$',line).group(1)
-                        
+                            if len(invtcountry) == 3 and invtcountry.endswith('X'):
+                                invtcountry = invtcountry[:-1]
+                                
                         if line.startswith("ZIP"):
                             invtzip = re.search('ZIP\s+(.*?)$',line).group(1)
                     
-                    rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [invtcity+'|'+invtstate+'|'+invtcountry,"NULL",invtcity,invtstate,invtcountry]
+                    loc_idd = id_generator()
+                    if invtcountry == "NULL":
+                        invtcountry = 'US'
+                    rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
                     
-                    rawinventor[id_generator()] = [patent_id,patent_id+'-'+str(n),invtcity+'|'+invtstate+'|'+invtcountry,fname,lname,str(n)]
+                    rawinventor[id_generator()] = [patent_id,"NULL",loc_idd,fname,lname,str(n)]
             except:
                 pass
             
@@ -242,9 +278,9 @@ def parse_patents(fd,fd2):
             try:
                 assg_info = avail_fields['ASSG'].split('\n\n\n\n\n')
                 for n in range(len(assg_info)):    
-                    assorg = 'NULL'
-                    assgfname = 'NULL'
-                    assglname = 'NULL'
+                    assorg = ''
+                    assgfname = ''
+                    assglname = ''
                     assgcity = 'NULL'
                     assgstate = 'NULL'
                     assgcountry = 'NULL'
@@ -255,12 +291,12 @@ def parse_patents(fd,fd2):
                             assgname = re.search('NAM\s+(.*?)$',line).group(1).split("; ")
                             if len(assgname) == 1:
                                 assgorg = assgname[0]
-                                assgfname = 'NULL'
-                                assglname = 'NULL'
+                                assgfname = ''
+                                assglname = ''
                             else:
                                 assgfname = assgname[1]
                                 assglname = assgname[0]
-                                assgorg = 'NULL'
+                                assgorg = ''
                             
                         if line.startswith("CTY"):
                             assgcity = re.search('CTY\s+(.*?)$',line).group(1)
@@ -270,15 +306,19 @@ def parse_patents(fd,fd2):
                         
                         if line.startswith("CNT"):
                             assgcountry = re.search('CNT\s+(.*?)$',line).group(1)
-                        
+                            if len(assgcountry) == 3 and assgcountry.endswith('X'):
+                                assgcountry = assgcountry[:-1]
                         if line.startswith("ZIP"):
                             assgzip = re.search('ZIP\s+(.*?)$',line).group(1)
                         
                         if line.startswith("COD"):
                             assgtype = re.search("COD\s+(.*?)$",line).group(1)
                 
-                    rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [assgcity+'|'+assgstate+'|'+assgcountry,"NULL",assgcity,assgstate,assgcountry]
-                    rawassignee[id_generator()] = [patent_id,'ASSG'+patent_id+'-'+str(n),assgcity+'|'+assgstate+'|'+assgcountry,assgtype,assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
+                    loc_idd = id_generator()
+                    if assgcountry == 'NULL':
+                        assgcountry = 'US'
+                    rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
+                    rawassignee[id_generator()] = [patent_id,"NULL",loc_idd,re.sub('^0+','',assgtype),assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
             except:
                 pass
             
@@ -336,6 +376,7 @@ def parse_patents(fd,fd2):
                         origsubclass = re.sub('\s+','',origclass[3:])
                         if len(origsubclass) > 3:
                             origsubclass = origsubclass[:3]+'.'+origsubclass[3:]
+                        origsubclass = re.sub('^0+','',origsubclass)
                         uspc[id_generator()] = [patent_id,origmainclass, origmainclass+'/'+origsubclass,'0']
                         mainclassdata[origmainclass] = [origmainclass,"NULL","NULL"]
                         subclassdata[origmainclass+'/'+origsubclass] = [origmainclass+'/'+origsubclass,"NULL","NULL"]
@@ -349,6 +390,7 @@ def parse_patents(fd,fd2):
                         crossrefsub = re.sub('\s+','',crossrefclass[3:])
                         if len(crossrefsub) > 3:
                             crossrefsub = crossrefsub[:3]+'.'+crossrefsub[3:]
+                        crossrefsub = re.sub('^0+','',crossrefsub)
                         uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(crossclass)]
                         mainclassdata[crossrefmain] = [crossrefmain,"NULL","NULL"]
                         subclassdata[crossrefmain+'/'+crossrefsub] = [crossrefmain+'/'+crossrefsub,"NULL","NULL"]
@@ -371,17 +413,23 @@ def parse_patents(fd,fd2):
                         
                         if line.startswith('ISD'):
                             refpatdate = re.search('ISD\s+(.*?)$',line).group(1)
-                            if refpatdate[6:] != '00':
-                                refpatdate = refpatdate[:4]+'-'+refpatdate[4:6]+'-'+refpatdate[6:]
+                            if refpatdate[6:] == "00":
+                                day = '01'
                             else:
-                                refpatdate = refpatdate[:4]+'-'+refpatdate[4:6]+'-01'
-                        
+                                day = refpatdate[6:]
+                            if refpatdate[4:6] == "00":
+                                month = '01'
+                            else:
+                                month = refpatdate[4:6]
+                            year = refpatdate[:4]
+                            refpatdate = year+'-'+month+'-'+day
+                            
                         if line.startswith('NAM'):
                             refpatname = re.search('NAM\s+(.*?)$',line).group(1)
                             
                         if line.startswith('OCL'):
                             refpatclass = re.search('OCL\s+(.*?)$',line).group(1) 
-                    uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,refpatname,re.sub('\d$','',refpatnum[:2]),refpatnum,'US',"CITATION SOURCE",str(n)]
+                    uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,"NULL","NULL",refpatnum,'US',"CITATION SOURCE",str(n)]
             except:
                 pass
             
@@ -399,17 +447,25 @@ def parse_patents(fd,fd2):
                         
                         if line.startswith('ISD'):
                             forrefpatdate = re.search('ISD\s+(.*?)$',line).group(1)
-                            if forrefpatdate[6:]!='00':
-                                forrefpatdate = refpatdate[:4]+'-'+refpatdate[4:6]+'-'+refpatdate[6:]
+                            if forrefpatdate[6:] == "00":
+                                day = '01'
                             else:
-                                forrefpatdate = refpatdate[:4]+'-'+refpatdate[4:6]+'-01'
+                                day = forrefpatdate[6:]
+                            if forrefpatdate[4:6] == "00":
+                                month = '01'
+                            else:
+                                month = forrefpatdate[4:6]
+                            year = forrefpatdate[:4]
+                            forrefpatdate = year+'-'+month+'-'+day
                             
                         if line.startswith('CNT'):
                             forrefpatcountry = re.search('CNT\s+(.*?)$',line).group(1)
+                            if len(forrefpatcountry) == 3 and forrefpatcountry.endswith('X'):
+                                forrefpatcountry = forrefpatcountry[:-1]
                             
                         if line.startswith('ICL'):
                             forrefpatclass = re.search('ICL\s+(.*?)$',line).group(1) 
-                    foreigncitation[id_generator()] = [patent_id,forrefpatdate,re.sub('\d$','',updnum[0:2]),forrefpatnum,forrefpatcountry,"NULL",str(n)] 
+                    foreigncitation[id_generator()] = [patent_id,forrefpatdate,"NULL",forrefpatnum,forrefpatcountry,"NULL",str(n)] 
             except:
                 pass
             
@@ -420,6 +476,7 @@ def parse_patents(fd,fd2):
                 for n in range(len(otherreflist)):
                     if re.search('PAL ',otherreflist[n]):
                         allrefs = otherreflist[n].split('PAL ')
+                        del allrefs[0]
                         for a in range(len(allrefs)):
                             otherref = 'NULL'
                             otherref = re.sub('\s+',' ',allrefs[a])
@@ -439,7 +496,7 @@ def parse_patents(fd,fd2):
             try:
                 legal_info = avail_fields['LREP'].split("\n\n\n\n\n")
                 for n in range(len(legal_info)):
-                    legalcountry = 'NULL'
+                    legalcountry = 'UNKNOWN'
                     legalfirm = 'NULL'
                     attfname = 'NULL'
                     attlname = 'NULL'
@@ -453,9 +510,12 @@ def parse_patents(fd,fd2):
                             attlname = attorney[0]
                             #print attlname
                         if line.startswith('CNT'):
-                            legalcountry = re.search('CNT\s+(.*?)$',line).group('; ')        
+                            legalcountry = re.search('CNT\s+(.*?)$',line).group('; ')
+                            if len(legalcountry) == 3 and legalcountry.endswith('X'):
+                                legalcountry = legalcountry[:-1]
+                                    
                     
-                    rawlawyer[id_generator()] = ['LAWYER'+patent_id+'-'+str(n),patent_id,attfname,attlname,legalfirm,legalcountry,str(n)]
+                    rawlawyer[id_generator()] = ["NULL",patent_id,attfname,attlname,legalfirm,legalcountry,str(n)]
                         
             except:
                 pass
@@ -473,7 +533,7 @@ def parse_patents(fd,fd2):
             except:
                 pass
             
-            patentdata[patent_id] = ['TAKE FROM KIND',updnum,'US',issdate,abst,title,re.sub('\d$','',updnum[0:2]),numclaims]
+            patentdata[patent_id] = [type_kind[apptype][1],updnum,'US',issdate,abst,title,type_kind[apptype][0],numclaims]
             
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'))
             for k,v in patentdata.items():
