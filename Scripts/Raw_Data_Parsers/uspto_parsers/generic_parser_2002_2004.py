@@ -1,6 +1,7 @@
 def parse_patents(fd,fd2):
     import re,csv,os
     import string,random
+    from bs4 import BeautifulSoup as bs
     
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -8,8 +9,8 @@ def parse_patents(fd,fd2):
     fd+='/'
     fd2+='/'
     diri = os.listdir(fd)
-    diri = [d for d in diri if d.endswith('xml')]
-
+    diri = [d for d in diri if re.search('XML',d,re.I)]
+    
     #Remove all files from output dir before writing
     outdir = os.listdir(fd2)
     for oo in outdir:
@@ -19,6 +20,10 @@ def parse_patents(fd,fd2):
     appfile = open(os.path.join(fd2,'application.csv'),'wb')
     app = csv.writer(appfile)
     app.writerow(['id','patent_id','type','number','country','date'])
+    
+    claimsfile = open(os.path.join(fd2,'claim.csv'),'wb')
+    clms = csv.writer(claimsfile)
+    clms.writerow(['uuid','patent_id','text','dependent','sequence'])
     
     rawlocfile = open(os.path.join(fd2,'rawlocation.csv'),'wb')
     rawloc = csv.writer(rawlocfile)
@@ -85,6 +90,7 @@ def parse_patents(fd,fd2):
     uspatentcitfile.close()
     uspcfile.close()
     foreigncitfile.close()
+    claimsfile.close()
     #usappcitfile.close()
     
     
@@ -133,7 +139,6 @@ def parse_patents(fd,fd2):
         del infile[0]
         numi+=len(infile)
         for i in infile:
-          try:
             # Get relevant logical groups from patent records according to documentation
             # Some patents can contain several INVT, ASSG and other logical groups - so, is important to retain all
             avail_fields = {}
@@ -195,12 +200,14 @@ def parse_patents(fd,fd2):
             usreldoc = {}
             
             ###                PARSERS FOR LOGICAL GROUPS                  ###
+           
             #PATN
             updnum = 'NULL'
             issdate = 'NULL'
             patkind = 'NULL'
             patcountry = 'NULL'
             
+
             try:
                 patent = avail_fields['B100'].split('\n')
                 for line in patent:
@@ -279,6 +286,26 @@ def parse_patents(fd,fd2):
             patent_id = updnum
             
             application[apptype+'/'+appnum[2:]] = [patent_id,apptype,appnum,patcountry,appdate]
+            
+            # Claims data
+            text = re.search('<CL(.*)</CL>',i,re.DOTALL).group()
+            soup = bs(text)
+            claimsdata = soup.findAll('clm')
+            checkss = open('e:/testing.txt','w')
+            print>>checkss,claimsdata
+            
+            for so in claimsdata:
+                clid = so['id']
+                clnum = int(clid.replace('CLM-',''))
+                try:
+                    dependent = re.search('<clref id="CLM-(\d+)',str(so),re.DOTALL).group(1)
+                    dependent = str(int(dependent))
+                except:
+                    dependent = "NULL"
+                need = re.sub('<.*?>|</.*?>','',str(so))
+                need = re.sub('[\n\t\r\f]+','',need)
+                need = re.sub('^\d+\. ','',need)
+                claims[id_generator()] = [patent_id,need,dependent,str(clnum)]
             
             #INVT - can be several
             try:
@@ -561,8 +588,6 @@ def parse_patents(fd,fd2):
             except:
                 pass
             
-            
-            
             # Abstract - can be several lines
             try:
                 abstfield = avail_fields['SDOAB'].split("<PDAT>")
@@ -584,6 +609,9 @@ def parse_patents(fd,fd2):
             for k,v in application.items():
                 appfile.writerow([k]+v)
             
+            claimsfile = csv.writer(open(os.path.join(fd2,'claim.csv'),'ab'))
+            for k,v in claims.items():
+                claimsfile.writerow([k]+v)
             
             rawinvfile = csv.writer(open(os.path.join(fd2,'rawinventor.csv'),'ab'))
             for k,v in rawinventor.items():
@@ -622,8 +650,6 @@ def parse_patents(fd,fd2):
             for k,v in rawlawyer.items():
                 rawlawyerfile.writerow([k]+v)
             
-          except:
-             print i
     
     rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'))
     for k,v in rawlocation.items():
