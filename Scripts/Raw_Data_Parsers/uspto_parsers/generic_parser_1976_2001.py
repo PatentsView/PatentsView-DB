@@ -21,6 +21,7 @@ def parse_patents(fd,fd2):
     fd+='/'
     fd2+='/'
     diri = os.listdir(fd)
+    diri = [d for d in diri if d.endswith('txt')]
 
     #Remove all files from output dir before writing
     outdir = os.listdir(fd2)
@@ -374,13 +375,15 @@ def parse_patents(fd,fd2):
                         origclass = re.search('OCL\s+(.*?)$',line).group(1).upper()
                         origmainclass = re.sub('\s+','',origclass[0:3])
                         origsubclass = re.sub('\s+','',origclass[3:])
-                        if len(origsubclass) > 3:
+                        if len(origsubclass) > 3 and re.search('^[A-Z]',origsubclass[3:]) is None:
                             origsubclass = origsubclass[:3]+'.'+origsubclass[3:]
                         origsubclass = re.sub('^0+','',origsubclass)
-                        uspc[id_generator()] = [patent_id,origmainclass, origmainclass+'/'+origsubclass,'0']
-                        mainclassdata[origmainclass] = [origmainclass,"NULL","NULL"]
-                        subclassdata[origmainclass+'/'+origsubclass] = [origmainclass+'/'+origsubclass,"NULL","NULL"]
-                        #print line
+                        if re.search('[A-Z]{3}',origsubclass[:3]):
+                            origsubclass = origsubclass.replace('.','')
+                        if origsubclass != "":
+                            mainclassdata[origmainclass] = [origmainclass,'NULL','NULL']
+                            uspc[id_generator()] = [patent_id,origmainclass,origmainclass+'/'+origsubclass,'0']
+                            subclassdata[origmainclass+'/'+origsubclass] = [origmainclass+'/'+origsubclass,'NULL','NULL']
                         
                     if line.startswith("XCL"):
                         crossrefmain = "NULL"
@@ -388,12 +391,15 @@ def parse_patents(fd,fd2):
                         crossrefclass = re.search('XCL\s+(.*?)$',line).group(1).upper()
                         crossrefmain = re.sub('\s+','',crossrefclass[:3])
                         crossrefsub = re.sub('\s+','',crossrefclass[3:])
-                        if len(crossrefsub) > 3:
+                        if len(crossrefsub) > 3 and re.search('^[A-Z]',crossrefsub[3:]) is None:
                             crossrefsub = crossrefsub[:3]+'.'+crossrefsub[3:]
                         crossrefsub = re.sub('^0+','',crossrefsub)
-                        uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(crossclass)]
-                        mainclassdata[crossrefmain] = [crossrefmain,"NULL","NULL"]
-                        subclassdata[crossrefmain+'/'+crossrefsub] = [crossrefmain+'/'+crossrefsub,"NULL","NULL"]
+                        if re.search('[A-Z]{3}',crossrefsub[:3]):
+                            crossrefsub = crossrefsub.replace(".","")
+                        if crossrefsub != "":
+                            mainclassdata[crossrefmain] = [crossrefmain,'NULL','NULL']
+                            uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(n)]
+                            subclassdata[crossrefmain+'/'+crossrefsub] = [crossrefmain+'/'+crossrefsub,'NULL','NULL']
                         crossclass+=1
                         
             except:

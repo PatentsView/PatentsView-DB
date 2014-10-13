@@ -8,6 +8,7 @@ def parse_patents(fd,fd2):
     fd+='/'
     fd2+='/'
     diri = os.listdir(fd)
+    diri = [d for d in diri if d.endswith('xml')]
 
     #Remove all files from output dir before writing
     outdir = os.listdir(fd2)
@@ -85,6 +86,35 @@ def parse_patents(fd,fd2):
     uspcfile.close()
     foreigncitfile.close()
     #usappcitfile.close()
+    
+    
+    #Type kind crosswalk - lookup table
+    type_kind = {
+                "A": 'utility',   #Utility Patent issued prior to January 2, 2001. 
+                "A1": 'utility', #Utility Patent Application published on or after January 2, 2001. 
+                "A2": 'utility', #Second or subsequent publication of a Utility Patent Application. 
+                'A9': 'utility', #Corrected published Utility Patent Application. 
+                'Bn': 'reexamination certificate', #Reexamination Certificate issued prior to January 2, 2001. NOTE: "n" represents a value 1 through 9. 
+                'B1': 'utility', #Utility Patent (no pre-grant publication) issued on or after January 2, 2001. 
+                'B2': 'utility', #Utility Patent (with pre-grant publication) issued on or after January 2, 2001. 
+                'Cn': 'utility', #Reexamination Certificate issued on or after January 2, 2001. NOTE: "n" represents a value 1 through 9 denoting the publication level. 
+                'E1': 'reissue', #Reissue Patent. 
+                'Fn': 'reexamination certificate', #Reexamination Certificate of a Reissue Patent NOTE: "n" represents a value 1 through 9 denoting the publication level. 
+                'H1': 'statutoty invention registration', #Statutory Invention Registration (SIR) Patent Documents. SIR documents began with the December 3, 1985 issue. 
+                'I1': 'reissue', #"X" Patents issued from July 31, 1790 to July 13, 1836. 
+                'I2': 'reissue', #"X" Reissue Patents issued from July 31, 1790 to July 13, 1836. 
+                'I3': 'additional improvements', #Additional Improvements - Patents issued between 1838 and 1861. 
+                'I4': 'defensive publication', #Defensive Publication - Documents issued from November 5, 1968 through May 5, 1987. 
+                'I5': 'TVPP', #Trial Voluntary Protest Program (TVPP) Patent Documents. 
+                'NP': 'non-patent literature', #Non-Patent Literature. 
+                'P': 'plant', #Plant Patent issued prior to January 2, 2001. 
+                'P1': 'plant', #Plant Patent Application published on or after January 2, 2001. 
+                'P2': 'plant', #Plant Patent (no pre-grant publication) issued on or after January 2, 2001. 
+                'P3': 'plant', #Plant Patent (with pre-grant publication) issued on or after January 2, 2001. 
+                'P4': 'plant', #Second or subsequent publication of a Plant Patent Application. 
+                'P9': 'plant', #Correction publication of a Plant Patent Application. 
+                'S1': 'design' #Design Patent.  
+                 }
     
     
     ### !For loggroups the last one will never be parsed but needs to be valid and required for parsing everything before it!
@@ -179,12 +209,15 @@ def parse_patents(fd,fd2):
                         updnum = re.sub('^H0','H',patnum)[:8]
                         updnum = re.sub('^RE0','RE',updnum)[:8]
                         updnum = re.sub('^PP0','PP',updnum)[:8]
+                        updnum = re.sub('^PP0','PP',updnum)[:8]
                         updnum = re.sub('^D0', 'D', updnum)[:8]
                         updnum = re.sub('^T0', 'T', updnum)[:8]
                         if len(patnum) > 7 and patnum.startswith('0'):
                             updnum = patnum[1:8]
                         #print updnum
                         #data['patnum'] = updnum
+                    if line.startswith('<B122US>'):
+                        patkind = 'H1'
                     if line.startswith('<B130>'):
                         patkind = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
                     if line.startswith('<B190>'):
@@ -243,9 +276,9 @@ def parse_patents(fd,fd2):
             except:
                 pass
             
-            patent_id = id_generator()
+            patent_id = updnum
             
-            application[appnum[:2]+'/'+appnum[2:]] = [patent_id,apptype,appnum,patcountry,appdate]
+            application[apptype+'/'+appnum[2:]] = [patent_id,apptype,appnum,patcountry,appdate]
             
             #INVT - can be several
             try:
@@ -288,9 +321,15 @@ def parse_patents(fd,fd2):
                             invtzip = re.search('<PCODE><PDAT>(.*?)</PDAT>',line).group(1)
                             #print invtzip
                 
-                    rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [invtcity+'|'+invtstate+'|'+invtcountry,"NULL",invtcity,invtstate,invtcountry]
+                    loc_idd = id_generator()
+                    if invtcountry == 'NULL':
+                        invtcountry = 'US'
+                    rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
                     
-                    rawinventor[id_generator()] = [patent_id,patent_id+'-'+str(n),invtcity+'|'+invtstate+'|'+invtcountry,fname,lname,str(n)]
+                    if fname == "NULL" and lname == "NULL":
+                        pass
+                    else:
+                        rawinventor[id_generator()] = [patent_id,"NULL",loc_idd,fname,lname,str(n)]
             except:
                 pass
             
@@ -339,9 +378,11 @@ def parse_patents(fd,fd2):
                             except:
                                 pass
                         
-                    rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [assgcity+'|'+assgstate+'|'+assgcountry,"NULL",assgcity,assgstate,assgcountry]
-                    
-                    rawassignee[id_generator()] = [patent_id,'ASSG'+patent_id+'-'+str(n),assgcity+'|'+assgstate+'|'+assgcountry,assgtype,assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
+                    loc_idd = id_generator()
+                    if assgcountry == 'NULL':
+                        assgcountry = 'US'
+                    rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
+                    rawassignee[id_generator()] = [patent_id,"NULL",loc_idd,assgtype,assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
             except:
                 pass
             
@@ -389,9 +430,16 @@ def parse_patents(fd,fd2):
                 origclass = re.search('<PDAT>(.*?)</PDAT>',line).group(1).upper()
                 origmainclass = re.sub("\s+",'',origclass[0:3])
                 origsubclass = re.sub('\s+','',origclass[3:])
-                uspc[id_generator()] = [patent_id,origmainclass,origmainclass+'/'+origsubclass,'0']
-                mainclassdata[origmainclass] = [origmainclass,'NULL','NULL']
-                subclassdata[origmainclass+'/'+origsubclass] = [origmainclass+'/'+origsubclass,'NULL','NULL']
+                if len(origsubclass) > 3 and re.search('^[A-Z]',origsubclass[3:]) is None:
+                    origsubclass = origsubclass[:3]+'.'+origsubclass[3:]
+                origsubclass = re.sub('^0+','',origsubclass)
+                if re.search('[A-Z]{3}',origsubclass[:3]):
+                    origsubclass = origsubclass.replace('.','')
+                if origsubclass != "":
+                    mainclassdata[origmainclass] = [origmainclass,'NULL','NULL']
+                    uspc[id_generator()] = [patent_id,origmainclass,origmainclass+'/'+origsubclass,'0']
+                    subclassdata[origmainclass+'/'+origsubclass] = [origmainclass+'/'+origsubclass,'NULL','NULL']
+                
             except:
                 pass
                            
@@ -406,9 +454,15 @@ def parse_patents(fd,fd2):
                     crossrefclass = re.search('<PDAT>(.*?)</PDAT>',classes[n]).group(1).upper()
                     crossrefmain = re.sub('\s+','',crossrefclass[:3])
                     crossrefsub = re.sub('\s+','',crossrefclass[3:])
-                    uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(n)]
-                    mainclassdata[crossrefmain] = [crossrefmain,'NULL','NULL']
-                    subclassdata[crossrefmain+'/'+crossrefsub] = [crossrefmain+'/'+crossrefsub,'NULL','NULL']
+                    if len(crossrefsub) > 3 and re.search('^[A-Z]',crossrefsub[3:]) is None:
+                        crossrefsub = crossrefsub[:3]+'.'+crossrefsub[3:]
+                    crossrefsub = re.sub('^0+','',crossrefsub)
+                    if re.search('[A-Z]{3}',crossrefsub[:3]):
+                        crossrefsub = crossrefsub.replace(".","")
+                    if crossrefsub != "":
+                        mainclassdata[crossrefmain] = [crossrefmain,'NULL','NULL']
+                        uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(n)]
+                        subclassdata[crossrefmain+'/'+crossrefsub] = [crossrefmain+'/'+crossrefsub,'NULL','NULL']
             except:
                 pass
     
@@ -436,6 +490,9 @@ def parse_patents(fd,fd2):
                             else:
                                 refpatdate = refpatdate[:4]+'-'+refpatdate[4:6]+'-01'
                         
+                        if line.startswith('<KIND>'):
+                            refpatkind = re.search('<KIND><PDAT>(.*?)</PDAT>',line).group(1)
+                        
                         if line.startswith('<CTRY>'):
                             refpatcountry = re.search('<CTRY><PDAT>(.*?)</PDAT>',line).group(1)
                         
@@ -451,7 +508,7 @@ def parse_patents(fd,fd2):
                         foreigncitation[id_generator()] = [patent_id,refpatdate,'NULL',refpatnum,refpatcountry,citedby,str(forpatseq)]
                         forpatseq+=1
                     else:
-                        uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,refpatname,re.sub('\d$','',refpatnum[:2]),refpatnum,refpatcountry,citedby,str(uspatseq)]
+                        uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,"NULL",refpatkind,refpatnum,refpatcountry,citedby,str(uspatseq)]
                         uspatseq+=1
                         
             except:
@@ -480,8 +537,9 @@ def parse_patents(fd,fd2):
             #Legal information - can be several
             try:
                 legal_info = avail_fields['B741'].split("\n\n\n\n\n")
+                legal_info = [a for a in legal_info if a != ">\r\n<"]
                 for n in range(len(legal_info)):
-                    legalcountry = 'NULL'
+                    legalcountry = 'UNKNOWN'
                     legalfirm = 'NULL'
                     attfname = 'NULL'
                     attlname = 'NULL'
@@ -498,7 +556,7 @@ def parse_patents(fd,fd2):
                             
                         legalcountry = 'US'        
                     
-                    rawlawyer[id_generator()] = ['LAWYER'+patent_id+'-'+str(n),patent_id,attfname,attlname,legalfirm,legalcountry,str(n)]
+                    rawlawyer[id_generator()] = ["NULL",patent_id,attfname,attlname,legalfirm,legalcountry,str(n)]
                         
             except:
                 pass
@@ -516,7 +574,7 @@ def parse_patents(fd,fd2):
             except:
                 abst = 'NULL'
             
-            patentdata[patent_id] = ['TAKE FROM KIND',updnum,'US',issdate,abst,title,re.sub('\d$','',updnum[0:2]),numclaims]
+            patentdata[patent_id] = [type_kind[patkind],updnum,'US',issdate,abst,title,patkind,numclaims]
             
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'))
             for k,v in patentdata.items():
