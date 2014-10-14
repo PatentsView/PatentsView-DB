@@ -33,6 +33,10 @@ def parse_patents(fd,fd2):
     app = csv.writer(appfile)
     app.writerow(['id','patent_id','type','number','country','date'])
     
+    claimsfile = open(os.path.join(fd2,'claim.csv'),'wb')
+    clms = csv.writer(claimsfile)
+    clms.writerow(['uuid','patent_id','text','dependent','sequence'])
+    
     rawlocfile = open(os.path.join(fd2,'rawlocation.csv'),'wb')
     rawloc = csv.writer(rawlocfile)
     rawloc.writerow(['id','location_id','city','state','country'])
@@ -94,6 +98,7 @@ def parse_patents(fd,fd2):
     rawlawyerfile.close()
     uspatentcitfile.close()
     uspcfile.close()
+    claimsfile.close()
     
     loggroups = ['PATN','INVT','ASSG','PRIR','REIS','RLAP','CLAS','UREF','FREF','OREF','LREP','PCTA','ABST','GOVT','PARN','BSUM','DRWD','DETD','CLMS','DCLM']
     
@@ -148,7 +153,7 @@ def parse_patents(fd,fd2):
             
             # Create containers based on existing Berkeley DB schema (not all are currently used - possible compatibility issues)
             application = {}
-            claims = {}
+            claimsdata = {}
             foreigncitation = {}
             ipcr = {}
             otherreference = {}
@@ -160,7 +165,6 @@ def parse_patents(fd,fd2):
             uspatentcitation = {}
             uspc = {}
             usreldoc = {}
-            
             
             
             ###                PARSERS FOR LOGICAL GROUPS                  ###
@@ -203,6 +207,7 @@ def parse_patents(fd,fd2):
                             #data['appnum'] = appnum
                     if line.startswith('APT'):
                         apptype = re.search('APT\s+(.*?)$',line).group(1)
+                        apptype = re.search('\d',apptype).group()
                     if line.startswith('APD'):
                         appdate = re.search('APD\s+(.*?)$',line).group(1)
                         appdate = appdate[:4]+'-'+appdate[4:6]+'-'+appdate[6:]
@@ -322,6 +327,7 @@ def parse_patents(fd,fd2):
                     rawassignee[id_generator()] = [patent_id,"NULL",loc_idd,re.sub('^0+','',assgtype),assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
             except:
                 pass
+            
             
             crossclass = 1
             #CLAS - should be several
@@ -527,7 +533,6 @@ def parse_patents(fd,fd2):
                 pass
             
             
-            
             # Abstract - can be several
             abst = 'NULL'
             try:
@@ -541,9 +546,122 @@ def parse_patents(fd,fd2):
             
             patentdata[patent_id] = [type_kind[apptype][1],updnum,'US',issdate,abst,title,type_kind[apptype][0],numclaims]
             
+            # Claims data parser
+            datum = {}
+            check = re.search('\nCLMS',i)
+            if check:
+                try:
+                    claims = re.search('CLMS(.*)\nDCLM',i,re.DOTALL).group(1)
+                except:    
+                    try:
+                        claims = re.search('CLMS(.*)\nEOV',i,re.DOTALL).group(1)
+                    except:
+                        try:
+                            claims = re.search('CLMS(.*)\nEOF',i,re.DOTALL).group(1)
+                        except:
+                            try:
+                                claims = re.search('CLMS(.*)',i,re.DOTALL).group(1)
+                            except:
+                                claims = ''
+                clnums = claims.split('NUM  ')
+                del clnums[0]
+                nnn = []
+                if len(clnums) > 1:
+                    for c in range(len(clnums)):
+                        needed = re.search('(\d+)\.\s(.*)',clnums[c],re.DOTALL)
+                        try:
+                            number = needed.group(1)
+                            text = needed.group(2)
+                            text = re.sub('PA.\s+|TB.\s+|EQ.\s+','',text)
+                            text = re.sub('[\n\t\r\f]+','',text)
+                            text = re.sub('\s+',' ',text)
+                            text = re.sub('_+','',text)
+                            datum[int(number)] = text
+                            nnn.append(int(number))
+                        except:
+                            text = re.sub('PA.\s+|TB.\s+|EQ.\s+','',clnums[c])
+                            text = re.sub('[\n\t\r\f]+','',text)
+                            text = re.sub('\s+',' ',text)
+                            text = re.sub('_+','',text)
+                            try:
+                                datum[nnn[-1]]+=text
+                            except:
+                                pass
+                else:
+                    try:
+                        needed = re.findall('\d+\.',claims)
+                        for ne in range(len(needed)-1):
+                            number = needed[ne]
+                            text = re.search(needed[ne]+'(.*)'+needed[ne+1],claims,re.DOTALL).group(1)
+                            text = re.sub('PA.\s+|TB.\s+|EQ.\s+','',text)
+                            text = re.sub('[\n\t\r\f]+','',text)
+                            text = re.sub('\s+',' ',text)
+                            text = re.sub('_+','',text)
+                            text = re.sub('^\s+','',text)
+                            number = re.sub('\.','',number)
+                            datum[int(number)] = text
+                            #print text
+                        number = needed[-1]
+                        text = re.search(number+'(.*)',claims,re.DOTALL).group(1)
+                        text = re.sub('PA.\s+|TB.\s+|EQ.\s+','',text)
+                        text = re.sub('[\n\t\r\f]+','',text)
+                        text = re.sub('\s+',' ',text)
+                        text = re.sub('_+','',text)
+                        number = re.sub('\.','',number)
+                        text = re.sub('^\s+','',text)
+                        datum[int(number)] = text
+                    except:
+                        try:
+                            number = '1'
+                            text = re.search('STM  (.*)',claims,re.DOTALL).group(1)
+                            text = re.sub('PA.\s+|TB.\s+|EQ.\s+','',text)
+                            text = re.sub('[\n\t\r\f]+','',text)
+                            text = re.sub('\s+',' ',text)
+                            text = re.sub('_+','',text)
+                            number = re.sub('\.','',number)
+                            text = re.sub('^\s+','',text)
+                            datum[int(number)] = text
+                        except:
+                            pass
+                
+                datum = sorted(datum.items())
+                for k,v in datum:
+                    claimsdata[id_generator()] = [updnum,re.sub('^\s\d+\.\s','',v),"NULL",str(k)]
+                if len(datum) == 0:
+                    pass
+            else:
+                check = re.search('\nDCLM',i)
+                if check:
+                    try:
+                        claims = re.search('DCLM(.*)\nEOV',i,re.DOTALL).group(1)
+                    except:    
+                        try:
+                            claims = re.search('DCLM(.*)\nEOF',i,re.DOTALL).group(1)
+                        except:
+                            try:
+                                claims = re.search('DCLM(.*)',i,re.DOTALL).group(1)
+                            except:
+                                claims = ''
+                        
+                    try:
+                        text = re.sub('[\n\t\r\f]+','',claims)
+                        text = re.sub('^\W+[A-Z]+\s+','',text)
+                        text = re.sub('\s+',' ',text)
+                    except:
+                        pass
+                    
+                    claimsdata[id_generator()]=[updnum,re.sub('^PAR\s+','',text),"NULL",'1']
+                else:
+                    pass
+
+            
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'))
             for k,v in patentdata.items():
                 patfile.writerow([k]+v)
+
+            claimsfile = csv.writer(open(os.path.join(fd2,'claim.csv'),'ab'))
+            for k,v in claimsdata.items():
+                claimsfile.writerow([k]+v)            
             
             appfile = csv.writer(open(os.path.join(fd2,'application.csv'),'ab'))
             for k,v in application.items():
@@ -581,7 +699,7 @@ def parse_patents(fd,fd2):
             for k,v in rawlawyer.items():
                 rawlawyerfile.writerow([k]+v)
           except:
-              print i
+              pass
               
     rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'))
     for k,v in rawlocation.items():

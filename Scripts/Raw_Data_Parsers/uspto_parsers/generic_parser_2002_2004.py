@@ -291,8 +291,6 @@ def parse_patents(fd,fd2):
             text = re.search('<CL(.*)</CL>',i,re.DOTALL).group()
             soup = bs(text)
             claimsdata = soup.findAll('clm')
-            checkss = open('e:/testing.txt','w')
-            print>>checkss,claimsdata
             
             for so in claimsdata:
                 clid = so['id']
