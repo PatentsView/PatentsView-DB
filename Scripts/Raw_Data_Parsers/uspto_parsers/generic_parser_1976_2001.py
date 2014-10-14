@@ -508,7 +508,7 @@ def parse_patents(fd,fd2):
             try:
                 legal_info = avail_fields['LREP'].split("\n\n\n\n\n")
                 for n in range(len(legal_info)):
-                    legalcountry = 'UNKNOWN'
+                    legalcountry = 'NULL'
                     legalfirm = 'NULL'
                     attfname = 'NULL'
                     attlname = 'NULL'
