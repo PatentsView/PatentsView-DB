@@ -39,6 +39,13 @@ def mysql_upload(host,username,password,dbname,folder):
         db=dbname)
     cursor = mydb.cursor()
     
+    #Add filename column to patent table
+    try:
+        cursor.execute('ALTER TABLE patent ADD filename varchar(120) COLLATE latin1_general_ci DEFAULT NULL')
+        mydb.commit()
+    except:
+        pass
+    
     #Empty the allpatents container to free up memory - not needed any more
     allpatents = {}
     

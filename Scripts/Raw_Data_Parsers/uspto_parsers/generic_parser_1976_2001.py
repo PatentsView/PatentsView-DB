@@ -544,7 +544,7 @@ def parse_patents(fd,fd2):
             except:
                 pass
             
-            patentdata[patent_id] = [type_kind[apptype][1],updnum,'US',issdate,abst,title,type_kind[apptype][0],numclaims]
+            patentdata[patent_id] = [type_kind[apptype][1],updnum,'US',issdate,abst,title,type_kind[apptype][0],numclaims,d]
             
             # Claims data parser
             datum = {}
