@@ -271,11 +271,13 @@ def parse_patents(fd,fd2):
                         if line.startswith("ZIP"):
                             invtzip = re.search('ZIP\s+(.*?)$',line).group(1)
                     
-                    loc_idd = id_generator()
                     if invtcountry == "NULL":
                         invtcountry = 'US'
-                    rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
-                    
+                    if (invtcity+'|'+invtstate+'|'+invtcountry).lower() in rawlocation:
+                        loc_idd = rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()][0]
+                    else:
+                        loc_idd = id_generator()
+                        rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
                     rawinventor[id_generator()] = [patent_id,"NULL",loc_idd,fname,lname,str(n)]
             except:
                 pass
@@ -320,10 +322,13 @@ def parse_patents(fd,fd2):
                         if line.startswith("COD"):
                             assgtype = re.search("COD\s+(.*?)$",line).group(1)
                 
-                    loc_idd = id_generator()
                     if assgcountry == 'NULL':
                         assgcountry = 'US'
-                    rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
+                    if (assgcity+'|'+assgstate+'|'+assgcountry).lower() in rawlocation:
+                        loc_idd = rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()][0]
+                    else:
+                        loc_idd = id_generator()
+                        rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
                     rawassignee[id_generator()] = [patent_id,"NULL",loc_idd,re.sub('^0+','',assgtype),assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
             except:
                 pass

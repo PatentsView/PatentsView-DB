@@ -346,10 +346,13 @@ def parse_patents(fd,fd2):
                             invtzip = re.search('<PCODE><PDAT>(.*?)</PDAT>',line).group(1)
                             #print invtzip
                 
-                    loc_idd = id_generator()
                     if invtcountry == 'NULL':
                         invtcountry = 'US'
-                    rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
+                    if (invtcity+'|'+invtstate+'|'+invtcountry).lower() in rawlocation:
+                        loc_idd = rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()][0]
+                    else:
+                        loc_idd = id_generator()
+                        rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
                     
                     if fname == "NULL" and lname == "NULL":
                         pass
@@ -403,10 +406,13 @@ def parse_patents(fd,fd2):
                             except:
                                 pass
                         
-                    loc_idd = id_generator()
                     if assgcountry == 'NULL':
                         assgcountry = 'US'
-                    rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
+                    if (assgcity+'|'+assgstate+'|'+assgcountry).lower() in rawlocation:
+                        loc_idd = rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()][0]
+                    else:
+                        loc_idd = id_generator()
+                        rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
                     rawassignee[id_generator()] = [patent_id,"NULL",loc_idd,assgtype,assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
             except:
                 pass
