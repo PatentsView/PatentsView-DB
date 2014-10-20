@@ -173,29 +173,29 @@ def upload_uspc(host,username,password,dbname,folder):
     cursor.execute("""
     -- Dumping structure for table PatentsProcessorGrant.mainclass_current
         CREATE TABLE IF NOT EXISTS `mainclass_current` (
-          `id` varchar(20) COLLATE latin1_general_ci NOT NULL,
-          `title` varchar(256) COLLATE latin1_general_ci DEFAULT NULL,
-          `text` varchar(256) COLLATE latin1_general_ci DEFAULT NULL,
+          `id` varchar(20) NOT NULL,
+          `title` varchar(256) DEFAULT NULL,
+          `text` varchar(256) DEFAULT NULL,
           PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;""")
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;""")
     mydb.commit()
     cursor.execute("""
     -- Dumping structure for table PatentsProcessorGrant.subclass_current
         CREATE TABLE IF NOT EXISTS `subclass_current` (
-          `id` varchar(20) COLLATE latin1_general_ci NOT NULL,
-          `title` varchar(256) COLLATE latin1_general_ci DEFAULT NULL,
-          `text` varchar(256) COLLATE latin1_general_ci DEFAULT NULL,
+          `id` varchar(20) NOT NULL,
+          `title` varchar(256) DEFAULT NULL,
+          `text` varchar(256) DEFAULT NULL,
           PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     """)
     mydb.commit()
     cursor.execute("""
     -- Dumping structure for table PatentsProcessorGrant.uspc_current
         CREATE TABLE IF NOT EXISTS `uspc_current` (
-          `uuid` varchar(36) COLLATE latin1_general_ci NOT NULL,
-          `patent_id` varchar(20) COLLATE latin1_general_ci DEFAULT NULL,
-          `mainclass_id` varchar(20) COLLATE latin1_general_ci DEFAULT NULL,
-          `subclass_id` varchar(20) COLLATE latin1_general_ci DEFAULT NULL,
+          `uuid` varchar(36) NOT NULL,
+          `patent_id` varchar(20) DEFAULT NULL,
+          `mainclass_id` varchar(20) DEFAULT NULL,
+          `subclass_id` varchar(20) DEFAULT NULL,
           `sequence` int(11) DEFAULT NULL,
           PRIMARY KEY (`uuid`),
           KEY `patent_id` (`patent_id`),
@@ -205,7 +205,7 @@ def upload_uspc(host,username,password,dbname,folder):
           CONSTRAINT `uspc_current_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `patent` (`id`),
           CONSTRAINT `uspc_current_ibfk_2` FOREIGN KEY (`mainclass_id`) REFERENCES `mainclass_current` (`id`),
           CONSTRAINT `uspc_current_ibfk_3` FOREIGN KEY (`subclass_id`) REFERENCES `subclass_current` (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     """)
     
     mydb.commit()
