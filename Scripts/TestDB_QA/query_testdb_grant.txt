@@ -12,27 +12,14 @@ select distinct
 
 
  from            grant_smalltest_20141006.patent p
-                  left join grant_smalltest_20141006.rawinventor ri on 
- ri.patent_id = p.id
-                  left join grant_smalltest_20141006.rawassignee ra on 
- ra.patent_id = p.id
-                  left join grant_smalltest_20141006.application a on 
- a.patent_id = p.id
-                  left join grant_smalltest_20141006.uspc usclass on 
- usclass.patent_id = p.id
-                  left join grant_smalltest_20141006.mainclass mc on 
- mc.id = usclass.mainclass_id
-                  left join grant_smalltest_20141006.subclass sc on sc.id 
- = usclass.subclass_id
-                  left join grant_smalltest_20141006.ipcr ipp on 
- ipp.patent_id = p.id
-                  left join grant_smalltest_20141006.foreigncitation fc 
- on fc.patent_id = p.id
-                  left join grant_smalltest_20141006.otherreference orr 
- on orr.patent_id = p.id
-                  left join grant_smalltest_20141006.rawlawyer rl on 
- rl.patent_id = p.id
-                  left join grant_smalltest_20141006.uspatentcitation usp 
- on usp.patent_id = p.id
+                  left join grant_smalltest_20141006.rawinventor ri on  ri.patent_id = p.id
+                  left join grant_smalltest_20141006.rawassignee ra on  ra.patent_id = p.id
+                  left join grant_smalltest_20141006.application a on  a.patent_id = p.id
+                  left join grant_smalltest_20141006.uspc_current usclass on  usclass.patent_id = p.id                  left join grant_smalltest_20141006.mainclass_current mc on  mc.id = usclass.mainclass_id                  left join grant_smalltest_20141006.subclass_current sc on sc.id = usclass.subclass_id
+                  left join grant_smalltest_20141006.ipcr ipp on  ipp.patent_id = p.id
+                  left join grant_smalltest_20141006.foreigncitation fc on fc.patent_id = p.id
+                  left join grant_smalltest_20141006.otherreference orr on orr.patent_id = p.id
+                  left join grant_smalltest_20141006.rawlawyer rl on  rl.patent_id = p.id
+                  left join grant_smalltest_20141006.uspatentcitation usp on usp.patent_id = p.id
 
  where           p.id = 

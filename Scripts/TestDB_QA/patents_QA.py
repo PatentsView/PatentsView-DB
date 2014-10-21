@@ -24,10 +24,14 @@ def generate_grants_qa(host,username,password,dbname,outputdir):
     core = quer[0]+quer[1]
         
     data = {}
+    
     for s in select:
         print s
+        cursor.execute('select * from '+dbname+'.uspc_current where patent_id ="'+str(s)+'"')
+        if len(cursor.fetchall()) == 0:
+            quer[17] = quer[17].replace("_current",'')
         for n in range(2,11):
-            query = core+re.sub(',$','',quer[n])+''.join(quer[12:])
+            query = core+re.sub(',$','',quer[n])+quer[13]+quer[12+n]+quer[-1]
             query = query.replace('grant_smalltest_20141006',dbname)
             cursor.execute(query+"'"+s+"'")
             outp = cursor.fetchall()
@@ -44,7 +48,7 @@ def generate_grants_qa(host,username,password,dbname,outputdir):
                 except:
                     data[s+'_'+str(n)] = [str(oo) for oo in list(o)]
     
-    outputfile = csv.writer(open(outputdir+'patents_QA.csv','wb'))
+    outputfile = csv.writer(open(os.path.join(outputdir,'patents_QA.csv'),'wb'))
     outputfile.writerow(['patent_id','patent_number','patent_date','patent_title','patent_abstract','num_claims','inventors','assignee_names','assignee_orgs','application_number','app_date','primary_USclass','other_USClass','IPC classes','foreign_patentcitation','other_references','lawyer_name','lawyer_firm','lawyer_country','USpatent_citations'])
     merge = {}
     
@@ -118,5 +122,7 @@ def generate_grants_qa(host,username,password,dbname,outputdir):
             uspat.append(' '.join(classif))
         if '; '.join(uspat) == '':
             uspat = ["None"]
+        
+        
         
         outputfile.writerow(val[:6]+['; '.join(inventors),'; '.join(assignees)]+val[10:13]+[uspc_primary,'; '.join(uspc),'; '.join(ipcr),'; '.join(foreign),val[24],'; '.join(lawyers)]+val[27:29]+['; '.join(uspat)])
