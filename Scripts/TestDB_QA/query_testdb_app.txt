@@ -6,14 +6,10 @@ select distinct
                  cl.text, cl.dependent 
 
 from            app_smalltest_20141008.application p
-                 left join app_smalltest_20141008.rawinventor ri on ri.application_id = p.id
-                 left join app_smalltest_20141008.uspc usclass on usclass.application_id = p.id
-                 left join app_smalltest_20141008.mainclass mc on mc.id = usclass.mainclass_id
-                 left join app_smalltest_20141008.subclass sc on sc.id = usclass.subclass_id
-                 left join app_smalltest_20141008.rawassignee ra on ra.application_id = p.id
+                 left join app_smalltest_20141008.rawinventor ri on ri.application_id = p.id                 left join app_smalltest_20141008.rawlocation rli on rli.id = ri.rawlocation_id
+                 left join app_smalltest_20141008.rawassignee ra on ra.application_id = p.id                 left join app_smalltest_20141008.rawlocation rla on rla.id = ra.rawlocation_id
+                 left join app_smalltest_20141008.uspc usclass on usclass.application_id = p.id                 left join app_smalltest_20141008.mainclass mc on mc.id = usclass.mainclass_id                 left join app_smalltest_20141008.subclass sc on sc.id = usclass.subclass_id
                  left join app_smalltest_20141008.claim cl on cl.application_id = p.id
-                 left join app_smalltest_20141008.rawlocation rli on rli.id = ri.rawlocation_id
-                 left join app_smalltest_20141008.rawlocation rla on rla.id = ra.rawlocation_id
-
+                 
 
 where           p.id = 

@@ -26,7 +26,7 @@ def generate_app_qa(host,username,password,dbname,outputdir):
     for s in select:
         print s
         for n in range(2,6):
-            query = core+re.sub(',$',' ',quer[n])+' '.join(quer[7:])
+            query = core+re.sub(',$',' ',quer[n])+' '+quer[7]+' '+quer[6+n]+' '+quer[-1]
             query = query.replace('app_smalltest_20141008',dbname)
             cursor.execute(query+"'"+s+"'")
             outp = cursor.fetchall()
@@ -42,7 +42,7 @@ def generate_app_qa(host,username,password,dbname,outputdir):
                 except:
                     data[s+'_'+str(n)] = [str(oo) for oo in list(o)]
     
-    outputfile = csv.writer(open(outputdir+'applications_QA.csv','wb'))
+    outputfile = csv.writer(open(os.path.join(outputdir,'applications_QA.csv'),'wb'))
     outputfile.writerow(['application_id','application_number','app_date','app_country','app_title','app_abstract','num_claims','inventors','inventor_location','assignee_names','assignee_orgs','assignee_location','assignee_nationality','assignee_residence','primary_USclass','other_USClass','claims'])
     merge = {}
     
