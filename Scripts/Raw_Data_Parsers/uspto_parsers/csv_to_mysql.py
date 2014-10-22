@@ -225,18 +225,11 @@ def upload_uspc(host,username,password,dbname,folder):
     mydb.commit()
     
     #Dump mainclass_current, subclass_current and uspc_current if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
-    cursor.execute('select id from mainclass_current')
-    ids = [f[0] for f in cursor.fetchall()]
-    for i in ids:
-        cursor.execute('DELETE FROM mainclass_current where id="'+i+'"')
-    cursor.execute('select id from subclass_current')
-    ids = [f[0] for f in cursor.fetchall()]
-    for i in ids:
-        cursor.execute('DELETE FROM subclass_current where id="'+i+'"')
-    cursor.execute('select uuid from uspc_current')
-    ids = [f[0] for f in cursor.fetchall()]
-    for i in ids:
-        cursor.execute('DELETE FROM uspc_current where uuid="'+i+'"')
+    cursor.execute('SET FOREIGN_KEY_CHECKS=0')
+    cursor.execute('truncate table mainclass_current')
+    cursor.execute('truncate table subclass_current')
+    cursor.execute('truncate table uspc_current')
+    cursor.execute('set foreign_key_checks=1')
     mydb.commit()
     
     #Upload mainclass data
@@ -273,9 +266,11 @@ def upload_uspc(host,username,password,dbname,folder):
     #Create USPC table off full master classification list
     uspc_full = csv.reader(file(os.path.join(folder,'USPC_patent_classes_data.csv'),'rb'))
     errorlog = open(os.path.join(folder,'upload_error.log'),'w')
+    current_exist = {}
     for m in uspc_full:
         try:
             gg = patnums[m[0]]
+            current_exist[m[0]] = gg
             towrite = [re.sub('"','',item) for item in m]
             towrite = [re.sub("'",'',w) for w in towrite]
             towrite.insert(0,id_generator())
@@ -296,5 +291,15 @@ def upload_uspc(host,username,password,dbname,folder):
         except:
             pass
     
+    for k in patnums.keys():
+        try:
+            gg = current_exist[k]
+        except:
+            cursor.execute('select * from uspc where patent_id ="'+gg+'"')
+            datum = [f[0] for f in cursor.fetchall()]
+            query = "insert into uspc_current value('"+"','".join(datum)+"')"
+            query = query.replace(",'NULL'",",NULL")
+            cursor.execute(query)
+            
     errorlog.close()
     mydb.commit()    
