@@ -1,9 +1,12 @@
 def parse_patents(fd,fd2):
-    import re,csv,os,codecs
-    import string,random,HTMLParser
+    import re,csv,os
+    import string,random
+    
+    
     
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
+    
     
     type_kind = {'1': ["A","utility"],
                  '2': ["E","reissue"],
@@ -20,9 +23,6 @@ def parse_patents(fd,fd2):
     diri = os.listdir(fd)
     diri = [d for d in diri if d.endswith('txt')]
 
-    #Initiate HTML Parser for unescape characters
-    h = HTMLParser.HTMLParser()
-
     #Remove all files from output dir before writing
     outdir = os.listdir(fd2)
     for oo in outdir:
@@ -30,73 +30,59 @@ def parse_patents(fd,fd2):
 
     #Rewrite files and write headers to them
     appfile = open(os.path.join(fd2,'application.csv'),'wb')
-    appfile.write(codecs.BOM_UTF8)
-    app = csv.writer(appfile,delimiter='\t')
+    app = csv.writer(appfile)
     app.writerow(['id','patent_id','type','number','country','date'])
     
     claimsfile = open(os.path.join(fd2,'claim.csv'),'wb')
-    claimsfile.write(codecs.BOM_UTF8)
-    clms = csv.writer(claimsfile,delimiter='\t')
+    clms = csv.writer(claimsfile)
     clms.writerow(['uuid','patent_id','text','dependent','sequence'])
     
     rawlocfile = open(os.path.join(fd2,'rawlocation.csv'),'wb')
-    rawlocfile.write(codecs.BOM_UTF8)
-    rawloc = csv.writer(rawlocfile,delimiter='\t')
+    rawloc = csv.writer(rawlocfile)
     rawloc.writerow(['id','location_id','city','state','country'])
     
     rawinvfile = open(os.path.join(fd2,'rawinventor.csv'),'wb')
-    rawinvfile.write(codecs.BOM_UTF8)
-    rawinv = csv.writer(rawinvfile,delimiter='\t')
+    rawinv = csv.writer(rawinvfile)
     rawinv.writerow(['uuid','patent_id','inventor_id','rawlocation_id','name_first','name_last','sequence'])
     
     rawassgfile = open(os.path.join(fd2,'rawassignee.csv'),'wb')
-    rawassgfile.write(codecs.BOM_UTF8)
-    rawassg = csv.writer(rawassgfile,delimiter='\t')
+    rawassg = csv.writer(rawassgfile)
     rawassg.writerow(['uuid','patent_id','assignee_id','rawlocation_id','type','name_first','name_last','organization','residence','nationality','sequence'])
     
     ipcrfile = open(os.path.join(fd2,'ipcr.csv'),'wb')
-    ipcrfile.write(codecs.BOM_UTF8)
-    ipcr = csv.writer(ipcrfile,delimiter='\t')
+    ipcr = csv.writer(ipcrfile)
     ipcr.writerow(['uuid','patent_id','classification_level','section','subclass','main_group','subgroup','symbol_position','classification_value','classification_status','classification_data_source','action_date','ipc_version_indicator','sequence'])
     
     patfile = open(os.path.join(fd2,'patent.csv'),'wb')
-    patfile.write(codecs.BOM_UTF8)
-    pat = csv.writer(patfile,delimiter='\t')
+    pat = csv.writer(patfile)
     pat.writerow(['id','type','number','country','date','abstract','title','kind','num_claims'])
     
     uspatentcitfile = open(os.path.join(fd2,'uspatentcitation.csv'),'wb')
-    uspatentcitfile.write(codecs.BOM_UTF8)
-    uspatcit = csv.writer(uspatentcitfile,delimiter='\t')
+    uspatcit = csv.writer(uspatentcitfile)
     uspatcit.writerow(['uuid','patent_id','citation_id','date','name','kind','number','country','category','sequence'])
     
     foreigncitfile = open(os.path.join(fd2,'foreigncitation.csv'),'wb')
-    foreigncitfile.write(codecs.BOM_UTF8)
-    foreigncit = csv.writer(foreigncitfile,delimiter='\t')
+    foreigncit = csv.writer(foreigncitfile)
     foreigncit.writerow(['uuid','patent_id','date','kind','number','country','category','sequence'])
     
     otherreffile = open(os.path.join(fd2,'otherreference.csv'),'wb')
-    otherreffile.write(codecs.BOM_UTF8)
-    otherref = csv.writer(otherreffile,delimiter='\t')
+    otherref = csv.writer(otherreffile)
     otherref.writerow(['uuid','patent_id','text','sequence'])
     
     rawlawyerfile = open(os.path.join(fd2,'rawlawyer.csv'),'wb')
-    rawlawyerfile.write(codecs.BOM_UTF8)
-    rawlawyer = csv.writer(rawlawyerfile,delimiter='\t')
+    rawlawyer = csv.writer(rawlawyerfile)
     rawlawyer.writerow(['uuid','lawyer_id','patent_id','name_first','name_last','organization','country','sequence'])
     
     uspcfile = open(os.path.join(fd2,'uspc.csv'),'wb')
-    uspcfile.write(codecs.BOM_UTF8)
-    uspcc = csv.writer(uspcfile,delimiter='\t')
+    uspcc = csv.writer(uspcfile)
     uspcc.writerow(['uuid','patent_id','mainclass_id','subclass_id','sequence'])
 
     mainclassfile = open(os.path.join(fd2,'mainclass.csv'),'wb')
-    mainclassfile.write(codecs.BOM_UTF8)
-    mainclass = csv.writer(mainclassfile,delimiter='\t')
+    mainclass = csv.writer(mainclassfile)
     mainclass.writerow(['id','title','text'])
 
     subclassfile = open(os.path.join(fd2,'subclass.csv'),'wb')
-    subclassfile.write(codecs.BOM_UTF8)
-    subclass = csv.writer(subclassfile,delimiter='\t')
+    subclass = csv.writer(subclassfile)
     subclass.writerow(['id','title','text'])
     
     mainclassfile.close()
@@ -123,12 +109,11 @@ def parse_patents(fd,fd2):
 
     for d in diri:
         print d
-        infile = h.unescape(open(os.path.join(fd,d)).read().decode('utf-8','ignore').replace('&angst','&aring')).split('PATN')
+        infile = open(os.path.join(fd,d)).read().split('PATN')
         del infile[0]
         for i in infile:
           numii+=1
           try:    
-            i = i.encode('utf-8','ignore')
             # Get relevant logical groups from patent records according to documentation
             # Some patents can contain several INVT, ASSG and other logical groups - so, is important to retain all
             avail_fields = {}
@@ -286,11 +271,13 @@ def parse_patents(fd,fd2):
                         if line.startswith("ZIP"):
                             invtzip = re.search('ZIP\s+(.*?)$',line).group(1)
                     
-                    loc_idd = id_generator()
                     if invtcountry == "NULL":
                         invtcountry = 'US'
-                    rawlocation[id_generator()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
-                    
+                    if (invtcity+'|'+invtstate+'|'+invtcountry).lower() in rawlocation:
+                        loc_idd = rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()][0]
+                    else:
+                        loc_idd = id_generator()
+                        rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
                     rawinventor[id_generator()] = [patent_id,"NULL",loc_idd,fname,lname,str(n)]
             except:
                 pass
@@ -335,10 +322,13 @@ def parse_patents(fd,fd2):
                         if line.startswith("COD"):
                             assgtype = re.search("COD\s+(.*?)$",line).group(1)
                 
-                    loc_idd = id_generator()
                     if assgcountry == 'NULL':
                         assgcountry = 'US'
-                    rawlocation[id_generator()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
+                    if (assgcity+'|'+assgstate+'|'+assgcountry).lower() in rawlocation:
+                        loc_idd = rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()][0]
+                    else:
+                        loc_idd = id_generator()
+                        rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
                     rawassignee[id_generator()] = [patent_id,"NULL",loc_idd,re.sub('^0+','',assgtype),assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
             except:
                 pass
