@@ -231,7 +231,6 @@ def upload_uspc(host,username,password,dbname,folder):
     cursor.execute('truncate table uspc_current')
     cursor.execute('set foreign_key_checks=1')
     mydb.commit()
-    
     #Upload mainclass data
     mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
     for m in mainclass:
@@ -241,6 +240,7 @@ def upload_uspc(host,username,password,dbname,folder):
         query = query.replace(",'NULL'",",NULL")
         cursor.execute(query)
  
+    print "VERY GOOD"
     #Upload subclass data
     subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
     exist = {}
@@ -251,10 +251,15 @@ def upload_uspc(host,username,password,dbname,folder):
             gg = exist[towrite[0]]
         except:
             exist[towrite[0]] = 1
+            try:
+                towrite[1] = re.search('^(.*?)-',towrite[1]).group(1)
+            except:
+                pass
             query = "insert into subclass_current values ('"+"','".join(towrite)+"')"
             query = query.replace(",'NULL'",",NULL")
             cursor.execute(query)
         
+    print "GOOD"
     mydb.commit()
     
     # Get all patent numbers in the current database not to upload full USPC table going back to 19th century
@@ -270,7 +275,7 @@ def upload_uspc(host,username,password,dbname,folder):
     for m in uspc_full:
         try:
             gg = patnums[m[0]]
-            current_exist[m[0]] = gg
+            current_exist[m[0]] = 1
             towrite = [re.sub('"','',item) for item in m]
             towrite = [re.sub("'",'',w) for w in towrite]
             towrite.insert(0,id_generator())
@@ -295,11 +300,12 @@ def upload_uspc(host,username,password,dbname,folder):
         try:
             gg = current_exist[k]
         except:
-            cursor.execute('select * from uspc where patent_id ="'+gg+'"')
-            datum = [f[0] for f in cursor.fetchall()]
-            query = "insert into uspc_current value('"+"','".join(datum)+"')"
-            query = query.replace(",'NULL'",",NULL")
-            cursor.execute(query)
+            cursor.execute('select * from uspc where patent_id ="'+str(k)+'"')
+            datum = cursor.fetchall()
+            for d in datum:
+                query = "insert into uspc_current value('"+"','".join([str(dd) for dd in d])+"')"
+                query = query.replace(",'NULL'",",NULL")
+                cursor.execute(query)
             
     errorlog.close()
     mydb.commit()    
