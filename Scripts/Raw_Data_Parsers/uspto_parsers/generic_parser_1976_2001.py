@@ -523,11 +523,15 @@ def parse_patents(fd,fd2):
             try:
                 legal_info = avail_fields['LREP'].split("\n\n\n\n\n")
                 for n in range(len(legal_info)):
-                    legalcountry = 'NULL'
-                    legalfirm = 'NULL'
-                    attfname = 'NULL'
-                    attlname = 'NULL'
-                    for line in legal_info[n].split('\n'):
+                    nnnn = 0
+                    lawyer_info = legal_info[n].split('\n')
+                    del lawyer_info[0]
+                    del lawyer_info[-1]
+                    for line in lawyer_info:
+                        legalcountry = 'NULL'
+                        legalfirm = 'NULL'
+                        attfname = 'NULL'
+                        attlname = 'NULL'
                         if line.startswith("FRM"):
                             legalfirm = re.search('FRM\s+(.*?)$',line).group(1)
                             #print legalfirm
@@ -542,7 +546,9 @@ def parse_patents(fd,fd2):
                                 legalcountry = legalcountry[:-1]
                                     
                     
-                    rawlawyer[id_generator()] = ["NULL",patent_id,attfname,attlname,legalfirm,legalcountry,str(n)]
+                        if [attfname,attlname,legalfirm,legalcountry] != ['NULL','NULL','NULL','NULL']:
+                            rawlawyer[id_generator()] = ["NULL",patent_id,attfname,attlname,legalfirm,legalcountry,str(nnnn)]
+                            nnnn+=1
                         
             except:
                 pass
