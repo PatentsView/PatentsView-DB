@@ -1,9 +1,10 @@
 import csv
 import MySQLdb
-import re,os,random,string
+import re,os,random,string,codecs
+
 
 def mysql_upload(host,username,password,dbname,folder):
-    inp = open(os.path.join(folder,'patent.csv'),'rb').read().split("\r\n")
+    inp = open(os.path.join(folder,'patent.csv'),'rb').read().decode('utf-8','ignore').split("\r\n")
     del inp[0]
     del inp[-1]
     duplicates = {}
@@ -13,35 +14,44 @@ def mysql_upload(host,username,password,dbname,folder):
     secondmerg = {}
     for n in range(len(inp)-1):
         try:
-            gg = allpatents[inp[n].split(",")[2]]
+            gg = allpatents[inp[n].split("\t")[2]]
             try:
-                duplicates[gg].append(inp[n].split(",")[0])
-                seconddupl[inp[n].split(",")[0]] = gg
+                duplicates[gg].append(inp[n].split("\t")[0])
+                seconddupl[inp[n].split("\t")[0]] = gg
             except:
-                duplicates[gg] = [inp[n].split(",")[0]]
-                seconddupl[inp[n].split(",")[0]] = gg
+                duplicates[gg] = [inp[n].split("\t")[0]]
+                seconddupl[inp[n].split("\t")[0]] = gg
         except:
-            allpatents[inp[n].split(",")[2]] = inp[n].split(",")[0]
+            allpatents[inp[n].split("\t")[2]] = inp[n].split("\t")[0]
         
-        if inp[n+1].split(',')[2] == "NULL":
+        if inp[n+1].split('\t')[2] == "NULL":
             try:
-                mergersid[runnums].append(inp[n+1].split(",")[0])
-                secondmerg[inp[n+1].split(",")[0]] = runnums
+                mergersid[runnums].append(inp[n+1].split("\t")[0])
+                secondmerg[inp[n+1].split("\t")[0]] = runnums
             except:
-                mergersid[runnums] = [inp[n+1].split(",")[0]]
-                secondmerg[inp[n+1].split(",")[0]] = runnums
+                mergersid[runnums] = [inp[n+1].split("\t")[0]]
+                secondmerg[inp[n+1].split("\t")[0]] = runnums
         else:
-            runnums = inp[n+1].split(",")[0]
+            runnums = inp[n+1].split("\t")[0]
     
     mydb = MySQLdb.connect(host=host,
         user=username,
         passwd=password,
-        db=dbname)
+        db=dbname,
+        charset='utf8',
+        use_unicode=True)
     cursor = mydb.cursor()
     
     #Add filename column to patent table
     try:
-        cursor.execute('ALTER TABLE patent ADD filename varchar(120) COLLATE latin1_general_ci DEFAULT NULL')
+        cursor.execute('ALTER TABLE patent ADD filename varchar(120) DEFAULT NULL')
+        mydb.commit()
+    except:
+        pass
+    
+    #Change column length for type in patent table
+    try:
+        cursor.execute('ALTER TABLE patent MODIFY type varchar(100)')
         mydb.commit()
     except:
         pass
@@ -76,11 +86,14 @@ def mysql_upload(host,username,password,dbname,folder):
     for l in locids:
         subclasschek[l.lower()] = 1
     
-    
+    diri = ['patent.csv','rawlocation.csv','rawinventor.csv']
     for d in diri:
         print d
-        infile = csv.reader(file(os.path.join(folder,d),'rb'))
-        head = infile.next()
+        infile = codecs.open(os.path.join(folder,d),'rb',encoding='utf-8').read().split('\r\n')
+        #head = infile.next()
+        head = infile[0].split('\t')
+        del infile[0]
+        del infile[-1]
         nullid = None
         if d == "patent.csv":
             idelem = 0
@@ -101,8 +114,10 @@ def mysql_upload(host,username,password,dbname,folder):
         if d == "subclass.csv":
             checkifexists = 3
         for i in infile:
-            towrite = [re.sub('"','',item) for item in i]
-            towrite = [re.sub("'",'',w) for w in towrite]
+            #i = i.encode('utf-8','ignore')
+            i = i.split('\t')
+            towrite = [item.replace('"','') for item in i]
+            towrite = [w.replace("'",'') for w in towrite]
             if nullid:
                 towrite[nullid] = 'NULL'
             try:
@@ -141,7 +156,6 @@ def mysql_upload(host,username,password,dbname,folder):
                                 query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
                                 query = query.replace(",'NULL'",",NULL")
                                 cursor.execute(query)
-            
     
         for v in mergersdata.values():
             query = "insert into "+d.replace('.csv','')+" values ('"+"','".join(towrite)+"')"
