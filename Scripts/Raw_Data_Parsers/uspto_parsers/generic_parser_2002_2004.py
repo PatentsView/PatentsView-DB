@@ -1,7 +1,9 @@
 def parse_patents(fd,fd2):
-    import re,csv,os
+    import re,csv,os,codecs
     import string,random
     from bs4 import BeautifulSoup as bs
+    
+    import HTMLParser
     
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -11,6 +13,9 @@ def parse_patents(fd,fd2):
     diri = os.listdir(fd)
     diri = [d for d in diri if re.search('XML',d,re.I)]
     
+    #Initiate HTML Parser for unescape characters
+    h = HTMLParser.HTMLParser()
+    
     #Remove all files from output dir before writing
     outdir = os.listdir(fd2)
     for oo in outdir:
@@ -18,39 +23,48 @@ def parse_patents(fd,fd2):
     
     #Rewrite files and write headers to them
     appfile = open(os.path.join(fd2,'application.csv'),'wb')
-    app = csv.writer(appfile)
+    appfile.write(codecs.BOM_UTF8)
+    app = csv.writer(appfile,delimiter='\t')
     app.writerow(['id','patent_id','type','number','country','date'])
     
     claimsfile = open(os.path.join(fd2,'claim.csv'),'wb')
-    clms = csv.writer(claimsfile)
+    claimsfile.write(codecs.BOM_UTF8)
+    clms = csv.writer(claimsfile,delimiter='\t')
     clms.writerow(['uuid','patent_id','text','dependent','sequence'])
     
     rawlocfile = open(os.path.join(fd2,'rawlocation.csv'),'wb')
-    rawloc = csv.writer(rawlocfile)
+    rawlocfile.write(codecs.BOM_UTF8)
+    rawloc = csv.writer(rawlocfile,delimiter='\t')
     rawloc.writerow(['id','location_id','city','state','country'])
     
     rawinvfile = open(os.path.join(fd2,'rawinventor.csv'),'wb')
-    rawinv = csv.writer(rawinvfile)
+    rawinvfile.write(codecs.BOM_UTF8)
+    rawinv = csv.writer(rawinvfile,delimiter='\t')
     rawinv.writerow(['uuid','patent_id','inventor_id','rawlocation_id','name_first','name_last','sequence'])
     
     rawassgfile = open(os.path.join(fd2,'rawassignee.csv'),'wb')
-    rawassg = csv.writer(rawassgfile)
+    rawassgfile.write(codecs.BOM_UTF8)
+    rawassg = csv.writer(rawassgfile,delimiter='\t')
     rawassg.writerow(['uuid','patent_id','assignee_id','rawlocation_id','type','name_first','name_last','organization','residence','nationality','sequence'])
     
     ipcrfile = open(os.path.join(fd2,'ipcr.csv'),'wb')
-    ipcr = csv.writer(ipcrfile)
+    ipcrfile.write(codecs.BOM_UTF8)
+    ipcr = csv.writer(ipcrfile,delimiter='\t')
     ipcr.writerow(['uuid','patent_id','classification_level','section','subclass','main_group','subgroup','symbol_position','classification_value','classification_status','classification_data_source','action_date','ipc_version_indicator','sequence'])
     
     patfile = open(os.path.join(fd2,'patent.csv'),'wb')
-    pat = csv.writer(patfile)
+    patfile.write(codecs.BOM_UTF8)
+    pat = csv.writer(patfile,delimiter='\t')
     pat.writerow(['id','type','number','country','date','abstract','title','kind','num_claims'])
     
     foreigncitfile = open(os.path.join(fd2,'foreigncitation.csv'),'wb')
-    foreigncit = csv.writer(foreigncitfile)
+    foreigncitfile.write(codecs.BOM_UTF8)
+    foreigncit = csv.writer(foreigncitfile,delimiter='\t')
     foreigncit.writerow(['uuid','patent_id','date','kind','number','country','category','sequence'])
     
     uspatentcitfile = open(os.path.join(fd2,'uspatentcitation.csv'),'wb')
-    uspatcit = csv.writer(uspatentcitfile)
+    uspatentcitfile.write(codecs.BOM_UTF8)
+    uspatcit = csv.writer(uspatentcitfile,delimiter='\t')
     uspatcit.writerow(['uuid','patent_id','citation_id','date','name','kind','number','country','category','sequence'])
     """
     usappcitfile = open(os.path.join(fd2,'usapplicationcitation.csv'),'wb')
@@ -58,23 +72,28 @@ def parse_patents(fd,fd2):
     usappcit.writerow(['uuid','patent_id','application_id','date','name','kind','number','country','category','sequence'])
     """
     uspcfile = open(os.path.join(fd2,'uspc.csv'),'wb')
-    uspcc = csv.writer(uspcfile)
+    uspcfile.write(codecs.BOM_UTF8)
+    uspcc = csv.writer(uspcfile,delimiter='\t')
     uspcc.writerow(['uuid','patent_id','mainclass_id','subclass_id','sequence'])
 
     otherreffile = open(os.path.join(fd2,'otherreference.csv'),'wb')
-    otherref = csv.writer(otherreffile)
+    otherreffile.write(codecs.BOM_UTF8)
+    otherref = csv.writer(otherreffile,delimiter='\t')
     otherref.writerow(['uuid','patent_id','text','sequence'])
     
     rawlawyerfile = open(os.path.join(fd2,'rawlawyer.csv'),'wb')
-    rawlawyer = csv.writer(rawlawyerfile)
+    rawlawyerfile.write(codecs.BOM_UTF8)
+    rawlawyer = csv.writer(rawlawyerfile,delimiter='\t')
     rawlawyer.writerow(['uuid','lawyer_id','patent_id','name_first','name_last','organization','country','sequence'])
 
     mainclassfile = open(os.path.join(fd2,'mainclass.csv'),'wb')
-    mainclass = csv.writer(mainclassfile)
+    mainclassfile.write(codecs.BOM_UTF8)
+    mainclass = csv.writer(mainclassfile,delimiter='\t')
     mainclass.writerow(['id','title','text'])
 
     subclassfile = open(os.path.join(fd2,'subclass.csv'),'wb')
-    subclass = csv.writer(subclassfile)
+    subclassfile.write(codecs.BOM_UTF8)
+    subclass = csv.writer(subclassfile,delimiter='\t')
     subclass.writerow(['id','title','text'])
     
     mainclassfile.close()
@@ -135,12 +154,13 @@ def parse_patents(fd,fd2):
     
     for d in diri:
         print d
-        infile = open(fd+d,'rb').read().split('<!DOCTYPE')
+        infile = h.unescape(open(fd+d,'rb').read().decode('utf-8','ignore').replace('&angst','&aring')).split('<!DOCTYPE')
         del infile[0]
         numi+=len(infile)
         for i in infile:
             # Get relevant logical groups from patent records according to documentation
             # Some patents can contain several INVT, ASSG and other logical groups - so, is important to retain all
+            i = i.encode('utf-8','ignore')
             avail_fields = {}
             num = 1
             avail_fields['B100'] = i.split('B200')[0]
@@ -346,13 +366,14 @@ def parse_patents(fd,fd2):
                             invtzip = re.search('<PCODE><PDAT>(.*?)</PDAT>',line).group(1)
                             #print invtzip
                 
+                    if re.search('&',fname):
+                        check = open('e:/test_utf.txt','a')
+                        print>>check, i
+                        check.close()
+                    loc_idd = id_generator()
                     if invtcountry == 'NULL':
                         invtcountry = 'US'
-                    if (invtcity+'|'+invtstate+'|'+invtcountry).lower() in rawlocation:
-                        loc_idd = rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()][0]
-                    else:
-                        loc_idd = id_generator()
-                        rawlocation[(invtcity+'|'+invtstate+'|'+invtcountry).lower()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
+                    rawlocation[id_generator()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
                     
                     if fname == "NULL" and lname == "NULL":
                         pass
@@ -406,13 +427,10 @@ def parse_patents(fd,fd2):
                             except:
                                 pass
                         
+                    loc_idd = id_generator()
                     if assgcountry == 'NULL':
                         assgcountry = 'US'
-                    if (assgcity+'|'+assgstate+'|'+assgcountry).lower() in rawlocation:
-                        loc_idd = rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()][0]
-                    else:
-                        loc_idd = id_generator()
-                        rawlocation[(assgcity+'|'+assgstate+'|'+assgcountry).lower()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
+                    rawlocation[id_generator()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
                     rawassignee[id_generator()] = [patent_id,"NULL",loc_idd,assgtype,assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
             except:
                 pass
@@ -605,23 +623,23 @@ def parse_patents(fd,fd2):
             
             patentdata[patent_id] = [type_kind[patkind],updnum,'US',issdate,abst,title,patkind,numclaims,d]
             
-            patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'))
+            patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'),delimiter='\t')
             for k,v in patentdata.items():
                 patfile.writerow([k]+v)
             
-            appfile = csv.writer(open(os.path.join(fd2,'application.csv'),'ab'))
+            appfile = csv.writer(open(os.path.join(fd2,'application.csv'),'ab'),delimiter='\t')
             for k,v in application.items():
                 appfile.writerow([k]+v)
             
-            claimsfile = csv.writer(open(os.path.join(fd2,'claim.csv'),'ab'))
+            claimsfile = csv.writer(open(os.path.join(fd2,'claim.csv'),'ab'),delimiter='\t')
             for k,v in claims.items():
                 claimsfile.writerow([k]+v)
             
-            rawinvfile = csv.writer(open(os.path.join(fd2,'rawinventor.csv'),'ab'))
+            rawinvfile = csv.writer(open(os.path.join(fd2,'rawinventor.csv'),'ab'),delimiter='\t')
             for k,v in rawinventor.items():
                 rawinvfile.writerow([k]+v)
             
-            rawassgfile = csv.writer(open(os.path.join(fd2,'rawassignee.csv'),'ab'))
+            rawassgfile = csv.writer(open(os.path.join(fd2,'rawassignee.csv'),'ab'),delimiter='\t')
             for k,v in rawassignee.items():
                 rawassgfile.writerow([k]+v)
             """
@@ -630,40 +648,40 @@ def parse_patents(fd,fd2):
                 usappcitfile.writerow([k]+v)
             """
             
-            ipcrfile = csv.writer(open(os.path.join(fd2,'ipcr.csv'),'ab'))
+            ipcrfile = csv.writer(open(os.path.join(fd2,'ipcr.csv'),'ab'),delimiter='\t')
             for k,v in ipcr.items():
                 ipcrfile.writerow([k]+v)
             
-            uspcfile = csv.writer(open(os.path.join(fd2,'uspc.csv'),'ab'))
+            uspcfile = csv.writer(open(os.path.join(fd2,'uspc.csv'),'ab'),delimiter='\t')
             for k,v in uspc.items():
                 uspcfile.writerow([k]+v)
             
-            uspatentcitfile = csv.writer(open(os.path.join(fd2,'uspatentcitation.csv'),'ab'))
+            uspatentcitfile = csv.writer(open(os.path.join(fd2,'uspatentcitation.csv'),'ab'),delimiter='\t')
             for k,v in uspatentcitation.items():
                 uspatentcitfile.writerow([k]+v)
             
-            foreigncitfile = csv.writer(open(os.path.join(fd2,'foreigncitation.csv'),'ab'))
+            foreigncitfile = csv.writer(open(os.path.join(fd2,'foreigncitation.csv'),'ab'),delimiter='\t')
             for k,v in foreigncitation.items():
                 foreigncitfile.writerow([k]+v)
             
-            otherreffile = csv.writer(open(os.path.join(fd2,'otherreference.csv'),'ab'))
+            otherreffile = csv.writer(open(os.path.join(fd2,'otherreference.csv'),'ab'),delimiter='\t')
             for k,v in otherreference.items():
                 otherreffile.writerow([k]+v)
             
-            rawlawyerfile = csv.writer(open(os.path.join(fd2,'rawlawyer.csv'),'ab'))
+            rawlawyerfile = csv.writer(open(os.path.join(fd2,'rawlawyer.csv'),'ab'),delimiter='\t')
             for k,v in rawlawyer.items():
                 rawlawyerfile.writerow([k]+v)
             
     
-    rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'))
+    rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'),delimiter='\t')
     for k,v in rawlocation.items():
         rawlocfile.writerow(v)
 
-    mainclassfile = csv.writer(open(os.path.join(fd2,'mainclass.csv'),'ab'))
+    mainclassfile = csv.writer(open(os.path.join(fd2,'mainclass.csv'),'ab'),delimiter='\t')
     for k,v in mainclassdata.items():
         mainclassfile.writerow(v)
     
-    subclassfile = csv.writer(open(os.path.join(fd2,'subclass.csv'),'ab'))
+    subclassfile = csv.writer(open(os.path.join(fd2,'subclass.csv'),'ab'),delimiter='\t')
     for k,v in subclassdata.items():
         subclassfile.writerow(v)
             
