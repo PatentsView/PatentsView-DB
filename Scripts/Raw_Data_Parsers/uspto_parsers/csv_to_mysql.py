@@ -240,7 +240,6 @@ def upload_uspc(host,username,password,dbname,folder):
         query = query.replace(",'NULL'",",NULL")
         cursor.execute(query)
  
-    print "VERY GOOD"
     #Upload subclass data
     subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
     exist = {}
@@ -259,7 +258,6 @@ def upload_uspc(host,username,password,dbname,folder):
             query = query.replace(",'NULL'",",NULL")
             cursor.execute(query)
         
-    print "GOOD"
     mydb.commit()
     
     # Get all patent numbers in the current database not to upload full USPC table going back to 19th century
@@ -303,9 +301,16 @@ def upload_uspc(host,username,password,dbname,folder):
             cursor.execute('select * from uspc where patent_id ="'+str(k)+'"')
             datum = cursor.fetchall()
             for d in datum:
-                query = "insert into uspc_current value('"+"','".join([str(dd) for dd in d])+"')"
+                cursor.execute('select * from mainclass_current where id = "'+d[2]+'"')
+                if len(cursor.fetchall()) == 0:
+                    cursor.execute('insert into mainclass_current values ("'+d[2]+'",NULL,NULL)')
+                cursor.execute('select * from subclass_current where id = "'+d[3]+'"')
+                if len(cursor.fetchall()) == 0:
+                    cursor.execute('insert into subclass_current values ("'+d[3]+'",NULL,NULL)')
+                query = "insert into uspc_current values ('"+"','".join([str(dd) for dd in d])+"')"
                 query = query.replace(",'NULL'",",NULL")
                 cursor.execute(query)
+                    
             
     errorlog.close()
     mydb.commit()    
