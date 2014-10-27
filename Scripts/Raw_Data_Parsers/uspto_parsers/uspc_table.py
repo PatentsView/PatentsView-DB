@@ -1,15 +1,30 @@
 def uspc_table(fd):
-    import re,csv,os
+    import re,csv,os,urllib2,HTMLParser,zipfile
+    from bs4 import BeautifulSoup as bs
+    from datetime import date
+    from zipfile import ZipFile
+    
+    import mechanize
+    br = mechanize.Browser()
+    
+    paturl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentGrant/mcfpat.zip'
+    appurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentAppl/mcfappl.zip'
+    ctafurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/ManualofClass/ctaf.zip'
+    br.retrieve(paturl,os.path.join(fd,'mcfpat.zip'))        
+    br.retrieve(appurl,os.path.join(fd,'mcfappl.zip'))
+    br.retrieve(ctafurl,os.path.join(fd,'ctaf.zip'))         
     fd+='/'
     diri = os.listdir(fd)
     for d in diri:
-        if re.search('ctaf.*?txt',d):
-            classindxfile = d
-        if re.search('mcfpat.*?txt',d):
-            patclassfile = d
+        if re.search('ctaf.*?zip',d):
+            classindxfile = ZipFile(os.path.join(fd, d),'r')
+        if re.search('mcfpat.*?zip',d):
+            patclassfile = ZipFile(os.path.join(fd, d),'r')
+        if re.search('mcfappl.*?zip',d):
+            appclassfile = ZipFile(os.path.join(fd, d), 'r')
     
     #Classes Index File parsing for class/subclass text
-    classidx = open(os.path.join(fd, classindxfile)).read().split("\n")
+    classidx = classindxfile.open(classindxfile.namelist()[0]).read().split('\n')
     data = {}
     for n in range(len(classidx)):
         classname = re.sub('[\.\s]+$','',classidx[n][21:])
@@ -76,7 +91,7 @@ def uspc_table(fd):
     #Get patent-class pairs
     outp = csv.writer(open(os.path.join(fd,'USPC_patent_classes_data.csv'),'wb'))
     pats = {}
-    with open(os.path.join(fd,patclassfile)) as inp:
+    with patclassfile.open(patclassfile.namelist()[0]) as inp:
         for i in inp:
             patentnum = i[:7]
             mainclass = re.sub('^0+','',i[7:10])
@@ -107,4 +122,35 @@ def uspc_table(fd):
                     outp.writerow([str(patentnum),mainclass,subclass,'1'])
         
         
-    
+    #Get application-class pairs
+    outp = csv.writer(open(os.path.join(fd,'USPC_application_classes_data.csv'),'wb'))
+    pats = {}
+    with appclassfile.open(appclassfile.namelist()[0]) as inp:
+        for i in inp:
+            patentnum = i[2:6]+'/'+i[2:13]
+            mainclass = re.sub('^0+','',i[15:18])
+            subclass = i[18:-2]
+            if subclass[3:] != '000':
+                try:
+                    temp = int(subclass[3:])
+                    if re.search('[A-Z]{3}',subclass[:3]) is None:
+                        subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
+                    else:
+                        subclass = re.sub('^0+','',subclass[:3])+re.sub('^0+','',subclass[3:])
+                except:
+                    if len(re.sub('0+','',subclass[3:])) > 1:
+                        subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
+                    else:
+                        subclass = re.sub('^0+','',subclass[:3])+re.sub('0+','',subclass[3:])    
+            else:
+                subclass = re.sub('^0+','',subclass[:3])
+            if i[-2] == 'P':
+                outp.writerow([patentnum,mainclass,subclass,'0'])
+            else:
+                try:
+                    gg = pats[patentnum]
+                    outp.writerow([str(patentnum),mainclass,subclass,str(gg)])
+                    pats[patentnum]+=1
+                except:
+                    pats[patentnum] = 2
+                    outp.writerow([str(patentnum),mainclass,subclass,'1'])

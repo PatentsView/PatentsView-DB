@@ -172,65 +172,68 @@ def mysql_upload(host,username,password,dbname,folder):
     print "ALL GOOD"
 
 
-def upload_uspc(host,username,password,dbname,folder):
+def upload_uspc(host,username,password,appdb,patdb,folder):
     
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
     
     mydb = MySQLdb.connect(host=host,
         user=username,
-        passwd=password,
-        db=dbname)
+        passwd=password)
     cursor = mydb.cursor()
     
-    #Create tables for current classification if they do not exist - mainclass_current, subclass_current and uspc_current
-    cursor.execute("""
-    -- Dumping structure for table PatentsProcessorGrant.mainclass_current
-        CREATE TABLE IF NOT EXISTS `mainclass_current` (
-          `id` varchar(20) NOT NULL,
-          `title` varchar(256) DEFAULT NULL,
-          `text` varchar(256) DEFAULT NULL,
-          PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;""")
-    mydb.commit()
-    cursor.execute("""
-    -- Dumping structure for table PatentsProcessorGrant.subclass_current
-        CREATE TABLE IF NOT EXISTS `subclass_current` (
-          `id` varchar(20) NOT NULL,
-          `title` varchar(256) DEFAULT NULL,
-          `text` varchar(256) DEFAULT NULL,
-          PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    """)
-    mydb.commit()
-    cursor.execute("""
-    -- Dumping structure for table PatentsProcessorGrant.uspc_current
-        CREATE TABLE IF NOT EXISTS `uspc_current` (
-          `uuid` varchar(36) NOT NULL,
-          `patent_id` varchar(20) DEFAULT NULL,
-          `mainclass_id` varchar(20) DEFAULT NULL,
-          `subclass_id` varchar(20) DEFAULT NULL,
-          `sequence` int(11) DEFAULT NULL,
-          PRIMARY KEY (`uuid`),
-          KEY `patent_id` (`patent_id`),
-          KEY `mainclass_id` (`mainclass_id`),
-          KEY `subclass_id` (`subclass_id`),
-          KEY `ix_uspc_sequence` (`sequence`),
-          CONSTRAINT `uspc_current_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `patent` (`id`),
-          CONSTRAINT `uspc_current_ibfk_2` FOREIGN KEY (`mainclass_id`) REFERENCES `mainclass_current` (`id`),
-          CONSTRAINT `uspc_current_ibfk_3` FOREIGN KEY (`subclass_id`) REFERENCES `subclass_current` (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    """)
+    dbnames = [appdb,patdb]
     
-    mydb.commit()
-    
-    #Dump mainclass_current, subclass_current and uspc_current if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
-    cursor.execute('SET FOREIGN_KEY_CHECKS=0')
-    cursor.execute('truncate table mainclass_current')
-    cursor.execute('truncate table subclass_current')
-    cursor.execute('truncate table uspc_current')
-    cursor.execute('set foreign_key_checks=1')
-    mydb.commit()
+    for d in dbnames:
+        #Create tables for current classification if they do not exist - mainclass_current, subclass_current and uspc_current
+        cursor.execute("""
+        -- Dumping structure for table PatentsProcessorGrant.mainclass_current
+            CREATE TABLE IF NOT EXISTS `"""+d+"""`.`mainclass_current` (
+              `id` varchar(20) NOT NULL,
+              `title` varchar(256) DEFAULT NULL,
+              `text` varchar(256) DEFAULT NULL,
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;""")
+        mydb.commit()
+        cursor.execute("""
+        -- Dumping structure for table PatentsProcessorGrant.subclass_current
+            CREATE TABLE IF NOT EXISTS `"""+d+"""`.`subclass_current` (
+              `id` varchar(20) NOT NULL,
+              `title` varchar(256) DEFAULT NULL,
+              `text` varchar(256) DEFAULT NULL,
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        """)
+        mydb.commit()
+        cursor.execute("""
+        -- Dumping structure for table PatentsProcessorGrant.uspc_current
+            CREATE TABLE IF NOT EXISTS `"""+d+"""`.`uspc_current` (
+              `uuid` varchar(36) NOT NULL,
+              `patent_id` varchar(20) DEFAULT NULL,
+              `mainclass_id` varchar(20) DEFAULT NULL,
+              `subclass_id` varchar(20) DEFAULT NULL,
+              `sequence` int(11) DEFAULT NULL,
+              PRIMARY KEY (`uuid`),
+              KEY `patent_id` (`patent_id`),
+              KEY `mainclass_id` (`mainclass_id`),
+              KEY `subclass_id` (`subclass_id`),
+              KEY `ix_uspc_sequence` (`sequence`),
+              CONSTRAINT `uspc_current_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `patent` (`id`),
+              CONSTRAINT `uspc_current_ibfk_2` FOREIGN KEY (`mainclass_id`) REFERENCES `mainclass_current` (`id`),
+              CONSTRAINT `uspc_current_ibfk_3` FOREIGN KEY (`subclass_id`) REFERENCES `subclass_current` (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        """)
+        
+        mydb.commit()
+        
+        #Dump mainclass_current, subclass_current and uspc_current if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
+        cursor.execute('SET FOREIGN_KEY_CHECKS=0')
+        cursor.execute('truncate table '+d+'mainclass_current')
+        cursor.execute('truncate table '+d+'subclass_current')
+        cursor.execute('truncate table '+d+'uspc_current')
+        cursor.execute('set foreign_key_checks=1')
+        mydb.commit()
+        
     #Upload mainclass data
     mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
     for m in mainclass:
@@ -238,8 +241,12 @@ def upload_uspc(host,username,password,dbname,folder):
         towrite = [re.sub("'",'',w) for w in towrite]
         query = "insert into mainclass_current values ('"+"','".join(towrite)+"')"
         query = query.replace(",'NULL'",",NULL")
-        cursor.execute(query)
- 
+        for d in dbnames:
+            try:
+                query = query.replace("mainclass_current",d+'.mainclass_current')
+                cursor.execute(query)
+            except:
+                pass
     #Upload subclass data
     subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
     exist = {}
@@ -256,61 +263,125 @@ def upload_uspc(host,username,password,dbname,folder):
                 pass
             query = "insert into subclass_current values ('"+"','".join(towrite)+"')"
             query = query.replace(",'NULL'",",NULL")
-            cursor.execute(query)
-        
-    mydb.commit()
-    
-    # Get all patent numbers in the current database not to upload full USPC table going back to 19th century
-    cursor.execute('select id,number from patent')
-    patnums = {}
-    for field in cursor.fetchall():
-        patnums[field[1]] = field[0]
-    
-    #Create USPC table off full master classification list
-    uspc_full = csv.reader(file(os.path.join(folder,'USPC_patent_classes_data.csv'),'rb'))
-    errorlog = open(os.path.join(folder,'upload_error.log'),'w')
-    current_exist = {}
-    for m in uspc_full:
-        try:
-            gg = patnums[m[0]]
-            current_exist[m[0]] = 1
-            towrite = [re.sub('"','',item) for item in m]
-            towrite = [re.sub("'",'',w) for w in towrite]
-            towrite.insert(0,id_generator())
-            towrite[1] = gg
-            for t in range(len(towrite)):
+            for d in dbnames:
                 try:
-                    gg = int(towrite[t])
-                    towrite[t] = str(int(towrite[t]))
+                    query = query.replace("subclass_current",d+'.subclass_current')
+                    cursor.execute(query)
                 except:
                     pass
-            towrite[3] = towrite[2]+'/'+re.sub('^0+','',towrite[3])
-            try:
-                query = "insert into uspc_current values ('"+"','".join(towrite)+"')"
-                query = query.replace(",'NULL'",",NULL")
-                cursor.execute(query)
-            except:
-                print>>errorlog,' '.join(towrite+[m[0]])
-        except:
-            pass
-    
-    for k in patnums.keys():
-        try:
-            gg = current_exist[k]
-        except:
-            cursor.execute('select * from uspc where patent_id ="'+str(k)+'"')
-            datum = cursor.fetchall()
-            for d in datum:
-                cursor.execute('select * from mainclass_current where id = "'+d[2]+'"')
-                if len(cursor.fetchall()) == 0:
-                    cursor.execute('insert into mainclass_current values ("'+d[2]+'",NULL,NULL)')
-                cursor.execute('select * from subclass_current where id = "'+d[3]+'"')
-                if len(cursor.fetchall()) == 0:
-                    cursor.execute('insert into subclass_current values ("'+d[3]+'",NULL,NULL)')
-                query = "insert into uspc_current values ('"+"','".join([str(dd) for dd in d])+"')"
-                query = query.replace(",'NULL'",",NULL")
-                cursor.execute(query)
-                    
             
-    errorlog.close()
-    mydb.commit()    
+    mydb.commit()
+    
+    if patdb is not None:
+        # Get all patent numbers in the current database not to upload full USPC table going back to 19th century
+        cursor.execute('select id,number from '+patdb+'.patent')
+        patnums = {}
+        for field in cursor.fetchall():
+            patnums[field[1]] = field[0]
+        
+        #Create USPC table off full master classification list
+        uspc_full = csv.reader(file(os.path.join(folder,'USPC_patent_classes_data.csv'),'rb'))
+        errorlog = open(os.path.join(folder,'upload_error.log'),'w')
+        current_exist = {}
+        for m in uspc_full:
+            try:
+                gg = patnums[m[0]]
+                current_exist[m[0]] = 1
+                towrite = [re.sub('"','',item) for item in m]
+                towrite = [re.sub("'",'',w) for w in towrite]
+                towrite.insert(0,id_generator())
+                towrite[1] = gg
+                for t in range(len(towrite)):
+                    try:
+                        gg = int(towrite[t])
+                        towrite[t] = str(int(towrite[t]))
+                    except:
+                        pass
+                towrite[3] = towrite[2]+'/'+re.sub('^0+','',towrite[3])
+                try:
+                    query = "insert into "+patdb+".uspc_current values ('"+"','".join(towrite)+"')"
+                    query = query.replace(",'NULL'",",NULL")
+                    cursor.execute(query)
+                except:
+                    print>>errorlog,' '.join(towrite+[m[0]])
+            except:
+                pass
+        
+        for k in patnums.keys():
+            try:
+                gg = current_exist[k]
+            except:
+                cursor.execute('select * from '+patdb+'.uspc where patent_id ="'+str(k)+'"')
+                datum = cursor.fetchall()
+                for d in datum:
+                    cursor.execute('select * from '+patdb+'.mainclass_current where id = "'+d[2]+'"')
+                    if len(cursor.fetchall()) == 0:
+                        cursor.execute('insert into '+patdb+'.mainclass_current values ("'+d[2]+'",NULL,NULL)')
+                    cursor.execute('select * from '+patdb+'.subclass_current where id = "'+d[3]+'"')
+                    if len(cursor.fetchall()) == 0:
+                        cursor.execute('insert into '+patdb+'.subclass_current values ("'+d[3]+'",NULL,NULL)')
+                    query = "insert into "+patdb+".uspc_current values ('"+"','".join([str(dd) for dd in d])+"')"
+                    query = query.replace(",'NULL'",",NULL")
+                    cursor.execute(query)
+                        
+                
+        errorlog.close()
+        mydb.commit()
+        
+    if appdb is not None:
+        # Get all application numbers in the current database not to upload full USPC table going back to 19th century
+        cursor.execute('select id,number from '+appdb+'.application')
+        patnums = {}
+        for field in cursor.fetchall():
+            patnums[field[1]] = field[0]
+        
+        #Create USPC table off full master classification list
+        uspc_full = csv.reader(file(os.path.join(folder,'USPC_application_classes_data.csv'),'rb'))
+        errorlog = open(os.path.join(folder,'upload_error.log'),'w')
+        current_exist = {}
+        for m in uspc_full:
+            try:
+                gg = patnums[m[0]]
+                current_exist[m[0]] = 1
+                towrite = [re.sub('"','',item) for item in m]
+                towrite = [re.sub("'",'',w) for w in towrite]
+                towrite.insert(0,id_generator())
+                towrite[1] = gg
+                for t in range(len(towrite)):
+                    try:
+                        gg = int(towrite[t])
+                        towrite[t] = str(int(towrite[t]))
+                    except:
+                        pass
+                towrite[3] = towrite[2]+'/'+re.sub('^0+','',towrite[3])
+                try:
+                    query = "insert into "+appdb+".uspc_current values ('"+"','".join(towrite)+"')"
+                    query = query.replace(",'NULL'",",NULL")
+                    cursor.execute(query)
+                except:
+                    print>>errorlog,' '.join(towrite+[m[0]])
+            except:
+                pass
+        
+        for k in patnums.keys():
+            try:
+                gg = current_exist[k]
+            except:
+                cursor.execute('select * from '+appdb+'.uspc where patent_id ="'+str(k)+'"')
+                datum = cursor.fetchall()
+                for d in datum:
+                    cursor.execute('select * from '+appdb+'.mainclass_current where id = "'+d[2]+'"')
+                    if len(cursor.fetchall()) == 0:
+                        cursor.execute('insert into '+appdb+'.mainclass_current values ("'+d[2]+'",NULL,NULL)')
+                    cursor.execute('select * from '+appdb+'.subclass_current where id = "'+d[3]+'"')
+                    if len(cursor.fetchall()) == 0:
+                        cursor.execute('insert into '+appdb+'.subclass_current values ("'+d[3]+'",NULL,NULL)')
+                    query = "insert into "+appdb+".uspc_current values ('"+"','".join([str(dd) for dd in d])+"')"
+                    query = query.replace(",'NULL'",",NULL")
+                    cursor.execute(query)
+                        
+                
+        errorlog.close()
+        mydb.commit()
+        
+            
