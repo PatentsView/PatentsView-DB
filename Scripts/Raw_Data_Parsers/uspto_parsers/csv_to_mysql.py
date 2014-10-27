@@ -181,6 +181,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
         user=username,
         passwd=password)
     cursor = mydb.cursor()
+    
     dbnames = [appdb,patdb]
     
     for n in range(2):
@@ -249,6 +250,8 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
             query = query.replace(",'NULL'",",NULL")
             for d in dbnames:
                 try:
+                    query = "insert into mainclass_current values ('"+"','".join(towrite)+"')"
+                    query = query.replace(",'NULL'",",NULL")
                     query = query.replace("mainclass_current",d+'.mainclass_current')
                     cursor.execute(query)
                 except:
@@ -267,10 +270,10 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                     towrite[1] = re.search('^(.*?)-',towrite[1]).group(1)
                 except:
                     pass
-                query = "insert into subclass_current values ('"+"','".join(towrite)+"')"
-                query = query.replace(",'NULL'",",NULL")
                 for d in dbnames:
                     try:
+                        query = "insert into subclass_current values ('"+"','".join(towrite)+"')"
+                        query = query.replace(",'NULL'",",NULL")
                         query = query.replace("subclass_current",d+'.subclass_current')
                         cursor.execute(query)
                     except:
@@ -333,13 +336,13 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                 
         errorlog.close()
         mydb.commit()
+    
     if appdb is not None:
         # Get all application numbers in the current database not to upload full USPC table going back to 19th century
         cursor.execute('select id,number from '+appdb+'.application')
         patnums = {}
         for field in cursor.fetchall():
-            patnums[field[1]] = field[0]
-        
+            patnums[field[0]] = field[1]
         #Create USPC table off full master classification list
         uspc_full = csv.reader(file(os.path.join(folder,'USPC_application_classes_data.csv'),'rb'))
         errorlog = open(os.path.join(folder,'upload_error.log'),'w')
@@ -365,8 +368,10 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                     cursor.execute(query)
                 except:
                     print>>errorlog,' '.join(towrite+[m[0]])
+                
             except:
                 pass
+        
         
         for k in patnums.keys():
             try:
