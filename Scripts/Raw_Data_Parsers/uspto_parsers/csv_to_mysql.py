@@ -184,93 +184,100 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
     
     dbnames = [appdb,patdb]
     
-    for d in dbnames:
-        #Create tables for current classification if they do not exist - mainclass_current, subclass_current and uspc_current
-        cursor.execute("""
-        -- Dumping structure for table PatentsProcessorGrant.mainclass_current
-            CREATE TABLE IF NOT EXISTS `"""+d+"""`.`mainclass_current` (
-              `id` varchar(20) NOT NULL,
-              `title` varchar(256) DEFAULT NULL,
-              `text` varchar(256) DEFAULT NULL,
-              PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;""")
-        mydb.commit()
-        cursor.execute("""
-        -- Dumping structure for table PatentsProcessorGrant.subclass_current
-            CREATE TABLE IF NOT EXISTS `"""+d+"""`.`subclass_current` (
-              `id` varchar(20) NOT NULL,
-              `title` varchar(256) DEFAULT NULL,
-              `text` varchar(256) DEFAULT NULL,
-              PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        """)
-        mydb.commit()
-        cursor.execute("""
-        -- Dumping structure for table PatentsProcessorGrant.uspc_current
-            CREATE TABLE IF NOT EXISTS `"""+d+"""`.`uspc_current` (
-              `uuid` varchar(36) NOT NULL,
-              `patent_id` varchar(20) DEFAULT NULL,
-              `mainclass_id` varchar(20) DEFAULT NULL,
-              `subclass_id` varchar(20) DEFAULT NULL,
-              `sequence` int(11) DEFAULT NULL,
-              PRIMARY KEY (`uuid`),
-              KEY `patent_id` (`patent_id`),
-              KEY `mainclass_id` (`mainclass_id`),
-              KEY `subclass_id` (`subclass_id`),
-              KEY `ix_uspc_sequence` (`sequence`),
-              CONSTRAINT `uspc_current_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `patent` (`id`),
-              CONSTRAINT `uspc_current_ibfk_2` FOREIGN KEY (`mainclass_id`) REFERENCES `mainclass_current` (`id`),
-              CONSTRAINT `uspc_current_ibfk_3` FOREIGN KEY (`subclass_id`) REFERENCES `subclass_current` (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        """)
-        
-        mydb.commit()
-        
-        #Dump mainclass_current, subclass_current and uspc_current if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
-        cursor.execute('SET FOREIGN_KEY_CHECKS=0')
-        cursor.execute('truncate table '+d+'mainclass_current')
-        cursor.execute('truncate table '+d+'subclass_current')
-        cursor.execute('truncate table '+d+'uspc_current')
-        cursor.execute('set foreign_key_checks=1')
-        mydb.commit()
-        
-    #Upload mainclass data
-    mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
-    for m in mainclass:
-        towrite = [re.sub('"','',item) for item in m]
-        towrite = [re.sub("'",'',w) for w in towrite]
-        query = "insert into mainclass_current values ('"+"','".join(towrite)+"')"
-        query = query.replace(",'NULL'",",NULL")
-        for d in dbnames:
-            try:
-                query = query.replace("mainclass_current",d+'.mainclass_current')
-                cursor.execute(query)
-            except:
-                pass
-    #Upload subclass data
-    subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
-    exist = {}
-    for m in subclass:
-        towrite = [re.sub('"','',item) for item in m]
-        towrite = [re.sub("'",'',w) for w in towrite]
-        try:
-            gg = exist[towrite[0]]
-        except:
-            exist[towrite[0]] = 1
-            try:
-                towrite[1] = re.search('^(.*?)-',towrite[1]).group(1)
-            except:
-                pass
-            query = "insert into subclass_current values ('"+"','".join(towrite)+"')"
+    for n in range(2):
+        d = dbnames[n]
+        if d is not None:
+            if n == 0:
+                idname = 'application'
+            else:
+                idname = 'patent'
+            
+            #Create tables for current classification if they do not exist - mainclass_current, subclass_current and uspc_current
+            cursor.execute("""
+            -- Dumping structure for table PatentsProcessorGrant.mainclass_current
+                CREATE TABLE IF NOT EXISTS `"""+d+"""`.`mainclass_current` (
+                  `id` varchar(20) NOT NULL,
+                  `title` varchar(256) DEFAULT NULL,
+                  `text` varchar(256) DEFAULT NULL,
+                  PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;""")
+            mydb.commit()
+            cursor.execute("""
+            -- Dumping structure for table PatentsProcessorGrant.subclass_current
+                CREATE TABLE IF NOT EXISTS `"""+d+"""`.`subclass_current` (
+                  `id` varchar(20) NOT NULL,
+                  `title` varchar(256) DEFAULT NULL,
+                  `text` varchar(256) DEFAULT NULL,
+                  PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+            """)
+            mydb.commit()
+            cursor.execute("""
+            -- Dumping structure for table PatentsProcessorGrant.uspc_current
+                CREATE TABLE IF NOT EXISTS `"""+d+"""`.`uspc_current` (
+                  `uuid` varchar(36) NOT NULL,
+                  `"""+idname+"""_id` varchar(20) DEFAULT NULL,
+                  `mainclass_id` varchar(20) DEFAULT NULL,
+                  `subclass_id` varchar(20) DEFAULT NULL,
+                  `sequence` int(11) DEFAULT NULL,
+                  PRIMARY KEY (`uuid`),
+                  KEY `"""+idname+"""_id` (`"""+idname+"""_id`),
+                  KEY `mainclass_id` (`mainclass_id`),
+                  KEY `subclass_id` (`subclass_id`),
+                  KEY `ix_uspc_sequence` (`sequence`),
+                  CONSTRAINT `uspc_current_ibfk_1` FOREIGN KEY (`"""+idname+"""_id`) REFERENCES `"""+idname+"""` (`id`),
+                  CONSTRAINT `uspc_current_ibfk_2` FOREIGN KEY (`mainclass_id`) REFERENCES `mainclass_current` (`id`),
+                  CONSTRAINT `uspc_current_ibfk_3` FOREIGN KEY (`subclass_id`) REFERENCES `subclass_current` (`id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+            """)
+            
+            mydb.commit()
+            
+            #Dump mainclass_current, subclass_current and uspc_current if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
+            cursor.execute('SET FOREIGN_KEY_CHECKS=0')
+            cursor.execute('truncate table '+d+'.mainclass_current')
+            cursor.execute('truncate table '+d+'.subclass_current')
+            cursor.execute('truncate table '+d+'.uspc_current')
+            cursor.execute('set foreign_key_checks=1')
+            mydb.commit()
+            
+        #Upload mainclass data
+        mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
+        for m in mainclass:
+            towrite = [re.sub('"','',item) for item in m]
+            towrite = [re.sub("'",'',w) for w in towrite]
+            query = "insert into mainclass_current values ('"+"','".join(towrite)+"')"
             query = query.replace(",'NULL'",",NULL")
             for d in dbnames:
                 try:
-                    query = query.replace("subclass_current",d+'.subclass_current')
+                    query = query.replace("mainclass_current",d+'.mainclass_current')
                     cursor.execute(query)
                 except:
                     pass
-            
-    mydb.commit()
+        #Upload subclass data
+        subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
+        exist = {}
+        for m in subclass:
+            towrite = [re.sub('"','',item) for item in m]
+            towrite = [re.sub("'",'',w) for w in towrite]
+            try:
+                gg = exist[towrite[0]]
+            except:
+                exist[towrite[0]] = 1
+                try:
+                    towrite[1] = re.search('^(.*?)-',towrite[1]).group(1)
+                except:
+                    pass
+                query = "insert into subclass_current values ('"+"','".join(towrite)+"')"
+                query = query.replace(",'NULL'",",NULL")
+                for d in dbnames:
+                    try:
+                        query = query.replace("subclass_current",d+'.subclass_current')
+                        cursor.execute(query)
+                    except:
+                        pass
+                
+        mydb.commit()
     
     if patdb is not None:
         # Get all patent numbers in the current database not to upload full USPC table going back to 19th century
