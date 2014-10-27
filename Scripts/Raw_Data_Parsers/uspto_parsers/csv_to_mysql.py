@@ -181,7 +181,6 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
         user=username,
         passwd=password)
     cursor = mydb.cursor()
-    
     dbnames = [appdb,patdb]
     
     for n in range(2):
@@ -334,7 +333,6 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                 
         errorlog.close()
         mydb.commit()
-        
     if appdb is not None:
         # Get all application numbers in the current database not to upload full USPC table going back to 19th century
         cursor.execute('select id,number from '+appdb+'.application')
@@ -374,7 +372,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
             try:
                 gg = current_exist[k]
             except:
-                cursor.execute('select * from '+appdb+'.uspc where patent_id ="'+str(k)+'"')
+                cursor.execute('select * from '+appdb+'.uspc where application_id ="'+str(k)+'"')
                 datum = cursor.fetchall()
                 for d in datum:
                     cursor.execute('select * from '+appdb+'.mainclass_current where id = "'+d[2]+'"')
