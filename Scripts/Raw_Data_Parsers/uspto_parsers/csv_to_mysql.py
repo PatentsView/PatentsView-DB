@@ -42,20 +42,6 @@ def mysql_upload(host,username,password,dbname,folder):
         use_unicode=True)
     cursor = mydb.cursor()
     
-    #Add filename column to patent table
-    try:
-        cursor.execute('ALTER TABLE patent ADD filename varchar(120) DEFAULT NULL')
-        mydb.commit()
-    except:
-        pass
-    
-    #Change column length for type in patent table
-    try:
-        cursor.execute('ALTER TABLE patent MODIFY type varchar(100)')
-        mydb.commit()
-    except:
-        pass
-    
     #Empty the allpatents container to free up memory - not needed any more
     allpatents = {}
     
@@ -192,47 +178,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
             else:
                 idname = 'patent'
             
-            #Create tables for current classification if they do not exist - mainclass_current, subclass_current and uspc_current
-            cursor.execute("""
-            -- Dumping structure for table PatentsProcessorGrant.mainclass_current
-                CREATE TABLE IF NOT EXISTS `"""+d+"""`.`mainclass_current` (
-                  `id` varchar(20) NOT NULL,
-                  `title` varchar(256) DEFAULT NULL,
-                  `text` varchar(256) DEFAULT NULL,
-                  PRIMARY KEY (`id`)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;""")
-            mydb.commit()
-            cursor.execute("""
-            -- Dumping structure for table PatentsProcessorGrant.subclass_current
-                CREATE TABLE IF NOT EXISTS `"""+d+"""`.`subclass_current` (
-                  `id` varchar(20) NOT NULL,
-                  `title` varchar(256) DEFAULT NULL,
-                  `text` varchar(256) DEFAULT NULL,
-                  PRIMARY KEY (`id`)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-            """)
-            mydb.commit()
-            cursor.execute("""
-            -- Dumping structure for table PatentsProcessorGrant.uspc_current
-                CREATE TABLE IF NOT EXISTS `"""+d+"""`.`uspc_current` (
-                  `uuid` varchar(36) NOT NULL,
-                  `"""+idname+"""_id` varchar(20) DEFAULT NULL,
-                  `mainclass_id` varchar(20) DEFAULT NULL,
-                  `subclass_id` varchar(20) DEFAULT NULL,
-                  `sequence` int(11) DEFAULT NULL,
-                  PRIMARY KEY (`uuid`),
-                  KEY `"""+idname+"""_id` (`"""+idname+"""_id`),
-                  KEY `mainclass_id` (`mainclass_id`),
-                  KEY `subclass_id` (`subclass_id`),
-                  KEY `ix_uspc_sequence` (`sequence`),
-                  CONSTRAINT `uspc_current_ibfk_1` FOREIGN KEY (`"""+idname+"""_id`) REFERENCES `"""+idname+"""` (`id`),
-                  CONSTRAINT `uspc_current_ibfk_2` FOREIGN KEY (`mainclass_id`) REFERENCES `mainclass_current` (`id`),
-                  CONSTRAINT `uspc_current_ibfk_3` FOREIGN KEY (`subclass_id`) REFERENCES `subclass_current` (`id`)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-            """)
-            
-            mydb.commit()
-            
+
             #Dump mainclass_current, subclass_current and uspc_current if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
             cursor.execute('SET FOREIGN_KEY_CHECKS=0')
             cursor.execute('truncate table '+d+'.mainclass_current')
