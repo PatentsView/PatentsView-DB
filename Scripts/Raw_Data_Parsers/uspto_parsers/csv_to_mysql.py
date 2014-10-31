@@ -72,7 +72,6 @@ def mysql_upload(host,username,password,dbname,folder):
     for l in locids:
         subclasschek[l.lower()] = 1
     
-    diri = ['patent.csv','rawlocation.csv','rawinventor.csv']
     for d in diri:
         print d
         infile = codecs.open(os.path.join(folder,d),'rb',encoding='utf-8').read().split('\r\n')
