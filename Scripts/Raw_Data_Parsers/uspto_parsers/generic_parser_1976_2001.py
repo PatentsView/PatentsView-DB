@@ -355,8 +355,7 @@ def parse_patents(fd,fd2):
                         subclass = 'NULL'
                         group = 'NULL'
                         subgroup = 'NULL'
-                        
-                        intclass = re.search('ICL\s+(.*?)$',line).group(1)
+                        intclass = re.search('ICL\s\s(.*?)$',line).group(1)
                         if int(year) <= 1984:
                             intsec = intclass[0]
                             mainclass = intclass[1:3]
@@ -386,14 +385,14 @@ def parse_patents(fd,fd2):
                             subclass = intclass[3]
                             group = re.sub('^\s+','',intclass[4:7])
                             subgroup = re.sub('^\s+','',intclass[7:])
-                   
+                        
                         ipcr[id_generator()] = [patent_id,mainclass,intsec,subclass, group,subgroup,"NULL","NULL","NULL","NULL","NULL","NULL",str(num)]
                         num+=1     
                         
                     if line.startswith("OCL"):
                         origmainclass = 'NULL'
                         origsubclass = 'NULL'
-                        origclass = re.search('OCL\s+(.*?)$',line).group(1).upper()
+                        origclass = re.search('OCL\s\s(.*?)$',line).group(1).upper()
                         origmainclass = re.sub('\s+','',origclass[0:3])
                         origsubclass = re.sub('\s+','',origclass[3:])
                         if len(origsubclass) > 3 and re.search('^[A-Z]',origsubclass[3:]) is None:
@@ -409,7 +408,7 @@ def parse_patents(fd,fd2):
                     if line.startswith("XCL"):
                         crossrefmain = "NULL"
                         crossrefsub = "NULL"
-                        crossrefclass = re.search('XCL\s+(.*?)$',line).group(1).upper()
+                        crossrefclass = re.search('XCL\s\s(.*?)$',line).group(1).upper()
                         crossrefmain = re.sub('\s+','',crossrefclass[:3])
                         crossrefsub = re.sub('\s+','',crossrefclass[3:])
                         if len(crossrefsub) > 3 and re.search('^[A-Z]',crossrefsub[3:]) is None:
@@ -455,7 +454,7 @@ def parse_patents(fd,fd2):
                             refpatname = re.search('NAM\s+(.*?)$',line).group(1)
                             
                         if line.startswith('OCL'):
-                            refpatclass = re.search('OCL\s+(.*?)$',line).group(1) 
+                            refpatclass = re.search('OCL\s\s(.*?)$',line).group(1) 
                     uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,"NULL","NULL",refpatnum,'US',"CITATION SOURCE",str(n)]
             except:
                 pass
@@ -491,7 +490,7 @@ def parse_patents(fd,fd2):
                                 forrefpatcountry = forrefpatcountry[:-1]
                             
                         if line.startswith('ICL'):
-                            forrefpatclass = re.search('ICL\s+(.*?)$',line).group(1) 
+                            forrefpatclass = re.search('ICL\s\s(.*?)$',line).group(1) 
                     foreigncitation[id_generator()] = [patent_id,forrefpatdate,"NULL",forrefpatnum,forrefpatcountry,"NULL",str(n)] 
             except:
                 pass
