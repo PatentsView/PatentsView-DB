@@ -168,7 +168,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
     cursor = mydb.cursor()
     
     dbnames = [appdb,patdb]
-    
+    """
     for n in range(2):
         d = dbnames[n]
         if d is not None:
@@ -195,8 +195,6 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
             query = query.replace(",'NULL'",",NULL")
             for d in dbnames:
                 try:
-                    query = "insert into mainclass_current values ('"+"','".join(towrite)+"')"
-                    query = query.replace(",'NULL'",",NULL")
                     query = query.replace("mainclass_current",d+'.mainclass_current')
                     cursor.execute(query)
                 except:
@@ -225,7 +223,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                         pass
                 
         mydb.commit()
-    
+    """
     if patdb is not None:
         # Get all patent numbers in the current database not to upload full USPC table going back to 19th century
         cursor.execute('select id,number from '+patdb+'.patent')
@@ -307,16 +305,15 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                     except:
                         pass
                 towrite[3] = towrite[2]+'/'+re.sub('^0+','',towrite[3])
+                towrite[1] = towrite[1][:4]+'/'+towrite[1] 
                 try:
                     query = "insert into "+appdb+".uspc_current values ('"+"','".join(towrite)+"')"
                     query = query.replace(",'NULL'",",NULL")
                     cursor.execute(query)
                 except:
                     print>>errorlog,' '.join(towrite+[m[0]])
-                
             except:
                 pass
-        
         
         for k in patnums.keys():
             try:
