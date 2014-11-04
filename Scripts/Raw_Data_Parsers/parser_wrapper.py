@@ -21,15 +21,18 @@ params = parser.parse_args()
 
 if int(params.period) == 1:
     generic_parser_1976_2001.parse_patents(params.input_dir,params.output_dir)
-if int(params.period) == 2:
+
+elif int(params.period) == 2:
     generic_parser_2002_2004.parse_patents(params.input_dir,params.output_dir)
 
-if int(params.mysql) == 1 and int(params.period) not in range(1,3):
+elif int(params.mysql) == 1 and int(params.period) not in range(1,3):
     csv_to_mysql.mysql_upload(params.mysql_host,params.mysql_username,params.mysql_passwd,params.mysql_dbname,params.mysql_input_dir)
 
-if int(params.uspc_create) == 1 and int(params.period) not in range(1,3):
+elif int(params.uspc_create) == 1 and int(params.period) not in range(1,3):
     uspc_table.uspc_table(params.uspc_input_dir)
 
-if int(params.uspc_upload) == 1 and int(params.period) not in range(1,3):
+elif int(params.uspc_upload) == 1 and int(params.period) not in range(1,3):
     csv_to_mysql.upload_uspc(params.mysql_host,params.mysql_username,params.mysql_passwd,params.uspc_appdb,params.uspc_patdb,params.uspc_upload_dir)
     
+else:
+    print "Please check you parameters. Consult python parser_wrapper.py --help if necessary."
