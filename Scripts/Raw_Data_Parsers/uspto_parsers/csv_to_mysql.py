@@ -168,7 +168,6 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
     cursor = mydb.cursor()
     
     dbnames = [appdb,patdb]
-    """
     for n in range(2):
         d = dbnames[n]
         if d is not None:
@@ -223,7 +222,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                         pass
                 
         mydb.commit()
-    """
+    
     if patdb is not None:
         # Get all patent numbers in the current database not to upload full USPC table going back to 19th century
         cursor.execute('select id,number from '+patdb+'.patent')
@@ -295,7 +294,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                 gg = patnums[m[0]]
                 current_exist[m[0]] = 1
                 towrite = [re.sub('"','',item) for item in m]
-                towrite = [re.sub("'",'',w) for w in towrite]
+                towrite = [re.sub("'","",w) for w in towrite]
                 towrite.insert(0,id_generator())
                 towrite[1] = gg
                 for t in range(len(towrite)):
