@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import argparse
 from uspto_parsers import generic_parser_1976_2001,generic_parser_2002_2004,csv_to_mysql,uspc_table
 

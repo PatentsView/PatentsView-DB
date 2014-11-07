@@ -184,13 +184,13 @@ def parse_patents(fd,fd2):
             
             ###                PARSERS FOR LOGICAL GROUPS                  ###
             #PATN
-            updnum = 'NULL'
-            appnum = 'NULL'
-            apptype = 'NULL'
-            appdate = 'NULL'
-            title = 'NULL'
-            issdate = 'NULL'
-            numclaims = 'NULL'
+            #updnum = 'NULL'
+            #appnum = 'NULL'
+            #apptype = 'NULL'
+            #appdate = 'NULL'
+            #title = 'NULL'
+            #issdate = 'NULL'
+            #numclaims = 'NULL'
             
             try:
                 patent = avail_fields['PATN'].split('\n')
@@ -339,7 +339,7 @@ def parse_patents(fd,fd2):
                     if assgcountry == 'NULL':
                         assgcountry = 'US'
                     rawlocation[id_generator()] = [loc_idd,"NULL",assgcity,assgstate,assgcountry]
-                    rawassignee[id_generator()] = [patent_id,"NULL",loc_idd,re.sub('^0+','',assgtype),assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
+                    rawassignee[id_generator()] = [patent_id,"NULL",loc_idd,assgtype,assgfname,assglname,assgorg,assgcountry,'NULL',str(n)]
             except:
                 pass
             

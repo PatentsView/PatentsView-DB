@@ -4,6 +4,28 @@ def parse_patents(fd,fd2):
     from bs4 import BeautifulSoup as bs
     
     import HTMLParser
+    import htmlentitydefs
+
+    _char = re.compile(r'&(\w+?);')
+    
+    # Generate some extra HTML entities
+    defs=htmlentitydefs.entitydefs
+    entities = open('uspto_parsers/htmlentities').read().split('\n')
+    for e in entities:
+        try:
+            first = re.sub('\s+|\"|;|&','',e[3:15])
+            second = re.sub('\s+|\"|;|&','',e[15:24])
+            define = re.search("(?<=\s\s\').*?$",e).group()
+            defs[first] = define[:-1].encode('utf-8')
+            defs[second] = define[:-1]
+        except:
+            pass
+    
+    def _char_unescape(m, defs=defs):
+        try:
+            return defs[m.group(1)].encode('utf-8')
+        except:
+            return m.group(0)
     
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -138,7 +160,8 @@ def parse_patents(fd,fd2):
                 'P3': 'plant', #Plant Patent (with pre-grant publication) issued on or after January 2, 2001. 
                 'P4': 'plant', #Second or subsequent publication of a Plant Patent Application. 
                 'P9': 'plant', #Correction publication of a Plant Patent Application. 
-                'S1': 'design' #Design Patent.  
+                'S1': 'design', #Design Patent.
+                'NULL': 'NULL' #Placeholder for NULL values for duplicates and such.
                  }
     
     
@@ -154,13 +177,17 @@ def parse_patents(fd,fd2):
     
     for d in diri:
         print d
-        infile = h.unescape(open(fd+d,'rb').read().decode('utf-8','ignore').replace('&angst','&aring')).split('<!DOCTYPE')
+        infile = open(fd+d,'rb').read().decode('utf-8','ignore').replace('&angst','&aring')
+        infile = infile.encode('utf-8','ignore')
+        infile = _char.sub(_char_unescape,infile)
+        #infile = h.unescape(infile)
+        infile = infile.split('<!DOCTYPE')
         del infile[0]
         numi+=len(infile)
         for i in infile:
             # Get relevant logical groups from patent records according to documentation
             # Some patents can contain several INVT, ASSG and other logical groups - so, is important to retain all
-            i = i.encode('utf-8','ignore')
+            i = i.decode()
             avail_fields = {}
             num = 1
             avail_fields['B100'] = i.split('B200')[0]
@@ -222,10 +249,10 @@ def parse_patents(fd,fd2):
             ###                PARSERS FOR LOGICAL GROUPS                  ###
            
             #PATN
-            updnum = 'NULL'
-            issdate = 'NULL'
-            patkind = 'NULL'
-            patcountry = 'NULL'
+            #updnum = 'NULL'
+            #issdate = 'NULL'
+            #patkind = 'NULL'
+            #patcountry = 'NULL'
             
 
             try:
@@ -261,9 +288,9 @@ def parse_patents(fd,fd2):
                 pass
             
             #Application
-            appnum = 'NULL'
-            apptype = 'NULL'
-            appdate = 'NULL'
+            #appnum = 'NULL'
+            #apptype = 'NULL'
+            #appdate = 'NULL'
             
             try:
                 patent = avail_fields['B200'].split('\n')
@@ -283,7 +310,7 @@ def parse_patents(fd,fd2):
             
             
             #Patent title
-            title = 'NULL'
+            #title = 'NULL'
             try:
                 patent = avail_fields['B540']
                 title = re.search('<PDAT>(.*?)</PDAT>',patent).group(1)
@@ -293,7 +320,7 @@ def parse_patents(fd,fd2):
             
             
             #Number of claims
-            numclaims = 'NULL'
+            #numclaims = 'NULL'
             try:
                 patent = avail_fields['B570'].split('\n')
                 for line in patent:
@@ -308,22 +335,25 @@ def parse_patents(fd,fd2):
             application[apptype+'/'+appnum[2:]] = [patent_id,apptype,appnum,patcountry,appdate]
             
             # Claims data
-            text = re.search('<CL(.*)</CL>',i,re.DOTALL).group()
-            soup = bs(text)
-            claimsdata = soup.findAll('clm')
-            
-            for so in claimsdata:
-                clid = so['id']
-                clnum = int(clid.replace('CLM-',''))
-                try:
-                    dependent = re.search('<clref id="CLM-(\d+)',str(so),re.DOTALL).group(1)
-                    dependent = str(int(dependent))
-                except:
-                    dependent = "NULL"
-                need = re.sub('<.*?>|</.*?>','',str(so))
-                need = re.sub('[\n\t\r\f]+','',need)
-                need = re.sub('^\d+\. ','',need)
-                claims[id_generator()] = [patent_id,need,dependent,str(clnum)]
+            try:
+                text = re.search('<CL(.*)</CL>',i,re.DOTALL).group()
+                soup = bs(text)
+                claimsdata = soup.findAll('clm')
+                
+                for so in claimsdata:
+                    clid = so['id']
+                    clnum = int(clid.replace('CLM-',''))
+                    try:
+                        dependent = re.search('<clref id="CLM-(\d+)',str(so),re.DOTALL).group(1)
+                        dependent = str(int(dependent))
+                    except:
+                        dependent = "NULL"
+                    need = re.sub('<.*?>|</.*?>','',str(so))
+                    need = re.sub('[\n\t\r\f]+','',need)
+                    need = re.sub('^\d+\. ','',need)
+                    claims[id_generator()] = [patent_id,need,dependent,str(clnum)]
+            except:
+                pass
             
             #INVT - can be several
             try:
@@ -366,10 +396,6 @@ def parse_patents(fd,fd2):
                             invtzip = re.search('<PCODE><PDAT>(.*?)</PDAT>',line).group(1)
                             #print invtzip
                 
-                    if re.search('&',fname):
-                        check = open('e:/test_utf.txt','a')
-                        print>>check, i
-                        check.close()
                     loc_idd = id_generator()
                     if invtcountry == 'NULL':
                         invtcountry = 'US'
