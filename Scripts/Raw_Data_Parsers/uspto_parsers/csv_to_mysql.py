@@ -192,10 +192,9 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
         #Upload mainclass data
         mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
         for m in mainclass:
-            towrite = [re.sub('"','',item) for item in m]
-            towrite = [re.sub("'",'',w) for w in towrite]
-            query = "insert into mainclass_current values ('"+"','".join(towrite)+"')"
-            query = query.replace(",'NULL'",",NULL")
+            towrite = [re.sub('"',"'",item) for item in m]
+            query = """insert into mainclass_current values ("""+'"'+'","'.join(towrite)+'")'
+            query = query.replace(',"NULL"',",NULL")
             for d in dbnames:
                 try:
                     query = query.replace("mainclass_current",d+'.mainclass_current')
@@ -206,8 +205,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
         subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
         exist = {}
         for m in subclass:
-            towrite = [re.sub('"','',item) for item in m]
-            towrite = [re.sub("'",'',w) for w in towrite]
+            towrite = [re.sub('"',"'",item) for item in m]
             try:
                 gg = exist[towrite[0]]
             except:
@@ -218,8 +216,8 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                     pass
                 for d in dbnames:
                     try:
-                        query = "insert into subclass_current values ('"+"','".join(towrite)+"')"
-                        query = query.replace(",'NULL'",",NULL")
+                        query = """insert into subclass_current values ("""+'"'+'","'.join(towrite)+'")'
+                        query = query.replace(',"NULL"',",NULL")
                         query = query.replace("subclass_current",d+'.subclass_current')
                         cursor.execute(query)
                     except:
@@ -242,8 +240,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
             try:
                 gg = patnums[m[0]]
                 current_exist[m[0]] = 1
-                towrite = [re.sub('"','',item) for item in m]
-                towrite = [re.sub("'",'',w) for w in towrite]
+                towrite = [re.sub('"',"'",item) for item in m]
                 towrite.insert(0,id_generator())
                 towrite[1] = gg
                 for t in range(len(towrite)):
@@ -254,8 +251,8 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                         pass
                 towrite[3] = towrite[2]+'/'+re.sub('^0+','',towrite[3])
                 try:
-                    query = "insert into "+patdb+".uspc_current values ('"+"','".join(towrite)+"')"
-                    query = query.replace(",'NULL'",",NULL")
+                    query = """insert into """+patdb+""".uspc_current values ("""+'"'+'","'.join(towrite)+'")'
+                    query = query.replace(',"NULL"',",NULL")
                     cursor.execute(query)
                 except:
                     print>>errorlog,' '.join(towrite+[m[0]])
@@ -275,8 +272,8 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                     cursor.execute('select * from '+patdb+'.subclass_current where id = "'+d[3]+'"')
                     if len(cursor.fetchall()) == 0:
                         cursor.execute('insert into '+patdb+'.subclass_current values ("'+d[3]+'",NULL,NULL)')
-                    query = "insert into "+patdb+".uspc_current values ('"+"','".join([str(dd) for dd in d])+"')"
-                    query = query.replace(",'NULL'",",NULL")
+                    query = "insert into "+patdb+".uspc_current values ("+'"'+'","'.join([str(dd) for dd in d])+'")'
+                    query = query.replace(',"NULL"',",NULL")
                     cursor.execute(query)
                         
                 
@@ -297,8 +294,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
             try:
                 gg = patnums[m[0]]
                 current_exist[m[0]] = 1
-                towrite = [re.sub('"','',item) for item in m]
-                towrite = [re.sub("'","",w) for w in towrite]
+                towrite = [re.sub('"',"'",item) for item in m]
                 towrite.insert(0,id_generator())
                 towrite[1] = gg
                 for t in range(len(towrite)):
@@ -310,8 +306,8 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                 towrite[3] = towrite[2]+'/'+re.sub('^0+','',towrite[3])
                 towrite[1] = towrite[1][:4]+'/'+towrite[1] 
                 try:
-                    query = "insert into "+appdb+".uspc_current values ('"+"','".join(towrite)+"')"
-                    query = query.replace(",'NULL'",",NULL")
+                    query = """insert into """+appdb+""".uspc_current values ("""+'"'+'","'.join(towrite)+'")'
+                    query = query.replace(',"NULL"',",NULL")
                     cursor.execute(query)
                 except:
                     print>>errorlog,' '.join(towrite+[m[0]])
@@ -331,8 +327,8 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                     cursor.execute('select * from '+appdb+'.subclass_current where id = "'+d[3]+'"')
                     if len(cursor.fetchall()) == 0:
                         cursor.execute('insert into '+appdb+'.subclass_current values ("'+d[3]+'",NULL,NULL)')
-                    query = "insert into "+appdb+".uspc_current values ('"+"','".join([str(dd) for dd in d])+"')"
-                    query = query.replace(",'NULL'",",NULL")
+                    query = """insert into """+appdb+""".uspc_current values ("""+'"'+'","'.join([str(dd) for dd in d])+'")'
+                    query = query.replace(',"NULL"',",NULL")
                     cursor.execute(query)
                         
                 

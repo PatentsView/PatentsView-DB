@@ -80,13 +80,13 @@ def uspc_table(fd):
                     gg = exist[i[0]+'/'+i[1]]
                 except:
                     exist[i[0]+'/'+i[1]] = 1
-                    outp2.writerow([i[0]+'/'+i[1],i[2],"NULL"])
+                    outp2.writerow([i[0]+'/'+i[1],i[2]])
         except:
             try:
                 gg = exist[i[0]+'/'+i[1]]
             except:
                 exist[i[0]+'/'+i[1]] = 1
-                outp2.writerow([i[0]+'/'+i[1],i[2],"NULL"])
+                outp2.writerow([i[0]+'/'+i[1],i[2]])
     
     #Get patent-class pairs
     outp = csv.writer(open(os.path.join(fd,'USPC_patent_classes_data.csv'),'wb'))
