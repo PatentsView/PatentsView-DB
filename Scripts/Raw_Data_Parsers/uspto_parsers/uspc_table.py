@@ -74,7 +74,7 @@ def uspc_table(fd):
         i = k.split(' ')+[v]
         try:
             if i[1] == '':
-                outp1.writerow([i[0],i[2],"NULL"])
+                outp1.writerow([i[0],i[2]])
             else:
                 try:
                     gg = exist[i[0]+'/'+i[1]]
