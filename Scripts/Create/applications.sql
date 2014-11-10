@@ -10,12 +10,12 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping database structure for app_smalltest_20141031
-CREATE DATABASE IF NOT EXISTS `app_smalltest_20141031` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `app_smalltest_20141031`;
+-- Dumping database structure for app_smalltest_20141110
+CREATE DATABASE IF NOT EXISTS `app_smalltest_20141110` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `app_smalltest_20141110`;
 
 
--- Dumping structure for table app_smalltest_20141031.application
+-- Dumping structure for table app_smalltest_20141110.application
 CREATE TABLE IF NOT EXISTS `application` (
   `id` varchar(36) NOT NULL,
   `type` varchar(20) DEFAULT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `application` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.application_assignee
+-- Dumping structure for table app_smalltest_20141110.application_assignee
 CREATE TABLE IF NOT EXISTS `application_assignee` (
   `application_id` varchar(20) DEFAULT NULL,
   `assignee_id` varchar(36) DEFAULT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `application_assignee` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.application_inventor
+-- Dumping structure for table app_smalltest_20141110.application_inventor
 CREATE TABLE IF NOT EXISTS `application_inventor` (
   `application_id` varchar(20) DEFAULT NULL,
   `inventor_id` varchar(36) DEFAULT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `application_inventor` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.assignee
+-- Dumping structure for table app_smalltest_20141110.assignee
 CREATE TABLE IF NOT EXISTS `assignee` (
   `id` varchar(36) NOT NULL,
   `type` varchar(10) DEFAULT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `assignee` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.claim
+-- Dumping structure for table app_smalltest_20141110.claim
 CREATE TABLE IF NOT EXISTS `claim` (
   `uuid` varchar(36) NOT NULL,
   `application_id` varchar(20) DEFAULT NULL,
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `claim` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.inventor
+-- Dumping structure for table app_smalltest_20141110.inventor
 CREATE TABLE IF NOT EXISTS `inventor` (
   `id` varchar(36) NOT NULL,
   `name_first` varchar(64) DEFAULT NULL,
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `inventor` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.location
+-- Dumping structure for table app_smalltest_20141110.location
 CREATE TABLE IF NOT EXISTS `location` (
   `id` varchar(128) NOT NULL,
   `city` varchar(128) DEFAULT NULL,
@@ -113,16 +113,16 @@ CREATE TABLE IF NOT EXISTS `location` (
   `latitude` float DEFAULT NULL,
   `longitude` float DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `ix_location_country` (`country`),
-  KEY `ix_location_state` (`state`),
   KEY `dloc_idx2` (`city`,`state`,`country`),
-  KEY `dloc_idx1` (`latitude`,`longitude`)
+  KEY `ix_location_country` (`country`),
+  KEY `dloc_idx1` (`latitude`,`longitude`),
+  KEY `ix_location_state` (`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.location_assignee
+-- Dumping structure for table app_smalltest_20141110.location_assignee
 CREATE TABLE IF NOT EXISTS `location_assignee` (
   `location_id` varchar(128) DEFAULT NULL,
   `assignee_id` varchar(36) DEFAULT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `location_assignee` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.location_inventor
+-- Dumping structure for table app_smalltest_20141110.location_inventor
 CREATE TABLE IF NOT EXISTS `location_inventor` (
   `location_id` varchar(128) DEFAULT NULL,
   `inventor_id` varchar(36) DEFAULT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS `location_inventor` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.mainclass
+-- Dumping structure for table app_smalltest_20141110.mainclass
 CREATE TABLE IF NOT EXISTS `mainclass` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS `mainclass` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.mainclass_current
+-- Dumping structure for table app_smalltest_20141110.mainclass_current
 CREATE TABLE IF NOT EXISTS `mainclass_current` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
@@ -170,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `mainclass_current` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.rawassignee
+-- Dumping structure for table app_smalltest_20141110.rawassignee
 CREATE TABLE IF NOT EXISTS `rawassignee` (
   `uuid` varchar(36) NOT NULL,
   `application_id` varchar(20) DEFAULT NULL,
@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS `rawassignee` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.rawinventor
+-- Dumping structure for table app_smalltest_20141110.rawinventor
 CREATE TABLE IF NOT EXISTS `rawinventor` (
   `uuid` varchar(36) NOT NULL,
   `application_id` varchar(20) DEFAULT NULL,
@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS `rawinventor` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.rawlocation
+-- Dumping structure for table app_smalltest_20141110.rawlocation
 CREATE TABLE IF NOT EXISTS `rawlocation` (
   `id` varchar(128) NOT NULL,
   `location_id` varchar(128) DEFAULT NULL,
@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS `rawlocation` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.subclass
+-- Dumping structure for table app_smalltest_20141110.subclass
 CREATE TABLE IF NOT EXISTS `subclass` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
@@ -247,7 +247,7 @@ CREATE TABLE IF NOT EXISTS `subclass` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.subclass_current
+-- Dumping structure for table app_smalltest_20141110.subclass_current
 CREATE TABLE IF NOT EXISTS `subclass_current` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
@@ -258,7 +258,7 @@ CREATE TABLE IF NOT EXISTS `subclass_current` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.temporary_update
+-- Dumping structure for table app_smalltest_20141110.temporary_update
 CREATE TABLE IF NOT EXISTS `temporary_update` (
   `pk` varchar(36) NOT NULL,
   `update` varchar(36) DEFAULT NULL,
@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS `temporary_update` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.uspc
+-- Dumping structure for table app_smalltest_20141110.uspc
 CREATE TABLE IF NOT EXISTS `uspc` (
   `uuid` varchar(36) NOT NULL,
   `application_id` varchar(20) DEFAULT NULL,
@@ -289,7 +289,7 @@ CREATE TABLE IF NOT EXISTS `uspc` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table app_smalltest_20141031.uspc_current
+-- Dumping structure for table app_smalltest_20141110.uspc_current
 CREATE TABLE IF NOT EXISTS `uspc_current` (
   `uuid` varchar(36) NOT NULL,
   `application_id` varchar(20) DEFAULT NULL,
