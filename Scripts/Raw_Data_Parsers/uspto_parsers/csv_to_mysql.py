@@ -174,7 +174,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
     dbnames = [appdb,patdb]
     for n in range(2):
         d = dbnames[n]
-        if d is not None:
+        if d:
             if n == 0:
                 idname = 'application'
             else:
@@ -187,45 +187,59 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
             cursor.execute('truncate table '+d+'.subclass_current')
             cursor.execute('truncate table '+d+'.uspc_current')
             cursor.execute('set foreign_key_checks=1')
-            mydb.commit()
-            
-        #Upload mainclass data
-        mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
-        for m in mainclass:
-            towrite = [re.sub('"',"'",item) for item in m]
-            query = """insert into mainclass_current values ("""+'"'+'","'.join(towrite)+'")'
-            query = query.replace(',"NULL"',",NULL")
-            for d in dbnames:
-                try:
-                    query = query.replace("mainclass_current",d+'.mainclass_current')
-                    cursor.execute(query)
-                except:
-                    pass
-        #Upload subclass data
-        subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
-        exist = {}
-        for m in subclass:
-            towrite = [re.sub('"',"'",item) for item in m]
-            try:
-                gg = exist[towrite[0]]
-            except:
-                exist[towrite[0]] = 1
-                try:
-                    towrite[1] = re.search('^(.*?)-',towrite[1]).group(1)
-                except:
-                    pass
-                for d in dbnames:
-                    try:
-                        query = """insert into subclass_current values ("""+'"'+'","'.join(towrite)+'")'
-                        query = query.replace(',"NULL"',",NULL")
-                        query = query.replace("subclass_current",d+'.subclass_current')
-                        cursor.execute(query)
-                    except:
-                        pass
-                
-        mydb.commit()
+            cursor.execute('insert into '+d+'.mainclass_current values("1","catch_all class")')
+            cursor.execute('insert into '+d+'.subclass_current values("1/1","catch_all class")')
+            mydb.commit() 
     
-    if patdb is not None:
+    #Upload mainclass data
+    mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
+    for m in mainclass:
+        towrite = [re.sub('"',"'",item) for item in m]
+        query = """insert into mainclass_current values ("""+'"'+'","'.join(towrite)+'")'
+        query = query.replace(',"NULL"',",NULL")
+        try:
+            query2 = query.replace("mainclass_current",appdb+'.mainclass_current')
+            cursor.execute(query2)
+        except:
+            pass
+        try:
+            query2 = query.replace("mainclass_current",patdb+'.mainclass_current')
+            cursor.execute(query2)
+        except:
+            pass
+    mydb.commit()
+
+    #Upload subclass data
+    subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
+    exist = {}
+    for m in subclass:
+        towrite = [re.sub('"',"'",item) for item in m]
+        try:
+            gg = exist[towrite[0]]
+        except:
+            exist[towrite[0]] = 1
+            try:
+                towrite[1] = re.search('^(.*?)-',towrite[1]).group(1)
+            except:
+                pass
+            query = """insert into subclass_current values ("""+'"'+'","'.join(towrite)+'")'
+            query = query.replace(',"NULL"',",NULL")
+            try:
+                query2 = query.replace("subclass_current",appdb+'.subclass_current')
+                cursor.execute(query2)
+            except:
+                print "BADDD"
+            try:
+                query2 = query.replace("subclass_current",patdb+'.subclass_current')
+                cursor.execute(query2)
+            except:
+                pass
+            
+    mydb.commit()
+                
+    #mydb.commit()
+    
+    if patdb:
         # Get all patent numbers in the current database not to upload full USPC table going back to 19th century
         cursor.execute('select id,number from '+patdb+'.patent')
         patnums = {}
@@ -280,7 +294,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
         errorlog.close()
         mydb.commit()
     
-    if appdb is not None:
+    if appdb:
         # Get all application numbers in the current database not to upload full USPC table going back to 19th century
         cursor.execute('select id,number from '+appdb+'.application')
         patnums = {}
