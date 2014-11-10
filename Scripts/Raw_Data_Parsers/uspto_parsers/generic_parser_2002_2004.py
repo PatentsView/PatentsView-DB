@@ -147,7 +147,7 @@ def parse_patents(fd,fd2):
                 'Cn': 'utility', #Reexamination Certificate issued on or after January 2, 2001. NOTE: "n" represents a value 1 through 9 denoting the publication level. 
                 'E1': 'reissue', #Reissue Patent. 
                 'Fn': 'reexamination certificate', #Reexamination Certificate of a Reissue Patent NOTE: "n" represents a value 1 through 9 denoting the publication level. 
-                'H1': 'statutoty invention registration', #Statutory Invention Registration (SIR) Patent Documents. SIR documents began with the December 3, 1985 issue. 
+                'H1': 'statutory invention registration', #Statutory Invention Registration (SIR) Patent Documents. SIR documents began with the December 3, 1985 issue. 
                 'I1': 'reissue', #"X" Patents issued from July 31, 1790 to July 13, 1836. 
                 'I2': 'reissue', #"X" Reissue Patents issued from July 31, 1790 to July 13, 1836. 
                 'I3': 'additional improvements', #Additional Improvements - Patents issued between 1838 and 1861. 
