@@ -268,10 +268,10 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                 for d in datum:
                     cursor.execute('select * from '+patdb+'.mainclass_current where id = "'+d[2]+'"')
                     if len(cursor.fetchall()) == 0:
-                        cursor.execute('insert into '+patdb+'.mainclass_current values ("'+d[2]+'",NULL,NULL)')
+                        cursor.execute('insert into '+patdb+'.mainclass_current values ("'+d[2]+'",NULL)')
                     cursor.execute('select * from '+patdb+'.subclass_current where id = "'+d[3]+'"')
                     if len(cursor.fetchall()) == 0:
-                        cursor.execute('insert into '+patdb+'.subclass_current values ("'+d[3]+'",NULL,NULL)')
+                        cursor.execute('insert into '+patdb+'.subclass_current values ("'+d[3]+'",NULL)')
                     query = "insert into "+patdb+".uspc_current values ("+'"'+'","'.join([str(dd) for dd in d])+'")'
                     query = query.replace(',"NULL"',",NULL")
                     cursor.execute(query)
