@@ -10,6 +10,7 @@ def parse_patents(fd,fd2):
     
     # Generate some extra HTML entities
     defs=htmlentitydefs.entitydefs
+    defs['apos'] = "'"
     entities = open('uspto_parsers/htmlentities').read().split('\n')
     for e in entities:
         try:
@@ -17,16 +18,16 @@ def parse_patents(fd,fd2):
             second = re.sub('\s+|\"|;|&','',e[15:24])
             define = re.search("(?<=\s\s\').*?$",e).group()
             defs[first] = define[:-1].encode('utf-8')
-            defs[second] = define[:-1]
+            defs[second] = define[:-1].encode('utf-8')
         except:
             pass
     
     def _char_unescape(m, defs=defs):
         try:
-            return defs[m.group(1)].encode('utf-8')
+            return defs[m.group(1)].encode('utf-8','ignore')
         except:
-            return m.group(0)
-    
+            return m.group()
+            
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
     
@@ -180,14 +181,14 @@ def parse_patents(fd,fd2):
         infile = open(fd+d,'rb').read().decode('utf-8','ignore').replace('&angst','&aring')
         infile = infile.encode('utf-8','ignore')
         infile = _char.sub(_char_unescape,infile)
-        #infile = h.unescape(infile)
+        #infile = h.unescape(infile).encode('utf-8')
         infile = infile.split('<!DOCTYPE')
         del infile[0]
         numi+=len(infile)
         for i in infile:
             # Get relevant logical groups from patent records according to documentation
             # Some patents can contain several INVT, ASSG and other logical groups - so, is important to retain all
-            i = i.decode()
+            #i = i.decode()
             avail_fields = {}
             num = 1
             avail_fields['B100'] = i.split('B200')[0]
@@ -351,6 +352,8 @@ def parse_patents(fd,fd2):
                     need = re.sub('<.*?>|</.*?>','',str(so))
                     need = re.sub('[\n\t\r\f]+','',need)
                     need = re.sub('^\d+\. ','',need)
+                    need = _char.sub(_char_unescape,need)
+                    need = _char.sub(_char_unescape,need)
                     claims[id_generator()] = [patent_id,need,dependent,str(clnum)]
             except:
                 pass
