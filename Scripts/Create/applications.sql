@@ -113,10 +113,10 @@ CREATE TABLE IF NOT EXISTS `location` (
   `latitude` float DEFAULT NULL,
   `longitude` float DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `dloc_idx2` (`city`,`state`,`country`),
   KEY `ix_location_country` (`country`),
-  KEY `dloc_idx1` (`latitude`,`longitude`),
-  KEY `ix_location_state` (`state`)
+  KEY `dloc_idx2` (`city`,`state`,`country`),
+  KEY `ix_location_state` (`state`),
+  KEY `dloc_idx1` (`latitude`,`longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
@@ -151,8 +151,6 @@ CREATE TABLE IF NOT EXISTS `location_inventor` (
 -- Dumping structure for table app_smalltest_20141110.mainclass
 CREATE TABLE IF NOT EXISTS `mainclass` (
   `id` varchar(20) NOT NULL,
-  `title` varchar(256) DEFAULT NULL,
-  `text` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -163,7 +161,6 @@ CREATE TABLE IF NOT EXISTS `mainclass` (
 CREATE TABLE IF NOT EXISTS `mainclass_current` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
-  `text` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -227,9 +224,9 @@ CREATE TABLE IF NOT EXISTS `rawlocation` (
   `country` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `location_id` (`location_id`),
+  KEY `ix_rawlocation_country` (`country`),
   KEY `loc_idx1` (`city`,`state`,`country`),
   KEY `ix_rawlocation_state` (`state`),
-  KEY `ix_rawlocation_country` (`country`),
   CONSTRAINT `rawlocation_ibfk_1` FOREIGN KEY (`location_id`) REFERENCES `location` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -239,8 +236,6 @@ CREATE TABLE IF NOT EXISTS `rawlocation` (
 -- Dumping structure for table app_smalltest_20141110.subclass
 CREATE TABLE IF NOT EXISTS `subclass` (
   `id` varchar(20) NOT NULL,
-  `title` varchar(256) DEFAULT NULL,
-  `text` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -251,7 +246,6 @@ CREATE TABLE IF NOT EXISTS `subclass` (
 CREATE TABLE IF NOT EXISTS `subclass_current` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
-  `text` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
