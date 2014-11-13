@@ -151,7 +151,6 @@ def mysql_upload(host,username,password,dbname,folder):
             cursor.execute(query)
         
         for v in duplicdata.values():
-            print v
             query = """insert into """+d.replace('.csv','')+""" values ("""+'"'+'","'.join(v)+'")'
             query = query.replace(',"NULL"',",NULL")
             cursor.execute(query)
@@ -187,8 +186,8 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
             cursor.execute('truncate table '+d+'.subclass_current')
             cursor.execute('truncate table '+d+'.uspc_current')
             cursor.execute('set foreign_key_checks=1')
-            cursor.execute('insert into '+d+'.mainclass_current values("1","catch_all class")')
-            cursor.execute('insert into '+d+'.subclass_current values("1/1","catch_all class")')
+            cursor.execute('insert into '+d+'.mainclass_current values("1","Unclassified")')
+            cursor.execute('insert into '+d+'.subclass_current values("1/1","Unclassified")')
             mydb.commit() 
     
     #Upload mainclass data
@@ -228,7 +227,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                 query2 = query.replace("subclass_current",appdb+'.subclass_current')
                 cursor.execute(query2)
             except:
-                print "BADDD"
+                pass
             try:
                 query2 = query.replace("subclass_current",patdb+'.subclass_current')
                 cursor.execute(query2)
@@ -269,7 +268,16 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                     query = query.replace(',"NULL"',",NULL")
                     cursor.execute(query)
                 except:
-                    print>>errorlog,' '.join(towrite+[m[0]])
+                    if int(towrite[-1]) == 0:
+                        query = """insert into """+patdb+""".mainclass_current values ("""+'"'+towrite[2]+'",NULL)'
+                        cursor.execute(query)
+                        query = """insert into """+patdb+""".subclass_current values ("""+'"'+towrite[3]+'",NULL)'
+                        cursor.execute(query)
+                        query = """insert into """+patdb+""".uspc_current values ("""+'"'+'","'.join(towrite)+'")'
+                        query = query.replace(',"NULL"',",NULL")
+                        cursor.execute(query)
+                    else:
+                        print>>errorlog,' '.join(towrite+[m[0]])
             except:
                 pass
         
@@ -324,7 +332,16 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                     query = query.replace(',"NULL"',",NULL")
                     cursor.execute(query)
                 except:
-                    print>>errorlog,' '.join(towrite+[m[0]])
+                    if int(towrite[-1]) == 0:
+                        query = """insert into """+appdb+""".mainclass_current values ("""+'"'+towrite[2]+'",NULL)'
+                        cursor.execute(query)
+                        query = """insert into """+appdb+""".subclass_current values ("""+'"'+towrite[3]+'",NULL)'
+                        cursor.execute(query)
+                        query = """insert into """+appdb+""".uspc_current values ("""+'"'+'","'.join(towrite)+'")'
+                        query = query.replace(',"NULL"',",NULL")
+                        cursor.execute(query)
+                    else:
+                        print>>errorlog,' '.join(towrite+[m[0]])
             except:
                 pass
         

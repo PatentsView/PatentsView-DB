@@ -418,9 +418,9 @@ def parse_patents(fd,fd2):
                             crossrefsub = crossrefsub.replace(".","")
                         if crossrefsub != "":
                             mainclassdata[crossrefmain] = [crossrefmain]
-                            uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(n)]
+                            uspc[id_generator()] = [patent_id,crossrefmain,crossrefmain+'/'+crossrefsub,str(crossclass)]
                             subclassdata[crossrefmain+'/'+crossrefsub] = [crossrefmain+'/'+crossrefsub]
-                        crossclass+=1
+                            crossclass+=1
                         
             except:
                 pass
