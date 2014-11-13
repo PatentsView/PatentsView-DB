@@ -12,7 +12,8 @@ def uspc_table(fd):
     ctafurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/ManualofClass/ctaf.zip'
     br.retrieve(paturl,os.path.join(fd,'mcfpat.zip'))        
     br.retrieve(appurl,os.path.join(fd,'mcfappl.zip'))
-    br.retrieve(ctafurl,os.path.join(fd,'ctaf.zip'))         
+    br.retrieve(ctafurl,os.path.join(fd,'ctaf.zip'))
+    
     fd+='/'
     diri = os.listdir(fd)
     for d in diri:
@@ -120,7 +121,6 @@ def uspc_table(fd):
                 except:
                     pats[patentnum] = 2
                     outp.writerow([str(patentnum),mainclass,subclass,'1'])
-        
         
     #Get application-class pairs
     outp = csv.writer(open(os.path.join(fd,'USPC_application_classes_data.csv'),'wb'))

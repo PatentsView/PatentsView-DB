@@ -545,11 +545,6 @@ def parse_patents(fd,fd2):
                 pass
     
             # U.S. Patent Reference - can be several
-            refpatnum = 'NULL'
-            refpatname = 'NULL'
-            refpatdate = 'NULL'
-            refpatclass = 'NULL'
-            refpatcountry = 'US'
                     
             try:
                 uspatref = avail_fields['B561'].split("\n\n\n\n\n")
@@ -557,6 +552,12 @@ def parse_patents(fd,fd2):
                 uspatseq = 0
                 forpatseq = 0
                 for n in range(len(uspatref)):
+                    refpatnum = 'NULL'
+                    refpatname = 'NULL'
+                    refpatdate = 'NULL'
+                    refpatclass = 'NULL'
+                    refpatcountry = 'US'
+                    citedby = 'NULL'
                     for line in uspatref[n].split("\n"):
                         if line.startswith('<DOC>'):
                             refpatnum = re.search('<DNUM><PDAT>(.*?)</PDAT>',line).group(1)
@@ -579,15 +580,19 @@ def parse_patents(fd,fd2):
                             
                         if line.startswith('<PNC>'):
                             refpatclass = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
-                            citedby = re.search('<CITED-BY-(.*?)/>',line).group(1)
-                            citedby = 'cited by '+citedby.lower()
+                        
+                        citedbysear = re.search('<CITED-BY-(.*?)/>',line)
+                        if citedbysear:
+                            citedby = 'cited by '+citedbysear.group(1).lower()
                         
                     if refpatcountry != 'US':
-                        foreigncitation[id_generator()] = [patent_id,refpatdate,refpatnum,refpatcountry,citedby,str(forpatseq)]
-                        forpatseq+=1
+                        if refpatnum != "NULL":
+                            foreigncitation[id_generator()] = [patent_id,refpatdate,refpatnum,refpatcountry,citedby,str(forpatseq)]
+                            forpatseq+=1
                     else:
-                        uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,"NULL",refpatkind,refpatcountry,citedby,str(uspatseq)]
-                        uspatseq+=1
+                        if refpatnum != "NULL":
+                            uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,"NULL",refpatkind,refpatcountry,citedby,str(uspatseq)]
+                            uspatseq+=1
                         
             except:
                 pass
