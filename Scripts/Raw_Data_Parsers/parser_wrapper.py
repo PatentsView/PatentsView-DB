@@ -16,8 +16,10 @@ parser.add_argument('--uspc-create',default='0',choices=['1','0'],help='You have
 parser.add_argument('--uspc-input-dir',help="Full path to directory where classification master files sit - these should be ctaf....txt and mcfpat....txt. Output directory will be the same as this input one.")
 parser.add_argument('--uspc-upload',default='0',choices=['1','0'],help="Please enter 1 if you want to upload classification tables to MySQL DB after processing them")
 parser.add_argument('--uspc-upload-dir',help="Full path to directory where processed classification files sit")
-parser.add_argument('--uspc-appdb', default=None, help = "Applications DB name if used.")
-parser.add_argument('--uspc-patdb', default=None, help = "Grants DB name if used.")
+parser.add_argument('--appdb', default=None, help = "Applications DB name if used.")
+parser.add_argument('--patdb', default=None, help = "Grants DB name if used.")
+parser.add_argument('--cpc-upload',default='0',choices=['1','0'],help="Please enter 1 if you want to upload CPC classification tables to MySQL DB after processing them")
+parser.add_argument('--cpc-upload-dir',help="Full path to directory where processed CPC classification files would be downloaded and used")
 params = parser.parse_args()
 
 if int(params.period) == 1:
@@ -33,7 +35,10 @@ elif int(params.uspc_create) == 1 and int(params.period) not in range(1,3):
     uspc_table.uspc_table(params.uspc_input_dir)
 
 elif int(params.uspc_upload) == 1 and int(params.period) not in range(1,3):
-    csv_to_mysql.upload_uspc(params.mysql_host,params.mysql_username,params.mysql_passwd,params.uspc_appdb,params.uspc_patdb,params.uspc_upload_dir)
+    csv_to_mysql.upload_uspc(params.mysql_host,params.mysql_username,params.mysql_passwd,params.appdb,params.patdb,params.uspc_upload_dir)
+
+elif int(params.cpc_upload) == 1 and int(params.period) not in range(1,3):
+    csv_to_mysql.upload_cpc(params.mysql_host,params.mysql_username,params.mysql_passwd,params.appdb,params.patdb,params.cpc_upload_dir)
     
 else:
     print "Please check you parameters. Consult python parser_wrapper.py --help if necessary."

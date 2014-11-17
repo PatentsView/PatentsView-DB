@@ -366,4 +366,222 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
         errorlog.close()
         mydb.commit()
         
+
+def upload_cpc(host,username,password,appdb,patdb,folder):
+    from zipfile import ZipFile
+    
+    import mechanize,os
+    br = mechanize.Browser()
+    
+    files = ['applications_classes.csv','grants_classes.csv','cpc_subsection.csv','cpc_group.csv','cpc_subgroup.csv']
+    for f in files:
+        url = 'http://cssip.org/docs/'+f
+        br.retrieve(url,os.path.join(folder,f))
+    
+    def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
+    
+    mydb = MySQLdb.connect(host=host,
+        user=username,
+        passwd=password)
+    cursor = mydb.cursor()
+    
+    dbnames = [appdb,patdb]
+    for n in range(2):
+        d = dbnames[n]
+        if d:
+            if n == 0:
+                idname = 'application'
+            else:
+                idname = 'patent'
             
+
+            #Dump mainclass_current, subclass_current and uspc_current if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
+            cursor.execute('SET FOREIGN_KEY_CHECKS=0')
+            cursor.execute('truncate table '+d+'.cpc_subsection')
+            cursor.execute('truncate table '+d+'.cpc_group')
+            cursor.execute('truncate table '+d+'.cpc_subgroup')
+            cursor.execute('truncate table '+d+'.cpc_current')
+            cursor.execute('set foreign_key_checks=1')
+            mydb.commit() 
+    
+    #Upload CPC subsection data
+    mainclass = csv.reader(file(os.path.join(folder,'cpc_subsection.csv'),'rb'))
+    for m in mainclass:
+        towrite = [re.sub('"',"'",item) for item in m]
+        query = """insert into cpc_subsection values ("""+'"'+'","'.join(towrite)+'")'
+        query = query.replace(',"NULL"',",NULL")
+        try:
+            query2 = query.replace("cpc_subsection",appdb+'.cpc_subsection')
+            cursor.execute(query2)
+        except:
+            pass
+        try:
+            query2 = query.replace("cpc_subsection",patdb+'.cpc_subsection')
+            cursor.execute(query2)
+        except:
+            pass
+    mydb.commit()
+
+    #Upload CPC group data
+    subclass = csv.reader(file(os.path.join(folder,'cpc_group.csv'),'rb'))
+    exist = {}
+    for m in subclass:
+        towrite = [re.sub('"',"'",item) for item in m]
+        try:
+            gg = exist[towrite[0]]
+        except:
+            exist[towrite[0]] = 1
+            query = """insert into cpc_group values ("""+'"'+'","'.join(towrite)+'")'
+            query = query.replace(',"NULL"',",NULL")
+            try:
+                query2 = query.replace("cpc_group",appdb+'.cpc_group')
+                cursor.execute(query2)
+            except:
+                pass
+            try:
+                query2 = query.replace("cpc_group",patdb+'.cpc_group')
+                cursor.execute(query2)
+            except:
+                pass
+            
+    mydb.commit()
+                
+    #Upload CPC subgroup data
+    subclass = csv.reader(file(os.path.join(folder,'cpc_subgroup.csv'),'rb'))
+    exist = {}
+    for m in subclass:
+        towrite = [re.sub('"',"'",item) for item in m]
+        try:
+            gg = exist[towrite[0]]
+        except:
+            exist[towrite[0]] = 1
+            query = """insert into cpc_subgroup values ("""+'"'+'","'.join(towrite)+'")'
+            query = query.replace(',"NULL"',",NULL")
+            try:
+                query2 = query.replace("cpc_subgroup",appdb+'.cpc_subgroup')
+                cursor.execute(query2)
+            except:
+                pass
+            try:
+                query2 = query.replace("cpc_subgroup",patdb+'.cpc_subgroup')
+                cursor.execute(query2)
+            except:
+                pass
+            
+    mydb.commit()
+    
+    
+    if patdb:
+        # Get all patent numbers in the current database not to upload full CPC table going back to 19th century
+        cursor.execute('select id,number from '+patdb+'.patent')
+        patnums = {}
+        for field in cursor.fetchall():
+            patnums[field[1]] = field[0]
+        
+        #Create CPC_current table off full master classification list
+        uspc_full = csv.reader(file(os.path.join(folder,'grants_classes.csv'),'rb'),delimiter = '\t')
+        uspc_full.next()
+        errorlog = open(os.path.join(folder,'upload_error_patents.log'),'w')
+        current_exist = {}
+        for nnn in range(10000000):
+            try:
+                m = uspc_full.next()
+                good = None
+                try:
+                    gg = patnums[m[0]]
+                    good = 1
+                except:
+                    pass
+                if good:
+                    current_exist[m[0]] = 1
+                    towrite = [re.sub('"',"'",item) for item in m[:3]]
+                    towrite.insert(0,id_generator())
+                    towrite[1] = gg
+                    for t in range(len(towrite)):
+                        try:
+                            gg = int(towrite[t])
+                            towrite[t] = str(int(towrite[t]))
+                        except:
+                            pass
+                    primaries = towrite[2].split("; ")
+                    cpcnum = 0
+                    for p in primaries:
+                        try:
+                            needed = [id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'primary',str(cpcnum)]
+                            query = """insert into """+patdb+""".cpc_current values ("""+'"'+'","'.join(needed)+'")'
+                            query = query.replace(',"NULL"',",NULL")
+                            cursor.execute(query)
+                            cpcnum+=1
+                        except:
+                            print>>errorlog,p+'\t'+' '.join(towrite)+'\t'+m[0]
+                    additionals = [t for t in towrite[3].split('; ') if t!= '']
+                    for p in additionals:
+                        try:
+                            needed = [id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'additional',str(cpcnum)]
+                            query = """insert into """+patdb+""".cpc_current values ("""+'"'+'","'.join(needed)+'")'
+                            query = query.replace(',"NULL"',",NULL")
+                            cursor.execute(query)
+                            cpcnum+=1
+                        except:
+                            print>>errorlog,p+'\t'+' '.join(towrite)+'\t'+m[0]
+            
+            except:
+                pass
+            
+        
+        errorlog.close()
+        mydb.commit()
+    
+    if appdb:
+        # Get all application numbers in the current database not to upload full USPC table going back to 19th century
+        cursor.execute('select id,number from '+appdb+'.application')
+        patnums = {}
+        for field in cursor.fetchall():
+            patnums[field[0]] = field[1]
+        
+        #Create USPC table off full master classification list
+        uspc_full = csv.reader(file(os.path.join(folder,'applications_classes.csv'),'rb'),delimiter = '\t')
+        errorlog = open(os.path.join(folder,'upload_error_apps.log'),'w')
+        current_exist = {}
+        for m in uspc_full:
+            try:
+                gg = patnums[m[0]]
+                current_exist[m[0]] = 1
+                towrite = [re.sub('"',"'",item) for item in m[:3]]
+                towrite.insert(0,id_generator())
+                towrite[1] = m[0]
+                for t in range(len(towrite)):
+                    try:
+                        gg = int(towrite[t])
+                        towrite[t] = str(int(towrite[t]))
+                    except:
+                        pass
+                primaries = towrite[2].split("; ")
+                cpcnum = 0
+                for p in primaries:
+                    try:
+                        needed = [id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'primary',str(cpcnum)]
+                        query = """insert into """+appdb+""".cpc_current values ("""+'"'+'","'.join(needed)+'")'
+                        query = query.replace(',"NULL"',",NULL")
+                        cursor.execute(query)
+                        cpcnum+=1
+                    except:
+                        print>>errorlog,p+'\t'+' '.join(towrite)+'\t'+m[0]
+            
+                additionals = [t for t in towrite[3].split('; ') if t!='']
+                for p in additionals:
+                    try:
+                        needed = [id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'additional',str(cpcnum)]
+                        query = """insert into """+appdb+""".cpc_current values ("""+'"'+'","'.join(needed)+'")'
+                        query = query.replace(',"NULL"',",NULL")
+                        cursor.execute(query)
+                        cpcnum+=1
+                    except:
+                        print>>errorlog,p+'\t'+' '.join(towrite)+'\t'+m[0]
+            
+            except:
+                pass
+            
+        errorlog.close()
+        mydb.commit()
