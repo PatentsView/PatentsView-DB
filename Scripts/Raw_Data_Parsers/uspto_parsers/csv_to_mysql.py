@@ -84,6 +84,8 @@ def mysql_upload(host,username,password,dbname,folder):
         del infile[0]
         del infile[-1]
         nullid = None
+        duplicdata = {}
+        mergersdata = {}
         if d == "patent.csv":
             idelem = 0
         else:
