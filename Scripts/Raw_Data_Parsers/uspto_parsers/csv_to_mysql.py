@@ -238,7 +238,6 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
             
     mydb.commit()
                 
-    #mydb.commit()
     
     if patdb:
         # Get all patent numbers in the current database not to upload full USPC table going back to 19th century
@@ -249,7 +248,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
         
         #Create USPC table off full master classification list
         uspc_full = csv.reader(file(os.path.join(folder,'USPC_patent_classes_data.csv'),'rb'))
-        errorlog = open(os.path.join(folder,'upload_error.log'),'w')
+        errorlog = open(os.path.join(folder,'upload_error_patents.log'),'w')
         current_exist = {}
         for m in uspc_full:
             try:
@@ -312,7 +311,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
             patnums[field[0]] = field[1]
         #Create USPC table off full master classification list
         uspc_full = csv.reader(file(os.path.join(folder,'USPC_application_classes_data.csv'),'rb'))
-        errorlog = open(os.path.join(folder,'upload_error.log'),'w')
+        errorlog = open(os.path.join(folder,'upload_error_apps.log'),'w')
         current_exist = {}
         for m in uspc_full:
             try:
@@ -356,10 +355,10 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                 for d in datum:
                     cursor.execute('select * from '+appdb+'.mainclass_current where id = "'+d[2]+'"')
                     if len(cursor.fetchall()) == 0:
-                        cursor.execute('insert into '+appdb+'.mainclass_current values ("'+d[2]+'",NULL,NULL)')
+                        cursor.execute('insert into '+appdb+'.mainclass_current values ("'+d[2]+'",NULL)')
                     cursor.execute('select * from '+appdb+'.subclass_current where id = "'+d[3]+'"')
                     if len(cursor.fetchall()) == 0:
-                        cursor.execute('insert into '+appdb+'.subclass_current values ("'+d[3]+'",NULL,NULL)')
+                        cursor.execute('insert into '+appdb+'.subclass_current values ("'+d[3]+'",NULL)')
                     query = """insert into """+appdb+""".uspc_current values ("""+'"'+'","'.join([str(dd) for dd in d])+'")'
                     query = query.replace(',"NULL"',",NULL")
                     cursor.execute(query)
