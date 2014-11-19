@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import argparse
-from uspto_parsers import generic_parser_1976_2001,generic_parser_2002_2004,csv_to_mysql,uspc_table
+from uspto_parsers import generic_parser_1976_2001,generic_parser_2002_2004,csv_to_mysql,uspc_table,merge_db_script
 
 parser = argparse.ArgumentParser(description='This program is used to parse USPTO full-text patent grant data for 1976-2004 and also uploading parsed data to MySQL.',epilog='(Example syntax for parsing raw data: python parser_wrapper.py --input-dir "uspto_raw/1976-2001/" --output-dir "uspto_parsed/1976-2001/" --period 1)\n (Example syntax for uploading to MySQL: python parser_wrapper.py --mysql 1 --mysql-input-dir "c:/uspto_parsed/1976-2001/" --mysql-host "localhost" --mysql-username "root" --mysql-passwd "password" --mysql-dbname "uspto")\n (Example syntax to create USPC tables: python parser_wrapper.py --uspc-create 1 --uspc-input-dir "c:/master_classfiles/")\n (Example syntax for USPC upload to MySQL: python parser_wrapper.py --uspc-upload 1 --uspc-upload-dir "c:/master_classfiles" --mysql-host .. --mysql-username .. --mysql-passwd .. --uspc-appdb app_smalltest --uspc-patdb grant_smalltest)' )
 parser.add_argument('--input-dir',help='Full path to directory where all patent raw files are located (TXT or XML format; as downloaded from Google Patents or ReedTech).')
@@ -20,6 +20,12 @@ parser.add_argument('--appdb', default=None, help = "Applications DB name if use
 parser.add_argument('--patdb', default=None, help = "Grants DB name if used.")
 parser.add_argument('--cpc-upload',default='0',choices=['1','0'],help="Please enter 1 if you want to upload CPC classification tables to MySQL DB after processing them")
 parser.add_argument('--cpc-upload-dir',help="Full path to directory where processed CPC classification files would be downloaded and used")
+parser.add_argument('--merge-db',default='0',choices=['1','0'],help="Please enter 1 if you want to merge DBs to speed up the PatentsProcessor")
+parser.add_argument('--sourcedb',help="Please provide what DBs you want to merge, comma-separate list, e.g. app_smalltest_1,app_smalltest2,app_smalltest3,etc.")
+parser.add_argument('--targetdb',help="Please provide name of target DB")
+
+
+
 params = parser.parse_args()
 
 if int(params.period) == 1:
@@ -39,6 +45,8 @@ elif int(params.uspc_upload) == 1 and int(params.period) not in range(1,3):
 
 elif int(params.cpc_upload) == 1 and int(params.period) not in range(1,3):
     csv_to_mysql.upload_cpc(params.mysql_host,params.mysql_username,params.mysql_passwd,params.appdb,params.patdb,params.cpc_upload_dir)
-    
+
+elif int(params.merge_db) == 1 and int(params.period) not in range(1,3):
+    merge_db_script.merge_db_pats(params.mysql_host,params.mysql_username,params.mysql_passwd,params.sourcedb,params.targetdb)
 else:
     print "Please check you parameters. Consult python parser_wrapper.py --help if necessary."
