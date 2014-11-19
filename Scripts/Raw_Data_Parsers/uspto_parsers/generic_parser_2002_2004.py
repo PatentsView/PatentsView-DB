@@ -73,7 +73,7 @@ def parse_patents(fd,fd2):
     ipcrfile = open(os.path.join(fd2,'ipcr.csv'),'wb')
     ipcrfile.write(codecs.BOM_UTF8)
     ipcr = csv.writer(ipcrfile,delimiter='\t')
-    ipcr.writerow(['uuid','patent_id','classification_level','section','subclass','main_group','subgroup','symbol_position','classification_value','classification_status','classification_data_source','action_date','ipc_version_indicator','sequence'])
+    ipcr.writerow(['uuid','patent_id','classification_level','section','mainclass','subclass','main_group','subgroup','symbol_position','classification_value','classification_status','classification_data_source','action_date','ipc_version_indicator','sequence'])
     
     patfile = open(os.path.join(fd2,'patent.csv'),'wb')
     patfile.write(codecs.BOM_UTF8)
@@ -494,7 +494,7 @@ def parse_patents(fd,fd2):
                     if line.startswith('<B516>'):
                         ipcrversion = re.search('<B516><PDAT>(.*?)</PDAT>',line).group(1)
                             
-                ipcr[id_generator()] = [patent_id,mainclass,intsec,subclass, group,subgroup,"NULL","NULL","NULL","NULL","NULL",ipcrversion,str(num)]
+                ipcr[id_generator()] = [patent_id,"NULL",intsec,mainclass,subclass, group,subgroup,"NULL","NULL","NULL","NULL","NULL",ipcrversion,str(num)]
                 num+=1     
                     
                         
