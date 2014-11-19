@@ -455,7 +455,7 @@ def parse_patents(fd,fd2):
                             
                         if line.startswith('OCL'):
                             refpatclass = re.search('OCL\s\s(.*?)$',line).group(1) 
-                    uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,"NULL","NULL",'US',"CITATION SOURCE",str(n)]
+                    uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,"NULL","NULL",'US',"NULL",str(n)]
             except:
                 pass
             
