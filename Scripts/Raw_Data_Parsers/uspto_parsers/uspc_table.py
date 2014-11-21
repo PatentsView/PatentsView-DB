@@ -6,14 +6,14 @@ def uspc_table(fd):
     
     import mechanize
     br = mechanize.Browser()
-    
+    """
     paturl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentGrant/mcfpat.zip'
     appurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentAppl/mcfappl.zip'
     ctafurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/ManualofClass/ctaf.zip'
     br.retrieve(paturl,os.path.join(fd,'mcfpat.zip'))        
     br.retrieve(appurl,os.path.join(fd,'mcfappl.zip'))
     br.retrieve(ctafurl,os.path.join(fd,'ctaf.zip'))
-    
+    """
     fd+='/'
     diri = os.listdir(fd)
     for d in diri:
@@ -34,7 +34,10 @@ def uspc_table(fd):
             try:
                 temp = int(classidx[n][6:9])
                 if re.search('[A-Z]{3}',classidx[n][3:6]) is None:
-                    subclass = re.sub('^0+','',classidx[n][3:6])+'.'+re.sub('0+','',classidx[n][6:9])
+                    if re.search('^[A-Z]',classidx[n][3:6]): 
+                        subclass = re.sub('0+','',classidx[n][3:6])+'.'+classidx[n][6:9]
+                    else:
+                        subclass = re.sub('^0+','',classidx[n][3:6])+'.'+re.sub('0+','',classidx[n][6:9])
                 else:
                     subclass =re.sub('^0+','',classidx[n][3:6])+re.sub('^0+','',classidx[n][6:9])
             except:
@@ -48,7 +51,10 @@ def uspc_table(fd):
             try:
                 temp = int(classidx[n][18:21])
                 if re.search('[A-Z]{3}',classidx[n][15:18]) is None:
-                    highersubclass = re.sub('^0+','',classidx[n][15:18])+'.'+re.sub('0+','',classidx[n][18:21])
+                    if re.search('^[A-Z]',classidx[n][15:18]): 
+                        highersubclass = re.sub('0+','',classidx[n][15:18])+'.'+classidx[n][18:21]
+                    else:
+                        highersubclass = re.sub('^0+','',classidx[n][15:18])+'.'+re.sub('0+','',classidx[n][18:21])
                 else:
                     highersubclass = re.sub('^0+','',classidx[n][15:18])+re.sub('^0+','',classidx[n][18:21])
             except:
@@ -101,7 +107,10 @@ def uspc_table(fd):
                 try:
                     temp = int(subclass[3:])
                     if re.search('[A-Z]{3}',subclass[:3]) is None:
-                        subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
+                        if re.search('^[A-Z]',subclass[:3]): 
+                            subclass = re.sub('0+','',subclass[:3])+'.'+subclass[3:]
+                        else:
+                            subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
                     else:
                         subclass = re.sub('^0+','',subclass[:3])+re.sub('^0+','',subclass[3:])
                 except:
@@ -134,7 +143,10 @@ def uspc_table(fd):
                 try:
                     temp = int(subclass[3:])
                     if re.search('[A-Z]{3}',subclass[:3]) is None:
-                        subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
+                        if re.search('^[A-Z]',subclass[:3]): 
+                            subclass = re.sub('0+','',subclass[:3])+'.'+subclass[3:]
+                        else:
+                            subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
                     else:
                         subclass = re.sub('^0+','',subclass[:3])+re.sub('^0+','',subclass[3:])
                 except:
