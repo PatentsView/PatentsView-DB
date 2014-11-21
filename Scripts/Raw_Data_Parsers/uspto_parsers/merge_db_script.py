@@ -23,7 +23,6 @@ def merge_db_pats(host,username,password,sourcedb,targetdb):
             if t in primaries:
                 cursor.execute('INSERT INTO '+targetdb+'.'+t+' SELECT * FROM '+d+'.'+t+' WHERE '+d+'.'+t+'.id NOT IN (SELECT id FROM '+targetdb+'.'+t+')')
             else:
-                print 'INSERT INTO '+targetdb+'.'+t+' SELECT * from '+d+'.'+t
                 cursor.execute('INSERT INTO '+targetdb+'.'+t+' SELECT * from '+d+'.'+t)
+            mydb.commit()
         cursor.execute('set foreign_key_checks=1')
-        mydb.commit()
