@@ -655,7 +655,10 @@ def parse_patents(fd,fd2):
             except:
                 abst = 'NULL'
             
-            patentdata[patent_id] = [type_kind[patkind],updnum,'US',issdate,abst,title,patkind,numclaims,d]
+            if patkind in type_kind:
+                patentdata[patent_id] = [type_kind[patkind],updnum,'US',issdate,abst,title,patkind,numclaims,d]
+            else:
+                patentdata[patent_id] = ['NULL',updnum,'US',issdate,abst,title,patkind,numclaims,d]
             
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'),delimiter='\t')
             for k,v in patentdata.items():
