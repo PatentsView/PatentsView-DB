@@ -10,20 +10,15 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping database structure for patent_expandedtest_20141117
-CREATE DATABASE IF NOT EXISTS `patent_expandedtest_20141117` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `patent_expandedtest_20141117`;
-
-
--- Dumping structure for table patent_expandedtest_20141117.application
+-- Dumping structure for table patent_20141201.application
 CREATE TABLE IF NOT EXISTS `application` (
   `id` varchar(36) NOT NULL,
-  `patent_id` varchar(20) DEFAULT NULL,
+  `patent_id` varchar(20) NOT NULL,
   `type` varchar(20) DEFAULT NULL,
   `number` varchar(64) DEFAULT NULL,
   `country` varchar(20) DEFAULT NULL,
   `date` date DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`,`patent_id`),
   KEY `patent_id` (`patent_id`),
   KEY `app_idx1` (`type`,`number`),
   KEY `app_idx2` (`date`),
@@ -33,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `application` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.assignee
+-- Dumping structure for table patent_20141201.assignee
 CREATE TABLE IF NOT EXISTS `assignee` (
   `id` varchar(36) NOT NULL,
   `type` varchar(10) DEFAULT NULL,
@@ -46,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `assignee` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.claim
+-- Dumping structure for table patent_20141201.claim
 CREATE TABLE IF NOT EXISTS `claim` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -62,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `claim` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.cpc_current
+-- Dumping structure for table patent_20141201.cpc_current
 CREATE TABLE IF NOT EXISTS `cpc_current` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -87,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `cpc_current` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.cpc_group
+-- Dumping structure for table patent_20141201.cpc_group
 CREATE TABLE IF NOT EXISTS `cpc_group` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
@@ -97,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `cpc_group` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.cpc_subgroup
+-- Dumping structure for table patent_20141201.cpc_subgroup
 CREATE TABLE IF NOT EXISTS `cpc_subgroup` (
   `id` varchar(20) NOT NULL,
   `title` varchar(512) DEFAULT NULL,
@@ -107,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `cpc_subgroup` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.cpc_subsection
+-- Dumping structure for table patent_20141201.cpc_subsection
 CREATE TABLE IF NOT EXISTS `cpc_subsection` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
@@ -117,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `cpc_subsection` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.foreigncitation
+-- Dumping structure for table patent_20141201.foreigncitation
 CREATE TABLE IF NOT EXISTS `foreigncitation` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -134,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `foreigncitation` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.inventor
+-- Dumping structure for table patent_20141201.inventor
 CREATE TABLE IF NOT EXISTS `inventor` (
   `id` varchar(36) NOT NULL,
   `name_first` varchar(64) DEFAULT NULL,
@@ -145,12 +140,13 @@ CREATE TABLE IF NOT EXISTS `inventor` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.ipcr
+-- Dumping structure for table patent_20141201.ipcr
 CREATE TABLE IF NOT EXISTS `ipcr` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
   `classification_level` varchar(20) DEFAULT NULL,
   `section` varchar(20) DEFAULT NULL,
+  `ipc_class` varchar(20) DEFAULT NULL,
   `subclass` varchar(20) DEFAULT NULL,
   `main_group` varchar(20) DEFAULT NULL,
   `subgroup` varchar(20) DEFAULT NULL,
@@ -163,16 +159,16 @@ CREATE TABLE IF NOT EXISTS `ipcr` (
   `sequence` int(11) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`),
-  KEY `ix_ipcr_ipc_version_indicator` (`ipc_version_indicator`),
   KEY `ix_ipcr_sequence` (`sequence`),
   KEY `ix_ipcr_action_date` (`action_date`),
+  KEY `ix_ipcr_ipc_version_indicator` (`ipc_version_indicator`),
   CONSTRAINT `ipcr_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `patent` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.lawyer
+-- Dumping structure for table patent_20141201.lawyer
 CREATE TABLE IF NOT EXISTS `lawyer` (
   `id` varchar(36) NOT NULL,
   `name_first` varchar(64) DEFAULT NULL,
@@ -185,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `lawyer` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.location
+-- Dumping structure for table patent_20141201.location
 CREATE TABLE IF NOT EXISTS `location` (
   `id` varchar(128) NOT NULL,
   `city` varchar(128) DEFAULT NULL,
@@ -194,16 +190,16 @@ CREATE TABLE IF NOT EXISTS `location` (
   `latitude` float DEFAULT NULL,
   `longitude` float DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `dloc_idx1` (`latitude`,`longitude`),
-  KEY `ix_location_state` (`state`),
+  KEY `ix_location_country` (`country`),
   KEY `dloc_idx2` (`city`,`state`,`country`),
-  KEY `ix_location_country` (`country`)
+  KEY `dloc_idx1` (`latitude`,`longitude`),
+  KEY `ix_location_state` (`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.location_assignee
+-- Dumping structure for table patent_20141201.location_assignee
 CREATE TABLE IF NOT EXISTS `location_assignee` (
   `location_id` varchar(128) DEFAULT NULL,
   `assignee_id` varchar(36) DEFAULT NULL,
@@ -216,7 +212,7 @@ CREATE TABLE IF NOT EXISTS `location_assignee` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.location_inventor
+-- Dumping structure for table patent_20141201.location_inventor
 CREATE TABLE IF NOT EXISTS `location_inventor` (
   `location_id` varchar(128) DEFAULT NULL,
   `inventor_id` varchar(36) DEFAULT NULL,
@@ -229,7 +225,7 @@ CREATE TABLE IF NOT EXISTS `location_inventor` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.mainclass
+-- Dumping structure for table patent_20141201.mainclass
 CREATE TABLE IF NOT EXISTS `mainclass` (
   `id` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
@@ -238,7 +234,7 @@ CREATE TABLE IF NOT EXISTS `mainclass` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.mainclass_current
+-- Dumping structure for table patent_20141201.mainclass_current
 CREATE TABLE IF NOT EXISTS `mainclass_current` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
@@ -248,7 +244,7 @@ CREATE TABLE IF NOT EXISTS `mainclass_current` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.otherreference
+-- Dumping structure for table patent_20141201.otherreference
 CREATE TABLE IF NOT EXISTS `otherreference` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -262,7 +258,7 @@ CREATE TABLE IF NOT EXISTS `otherreference` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.patent
+-- Dumping structure for table patent_20141201.patent
 CREATE TABLE IF NOT EXISTS `patent` (
   `id` varchar(20) NOT NULL,
   `type` varchar(100) DEFAULT NULL,
@@ -282,7 +278,7 @@ CREATE TABLE IF NOT EXISTS `patent` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.patent_assignee
+-- Dumping structure for table patent_20141201.patent_assignee
 CREATE TABLE IF NOT EXISTS `patent_assignee` (
   `patent_id` varchar(20) DEFAULT NULL,
   `assignee_id` varchar(36) DEFAULT NULL,
@@ -295,7 +291,7 @@ CREATE TABLE IF NOT EXISTS `patent_assignee` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.patent_inventor
+-- Dumping structure for table patent_20141201.patent_inventor
 CREATE TABLE IF NOT EXISTS `patent_inventor` (
   `patent_id` varchar(20) DEFAULT NULL,
   `inventor_id` varchar(36) DEFAULT NULL,
@@ -308,7 +304,7 @@ CREATE TABLE IF NOT EXISTS `patent_inventor` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.patent_lawyer
+-- Dumping structure for table patent_20141201.patent_lawyer
 CREATE TABLE IF NOT EXISTS `patent_lawyer` (
   `patent_id` varchar(20) DEFAULT NULL,
   `lawyer_id` varchar(36) DEFAULT NULL,
@@ -321,7 +317,7 @@ CREATE TABLE IF NOT EXISTS `patent_lawyer` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.rawassignee
+-- Dumping structure for table patent_20141201.rawassignee
 CREATE TABLE IF NOT EXISTS `rawassignee` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -345,7 +341,7 @@ CREATE TABLE IF NOT EXISTS `rawassignee` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.rawinventor
+-- Dumping structure for table patent_20141201.rawinventor
 CREATE TABLE IF NOT EXISTS `rawinventor` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -367,7 +363,7 @@ CREATE TABLE IF NOT EXISTS `rawinventor` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.rawlawyer
+-- Dumping structure for table patent_20141201.rawlawyer
 CREATE TABLE IF NOT EXISTS `rawlawyer` (
   `uuid` varchar(36) NOT NULL,
   `lawyer_id` varchar(36) DEFAULT NULL,
@@ -388,7 +384,7 @@ CREATE TABLE IF NOT EXISTS `rawlawyer` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.rawlocation
+-- Dumping structure for table patent_20141201.rawlocation
 CREATE TABLE IF NOT EXISTS `rawlocation` (
   `id` varchar(128) NOT NULL,
   `location_id` varchar(128) DEFAULT NULL,
@@ -397,16 +393,16 @@ CREATE TABLE IF NOT EXISTS `rawlocation` (
   `country` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `location_id` (`location_id`),
+  KEY `loc_idx1` (`city`,`state`,`country`),
   KEY `ix_rawlocation_state` (`state`),
   KEY `ix_rawlocation_country` (`country`),
-  KEY `loc_idx1` (`city`,`state`,`country`),
   CONSTRAINT `rawlocation_ibfk_1` FOREIGN KEY (`location_id`) REFERENCES `location` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.subclass
+-- Dumping structure for table patent_20141201.subclass
 CREATE TABLE IF NOT EXISTS `subclass` (
   `id` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
@@ -415,7 +411,7 @@ CREATE TABLE IF NOT EXISTS `subclass` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.subclass_current
+-- Dumping structure for table patent_20141201.subclass_current
 CREATE TABLE IF NOT EXISTS `subclass_current` (
   `id` varchar(20) NOT NULL,
   `title` varchar(512) DEFAULT NULL,
@@ -425,7 +421,7 @@ CREATE TABLE IF NOT EXISTS `subclass_current` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.temporary_update
+-- Dumping structure for table patent_20141201.temporary_update
 CREATE TABLE IF NOT EXISTS `temporary_update` (
   `pk` varchar(36) NOT NULL,
   `update` varchar(36) DEFAULT NULL,
@@ -436,7 +432,7 @@ CREATE TABLE IF NOT EXISTS `temporary_update` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.usapplicationcitation
+-- Dumping structure for table patent_20141201.usapplicationcitation
 CREATE TABLE IF NOT EXISTS `usapplicationcitation` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -457,7 +453,7 @@ CREATE TABLE IF NOT EXISTS `usapplicationcitation` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.uspatentcitation
+-- Dumping structure for table patent_20141201.uspatentcitation
 CREATE TABLE IF NOT EXISTS `uspatentcitation` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -477,7 +473,7 @@ CREATE TABLE IF NOT EXISTS `uspatentcitation` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.uspc
+-- Dumping structure for table patent_20141201.uspc
 CREATE TABLE IF NOT EXISTS `uspc` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -497,7 +493,7 @@ CREATE TABLE IF NOT EXISTS `uspc` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.uspc_current
+-- Dumping structure for table patent_20141201.uspc_current
 CREATE TABLE IF NOT EXISTS `uspc_current` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -517,7 +513,7 @@ CREATE TABLE IF NOT EXISTS `uspc_current` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table patent_expandedtest_20141117.usreldoc
+-- Dumping structure for table patent_20141201.usreldoc
 CREATE TABLE IF NOT EXISTS `usreldoc` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
@@ -532,12 +528,12 @@ CREATE TABLE IF NOT EXISTS `usreldoc` (
   `sequence` int(11) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`),
-  KEY `ix_usreldoc_doctype` (`doctype`),
   KEY `ix_usreldoc_country` (`country`),
-  KEY `ix_usreldoc_rel_id` (`rel_id`),
-  KEY `ix_usreldoc_number` (`number`),
-  KEY `ix_usreldoc_sequence` (`sequence`),
+  KEY `ix_usreldoc_doctype` (`doctype`),
   KEY `ix_usreldoc_date` (`date`),
+  KEY `ix_usreldoc_rel_id` (`rel_id`),
+  KEY `ix_usreldoc_sequence` (`sequence`),
+  KEY `ix_usreldoc_number` (`number`),
   CONSTRAINT `usreldoc_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `patent` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
