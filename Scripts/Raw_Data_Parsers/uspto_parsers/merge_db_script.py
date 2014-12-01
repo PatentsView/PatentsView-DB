@@ -13,7 +13,7 @@ def merge_db_pats(host,username,password,sourcedb,targetdb):
     
     cursor = mydb.cursor()
     
-    primaries = ['application','mainclass','subclass','mainclass_current','subclass_current']
+    primaries = ['mainclass','subclass','mainclass_current','subclass_current']
     for d in dbnames:
         cursor.execute('SET FOREIGN_KEY_CHECKS=0')
         cursor.execute('SHOW TABLES FROM `'+d+'`')

@@ -147,6 +147,7 @@ def mysql_upload(host,username,password,dbname,folder):
                             else:
                                 query = """insert into """+tablename+""" values ("""+'"'+'","'.join(towrite)+'")'
                                 query = query.replace(',"NULL"',",NULL")
+                                query = query.replace(',""',',NULL')
                                 query = query.replace('\\','\\\\')
                                 cursor.execute(query)
             numRows += 1
