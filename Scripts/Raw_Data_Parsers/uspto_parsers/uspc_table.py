@@ -6,14 +6,12 @@ def uspc_table(fd):
     
     import mechanize
     br = mechanize.Browser()
-    """
     paturl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentGrant/mcfpat.zip'
     appurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentAppl/mcfappl.zip'
     ctafurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/ManualofClass/ctaf.zip'
     br.retrieve(paturl,os.path.join(fd,'mcfpat.zip'))        
     br.retrieve(appurl,os.path.join(fd,'mcfappl.zip'))
     br.retrieve(ctafurl,os.path.join(fd,'ctaf.zip'))
-    """
     fd+='/'
     diri = os.listdir(fd)
     for d in diri:
