@@ -23,8 +23,8 @@ parser.add_argument('--cpc-upload-dir',help="Full path to directory where proces
 parser.add_argument('--merge-db',default='0',choices=['1','0'],help="Please enter 1 if you want to merge DBs to speed up the PatentsProcessor")
 parser.add_argument('--sourcedb',help="Please provide what DBs you want to merge, comma-separate list, e.g. app_smalltest_1,app_smalltest2,app_smalltest3,etc.")
 parser.add_argument('--targetdb',help="Please provide name of target DB")
-
-
+parser.add_argument('--nber-upload',default='0',choices=['1','0'],help="Flag if this is NBER upload")
+parser.add_argument('--nber-upload-dir',help="Full path to directory where processed NBER classification files would be downloaded and used")
 
 params = parser.parse_args()
 
@@ -48,5 +48,7 @@ elif int(params.cpc_upload) == 1 and int(params.period) not in range(1,3):
 
 elif int(params.merge_db) == 1 and int(params.period) not in range(1,3):
     merge_db_script.merge_db_pats(params.mysql_host,params.mysql_username,params.mysql_passwd,params.sourcedb,params.targetdb)
+elif int(params.nber_upload) == 1  and int(params.period) not in range(1,3):
+    csv_to_mysql.upload_nber(params.mysql_host,params.mysql_username,params.mysql_passwd,params.patdb,params.nber_upload_dir)
 else:
     print "Please check you parameters. Consult python parser_wrapper.py --help if necessary."

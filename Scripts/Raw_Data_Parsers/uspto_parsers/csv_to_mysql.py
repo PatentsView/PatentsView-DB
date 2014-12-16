@@ -595,3 +595,83 @@ def upload_cpc(host,username,password,appdb,patdb,folder):
             
         errorlog.close()
         mydb.commit()
+        
+def upload_nber(host,username,password,patdb,folder):
+    import mechanize,os
+    br = mechanize.Browser()
+    
+    files = ['nber_classes.csv','patent_nber_all.csv']
+    for f in files:
+        url = 'http://cssip.org/docs/'+f
+        br.retrieve(url,os.path.join(folder,f))
+    
+    def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
+    
+    mydb = MySQLdb.connect(host=host,
+        user=username,
+        passwd=password,
+        db=patdb)
+    cursor = mydb.cursor()
+    
+    
+    idname = 'patent'
+    cursor.execute('SHOW TABLES')
+    tables = [f[0] for f in cursor.fetchall()]
+    #Dump NBER tables data if populated - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
+    cursor.execute('SET FOREIGN_KEY_CHECKS=0')
+    cursor.execute('truncate table '+patdb+'.nber_category')
+    cursor.execute('truncate table '+patdb+'.nber_subcategory')
+    cursor.execute('truncate table '+patdb+'.nber')
+    cursor.execute('set foreign_key_checks=1')
+    mydb.commit() 
+
+    #Upload NBER category and subcategory data
+    mainclass = csv.reader(file(os.path.join(folder,'nber_classes.csv'),'rb'))
+    mainclass.next()
+    for m in mainclass:
+        towrite = [re.sub('"',"'",item) for item in m]
+        #category
+        try:
+            query = """insert into nber_category values ("""+'"'+'","'.join(towrite[:2])+'")'
+            query = query.replace(',"NULL"',",NULL")
+            query2 = query.replace("nber_category",patdb+'.nber_category')
+            cursor.execute(query2)
+        except:
+            pass
+    
+        #subcategory
+        query = """insert into nber_subcategory values ("""+'"'+'","'.join(towrite[2:])+'")'
+        query = query.replace(',"NULL"',",NULL")
+        query2 = query.replace("nber_subcategory",patdb+'.nber_subcategory')
+        cursor.execute(query2)
+    
+    mydb.commit()
+    
+    # Get all patent numbers in the current database not to upload full NBER table going back to 19th century
+    cursor.execute('select id,number from '+patdb+'.patent')
+    patnums = {}
+    for field in cursor.fetchall():
+        patnums[field[1]] = field[0]
+    
+    #Create NBER table off full master classification list
+    uspc_full = csv.reader(file(os.path.join(folder,'patent_nber_all.csv'),'rb'))
+    uspc_full.next()
+    errorlog = open(os.path.join(folder,'upload_error_patents.log'),'w')
+    for u in uspc_full:
+        try:
+            gg = patnums[u[0]]
+            towrite = [re.sub('"',"'",item) for item in u]
+            towrite.insert(0,id_generator())
+            towrite.insert(2,towrite[2][0])
+            try:
+                query = """insert into """+patdb+""".nber values ("""+'"'+'","'.join(towrite)+'")'
+                query = query.replace(',"NULL"',",NULL")
+                cursor.execute(query)
+            except:
+                print>>errorlog,' '.join(towrite)
+        except:
+            pass
+    
+    errorlog.close()
+    mydb.commit()
