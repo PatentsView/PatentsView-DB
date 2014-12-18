@@ -105,7 +105,7 @@ def update_appnums(folder,host,username,password,appdb):
         data[i[0]] = i
     for n in nums:
         gg = data[n[2]]
-        tmp.writerow(n[:7]+[gg[-1]]+n[8:-1]+[gg[-2]])
+        tmp.writerow(n[:7]+[gg[-1]]+n[8:]+[gg[-2]])
     outp.close()
     cursor.execute('load data local infile "'+folder+'/appnums_tmp.csv'+'" into table '+appdb+'.application_update fields optionally enclosed by '+"'"+'"'+"'"+' terminated by "\t" lines terminated by "\n"')
     mydb.commit()
