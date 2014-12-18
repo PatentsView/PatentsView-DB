@@ -658,18 +658,22 @@ def upload_nber(host,username,password,patdb,folder):
     uspc_full = csv.reader(file(os.path.join(folder,'patent_nber_all.csv'),'rb'))
     uspc_full.next()
     errorlog = open(os.path.join(folder,'upload_error_patents.log'),'w')
+    num = 0
+    check = range(1000,10000000,1000)
     for u in uspc_full:
         try:
-            gg = patnums[u[0]]
-            towrite = [re.sub('"',"'",item) for item in u]
-            towrite.insert(0,id_generator())
-            towrite.insert(2,towrite[2][0])
+            gg = patnums[u[1]]
+            num+=1
             try:
-                query = """insert into """+patdb+""".nber values ("""+'"'+'","'.join(towrite)+'")'
-                query = query.replace(',"NULL"',",NULL")
+                query = """insert into """+patdb+""".nber values ("""+'"'+'","'.join(u)+'")'
                 cursor.execute(query)
             except:
-                print>>errorlog,' '.join(towrite)
+                cursor.execute('insert into '+patdb+'.nber_category values ("'+u[2]+'","Unclassified")')
+                cursor.execute('insert into '+patdb+'.nber_subcategory values ("'+u[3]+'","Unclassified")')
+                query = """insert into """+patdb+""".nber values ("""+'"'+'","'.join(u)+'")'
+                cursor.execute(query)
+            if num in check:
+                mydb.commit()
         except:
             pass
     
