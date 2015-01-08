@@ -9,7 +9,7 @@
 
 **WARNING:** `generate_database.sql` drops the existing database (`PatentsView_20141215_dev` by default).
 
-* Edit `generate_database.sql` and `add_full_text_indexes.sql` and replace `PatentsView_20141215_dev` with the name of the destination database to be created.  In the future, we might want to simplify this by working in the "current" database, but during development it was safer to retain explicit database references.
+* Edit `generate_database.sql` and `add_full_text_indexes.sql` and replace `patent_20141215` with the name of the source database and `PatentsView_20141215_dev` with the name of the destination database to be created.  In the future, we might want to simplify this by working in the "current" database, but during development it was safer to retain explicit database references.
 
 * Run `generate_database.sql`.  This will take a long time depending on server load and configuration.  The run that completed just prior to the creation of this README took approximately 10 hours.
 
