@@ -834,7 +834,7 @@ create table `PatentsView_20141215_dev`.`assignee`
   `organization` varchar(256) null,
   `num_patents` int unsigned not null,
   `lastknown_location_id` int unsigned null,
-  `lastknown_persistent_location_id` int unsigned null,
+  `lastknown_persistent_location_id` varchar(128) null,
   `lastknown_city` varchar(128) null,
   `lastknown_state` varchar(20) null,
   `lastknown_country` varchar(10) null,
