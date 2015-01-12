@@ -780,6 +780,7 @@ create table `PatentsView_20141215_dev`.`patent_assignee`
   `patent_id` varchar(20) not null,
   `assignee_id` int unsigned not null,
   `location_id` int unsigned null,
+  `sequence` smallint unsigned not null,
   primary key (`patent_id`, `assignee_id`),
   unique index ak_patent_assignee (`assignee_id`, `patent_id`)
 )
@@ -789,10 +790,10 @@ engine=InnoDB;
 # 4,825,748 @ 7:20
 insert into `PatentsView_20141215_dev`.`patent_assignee`
 (
-  `patent_id`, `assignee_id`, `location_id`
+  `patent_id`, `assignee_id`, `location_id`, `sequence`
 )
 select distinct
-  pa.`patent_id`, t.`new_assignee_id`, tl.`new_location_id`
+  pa.`patent_id`, t.`new_assignee_id`, tl.`new_location_id`, ra.`sequence`
 from
   `patent_20141215`.`patent_assignee` pa
   inner join `PatentsView_20141215_dev`.`temp_id_mapping_assignee` t on t.`old_assignee_id` = pa.`assignee_id`
@@ -1003,6 +1004,7 @@ create table `PatentsView_20141215_dev`.`patent_inventor`
   `patent_id` varchar(20) not null,
   `inventor_id` int unsigned not null,
   `location_id` int unsigned null,
+  `sequence` smallint unsigned not null,
   primary key (`patent_id`, `inventor_id`),
   unique index ak_patent_inventor (`inventor_id`, `patent_id`)
 )
@@ -1012,10 +1014,10 @@ engine=InnoDB;
 # 12,389,559 @ 29:50
 insert into `PatentsView_20141215_dev`.`patent_inventor`
 (
-  `patent_id`, `inventor_id`, `location_id`
+  `patent_id`, `inventor_id`, `location_id`, `sequence`
 )
 select distinct
-  pii.`patent_id`, t.`new_inventor_id`, tl.`new_location_id`
+  pii.`patent_id`, t.`new_inventor_id`, tl.`new_location_id`, ri.`sequence`
 from
   `patent_20141215`.`patent_inventor` pii
   inner join `PatentsView_20141215_dev`.`temp_id_mapping_inventor` t on t.`old_inventor_id` = pii.`inventor_id`
