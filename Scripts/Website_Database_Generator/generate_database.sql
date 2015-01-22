@@ -1926,9 +1926,11 @@ alter table `PatentsView_20141215_dev`.`patent` add index `ix_patent_year` (`yea
 alter table `PatentsView_20141215_dev`.`usapplicationcitation` add index `ix_usapplicationcitation_cited_application_id` (`cited_application_id`);
 alter table `PatentsView_20141215_dev`.`uspatentcitation` add index `ix_uspatentcitation_cited_patent_id` (`cited_patent_id`);
 alter table `PatentsView_20141215_dev`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_mainclass_id` (`mainclass_id`);
-alter table `PatentsView_20141215_dev`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_title` (`mainclass_title`);
+alter table `PatentsView_20141215_dev`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_mainclass_title` (`mainclass_title`);
 alter table `PatentsView_20141215_dev`.`uspc_current` add index `ix_uspc_current_mainclass_id` (`mainclass_id`);
 alter table `PatentsView_20141215_dev`.`uspc_current` add index `ix_uspc_current_subclass_id` (`subclass_id`);
+alter table `PatentsView_20141215_dev`.`uspc_current` add index `ix_uspc_current_mainclass_title` (`mainclass_title`);
+alter table `PatentsView_20141215_dev`.`uspc_current` add index `ix_uspc_current_subclass_title` (`subclass_title`);
 
 
 # END additional indexing #####################################################################################################################################
