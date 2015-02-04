@@ -2291,6 +2291,32 @@ group by
 # END location_uspc_mainclass ######################################################################################################################
 
 
+# BEGIN location_nber_subcategory ######################################################################################################################
+
+drop table if exists `PatentsView_20141215_v5`.`location_nber_subcategory`;
+create table `PatentsView_20141215_v5`.`location_nber_subcategory`
+(
+  `location_id` int unsigned not null,
+  `subcategory_id` varchar(20) not null,
+  `num_patents` int unsigned not null
+)
+  engine=InnoDB;
+
+# 
+insert into `PatentsView_20141215_v5`.`location_nber_subcategory`
+(`location_id`, `subcategory_id`, `num_patents`)
+  select
+    pi.location_id, nber.subcategory_id, count(distinct pi.patent_id)
+  from
+    `PatentsView_20141215_v5`.`patent_inventor` pi
+    inner join `PatentsView_20141215_v5`.`nber` nber using(patent_id)
+  where location_id is not null
+  group by
+    pi.location_id, nber.subcategory_id;
+
+# END location_nber_subcategory ######################################################################################################################
+
+
 # BEGIN location_year ######################################################################################################################
 
 
