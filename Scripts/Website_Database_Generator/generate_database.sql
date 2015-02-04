@@ -856,7 +856,7 @@ engine=InnoDB;
 # 438,452 @ 0:07
 insert into `PatentsView_20141215_dev`.`location_assignee`
   (`location_id`, `assignee_id`, `num_patents`)
-select
+select distinct
   timl.`new_location_id`,
   tima.`new_assignee_id`,
   null
