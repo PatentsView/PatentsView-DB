@@ -773,9 +773,7 @@ engine=InnoDB;
 
 # 0:47
 insert into `PatentsView_20141215_dev`.`temp_assignee_num_patents`
-(
-  `assignee_id`, `num_patents`
-)
+  (`assignee_id`, `num_patents`)
 select
   `assignee_id`,
   count(distinct `patent_id`)
@@ -2215,9 +2213,20 @@ group by
 # BEGIN location_assignee update num_patents ###################################################################################################################################
 
 
-# @2:33
-update location_assignee
-  set num_patents=(select count(distinct patent_id) from patent_assignee where location_assignee.location_id=patent_assignee.location_id and location_assignee.assignee_id=patent_assignee.assignee_id);
+# 434,823 @ 0:17
+update
+  `PatentsView_20141215_dev`.`location_assignee` la
+  inner join
+  (
+    select
+      `location_id`, `assignee_id`, count(distinct `patent_id`) num_patents
+    from
+      `PatentsView_20141215_dev`.`patent_assignee`
+    group by
+      `location_id`, `assignee_id`
+  ) pa on pa.`location_id` = la.`location_id` and pa.`assignee_id` = la.`assignee_id`
+set
+  la.`num_patents` = pa.`num_patents`;
 
 
 # END location_assignee update num_patents ###################################################################################################################################
@@ -2226,8 +2235,20 @@ update location_assignee
 # BEGIN location_inventor update num_patents ###################################################################################################################################
 
 
-update location_inventor
-  set num_patents=(select count(distinct patent_id) from patent_inventor where location_inventor.location_id=patent_inventor.location_id and location_inventor.inventor_id=patent_inventor.inventor_id);
+# 4,167,939 @ 2:33
+update
+  `PatentsView_20141215_dev`.`location_inventor` li
+  inner join
+  (
+    select
+      `location_id`, `inventor_id`, count(distinct `patent_id`) num_patents
+    from
+      `PatentsView_20141215_dev`.`patent_inventor`
+    group by
+      `location_id`, `inventor_id`
+  ) pii on pii.`location_id` = li.`location_id` and pii.`inventor_id` = li.`inventor_id`
+set
+  li.`num_patents` = pii.`num_patents`;
 
 
 # END location_assignee update num_patents ###################################################################################################################################
@@ -2245,7 +2266,8 @@ create table `PatentsView_20141215_dev`.`location_cpc_subsection`
 )
 engine=InnoDB;
 
-# 1,141,331 @ 10:42
+
+# 1,077,971 @ 6:19
 insert into `PatentsView_20141215_dev`.`location_cpc_subsection`
   (`location_id`, `subsection_id`, `num_patents`)
 select
@@ -2274,7 +2296,8 @@ create table `PatentsView_20141215_dev`.`location_uspc_mainclass`
 )
 engine=InnoDB;
 
-# 2,360,512 @ 14:35
+
+# 2,260,351 @ 7:47
 insert into `PatentsView_20141215_dev`.`location_uspc_mainclass`
   (`location_id`, `mainclass_id`, `num_patents`)
 select
@@ -2293,26 +2316,30 @@ group by
 
 # BEGIN location_nber_subcategory ######################################################################################################################
 
-drop table if exists `PatentsView_20141215_v5`.`location_nber_subcategory`;
-create table `PatentsView_20141215_v5`.`location_nber_subcategory`
+
+drop table if exists `PatentsView_20141215_dev`.`location_nber_subcategory`;
+create table `PatentsView_20141215_dev`.`location_nber_subcategory`
 (
   `location_id` int unsigned not null,
   `subcategory_id` varchar(20) not null,
   `num_patents` int unsigned not null
 )
-  engine=InnoDB;
+engine=InnoDB;
+
 
 # 
-insert into `PatentsView_20141215_v5`.`location_nber_subcategory`
-(`location_id`, `subcategory_id`, `num_patents`)
-  select
-    pi.location_id, nber.subcategory_id, count(distinct pi.patent_id)
-  from
-    `PatentsView_20141215_v5`.`patent_inventor` pi
-    inner join `PatentsView_20141215_v5`.`nber` nber using(patent_id)
-  where location_id is not null
-  group by
-    pi.location_id, nber.subcategory_id;
+insert into `PatentsView_20141215_dev`.`location_nber_subcategory`
+  (`location_id`, `subcategory_id`, `num_patents`)
+select
+  pi.location_id, nber.subcategory_id, count(distinct pi.patent_id)
+from
+  `PatentsView_20141215_dev`.`patent_inventor` pi
+  inner join `PatentsView_20141215_dev`.`nber` nber using(patent_id)
+where
+  location_id is not null
+group by
+  pi.location_id, nber.subcategory_id;
+
 
 # END location_nber_subcategory ######################################################################################################################
 
@@ -2328,6 +2355,7 @@ create table `PatentsView_20141215_dev`.`location_year`
   `num_patents` int unsigned not null
 )
 engine=InnoDB;
+
 
 # 867,942 @ 1:19
 insert into `PatentsView_20141215_dev`.`location_year`
@@ -2393,6 +2421,8 @@ alter table `PatentsView_20141215_dev`.`location` add index `ix_location_persist
 alter table `PatentsView_20141215_dev`.`location` add index `ix_location_state` (`state`);
 alter table `PatentsView_20141215_dev`.`location_cpc_subsection` add index `ix_location_cpc_subsection_location_id` (`location_id`);
 alter table `PatentsView_20141215_dev`.`location_cpc_subsection` add index `ix_location_cpc_subsection_subsection_id` (`subsection_id`);
+alter table `PatentsView_20141215_dev`.`location_nber_subcategory` add index `ix_location_nber_subcategory_location_id` (`location_id`);
+alter table `PatentsView_20141215_dev`.`location_nber_subcategory` add index `ix_location_nber_subcategory_mainclass_id` (`subcategory_id`);
 alter table `PatentsView_20141215_dev`.`location_uspc_mainclass` add index `ix_location_uspc_mainclass_location_id` (`location_id`);
 alter table `PatentsView_20141215_dev`.`location_uspc_mainclass` add index `ix_location_uspc_mainclass_mainclass_id` (`mainclass_id`);
 alter table `PatentsView_20141215_dev`.`location_year` add index `ix_location_year_location_id` (`location_id`);
