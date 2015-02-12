@@ -771,7 +771,7 @@ create table `PatentsView_20141215_dev`.`temp_assignee_num_patents`
 engine=InnoDB;
 
 
-# 0:47
+#
 insert into `PatentsView_20141215_dev`.`temp_assignee_num_patents`
   (`assignee_id`, `num_patents`)
 select
@@ -782,7 +782,27 @@ from
 group by
   `assignee_id`;
 
+drop table if exists `PatentsView_20141215_dev`.`temp_assignee_num_inventors`;
+create table `PatentsView_20141215_dev`.`temp_assignee_num_inventors`
+(
+  `assignee_id` varchar(36) not null,
+  `num_inventors` int unsigned not null,
+  primary key (`assignee_id`)
+)
+engine=InnoDB;
 
+# 0:15
+insert into `PatentsView_20141215_dev`.`temp_assignee_num_inventors`
+  (`assignee_id`, `num_inventors`)
+select
+  aa.`assignee_id`,
+  count(distinct ii.`inventor_id`)
+from
+  `patent_20141215`.`patent_assignee` aa
+  join `patent_20141215`.`patent_inventor` ii on ii.patent_id = aa.patent_id
+group by
+  aa.`assignee_id`;
+  
 drop table if exists `PatentsView_20141215_dev`.`temp_assignee_years_active`;
 create table `PatentsView_20141215_dev`.`temp_assignee_years_active`
 (
@@ -873,6 +893,7 @@ create table `PatentsView_20141215_dev`.`assignee`
   `name_last` varchar(64) null,
   `organization` varchar(256) null,
   `num_patents` int unsigned not null,
+  `num_inventors` int unsigned not null,
   `lastknown_location_id` int unsigned null,
   `lastknown_persistent_location_id` varchar(128) null,
   `lastknown_city` varchar(128) null,
@@ -893,14 +914,14 @@ engine=InnoDB;
 insert into `PatentsView_20141215_dev`.`assignee`
 (
   `assignee_id`, `type`, `name_first`, `name_last`, `organization`,
-  `num_patents`, `lastknown_location_id`, `lastknown_persistent_location_id`, `lastknown_city`,
+  `num_patents`, `num_inventors`, `lastknown_location_id`, `lastknown_persistent_location_id`, `lastknown_city`,
   `lastknown_state`, `lastknown_country`, `lastknown_latitude`, `lastknown_longitude`,
   `first_seen_date`, `last_seen_date`, `years_active`, `persistent_assignee_id`
 )
 select
   t.`new_assignee_id`, trim(leading '0' from nullif(trim(a.`type`), '')), nullif(trim(a.`name_first`), ''),
   nullif(trim(a.`name_last`), ''), nullif(trim(a.`organization`), ''),
-  tanp.`num_patents`, talkl.`location_id`, talkl.`persistent_location_id`, talkl.`city`, talkl.`state`,
+  tanp.`num_patents`, tani.`num_inventors`, talkl.`location_id`, talkl.`persistent_location_id`, talkl.`city`, talkl.`state`,
   talkl.`country`, talkl.`latitude`, talkl.`longitude`,
   tafls.`first_seen_date`, tafls.`last_seen_date`,
   ifnull(case when tafls.`actual_years_active` < 1 then 1 else tafls.`actual_years_active` end, 0),
@@ -910,7 +931,8 @@ from
   inner join `PatentsView_20141215_dev`.`temp_id_mapping_assignee` t on t.`old_assignee_id` = a.`id`
   left outer join `PatentsView_20141215_dev`.`temp_assignee_lastknown_location` talkl on talkl.`assignee_id` = a.`id`
   inner join `PatentsView_20141215_dev`.`temp_assignee_num_patents` tanp on tanp.`assignee_id` = a.`id`
-  left outer join `PatentsView_20141215_dev`.`temp_assignee_years_active` tafls on tafls.`assignee_id` = a.`id`;
+  left outer join `PatentsView_20141215_dev`.`temp_assignee_years_active` tafls on tafls.`assignee_id` = a.`id`
+  inner join `PatentsView_20141215_dev`.`temp_assignee_num_inventors` tani on tani.`assignee_id` = a.`id`;
 
 
 # END assignee ################################################################################################################################################
@@ -1009,6 +1031,28 @@ from
 group by
   `inventor_id`;
 
+drop table if exists `PatentsView_20141215_dev`.`temp_inventor_num_assignees`;
+create table `PatentsView_20141215_dev`.`temp_inventor_num_assignees`
+(
+  `inventor_id` varchar(36) not null,
+  `num_assignees` int unsigned not null,
+  primary key (`inventor_id`)
+)
+engine=InnoDB;
+
+
+# 0:15
+insert into `PatentsView_20141215_dev`.`temp_inventor_num_assignees`
+  (`inventor_id`, `num_assignees`)
+select
+  ii.`inventor_id`, count(distinct aa.`assignee_id`)
+from
+  `patent_20141215`.`patent_inventor` ii
+  join `patent_20141215`.`patent_assignee` aa
+  on aa.`patent_id` = ii.`patent_id`
+group by
+  ii.`inventor_id`;
+
 
 drop table if exists `PatentsView_20141215_dev`.`temp_inventor_years_active`;
 create table `PatentsView_20141215_dev`.`temp_inventor_years_active`
@@ -1097,6 +1141,7 @@ create table `PatentsView_20141215_dev`.`inventor`
   `name_first` varchar(64) null,
   `name_last` varchar(64) null,
   `num_patents` int unsigned not null,
+  `num_assignees` int unsigned not null,
   `lastknown_location_id` int unsigned null,
   `lastknown_persistent_location_id` varchar(128) null,
   `lastknown_city` varchar(128) null,
@@ -1116,14 +1161,14 @@ engine=InnoDB;
 # 3,572,763 @ 1:57
 insert into `PatentsView_20141215_dev`.`inventor`
 (
-  `inventor_id`, `name_first`, `name_last`, `num_patents`,
+  `inventor_id`, `name_first`, `name_last`, `num_patents`, `num_assignees`,
   `lastknown_location_id`, `lastknown_persistent_location_id`, `lastknown_city`,
   `lastknown_state`, `lastknown_country`, `lastknown_latitude`, `lastknown_longitude`,
   `first_seen_date`, `last_seen_date`, `years_active`, `persistent_inventor_id`
 )
 select
   t.`new_inventor_id`, nullif(trim(i.`name_first`), ''), nullif(trim(i.`name_last`), ''),
-  tinp.`num_patents`, tilkl.`location_id`, tilkl.`persistent_location_id`, tilkl.`city`, tilkl.`state`,
+  tinp.`num_patents`, tina.`num_assignees`, tilkl.`location_id`, tilkl.`persistent_location_id`, tilkl.`city`, tilkl.`state`,
   tilkl.`country`, tilkl.`latitude`, tilkl.`longitude`, tifls.`first_seen_date`, tifls.`last_seen_date`,
   ifnull(case when tifls.`actual_years_active` < 1 then 1 else tifls.`actual_years_active` end, 0),
   i.`id`
@@ -1132,7 +1177,8 @@ from
   inner join `PatentsView_20141215_dev`.`temp_id_mapping_inventor` t on t.`old_inventor_id` = i.`id`
   left outer join `PatentsView_20141215_dev`.`temp_inventor_lastknown_location` tilkl on tilkl.`inventor_id` = i.`id`
   inner join `PatentsView_20141215_dev`.`temp_inventor_num_patents` tinp on tinp.`inventor_id` = i.`id`
-  left outer join `PatentsView_20141215_dev`.`temp_inventor_years_active` tifls on tifls.`inventor_id` = i.`id`;
+  left outer join `PatentsView_20141215_dev`.`temp_inventor_years_active` tifls on tifls.`inventor_id` = i.`id`
+  inner join `PatentsView_20141215_dev`.`temp_inventor_num_assignees` tina on tina.`inventor_id` = i.`id`;
 
 
 # END inventor ################################################################################################################################################
