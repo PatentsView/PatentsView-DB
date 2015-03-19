@@ -921,7 +921,7 @@ insert into `PatentsView_20141215_dev`.`assignee`
 select
   t.`new_assignee_id`, trim(leading '0' from nullif(trim(a.`type`), '')), nullif(trim(a.`name_first`), ''),
   nullif(trim(a.`name_last`), ''), nullif(trim(a.`organization`), ''),
-  tanp.`num_patents`, tani.`num_inventors`, talkl.`location_id`, talkl.`persistent_location_id`, talkl.`city`, talkl.`state`,
+  tanp.`num_patents`, ifnull(tani.`num_inventors`, 0), talkl.`location_id`, talkl.`persistent_location_id`, talkl.`city`, talkl.`state`,
   talkl.`country`, talkl.`latitude`, talkl.`longitude`,
   tafls.`first_seen_date`, tafls.`last_seen_date`,
   ifnull(case when tafls.`actual_years_active` < 1 then 1 else tafls.`actual_years_active` end, 0),
@@ -932,7 +932,7 @@ from
   left outer join `PatentsView_20141215_dev`.`temp_assignee_lastknown_location` talkl on talkl.`assignee_id` = a.`id`
   inner join `PatentsView_20141215_dev`.`temp_assignee_num_patents` tanp on tanp.`assignee_id` = a.`id`
   left outer join `PatentsView_20141215_dev`.`temp_assignee_years_active` tafls on tafls.`assignee_id` = a.`id`
-  inner join `PatentsView_20141215_dev`.`temp_assignee_num_inventors` tani on tani.`assignee_id` = a.`id`;
+  left outer join `PatentsView_20141215_dev`.`temp_assignee_num_inventors` tani on tani.`assignee_id` = a.`id`;
 
 
 # END assignee ################################################################################################################################################
@@ -1168,7 +1168,7 @@ insert into `PatentsView_20141215_dev`.`inventor`
 )
 select
   t.`new_inventor_id`, nullif(trim(i.`name_first`), ''), nullif(trim(i.`name_last`), ''),
-  tinp.`num_patents`, tina.`num_assignees`, tilkl.`location_id`, tilkl.`persistent_location_id`, tilkl.`city`, tilkl.`state`,
+  tinp.`num_patents`, ifnull(tina.`num_assignees`, 0), tilkl.`location_id`, tilkl.`persistent_location_id`, tilkl.`city`, tilkl.`state`,
   tilkl.`country`, tilkl.`latitude`, tilkl.`longitude`, tifls.`first_seen_date`, tifls.`last_seen_date`,
   ifnull(case when tifls.`actual_years_active` < 1 then 1 else tifls.`actual_years_active` end, 0),
   i.`id`
@@ -1178,7 +1178,7 @@ from
   left outer join `PatentsView_20141215_dev`.`temp_inventor_lastknown_location` tilkl on tilkl.`inventor_id` = i.`id`
   inner join `PatentsView_20141215_dev`.`temp_inventor_num_patents` tinp on tinp.`inventor_id` = i.`id`
   left outer join `PatentsView_20141215_dev`.`temp_inventor_years_active` tifls on tifls.`inventor_id` = i.`id`
-  inner join `PatentsView_20141215_dev`.`temp_inventor_num_assignees` tina on tina.`inventor_id` = i.`id`;
+  left outer join `PatentsView_20141215_dev`.`temp_inventor_num_assignees` tina on tina.`inventor_id` = i.`id`;
 
 
 # END inventor ################################################################################################################################################
