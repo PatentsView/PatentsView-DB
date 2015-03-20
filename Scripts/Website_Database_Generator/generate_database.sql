@@ -860,8 +860,8 @@ from
   left outer join `PatentsView_20141215_dev`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`location_id`;
 
 
-drop table if exists `PatentsView_20141215_dev`.`location_assignee_update`;
-create table `PatentsView_20141215_dev`.`location_assignee_update`
+drop table if exists `PatentsView_20141215_dev`.`location_assignee`;
+create table `PatentsView_20141215_dev`.`location_assignee`
 (
   `location_id` int unsigned not null,
   `assignee_id` int unsigned not null,
@@ -872,7 +872,7 @@ engine=InnoDB;
 
 
 # 438,452 @ 0:07
-insert into `PatentsView_20141215_dev`.`location_assignee_update`
+insert into `PatentsView_20141215_dev`.`location_assignee`
   (`location_id`, `assignee_id`, `num_patents`)
 select distinct
   timl.`new_location_id`,
@@ -1110,8 +1110,8 @@ from
   left outer join `PatentsView_20141215_dev`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`location_id`;
 
 
-drop table if exists `PatentsView_20141215_dev`.`location_inventor_update`;
-create table `PatentsView_20141215_dev`.`location_inventor_update`
+drop table if exists `PatentsView_20141215_dev`.`location_inventor`;
+create table `PatentsView_20141215_dev`.`location_inventor`
 (
   `location_id` int unsigned not null,
   `inventor_id` int unsigned not null,
@@ -1122,7 +1122,7 @@ engine=InnoDB;
 
 
 # 4,188,507 @ 0:50
-insert into `PatentsView_20141215_dev`.`location_inventor_update`
+insert into `PatentsView_20141215_dev`.`location_inventor`
   (`location_id`, `inventor_id`, `num_patents`)
 select distinct
   timl.`new_location_id`,
@@ -2261,7 +2261,7 @@ group by
 
 # 434,823 @ 0:17
 update
-  `PatentsView_20141215_dev`.`location_assignee_update` la
+  `PatentsView_20141215_dev`.`location_assignee` la
   inner join
   (
     select
@@ -2283,7 +2283,7 @@ set
 
 # 4,167,939 @ 2:33
 update
-  `PatentsView_20141215_dev`.`location_inventor_update` li
+  `PatentsView_20141215_dev`.`location_inventor` li
   inner join
   (
     select
@@ -2459,8 +2459,8 @@ alter table `PatentsView_20141215_dev`.`inventor_uspc_mainclass` add index `ix_i
 alter table `PatentsView_20141215_dev`.`inventor_year` add index `ix_inventor_year_inventor_id` (`inventor_id`);
 alter table `PatentsView_20141215_dev`.`inventor_year` add index `ix_inventor_year_year` (`patent_year`);
 alter table `PatentsView_20141215_dev`.`ipcr` add index `ix_ipcr_ipc_class` (`ipc_class`);
-alter table `PatentsView_20141215_dev`.`location_assignee_update` add index `ix_location_assignee_assignee_id` (`assignee_id`);
-alter table `PatentsView_20141215_dev`.`location_inventor_update` add index `ix_location_inventor_inventor_id` (`inventor_id`);
+alter table `PatentsView_20141215_dev`.`location_assignee` add index `ix_location_assignee_assignee_id` (`assignee_id`);
+alter table `PatentsView_20141215_dev`.`location_inventor` add index `ix_location_inventor_inventor_id` (`inventor_id`);
 alter table `PatentsView_20141215_dev`.`location` add index `ix_location_city` (`city`);
 alter table `PatentsView_20141215_dev`.`location` add index `ix_location_country` (`country`);
 alter table `PatentsView_20141215_dev`.`location` add index `ix_location_persistent_location_id` (`persistent_location_id`);
