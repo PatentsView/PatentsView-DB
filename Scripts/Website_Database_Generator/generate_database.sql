@@ -597,28 +597,28 @@ create table `PatentsView_20141215_dev`.`temp_location_patent`
 engine=InnoDB;
 
 
-# 24,294,018 @ 3:12
+# 11,867,513 @ 3:41
 insert into `PatentsView_20141215_dev`.`temp_location_patent`
   (`location_id`, `patent_id`)
 select
   timl.`new_location_id`,
-  pii.`patent_id`
+  ri.`patent_id`
 from
   `PatentsView_20141215_dev`.`temp_id_mapping_location` timl
-  inner join `patent_20141215`.`location_inventor_update` li on li.`location_id` = timl.`old_location_id`
-  inner join `patent_20141215`.`patent_inventor` pii on pii.`inventor_id` = li.`inventor_id`;
+  inner join `patent_20141215`.`rawlocation` rl on rl.`location_id_transformed` = timl.`old_location_id`
+  inner join `patent_20141215`.`rawinventor` ri on ri.`rawlocation_id` = rl.`id`;
 
 
-# 50,566,007 @ 5:33
+# 4,457,955 @ 2:54
 insert into `PatentsView_20141215_dev`.`temp_location_patent`
   (`location_id`, `patent_id`)
 select
   timl.`new_location_id`,
-  pa.`patent_id`
+  ra.`patent_id`
 from
   `PatentsView_20141215_dev`.`temp_id_mapping_location` timl
-  inner join `patent_20141215`.`location_assignee_update` la on la.`location_id` = timl.`old_location_id`
-  inner join `patent_20141215`.`patent_assignee` pa on pa.`assignee_id` = la.`assignee_id`;
+  inner join `patent_20141215`.`rawlocation` rl on rl.`location_id_transformed` = timl.`old_location_id`
+  inner join `patent_20141215`.`rawassignee` ra on ra.`rawlocation_id` = rl.`id`;
 
 
 # 7:28
