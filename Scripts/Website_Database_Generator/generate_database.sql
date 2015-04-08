@@ -2532,6 +2532,8 @@ drop table if exists `PatentsView_20141215_dev`.`temp_patent_earliest_applicatio
 drop table if exists `PatentsView_20141215_dev`.`temp_patent_firstnamed_assignee`;
 drop table if exists `PatentsView_20141215_dev`.`temp_patent_firstnamed_inventor`;
 drop table if exists `PatentsView_20141215_dev`.`temp_subclass_current_title`;
+drop table if exists `PatentsView_20141215_dev`.`temp_assignee_num_inventors`;
+drop table if exists `PatentsView_20141215_dev`.`temp_inventor_num_assignees`;
 
 
 # END temporary table removal #################################################################################################################################
