@@ -621,8 +621,9 @@ from
   inner join `patent_20141215`.`rawassignee` ra on ra.`rawlocation_id` = rl.`id`;
 
 
-# 7:28
+# 15:00
 alter table `PatentsView_20141215_dev`.`temp_location_patent` add index (`location_id`, `patent_id`);
+alter table `PatentsView_20141215_dev`.`temp_location_patent` add index (`patent_id`, `location_id`);
 
 
 drop table if exists `PatentsView_20141215_dev`.`temp_location_num_patents`;
@@ -2317,14 +2318,12 @@ engine=InnoDB;
 insert into `PatentsView_20141215_dev`.`location_cpc_subsection`
   (`location_id`, `subsection_id`, `num_patents`)
 select
-  pi.location_id, cpc.subsection_id, count(distinct pi.patent_id)
+  tlp.`location_id`, cpc.`subsection_id`, count(distinct tlp.`patent_id`)
 from
-  `PatentsView_20141215_dev`.`patent_inventor` pi
-  inner join `PatentsView_20141215_dev`.`cpc_current_subsection` cpc using(patent_id)
-where
-  location_id is not null
+  `PatentsView_20141215_dev`.`temp_location_patent` tlp
+  inner join `PatentsView_20141215_dev`.`cpc_current_subsection` cpc using(`patent_id`)
 group by
-  pi.location_id, cpc.subsection_id;
+  tlp.`location_id`, cpc.`subsection_id`;
 
 
 # END location_cpc_subsection ######################################################################################################################
@@ -2347,14 +2346,12 @@ engine=InnoDB;
 insert into `PatentsView_20141215_dev`.`location_uspc_mainclass`
   (`location_id`, `mainclass_id`, `num_patents`)
 select
-  pi.location_id, uspc.mainclass_id, count(distinct pi.patent_id)
+  tlp.`location_id`, uspc.`mainclass_id`, count(distinct tlp.`patent_id`)
 from
-  `PatentsView_20141215_dev`.`patent_inventor` pi
-  inner join `PatentsView_20141215_dev`.`uspc_current_mainclass` uspc using(patent_id)
-where
-  location_id is not null
+  `PatentsView_20141215_dev`.`temp_location_patent` tlp
+  inner join `PatentsView_20141215_dev`.`uspc_current_mainclass` uspc using(`patent_id`)
 group by
-  pi.location_id, uspc.mainclass_id;
+  tlp.`location_id`, uspc.`mainclass_id`;
 
 
 # END location_uspc_mainclass ######################################################################################################################
@@ -2377,14 +2374,12 @@ engine=InnoDB;
 insert into `PatentsView_20141215_dev`.`location_nber_subcategory`
   (`location_id`, `subcategory_id`, `num_patents`)
 select
-  pi.location_id, nber.subcategory_id, count(distinct pi.patent_id)
+  tlp.`location_id`, nber.`subcategory_id`, count(distinct tlp.`patent_id`)
 from
-  `PatentsView_20141215_dev`.`patent_inventor` pi
-  inner join `PatentsView_20141215_dev`.`nber` nber using(patent_id)
-where
-  location_id is not null
+  `PatentsView_20141215_dev`.`temp_location_patent` tlp
+  inner join `PatentsView_20141215_dev`.`nber` nber using(`patent_id`)
 group by
-  pi.location_id, nber.subcategory_id;
+  tlp.`location_id`, nber.`subcategory_id`;
 
 
 # END location_nber_subcategory ######################################################################################################################
@@ -2407,14 +2402,12 @@ engine=InnoDB;
 insert into `PatentsView_20141215_dev`.`location_year`
   (`location_id`, `year`, `num_patents`)
 select
-  pi.location_id, p.year, count(distinct p.patent_id)
+  tlp.`location_id`, p.`year`, count(distinct tlp.`patent_id`)
 from
-  `PatentsView_20141215_dev`.`patent_inventor` pi
-  inner join `PatentsView_20141215_dev`.`patent` p using(patent_id)
-where
-  location_id is not null
+  `PatentsView_20141215_dev`.`temp_location_patent` tlp
+  inner join `PatentsView_20141215_dev`.`patent` p using(`patent_id`)
 group by
-  pi.location_id, p.year;
+  tlp.`location_id`, p.`year`;
 
 
 # END location_year ######################################################################################################################
