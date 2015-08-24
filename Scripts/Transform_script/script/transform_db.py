@@ -98,8 +98,8 @@ def update_appnums(folder,host,username,password,appdb):
     cursor.execute('select * from '+appdb+'.application')
     nums = [list(f) for f in cursor.fetchall()]
     inp = csv.reader(file(os.path.join(folder,files[0]),'rb'))
-    outp = open(os.path.join(folder,'appnums_tmp.csv'),'wb',delimiter='\t')
-    tmp = csv.writer(outp)
+    outp = open(os.path.join(folder,'appnums_tmp.csv'),'wb')
+    tmp = csv.writer(outp,delimiter='\t')
     data = {}
     for i in inp:
         data[i[0]] = i
