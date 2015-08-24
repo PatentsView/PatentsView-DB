@@ -5,7 +5,7 @@ def transform(folder,host,username,password,appdb,patdb):
     br = mechanize.Browser()
     files = ['application_correct.csv']
     for f in files:
-        url = 'http://cssip.org/docs/'+f
+        url = 'http://www.dev.patentsview.org/data/'+f
         br.retrieve(url,os.path.join(folder,f))
     
     mydb = MySQLdb.connect(host=host,
@@ -87,7 +87,7 @@ def update_appnums(folder,host,username,password,appdb):
     files = ['appnums_correct_grant.csv']
     
     for f in files:
-        url = 'http://cssip.org/docs/'+f
+        url = 'http://www.dev.patentsview.org/data/'+f
         br.retrieve(url,os.path.join(folder,f))
     
     mydb = MySQLdb.connect(host=host,
