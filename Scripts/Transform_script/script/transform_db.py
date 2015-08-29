@@ -51,17 +51,18 @@ def transform(folder,host,username,password,appdb,patdb):
         inp = csv.reader(file(os.path.join(folder,'application_correct.csv'),'rb'))
         inp.next()
         try:
-            cursor.execute('alter table '+patdb+'.application add column id_transformed varchar(36), add column number_transformed varchar(64), add column type_transformed varchar(20)')
+            cursor.execute('alter table '+patdb+'.application add column id_transformed varchar(36), add column number_transformed varchar(64), add column series_code_transformed_from_type varchar(20)')
             mydb.commit()
         except:
             pass
-        cursor.execute('update '+patdb+'.application set id_transformed = id,number_transformed = number,type_transformed=type')
+        cursor.execute('update '+patdb+'.application set id_transformed = id,number_transformed = number,series_code_transformed_from_type=type')
         mydb.commit()
         for i in inp:
             if i[2] == 'D':
-                cursor.execute('update '+patdb+'.application set id_transformed="'+i[1]+'",number_transformed="'+i[1]+'",type_transformed="D" where patent_id = "'+i[0]+'"')
+                cursor.execute('update '+patdb+'.application set id_transformed="'+i[1]+'",number_transformed="'+i[1]+'",series_code_transformed_from_type="D" where patent_id = "'+i[0]+'"')
             else:
-                cursor.execute('update '+patdb+'.application set id_transformed="'+i[1][:2]+'/'+i[1][2:]+'",number_transformed="'+i[1]+'",type_transformed="'+i[2]+'" where patent_id = "'+i[0]+'"')
+                # Double check this field for post-2015 patents
+                cursor.execute('update '+patdb+'.application set id_transformed="'+i[1][:2]+'/'+i[1][2:]+'",number_transformed="'+i[1]+'",series_code_transformed_from_type="'+i[2]+'" where patent_id = "'+i[0]+'"')
         mydb.commit()
         
         ### Transform application_id and number in usapplicationcitation table ###
