@@ -63,7 +63,20 @@ def transform(folder,host,username,password,appdb,patdb):
             else:
                 cursor.execute('update '+patdb+'.application set id_transformed="'+i[1][:2]+'/'+i[1][2:]+'",number_transformed="'+i[1]+'",type_transformed="'+i[2]+'" where patent_id = "'+i[0]+'"')
         mydb.commit()
-    
+        
+        ### Transform application_id and number in usapplicationcitation table ###
+        try:
+            cursor.execute('alter table '+patdb+'.usapplicationcitation add column application_id_transformed varchar(36), add column number_transformed varchar(64)')
+            mydb.commit()
+        except:
+            pass
+        cursor.execute('select application_id,number from '+patdb+'.usapplicationcitation')
+        fields = list(cursor.fetchall())
+        for f in fields:
+            idnum = f[0][:5]+f[0][:4]+f[0][5:]
+            numb = f[1].replace('/','')
+            cursor.execute('update '+patdb+'.usapplicationcitation set application_id_transformed = "'+idnum+'",number_transformed = "'+numb+'"')
+        mydb.commit()
     if appdb:
         ### Change country codes with X in rawlocation ###
         try:
