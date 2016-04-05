@@ -494,7 +494,7 @@ def upload_cpc(host,username,password,appdb,patdb,folder):
         uspc_full.next()
         errorlog = open(os.path.join(folder,'upload_error_patents.log'),'w')
         current_exist = {}
-        for nnn in range(10000000):
+        for nnn in range(15000000):
             try:
                 m = uspc_full.next()
                 good = None
@@ -602,7 +602,7 @@ def upload_nber(host,username,password,patdb,folder):
     
     files = ['nber_classes.csv','patent_nber_all.csv']
     for f in files:
-        url = 'http://cssip.org/docs/'+f
+        url = 'http://www.dev.patentsview.org/data/'+f
         br.retrieve(url,os.path.join(folder,f))
     
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
@@ -645,7 +645,7 @@ def upload_nber(host,username,password,patdb,folder):
         query = query.replace(',"NULL"',",NULL")
         query2 = query.replace("nber_subcategory",patdb+'.nber_subcategory')
         cursor.execute(query2)
-    
+        
     mydb.commit()
     
     # Get all patent numbers in the current database not to upload full NBER table going back to 19th century
