@@ -2,10 +2,10 @@ def cpc_class_tables(outputdir,datadir):
     import re,os,csv
     from bs4 import BeautifulSoup as bs
     
-    ### get the latest CPC specification from http://www.cooperativepatentclassification.org/cpcSchemeAndDefinitions/Bulk.html
-    outp = csv.writer(open(os.path.join(outputdir,'cpc_subsection.csv','wb')))
-    outp2 = csv.writer(open(os.path.join(outputdir,'cpc_group.csv','wb')))
-    outp3 = csv.writer(open(os.path.join(outputdir,'cpc_subgroup.csv','wb')))
+    ### get the latest CPC specification in XML from http://www.cooperativepatentclassification.org/cpcSchemeAndDefinitions/Bulk.html
+    outp = csv.writer(open(os.path.join(outputdir,'cpc_subsection.csv'),'wb'))
+    outp2 = csv.writer(open(os.path.join(outputdir,'cpc_group.csv'),'wb'))
+    outp3 = csv.writer(open(os.path.join(outputdir,'cpc_subgroup.csv'),'wb'))
     
     datum = {}
     diri = os.listdir(datadir)
