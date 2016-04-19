@@ -1,6 +1,7 @@
 def cpc_class_tables(outputdir,datadir):
     import re,os,csv
     from bs4 import BeautifulSoup as bs
+    from unidecode import unidecode
     
     ### get the latest CPC specification in XML from http://www.cooperativepatentclassification.org/cpcSchemeAndDefinitions/Bulk.html
     outp = csv.writer(open(os.path.join(outputdir,'cpc_subsection.csv'),'wb'))
@@ -59,8 +60,10 @@ def cpc_class_tables(outputdir,datadir):
                             except:
                                 text_class = ["NULL"]
                         text_class = '; '.join(text_class)
-                        data[7] = text_class
-                        #print '1.'+primarysub
+                        try:
+                            data[7] = text_class.decode('utf-8','ignore')
+                        except:
+                            data[7] = unidecode(text_class)
                         outp3.writerow([title.text,data[7]])
                 if int(level) == 8:
                         again = bs(str(s))
@@ -75,7 +78,10 @@ def cpc_class_tables(outputdir,datadir):
                             except:
                                 text_class = ["NULL"]
                         text_class = '; '.join(text_class)
-                        data[8] = text_class
+                        try:
+                            data[8] = text_class.decode('utf-8','ignore')
+                        except:
+                            data[8] = unidecode(text_class)
                         outp3.writerow([title.text,data[7]+'-'+data[8]])
                 for n in range(9,30):
                     if int(level) == n:
@@ -90,10 +96,20 @@ def cpc_class_tables(outputdir,datadir):
                             query = data[7]
                             for nn in range(8,n+1):
                                 query+='-'+data[nn]
-                            outp3.writerow([title.text,query])                  
+                            try:
+                                outp3.writerow([title.text,query.decode('utf-8','ignore')])
+                            except:
+                                outp3.writerow([title.text,query])
                         except:
-                            data[n] = ' '.join(text_class).decode('utf-8','ignore')
+                            try:
+                                data[n] = ' '.join(text_class).decode('utf-8','ignore')
+                            except:
+                                data[n] = ' '.join(text_class)
                             query = data[7]
                             for nn in range(8,n):
                                 query+='-'+data[nn]
-                            outp3.writerow([title.text,query])                 
+                            try:
+                                outp3.writerow([title.text,query.decode("utf-8",'ignore')])
+                            except:
+                                outp3.writerow([title.text,unidecode(query)])
+                                
