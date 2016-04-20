@@ -6,9 +6,13 @@ def uspc_table(fd):
     
     import mechanize
     br = mechanize.Browser()
-    paturl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentGrant/mcfpat.zip'
-    appurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentAppl/mcfappl.zip'
-    ctafurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/ManualofClass/ctaf.zip'
+    #paturl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentGrant/mcfpat.zip'
+    #appurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentAppl/mcfappl.zip'
+    #ctafurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/ManualofClass/ctaf.zip'
+    paturl = 'https://bulkdata.uspto.gov/data2/patent/classification/mcfpat.zip'
+    appurl = 'https://bulkdata.uspto.gov/data2/patent/classification/mcfappl.zip'
+    ctafurl = 'https://bulkdata.uspto.gov/data2/patent/classification/ctaf.zip'
+    
     br.retrieve(paturl,os.path.join(fd,'mcfpat.zip'))        
     br.retrieve(appurl,os.path.join(fd,'mcfappl.zip'))
     br.retrieve(ctafurl,os.path.join(fd,'ctaf.zip'))
