@@ -197,8 +197,8 @@ def parse_patents(fd,fd2):
                 for line in patent:
                     if line.startswith("WKU"):
                         patnum = re.search('WKU\s+(.*?)$',line).group(1)
-                        patnum = patnum[:8] # Remove check digit
-                        updnum = re.sub('^H0','H',patnum)
+                        updnum = patnum[:8] # Remove check digit
+                        updnum = re.sub('^H0','H',updnum)
                         updnum = re.sub('^RE0','RE',updnum)
                         updnum = re.sub('^PP0','PP',updnum)
                         updnum = re.sub('^PP0','PP',updnum)
