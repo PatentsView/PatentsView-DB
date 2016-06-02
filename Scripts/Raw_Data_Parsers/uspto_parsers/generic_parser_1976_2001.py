@@ -197,12 +197,12 @@ def parse_patents(fd,fd2):
                 for line in patent:
                     if line.startswith("WKU"):
                         patnum = re.search('WKU\s+(.*?)$',line).group(1)
-                        updnum = patnum[:8] # Remove check digit
-                        updnum = re.sub('^H0','H',updnum)
-                        updnum = re.sub('^RE0','RE',updnum)
+                        updnum = patnum[:8]  # Remove check digit
+                        updnum = re.sub('^H0',   'H', updnum)
+                        updnum = re.sub('^RE0',  'RE',updnum)
                         updnum = re.sub('^PP00?','PP',updnum)
-                        updnum = re.sub('^D0', 'D', updnum)
-                        updnum = re.sub('^T0', 'T', updnum)
+                        updnum = re.sub('^D0',   'D', updnum)
+                        updnum = re.sub('^T0',   'T', updnum)
                         if len(patnum) > 7 and patnum.startswith('0'):
                             updnum = patnum[1:8]
                         #data['patnum'] = updnum
@@ -290,7 +290,6 @@ def parse_patents(fd,fd2):
                     if invtcountry == "NULL":
                         invtcountry = 'US'
                     rawlocation[id_generator()] = [loc_idd,"NULL",invtcity,invtstate,invtcountry]
-                    
                     rawinventor[id_generator()] = [patent_id,"NULL",loc_idd,fname,lname,str(n)]
             except:
                 pass
@@ -734,4 +733,3 @@ def parse_patents(fd,fd2):
         subclassfile.writerow(v)
             
     print numii
-
