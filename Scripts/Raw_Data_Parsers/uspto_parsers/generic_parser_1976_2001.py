@@ -200,8 +200,7 @@ def parse_patents(fd,fd2):
                         updnum = patnum[:8] # Remove check digit
                         updnum = re.sub('^H0','H',updnum)
                         updnum = re.sub('^RE0','RE',updnum)
-                        updnum = re.sub('^PP0','PP',updnum)
-                        updnum = re.sub('^PP0','PP',updnum)
+                        updnum = re.sub('^PP00?','PP',updnum)
                         updnum = re.sub('^D0', 'D', updnum)
                         updnum = re.sub('^T0', 'T', updnum)
                         if len(patnum) > 7 and patnum.startswith('0'):
