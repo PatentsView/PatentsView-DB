@@ -26,7 +26,6 @@ def cpc_table(fd):
         else:
             filedates = str(curyear)+'-'+str(curmonth)+'-'+str(days)
         
-
     import mechanize
     br = mechanize.Browser()
     ### Check the most recent date and update here for the classification files
@@ -103,21 +102,21 @@ def cpc_table(fd):
             patnum = '0'*(7-len(str(int(patnum))))+str(int(patnum))
             numi = 0
             if ii[41] == 'I':
-                cpc_prim.append(re.sub('\s+','',ii[17:31]))
+                cpc_prim.append(re.sub('\s+','',ii[17:32]))
             else:
-                cpc_add.append(re.sub('\s+','',ii[17:31]))
+                cpc_add.append(re.sub('\s+','',ii[17:32]))
             if ii[40] == 'F':
-                primate = [0,re.sub('\s+','',ii[17:31])]
+                primate = [0,re.sub('\s+','',ii[17:32])]
             for ee,icheck in enumerate(inp[num+1:]):
                 numi+=1
                 pat = '0'*(7-len(str(int(icheck[10:17]))))+str(int(icheck[10:17]))
                 if pat == patnum:
                     if icheck[41] == 'I':
-                        cpc_prim.append(re.sub('\s+','',icheck[17:31]))
+                        cpc_prim.append(re.sub('\s+','',icheck[17:32]))
                     else:
-                        cpc_add.append(re.sub('\s+','',icheck[17:31]))
+                        cpc_add.append(re.sub('\s+','',icheck[17:32]))
                     if icheck[40] == 'F':
-                        primate = [numi,re.sub('\s+','',ii[17:31])]
+                        primate = [numi,re.sub('\s+','',ii[17:32])]
                 else:
                     cpc_prim = '; '.join(cpc_prim)
                     cpc_add = '; '.join(cpc_add)

@@ -1,3 +1,5 @@
+import MySQLdb,re
+    
 def GetAppTable(host, username, password, PatentDb):
 
     """
@@ -44,7 +46,6 @@ def GetAppTable(host, username, password, PatentDb):
 
 
 def transform(folder,host,username,password,appdb,patdb):
-    import MySQLdb,re
     
     """
     This function unifies the format of Patent info
@@ -89,11 +90,12 @@ def transform(folder,host,username,password,appdb,patdb):
     
     if patdb:
         ### Correct lawyer tables ###
-        tables = [patdb+'.lawyer',patdb+'.rawlawyer']
+        tables = [patdb+'.rawlawyer']
         for t in tables:
             # Get columns
             cursor.execute('SHOW columns from '+t)
             raw = [f[:2] for f in cursor.fetchall() if f[0]!='sequence']
+            
             #Change blanks and UNKNOWN to NULL
             for ro in raw:
                 r = ro[0]
@@ -132,11 +134,15 @@ def transform(folder,host,username,password,appdb,patdb):
         cursor.execute('update '+patdb+'.application set id_transformed = id,number_transformed = number,series_code_transformed_from_type=type')
         mydb.commit()
         for i in inp:
-            if i[2] == 'D':
-                cursor.execute('update '+patdb+'.application set id_transformed="'+i[1]+'",number_transformed="'+i[1]+'",series_code_transformed_from_type="D" where patent_id = "'+i[0]+'"')
-            else:
-                # Double check this field for post-2015 patents
-                cursor.execute('update '+patdb+'.application set id_transformed="'+i[1][:2]+'/'+i[1][2:]+'",number_transformed="'+i[1]+'",series_code_transformed_from_type="'+i[2]+'" where patent_id = "'+i[0]+'"')
+            try:
+                if i[2] == 'D':
+                    cursor.execute('update '+patdb+'.application set id_transformed="'+i[1]+'",number_transformed="'+i[1]+'",series_code_transformed_from_type="D" where patent_id = "'+i[0]+'"')
+                else:
+                    # Double check this field for post-2015 patents
+                    cursor.execute('update '+patdb+'.application set id_transformed="'+i[1][:2]+'/'+i[1][2:]+'",number_transformed="'+i[1]+'",series_code_transformed_from_type="'+i[2]+'" where patent_id = "'+i[0]+'"')
+            except:
+                print i
+
         mydb.commit()
         
         ### Transform application_id and number in usapplicationcitation table ###
