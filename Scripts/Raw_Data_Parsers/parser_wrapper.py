@@ -45,7 +45,7 @@ elif int(params.uspc_create) == 1 and int(params.period) not in range(1,3):
 
 elif int(params.cpc_create) == 1 and int(params.period) not in range(1,3):
     cpc_table.cpc_table(params.cpc_input_dir)
-    #cpc_class_tables.cpc_class_tables(params.cpc_input_dir,params.cpc_classdata_dir)
+    cpc_class_tables.cpc_class_tables(params.cpc_input_dir,params.cpc_classdata_dir)
 
 elif int(params.uspc_upload) == 1 and int(params.period) not in range(1,3):
     csv_to_mysql.upload_uspc(params.mysql_host,params.mysql_username,params.mysql_passwd,params.appdb,params.patdb,params.uspc_upload_dir)

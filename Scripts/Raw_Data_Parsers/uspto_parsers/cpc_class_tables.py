@@ -37,10 +37,7 @@ def cpc_class_tables(outputdir,datadir):
                     text_need = text_need.findAll('text')
                     text_class = [t.text for t in text_need if t.text == re.sub('E.G.','e.g.',t.text.upper()) or t.text == re.sub('I.E.','i.e.',t.text.upper())]
                     text_class = '; '.join(text_class)
-                    try:    
-                        outp2.writerow([title.text.decode('utf-8','ignore'),text_class.decode('utf-8','ignore')])
-                    except:
-                        outp2.writerow([unidecode(title.text),unidecode(text_class)])
+                    outp2.writerow([title.text,text_class])
     
         if re.search('-[A-Z]\d+[A-Z].xml$',d):
             print d

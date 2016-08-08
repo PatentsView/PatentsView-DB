@@ -38,11 +38,8 @@ def merge_db_pats(host,username,password,sourcedb,targetdb):
                         else:
                             colstoadd = set.difference(set(col2),set(col1))
                         for col in list(colstoadd):
-                            try:
-                                cursor.execute('ALTER TABLE '+targetdb+'.'+t+' ADD COLUMN '+col[0]+' '+col[1])
-                                mydb.commit()
-                            except:
-                                pass
+                            cursor.execute('ALTER TABLE '+targetdb+'.'+t+' ADD COLUMN '+col[0]+' '+col[1])
+                            mydb.commit()
                         cursor.execute('INSERT INTO '+targetdb+'.'+t+' SELECT * FROM `'+d+'`.'+t+' WHERE `'+d+'`.'+t+'.id NOT IN (SELECT id FROM `'+targetdb+'`.'+t+')')
                         
                         
@@ -64,11 +61,8 @@ def merge_db_pats(host,username,password,sourcedb,targetdb):
                         else:
                             colstoadd = set.difference(set(col2),set(col1))
                         for col in list(colstoadd):
-                            try:
-                                cursor.execute('ALTER TABLE '+targetdb+'.'+t+' ADD COLUMN '+col[0]+' '+col[1])
-                                mydb.commit()
-                            except:
-                                pass
+                            cursor.execute('ALTER TABLE '+targetdb+'.'+t+' ADD COLUMN '+col[0]+' '+col[1])
+                            mydb.commit()
                         cursor.execute('INSERT INTO '+targetdb+'.'+t+' SELECT * from `'+d+'`.'+t)
             mydb.commit()
         cursor.execute('set foreign_key_checks=1')
