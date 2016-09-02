@@ -12,7 +12,9 @@ drop database if exists `PatentsView_dev`;
 create database if not exists `PatentsView_dev` default character set=utf8 default collate=utf8_general_ci;
 
 
-# BEGIN assignee id mapping ###################################################################################################################################
+# BEGIN assignee id mapping 
+
+###################################################################################################################################
 
 
 # We need this early for firstnamed stuff.
@@ -38,10 +40,14 @@ from
   `patent_dev`.`patent_assignee` pa;
 
 
-# END assignee id mapping #####################################################################################################################################
+# END assignee id mapping 
+
+#####################################################################################################################################
 
 
-# BEGIN inventor id mapping ###################################################################################################################################
+# BEGIN inventor id mapping 
+
+###################################################################################################################################
 
 
 # We need this early for firstnamed stuff.
@@ -67,10 +73,14 @@ from
   `patent_dev`.`patent_inventor`;
 
 
-# END inventor id mapping #####################################################################################################################################
+# END inventor id mapping 
+
+#####################################################################################################################################
 
 
-# BEGIN location id mapping ###################################################################################################################################
+# BEGIN location id mapping 
+
+###################################################################################################################################
 
 
 # This bit has changed.  Prior to February 2015, there were many locations that were the same but had
@@ -128,15 +138,21 @@ select distinct
   rl.`location_id`,
   t.`new_location_id`
 from
-  (select distinct `location_id`, `location_id_transformed` from `patent_dev`.`rawlocation` where `location_id` is not null and `location_id` != '') rl
+  (select distinct `location_id`, `location_id_transformed` from `patent_dev`.`rawlocation` where `location_id` is not null and 
+
+`location_id` != '') rl
   inner join `PatentsView_dev`.`temp_id_mapping_location_transformed` t on
     t.`old_location_id_transformed` = rl.`location_id_transformed`;
 
 
-# END location id mapping #####################################################################################################################################
+# END location id mapping 
+
+#####################################################################################################################################
 
 
-# BEGIN patent ################################################################################################################################################
+# BEGIN patent 
+
+################################################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`temp_patent_firstnamed_assignee`;
@@ -180,7 +196,9 @@ from
   left outer join `PatentsView_dev`.`temp_id_mapping_assignee` ta on ta.`old_assignee_id` = ra.`assignee_id`
   left outer join `patent_dev`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
   left outer join `patent_dev`.`location` l on l.`id` = rl.`location_id`
-  left outer join `PatentsView_dev`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = rl.`location_id_transformed`
+  left outer join `PatentsView_dev`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = 
+
+rl.`location_id_transformed`
 where
   ta.`new_assignee_id` is not null or
   tl.`new_location_id` is not null;
@@ -227,7 +245,9 @@ from
   left outer join `PatentsView_dev`.`temp_id_mapping_inventor` ti on ti.`old_inventor_id` = ri.`inventor_id`
   left outer join `patent_dev`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
   left outer join `patent_dev`.`location` l on l.`id` = rl.`location_id`
-  left outer join `PatentsView_dev`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = rl.`location_id_transformed`
+  left outer join `PatentsView_dev`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = 
+
+rl.`location_id_transformed`
 where
   ti.`new_inventor_id` is not null or
   tl.`new_location_id` is not null;
@@ -492,10 +512,16 @@ from
   left outer join `PatentsView_dev`.`temp_patent_earliest_application_date` tpead on tpead.`patent_id` = p.`id`;
 
 
-# END patent ##################################################################################################################################################
+# END patent 
+
+################################################################################################################################################
+
+##
 
 
-# BEGIN application ###########################################################################################################################################
+# BEGIN application 
+
+###########################################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`application`;
@@ -523,10 +549,14 @@ from
   `patent_dev`.`application`;
 
 
-# END application #############################################################################################################################################
+# END application 
+
+#############################################################################################################################################
 
 
-# BEGIN location ##############################################################################################################################################
+# BEGIN location 
+
+##############################################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`temp_location_num_assignees`;
@@ -687,10 +717,14 @@ from
   left outer join `PatentsView_dev`.`temp_location_num_patents` tlnp on tlnp.`location_id` = timl.`new_location_id`;
 
 
-# END location ################################################################################################################################################
+# END location 
+
+################################################################################################################################################
 
 
-# BEGIN assignee ##############################################################################################################################################
+# BEGIN assignee 
+
+##############################################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`temp_assignee_lastknown_location`;
@@ -763,7 +797,9 @@ from
       t.`rownum` < 2
   ) t
   left outer join `patent_dev`.`location` l on l.`id` = t.`location_id`
-  left outer join `PatentsView_dev`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = t.`location_id_transformed`;
+  left outer join `PatentsView_dev`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = 
+
+t.`location_id_transformed`;
 
 
 drop table if exists `PatentsView_dev`.`temp_assignee_num_patents`;
@@ -859,8 +895,12 @@ select distinct
 from
   `patent_dev`.`patent_assignee` pa
   inner join `PatentsView_dev`.`temp_id_mapping_assignee` t on t.`old_assignee_id` = pa.`assignee_id`
-  left outer join (select patent_id, assignee_id, min(sequence) sequence from `patent_dev`.`rawassignee` group by patent_id, assignee_id) t on t.`patent_id` = pa.`patent_id` and t.`assignee_id` = pa.`assignee_id`
-  left outer join `patent_dev`.`rawassignee` ra on ra.`patent_id` = t.`patent_id` and ra.`assignee_id` = t.`assignee_id` and ra.`sequence` = t.`sequence`
+  left outer join (select patent_id, assignee_id, min(sequence) sequence from `patent_dev`.`rawassignee` group by patent_id, assignee_id) t 
+
+on t.`patent_id` = pa.`patent_id` and t.`assignee_id` = pa.`assignee_id`
+  left outer join `patent_dev`.`rawassignee` ra on ra.`patent_id` = t.`patent_id` and ra.`assignee_id` = t.`assignee_id` and ra.`sequence` 
+
+= t.`sequence`
   left outer join `patent_dev`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
   left outer join `PatentsView_dev`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`location_id`;
 
@@ -940,10 +980,14 @@ from
   left outer join `PatentsView_dev`.`temp_assignee_num_inventors` tani on tani.`assignee_id` = a.`id`;
 
 
-# END assignee ################################################################################################################################################
+# END assignee 
+
+################################################################################################################################################
 
 
-# BEGIN inventor ##############################################################################################################################################
+# BEGIN inventor 
+
+##############################################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`temp_inventor_lastknown_location`;
@@ -1016,7 +1060,9 @@ from
       t.`rownum` < 2
   ) t
   left outer join `patent_dev`.`location` l on l.`id` = t.`location_id`
-  left outer join `PatentsView_dev`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = t.`location_id_transformed`;
+  left outer join `PatentsView_dev`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = 
+
+t.`location_id_transformed`;
 
 
 drop table if exists `PatentsView_dev`.`temp_inventor_num_patents`;
@@ -1112,8 +1158,12 @@ select distinct
 from
   `patent_dev`.`patent_inventor` pii
   inner join `PatentsView_dev`.`temp_id_mapping_inventor` t on t.`old_inventor_id` = pii.`inventor_id`
-  left outer join (select patent_id, inventor_id, min(sequence) sequence from `patent_dev`.`rawinventor` group by patent_id, inventor_id) t on t.`patent_id` = pii.`patent_id` and t.`inventor_id` = pii.`inventor_id`
-  left outer join `patent_dev`.`rawinventor` ri on ri.`patent_id` = t.`patent_id` and ri.`inventor_id` = t.`inventor_id` and ri.`sequence` = t.`sequence`
+  left outer join (select patent_id, inventor_id, min(sequence) sequence from `patent_dev`.`rawinventor` group by patent_id, inventor_id) t 
+
+on t.`patent_id` = pii.`patent_id` and t.`inventor_id` = pii.`inventor_id`
+  left outer join `patent_dev`.`rawinventor` ri on ri.`patent_id` = t.`patent_id` and ri.`inventor_id` = t.`inventor_id` and ri.`sequence` 
+
+= t.`sequence`
   left outer join `patent_dev`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
   left outer join `PatentsView_dev`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`location_id`;
 
@@ -1189,10 +1239,14 @@ from
   left outer join `PatentsView_dev`.`temp_inventor_num_assignees` tina on tina.`inventor_id` = i.`id`;
 
 
-# END inventor ################################################################################################################################################
+# END inventor 
+
+################################################################################################################################################
 
 
-# BEGIN usapplicationcitation #################################################################################################################################
+# BEGIN usapplicationcitation 
+
+#################################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`usapplicationcitation`;
@@ -1227,10 +1281,14 @@ from
   inner join `patent_dev`.`usapplicationcitation` ac on ac.`patent_id` = p.`patent_id`;
 
 
-# END usapplicationcitation ###################################################################################################################################
+# END usapplicationcitation 
+
+###################################################################################################################################
 
 
-# BEGIN uspatentcitation ######################################################################################################################################
+# BEGIN uspatentcitation 
+
+######################################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`uspatentcitation`;
@@ -1255,10 +1313,14 @@ from
   inner join `patent_dev`.`uspatentcitation` pc on pc.`patent_id` = p.`patent_id`;
 
 
-# END uspatentcitation ########################################################################################################################################
+# END uspatentcitation 
+
+########################################################################################################################################
 
 
-# BEGIN cpc_current ###########################################################################################################################################
+# BEGIN cpc_current 
+
+###########################################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`temp_cpc_current_subsection_aggregate_counts`;
@@ -1461,10 +1523,14 @@ from
   left outer join `PatentsView_dev`.`temp_cpc_current_subsection_aggregate_counts` tccsac on tccsac.`subsection_id` = c.`subsection_id`;
 
 
-# END cpc_current #############################################################################################################################################
+# END cpc_current 
+
+#############################################################################################################################################
 
 
-# BEGIN cpc_current_subsection_patent_year ####################################################################################################################
+# BEGIN cpc_current_subsection_patent_year 
+
+####################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`cpc_current_subsection_patent_year`;
@@ -1492,10 +1558,16 @@ group by
   c.`subsection_id`, year(p.`date`);
 
 
-# END cpc_current_subsection_patent_year ######################################################################################################################
+# END cpc_current_subsection_patent_year 
+
+######################################################################################################################
 
 
-# BEGIN ipcr ##################################################################################################################################################
+# BEGIN ipcr 
+
+################################################################################################################################################
+
+##
 
 
 drop table if exists `PatentsView_dev`.`temp_ipcr_aggregations`;
@@ -1597,20 +1669,34 @@ select
   nullif(trim(i.`main_group`), ''), nullif(trim(i.`subgroup`), ''), nullif(trim(i.`symbol_position`), ''),
   nullif(trim(i.`classification_value`), ''), nullif(trim(i.`classification_data_source`), ''),
   case when `action_date` > date('1899-12-31') and `action_date` < date_add(current_date, interval 10 year) then `action_date` else null end,
-  case when `ipc_version_indicator` > date('1899-12-31') and `ipc_version_indicator` < date_add(current_date, interval 10 year) then `ipc_version_indicator` else null end,
+  case when `ipc_version_indicator` > date('1899-12-31') and `ipc_version_indicator` < date_add(current_date, interval 10 year) then 
+
+`ipc_version_indicator` else null end,
   tia.`num_assignees`, tia.`num_inventors`, tiya.`first_seen_date`, tiya.`last_seen_date`,
   ifnull(case when tiya.`actual_years_active` < 1 then 1 else tiya.`actual_years_active` end, 0)
 from
   `PatentsView_dev`.`patent` p
   inner join `patent_dev`.`ipcr` i on i.`patent_id` = p.`patent_id`
-  left outer join `PatentsView_dev`.`temp_ipcr_aggregations` tia on tia.`section` = i.`section` and tia.`ipc_class` = i.`ipc_class` and tia.`subclass` = i.`subclass`
-  left outer join `PatentsView_dev`.`temp_ipcr_years_active` tiya on tiya.`section` = i.`section` and tiya.`ipc_class` = i.`ipc_class` and tiya.`subclass` = i.`subclass`;
+  left outer join `PatentsView_dev`.`temp_ipcr_aggregations` tia on tia.`section` = i.`section` and tia.`ipc_class` = i.`ipc_class` and 
+
+tia.`subclass` = i.`subclass`
+  left outer join `PatentsView_dev`.`temp_ipcr_years_active` tiya on tiya.`section` = i.`section` and tiya.`ipc_class` = i.`ipc_class` and 
+
+tiya.`subclass` = i.`subclass`;
 
 
-# END ipcr ####################################################################################################################################################
+# END ipcr 
+
+################################################################################################################################################
+
+####
 
 
-# BEGIN nber ##################################################################################################################################################
+# BEGIN nber 
+
+################################################################################################################################################
+
+##
 
 
 drop table if exists `PatentsView_dev`.`temp_nber_subcategory_aggregate_counts`;
@@ -1694,10 +1780,16 @@ from
   left outer join `PatentsView_dev`.`temp_nber_subcategory_aggregate_counts` tnsac on tnsac.`subcategory_id` = n.`subcategory_id`;
 
 
-# END nber ####################################################################################################################################################
+# END nber 
+
+################################################################################################################################################
+
+####
 
 
-# BEGIN nber_subcategory_patent_year ##########################################################################################################################
+# BEGIN nber_subcategory_patent_year 
+
+##########################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`nber_subcategory_patent_year`;
@@ -1725,10 +1817,14 @@ group by
   n.`subcategory_id`, year(p.`date`);
 
 
-# END nber_subcategory_patent_year ############################################################################################################################
+# END nber_subcategory_patent_year 
+
+############################################################################################################################
 
 
-# BEGIN uspc_current ##########################################################################################################################################
+# BEGIN uspc_current 
+
+##########################################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`temp_mainclass_current_aggregate_counts`;
@@ -1903,10 +1999,14 @@ from
   left outer join `PatentsView_dev`.`temp_mainclass_current_aggregate_counts` tmcac on tmcac.`mainclass_id` = u.`mainclass_id`;
 
 
-# END uspc_current ############################################################################################################################################
+# END uspc_current 
+
+############################################################################################################################################
 
 
-# BEGIN uspc_current_mainclass_application_year ###############################################################################################################
+# BEGIN uspc_current_mainclass_application_year 
+
+###############################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`uspc_current_mainclass_application_year`;
@@ -1950,10 +2050,14 @@ set
   p.`uspc_current_mainclass_average_patent_processing_days` = c.`average_patent_processing_days`;
 
 
-# END uspc_current_mainclass_application_year #################################################################################################################
+# END uspc_current_mainclass_application_year 
+
+#################################################################################################################
 
 
-# BEGIN uspc_current_mainclass_patent_year ####################################################################################################################
+# BEGIN uspc_current_mainclass_patent_year 
+
+####################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`uspc_current_mainclass_patent_year`;
@@ -1981,7 +2085,9 @@ group by
   u.`mainclass_id`, year(p.`date`);
 
 
-# END uspc_current_mainclass_patent_year ######################################################################################################################
+# END uspc_current_mainclass_patent_year 
+
+######################################################################################################################
 
 
 # BEGIN assignee_inventor ######################################################################################################################
@@ -2012,7 +2118,9 @@ group by
 # END assignee_inventor ######################################################################################################################
 
 
-# BEGIN inventor_coinventor ######################################################################################################################
+# BEGIN inventor_coinventor 
+
+######################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`inventor_coinventor`;
@@ -2039,7 +2147,9 @@ group by
 # END inventor_coinventor ######################################################################################################################
 
 
-# BEGIN inventor_cpc_subsection ######################################################################################################################
+# BEGIN inventor_cpc_subsection 
+
+######################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`inventor_cpc_subsection`;
@@ -2066,10 +2176,14 @@ group by
   pi.inventor_id, c.subsection_id;
 
 
-# END inventor_cpc_subsection ######################################################################################################################
+# END inventor_cpc_subsection 
+
+######################################################################################################################
 
 
-# BEGIN inventor_nber_subcategory ######################################################################################################################
+# BEGIN inventor_nber_subcategory 
+
+######################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`inventor_nber_subcategory`;
@@ -2095,10 +2209,14 @@ group by
   pi.inventor_id, n.subcategory_id;
 
 
-# END inventor_nber_subcategory ######################################################################################################################
+# END inventor_nber_subcategory 
+
+######################################################################################################################
 
 
-# BEGIN inventor_uspc_mainclass ######################################################################################################################
+# BEGIN inventor_uspc_mainclass 
+
+######################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`inventor_uspc_mainclass`;
@@ -2122,7 +2240,9 @@ group by
   pi.inventor_id, u.mainclass_id;
 
 
-# END inventor_uspc_mainclass ######################################################################################################################
+# END inventor_uspc_mainclass 
+
+######################################################################################################################
 
 
 # BEGIN inventor_year ######################################################################################################################
@@ -2151,7 +2271,9 @@ group by
 # END inventor_year ######################################################################################################################
 
 
-# BEGIN assignee_cpc_subsection ######################################################################################################################
+# BEGIN assignee_cpc_subsection 
+
+######################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`assignee_cpc_subsection`;
@@ -2178,10 +2300,14 @@ group by
   pa.assignee_id, c.subsection_id;
 
 
-# END assignee_cpc_subsection ######################################################################################################################
+# END assignee_cpc_subsection 
+
+######################################################################################################################
 
 
-# BEGIN assignee_nber_subcategory ######################################################################################################################
+# BEGIN assignee_nber_subcategory 
+
+######################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`assignee_nber_subcategory`;
@@ -2207,10 +2333,14 @@ group by
   pa.assignee_id, n.subcategory_id;
 
 
-# END assignee_nber_subcategory ######################################################################################################################
+# END assignee_nber_subcategory 
+
+######################################################################################################################
 
 
-# BEGIN assignee_uspc_mainclass ######################################################################################################################
+# BEGIN assignee_uspc_mainclass 
+
+######################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`assignee_uspc_mainclass`;
@@ -2234,7 +2364,9 @@ group by
   pa.assignee_id, u.mainclass_id;
 
 
-# END assignee_uspc_mainclass ######################################################################################################################
+# END assignee_uspc_mainclass 
+
+######################################################################################################################
 
 
 # BEGIN assignee_year ######################################################################################################################
@@ -2264,7 +2396,9 @@ group by
 # END assignee_year ######################################################################################################################
 
 
-# BEGIN location_assignee update num_patents ###################################################################################################################################
+# BEGIN location_assignee update num_patents 
+
+###################################################################################################################################
 
 
 # 434,823 @ 0:17
@@ -2283,10 +2417,14 @@ set
   la.`num_patents` = pa.`num_patents`;
 
 
-# END location_assignee update num_patents ###################################################################################################################################
+# END location_assignee update num_patents 
+
+###################################################################################################################################
 
 
-# BEGIN location_inventor update num_patents ###################################################################################################################################
+# BEGIN location_inventor update num_patents 
+
+###################################################################################################################################
 
 
 # 4,167,939 @ 2:33
@@ -2305,10 +2443,14 @@ set
   li.`num_patents` = pii.`num_patents`;
 
 
-# END location_assignee update num_patents ###################################################################################################################################
+# END location_assignee update num_patents 
+
+###################################################################################################################################
 
 
-# BEGIN location_cpc_subsection ######################################################################################################################
+# BEGIN location_cpc_subsection 
+
+######################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`location_cpc_subsection`;
@@ -2333,10 +2475,14 @@ group by
   tlp.`location_id`, cpc.`subsection_id`;
 
 
-# END location_cpc_subsection ######################################################################################################################
+# END location_cpc_subsection 
+
+######################################################################################################################
 
 
-# BEGIN location_uspc_mainclass ######################################################################################################################
+# BEGIN location_uspc_mainclass 
+
+######################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`location_uspc_mainclass`;
@@ -2361,10 +2507,14 @@ group by
   tlp.`location_id`, uspc.`mainclass_id`;
 
 
-# END location_uspc_mainclass ######################################################################################################################
+# END location_uspc_mainclass 
+
+######################################################################################################################
 
 
-# BEGIN location_nber_subcategory ######################################################################################################################
+# BEGIN location_nber_subcategory 
+
+######################################################################################################################
 
 
 drop table if exists `PatentsView_dev`.`location_nber_subcategory`;
@@ -2389,7 +2539,9 @@ group by
   tlp.`location_id`, nber.`subcategory_id`;
 
 
-# END location_nber_subcategory ######################################################################################################################
+# END location_nber_subcategory 
+
+######################################################################################################################
 
 
 # BEGIN location_year ######################################################################################################################
@@ -2420,7 +2572,9 @@ group by
 # END location_year ######################################################################################################################
 
 
-# BEGIN additional indexing ###################################################################################################################################
+# BEGIN additional indexing 
+
+###################################################################################################################################
 
 
 # 1:53:23
@@ -2532,7 +2686,9 @@ alter table `PatentsView_dev`.`uspc_current` add index `ix_uspc_current_num_assi
 alter table `PatentsView_dev`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_num_inventors` (`num_inventors`);
 alter table `PatentsView_dev`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_num_assignees` (`num_assignees`);
-alter table `PatentsView_dev`.`uspc_current_mainclass_patent_year` add index `ix_uspc_current_mainclass_patent_year_num_patents` (`num_patents`);
+alter table `PatentsView_dev`.`uspc_current_mainclass_patent_year` add index `ix_uspc_current_mainclass_patent_year_num_patents` 
+
+(`num_patents`);
 alter table `PatentsView_dev`.`inventor` add index `ix_inventor_lastknown_location_id` (`lastknown_location_id`);
 alter table `PatentsView_dev`.`inventor` add index `ix_inventor_lastknown_persistent_location_id` (`lastknown_persistent_location_id`);
 alter table `PatentsView_dev`.`inventor` add index `ix_inventor_first_seen_date` (`first_seen_date`);
@@ -2546,15 +2702,21 @@ alter table `PatentsView_dev`.`patent` add index `ix_patent_country` (`country`)
 alter table `PatentsView_dev`.`patent` add index `ix_patent_num_claims` (`num_claims`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_assignee_id` (`firstnamed_assignee_id`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_assignee_persistent_id` (`firstnamed_assignee_persistent_id`);
-alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_assignee_persistent_location_id` (`firstnamed_assignee_persistent_location_id`)
+alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_assignee_persistent_location_id` 
+
+(`firstnamed_assignee_persistent_location_id`)
 ;
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_assignee_location_id` (`firstnamed_assignee_location_id`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_persistent_id` (`firstnamed_inventor_persistent_id`);
-alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_persistent_location_id` (`firstnamed_inventor_persistent_location_id`);
+alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_persistent_location_id` 
+
+(`firstnamed_inventor_persistent_location_id`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_id` (`firstnamed_inventor_id`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_location_id` (`firstnamed_inventor_location_id`);
 
-# END additional indexing #####################################################################################################################################
+# END additional indexing 
+
+#####################################################################################################################################
 
 # BEGIN new class table creation
 #####################################################################################################################################
@@ -2563,14 +2725,28 @@ create table if not exists `PatentsView_dev`.`cpc_subsection` (id varchar(20) pr
 create table if not exists `PatentsView_dev`.`cpc_subgroup` (id varchar(20) primary key,title varchar(512));
 create table if not exists `PatentsView_dev`.`cpc_group` (id varchar(20) primary key,title varchar(256));
 create table if not exists `PatentsView_dev`.`nber_category` (id varchar(20) primary key,title varchar(512));
-create table if not exists `PatentsView_dev`.nber_subcategory (id varchar(20) primary key,title varchar(512), num_patents int(10) unsigned, num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
-create table if not exists `PatentsView_dev`.uspc_mainclass (id varchar(20) primary key,title varchar(256), num_patents int(10) unsigned, num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
+create table if not exists `PatentsView_dev`.nber_subcategory (id varchar(20) primary key,title varchar(512), num_patents int(10) unsigned, 
+
+num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
+create table if not exists `PatentsView_dev`.uspc_mainclass (id varchar(20) primary key,title varchar(256), num_patents int(10) unsigned, 
+
+num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
 create table if not exists `PatentsView_dev`.uspc_subclass (id varchar(20) primary key,title varchar(512));
-CREATE TABLE if not exists `PatentsView_dev`.`nber_copy` ( `patent_id` varchar(20) NOT NULL,  `category_id` varchar(20) DEFAULT NULL, `subcategory_id` varchar(20) DEFAULT NULL,PRIMARY KEY (`patent_id`),KEY `ix_nber_subcategory_id` (`subcategory_id`),KEY `ix_nber_category_id` (`category_id`));
-CREATE TABLE if not exists `PatentsView_dev`.`cpc_current_copy` (  `patent_id` varchar(20) NOT NULL,  `sequence` int(10) unsigned NOT NULL,  `section_id` varchar(10) DEFAULT NULL,  `subsection_id` varchar(20) DEFAULT NULL,  `group_id` varchar(20) DEFAULT NULL,  `subgroup_id` varchar(20) DEFAULT NULL,  `category` varchar(36) DEFAULT NULL,  PRIMARY KEY (`patent_id`,`sequence`),  KEY `ix_cpc_current_group_id` (`group_id`),  KEY `ix_cpc_current_subgroup_id` (`subgroup_id`),  KEY `ix_cpc_current_subsection_id` (`subsection_id`),  KEY `ix_cpc_current_section_id` (`section_id`),  KEY `ix_cpc_current_sequence` (`sequence`));
+CREATE TABLE if not exists `PatentsView_dev`.`nber_copy` ( `patent_id` varchar(20) NOT NULL,  `category_id` varchar(20) DEFAULT NULL, `subcategory_id` varchar(20) DEFAULT NULL,PRIMARY KEY (`patent_id`),KEY `ix_nber_subcategory_id` (`subcategory_id`),KEY `ix_nber_category_id` 
+
+(`category_id`));
+CREATE TABLE if not exists `PatentsView_dev`.`cpc_current_copy` (  `patent_id` varchar(20) NOT NULL,  `sequence` int(10) unsigned NOT NULL, `section_id` varchar(10) DEFAULT NULL,  `subsection_id` varchar(20) DEFAULT NULL,  `group_id` varchar(20) DEFAULT NULL,  `subgroup_id` varchar
+
+(20) DEFAULT NULL,  `category` varchar(36) DEFAULT NULL,  PRIMARY KEY (`patent_id`,`sequence`),  KEY `ix_cpc_current_group_id` (`group_id`),  KEY `ix_cpc_current_subgroup_id` (`subgroup_id`),  KEY `ix_cpc_current_subsection_id` (`subsection_id`),  KEY `ix_cpc_current_section_id` (`section_id`),  KEY `ix_cpc_current_sequence` (`sequence`));
 CREATE TABLE if not exists `PatentsView_dev`.`cpc_current_subsection_copy` (  `patent_id` varchar(20) NOT NULL,  `section_id` varchar(10) DEFAULT NULL,  `subsection_id` varchar(20) NOT NULL DEFAULT '',  PRIMARY KEY (`patent_id`,`subsection_id`),  KEY `ix_cpc_current_subsection_subsection_id` (`subsection_id`),  KEY `ix_cpc_current_subsection_section_id` (`section_id`));
 CREATE TABLE if not exists `PatentsView_dev`.`uspc_current_mainclass_copy` (  `patent_id` varchar(20) NOT NULL,  `mainclass_id` varchar(20) NOT NULL DEFAULT '',  PRIMARY KEY (`patent_id`,`mainclass_id`),  KEY `ix_uspc_current_mainclass_mainclass_id` (`mainclass_id`));
-CREATE TABLE if not exists `PatentsView_dev`.`uspc_current_copy` (  `patent_id` varchar(20) NOT NULL,  `sequence` int(10) unsigned NOT NULL,  `mainclass_id` varchar(20) DEFAULT NULL,  `subclass_id` varchar(20) DEFAULT NULL,  PRIMARY KEY (`patent_id`,`sequence`),  KEY `ix_uspc_current_mainclass_id` (`mainclass_id`),  KEY `ix_uspc_current_subclass_id` (`subclass_id`),  KEY `ix_uspc_current_sequence` (`sequence`));
+CREATE TABLE if not exists `PatentsView_dev`.`uspc_current_copy` (  `patent_id` varchar(20) NOT NULL,  `sequence` int(10) unsigned NOT 
+
+NULL,  `mainclass_id` varchar(20) DEFAULT NULL,  `subclass_id` varchar(20) DEFAULT NULL,  PRIMARY KEY (`patent_id`,`sequence`),  KEY 
+
+`ix_uspc_current_mainclass_id` (`mainclass_id`),  KEY `ix_uspc_current_subclass_id` (`subclass_id`),  KEY `ix_uspc_current_sequence` 
+
+(`sequence`));
 
 # END new class table creation
 #####################################################################################################################################
@@ -2579,17 +2755,37 @@ CREATE TABLE if not exists `PatentsView_dev`.`uspc_current_copy` (  `patent_id` 
 #####################################################################################################################################
 
 
-insert into `PatentsView_dev`.cpc_subsection select subsection_id,subsection_title,num_patents,num_inventors,num_assignees,first_seen_date,last_seen_date,years_active from `PatentsView_dev`.cpc_current group by subsection_id;
+insert into `PatentsView_dev`.cpc_subsection select 
+
+subsection_id,subsection_title,num_patents,num_inventors,num_assignees,first_seen_date,last_seen_date,years_active from 
+
+`PatentsView_dev`.cpc_current group by subsection_id;
 insert into `PatentsView_dev`.cpc_group select group_id,group_title from `PatentsView_dev`.cpc_current group by group_id;
 insert into `PatentsView_dev`.cpc_subgroup select subgroup_id,subgroup_title from `PatentsView_dev`.cpc_current group by subgroup_id;
 insert into `PatentsView_dev`.nber_category select category_id,category_title from `PatentsView_dev`.nber group by category_id;
-insert into `PatentsView_dev`.nber_subcategory select subcategory_id,subcategory_title,num_patents,num_inventors,num_assignees,first_seen_date,last_seen_date,years_active from `PatentsView_dev`.nber group by subcategory_id;
-insert into `PatentsView_dev`.uspc_mainclass select mainclass_id,mainclass_title,num_patents, num_inventors, num_assignees,first_seen_date,last_seen_date,years_active from `PatentsView_dev`.uspc_current group by mainclass_id;
-insert into `PatentsView_dev`.uspc_subclass select subclass_id,subclass_title from `PatentsView_dev`.uspc_current group by subclass_id;
-insert into `PatentsView_dev`.uspc_current_mainclass_copy select distinct patent_id,mainclass_id from `PatentsView_dev`.uspc_current_mainclass;
-insert into `PatentsView_dev`.cpc_current_subsection_copy select distinct patent_id,section_id,subsection_id from `PatentsView_dev`.cpc_current_subsection;
-insert into `PatentsView_dev`.uspc_current_copy select distinct patent_id,sequence,mainclass_id,subclass_id from `PatentsView_dev`.uspc_current;
-insert into `PatentsView_dev`.cpc_current_copy select distinct patent_id,sequence,section_id,subsection_id,group_id,subgroup_id,category from `PatentsView_dev`.cpc_current;
+insert into `PatentsView_dev`.nber_subcategory select 
+
+subcategory_id,subcategory_title,num_patents,num_inventors,num_assignees,first_seen_date,last_seen_date,years_active from 
+
+`PatentsView_dev`.nber group by subcategory_id;
+insert into `PatentsView_dev`.uspc_mainclass select mainclass_id,mainclass_title,num_patents, num_inventors, 
+
+num_assignees,first_seen_date,last_seen_date,years_active from `PatentsView_dev`.uspc_current group by mainclass_id;
+insert into `PatentsView_dev`.uspc_subclass select subclass_id,subclass_title from `PatentsView_dev`.uspc_current group by 
+
+subclass_id;
+insert into `PatentsView_dev`.uspc_current_mainclass_copy select distinct patent_id,mainclass_id from 
+
+`PatentsView_dev`.uspc_current_mainclass;
+insert into `PatentsView_dev`.cpc_current_subsection_copy select distinct patent_id,section_id,subsection_id from 
+
+`PatentsView_dev`.cpc_current_subsection;
+insert into `PatentsView_dev`.uspc_current_copy select distinct patent_id,sequence,mainclass_id,subclass_id from 
+
+`PatentsView_dev`.uspc_current;
+insert into `PatentsView_dev`.cpc_current_copy select distinct patent_id,sequence,section_id,subsection_id,group_id,subgroup_id,category 
+
+from `PatentsView_dev`.cpc_current;
 insert into `PatentsView_dev`.nber_copy select distinct patent_id,category_id,subcategory_id from `PatentsView_dev`.nber;
 
 # END new class table population
@@ -2614,7 +2810,104 @@ alter table `PatentsView_dev`.`cpc_subsection` add index `ix_cpc_subsection_num_
 # END new class table indexing
 #####################################################################################################################################
 
-# BEGIN temporary table removal ###############################################################################################################################
+# BEGIN inventor_rawinventor alias 
+
+###############################################################################################################################
+
+create table if not exists `PatentsView_dev`.inventor_rawinventor (uuid int(10) unsigned AUTO_INCREMENT PRIMARY KEY,name_first varchar(64),name_last varchar(64),patent_id varchar(20),inventor_id int(10) unsigned);
+
+INSERT INTO `PatentsView_dev`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id) 
+SELECT DISTINCT ri.name_first,ri.name_last,ri.patent_id,repi.inventor_id 
+FROM `PatentsView_dev`.`inventor` repi 
+left join `patent_dev`.`rawinventor` ri 
+on ri.inventor_id = repi.persistent_inventor_id;
+
+alter table `PatentsView_dev`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_first` (`name_first`);
+alter table `PatentsView_dev`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_last` (`name_last`);
+alter table `PatentsView_dev`.`inventor_rawinventor` add index `ix_inventor_rawinventor_inventor_id` (`inventor_id`);
+alter table `PatentsView_dev`.`inventor_rawinventor` add index `ix_inventor_rawinventor_patent_id` (`patent_id`);
+
+# END inventor_rawinventor alias 
+
+###############################################################################################################################
+
+# BEGIN WIPO fields tables 
+
+###############################################################################################################################
+
+CREATE TABLE IF NOT EXISTS `PatentsView_dev`.`wipo` (
+   `patent_id` varchar(20) NOT NULL,
+   `field_id` int(10) unsigned DEFAULT NULL,
+   `sequence` int(10) unsigned NOT NULL,
+   PRIMARY KEY (`patent_id`,`sequence`),
+   KEY `ix_wipo_field_id` (`field_id`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `PatentsView_dev`.`wipo_field` (
+   `id` int(10) unsigned NOT NULL,
+   `sector_title` varchar(60) DEFAULT NULL,
+   `field_title` varchar(60) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `ix_wipo_field_sector_title` (`sector_title`),
+   KEY `ix_wipo_field_field_title` (`field_title`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `PatentsView_dev`.`wipo` SELECT * FROM `patent_dev`.`wipo`;
+INSERT INTO `PatentsView_dev`.`wipo_field` SELECT * FROM `patent_dev`.`wipo_field`;
+
+# END WIPO fields tables
+
+###############################################################################################################################
+
+# BEGIN Government interest tables 
+
+###############################################################################################################################
+
+CREATE TABLE IF NOT EXISTS `PatentsView_dev`.`government_interest` (
+   `patent_id` varchar(255) NOT NULL,
+   `gi_statement` text,
+   PRIMARY KEY (`patent_id`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `PatentsView_dev`.`government_organization` (
+   `organization_id` int(11) NOT NULL AUTO_INCREMENT,
+   `name` varchar(255) DEFAULT NULL,
+   `level_one` varchar(255) DEFAULT NULL,
+   `level_two` varchar(255) DEFAULT NULL,
+   `level_three` varchar(255) DEFAULT NULL,
+   PRIMARY KEY (`organization_id`)
+ ) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `PatentsView_dev`.`patent_contractawardnumber` (
+   `patent_id` varchar(255) NOT NULL,
+   `contract_award_number` varchar(255) NOT NULL,
+   PRIMARY KEY (`patent_id`,`contract_award_number`),
+   CONSTRAINT `patent_contractawardnumber_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `government_interest` (`patent_id`) ON DELETE CASCADE
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `PatentsView_dev`.`patent_govintorg` (
+   `patent_id` varchar(255) NOT NULL,
+   `organization_id` int(11) NOT NULL,
+   PRIMARY KEY (`patent_id`,`organization_id`),
+   KEY `organization_id` (`organization_id`),
+   CONSTRAINT `patent_govintorg_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `government_interest` (`patent_id`) ON DELETE CASCADE,
+   CONSTRAINT `patent_govintorg_ibfk_2` FOREIGN KEY (`organization_id`) REFERENCES `government_organization` (`organization_id`) ON DELETE CASCADE
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `PatentsView_dev`.`government_interest` SELECT * FROM `patent_dev`.`government_interest`;
+INSERT INTO `PatentsView_dev`.`government_organization` SELECT * FROM `patent_dev`.`government_organization`;
+INSERT INTO `PatentsView_dev`.`patent_contractawardnumber` SELECT * FROM `patent_dev`.`patent_contractawardnumber`;
+INSERT INTO `PatentsView_dev`.`patent_govintorg` SELECT * FROM `patent_dev`.`patent_govintorg`;
+
+ALTER TABLE `PatentsView_dev`.`government_organization` ADD INDEX `ix_government_organization_name`(`name`);
+ALTER TABLE `PatentsView_dev`.`government_organization` ADD INDEX `ix_government_organization_level_one`(`level_one`);
+ALTER TABLE `PatentsView_dev`.`government_organization` ADD INDEX `ix_government_organization_level_two`(`level_two`);
+ALTER TABLE `PatentsView_dev`.`government_organization` ADD INDEX `ix_government_organization_level_three`(`level_three`);
+
+# END Government interest tables
+
+###############################################################################################################################
+
+
+# BEGIN temporary table removal 
+
+###############################################################################################################################
 
 
 # select concat('drop table if exists `', `table_schema`, '`.`', `table_name`, '`;') from `information_schema`.`tables` where `table_schema` = 'PatentsView_dev' and `table_name` like 'temp\_%' order by `table_name`;
@@ -2655,7 +2948,9 @@ drop table if exists `PatentsView_dev`.`temp_assignee_num_inventors`;
 drop table if exists `PatentsView_dev`.`temp_inventor_num_assignees`;
 
 
-# END temporary table removal #################################################################################################################################
+# END temporary table removal 
+
+#################################################################################################################################
 
 
 # Run UnencodeHTMLEntities Python script followed by add_full_text_indexes SQL script.
