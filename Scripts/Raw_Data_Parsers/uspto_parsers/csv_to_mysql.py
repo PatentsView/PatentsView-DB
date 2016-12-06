@@ -3,7 +3,7 @@ import MySQLdb
 import re,os,random,string,codecs
 
 
-def mysql_upload(host,username,password,dbname,folder):
+def mysql_upload(host,username,password,dbname,folder,output_folder):
     inp = open(os.path.join(folder,'patent.csv'),'rb').read().decode('utf-8','ignore').split("\r\n")
     del inp[0]
     del inp[-1]
@@ -79,6 +79,7 @@ def mysql_upload(host,username,password,dbname,folder):
     for d in diri:
         print d
         infile = h.unescape(codecs.open(os.path.join(folder,d),'rb',encoding='utf-8').read()).split('\r\n')
+        outp = csv.writer(open(os.path.join(output_folder,d),'wb'),delimiter='\t')
         #head = infile.next()
         head = infile[0].split('\t')
         del infile[0]
@@ -141,35 +142,53 @@ def mysql_upload(host,username,password,dbname,folder):
                                     if checkifexists == 3:
                                         gg = subclasschek[towrite[0].lower()]
                                 except:
-                                    query = """insert into """+tablename+""" values ("""+'"'+'","'.join(towrite)+'")'
-                                    query = query.replace(',"NULL"',",NULL")
-                                    cursor.execute(query)
+                                    outp.writerow(towrite)
+                                    #query = """insert into """+tablename+""" values ("""+'"'+'","'.join(towrite)+'")'
+                                    #query = query.replace(',"NULL"',",NULL")
+                                    #cursor.execute(query)
                             else:
-                                query = """insert into """+tablename+""" values ("""+'"'+'","'.join(towrite)+'")'
-                                query = query.replace(',"NULL"',",NULL")
-                                query = query.replace(',""',',NULL')
-                                query = query.replace('\\','\\\\')
-                                cursor.execute(query)
+                                outp.writerow(towrite)
+                                #query = """insert into """+tablename+""" values ("""+'"'+'","'.join(towrite)+'")'
+                                #query = query.replace(',"NULL"',",NULL")
+                                #query = query.replace(',""',',NULL')
+                                #query = query.replace('\\','\\\\')
+                                #cursor.execute(query)
             numRows += 1
-            if numRows % 10000 == 0:
-                print d, numRows
-                mydb.commit()
+            #if numRows % 10000 == 0:
+            #    print d, numRows
+            #    mydb.commit()
 
         for v in mergersdata.values():
-            query = """insert into """+tablename+""" values ("""+'"'+'","'.join(v)+'")'
-            query = query.replace(',"NULL"',",NULL")
-            cursor.execute(query)
+            outp.writerow(v)
+            #query = """insert into """+tablename+""" values ("""+'"'+'","'.join(v)+'")'
+            #query = query.replace(',"NULL"',",NULL")
+            #cursor.execute(query)
         
         for v in duplicdata.values():
-            query = """insert into """+tablename+""" values ("""+'"'+'","'.join(v)+'")'
-            query = query.replace(',"NULL"',",NULL")
-            cursor.execute(query)
+            outp.writerow(v)
+            #query = """insert into """+tablename+""" values ("""+'"'+'","'.join(v)+'")'
+            #query = query.replace(',"NULL"',",NULL")
+            #cursor.execute(query)
 
-        print d, numRows
-        mydb.commit()
+        #print d, numRows
+        #mydb.commit()
 
     print "ALL GOOD"
 
+
+def upload_csv(host,username,password,dbname,folder):
+    mydb = MySQLdb.connect(host=host,
+        user=username,
+        passwd=password,
+        db=dbname,
+        charset='utf8',
+        use_unicode=True)
+    cursor = mydb.cursor()
+    diri = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder,f))] # gets only files, not folders
+    for d in diri:
+        cursor.execute("load data local infile '"+os.path.join(folder,d)+"' into table "+d.replace('.csv','')+" fields terminated by '\t' lines terminated by '\r\n'")
+
+    
 
 def upload_uspc(host,username,password,appdb,patdb,folder):
     
@@ -494,7 +513,7 @@ def upload_cpc(host,username,password,appdb,patdb,folder):
         uspc_full.next()
         errorlog = open(os.path.join(folder,'upload_error_patents.log'),'w')
         current_exist = {}
-        for nnn in range(15000000):
+        for nnn in range(10000000):
             try:
                 m = uspc_full.next()
                 good = None
@@ -602,7 +621,7 @@ def upload_nber(host,username,password,patdb,folder):
     
     files = ['nber_classes.csv','patent_nber_all.csv']
     for f in files:
-        url = 'http://www.dev.patentsview.org/data/'+f
+        url = 'http://cssip.org/docs/'+f
         br.retrieve(url,os.path.join(folder,f))
     
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
@@ -645,7 +664,7 @@ def upload_nber(host,username,password,patdb,folder):
         query = query.replace(',"NULL"',",NULL")
         query2 = query.replace("nber_subcategory",patdb+'.nber_subcategory')
         cursor.execute(query2)
-        
+    
     mydb.commit()
     
     # Get all patent numbers in the current database not to upload full NBER table going back to 19th century
