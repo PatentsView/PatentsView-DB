@@ -7,7 +7,8 @@ parser.add_argument('--input-dir',help='Full path to directory where all patent 
 parser.add_argument('--output-dir',help='Full path to directory where to write all output csv files.')
 parser.add_argument('--period',default="5",choices=['1','2'],help='Enter 1 for 1976-2001 or 2 for 2002-2004.')
 parser.add_argument('--mysql',default="0",choices=['1','0'],required=False,help='If you want to upload resultant files into MySQL - please specify "1" here and MySQL output-dir and connection data.')
-parser.add_argument('--mysql-input-dir',help="Full path to directory with all output csv files to upload to MySQL.")
+parser.add_argument('--mysql-input-dir',help="Full path to directory with all output csv files to process for further upload to MySQL.")
+parser.add_argument('--mysql-output-dir',help="Full path to directory with all output csv files to upload to MySQL. SHOULD BE DIFFERENT THAN MYSQL_INPUT_DIR!!")
 parser.add_argument('--mysql-host',help="Specify MySQL host.")
 parser.add_argument('--mysql-username',help="Specify MySQL username.")
 parser.add_argument('--mysql-passwd',help="Specify MySQL password.")
@@ -38,7 +39,8 @@ elif int(params.period) == 2:
     generic_parser_2002_2004.parse_patents(params.input_dir,params.output_dir)
 
 elif int(params.mysql) == 1 and int(params.period) not in range(1,3):
-    csv_to_mysql.mysql_upload(params.mysql_host,params.mysql_username,params.mysql_passwd,params.mysql_dbname,params.mysql_input_dir)
+    csv_to_mysql.mysql_upload(params.mysql_host,params.mysql_username,params.mysql_passwd,params.mysql_dbname,params.mysql_input_dir,params.mysql_output_dir)
+    csv_to_mysql.upload_csv(params.mysql_host,params.mysql_username,params.mysql_passwd,params.mysql_dbname,params.mysql_output_dir)
 
 elif int(params.uspc_create) == 1 and int(params.period) not in range(1,3):
     uspc_table.uspc_table(params.uspc_input_dir)
