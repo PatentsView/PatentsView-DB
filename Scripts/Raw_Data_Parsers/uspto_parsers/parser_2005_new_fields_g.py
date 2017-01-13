@@ -632,6 +632,9 @@ def parse_patents(fd, fd2):
                 pass
             '''
 
+
+
+            #I think it may be the patent cit/other cit problem
             if ("references-cited" in avail_fields)|('us-references-cited' in avail_fields):
                 if "references-cited" in avail_fields:
                     citation = re.split("<citation", avail_fields['references-cited'])
@@ -640,14 +643,9 @@ def parse_patents(fd, fd2):
                     citation = re.split("<us-citation", avail_fields['us-references-cited'])
                 otherseq = 0
                 forpatseq=0
-                uspatseq=0
-                if patent_id =='9226437':
-                    print "Found the numerical!"
-                    print len(citation)
-                if patent_id =='D746824':
-                    print "Found the D start!"
-                    print len(citation)               
+                uspatseq=0               
                 for i in citation:
+                    #print citation
                     refpatnum = 'NULL' 
                     citpatname = 'NULL' 
                     citdate = 'NULL' 
@@ -680,17 +678,6 @@ def parse_patents(fd, fd2):
                             if not re.match(r'^[A-Z]*\d+$', citdocno):
                                 citdocno = citdocno
                                 #print citdocno
-
-                                '''
-                                if "/" in citdocno:
-                                    print citdocno
-                                    num = re.findall('\d+', citdocno)
-                                    print num
-                                    citdocno = num[0] + "/" +num[1]
-                                else:
-                                    citdocno=citdocno
-                                    #print citdocno
-                                '''
                                 app_flag = True
                             #print citdocno
                         try:
@@ -717,17 +704,23 @@ def parse_patents(fd, fd2):
                             print "Problem with other variables"
                     try:
                         if citcountry == "US":
+                            '''
+                            remove application/patent division to see if that was the problem
                             if citdocno != "NULL" and not app_flag : 
                                 uspatentcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind,citcountry,citcategory,str(uspatseq), ref_class] 
                                 uspatseq+=1
                             if citdocno != 'NULL' and app_flag:
                                 usappcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind, citdocno, citcountry,citcategory,str(uspatseq)]
+                            '''
+                            uspatentcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind,citcountry,citcategory,str(uspatseq), ref_class] 
                         elif citdocno != "NULL":
                             foreigncitation[id_generator()] = [patent_id,citdate,citdocno,citcountry,citcategory, str(forpatseq)] 
                             forpatseq+=1 
                         elif text!= "NULL":
                             otherreference[id_generator()] = [patent_id, text, str(otherseq)]
                             otherseq +=1
+                        else:
+                            print "Have we found the missing citations?"
                     except:
                         print "Problem making data"
 
