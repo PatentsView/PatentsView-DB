@@ -229,7 +229,7 @@ def parse_patents(fd, fd2):
     loggroups = ["publication-reference", "application-reference", "us-application-series-code", "number-of-claims", "claims", "?BRFSUM", "?DETDESC", "pct-or-regional-filing-data", "us-botanic",
                  "citations", "assignees", "inventors", "agents", "us-related-documents", "applicants", "us-applicants", 'description-of-drawings', 'description', "pct-or-regional-publishing-data", "us-patent-grant",
                 "abstract", "invention-title","classification-national","classification-ipc","classification-ipcr", "examiners", "references-cited", "us-references-cited", "priority-claim", "us-term-of-grant","us-exemplary-claim",
-                "us-issued-on-continued-prosecution-application"]
+                "us-issued-on-continued-prosecution-application", "field-of-search", "us-field-of-classification-search"]
 
     numi = 0
     
@@ -424,9 +424,7 @@ def parse_patents(fd, fd2):
             try:
                 us_issued = None
                 us_issued = re.search('us-issued-on-continued-prosecution-application grant-cpa-text="(.*?)"', i).group(1)
-                print apptype
-                if int(appdate[:4]) > 2000:
-                    print appdate
+                # we decided to ignore this
             except:
                 pass
             
@@ -561,6 +559,27 @@ def parse_patents(fd, fd2):
             #data = {'class': main[0][:3].replace(' ', ''), 
                  #'subclass': crossrefsub} 
 
+            '''
+            this is not the right solution
+            if ('field-of-search' in avail_fields)|("us-field-of-classification-search" in avail_fields):
+                if 'field-of-search' in avail_fields:
+                    search = avail_fields["field-of-search"].split("\n")
+                elif "us-field-of-classification-search" in avail_fields:
+                    search = avail_field["us-field-of-classification-search"].split("\n")
+                for line in search:
+                    if line.startswith('<main-classification'):
+                        main = re.search('<main-classification>(.*?)</main-classification', line).group(1)
+                        crossrefsub = main[3:].replace(" ","") 
+                        if len(crossrefsub) > 3 and re.search('^[A-Z]',crossrefsub[3:]) is None: 
+                            crossrefsub = crossrefsub[:3]+'.'+crossrefsub[3:] 
+                        crossrefsub = re.sub('^0+','',crossrefsub) 
+                        if re.search('[A-Z]{3}',crossrefsub[:3]): 
+                            crossrefsub = crossrefsub.replace(".","")
+                        main = main[:3].replace(" ","")
+                        sub = crossrefsub
+                        mainclassdata[main] = [main]
+                        subclassdata[sub] = [sub]
+            '''
 
             if 'classification-national' in avail_fields:
                 national = avail_fields["classification-national"]
@@ -702,47 +721,18 @@ def parse_patents(fd, fd2):
                                 text = re.search("<othercit>(.*?)</othercit>", line).group(1)
                         except:
                             print "Problem with other variables"
-                    try:
-                        if citcountry == "US":
-                            '''
-                            remove application/patent division to see if that was the problem
-                            if citdocno != "NULL" and not app_flag : 
-                                uspatentcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind,citcountry,citcategory,str(uspatseq), ref_class] 
-                                uspatseq+=1
-                            if citdocno != 'NULL' and app_flag:
-                                usappcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind, citdocno, citcountry,citcategory,str(uspatseq)]
-                            '''
+                    if citcountry == "US":
+                        if citdocno != "NULL" and not app_flag : 
                             uspatentcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind,citcountry,citcategory,str(uspatseq), ref_class] 
-                        elif citdocno != "NULL":
-                            foreigncitation[id_generator()] = [patent_id,citdate,citdocno,citcountry,citcategory, str(forpatseq)] 
-                            forpatseq+=1 
-                        elif text!= "NULL":
-                            otherreference[id_generator()] = [patent_id, text, str(otherseq)]
-                            otherseq +=1
-                        else:
-                            print "Have we found the missing citations?"
-                    except:
-                        print "Problem making data"
-
-                    '''
-                    try:
-                        if citcountry != 'US': 
-                             if citdocno != "NULL":
-                                    foreigncitation[id_generator()] = [patent_id,citdate,citdocno,citcountry,citcategory, str(forpatseq)] 
-                                    forpatseq+=1 
-                        else: 
-                            if citdocno != "NULL" and not app_flag : 
-                                uspatentcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind,citcountry,citcategory,str(uspatseq), ref_class] 
-                                uspatseq+=1
-                            if citdocno != 'NULL' and app_flag:
-                                usappcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind, citdocno, citcountry,citcategory,str(uspatseq)]
-
-                        if text != "NULL":
-                            otherreference[id_generator()] = [patent_id, text, str(otherseq)]
-                            otherseq +=1
-                    except:
-                        print "Problem making data"
-                    '''
+                            uspatseq+=1
+                        if citdocno != 'NULL' and app_flag:
+                            usappcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind, citdocno, citcountry,citcategory,str(uspatseq)]
+                    elif citdocno != "NULL":
+                        foreigncitation[id_generator()] = [patent_id,citdate,citdocno,citcountry,citcategory, str(forpatseq)] 
+                        forpatseq+=1 
+                    elif text!= "NULL":
+                        otherreference[id_generator()] = [patent_id, text, str(otherseq)]
+                        otherseq +=1
             
             if 'assignees' in avail_fields:
                 assignees = avail_fields['assignees'].split("</assignee") #splits fields if there are multiple assignees
@@ -921,10 +911,10 @@ def parse_patents(fd, fd2):
             except:
                 pass
             
-            try:
+            if 'us-related-documents' in avail_fields:
                 related_docs = avail_fields['us-related-documents']
                 possible_doc_type = ["</division>", '</continuation>', '</continuation-in-part>','</continuing-reissue>',
-                                     '</us-divisional-reissue>', '</reexamination>', '</substitutio>', '</us-provisional-application>', '</utility-model-basis>', 
+                                     '</us-divisional-reissue>', '</reexamination>', '</substitution>', '</us-provisional-application>', '</utility-model-basis>', 
                                      '</reissue>', '</related-publication>', '</correction>',
                                      '</us-provisional-application>','</us-reexamination-reissue-merger>']
                 def iter_list_splitter(list_to_split, seperators):
@@ -960,7 +950,7 @@ def parse_patents(fd, fd2):
                                     else:
                                         reldate = reldate[:4]+'-'+reldate[4:6]+'-'+'01'
                                         year = reldate[:4]
-                            usreldoc[id_generator()] = [doc_type, "NULL", reldocno, relkind, relcountry, reldate, "NULL", rel_seq]
+                            usreldoc[id_generator()] = [patent_id, doc_type, "NULL", reldocno, relkind, relcountry, reldate, "NULL", rel_seq]
                             rel_seq +=1
                         else:
                             split_by_relation = iter_list_splitter([i], possible_relations)
@@ -997,9 +987,7 @@ def parse_patents(fd, fd2):
                                     if line.startswith("<parent-status"):
                                         relparentstatus = re.search('<parent-status>(.*?)</parent-status', line).group(1)
                                 rel_seq +=1
-                                usreldoc[id_generator()] = [doc_type, reltype, reldocno, relkind, relcountry, reldate,  relparentstatus, rel_seq]
-            except:
-                pass
+                                usreldoc[id_generator()] = [patent_id, doc_type, reltype, reldocno, relkind, relcountry, reldate,  relparentstatus, rel_seq]
 
 
 
@@ -1132,7 +1120,7 @@ def parse_patents(fd, fd2):
                     if line.startswith("<heading"):
                         det_seq +=1
                         heading = re.search(">(.*?)<", line).group(1)
-                        detail_desc_text[id_generator()] = [patent_id,"heading", heading, brf_sum_seq]
+                        detail_desc_text[id_generator()] = [patent_id,"heading", heading, det_seq]
             except:
                 pass
 
