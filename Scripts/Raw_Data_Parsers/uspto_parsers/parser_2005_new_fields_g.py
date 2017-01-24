@@ -674,6 +674,7 @@ def parse_patents(fd, fd2):
                     citcategory = "NULL"
                     text = "NULL"
                     app_flag = False
+                    ref_class = "NULL"
                     
                     #print i
                     to_process = i.split('\n')
@@ -730,7 +731,7 @@ def parse_patents(fd, fd2):
                     elif citdocno != "NULL":
                         foreigncitation[id_generator()] = [patent_id,citdate,citdocno,citcountry,citcategory, str(forpatseq)] 
                         forpatseq+=1 
-                    elif text!= "NULL":
+                    if text!= "NULL":
                         otherreference[id_generator()] = [patent_id, text, str(otherseq)]
                         otherseq +=1
             
@@ -943,13 +944,17 @@ def parse_patents(fd, fd2):
                                     relkind = re.search('<kind>(.*?)</kind>',line).group(1)
                                 if line.startswith("<country"):
                                     relcountry = re.search('<country>(.*?)</country>',line).group(1)
-                                if line.startswith("<date"):
-                                    reldate = re.search('<date>(.*?)</date>',line).group(1)
-                                    if reldate[6:] != "00":
-                                        reldate = reldate[:4]+'-'+reldate[4:6]+'-'+reldate[6:]
-                                    else:
-                                        reldate = reldate[:4]+'-'+reldate[4:6]+'-'+'01'
-                                        year = reldate[:4]
+                                try:
+                                    if line.startswith("<date"):
+                                        reldate = re.search('<date>(.*?)</date>',line).group(1)
+                                        if reldate[6:] != "00":
+                                            reldate = reldate[:4]+'-'+reldate[4:6]+'-'+reldate[6:]
+                                        else:
+                                            reldate = reldate[:4]+'-'+reldate[4:6]+'-'+'01'
+                                            year = reldate[:4]
+                                except:
+                                    print "Missing date on usreldoc"
+                                    reldate = "0000-00-00"
                             usreldoc[id_generator()] = [patent_id, doc_type, "NULL", reldocno, relkind, relcountry, reldate, "NULL", rel_seq]
                             rel_seq +=1
                         else:
@@ -977,13 +982,17 @@ def parse_patents(fd, fd2):
                                         relkind = re.search('<kind>(.*?)</kind>',line).group(1)
                                     if line.startswith("<country"):
                                         relcountry = re.search('<country>(.*?)</country>',line).group(1)
-                                    if line.startswith("<date"):
-                                        reldate = re.search('<date>(.*?)</date>',line).group(1)
-                                        if reldate[6:] != "00":
-                                            reldate = reldate[:4]+'-'+reldate[4:6]+'-'+reldate[6:]
-                                        else:
-                                            reldate = reldate[:4]+'-'+reldate[4:6]+'-'+'01'
-                                            year = reldate[:4]
+                                    try:
+                                        if line.startswith("<date"):
+                                            reldate = re.search('<date>(.*?)</date>',line).group(1)
+                                            if reldate[6:] != "00":
+                                                reldate = reldate[:4]+'-'+reldate[4:6]+'-'+reldate[6:]
+                                            else:
+                                                reldate = reldate[:4]+'-'+reldate[4:6]+'-'+'01'
+                                                year = reldate[:4]
+                                    except:
+                                        reldate = "0000-00-00"
+                                        print "Missing date on reldoc"
                                     if line.startswith("<parent-status"):
                                         relparentstatus = re.search('<parent-status>(.*?)</parent-status', line).group(1)
                                 rel_seq +=1
@@ -1150,8 +1159,11 @@ def parse_patents(fd, fd2):
                 kind = None
                 publishing = avail_fields["pct-or-regional-publishing-data"].split("\n") 
                 for line in publishing:
-                    if line.startswith("<doc-number"):
-                        rel_id = re.search("<doc-number>(.*?)</doc-number>", line).group(1)
+                    try:
+                        if line.startswith("<doc-number"):
+                            rel_id = re.search("<doc-number>(.*?)</doc-number>", line).group(1)
+                    except:
+                        print "Publishing data lacks docno"
                     if line.startswith('<kind'):
                          kind = re.search('<kind>(.*?)</kind>', line).group(1)
                     if line.startswith('<date'):
@@ -1207,21 +1219,26 @@ def parse_patents(fd, fd2):
                 sheets = None
                 figs = None
                 for line in figures:
-                    if line.startswith('<number-of-drawing-sheets'):
-                        sheets = re.search('<number-of-drawing-sheets>(.*?)</number-of-drawing-sheets>', line).group(1)
-                    if line.startswith('<number-of-figures'):
-                         figs = re.search('<number-of-figures>(.*?)</number-of-figures>', line).group(1)
+                    try:
+                        if line.startswith('<number-of-drawing-sheets'):
+                            sheets = re.search('<number-of-drawing-sheets>(.*?)</number-of-drawing-sheets>', line).group(1)
+                        if line.startswith('<number-of-figures'):
+                             figs = re.search('<number-of-figures>(.*?)</number-of-figures>', line).group(1)
+                    except:
+                        print "Missing field from figures"
                 figure_data[id_generator()] = [patent_id, figs, sheets]
-
             if "us-botanic" in avail_fields:
                 latin = None
                 variety = None
                 botanic = avail_fields["us-botanic"].split("\n")
                 for line in botanic:
-                    if line.startswith("<latin-name"):
-                        latin_name = re.search('<latin-name>(.*?)</latin-name>', line).group(1)
-                    if line.startswith("<variety"):
-                        variety = re.search("<variety>(.*?)</variety>", line).group(1)
+                    try:
+                        if line.startswith("<latin-name"):
+                            latin_name = re.search('<latin-name>(.*?)</latin-name>', line).group(1)
+                        if line.startswith("<variety"):
+                            variety = re.search("<variety>(.*?)</variety>", line).group(1)
+                    except:
+                        print "Problem with botanic"
                 botanic_data[id_generator()] = [patent_id, latin_name, variety]
 
             patentdata[patent_id] = [apptype,docno,'US',issdate,abst,title,patkind,numclaims,rule_47, d]
