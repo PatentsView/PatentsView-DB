@@ -142,7 +142,6 @@ def parse_patents(fd,fd2):
 
     ##### PARENT CASE logical group is the USRELDOC #####
     
-    
     draw_desc_textfile = open(os.path.join(fd2,'01_new_draw_desc_text.csv'), 'wb')
     draw_desc_textfile.write(codecs.BOM_UTF8)
     drawdesc = csv.writer(draw_desc_textfile, delimiter='\t')
@@ -158,19 +157,10 @@ def parse_patents(fd,fd2):
     det_desc = csv.writer(det_desc_textfile, delimiter='\t')
     det_desc.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
 
-    #patdescfile = open(os.path.join(fd2,'patent_description.csv'),'wb')
-    #patdescfile.write(codecs.BOM_UTF8)
-    #patdesc = csv.writer(patdescfile,delimiter='\t')
-    #patdesc.writerow(['patent_id','brief_summary','drawing_desc','detail_desc'])
-    
-
-
     rel_app_textfile = open(os.path.join(fd2,'01_new_rel_app_text.csv'), 'wb')
     rel_app_textfile.write(codecs.BOM_UTF8)
     rel_app = csv.writer(rel_app_textfile, delimiter='\t')
     rel_app.writerow(['uuid', 'patent_id',"text"])
-
-    
 
     non_inventor_applicantfile = open(os.path.join(fd2,'01_new_non_inventor_applicant.csv'),'wb')
     non_inventor_applicantfile.write(codecs.BOM_UTF8)
@@ -181,14 +171,6 @@ def parse_patents(fd,fd2):
     pct_datafile.write(codecs.BOM_UTF8)
     pct_data = csv.writer(pct_datafile, delimiter='\t')
     pct_data.writerow(['uuid', 'patent_id', 'rel_id', 'date', '371_date', 'country', 'kind', "doc_type","102_date"])
-
-    #pctfile = open(os.path.join(fd2,'pct_information.csv'),'wb')
-    #pctfile.write(codecs.BOM_UTF8)
-    #pct = csv.writer(pctfile,delimiter='\t')
-    #pct.writerow(['uuid','patent_id','number','371_date','102_date','filing_date','pub_number','pub_date','sequence'])
-    
-    
-
 
     botanicfile = open(os.path.join(fd2,'01_new_botanic.csv'), 'wb')
     botanicfile.write(codecs.BOM_UTF8)
@@ -209,7 +191,6 @@ def parse_patents(fd,fd2):
     rawassgfile.close()
     ipcrfile.close()
     otherreffile.close()
-    #priorityfile.close()
     foreigncitfile.close()
     patfile.close()
     rawlawyerfile.close()
@@ -217,8 +198,6 @@ def parse_patents(fd,fd2):
     uspcfile.close()
     claimsfile.close()
     examfile.close()
-    #pctfile.close()
-    
     forpriorityfile.close()
     us_term_of_grantfile.close()
     usreldocfile.close()
