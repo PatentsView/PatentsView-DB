@@ -123,25 +123,19 @@ def parse_patents(fd,fd2):
     forpriority = csv.writer(forpriorityfile,delimiter='\t')
     forpriority.writerow(['uuid', 'patent_id', "sequence", "kind", "app_num", "app_date", "country"])
 
-    #priorityfile = open(os.path.join(fd2,'priority.csv'),'wb')
-    #priorityfile.write(codecs.BOM_UTF8)
-    #priority = csv.writer(priorityfile,delimiter='\t')
-    #priority.writerow(['uuid','patent_id','app_number','app_date','app_country','sequence'])
-    
-    ##### PARENT CASE logical group is the USRELDOC #####
-
     us_term_of_grantfile = open(os.path.join(fd2,'01_new_us_term_of_grant.csv'), 'wb')
     us_term_of_grantfile.write(codecs.BOM_UTF8)
     us_term_of_grant = csv.writer(us_term_of_grantfile, delimiter='\t')
     us_term_of_grant.writerow(['uuid','patent_id','lapse_of_patent', 'disclaimer_date' 'term_disclaimer', 'term_grant', 'term_ext'])
 
+    ##### PARENT CASE logical group is the USRELDOC #####
     usreldocfile = open(os.path.join(fd2,'usreldoc.csv'), 'wb')
     usreldocfile.write(codecs.BOM_UTF8)
     usrel = csv.writer(usreldocfile, delimiter='\t')
     usrel.writerow(['uuid', 'patent_id', 'doc_type',  'relkind', 'reldocno', 'relcountry', 'reldate', 'rel_seq'])
 
     ##### PARENT CASE logical group is the USRELDOC #####
-    
+
     draw_desc_textfile = open(os.path.join(fd2,'01_new_draw_desc_text.csv'), 'wb')
     draw_desc_textfile.write(codecs.BOM_UTF8)
     drawdesc = csv.writer(draw_desc_textfile, delimiter='\t')
@@ -191,6 +185,7 @@ def parse_patents(fd,fd2):
     rawassgfile.close()
     ipcrfile.close()
     otherreffile.close()
+    #priorityfile.close()
     foreigncitfile.close()
     patfile.close()
     rawlawyerfile.close()
@@ -198,6 +193,8 @@ def parse_patents(fd,fd2):
     uspcfile.close()
     claimsfile.close()
     examfile.close()
+    #pctfile.close()
+    
     forpriorityfile.close()
     us_term_of_grantfile.close()
     usreldocfile.close()
@@ -302,6 +299,8 @@ def parse_patents(fd,fd2):
             #assistexamlname = 'NULL'
             
             try:
+                numfigs = ''
+                numsheets = ''
                 patent = avail_fields['PATN'].split('\n')
                 for line in patent:
                     if line.startswith("WKU"):
@@ -393,7 +392,8 @@ def parse_patents(fd,fd2):
             
             patent_id = updnum
             
-            figureinfo[id_generator()] = [updnum,numfigs,numsheets]
+            if numfigs!='' or numsheets!='':
+              figureinfo[id_generator()] = [updnum,numfigs,numsheets]
             termofgrant[id_generator()] = [updnum,'',disclaimerdate,'',termpat,'']
             
             if int(appdate[:4]) >= 1992 and seriescode == "D":
