@@ -1,6 +1,6 @@
 def parse_patents(fd,fd2):
-    import re,csv,os,codecs
-    import string,random
+    import re,csv,os,codecs,traceback
+    import string,random,zipfile
     from bs4 import BeautifulSoup as bs
     
     import HTMLParser
@@ -34,7 +34,7 @@ def parse_patents(fd,fd2):
     fd+='/'
     fd2+='/'
     diri = os.listdir(fd)
-    diri = [d for d in diri if re.search('XML',d,re.I)]
+    diri = [d for d in diri if re.search('zip',d,re.I)]
     
     #Initiate HTML Parser for unescape characters
     h = HTMLParser.HTMLParser()
@@ -63,8 +63,13 @@ def parse_patents(fd,fd2):
     rawinvfile = open(os.path.join(fd2,'rawinventor.csv'),'wb')
     rawinvfile.write(codecs.BOM_UTF8)
     rawinv = csv.writer(rawinvfile,delimiter='\t')
-    rawinv.writerow(['uuid','patent_id','inventor_id','rawlocation_id','name_first','name_last','sequence'])
+    rawinv.writerow(['uuid','patent_id','inventor_id','rawlocation_id','name_first','name_last','sequence','rule_47'])
     
+    examinerfile = open(os.path.join(fd2,'examiner.csv'),'wb')
+    examinerfile.write(codecs.BOM_UTF8)
+    exam = csv.writer(examinerfile,delimiter='\t')
+    exam.writerow(['id','patent_id','fname','lname','role','group','sequence'])
+
     rawassgfile = open(os.path.join(fd2,'rawassignee.csv'),'wb')
     rawassgfile.write(codecs.BOM_UTF8)
     rawassg = csv.writer(rawassgfile,delimiter='\t')
@@ -78,7 +83,7 @@ def parse_patents(fd,fd2):
     patfile = open(os.path.join(fd2,'patent.csv'),'wb')
     patfile.write(codecs.BOM_UTF8)
     pat = csv.writer(patfile,delimiter='\t')
-    pat.writerow(['id','type','number','country','date','abstract','title','kind','num_claims'])
+    pat.writerow(['id','type','number','country','date','abstract','title','kind','num_claims', 'filename'])
     
     foreigncitfile = open(os.path.join(fd2,'foreigncitation.csv'),'wb')
     foreigncitfile.write(codecs.BOM_UTF8)
@@ -91,6 +96,7 @@ def parse_patents(fd,fd2):
     uspatcit.writerow(['uuid','patent_id','citation_id','date','name','kind','country','category','sequence'])
     """
     usappcitfile = open(os.path.join(fd2,'usapplicationcitation.csv'),'wb')
+    usappcitfile.write(codecs.BOM_UTF8)
     usappcit = csv.writer(usappcitfile)
     usappcit.writerow(['uuid','patent_id','application_id','date','name','kind','number','country','category','sequence'])
     """
@@ -119,7 +125,65 @@ def parse_patents(fd,fd2):
     subclass = csv.writer(subclassfile,delimiter='\t')
     subclass.writerow(['id'])
     
+    ### New fields ###
+    forpriorityfile = open(os.path.join(fd2,'01_new_forpriority.csv'),'wb')
+    forpriorityfile.write(codecs.BOM_UTF8)
+    forpriority = csv.writer(forpriorityfile,delimiter='\t')
+    forpriority.writerow(['uuid', 'patent_id', "sequence", "kind", "app_num", "app_date", "country"])
+
+    us_term_of_grantfile = open(os.path.join(fd2,'01_new_us_term_of_grant.csv'), 'wb')
+    us_term_of_grantfile.write(codecs.BOM_UTF8)
+    us_term_of_grant = csv.writer(us_term_of_grantfile, delimiter='\t')
+    us_term_of_grant.writerow(['uuid','patent_id','lapse_of_patent', 'disclaimer_date' 'term_disclaimer', 'term_grant', 'term_ext'])
+
+    usreldocfile = open(os.path.join(fd2,'usreldoc.csv'), 'wb')
+    usreldocfile.write(codecs.BOM_UTF8)
+    usrel = csv.writer(usreldocfile, delimiter='\t')
+    usrel.writerow(['uuid', 'patent_id', 'doc_type',  'relkind', 'reldocno', 'relcountry', 'reldate',  'parent_status', 'rel_seq','kind'])
+
+    draw_desc_textfile = open(os.path.join(fd2,'01_new_draw_desc_text.csv'), 'wb')
+    draw_desc_textfile.write(codecs.BOM_UTF8)
+    drawdesc = csv.writer(draw_desc_textfile, delimiter='\t')
+    drawdesc.writerow(['uuid', 'patent_id', "text", "seq"])
+
+    brf_sum_textfile = open(os.path.join(fd2,'01_new_brf_sum_text.csv'), 'wb')
+    brf_sum_textfile.write(codecs.BOM_UTF8)
+    brf_sum = csv.writer(brf_sum_textfile, delimiter='\t')
+    brf_sum.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
+
+    det_desc_textfile = open(os.path.join(fd2,'01_new_detail_desc_text.csv'), 'wb')
+    det_desc_textfile.write(codecs.BOM_UTF8)
+    det_desc = csv.writer(det_desc_textfile, delimiter='\t')
+    det_desc.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
+
+    rel_app_textfile = open(os.path.join(fd2,'01_new_rel_app_text.csv'), 'wb')
+    rel_app_textfile.write(codecs.BOM_UTF8)
+    rel_app = csv.writer(rel_app_textfile, delimiter='\t')
+    rel_app.writerow(['uuid', 'patent_id',"text"])
+
+    non_inventor_applicantfile = open(os.path.join(fd2,'01_new_non_inventor_applicant.csv'),'wb')
+    non_inventor_applicantfile.write(codecs.BOM_UTF8)
+    noninventorapplicant = csv.writer(non_inventor_applicantfile,delimiter='\t')
+    noninventorapplicant.writerow(['uuid', 'patent_id', "last_name", "first_name", "sequence", "designation", "applicant_type", "street", "city", "state", "country", "nationality", "residence"])
+
+    pct_datafile = open(os.path.join(fd2,'01_new_pct_data.csv'), 'wb')
+    pct_datafile.write(codecs.BOM_UTF8)
+    pct_data = csv.writer(pct_datafile, delimiter='\t')
+    pct_data.writerow(['uuid', 'patent_id', 'rel_id', 'date', '371_date', 'country', 'kind', "doc_type","102_date"])
+
+    botanicfile = open(os.path.join(fd2,'01_new_botanic.csv'), 'wb')
+    botanicfile.write(codecs.BOM_UTF8)
+    botanic_info = csv.writer(botanicfile, delimiter='\t')
+    botanic_info.writerow(['uuid', 'patent_id', 'latin_name', "variety"])
+
+    figurefile = open(os.path.join(fd2,'01_new_figures.csv'), 'wb')
+    figurefile.write(codecs.BOM_UTF8)
+    figure_info = csv.writer(figurefile, delimiter='\t')
+    figure_info.writerow(['uuid', 'patent_id', 'num_figs', "num_sheets"])
+    
+    
     mainclassfile.close()
+    examinerfile.close()
     subclassfile.close()
     appfile.close()
     rawlocfile.close()
@@ -135,6 +199,17 @@ def parse_patents(fd,fd2):
     claimsfile.close()
     #usappcitfile.close()
     
+    forpriorityfile.close()
+    us_term_of_grantfile.close()
+    usreldocfile.close()
+    non_inventor_applicantfile.close()
+    draw_desc_textfile.close()
+    brf_sum_textfile.close()
+    rel_app_textfile.close()
+    det_desc_textfile.close()
+    pct_datafile.close()
+    botanicfile.close()
+    figurefile.close()
     
     #Type kind crosswalk - lookup table
     type_kind = {
@@ -165,9 +240,14 @@ def parse_patents(fd,fd2):
                 'NULL': 'NULL' #Placeholder for NULL values for duplicates and such.
                  }
     
-    
+    parent_status={
+                   '00': 'PENDING',
+                   '01': 'GRANTED',
+                   '03': 'ABANDONED',
+                   '04': 'SIR'
+                   }    
     ### !For loggroups the last one will never be parsed but needs to be valid and required for parsing everything before it!
-    loggroups = ['B100','B200', 'B510','B521','B522','B540','B561','B562','B570','B580','B721','B731','B732US','B741','SDOAB','CL']
+    loggroups = ['B100','B200','B300','B400','B510','B521','B522','B540','B561','B562','B570','B580','B595','B596','B600','B721','B731','B732US','B741','B746', 'B747', 'B748US', 'B860','B870','BRFSUM',"DETDESC","DRWDESC", 'SDOAB','CL']
     numi = 0
     num = 0
     
@@ -177,8 +257,10 @@ def parse_patents(fd,fd2):
     subclassdata = {}
     
     for d in diri:
-        print d
-        infile = open(fd+d,'rb').read().decode('utf-8','ignore').replace('&angst','&aring')
+      print d
+      inp = zipfile.ZipFile(os.path.join(fd,d))
+      for i in inp.namelist():
+        infile = inp.open(i).read().decode('utf-8','ignore').replace('&angst','&aring')
         infile = infile.encode('utf-8','ignore')
         infile = _char.sub(_char_unescape,infile)
         #infile = h.unescape(infile).encode('utf-8')
@@ -225,20 +307,11 @@ def parse_patents(fd,fd2):
                     pass
             # Create containers based on existing Berkeley DB schema (not all are currently used - possible compatibility issues)
             application = {}
-            assignee = {}
             claims = {}
             foreigncitation = {}
-            inventor = {}
             ipcr = {}
-            lawyer = {}
-            location = {}
-            location_assignee = {}
-            location_inventor = {}
             otherreference = {}
             patentdata = {}
-            patent_assignee = {}
-            patent_inventor = {}
-            patent_lawyer = {}
             rawassignee = {}
             rawinventor = {}
             rawlawyer = {}
@@ -246,7 +319,13 @@ def parse_patents(fd,fd2):
             uspatentcitation = {}
             uspc = {}
             usreldoc = {}
-            
+            examiner = {}
+            pctdata = {}
+            prioritydata = {}
+            figureinfo = {}
+            termofgrant = {}
+            drawdescdata = {}
+            relappdata = {}
             ###                PARSERS FOR LOGICAL GROUPS                  ###
            
             #PATN
@@ -288,6 +367,29 @@ def parse_patents(fd,fd2):
             except:
                 pass
             
+            
+            #Term of grant
+            try:
+                togrant = avail_fields['B400'].split("\n")
+                termdisc = ''
+                for line in togrant:
+                    if line.startswith('<B473>'):
+                        disclaimerdate = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
+                        if disclaimerdate[6:] != "00":
+                            disclaimerdate = disclaimerdate[:4]+'-'+disclaimerdate[4:6]+'-'+disclaimerdate[6:]
+                        else:
+                            disclaimerdate = disclaimerdate[:4]+'-'+disclaimerdate[4:6]+'-'+'01'
+                    if line.startswith('<B473US'):
+                        termdisc = 'YES'
+                    if line.startswith('<B474>'):
+                        term = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
+                    if line.startswith('<B474US>'):
+                        termext = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
+                termofgrant[id_generator()] = [updnum,'',disclaimerdate,termdisc,term,termext]
+            except:
+                pass
+    
+        
             #Application
             #appnum = 'NULL'
             #apptype = 'NULL'
@@ -320,6 +422,333 @@ def parse_patents(fd,fd2):
                 pass
             
             
+            #Figure info
+            numsheets = ''
+            numfigs = ''
+            try:
+                patent = avail_fields['B595']
+                numsheets = re.search('<PDAT>(.*?)</PDAT>',patent).group(1)
+            except:
+                pass
+            
+            try:
+                patent = avail_fields['B596']
+                numfigs = re.search('<PDAT>(.*?)</PDAT>',patent).group(1)
+            except:
+                pass
+            
+            
+            #Related docs
+            try:
+                patent = avail_fields['B600'].split("\r\n")
+                patent = [p for p in patent if p!='>' and p!="</" and p!='']
+                patent = ''.join(patent)
+                enume = 0
+                if re.search('<B610',patent): #ADDITION
+                    #addition = re.search('<B610.*?<PDAT>(.*?)</PDAT></B610').group(1)
+                    print patent
+                if re.search('<B620',patent): #DIVISION
+                    division = re.findall('<B620>(.*?)</B620>',patent)
+                    for e,div in enumerate(division):
+                        child = re.findall('<CDOC>.*?<PDAT>(.*?)</PDAT>.*?</CDOC>',div)
+                        parentfull = re.findall('<PDOC>(.*?)</PDOC>',div)
+                        parent_grantf = re.findall('<PPUB>(.*?)</PPUB>',div)
+                        parent_stat = re.findall('<PSTA>(.*?)</PSTA>',div)
+                        for n in range(len(child)):
+                            usreldoc[id_generator()] = [updnum,'division','child_doc',child[n].replace("/",''),'','','','',str(enume),'']
+                            enume+=1
+                        for n in range(len(parentfull)):
+                            try:
+                                parent = bs(parentfull[n])
+                                kind = parent.kind.pdat.string
+                                relation = 'parent_doc'
+                                relnum = parent.dnum.pdat.string.replace("/",'')
+                                reldate = parent.date.pdat.string
+                                reldate = reldate[:4]+'-'+reldate[4:6]+'-'+reldate[6:]
+                                relctn = parent.ctry.pdat.string
+                                status = parent_status[bs(parent_stat[n]).pdat.string]
+                                usreldoc[id_generator()] = [updnum,'division',relation,relnum,relctn,reldate,status,str(enume),kind]
+                                enume+=1
+                            except:
+                                pass
+                        for n in range(len(parent_grantf)):
+                            try:
+                                parent_grant = bs(parent_grantf[n])
+                                pgrant_num = parent_grant.dnum.pdat.string.replace('Des. ','D')
+                                pgrant_ctry = parent_grant.ctry.pdat.string
+                                pgrant_kind = parent_grant.kind.pdat.string.replace(' ','')
+                                usreldoc[id_generator()] = [updnum,'division','parent_grant_document',pgrant_num,pgrant_ctry,'','',str(enume),pgrant_kind]
+                                enume+=1
+                            except:
+                                pass
+
+                if re.search('<B631',patent): #CONTINUATION
+                    division = re.findall('<B631>(.*?)</B631>',patent)
+                    for e,div in enumerate(division):
+                        child = re.findall('<CDOC>.*?<PDAT>(.*?)</PDAT>.*?</CDOC>',div)
+                        parentfull = re.findall('<PDOC>(.*?)</PDOC>',div)
+                        parent_grantf = re.findall('<PPUB>(.*?)</PPUB>',div)
+                        parent_stat = re.findall('<PSTA>(.*?)</PSTA>',div)
+                        for n in range(len(child)):
+                            usreldoc[id_generator()] = [updnum,'continuation','child_doc',child[n].replace("/",''),'','','','',str(enume),'']
+                            enume+=1
+                        for n in range(len(parentfull)):
+                            try:
+                                parent = bs(parentfull[n])
+                                kind = parent.kind.pdat.string
+                                relation = 'parent_doc'
+                                relnum = parent.dnum.pdat.string.replace("/",'')
+                                reldate = parent.date.pdat.string
+                                reldate = reldate[:4]+'-'+reldate[4:6]+'-'+reldate[6:]
+                                relctn = parent.ctry.pdat.string
+                                status = parent_status[bs(parent_stat[n]).pdat.string]
+                                usreldoc[id_generator()] = [updnum,'continuation',relation,relnum,relctn,reldate,status,str(enume),kind]
+                                enume+=1
+                            except:
+                                pass
+                        for n in range(len(parent_grantf)):
+                            try:
+                                parent_grant = bs(parent_grantf[n])
+                                pgrant_num = parent_grant.dnum.pdat.string.replace('Des. ','D')
+                                pgrant_ctry = parent_grant.ctry.pdat.string
+                                pgrant_kind = parent_grant.kind.pdat.string.replace(' ','')
+                                usreldoc[id_generator()] = [updnum,'continuation','parent_grant_document',pgrant_num,pgrant_ctry,'','',str(enume),pgrant_kind]
+                                enume+=1
+                            except:
+                                pass
+
+                if re.search('<B632',patent): #CONTINUATION-IN-PART
+                    division = re.findall('<B632>(.*?)</B632>',patent)
+                    for e,div in enumerate(division):
+                        child = re.findall('<CDOC>.*?<PDAT>(.*?)</PDAT>.*?</CDOC>',div)
+                        parentfull = re.findall('<PDOC>(.*?)</PDOC>',div)
+                        parent_grantf = re.findall('<PPUB>(.*?)</PPUB>',div)
+                        parent_stat = re.findall('<PSTA>(.*?)</PSTA>',div)
+                        for n in range(len(child)):
+                            usreldoc[id_generator()] = [updnum,'continuation_in_part','child_doc',child[n].replace("/",''),'','','','',str(enume),'']
+                            enume+=1
+                        for n in range(len(parentfull)):
+                            try:
+                                parent = bs(parentfull[n])
+                                kind = parent.kind.pdat.string
+                                relation = 'parent_doc'
+                                relnum = parent.dnum.pdat.string.replace("/",'')
+                                reldate = parent.date.pdat.string
+                                reldate = reldate[:4]+'-'+reldate[4:6]+'-'+reldate[6:]
+                                relctn = parent.ctry.pdat.string
+                                status = parent_status[bs(parent_stat[n]).pdat.string]
+                                usreldoc[id_generator()] = [updnum,'continuation_in_part',relation,relnum,relctn,reldate,status,str(enume),kind]
+                                enume+=1
+                            except:
+                                pass
+                        for n in range(len(parent_grantf)):
+                            try:
+                                parent_grant = bs(parent_grantf[n])
+                                pgrant_num = parent_grant.dnum.pdat.string.replace('Des. ','D')
+                                pgrant_ctry = parent_grant.ctry.pdat.string
+                                pgrant_kind = parent_grant.kind.pdat.string.replace(' ','')
+                                usreldoc[id_generator()] = [updnum,'continuation_in_part','parent_grant_document',pgrant_num,pgrant_ctry,'','',str(enume),pgrant_kind]
+                                enume+=1
+                            except:
+                                pass
+
+                if re.search('<B633',patent): #CONTINUING REISSUE
+                    division = re.findall('<B633>(.*?)</B633>',patent)
+                    for e,div in enumerate(division):
+                        child = re.findall('<CDOC>.*?<PDAT>(.*?)</PDAT>.*?</CDOC>',div)
+                        parentfull = re.findall('<PDOC>(.*?)</PDOC>',div)
+                        parent_grantf = re.findall('<PPUB>(.*?)</PPUB>',div)
+                        parent_stat = re.findall('<PSTA>(.*?)</PSTA>',div)
+                        for n in range(len(child)):
+                            usreldoc[id_generator()] = [updnum,'continuing_reissue','child_doc',child[n].replace("/",''),'','','','',str(enume),'']
+                            enume+=1
+                        for n in range(len(parentfull)):
+                            try:
+                                parent = bs(parentfull[n])
+                                kind = parent.kind.pdat.string
+                                relation = 'parent_doc'
+                                relnum = parent.dnum.pdat.string.replace("/",'')
+                                reldate = parent.date.pdat.string
+                                reldate = reldate[:4]+'-'+reldate[4:6]+'-'+reldate[6:]
+                                relctn = parent.ctry.pdat.string
+                                status = parent_status[bs(parent_stat[n]).pdat.string]
+                                usreldoc[id_generator()] = [updnum,'continuing_reissue',relation,relnum,relctn,reldate,status,str(enume),kind]
+                                enume+=1
+                            except:
+                                pass
+                        for n in range(len(parent_grantf)):
+                            try:
+                                parent_grant = bs(parent_grantf[n])
+                                pgrant_num = parent_grant.dnum.pdat.string.replace('Des. ','D')
+                                pgrant_ctry = parent_grant.ctry.pdat.string
+                                pgrant_kind = parent_grant.kind.pdat.string.replace(' ','')
+                                usreldoc[id_generator()] = [updnum,'continuing_reissue','parent_grant_document',pgrant_num,pgrant_ctry,'','',str(enume),pgrant_kind]
+                                enume+=1
+                            except:
+                                pass
+                
+                if re.search('<B640',patent): #REISSUE
+                    division = re.findall('<B640>(.*?)</B640>',patent)
+                    for e,div in enumerate(division):
+                        child = re.findall('<CDOC>.*?<PDAT>(.*?)</PDAT>.*?</CDOC>',div)
+                        parentfull = re.findall('<PDOC>(.*?)</PDOC>',div)
+                        parent_grantf = re.findall('<PPUB>(.*?)</PPUB>',div)
+                        parent_stat = re.findall('<PSTA>(.*?)</PSTA>',div)
+                        for n in range(len(child)):
+                            usreldoc[id_generator()] = [updnum,'reissue','child_doc',child[n].replace("/",''),'','','','',str(enume),'']
+                            enume+=1
+                        for n in range(len(parentfull)):
+                            try:
+                                parent = bs(parentfull[n])
+                                kind = parent.kind.pdat.string
+                                relation = 'parent_doc'
+                                relnum = parent.dnum.pdat.string.replace("/",'')
+                                reldate = parent.date.pdat.string
+                                reldate = reldate[:4]+'-'+reldate[4:6]+'-'+reldate[6:]
+                                relctn = parent.ctry.pdat.string
+                                status = parent_status[bs(parent_stat[n]).pdat.string]
+                                usreldoc[id_generator()] = [updnum,'reissue',relation,relnum,relctn,reldate,status,str(enume),kind]
+                                enume+=1
+                            except:
+                                pass
+                        for n in range(len(parent_grantf)):
+                            try:
+                                parent_grant = bs(parent_grantf[n])
+                                pgrant_num = parent_grant.dnum.pdat.string.replace('Des. ','D')
+                                pgrant_ctry = parent_grant.ctry.pdat.string
+                                pgrant_kind = parent_grant.kind.pdat.string.replace(' ','')
+                                usreldoc[id_generator()] = [updnum,'reissue','parent_grant_document',pgrant_num,pgrant_ctry,'','',str(enume),pgrant_kind]
+                                enume+=1
+                            except:
+                                pass
+                    
+                if re.search('<B641',patent): #divisional_reissue
+                    pass
+                    #print patent
+
+                if re.search('<B645',patent): #us_reexamination_reissue_merger
+                    pass
+                    #print patent
+                    
+                if re.search('<B650',patent): #related_publication; parent_pct_document
+                    division = re.findall('<B650>(.*?)</B650>',patent)
+                    for e,div in enumerate(division):
+                        relation = 'parent_pct_document'
+                        doc = re.findall('<DOC>(.*?)</DOC>',div)
+                        for n in range(len(doc)):
+                            dd = bs(doc[n])
+                            pctdd = dd.date.pdat.string
+                            pctdd = pctdd[:4]+'-'+pctdd[4:6]+'-'+pctdd[6:]
+                            usreldoc[id_generator()] = [updnum,'related_publication','parent_pct_document',dd.dnum.pdat.string,dd.ctry.pdat.string,pctdd,'',str(enume),'']
+                            enume+=1
+                    
+                if re.search('<B660',patent): #substitution
+                    division = re.findall('<B660>(.*?)</B660>',patent)
+                    for e,div in enumerate(division):
+                        child = re.findall('<CDOC>.*?<PDAT>(.*?)</PDAT>.*?</CDOC>',div)
+                        parentfull = re.findall('<PDOC>(.*?)</PDOC>',div)
+                        parent_grantf = re.findall('<PPUB>(.*?)</PPUB>',div)
+                        parent_stat = re.findall('<PSTA>(.*?)</PSTA>',div)
+                        for n in range(len(child)):
+                            usreldoc[id_generator()] = [updnum,'substitution','child_doc',child[n].replace("/",''),'','','','',str(enume),'']
+                            enume+=1
+                        for n in range(len(parentfull)):
+                            try:
+                                parent = bs(parentfull[n])
+                                kind = parent.kind.pdat.string
+                                relation = 'parent_doc'
+                                relnum = parent.dnum.pdat.string.replace("/",'')
+                                reldate = parent.date.pdat.string
+                                reldate = reldate[:4]+'-'+reldate[4:6]+'-'+reldate[6:]
+                                relctn = parent.ctry.pdat.string
+                                status = parent_status[bs(parent_stat[n]).pdat.string]
+                                usreldoc[id_generator()] = [updnum,'substitution',relation,relnum,relctn,reldate,status,str(enume),kind]
+                                enume+=1
+                            except:
+                                pass
+                        for n in range(len(parent_grantf)):
+                            try:
+                                parent_grant = bs(parent_grantf[n])
+                                pgrant_num = parent_grant.dnum.pdat.string.replace('Des. ','D')
+                                pgrant_ctry = parent_grant.ctry.pdat.string
+                                pgrant_kind = parent_grant.kind.pdat.string.replace(' ','')
+                                usreldoc[id_generator()] = [updnum,'substitution','parent_grant_document',pgrant_num,pgrant_ctry,'','',str(enume),pgrant_kind]
+                                enume+=1
+                            except:
+                                pass
+                    
+                if re.search('<B680',patent): #us_provisional_application
+                    division = re.findall('<B680(.*?)</B680',patent)
+                    for e,div in enumerate(division):
+                        relation = ''
+                        doc = re.findall('<DOC>(.*?)</DOC>',div)
+                        for n in range(len(doc)):
+                            dd = bs(doc[n])
+                            pctdd = dd.date.pdat.string
+                            pctdd = pctdd[:4]+'-'+pctdd[4:6]+'-'+pctdd[6:]
+                            usreldoc[id_generator()] = [updnum,'us_provisional_application',relation,dd.dnum.pdat.string.replace('/',''),'US',pctdd,'',str(enume),dd.kind.pdat.string]
+                            enume+=1
+                
+                if re.search('<B690',patent): #related_publication
+                    division = re.findall('<B690(.*?)</B690',patent)
+                    for e,div in enumerate(division):
+                        doc = re.findall('<DOC>(.*?)</DOC>',div)
+                        for n in range(len(doc)):
+                            dd = bs(doc[n])
+                            pctdd = dd.date.pdat.string
+                            pctdd = pctdd[:4]+'-'+pctdd[4:6]+'-'+pctdd[6:]
+                            usreldoc[id_generator()] = [updnum,'related_publication','',dd.dnum.pdat.string,dd.ctry.pdat.string,pctdd,'',str(enume),dd.kind.pdat.string]
+                            enume+=1
+            except:
+                pass
+            
+    
+            #PCT data
+            try:
+                patent = avail_fields['B860']
+                doc = re.findall('<B861.*?</B861',patent)
+                date371 = re.findall('<B864.*?</B864',patent)
+                for e,dd in enumerate(doc):
+                    dd = re.search('<DOC>(.*?)</DOC>',dd).group(1)
+                    dd = bs(dd)
+                    pctnum = dd.dnum.pdat.string
+                    pdate = dd.date.pdat.string
+                    pdate = pdate[:4]+'-'+pdate[4:6]+'-'+pdate[6:]
+                    pctry = 'WO'
+                    try:
+                        d371=re.search('<PDAT>(.*?)</PDAT>',date371[e]).group(1)
+                        d371 = d371[:4]+'-'+d371[4:6]+'-'+d371[6:]
+                    except:
+                        d371=''
+                    pctdata[id_generator()] = [updnum,pctnum,pdate,d371,pctry,'00',"pct_application",''] 
+            except:
+                pass
+            
+            try:
+                patent = avail_fields['B870']
+                doc = re.findall('<B871.*?</B871',patent)
+                for e,dd in enumerate(doc):
+                    dd = re.search('<DOC>(.*?)</DOC>',dd).group(1)
+                    dd = bs(dd)
+                    pctnum = dd.dnum.pdat.string
+                    pdate = dd.date.pdat.string
+                    pdate = pdate[:4]+'-'+pdate[4:6]+'-'+pdate[6:]
+                    pctry = 'WO'
+                    pctdata[id_generator()] = [updnum,pctnum,pdate,'',pctry,'A',"wo_grant",'']
+            except:
+                pass
+                
+            ### priority data
+            try:
+                patent = avail_fields['B300']
+                nums = re.findall('<B310>.*?<PDAT>(.*?)</PDAT>.*?</B310>',patent)
+                dates = re.findall('<B320>.*?<PDAT>(.*?)</PDAT>.*?</B320>',patent)
+                ctrys = re.findall('<B330>.*?<PDAT>(.*?)</PDAT>.*?</B330>',patent)
+                for n in range(len(nums)):
+                    prioritydata[id_generator()] = [updnum,str(n),'',nums[n],dates[n],ctrys[n]]
+            except:
+                pass
+                
             #Number of claims
             #numclaims = 'NULL'
             try:
@@ -333,6 +762,8 @@ def parse_patents(fd,fd2):
             
             patent_id = updnum
             
+            if numfigs!='' or numsheets!='':
+                figureinfo[id_generator()] = [updnum,numfigs,numsheets]
             application[apptype+'/'+appnum[2:]] = [patent_id,apptype,appnum,patcountry,appdate]
             
             # Claims data
@@ -369,6 +800,7 @@ def parse_patents(fd,fd2):
                     invtstate = 'NULL'
                     invtcountry = 'NULL'
                     invtzip = 'NULL'
+                    rule47 = 'NULL'
                     for line in inv_info[n].split("\n"):
                         #print line
                         if line.startswith("<NAM>"):
@@ -407,7 +839,7 @@ def parse_patents(fd,fd2):
                     if fname == "NULL" and lname == "NULL":
                         pass
                     else:
-                        rawinventor[id_generator()] = [patent_id,"NULL",loc_idd,fname,lname,str(n)]
+                        rawinventor[id_generator()] = [patent_id,"NULL",loc_idd,fname,lname,str(n),'']
             except:
                 pass
             
@@ -654,15 +1086,115 @@ def parse_patents(fd,fd2):
                 #print abst
             except:
                 abst = 'NULL'
+            try:     
+                sequence = 0
+                id_group = "NULL"
+                if "B748US" in avail_fields:
+                    grouping = avail_fields["B748US"]
+                    id_group = re.search('<PDAT>(.*?)</PDAT>', grouping).group(1)
+                
+                if "B746" in avail_fields:
+                    pexfname = "NULL"
+                    pexlname = "NULL"
+                    sequence +=1
+                    prim_examiners = avail_fields['B746'].split("\n")
+                    for line in prim_examiners:
+                        if line.startswith("<NAM>"):
+                            pexfname = re.search('<FNM><PDAT>(.*?)</PDAT>',line).group(1)
+                            pexlname = re.search('<SNM><STEXT><PDAT>(.*?)</PDAT>',line).group(1)
+                    examiner[id_generator()] = [patent_id, pexfname, pexlname, "primary", id_group, sequence]
+                if "B747" in avail_fields:
+                    aexfname = "NULL"
+                    aexlname = "NULL"
+                    sequence +=1
+                    assist_examiners = avail_fields['B747'].split("\n")
+                    for line in assist_examiners:
+                        if line.startswith("<NAM>"):
+                            aexfname = re.search('<FNM><PDAT>(.*?)</PDAT>',line).group(1)
+                            aexlname = re.search('<SNM><STEXT><PDAT>(.*?)</PDAT>',line).group(1)
+                    examiner[id_generator()] = [patent_id, aexfname, aexlname, "assistant", id_group, sequence]
+            except:
+                pass
+
+            #Detailed description
+            detdesc = 'NULL'
+            try:
+                patent = avail_fields['DETDESC']
+                detdesc = bs(re.search('<BTEXT>(.*?)</BTEXT>',patent,re.DOTALL).group(1))
+                detdesc = re.sub('\s+',' ',detdesc.get_text().decode('utf-8','ignore').encode('utf-8','ignore'))
+            except:
+                pass
+
+            #Drawing description
+            try:
+                patent = avail_fields['DRWDESC']
+                drawdesc = bs(re.search('<BTEXT>(.*?)</BTEXT>',patent,re.DOTALL).group(1))
+                drawdesc = drawdesc.findAll('pdat')
+                for e,d in enumerate(drawdesc):
+                    drawdescdata[id_generator()] =[patent_id,re.sub('\s+',' ',d.get_text().decode('utf-8','ignore').encode('utf-8','ignore')),str(e)] 
+            except:
+                pass
+            
+            #Brief summary
+            bsum = 'NULL'
+            try:
+                patent = avail_fields['BRFSUM']
+                bsum = re.search('<BTEXT>(.*?)</BTEXT>',patent,re.DOTALL).group(1)
+                bsum = bsum.split('<STEXT>')
+                del bsum[0]
+                if re.search('RELATED APPLICATION',bsum[0]):
+                    relapp = re.findall('<PARA.*?<PDAT>(.*?)</PDAT>',bsum[0])
+                    relapp = ' '.join(relapp)
+                
+                    relapp = h.unescape(relapp.decode('utf-8','ignore'))
+                    if not re.search('None|Not applicable',relapp,re.I):
+                        relappdata[id_generator()] = [updnum,re.sub('\s+',' ',relapp)]
+                    bsum = '<H LVL="1"><STEXT>'+'<STEXT>'.join(bsum[1:])
+                else:
+                    bsum = '<H LVL="1"><STEXT>'+'<STEXT>'.join(bsum)
+                ### need to separate relapp
+                bsum = re.sub('\s+',' ',bs(bsum).get_text().decode('utf-8','ignore').encode('utf-8','ignore'))
+            except:
+                pass
             
             if patkind in type_kind:
                 patentdata[patent_id] = [type_kind[patkind],updnum,'US',issdate,abst,title,patkind,numclaims,d]
             else:
                 patentdata[patent_id] = ['NULL',updnum,'US',issdate,abst,title,patkind,numclaims,d]
             
+            brf_sum_textfile = csv.writer(open(os.path.join(fd2,'01_new_brf_sum_text.csv'),'ab'),delimiter='\t')
+            brf_sum_textfile.writerow([id_generator(),patent_id,"",bsum,'0'])
+            
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'),delimiter='\t')
             for k,v in patentdata.items():
                 patfile.writerow([k]+v)
+            
+            det_desc_textfile = csv.writer(open(os.path.join(fd2,'01_new_detail_desc_text.csv'),'ab'),delimiter='\t')
+            det_desc_textfile.writerow([id_generator(),patent_id,"",detdesc,'0'])
+            
+            draw_desc_textfile = csv.writer(open(os.path.join(fd2,'01_new_draw_desc_text.csv'),'ab'),delimiter='\t')
+            for k,v in drawdescdata.items():
+                draw_desc_textfile.writerow([k]+v)
+            
+            figurefile = csv.writer(open(os.path.join(fd2,'01_new_figures.csv'),'ab'),delimiter='\t')
+            for k,v in figureinfo.items():
+                figurefile.writerow([k]+v)
+             
+            rel_app_textfile = csv.writer(open(os.path.join(fd2,'01_new_rel_app_text.csv'),'ab'),delimiter='\t')
+            for k,v in relappdata.items():
+                rel_app_textfile.writerow([k]+v)
+                
+            pct_datafile = csv.writer(open(os.path.join(fd2,'01_new_pct_data.csv'),'ab'),delimiter='\t')
+            for k,v in pctdata.items():
+                pct_datafile.writerow([k]+v)
+            
+            usreldocfile = csv.writer(open(os.path.join(fd2,'usreldoc.csv'),'ab'),delimiter='\t')
+            for k,v in usreldoc.items():
+                usreldocfile.writerow([k]+v)
+            
+            forpriorityfile = csv.writer(open(os.path.join(fd2,'01_new_forpriority.csv'),'ab'),delimiter='\t')
+            for k,v in prioritydata.items():
+                forpriorityfile.writerow([k]+v)
             
             appfile = csv.writer(open(os.path.join(fd2,'application.csv'),'ab'),delimiter='\t')
             for k,v in application.items():
@@ -708,6 +1240,15 @@ def parse_patents(fd,fd2):
             rawlawyerfile = csv.writer(open(os.path.join(fd2,'rawlawyer.csv'),'ab'),delimiter='\t')
             for k,v in rawlawyer.items():
                 rawlawyerfile.writerow([k]+v)
+
+            examinerfile = csv.writer(open(os.path.join(fd2,'examiner.csv'),'ab'),delimiter='\t')
+            for k,v in examiner.items():
+                examinerfile.writerow([k]+v)
+            
+            us_term_of_grantfile = csv.writer(open(os.path.join(fd2,'01_new_us_term_of_grant.csv'),'ab'),delimiter='\t')
+            for k,v in termofgrant.items():
+                us_term_of_grantfile.writerow([k]+v)
+            
             
     
     rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'),delimiter='\t')
@@ -721,7 +1262,5 @@ def parse_patents(fd,fd2):
     subclassfile = csv.writer(open(os.path.join(fd2,'subclass.csv'),'ab'),delimiter='\t')
     for k,v in subclassdata.items():
         subclassfile.writerow(v)
-            
 
-            
     print numi
