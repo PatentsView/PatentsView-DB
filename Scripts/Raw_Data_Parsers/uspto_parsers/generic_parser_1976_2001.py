@@ -1015,11 +1015,12 @@ def parse_patents(fd,fd2):
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'),delimiter='\t')
             for k,v in patentdata.items():
                 patfile.writerow([k]+v)
-    
+            """
+            ### Need to work more on parsing from raw data
             usreldocfile = csv.writer(open(os.path.join(fd2,'usreldoc.csv'),'ab'),delimiter='\t')
             for k,v in usreldoc.items():
                 usreldocfile.writerow([k]+v)
-            
+            """
             rel_app_textfile = csv.writer(open(os.path.join(fd2,'01_new_rel_app_text.csv'),'ab'),delimiter='\t')
             for k,v in relappdata.items():
                 rel_app_textfile.writerow([k]+v)
