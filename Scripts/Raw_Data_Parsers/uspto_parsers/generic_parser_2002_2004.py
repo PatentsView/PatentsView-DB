@@ -1146,7 +1146,7 @@ def parse_patents(fd,fd2):
                     relapp = re.findall('<PARA.*?<PDAT>(.*?)</PDAT>',bsum[0])
                     relapp = ' '.join(relapp)
                 
-                    relapp = h.unescape(relapp.decode('utf-8','ignore'))
+                    relapp = h.unescape(relapp.decode('utf-8','ignore').encode('utf-8','ignore'))
                     if not re.search('None|Not applicable',relapp,re.I):
                         relappdata[id_generator()] = [updnum,re.sub('\s+',' ',relapp)]
                     bsum = '<H LVL="1"><STEXT>'+'<STEXT>'.join(bsum[1:])
