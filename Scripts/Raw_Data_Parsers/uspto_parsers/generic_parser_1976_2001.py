@@ -363,9 +363,9 @@ def parse_patents(fd,fd2):
                     
                     #U.S. term of grant
                     if line.startswith('TRM'):
-                        termpat = re.search('TRM\s+(.*?)$',line).group(1)
+                        termpat = re.sub('[\n\t\r\f]+','',re.search('TRM\s+(.*?)$',line).group(1))
                     if line.startswith('DCD'):
-                        disclaimerdate = re.search('DCD\s+(.*?)$',line).group(1)
+                        disclaimerdate = re.sub('[\n\t\r\f]+','',re.search('DCD\s+(.*?)$',line).group(1))
                         disclaimerdate = disclaimerdate[:4]+'-'+disclaimerdate[4:6]+'-'+disclaimerdate[6:]
                     
                     
@@ -728,17 +728,17 @@ def parse_patents(fd,fd2):
                     pctpubdate = 'NULL'
                     for line in pctinfo[n].split("\n"):
                         if line.startswith('PCN'):
-                            pctnum = re.search('PCN\s+(.*?)$',line).group(1)
+                            pctnum = re.sub('[\n\t\r\f]+','',re.search('PCN\s+(.*?)$',line).group(1))
                         if line.startswith('PD1'):
-                            pct371 = re.search('PD1\s+(.*?)$',line).group(1)
+                            pct371 = re.sub('[\n\t\r\f]+','',re.search('PD1\s+(.*?)$',line).group(1))
                         if line.startswith('PD2'):
-                            pct102 = re.search('PD2\s+(.*?)$',line).group(1)
+                            pct102 = re.sub('[\n\t\r\f]+','',re.search('PD2\s+(.*?)$',line).group(1))
                         if line.startswith('PD3'):
-                            pctdate = re.search('PD3\s+(.*?)$',line).group(1)
+                            pctdate = re.sub('[\n\t\r\f]+','',re.search('PD3\s+(.*?)$',line).group(1))
                         if line.startswith('PCP'):
-                            pctpubnum = re.search('PCP\s+(.*?)$',line).group(1)
+                            pctpubnum = re.sub('[\n\t\r\f]+','',re.search('PCP\s+(.*?)$',line).group(1))
                         if line.startswith('PCD'):
-                            pctpubdate = re.search('PCD\s+(.*?)$',line).group(1)
+                            pctpubdate = re.sub('[\n\t\r\f]+','',re.search('PCD\s+(.*?)$',line).group(1))
                     
                     pctdata[id_generator()] = [patent_id,pctpubnum,pctpubdate,pct371,"WO","A","wo_grant",pct102]
                     pctdata[id_generator()] = [patent_id,pctnum,pctdate,pct371,"WO","00","pct_application",pct102]
@@ -878,10 +878,8 @@ def parse_patents(fd,fd2):
                 for doctype in reldoctype:
                     doctype=doctype.replace('_',' ')
                     if re.search(doctype,parent.lower().replace('conti9nuation','continuation')):
-                        print parent
                         reldoc = doctype
                         data = re.findall(doctype+' of.*?\s([\d+,]?\d+,\d+)\W|'+doctype+' of.*?\s(\d+/\d+,\d+)\W',parent.lower().replace('conti9nuation','continuation'))
-                        print data
                         for l in range(len(data)):
                             usreldoc[id_generator()] =[updnum,doctype.replace(" ","_").replace("-",'_'),'',data[l].replace(',',''),'','','',str(l),'']
                 
