@@ -391,7 +391,10 @@ def parse_patents(fd,fd2):
             
             if numfigs!='' or numsheets!='':
               figureinfo[id_generator()] = [updnum,numfigs,numsheets]
-            termofgrant[id_generator()] = [updnum,'',disclaimerdate,'',termpat,'']
+            try:
+                termofgrant[id_generator()] = [updnum,'',disclaimerdate,'',termpat,'']
+            except:
+                pass
             
             if int(appdate[:4]) >= 1992 and seriescode == "D":
                 seriescode = "29"
@@ -870,12 +873,15 @@ def parse_patents(fd,fd2):
                         bsum = re.sub('TBL\s+',' ',bsum)
                         parent = parent[0]
                 
+                # this is experimental for 1976-2001; need to address further later to extract individual app and patent numbers
                 reldoc = ''
                 for doctype in reldoctype:
                     doctype=doctype.replace('_',' ')
                     if re.search(doctype,parent.lower().replace('conti9nuation','continuation')):
+                        print parent
                         reldoc = doctype
-                        data = re.findall(doctype+' of.*?\s([\d+,]?\d+,\d+)\W',parent.lower().replace('conti9nuation','continuation'))
+                        data = re.findall(doctype+' of.*?\s([\d+,]?\d+,\d+)\W|'+doctype+' of.*?\s(\d+/\d+,\d+)\W',parent.lower().replace('conti9nuation','continuation'))
+                        print data
                         for l in range(len(data)):
                             usreldoc[id_generator()] =[updnum,doctype.replace(" ","_").replace("-",'_'),'',data[l].replace(',',''),'','','',str(l),'']
                 
