@@ -1,5 +1,5 @@
 def parse_patents(fd,fd2):
-    import re,csv,os,codecs,zipfile
+    import re,csv,os,codecs,zipfile,traceback
     import string,random,HTMLParser
     
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
@@ -1079,7 +1079,7 @@ def parse_patents(fd,fd2):
                 us_term_of_grantfile.writerow([k]+v)
             
           except:
-              pass
+              traceback.print_exc()
               
     rawlocfile = csv.writer(open(os.path.join(fd2,'rawlocation.csv'),'ab'),delimiter='\t')
     for k,v in rawlocation.items():
