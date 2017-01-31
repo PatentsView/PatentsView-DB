@@ -1183,6 +1183,7 @@ def parse_patents(fd,fd2):
              
             rel_app_textfile = csv.writer(open(os.path.join(fd2,'01_new_rel_app_text.csv'),'ab'),delimiter='\t')
             for k,v in relappdata.items():
+                v = [vv.encode('utf-8','ignore') for vv in v]
                 rel_app_textfile.writerow([k]+v)
                 
             pct_datafile = csv.writer(open(os.path.join(fd2,'01_new_pct_data.csv'),'ab'),delimiter='\t')
