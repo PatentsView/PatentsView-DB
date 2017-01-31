@@ -2,7 +2,7 @@ def parse_patents(fd,fd2):
     import re,csv,os,codecs,traceback
     import string,random,zipfile
     from bs4 import BeautifulSoup as bs
-    
+    from unidecode import unidecode
     import HTMLParser
     import htmlentitydefs
 
@@ -427,6 +427,7 @@ def parse_patents(fd,fd2):
             numfigs = ''
             try:
                 patent = avail_fields['B595']
+                #print patent
                 numsheets = re.search('<PDAT>(.*?)</PDAT>',patent).group(1)
             except:
                 pass
@@ -1145,15 +1146,15 @@ def parse_patents(fd,fd2):
                 if re.search('RELATED APPLICATION',bsum[0]):
                     relapp = re.findall('<PARA.*?<PDAT>(.*?)</PDAT>',bsum[0])
                     relapp = ' '.join(relapp)
-                
-                    relapp = h.unescape(relapp.decode('utf-8','ignore').encode('utf-8','ignore'))
+                    relapp = h.unescape(unidecode(relapp))
+                    #relapp = h.unescape(relapp.decode('latin-1','ignore').encode('utf-8','ignore'))
                     if not re.search('None|Not applicable',relapp,re.I):
                         relappdata[id_generator()] = [updnum,re.sub('\s+',' ',relapp)]
                     bsum = '<H LVL="1"><STEXT>'+'<STEXT>'.join(bsum[1:])
                 else:
                     bsum = '<H LVL="1"><STEXT>'+'<STEXT>'.join(bsum)
                 ### need to separate relapp
-                bsum = re.sub('\s+',' ',bs(bsum).get_text().decode('utf-8','ignore').encode('utf-8','ignore'))
+                bsum = re.sub('\s+',' ',unidecode(bs(bsum).get_text()))
             except:
                 pass
             
