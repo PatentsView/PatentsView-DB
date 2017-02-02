@@ -372,6 +372,8 @@ def parse_patents(fd,fd2):
             try:
                 togrant = avail_fields['B400'].split("\n")
                 termdisc = ''
+                termext = ''
+                disclaimerdate = ''
                 for line in togrant:
                     if line.startswith('<B473>'):
                         disclaimerdate = re.search('<PDAT>(.*?)</PDAT>',line).group(1)
