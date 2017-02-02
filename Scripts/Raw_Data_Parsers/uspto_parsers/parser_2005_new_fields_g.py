@@ -138,58 +138,59 @@ def parse_patents(fd, fd2):
     exam = csv.writer(examinerfile,delimiter='\t')
     exam.writerow(['id','patent_id','fname','lname','role','group','sequence'])
 
-    forpriorityfile = open(os.path.join(fd2,'01_new_forpriority.csv'),'wb')
+    forpriorityfile = open(os.path.join(fd2,'foreign_priority.csv'),'wb')
     forpriorityfile.write(codecs.BOM_UTF8)
     forpriority = csv.writer(forpriorityfile,delimiter='\t')
     forpriority.writerow(['uuid', 'patent_id', "sequence", "kind", "app_num", "app_date", "country"])
 
-    us_term_of_grantfile = open(os.path.join(fd2,'01_new_us_term_of_grant.csv'), 'wb')
+    us_term_of_grantfile = open(os.path.join(fd2,'us_term_of_grant.csv'), 'wb')
     us_term_of_grantfile.write(codecs.BOM_UTF8)
     us_term_of_grant = csv.writer(us_term_of_grantfile, delimiter='\t')
     us_term_of_grant.writerow(['uuid','patent_id','lapse_of_patent', 'disclaimer_date','term_disclaimer', 'term_grant', 'term_ext'])
 
+
     usreldocfile = open(os.path.join(fd2,'usreldoc.csv'), 'wb')
     usreldocfile.write(codecs.BOM_UTF8)
     usrel = csv.writer(usreldocfile, delimiter='\t')
-    usrel.writerow(['uuid', 'patent_id', 'doc_type',  'relkind', 'reldocno', 'relcountry', 'reldate', 'rel_seq'])
+    usrel.writerow(['uuid', 'patent_id', 'doc_type',  'relkind', 'reldocno', 'relcountry', 'reldate',  'parent_status', 'rel_seq','kind'])
 
-    draw_desc_textfile = open(os.path.join(fd2,'01_new_draw_desc_text.csv'), 'wb')
+    draw_desc_textfile = open(os.path.join(fd2,'draw_desc_text.csv'), 'wb')
     draw_desc_textfile.write(codecs.BOM_UTF8)
     drawdesc = csv.writer(draw_desc_textfile, delimiter='\t')
-    drawdesc.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
+    drawdesc.writerow(['uuid', 'patent_id', 'text'])
 
-    brf_sum_textfile = open(os.path.join(fd2,'01_new_brf_sum_text.csv'), 'wb')
+    brf_sum_textfile = open(os.path.join(fd2,'brf_sum_text.csv'), 'wb')
     brf_sum_textfile.write(codecs.BOM_UTF8)
     brf_sum = csv.writer(brf_sum_textfile, delimiter='\t')
-    brf_sum.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
+    brf_sum.writerow(['uuid', 'patent_id', 'text'])
 
-    rel_app_textfile = open(os.path.join(fd2,'01_new_rel_app_text.csv'), 'wb')
+    rel_app_textfile = open(os.path.join(fd2,'rel_app_text.csv'), 'wb')
     rel_app_textfile.write(codecs.BOM_UTF8)
     rel_app = csv.writer(rel_app_textfile, delimiter='\t')
     rel_app.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
 
-    det_desc_textfile = open(os.path.join(fd2,'01_new_detail_desc_text.csv'), 'wb')
+    det_desc_textfile = open(os.path.join(fd2,'detail_desc_text.csv'), 'wb')
     det_desc_textfile.write(codecs.BOM_UTF8)
     det_desc = csv.writer(det_desc_textfile, delimiter='\t')
-    det_desc.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
+    det_desc.writerow(['uuid', 'patent_id', "text"])
 
 
-    non_inventor_applicantfile = open(os.path.join(fd2,'01_new_non_inventor_applicant.csv'),'wb')
+    non_inventor_applicantfile = open(os.path.join(fd2,'non_inventor_applicant.csv'),'wb')
     non_inventor_applicantfile.write(codecs.BOM_UTF8)
     noninventorapplicant = csv.writer(non_inventor_applicantfile,delimiter='\t')
-    noninventorapplicant.writerow(['uuid', 'patent_id', "last_name", "first_name", "org_name", "sequence", "designation", "applicant_type", "street", "city", "state", "country", "nationality", "residence"])
+    noninventorapplicant.writerow(['uuid', 'patent_id', "location_id", "last_name", "first_name", "org_name", "sequence", "designation", "applicant_type"])
 
-    pct_datafile = open(os.path.join(fd2,'01_new_pct_data.csv'), 'wb')
+    pct_datafile = open(os.path.join(fd2,'pct_data.csv'), 'wb')
     pct_datafile.write(codecs.BOM_UTF8)
     pct_data = csv.writer(pct_datafile, delimiter='\t')
-    pct_data.writerow(['uuid', 'patent_id', 'rel_id', 'date', '371_date', 'country', 'kind', "doc_type"])
+    pct_data.writerow(['uuid', 'patent_id', 'rel_id', 'date', '371_date', 'country', 'kind', "doc_type", "102_date"])
 
-    botanicfile = open(os.path.join(fd2,'01_new_botanic.csv'), 'wb')
+    botanicfile = open(os.path.join(fd2,'botanic.csv'), 'wb')
     botanicfile.write(codecs.BOM_UTF8)
     botanic_info = csv.writer(botanicfile, delimiter='\t')
     botanic_info.writerow(['uuid', 'patent_id', 'latin_name', "variety"])
 
-    figurefile = open(os.path.join(fd2,'01_new_figures.csv'), 'wb')
+    figurefile = open(os.path.join(fd2,'figures.csv'), 'wb')
     figurefile.write(codecs.BOM_UTF8)
     figure_info = csv.writer(figurefile, delimiter='\t')
     figure_info.writerow(['uuid', 'patent_id', 'num_figs', "num_sheets"])
@@ -817,7 +818,7 @@ def parse_patents(fd, fd2):
                         if line.startswith('<city'):
                              city = re.search('<city>(.*?)</city>', line).group(1)
                         if line.startswith("<state"):
-                            invtstate = re.search('<state>(.*?)</state>',line).group(1)
+                            state = re.search('<state>(.*?)</state>',line).group(1)
                         if line.startswith('<country'):
                              country = re.search('<country>(.*?)</country>', line).group(1)
                     try: #nationality only in earlier years
@@ -836,7 +837,9 @@ def parse_patents(fd, fd2):
                     #this get us the non-inventor applicants in 2013+. Inventor applicants are in applicant and also in inventor.
                     non_inventor_app_types =  ['legal-representative', 'party-of-interest', 'obligated-assignee', 'assignee']
                     if later_applicant_type in non_inventor_app_types:
-                            non_inventor_applicant[id_generator()] = [patent_id, last_name, first_name, orgname, sequence, designation, later_applicant_type, street, city, state, country, nationality, residence]
+                            loc_idd = id_generator() 
+                            rawlocation[id_generator()] = [loc_idd,city,state, country] 
+                            non_inventor_applicant[id_generator()] = [patent_id, loc_idd, last_name, first_name, orgname, sequence, designation, later_applicant_type]
                     #this gets us the inventors from 2005-2012
                     if earlier_applicant_type == "applicant-inventor":
                         inventor_seq +=1
@@ -844,7 +847,9 @@ def parse_patents(fd, fd2):
                         rawlocation[id_generator()] = [loc_idd,city,state, country] 
                         rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, first_name,last_name,str(inventor_seq)]  
                     if (earlier_applicant_type != "applicant-inventor") and earlier_applicant_type!="NULL":
-                        non_inventor_applicant[id_generator()] = [patent_id, last_name, first_name, orgname, sequence, designation, earlier_applicant_type, street, city, state, country, nationality, residence]
+                        loc_idd = id_generator() 
+                        rawlocation[id_generator()] = [loc_idd,city,state, country] 
+                        non_inventor_applicant[id_generator()] = [patent_id, loc_idd, last_name, first_name, orgname, sequence, designation, earlier_applicant_type]
             except:
                 pass
 
@@ -911,6 +916,7 @@ def parse_patents(fd, fd2):
                     rawlawyer[id_generator()] = ["NULL",patent_id,fname,lname,laworg,lawcountry,str(i)]
             except:
                 pass
+
             
             if 'us-related-documents' in avail_fields:
                 related_docs = avail_fields['us-related-documents']
@@ -930,6 +936,7 @@ def parse_patents(fd, fd2):
                 possible_relations = ['<parent-doc>', '<parent-grant-document>', 
                                       '<parent-pct-document>', '<child-doc>']
                 rel_seq = 0
+                kind = None
                 for i in split_docs:
                     if i!='\r\n</': #sometimes this extra piece exists so we should get rid of it
                         doc_info = i.split("\n")
@@ -941,7 +948,7 @@ def parse_patents(fd, fd2):
                                 if line.startswith("<doc-number"):
                                     reldocno = re.search('<doc-number>(.*?)</doc-number>',line).group(1)
                                 if line.startswith("<kind"):
-                                    relkind = re.search('<kind>(.*?)</kind>',line).group(1)
+                                    kind = re.search('<kind>(.*?)</kind>',line).group(1)
                                 if line.startswith("<country"):
                                     relcountry = re.search('<country>(.*?)</country>',line).group(1)
                                 try:
@@ -955,7 +962,8 @@ def parse_patents(fd, fd2):
                                 except:
                                     print "Missing date on usreldoc"
                                     reldate = "0000-00-00"
-                            usreldoc[id_generator()] = [patent_id, doc_type, "NULL", reldocno, relkind, relcountry, reldate, "NULL", rel_seq]
+                            usreldoc[id_generator()] = [patent_id, doc_type, "NULL", reldocno, relcountry, reldate, "NULL", rel_seq, kind]
+                            #usrel.writerow(['uuid', 'patent_id', 'doc_type',  'relkind', 'reldocno', 'relcountry', 'reldate',  'parent_status', 'rel_seq','kind']) 
                             rel_seq +=1
                         else:
                             split_by_relation = iter_list_splitter([i], possible_relations)
@@ -971,7 +979,7 @@ def parse_patents(fd, fd2):
                                 else:
                                     reltype = "parent document" #because of how the text is split parent document doesn't in the doc info for the parent document
                                 reldocno=None
-                                relkind = None
+                                kind = None
                                 relcountry = None
                                 reldate = None
                                 relparentstatus = None
@@ -979,7 +987,7 @@ def parse_patents(fd, fd2):
                                     if line.startswith("<doc-number"):
                                         reldocno = re.search('<doc-number>(.*?)</doc-number>',line).group(1)
                                     if line.startswith("<kind"):
-                                        relkind = re.search('<kind>(.*?)</kind>',line).group(1)
+                                        kind = re.search('<kind>(.*?)</kind>',line).group(1)
                                     if line.startswith("<country"):
                                         relcountry = re.search('<country>(.*?)</country>',line).group(1)
                                     try:
@@ -996,7 +1004,8 @@ def parse_patents(fd, fd2):
                                     if line.startswith("<parent-status"):
                                         relparentstatus = re.search('<parent-status>(.*?)</parent-status', line).group(1)
                                 rel_seq +=1
-                                usreldoc[id_generator()] = [patent_id, doc_type, reltype, reldocno, relkind, relcountry, reldate,  relparentstatus, rel_seq]
+                                usreldoc[id_generator()] = [patent_id, doc_type, reltype, reldocno, relcountry, reldate,  relparentstatus, rel_seq, kind]
+                                
 
 
 
@@ -1077,17 +1086,21 @@ def parse_patents(fd, fd2):
                 draw_seq = 0
                 draw_des = avail_fields['description-of-drawings'].split("\n")
                 #print draw_des
+                draw_text =''
                 for line in draw_des:
                     if line.startswith("<p id"):
                         draw_seq +=1
                         #this hack deals with the fact that some miss the </p> ending
                         start, cut, text = line.partition('">')
                         draw_desc, cut, end = text.partition("</p")
-                        draw_desc_text[id_generator()] = [patent_id,"text", draw_desc, draw_seq]
+                        #draw_desc_text[id_generator()] = [patent_id,"text", draw_desc, draw_seq]
+                        draw_text += " " + draw_desc
                     if line.startswith("<heading"):
                         draw_seq +=1
                         heading = re.search(">(.*?)<", line).group(1)
-                        draw_desc_text[id_generator()] = [patent_id,"heading", heading, draw_seq]
+                        draw_text += " " + heading
+                        #draw_desc_text[id_generator()] = [patent_id,"heading", heading, draw_seq]
+                draw_desc_text[id_generator()] = [patent_id,draw_text]
             except:
                 pass
                 #print "Problem with drawing description"
@@ -1097,17 +1110,21 @@ def parse_patents(fd, fd2):
                 heading = "NULL"
                 text = "NULL"
                 brf_sum_seq = 0
+                brf_text = ''
                 for line in brf_sum:
                     if line.startswith("<p id"):
                         brf_sum_seq +=1
                         #this hack deals with the fact that some miss the </p> ending
                         start, cut, text = line.partition('">')
                         brf_sum, cut, end = text.partition("</p")
-                        brf_sum_text[id_generator()] = [patent_id,"text", brf_sum, brf_sum_seq]
+                        #brf_sum_text[id_generator()] = [patent_id,"text", brf_sum, brf_sum_seq]
+                        brf_text += ' ' + brf_sum
                     if line.startswith("<heading"):
                         brf_sum_seq +=1
                         heading = re.search(">(.*?)<", line).group(1)
-                        brf_sum_text[id_generator()] = [patent_id,"heading", heading, brf_sum_seq]
+                        brf_text += " " + heading
+                        #brf_sum_text[id_generator()] = [patent_id,"heading", heading, brf_sum_seq]
+                brf_sum_text[id_generator()] = [patent_id,brf_text]
             except:
                 pass
 
@@ -1116,6 +1133,7 @@ def parse_patents(fd, fd2):
                 det = avail_fields["DETDESC"].split("\n")
                 det_seq = 0
                 heading = "NULL"
+                detailed_text_field =""
                 for line in det:
                     if line.startswith("<p id"):
                         det_seq +=1
@@ -1125,11 +1143,14 @@ def parse_patents(fd, fd2):
                         #there are empty paragraph tags that flag lists and tables, for now we are skipping them
                         #maybe later import table or list from table and list parsing to improve completeness
                         if len(det_desc) > 5: #only include if there is a detailed desciption text in this tag
-                            detail_desc_text[id_generator()] = [patent_id,"text", det_desc, det_seq]
+                            detailed_text_field += " " + det_desc
+                            #detail_desc_text[id_generator()] = [patent_id,"text", det_desc, det_seq]
                     if line.startswith("<heading"):
                         det_seq +=1
                         heading = re.search(">(.*?)<", line).group(1)
-                        detail_desc_text[id_generator()] = [patent_id,"heading", heading, det_seq]
+                        detailed_text_field += " " + heading
+                        #detail_desc_text[id_generator()] = [patent_id,"heading", heading, det_seq]
+                detail_desc_text[id_generator()] = [patent_id, detailed_text_field]
             except:
                 pass
 
@@ -1152,12 +1173,13 @@ def parse_patents(fd, fd2):
                 us_term_of_grant[id_generator()] = [patent_id, lapse_of_patent, "NULL", text, length_of_grant, us_term_extension]
 
             if 'pct-or-regional-publishing-data' in avail_fields:
-                rel_id = None
                 number = None
                 date = None
                 country = None
+                rel_id = None
                 kind = None
-                publishing = avail_fields["pct-or-regional-publishing-data"].split("\n") 
+                date_102 = None
+                publishing = avail_fields["pct-or-regional-publishing-data"].split("\n")
                 for line in publishing:
                     try:
                         if line.startswith("<doc-number"):
@@ -1174,10 +1196,10 @@ def parse_patents(fd, fd2):
                             date = date[:4]+'-'+ date[4:6]+'-'+'01'
                     if line.startswith('<country'):
                          country = re.search('<country>(.*?)</country>', line).group(1)
-                pct_data[id_generator()] = [patent_id, rel_id, date, None, country, kind, "wo_grant"]
+                pct_data[id_generator()] = [patent_id, rel_id, date, None, country, kind, "wo_grant", None]
 
 
-            try:
+            if "pct-or-regional-filing-data" in avail_fields:
                 rel_id = None
                 number = None
                 date = None
@@ -1186,8 +1208,12 @@ def parse_patents(fd, fd2):
                 date_371= None
                 pct = avail_fields["pct-or-regional-filing-data"].split("<us-371c124-date") 
                 #split on us_371 date, because there are two date lines
-                pct_info = pct[0].split("\n")
-                info_371 = pct[1].split("\n")
+                try:
+                    pct_info = pct[0].split("\n")
+                    info_371 = pct[1].split("\n")
+                except:
+                    pct_info = pct[0].split("\n")
+                    info_371 = []
                 for line in pct_info:
                     if line.startswith("<doc-number"):
                         rel_id = re.search("<doc-number>(.*?)</doc-number>", line).group(1)
@@ -1209,9 +1235,8 @@ def parse_patents(fd, fd2):
                         else:
                             date3 = date3[:4]+'-'+ date3[4:6]+'-'+'01'
                         date_371 = date3
-                pct_data[id_generator()] = [patent_id, rel_id, date, date_371, country, kind, "pct_application"]
-            except:
-                pass
+                pct_data[id_generator()] = [patent_id, rel_id, date, date_371, country, kind, "pct_application", None]
+
 
             #us-issued (add to patents?)
             if "figures" in avail_fields:
@@ -1301,7 +1326,7 @@ def parse_patents(fd, fd2):
             for k,v in examiner.items():
                 examinerfile.writerow([k]+v)
 
-            for_priorityfile = csv.writer(open(os.path.join(fd2,'01_new_forpriority.csv'),'ab'),delimiter='\t')
+            for_priorityfile = csv.writer(open(os.path.join(fd2,'foreign_priority.csv'),'ab'),delimiter='\t')
             for k,v in for_priority.items():
                 for_priorityfile.writerow([k]+v)
 
@@ -1309,39 +1334,39 @@ def parse_patents(fd, fd2):
             for k,v in usreldoc.items():
                 usreldocfile.writerow([k]+v)
 
-            us_term_of_grantfile = csv.writer(open(os.path.join(fd2,'01_new_us_term_of_grant.csv'),'ab'),delimiter='\t')
+            us_term_of_grantfile = csv.writer(open(os.path.join(fd2,'us_term_of_grant.csv'),'ab'),delimiter='\t')
             for k,v in us_term_of_grant.items():
                 us_term_of_grantfile.writerow([k]+v)
 
-            non_inventor_applicantfile = csv.writer(open(os.path.join(fd2,'01_new_non_inventor_applicant.csv'),'ab'),delimiter='\t')
+            non_inventor_applicantfile = csv.writer(open(os.path.join(fd2,'non_inventor_applicant.csv'),'ab'),delimiter='\t')
             for k,v in non_inventor_applicant.items():
                 non_inventor_applicantfile.writerow([k]+v)
 
-            draw_desc_textfile = csv.writer(open(os.path.join(fd2,'01_new_draw_desc_text.csv'),'ab'),delimiter='\t')
+            draw_desc_textfile = csv.writer(open(os.path.join(fd2,'draw_desc_text.csv'),'ab'),delimiter='\t')
             for k,v in draw_desc_text.items():
                 draw_desc_textfile.writerow([k]+v)
 
-            brf_sum_textfile = csv.writer(open(os.path.join(fd2,'01_new_brf_sum_text.csv'),'ab'),delimiter='\t')
+            brf_sum_textfile = csv.writer(open(os.path.join(fd2,'brf_sum_text.csv'),'ab'),delimiter='\t')
             for k,v in brf_sum_text.items():
                 brf_sum_textfile.writerow([k]+v)
 
-            detail_desc_textfile = csv.writer(open(os.path.join(fd2,'01_new_detail_desc_text.csv'),'ab'),delimiter='\t')
+            detail_desc_textfile = csv.writer(open(os.path.join(fd2,'detail_desc_text.csv'),'ab'),delimiter='\t')
             for k,v in detail_desc_text.items():
                 detail_desc_textfile.writerow([k]+v)
 
-            rel_app_textfile = csv.writer(open(os.path.join(fd2,'01_new_rel_app_text.csv'),'ab'),delimiter='\t')
+            rel_app_textfile = csv.writer(open(os.path.join(fd2,'rel_app_text.csv'),'ab'),delimiter='\t')
             for k,v in rel_app_text.items():
                 rel_app_textfile.writerow([k]+v)
 
-            pct_datafile = csv.writer(open(os.path.join(fd2,'01_new_pct_data.csv'),'ab'),delimiter='\t')
+            pct_datafile = csv.writer(open(os.path.join(fd2,'pct_data.csv'),'ab'),delimiter='\t')
             for k,v in pct_data.items():
                 pct_datafile.writerow([k]+v)
 
-            botanicfile = csv.writer(open(os.path.join(fd2,'01_new_botanic.csv'),'ab'),delimiter='\t')
+            botanicfile = csv.writer(open(os.path.join(fd2,'botanic.csv'),'ab'),delimiter='\t')
             for k,v in botanic_data.items():
                 botanicfile.writerow([k]+v)
 
-            figuresfile = csv.writer(open(os.path.join(fd2,'01_new_figures.csv'),'ab'),delimiter='\t')
+            figuresfile = csv.writer(open(os.path.join(fd2,'figures.csv'),'ab'),delimiter='\t')
             for k,v in figure_data.items():
                 figuresfile.writerow([k]+v)
 
