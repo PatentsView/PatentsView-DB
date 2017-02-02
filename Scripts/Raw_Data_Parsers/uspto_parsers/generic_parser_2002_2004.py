@@ -126,12 +126,12 @@ def parse_patents(fd,fd2):
     subclass.writerow(['id'])
     
     ### New fields ###
-    forpriorityfile = open(os.path.join(fd2,'01_new_forpriority.csv'),'wb')
+    forpriorityfile = open(os.path.join(fd2,'forpriority.csv'),'wb')
     forpriorityfile.write(codecs.BOM_UTF8)
     forpriority = csv.writer(forpriorityfile,delimiter='\t')
     forpriority.writerow(['uuid', 'patent_id', "sequence", "kind", "app_num", "app_date", "country"])
 
-    us_term_of_grantfile = open(os.path.join(fd2,'01_new_us_term_of_grant.csv'), 'wb')
+    us_term_of_grantfile = open(os.path.join(fd2,'us_term_of_grant.csv'), 'wb')
     us_term_of_grantfile.write(codecs.BOM_UTF8)
     us_term_of_grant = csv.writer(us_term_of_grantfile, delimiter='\t')
     us_term_of_grant.writerow(['uuid','patent_id','lapse_of_patent', 'disclaimer_date' 'term_disclaimer', 'term_grant', 'term_ext'])
@@ -141,42 +141,42 @@ def parse_patents(fd,fd2):
     usrel = csv.writer(usreldocfile, delimiter='\t')
     usrel.writerow(['uuid', 'patent_id', 'doc_type',  'relkind', 'reldocno', 'relcountry', 'reldate',  'parent_status', 'rel_seq','kind'])
 
-    draw_desc_textfile = open(os.path.join(fd2,'01_new_draw_desc_text.csv'), 'wb')
+    draw_desc_textfile = open(os.path.join(fd2,'draw_desc_text.csv'), 'wb')
     draw_desc_textfile.write(codecs.BOM_UTF8)
     drawdesc = csv.writer(draw_desc_textfile, delimiter='\t')
     drawdesc.writerow(['uuid', 'patent_id', "text", "seq"])
 
-    brf_sum_textfile = open(os.path.join(fd2,'01_new_brf_sum_text.csv'), 'wb')
+    brf_sum_textfile = open(os.path.join(fd2,'brf_sum_text.csv'), 'wb')
     brf_sum_textfile.write(codecs.BOM_UTF8)
     brf_sum = csv.writer(brf_sum_textfile, delimiter='\t')
     brf_sum.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
 
-    det_desc_textfile = open(os.path.join(fd2,'01_new_detail_desc_text.csv'), 'wb')
+    det_desc_textfile = open(os.path.join(fd2,'detail_desc_text.csv'), 'wb')
     det_desc_textfile.write(codecs.BOM_UTF8)
     det_desc = csv.writer(det_desc_textfile, delimiter='\t')
     det_desc.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
 
-    rel_app_textfile = open(os.path.join(fd2,'01_new_rel_app_text.csv'), 'wb')
+    rel_app_textfile = open(os.path.join(fd2,'rel_app_text.csv'), 'wb')
     rel_app_textfile.write(codecs.BOM_UTF8)
     rel_app = csv.writer(rel_app_textfile, delimiter='\t')
     rel_app.writerow(['uuid', 'patent_id',"text"])
 
-    non_inventor_applicantfile = open(os.path.join(fd2,'01_new_non_inventor_applicant.csv'),'wb')
+    non_inventor_applicantfile = open(os.path.join(fd2,'non_inventor_applicant.csv'),'wb')
     non_inventor_applicantfile.write(codecs.BOM_UTF8)
     noninventorapplicant = csv.writer(non_inventor_applicantfile,delimiter='\t')
     noninventorapplicant.writerow(['uuid', 'patent_id', "last_name", "first_name", "sequence", "designation", "applicant_type", "street", "city", "state", "country", "nationality", "residence"])
 
-    pct_datafile = open(os.path.join(fd2,'01_new_pct_data.csv'), 'wb')
+    pct_datafile = open(os.path.join(fd2,'pct_data.csv'), 'wb')
     pct_datafile.write(codecs.BOM_UTF8)
     pct_data = csv.writer(pct_datafile, delimiter='\t')
     pct_data.writerow(['uuid', 'patent_id', 'rel_id', 'date', '371_date', 'country', 'kind', "doc_type","102_date"])
 
-    botanicfile = open(os.path.join(fd2,'01_new_botanic.csv'), 'wb')
+    botanicfile = open(os.path.join(fd2,'botanic.csv'), 'wb')
     botanicfile.write(codecs.BOM_UTF8)
     botanic_info = csv.writer(botanicfile, delimiter='\t')
     botanic_info.writerow(['uuid', 'patent_id', 'latin_name', "variety"])
 
-    figurefile = open(os.path.join(fd2,'01_new_figures.csv'), 'wb')
+    figurefile = open(os.path.join(fd2,'figures.csv'), 'wb')
     figurefile.write(codecs.BOM_UTF8)
     figure_info = csv.writer(figurefile, delimiter='\t')
     figure_info.writerow(['uuid', 'patent_id', 'num_figs', "num_sheets"])
@@ -247,7 +247,7 @@ def parse_patents(fd,fd2):
                    '04': 'SIR'
                    }    
     ### !For loggroups the last one will never be parsed but needs to be valid and required for parsing everything before it!
-    loggroups = ['B100','B200','B300','B400','B510','B521','B522','B540','B561','B562','B570','B580','B595','B596','B600','B721','B731','B732US','B741','B746', 'B747', 'B748US', 'B860','B870','BRFSUM',"DETDESC","DRWDESC", 'SDOAB','CL']
+    loggroups = ['B100','B200','B300','B400','B510','B521','B522','B540','B561','B562','B570','B580','B590','B600','B721','B731','B732US','B741','B746', 'B747', 'B748US', 'B860','B870','BRFSUM',"DETDESC","DRWDESC", 'SDOAB','CL']
     numi = 0
     num = 0
     
@@ -263,7 +263,6 @@ def parse_patents(fd,fd2):
         infile = inp.open(i).read().decode('utf-8','ignore').replace('&angst','&aring')
         infile = infile.encode('utf-8','ignore')
         infile = _char.sub(_char_unescape,infile)
-        #infile = h.unescape(infile).encode('utf-8')
         infile = infile.split('<!DOCTYPE')
         del infile[0]
         numi+=len(infile)
@@ -428,15 +427,13 @@ def parse_patents(fd,fd2):
             numsheets = ''
             numfigs = ''
             try:
-                patent = avail_fields['B595']
-                #print patent
-                numsheets = re.search('<PDAT>(.*?)</PDAT>',patent).group(1)
-            except:
-                pass
-            
-            try:
-                patent = avail_fields['B596']
-                numfigs = re.search('<PDAT>(.*?)</PDAT>',patent).group(1)
+                patent = avail_fields['B590']
+                numsheets = re.search('<B595><PDAT>(.*?)</PDAT></B595',patent)
+                if numsheets:
+                    numsheets = numsheets.group(1)
+                numfigs = re.search('<B596><PDAT>(.*?)</PDAT></B596',patent)
+                if numfigs:
+                    numfigs = numfigs.group(1)
             except:
                 pass
             
@@ -1165,30 +1162,30 @@ def parse_patents(fd,fd2):
             else:
                 patentdata[patent_id] = ['NULL',updnum,'US',issdate,abst,title,patkind,numclaims,d]
             
-            brf_sum_textfile = csv.writer(open(os.path.join(fd2,'01_new_brf_sum_text.csv'),'ab'),delimiter='\t')
+            brf_sum_textfile = csv.writer(open(os.path.join(fd2,'brf_sum_text.csv'),'ab'),delimiter='\t')
             brf_sum_textfile.writerow([id_generator(),patent_id,"",bsum,'0'])
             
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'),delimiter='\t')
             for k,v in patentdata.items():
                 patfile.writerow([k]+v)
             
-            det_desc_textfile = csv.writer(open(os.path.join(fd2,'01_new_detail_desc_text.csv'),'ab'),delimiter='\t')
+            det_desc_textfile = csv.writer(open(os.path.join(fd2,'detail_desc_text.csv'),'ab'),delimiter='\t')
             det_desc_textfile.writerow([id_generator(),patent_id,"",detdesc,'0'])
             
-            draw_desc_textfile = csv.writer(open(os.path.join(fd2,'01_new_draw_desc_text.csv'),'ab'),delimiter='\t')
+            draw_desc_textfile = csv.writer(open(os.path.join(fd2,'draw_desc_text.csv'),'ab'),delimiter='\t')
             for k,v in drawdescdata.items():
                 draw_desc_textfile.writerow([k]+v)
             
-            figurefile = csv.writer(open(os.path.join(fd2,'01_new_figures.csv'),'ab'),delimiter='\t')
+            figurefile = csv.writer(open(os.path.join(fd2,'figures.csv'),'ab'),delimiter='\t')
             for k,v in figureinfo.items():
                 figurefile.writerow([k]+v)
              
-            rel_app_textfile = csv.writer(open(os.path.join(fd2,'01_new_rel_app_text.csv'),'ab'),delimiter='\t')
+            rel_app_textfile = csv.writer(open(os.path.join(fd2,'rel_app_text.csv'),'ab'),delimiter='\t')
             for k,v in relappdata.items():
                 v = [vv.encode('utf-8','ignore') for vv in v]
                 rel_app_textfile.writerow([k]+v)
                 
-            pct_datafile = csv.writer(open(os.path.join(fd2,'01_new_pct_data.csv'),'ab'),delimiter='\t')
+            pct_datafile = csv.writer(open(os.path.join(fd2,'pct_data.csv'),'ab'),delimiter='\t')
             for k,v in pctdata.items():
                 pct_datafile.writerow([k]+v)
             
@@ -1196,7 +1193,7 @@ def parse_patents(fd,fd2):
             for k,v in usreldoc.items():
                 usreldocfile.writerow([k]+v)
             
-            forpriorityfile = csv.writer(open(os.path.join(fd2,'01_new_forpriority.csv'),'ab'),delimiter='\t')
+            forpriorityfile = csv.writer(open(os.path.join(fd2,'forpriority.csv'),'ab'),delimiter='\t')
             for k,v in prioritydata.items():
                 forpriorityfile.writerow([k]+v)
             
@@ -1249,7 +1246,7 @@ def parse_patents(fd,fd2):
             for k,v in examiner.items():
                 examinerfile.writerow([k]+v)
             
-            us_term_of_grantfile = csv.writer(open(os.path.join(fd2,'01_new_us_term_of_grant.csv'),'ab'),delimiter='\t')
+            us_term_of_grantfile = csv.writer(open(os.path.join(fd2,'us_term_of_grant.csv'),'ab'),delimiter='\t')
             for k,v in termofgrant.items():
                 us_term_of_grantfile.writerow([k]+v)
             
