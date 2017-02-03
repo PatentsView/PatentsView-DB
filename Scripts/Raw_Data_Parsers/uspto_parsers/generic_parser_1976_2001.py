@@ -216,7 +216,7 @@ def parse_patents(fd,fd2):
       print d
       inp = zipfile.ZipFile(os.path.join(fd,d))
       for i in inp.namelist():
-        infile = h.unescape(inp.open(i).read().decode('utf-8','ignore').replace('&angst','&aring')).split('PATN')
+        infile = h.unescape(inp.open(i).read().decode('utf-8','ignore').replace('&angst','&aring')).replace("\r","").split('PATN')
         del infile[0]
 
         for i in infile:
