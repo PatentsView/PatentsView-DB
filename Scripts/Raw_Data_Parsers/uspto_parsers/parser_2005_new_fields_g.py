@@ -60,7 +60,7 @@ def parse_patents(fd, fd2):
     claimsfile = open(os.path.join(fd2,'claim.csv'),'wb')
     claimsfile.write(codecs.BOM_UTF8)
     clms = csv.writer(claimsfile,delimiter='\t')
-    clms.writerow(['uuid','patent_id','text','dependent','sequence', "exemplary"])
+    clms.writerow(['uuid','patent_id','text','dependent','sequence', 'exemplary'])
     
     
     rawlocfile = open(os.path.join(fd2,'rawlocation.csv'),'wb')
@@ -73,7 +73,7 @@ def parse_patents(fd, fd2):
     rawinvfile.write(codecs.BOM_UTF8)
     rawinv = csv.writer(rawinvfile,delimiter='\t')
     #also no inventor id in UC Berkeley
-    rawinv.writerow(['uuid','patent_id', 'inventor_id','rawlocation_id','name_first','name_last','sequence'])
+    rawinv.writerow(['uuid','patent_id', 'inventor_id','rawlocation_id','name_first','name_last', 'sequence', "rule_47"])
     
     
     rawassgfile = open(os.path.join(fd2,'rawassignee.csv'),'wb')
@@ -90,7 +90,7 @@ def parse_patents(fd, fd2):
     patfile = open(os.path.join(fd2,'patent.csv'),'wb')
     patfile.write(codecs.BOM_UTF8)
     pat = csv.writer(patfile,delimiter='\t')
-    pat.writerow(['id','type','number','country','date','abstract','title','kind','num_claims', "rule_47", 'filename'])
+    pat.writerow(['id','type','number','country','date','abstract','title','kind','num_claims', 'filename'])
     
     foreigncitfile = open(os.path.join(fd2,'foreigncitation.csv'),'wb')
     foreigncitfile.write(codecs.BOM_UTF8)
@@ -167,7 +167,7 @@ def parse_patents(fd, fd2):
     rel_app_textfile = open(os.path.join(fd2,'rel_app_text.csv'), 'wb')
     rel_app_textfile.write(codecs.BOM_UTF8)
     rel_app = csv.writer(rel_app_textfile, delimiter='\t')
-    rel_app.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
+    rel_app.writerow(['uuid', 'patent_id', 'text'])
 
     det_desc_textfile = open(os.path.join(fd2,'detail_desc_text.csv'), 'wb')
     det_desc_textfile.write(codecs.BOM_UTF8)
@@ -293,12 +293,7 @@ def parse_patents(fd, fd2):
                 avail_fields["figures"] = figures
             except:
                 pass
-            '''
-            try:
-                us_issued = re.search('us-issued-on-continued-prosecution-application grant-cpa-text="(.*?)"', i).group(1)
-            except:
-                pass
-            '''
+    
             try:
                 sir_tag = re.search('us-sir-flag sir-text="(.*?)"', i).group(1)
             except:
@@ -422,12 +417,6 @@ def parse_patents(fd, fd2):
                 application[appdate[:4]+"/"+appnum] = [patent_id, series_code, appnum, patcountry, appdate]
             except:
                 pass
-            try:
-                us_issued = None
-                us_issued = re.search('us-issued-on-continued-prosecution-application grant-cpa-text="(.*?)"', i).group(1)
-                # we decided to ignore this
-            except:
-                pass
             
             try:
                 numclaims = 0
@@ -438,7 +427,7 @@ def parse_patents(fd, fd2):
 
             except:
                 pass
-            
+
             if "us-exemplary-claim" in avail_fields:
                 if type(avail_fields["us-exemplary-claim"]) ==str: #if there is only one claim make list for processing
                         claim = [avail_fields["us-exemplary-claim"]]
@@ -447,7 +436,6 @@ def parse_patents(fd, fd2):
                 exemplary_claims = []
                 for item in claim:
                     exemplary_claims.append(re.search(">(.*?)<", item).group(1))
-            
             
 
             #claims_list = []
@@ -542,7 +530,7 @@ def parse_patents(fd, fd2):
                             classification_status = re.search('<classification-status>(.*?)</classification-status>', line).group(1)
                         if line.startswith("<classification-data-source"):
                             classification_source = re.search('<classification-data-source>(.*?)</classification-data-source>', line).group(1)
-                        if line.startswith("<date>"):
+                        if line.startswith("<action-date>"):
                             action_date = re.search('<date>(.*?)</date>', line).group(1)
                             if action_date[6:] != "00":
                                     action_date = action_date[:4]+'-'+action_date[4:6]+'-'+action_date[6:]
@@ -770,7 +758,6 @@ def parse_patents(fd, fd2):
                     rawassignee[id_generator()] = [patent_id, None, loc_idd,assgtype,assgfname,assglname,assgorg,str(i)]
                     #how to handle assignee id, for now it is null
 
-
             try:
                 if 'applicants' in avail_fields:
                     applicant_list = re.split("</applicant>", avail_fields['applicants'])
@@ -845,7 +832,7 @@ def parse_patents(fd, fd2):
                         inventor_seq +=1
                         loc_idd = id_generator() 
                         rawlocation[id_generator()] = [loc_idd,city,state, country] 
-                        rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, first_name,last_name,str(inventor_seq)]  
+                        rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, first_name,last_name, str(inventor_seq), rule_47]  
                     if (earlier_applicant_type != "applicant-inventor") and earlier_applicant_type!="NULL":
                         loc_idd = id_generator() 
                         rawlocation[id_generator()] = [loc_idd,city,state, country] 
@@ -889,7 +876,7 @@ def parse_patents(fd, fd2):
                     if fname == "NULL" and lname == "NULL": 
                          pass 
                     else: 
-                         rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, fname,lname,str(i+1)]
+                         rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, fname,lname, str(i+1), rule_47]
             except:
                 pass
             
@@ -1070,15 +1057,18 @@ def parse_patents(fd, fd2):
             try:
                 rel_app = avail_fields["RELAPP"].split("\n")
                 rel_app_seq = 0
+                text_field = ""
                 for line in rel_app:
                     if line.startswith("<heading"):
                         rel_app_seq +=1
                         heading = re.search(">(.*?)<", line).group(1)
-                        rel_app_text[id_generator()] = [patent_id,"heading", heading, rel_app_seq]
+                        text_field += heading + " "
+                        #rel_app_text[id_generator()] = [patent_id,"heading", heading, rel_app_seq]
                     if line.startswith("<p"):
                         rel_app_seq +=1
                         text = re.search(">(.*?)</p>", line).group(1)
-                        rel_app_text[id_generator()] = [patent_id,"text", text, rel_app_seq]
+                        text_field += text + " "
+                rel_app_text[id_generator()] = [patent_id, text_field]
             except:
                 pass
            
@@ -1093,14 +1083,17 @@ def parse_patents(fd, fd2):
                         #this hack deals with the fact that some miss the </p> ending
                         start, cut, text = line.partition('">')
                         draw_desc, cut, end = text.partition("</p")
-                        #draw_desc_text[id_generator()] = [patent_id,"text", draw_desc, draw_seq]
-                        draw_text += " " + draw_desc
+                        soup = bs(draw_desc, "lxml")
+                        text = soup.get_text()
+                        text = [piece.encode('utf-8','ignore') for piece in text]
+                        text = "".join(text)
+                        draw_desc_text[id_generator()] = [patent_id, text, draw_seq]
                     if line.startswith("<heading"):
                         draw_seq +=1
                         heading = re.search(">(.*?)<", line).group(1)
-                        draw_text += " " + heading
-                        #draw_desc_text[id_generator()] = [patent_id,"heading", heading, draw_seq]
-                draw_desc_text[id_generator()] = [patent_id,draw_text]
+                        #draw_text += " " + heading
+                        draw_desc_text[id_generator()] = [patent_id, heading, draw_seq]
+               # draw_desc_text[id_generator()] = [patent_id,draw_text]
             except:
                 pass
                 #print "Problem with drawing description"
@@ -1129,7 +1122,7 @@ def parse_patents(fd, fd2):
                 pass
 
 
-            try:
+            if "DETDESC" in avail_fields:
                 det = avail_fields["DETDESC"].split("\n")
                 det_seq = 0
                 heading = "NULL"
@@ -1150,9 +1143,11 @@ def parse_patents(fd, fd2):
                         heading = re.search(">(.*?)<", line).group(1)
                         detailed_text_field += " " + heading
                         #detail_desc_text[id_generator()] = [patent_id,"heading", heading, det_seq]
-                detail_desc_text[id_generator()] = [patent_id, detailed_text_field]
-            except:
-                pass
+                soup = bs(detailed_text_field, "lxml")
+                text = soup.get_text()
+                text = [piece.encode('utf-8','ignore') for piece in text]
+                text = "".join(text)
+                detail_desc_text[id_generator()] = [patent_id, text]
 
             if 'us-term-of-grant' in avail_fields:
                 us_term_of_grant_temp = avail_fields['us-term-of-grant']
@@ -1266,7 +1261,7 @@ def parse_patents(fd, fd2):
                         print "Problem with botanic"
                 botanic_data[id_generator()] = [patent_id, latin_name, variety]
 
-            patentdata[patent_id] = [apptype,docno,'US',issdate,abst,title,patkind,numclaims,rule_47, d]
+            patentdata[patent_id] = [apptype,docno,'US',issdate,abst,title,patkind,numclaims, d]
 
 
                         
