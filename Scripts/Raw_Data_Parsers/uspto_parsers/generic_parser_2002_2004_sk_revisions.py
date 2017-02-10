@@ -1126,8 +1126,11 @@ def parse_patents(fd,fd2):
             detdesc = 'NULL'
             try:
                 patent = avail_fields['DETDESC']
-                detdesc = bs(re.search('<BTEXT>(.*?)</BTEXT>',patent,re.DOTALL).group(1))
-                detdesc = re.sub('\s+',' ',detdesc.get_text().decode('utf-8','ignore').encode('utf-8','ignore'))
+                detdesc = re.search('<BTEXT>(.*?)</BTEXT>',patent,re.DOTALL).group(1)
+                detdesc = detdesc.replace('<H LVL="1">','')
+                detdesc = detdesc.replace('</H>','')
+                detdesc = bs(re.sub('\s+',' ',detdesc))
+                detdesc = re.sub('\s+',' ',re.sub('<.*?>','',detdesc.get_text().decode('utf-8','ignore').encode('utf-8','ignore')))
             except:
                 pass
 
@@ -1137,7 +1140,7 @@ def parse_patents(fd,fd2):
                 drawdesc = bs(re.search('<BTEXT>(.*?)</BTEXT>',patent,re.DOTALL).group(1))
                 drawdesc = drawdesc.findAll('pdat')
                 for e,draw_description in enumerate(drawdesc):
-                    drawdescdata[id_generator()] =[patent_id, re.sub('\s+',' ',draw_description.get_text().decode('utf-8','ignore').encode('utf-8','ignore')),str(e)] 
+                    drawdescdata[id_generator()] =[patent_id, re.sub('\s+',' ',re.sub('<.*?>','',draw_description.get_text().decode('utf-8','ignore').encode('utf-8','ignore'))),str(e)] 
             except:
                 pass
             
@@ -1159,7 +1162,9 @@ def parse_patents(fd,fd2):
                 else:
                     bsum = '<H LVL="1"><STEXT>'+'<STEXT>'.join(bsum)
                 ### need to separate relapp
-                bsum = re.sub('\s+',' ',unidecode(bs(bsum).get_text()))
+                bsum = re.sub('\s+',' ',unidecode(re.sub('<.*?>','',bs(bsum).get_text())))
+                if bsum == "[]":
+                    bsum = 'NULL'
             except:
                 pass
             
