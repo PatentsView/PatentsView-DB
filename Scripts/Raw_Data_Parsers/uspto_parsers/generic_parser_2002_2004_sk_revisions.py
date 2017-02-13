@@ -7,6 +7,7 @@ def parse_patents(fd,fd2):
     import htmlentitydefs
 
     _char = re.compile(r'&(\w+?);')
+    print ("this is coppied from Github!")
     
     # Generate some extra HTML entities
     defs=htmlentitydefs.entitydefs
@@ -1130,10 +1131,28 @@ def parse_patents(fd,fd2):
                 detdesc = detdesc.replace('<H LVL="1">','')
                 detdesc = detdesc.replace('</H>','')
                 detdesc = bs(re.sub('\s+',' ',detdesc))
-                detdesc = re.sub('\s+',' ',re.sub('<.*?>','',detdesc.get_text().decode('utf-8','ignore').encode('utf-8','ignore')))
+                detdesc = re.sub('<.*?>','',detdesc.get_text())
+                try:
+                    detdesc = detdesc.decode('utf-8','ignore').encode('utf-8','ignore')
+                except:
+                    detdesc = unidecode(detdesc)
+                #print detdesc
             except:
                 pass
 
+            try:
+                patent = avail_fields['DRWDESC']
+                lines = patent.split("\n")
+                draw_seq = 0
+                for line in lines:
+                    if line.startswith("<PARA") or line.startswith("<H"):
+                        drawdesc = re.findall('<PDAT>(.*?)</PDAT>', line, re.DOTALL)
+                        desc = " ".join(drawdesc)
+                        drawdescdata[id_generator()] = [patent_id, desc, str(draw_seq)]
+                        draw_seq +=1
+            except:
+                pass
+            '''
             #Drawing description
             try:
                 patent = avail_fields['DRWDESC']
@@ -1143,7 +1162,7 @@ def parse_patents(fd,fd2):
                     drawdescdata[id_generator()] =[patent_id, re.sub('\s+',' ',re.sub('<.*?>','',draw_description.get_text().decode('utf-8','ignore').encode('utf-8','ignore'))),str(e)] 
             except:
                 pass
-            
+            '''
             #Brief summary
             bsum = 'NULL'
             try:
@@ -1276,3 +1295,4 @@ def parse_patents(fd,fd2):
         subclassfile.writerow(v)
 
     print numi
+
