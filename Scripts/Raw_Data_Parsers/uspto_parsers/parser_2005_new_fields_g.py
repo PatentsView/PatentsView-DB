@@ -298,9 +298,9 @@ def parse_patents(fd, fd2):
                 sir_tag = re.search('us-sir-flag sir-text="(.*?)"', i).group(1)
             except:
                 pass
-            rule_47 = False
+            rule_47 = 0
             if "rule-47-flag" in i:
-                rule_47 = True
+                rule_47 = 1
 
 
             
@@ -508,8 +508,8 @@ def parse_patents(fd, fd2):
                             class_level = re.search('<classification-level>(.*?)</classification-level>',line).group(1)
                         if line.startswith("<section"):
                             section = re.search('<section>(.*?)</section>', line).group(1)
-                        if line.startswith("<main-classification"):
-                            mainclass = re.search('<main-classification>(.*?)</main-classification>', line).group(1)
+                        if line.startswith("<class>"):
+                            mainclass = re.search('<class>(.*?)</class>', line).group(1)
                         if line.startswith("<subclass"):
                             subclass = re.search('<subclass>(.*?)</subclass>', line).group(1)
                         if line.startswith("<main-group"):
@@ -1122,7 +1122,7 @@ def parse_patents(fd, fd2):
                 pass
 
 
-            if "DETDESC" in avail_fields:
+            try:
                 det = avail_fields["DETDESC"].split("\n")
                 det_seq = 0
                 heading = "NULL"
@@ -1148,6 +1148,8 @@ def parse_patents(fd, fd2):
                 text = [piece.encode('utf-8','ignore') for piece in text]
                 text = "".join(text)
                 detail_desc_text[id_generator()] = [patent_id, text]
+            except:
+                pass
 
             if 'us-term-of-grant' in avail_fields:
                 us_term_of_grant_temp = avail_fields['us-term-of-grant']

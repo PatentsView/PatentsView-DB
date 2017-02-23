@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import argparse
-from uspto_parsers import generic_parser_1976_2001_b_examiner, parser_2004_e_examiner,csv_to_mysql,uspc_table,merge_db_script, parser_2005_new_fields_f
+import timeit
+from uspto_parsers import generic_parser_1976_2001new7, generic_parser_2002_2004_new10 ,csv_to_mysql,uspc_table,merge_db_script, parser_2005_new_fields_g
 
 parser = argparse.ArgumentParser(description='This program is used to parse USPTO full-text patent grant data for 1976-2004 and also uploading parsed data to MySQL.',epilog='(Example syntax for parsing raw data: python parser_wrapper.py --input-dir "uspto_raw/1976-2001/" --output-dir "uspto_parsed/1976-2001/" --period 1)\n (Example syntax for uploading to MySQL: python parser_wrapper.py --mysql 1 --mysql-input-dir "c:/uspto_parsed/1976-2001/" --mysql-host "localhost" --mysql-username "root" --mysql-passwd "password" --mysql-dbname "uspto")\n (Example syntax to create USPC tables: python parser_wrapper.py --uspc-create 1 --uspc-input-dir "c:/master_classfiles/")\n (Example syntax for USPC upload to MySQL: python parser_wrapper.py --uspc-upload 1 --uspc-upload-dir "c:/master_classfiles" --mysql-host .. --mysql-username .. --mysql-passwd .. --uspc-appdb app_smalltest --uspc-patdb grant_smalltest)' )
 parser.add_argument('--input-dir',help='Full path to directory where all patent raw files are located (TXT or XML format; as downloaded from Google Patents or ReedTech).')
@@ -8,6 +9,7 @@ parser.add_argument('--output-dir',help='Full path to directory where to write a
 parser.add_argument('--period',default="5",choices=['1','2', '3'],help='Enter 1 for 1976-2001 or 2 for 2002-2004 or 3 for 2005+.')
 parser.add_argument('--mysql',default="0",choices=['1','0'],required=False,help='If you want to upload resultant files into MySQL - please specify "1" here and MySQL output-dir and connection data.')
 parser.add_argument('--mysql-input-dir',help="Full path to directory with all output csv files to upload to MySQL.")
+parser.add_argument('--mysql-output-dir',help="Full path to directory for output MySQL.")
 parser.add_argument('--mysql-host',help="Specify MySQL host.")
 parser.add_argument('--mysql-username',help="Specify MySQL username.")
 parser.add_argument('--mysql-passwd',help="Specify MySQL password.")
@@ -25,26 +27,40 @@ parser.add_argument('--sourcedb',help="Please provide what DBs you want to merge
 parser.add_argument('--targetdb',help="Please provide name of target DB")
 
 
-
 params = parser.parse_args()
 
 if int(params.period) == 1:
-    generic_parser_1976_2001_b_examiner.parse_patents(params.input_dir,params.output_dir)
+	parser = generic_parser_1976_2001new7.parse_patents
+	input_dir = params.input_dir
+	output_dir = params.output_dir
+	print(timeit.timeit('parser(input_dir, output_dir)', setup="from __main__ import parser, input_dir, output_dir", number= 1))
+    #print(timeit.timeit(partial(generic_parser_1976_2001new7.parse_patents(), params.input_dir,params.output_dir)))
 
 elif int(params.period) == 2:
-    parser_2004_e_examiner.parse_patents(params.input_dir,params.output_dir)
+	parser = generic_parser_2002_2004_new10.parse_patents
+	input_dir = params.input_dir
+	output_dir = params.output_dir
+	print(timeit.timeit('parser(input_dir, output_dir)', setup="from __main__ import parser, input_dir, output_dir", number= 1))
+    #print(timeit.timeit('generic_parser_2002_2004_new10.parse_patents(params.input_dir,params.output_dir)', number= 1, globals=globals()))
 
 elif int(params.period)==3:
-	parser_2005_new_fields_f.parse_patents(params.input_dir, params.output_dir)
+	parser = parser_2005_new_fields_g.parse_patents
+	input_dir = params.input_dir
+	output_dir = params.output_dir
+	print(timeit.timeit('parser(input_dir, output_dir)', setup="from __main__ import parser, input_dir, output_dir", number= 1))
+	#print(timeit.timeit('parser_2005_new_fields_g.parse_patents(params.input_dir, params.output_dir)', number= 1, globals=globals()))
+
+# elif int(params.mysql) == 1 and int(params.period) not in range(1,4):
+#    csv_to_mysql.mysql_upload (params.mysql_host,params.mysql_username,params.mysql_passwd,params.mysql_dbname,params.mysql_input_dir, params.mysql_output_dir)
 
 elif int(params.mysql) == 1 and int(params.period) not in range(1,4):
-    csv_to_mysql.mysql_upload(params.mysql_host,params.mysql_username,params.mysql_passwd,params.mysql_dbname,params.mysql_input_dir)
+    csv_to_mysql.upload_csv (params.mysql_host,params.mysql_username,params.mysql_passwd,params.mysql_dbname,params.mysql_input_dir)
 
 elif int(params.uspc_create) == 1 and int(params.period) not in range(1,4):
     uspc_table.uspc_table(params.uspc_input_dir)
 
 elif int(params.uspc_upload) == 1 and int(params.period) not in range(1,4):
-    csv_to_mysql.upload_uspc(params.mysql_host,params.mysql_username,params.mysql_passwd,params.appdb,params.patdb,params.uspc_upload_dir)
+    csv_to_mysql.upload_uspc(params.mysql_host,params.mysql_username,params.mysql_passwd,params.appdb,params.patdb,params.uspc_upload_dir, params.output_dir)
 
 elif int(params.cpc_upload) == 1 and int(params.period) not in range(1,4):
     csv_to_mysql.upload_cpc(params.mysql_host,params.mysql_username,params.mysql_passwd,params.appdb,params.patdb,params.cpc_upload_dir)
