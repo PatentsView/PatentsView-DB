@@ -69,7 +69,7 @@ def parse_patents(fd,fd2):
     examinerfile = open(os.path.join(fd2,'examiner.csv'),'wb')
     examinerfile.write(codecs.BOM_UTF8)
     exam = csv.writer(examinerfile,delimiter='\t')
-    exam.writerow(['id','patent_id','fname','lname','role','group','sequence'])
+    exam.writerow(['id','patent_id','fname','lname','role','group'])
 
     rawassgfile = open(os.path.join(fd2,'rawassignee.csv'),'wb')
     rawassgfile.write(codecs.BOM_UTF8)
@@ -1103,23 +1103,21 @@ def parse_patents(fd,fd2):
                 if "B746" in avail_fields:
                     pexfname = "NULL"
                     pexlname = "NULL"
-                    sequence +=1
                     prim_examiners = avail_fields['B746'].split("\n")
                     for line in prim_examiners:
                         if line.startswith("<NAM>"):
                             pexfname = re.search('<FNM><PDAT>(.*?)</PDAT>',line).group(1)
                             pexlname = re.search('<SNM><STEXT><PDAT>(.*?)</PDAT>',line).group(1)
-                    examiner[id_generator()] = [patent_id, pexfname, pexlname, "primary", id_group, sequence]
+                    examiner[id_generator()] = [patent_id, pexfname, pexlname, "primary", id_group]
                 if "B747" in avail_fields:
                     aexfname = "NULL"
                     aexlname = "NULL"
-                    sequence +=1
                     assist_examiners = avail_fields['B747'].split("\n")
                     for line in assist_examiners:
                         if line.startswith("<NAM>"):
                             aexfname = re.search('<FNM><PDAT>(.*?)</PDAT>',line).group(1)
                             aexlname = re.search('<SNM><STEXT><PDAT>(.*?)</PDAT>',line).group(1)
-                    examiner[id_generator()] = [patent_id, aexfname, aexlname, "assistant", id_group, sequence]
+                    examiner[id_generator()] = [patent_id, aexfname, aexlname, "assistant", id_group]
             except:
                 pass
 

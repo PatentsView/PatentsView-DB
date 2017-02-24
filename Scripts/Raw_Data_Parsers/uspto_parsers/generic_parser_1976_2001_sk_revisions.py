@@ -94,7 +94,7 @@ def parse_patents(fd,fd2):
     examfile = open(os.path.join(fd2,'examiner.csv'),'wb')
     examfile.write(codecs.BOM_UTF8)
     examiner = csv.writer(examfile,delimiter='\t')
-    examiner.writerow(['id','patent_id','fname','lname','role','group','sequence'])
+    examiner.writerow(['id','patent_id','fname','lname','role','group'])
     
     rawlawyerfile = open(os.path.join(fd2,'rawlawyer.csv'),'wb')
     rawlawyerfile.write(codecs.BOM_UTF8)
@@ -376,13 +376,13 @@ def parse_patents(fd,fd2):
                         assistexam = re.search('EXA\s+(.*?)$',line).group(1).split("; ")
                         assistexamfname = assistexam[1]
                         assistexamlname = assistexam[0]
-                        examiner[id_generator()] = [patent_id,assistexamfname,assistexamlname,"assistant", "NULL", sequence]
+                        examiner[id_generator()] = [patent_id,assistexamfname,assistexamlname,"assistant", "NULL"]
                     if line.startswith("EXP"):
                         sequence +=1
                         primexam = re.search('EXP\s+(.*?)$',line).group(1).split("; ")
                         primexamfname = primexam[1]
                         primexamlname = primexam[0]
-                        examiner[id_generator()] = [patent_id,primexamfname,primexamlname,"primary", "NULL", sequence]
+                        examiner[id_generator()] = [patent_id,primexamfname,primexamlname,"primary", "NULL"]
                     if line.startswith("ECL"):                     
                         exemplary = re.search('ECL\s+(.*?)$',line).group(1)
                         exemplary_list = exemplary.split(",")
@@ -722,7 +722,7 @@ def parse_patents(fd,fd2):
             #PCT info
             try:
                 pctinfo = avail_fields['PCTA'].split('\n\n\n\n\n')
-                print pctinfo
+                #print pctinfo
                 for n in range(len(pctinfo)):
                     pctnum = 'NULL'
                     pct371 = 'NULL'

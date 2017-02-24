@@ -136,7 +136,7 @@ def parse_patents(fd, fd2):
     examinerfile = open(os.path.join(fd2,'examiner.csv'),'wb')
     examinerfile.write(codecs.BOM_UTF8)
     exam = csv.writer(examinerfile,delimiter='\t')
-    exam.writerow(['id','patent_id','fname','lname','role','group','sequence'])
+    exam.writerow(['id','patent_id','fname','lname','role','group'])
 
     forpriorityfile = open(os.path.join(fd2,'foreign_priority.csv'),'wb')
     forpriorityfile.write(codecs.BOM_UTF8)
@@ -999,9 +999,7 @@ def parse_patents(fd, fd2):
             try:
                 examiners = avail_fields["examiners"].split("<assistant-examiner")
                 department = "Null"
-                sequence = 0
                 for i in range(len(examiners)):
-                    sequence +=1
                     list_of_examiner = examiners[i].split("\n")
                     fname = "Null"
                     lname = "Null"
@@ -1013,9 +1011,9 @@ def parse_patents(fd, fd2):
                         if line.startswith("<department"):
                             department = re.search("<department>(.*?)</department>", line).group(1)
                     if i == 0: #the first examiner is the primary examiner
-                        examiner[id_generator()]=[docno, fname, lname, "primary", department, sequence]
+                        examiner[id_generator()]=[docno, fname, lname, "primary", department]
                     else:
-                        examiner[id_generator()]=[docno, fname, lname, "assistant", department, sequence] 
+                        examiner[id_generator()]=[docno, fname, lname, "assistant", department] 
             except:
                 pass
 

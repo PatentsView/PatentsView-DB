@@ -50,7 +50,6 @@ CREATE TABLE `examiner` (
   `lname` varchar(40) DEFAULT NULL,
   `role` varchar(20) DEFAULT NULL,
   `group` varchar(20) DEFAULT NULL,
-  `sequence` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`,`patent_id`),
   KEY `patent_id` (`patent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
