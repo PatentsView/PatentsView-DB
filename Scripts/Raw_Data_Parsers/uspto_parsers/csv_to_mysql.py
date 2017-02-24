@@ -2,7 +2,6 @@ import csv
 import MySQLdb
 import re,os,random,string,codecs
 
-
 def mysql_upload(host,username,password,dbname,folder,output_folder):
     inp = open(os.path.join(folder,'patent.csv'),'rb').read().decode('utf-8','ignore').split("\r\n")
     del inp[0]
@@ -186,7 +185,7 @@ def upload_csv(host,username,password,dbname,folder):
     cursor = mydb.cursor()
     diri = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder,f))] # gets only files, not folders
     for d in diri:
-        cursor.execute("load data local infile '"+os.path.join(folder,d)+"' into table "+d.replace('.csv','')+" fields terminated by '\t' lines terminated by '\r\n'")
+        cursor.execute("load data local infile '"+os.path.join(folder,d)+"' into table "+d.replace('.csv','')+" fields terminated by '\t' lines terminated by '\r\n' ignore 1 lines")
 
     
 
