@@ -1,5 +1,5 @@
 -- Create patents schema
--- Updated 2.2.17 by Sarah Kelley
+-- Updated 3.1.17 by Sarah Kelley
 
 /*REATE SCHEMA new_parser_qa; */
 use new_parser_qa;
@@ -886,9 +886,8 @@ CREATE TABLE `brf_sum_text` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
   `text` text DEFAULT NULL,
-  `sequence` int(10) unsigned NOT NULL,
   PRIMARY KEY (`uuid`),
-  KEY `ix_brfsumtext_patent_id` (`patent_id`, `sequence`)
+  KEY `ix_brfsumtext_patent_id` (`patent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1020,7 +1019,7 @@ DROP TABLE IF EXISTS `us_term_of_grant`;
 CREATE TABLE `us_term_of_grant` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) NOT NULL,
-  `lapse_of_patent` int(11) DEFAULT NULL,
+  `lapse_of_patent` varchar(20) DEFAULT NULL,
   `disclaimer_date` date DEFAULT NULL, 
   `term_disclaimer` VARCHAR(128) DEFAULT NULL,
   `term_grant` VARCHAR(128) DEFAULT NULL, -- ska: confirm data type

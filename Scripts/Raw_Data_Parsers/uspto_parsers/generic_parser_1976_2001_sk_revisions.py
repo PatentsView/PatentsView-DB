@@ -975,7 +975,10 @@ def parse_patents(fd,fd2):
                     exemplary = False
                     if str(k) in exemplary_list:
                         exemplary = True
-                    claimsdata[id_generator()] = [updnum,re.sub('^\s\d+\.\s','',v),"NULL",str(k), exemplary]
+                    claim_stripped = re.sub('^\s\d+\.\s','',v)
+                    claim_stripped = claim_stripped.lstrip('12234567890.')
+                    claimsdata[id_generator()] = [updnum,claim_stripped,"NULL",str(k), exemplary]
+                    #claimsdata[id_generator()] = [updnum,re.sub('^\s\d+\.\s','',v),"NULL",str(k), exemplary]
                 if len(datum) == 0:
                     pass
             else:
@@ -1001,7 +1004,10 @@ def parse_patents(fd,fd2):
                     exemplary = False
                     if "1" in exemplary_list:
                         exemplary = True
-                    claimsdata[id_generator()]=[updnum,re.sub('^PAR\s+','',text),"NULL",'1', exemplary]
+                    text_stripped = re.sub('^PAR\s+','',text)
+                    text_stripped = text_stripped.lstrip('12234567890.')
+                    claimsdata[id_generator()]=[updnum,text_stripped,"NULL",'1', exemplary]
+                    #claimsdata[id_generator()]=[updnum,re.sub('^PAR\s+','',text),"NULL",'1', exemplary]
                 else:
                     pass
 

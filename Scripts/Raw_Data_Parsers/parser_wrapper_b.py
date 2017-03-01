@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import argparse
 import timeit
+import datetime
 from uspto_parsers import generic_parser_1976_2001new7, generic_parser_2002_2004_new10 ,csv_to_mysql,uspc_table,merge_db_script, parser_2005_new_fields_g
 
 parser = argparse.ArgumentParser(description='This program is used to parse USPTO full-text patent grant data for 1976-2004 and also uploading parsed data to MySQL.',epilog='(Example syntax for parsing raw data: python parser_wrapper.py --input-dir "uspto_raw/1976-2001/" --output-dir "uspto_parsed/1976-2001/" --period 1)\n (Example syntax for uploading to MySQL: python parser_wrapper.py --mysql 1 --mysql-input-dir "c:/uspto_parsed/1976-2001/" --mysql-host "localhost" --mysql-username "root" --mysql-passwd "password" --mysql-dbname "uspto")\n (Example syntax to create USPC tables: python parser_wrapper.py --uspc-create 1 --uspc-input-dir "c:/master_classfiles/")\n (Example syntax for USPC upload to MySQL: python parser_wrapper.py --uspc-upload 1 --uspc-upload-dir "c:/master_classfiles" --mysql-host .. --mysql-username .. --mysql-passwd .. --uspc-appdb app_smalltest --uspc-patdb grant_smalltest)' )
@@ -30,28 +31,21 @@ parser.add_argument('--targetdb',help="Please provide name of target DB")
 params = parser.parse_args()
 
 if int(params.period) == 1:
-	parser = generic_parser_1976_2001new7.parse_patents
-	input_dir = params.input_dir
-	output_dir = params.output_dir
-	print(timeit.timeit('parser(input_dir, output_dir)', setup="from __main__ import parser, input_dir, output_dir", number= 1))
-    #print(timeit.timeit(partial(generic_parser_1976_2001new7.parse_patents(), params.input_dir,params.output_dir)))
+	print datetime.datetime.now().time()
+	generic_parser_1976_2001new7.parse_patents(params.input_dir,params.output_dir)
+	print datetime.datetime.now().time()
+
 
 elif int(params.period) == 2:
-	parser = generic_parser_2002_2004_new10.parse_patents
-	input_dir = params.input_dir
-	output_dir = params.output_dir
-	print(timeit.timeit('parser(input_dir, output_dir)', setup="from __main__ import parser, input_dir, output_dir", number= 1))
-    #print(timeit.timeit('generic_parser_2002_2004_new10.parse_patents(params.input_dir,params.output_dir)', number= 1, globals=globals()))
+	print datetime.datetime.now().time()
+	generic_parser_2002_2004_new10.parse_patents(params.input_dir,params.output_dir)
+	print datetime.datetime.now().time()
 
 elif int(params.period)==3:
-	parser = parser_2005_new_fields_g.parse_patents
-	input_dir = params.input_dir
-	output_dir = params.output_dir
-	print(timeit.timeit('parser(input_dir, output_dir)', setup="from __main__ import parser, input_dir, output_dir", number= 1))
-	#print(timeit.timeit('parser_2005_new_fields_g.parse_patents(params.input_dir, params.output_dir)', number= 1, globals=globals()))
+	print datetime.datetime.now().time()
+	parser_2005_new_fields_g.parse_patents(params.input_dir, params.output_dir)
+	print datetime.datetime.now().time()
 
-# elif int(params.mysql) == 1 and int(params.period) not in range(1,4):
-#    csv_to_mysql.mysql_upload (params.mysql_host,params.mysql_username,params.mysql_passwd,params.mysql_dbname,params.mysql_input_dir, params.mysql_output_dir)
 
 elif int(params.mysql) == 1 and int(params.period) not in range(1,4):
     csv_to_mysql.upload_csv (params.mysql_host,params.mysql_username,params.mysql_passwd,params.mysql_dbname,params.mysql_input_dir)
