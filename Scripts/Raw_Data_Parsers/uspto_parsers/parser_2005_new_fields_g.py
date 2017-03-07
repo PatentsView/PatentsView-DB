@@ -766,7 +766,7 @@ def parse_patents(fd, fd2):
                 else:                   
                     applicant_list = re.split("</us-applicant>", avail_fields['us-applicants'])
                     applicant_list = applicant_list[:-1] #gets rid of extra last line
-                inventor_seq = 1
+                inventor_seq = 0
                 for person in applicant_list:
                     designation = "NULL"
                     earlier_applicant_type = "NULL"
@@ -829,10 +829,10 @@ def parse_patents(fd, fd2):
                             non_inventor_applicant[id_generator()] = [patent_id, loc_idd, last_name, first_name, orgname, sequence, designation, later_applicant_type]
                     #this gets us the inventors from 2005-2012
                     if earlier_applicant_type == "applicant-inventor":
-                        inventor_seq +=1
                         loc_idd = id_generator() 
                         rawlocation[id_generator()] = [loc_idd,city,state, country] 
                         rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, first_name,last_name, str(inventor_seq), rule_47]  
+                        inventor_seq +=1
                     if (earlier_applicant_type != "applicant-inventor") and earlier_applicant_type!="NULL":
                         loc_idd = id_generator() 
                         rawlocation[id_generator()] = [loc_idd,city,state, country] 
@@ -876,7 +876,7 @@ def parse_patents(fd, fd2):
                     if fname == "NULL" and lname == "NULL": 
                          pass 
                     else: 
-                         rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, fname,lname, str(i+1), rule_47]
+                         rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, fname,lname, str(i), rule_47]
             except:
                 pass
             
@@ -1081,17 +1081,26 @@ def parse_patents(fd, fd2):
                         #this hack deals with the fact that some miss the </p> ending
                         start, cut, text = line.partition('">')
                         draw_desc, cut, end = text.partition("</p")
-                        soup = bs(draw_desc, "lxml")
-                        text = soup.get_text()
-                        text = [piece.encode('utf-8','ignore') for piece in text]
-                        text = "".join(text)
-                        draw_desc_text[id_generator()] = [patent_id, text, draw_seq]
+                        if "<" in draw_desc or ">" in draw_desc:
+                            soup = bs(draw_desc, "lxml")
+                            text = soup.get_text()
+                        else:
+                            text = draw_desc
+                        #text = [piece.encode('utf-8','ignore') for piece in text]
+                        #text = "".join(text)
+                        if not (text.strip() in ["BRIEF DESCRIPTION OF THE DRAWINGS", "BRIEF DESCRIPTION OF THE DRAWING", "BRIEF DESCRIPTION OF THE DRAWING"]):
+                            draw_desc_text[id_generator()] = [patent_id, text, draw_seq]
+                        else:
+                            pass #skipping the brief description heading
                     if line.startswith("<heading"):
                         draw_seq +=1
+
                         heading = re.search(">(.*?)<", line).group(1)
                         #draw_text += " " + heading
-                        draw_desc_text[id_generator()] = [patent_id, heading, draw_seq]
-               # draw_desc_text[id_generator()] = [patent_id,draw_text]
+                        if not (text.strip() in ["BRIEF DESCRIPTION OF THE DRAWINGS", "BRIEF DESCRIPTION OF THE DRAWING", "BRIEF DESCRIPTION OF THE DRAWING"]):
+                            draw_desc_text[id_generator()] = [patent_id, heading, draw_seq]
+                        else:
+                          pass #skipping the brief description heading
             except:
                 pass
                 #print "Problem with drawing description"
@@ -1135,16 +1144,18 @@ def parse_patents(fd, fd2):
                         #maybe later import table or list from table and list parsing to improve completeness
                         if len(det_desc) > 5: #only include if there is a detailed desciption text in this tag
                             detailed_text_field += " " + det_desc
-                            #detail_desc_text[id_generator()] = [patent_id,"text", det_desc, det_seq]
                     if line.startswith("<heading"):
                         det_seq +=1
                         heading = re.search(">(.*?)<", line).group(1)
                         detailed_text_field += " " + heading
                         #detail_desc_text[id_generator()] = [patent_id,"heading", heading, det_seq]
-                soup = bs(detailed_text_field, "lxml")
-                text = soup.get_text()
-                text = [piece.encode('utf-8','ignore') for piece in text]
-                text = "".join(text)
+                if ("<" in detailed_text_field) or (">" in detailed_text_field):
+                    soup = bs(detailed_text_field, "lxml")
+                    text = soup.get_text()
+                else:
+                    text = detailed_text_field
+                #text = [piece.encode('utf-8','ignore') for piece in text]
+                #text = "".join(text)
                 detail_desc_text[id_generator()] = [patent_id, text]
             except:
                 pass
@@ -1339,7 +1350,21 @@ def parse_patents(fd, fd2):
 
             draw_desc_textfile = csv.writer(open(os.path.join(fd2,'draw_desc_text.csv'),'ab'),delimiter='\t')
             for k,v in draw_desc_text.items():
-                draw_desc_textfile.writerow([k]+v)
+                try:
+                    draw_desc_textfile.writerow([k]+v)
+                except:
+                    first = v[0]
+                    second = v[1]
+                    third = v[2]
+                    second = [piece.encode('utf-8','ignore') for piece in second]
+                    second= "".join(second)
+                    value = []
+                    value.append(first)
+                    value.append(second)
+                    value.append(third)
+                    draw_desc_textfile.writerow([k]+value)
+
+
 
             brf_sum_textfile = csv.writer(open(os.path.join(fd2,'brf_sum_text.csv'),'ab'),delimiter='\t')
             for k,v in brf_sum_text.items():
@@ -1347,7 +1372,19 @@ def parse_patents(fd, fd2):
 
             detail_desc_textfile = csv.writer(open(os.path.join(fd2,'detail_desc_text.csv'),'ab'),delimiter='\t')
             for k,v in detail_desc_text.items():
-                detail_desc_textfile.writerow([k]+v)
+                try:
+                    detail_desc_textfile.writerow([k]+v)
+                except:
+                    first = v[0]
+                    second = v[1]
+                    second = [piece.encode('utf-8','ignore') for piece in second]
+                    second= "".join(second)
+                    value = []
+                    value.append(first)
+                    value.append(second)
+                    detail_desc_textfile.writerow([k]+value)
+
+
 
             rel_app_textfile = csv.writer(open(os.path.join(fd2,'rel_app_text.csv'),'ab'),delimiter='\t')
             for k,v in rel_app_text.items():
