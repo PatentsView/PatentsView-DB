@@ -812,13 +812,19 @@ def parse_patents(fd,fd2):
             try:
                 drawdesc = re.sub('\s+',' ',avail_fields['DRWD'])
                 drawdesc = re.sub('\s$','',drawdesc)
-                drawdesc = drawdesc.split(' PAL ')
-                for n in range(1,len(drawdesc)):
-                    drawdescdata[id_generator()] =[patent_id,drawdesc[n],str(n)] 
+                drawdesc = re.split(r'( PAR | PAL | PAC )', drawdesc)
+                drawdesc = filter(None, drawdesc) #this doesn't work combined with next filter, so separate for now
+                drawdesc = filter(lambda x : x not in [' PAR ', ' PAL ',' PAC ', 'BRIEF DESCRIPTION OF THE DRAWINGS'," BRIEF DESCRIPTION OF THE DRAWING", "DESCRIPTION OF THE DRAWING"], drawdesc)
+                draw_sequence = 1
+                for n in range(0,len(drawdesc) ):
+                    if drawdesc[n] >1: #filter out blank entries
+                        drawdescdata[id_generator()] =[patent_id,drawdesc[n],str(draw_sequence)] 
+                        draw_sequence +=1
             except:
                 pass
-            
+
             # Detail description
+            '''
             detdesc = 'NULL'
             try:
                 detdesc = re.sub('PAR\s+',' ',bsum)
@@ -828,6 +834,17 @@ def parse_patents(fd,fd2):
 
             except:
                 pass
+            '''
+            detdesc = 'NULL'
+            try:
+                detdesc = re.sub('PAR\s+',' ',avail_fields['DETD'])
+                detdesc = re.sub('PAC\s+',' ',detdesc)
+                detdesc = re.sub('PA\d+\s+',' ',detdesc)
+                detdesc = re.sub('TBL\s+','',detdesc)
+                detdesc = re.sub('\s+',' ',detdesc)
+            except:
+                pass
+
 
             # Parent case for US rel docs
             try:
