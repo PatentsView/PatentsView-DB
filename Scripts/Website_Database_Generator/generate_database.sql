@@ -464,6 +464,7 @@ create table `PatentsView_dev`.`patent`
   `earliest_application_date` date null,
   `patent_processing_days` int unsigned null,
   `uspc_current_mainclass_average_patent_processing_days` int unsigned null, # This will have to be updated once we've calculated the value in the uspc_current section below.
+ `cpc_current_group_average_patent_processing_days` int unsigned null, # This will have to be updated once we've calculated the value in the uspc_current section below.
   primary key (`patent_id`)
 )
 engine=InnoDB;
@@ -1359,7 +1360,6 @@ from
 group by
   c.`subsection_id`;
 
-
 drop table if exists `PatentsView_dev`.`temp_cpc_subsection_title`;
 create table `PatentsView_dev`.`temp_cpc_subsection_title`
 (
@@ -1381,6 +1381,47 @@ select
   end
 from
   `patent_dev`.`cpc_subsection`;
+
+
+drop table if exists `PatentsView_dev`.`temp_cpc_current_group_aggregate_counts`;
+create table `PatentsView_dev`.`temp_cpc_current_group_aggregate_counts`
+(
+  `group_id` varchar(20) not null,
+  `num_assignees` int unsigned not null,
+  `num_inventors` int unsigned not null,
+  `num_patents` int unsigned not null,
+  `first_seen_date` date null,
+  `last_seen_date` date null,
+  `actual_years_active` smallint unsigned not null,
+  primary key (`group_id`)
+)
+engine=InnoDB;
+
+
+# 29:37
+insert into `PatentsView_dev`.`temp_cpc_current_group_aggregate_counts`
+(
+  `group_id`, `num_assignees`, `num_inventors`, `num_patents`,
+  `first_seen_date`, `last_seen_date`, `actual_years_active`
+)
+select
+  c.`group_id`,
+  count(distinct pa.`assignee_id`) num_assignees,
+  count(distinct pii.`inventor_id`) num_inventors,
+  count(distinct c.`patent_id`) num_patents,
+  min(p.`date`), max(p.`date`),
+  ifnull(round(timestampdiff(day, min(p.`date`), max(p.`date`)) / 365), 0)
+from
+  `patent_dev`.`cpc_current` c
+  left outer join `patent_dev`.`patent_assignee` pa on pa.`patent_id` = c.`patent_id`
+  left outer join `patent_dev`.`patent_inventor` pii on pii.`patent_id` = c.`patent_id`
+  left outer join `PatentsView_dev`.`patent` p on p.`patent_id` = c.`patent_id`
+group by
+  c.`group_id`;
+
+
+
+
 
 
 drop table if exists `PatentsView_dev`.`temp_cpc_group_title`;
@@ -1448,6 +1489,12 @@ create table `PatentsView_dev`.`cpc_current`
   `first_seen_date` date null,
   `last_seen_date` date null,
   `years_active` smallint unsigned null,
+  `num_assignees_group` int unsigned null,
+  `num_inventors_group` int unsigned null,
+  `num_patents_group` int unsigned null,
+  `first_seen_date_group` date null,
+  `last_seen_date_group` date null,
+  `years_active_group` smallint unsigned null,
   primary key (`patent_id`, `sequence`)
 )
 engine=InnoDB;
@@ -1461,7 +1508,9 @@ insert into `PatentsView_dev`.`cpc_current`
   `subsection_title`, `group_id`, `group_title`, `subgroup_id`,
   `subgroup_title`, `category`,
   `num_assignees`, `num_inventors`, `num_patents`,
-  `first_seen_date`, `last_seen_date`, `years_active`
+  `first_seen_date`, `last_seen_date`, `years_active`,
+  `num_assignees_group`, `num_inventors_group`, `num_patents_group`,
+  `first_seen_date_group`, `last_seen_date_group`, `years_active_group`
 )
 select
   p.`patent_id`, c.`sequence`,
@@ -1474,14 +1523,18 @@ select
   nullif(trim(sg.`title`), ''),
   c.`category`, tccsac.`num_assignees`, tccsac.`num_inventors`,
   tccsac.`num_patents`, tccsac.`first_seen_date`, tccsac.`last_seen_date`,
-  case when tccsac.`actual_years_active` < 1 then 1 else tccsac.`actual_years_active` end
+  case when tccsac.`actual_years_active` < 1 then 1 else tccsac.`actual_years_active` end,
+  tccgac.`num_assignees`, tccgac.`num_inventors`,
+  tccgac.`num_patents`, tccgac.`first_seen_date`, tccgac.`last_seen_date`,
+  case when tccgac.`actual_years_active` < 1 then 1 else tccgac.`actual_years_active` end
 from
   `PatentsView_dev`.`patent` p
   inner join `patent_dev`.`cpc_current` c on p.`patent_id` = c.`patent_id`
   left outer join `PatentsView_dev`.`temp_cpc_subsection_title` s on s.`id` = c.`subsection_id`
   left outer join `PatentsView_dev`.`temp_cpc_group_title` g on g.`id` = c.`group_id`
   left outer join `PatentsView_dev`.`temp_cpc_subgroup_title` sg on sg.`id` = c.`subgroup_id`
-  left outer join `PatentsView_dev`.`temp_cpc_current_subsection_aggregate_counts` tccsac on tccsac.`subsection_id` = c.`subsection_id`;
+  left outer join `PatentsView_dev`.`temp_cpc_current_subsection_aggregate_counts` tccsac on tccsac.`subsection_id` = c.`subsection_id`
+  left outer join `PatentsView_dev`.`temp_cpc_current_group_aggregate_counts` tccgac on tccgac.`group_id` = c.`group_id`;
 
 
 drop table if exists `PatentsView_dev`.`cpc_current_subsection`;
@@ -1523,6 +1576,48 @@ from
   left outer join `PatentsView_dev`.`temp_cpc_current_subsection_aggregate_counts` tccsac on tccsac.`subsection_id` = c.`subsection_id`;
 
 
+
+
+drop table if exists `PatentsView_dev`.`cpc_current_group`;
+create table `PatentsView_dev`.`cpc_current_group`
+(
+  `patent_id` varchar(20) not null,
+  `section_id` varchar(10) null,
+  `group_id` varchar(20) null,
+  `group_title` varchar(512) null,
+  `num_assignees` int unsigned null,
+  `num_inventors` int unsigned null,
+  `num_patents` int unsigned null,
+  `first_seen_date` date null,
+  `last_seen_date` date null,
+  `years_active` smallint unsigned null,
+  primary key (`patent_id`, `group_id`)
+)
+engine=InnoDB;
+
+
+# 7,240,381 @ 19:00
+insert into `PatentsView_dev`.`cpc_current_group`
+(
+  `patent_id`, `section_id`, `group_id`, `group_title`,
+  `num_assignees`, `num_inventors`, `num_patents`,
+  `first_seen_date`, `last_seen_date`, `years_active`
+)
+select
+  c.`patent_id`,
+  c.`section_id`,
+  c.`group_id`,
+  nullif(trim(s.`title`), ''),
+  tccgac.`num_assignees`, tccgac.`num_inventors`,
+  tccgac.`num_patents`, tccgac.`first_seen_date`, tccgac.`last_seen_date`,
+  case when tccgac.`actual_years_active` < 1 then 1 else tccgac.`actual_years_active` end
+from
+  (select distinct `patent_id`, `section_id`, `group_id` from `PatentsView_dev`.`cpc_current`) c
+  left outer join `PatentsView_dev`.`temp_cpc_group_title` s on s.`id` = c.`group_id`
+  left outer join `PatentsView_dev`.`temp_cpc_current_group_aggregate_counts` tccgac on tccgac.`group_id` = c.`group_id`;
+
+
+
 # END cpc_current 
 
 #############################################################################################################################################
@@ -1559,6 +1654,40 @@ group by
 
 
 # END cpc_current_subsection_patent_year 
+
+######################################################################################################################
+
+# BEGIN cpc_current_group_patent_year 
+
+####################################################################################################################
+
+
+drop table if exists `PatentsView_dev`.`cpc_current_group_patent_year`;
+create table `PatentsView_dev`.`cpc_current_group_patent_year`
+(
+  `group_id` varchar(20) not null,
+  `patent_year` smallint unsigned not null,
+  `num_patents` int unsigned not null,
+  primary key (`group_id`, `patent_year`)
+)
+engine=InnoDB;
+
+
+# 13:24
+insert into `PatentsView_dev`.`cpc_current_group_patent_year`
+  (`group_id`, `patent_year`, `num_patents`)
+select
+  c.`group_id`, year(p.`date`), count(distinct c.`patent_id`)
+from
+  `patent_dev`.`cpc_current` c
+  inner join `PatentsView_dev`.`patent` p on p.`patent_id` = c.`patent_id` and p.`date` is not null
+where
+  c.`group_id` is not null and c.`group_id` != ''
+group by
+  c.`group_id`, year(p.`date`);
+
+
+# END cpc_current_group_patent_year 
 
 ######################################################################################################################
 
@@ -2055,6 +2184,58 @@ set
 #################################################################################################################
 
 
+# BEGIN cpc_current_group_application_year 
+
+###############################################################################################################
+
+
+drop table if exists `PatentsView_dev`.`cpc_current_group_application_year`;
+create table `PatentsView_dev`.`cpc_current_group_application_year`
+(
+  `group_id` varchar(20) not null,
+  `application_year` smallint unsigned not null,
+  `sample_size` int unsigned not null,
+  `average_patent_processing_days` int unsigned null,
+  primary key (`group_id`, `application_year`)
+)
+engine=InnoDB;
+
+
+# 20,241 @ 0:56
+insert into `PatentsView_dev`.`cpc_current_group_application_year`
+  (`group_id`, `application_year`, `sample_size`, `average_patent_processing_days`)
+select
+  u.`group_id`,
+  year(p.`earliest_application_date`),
+  count(*),
+  round(avg(p.`patent_processing_days`))
+from
+  `PatentsView_dev`.`patent` p
+  inner join `PatentsView_dev`.`cpc_current` u on u.`patent_id` = p.`patent_id`
+where
+  p.`patent_processing_days` is not null and u.`sequence` = 0
+group by
+  u.`group_id`, year(p.`earliest_application_date`);
+
+
+# 5,406,673 @ 32:45
+# Update the patent with the average mainclass processing days.
+update
+  `PatentsView_dev`.`patent` p
+  inner join `PatentsView_dev`.`cpc_current` u on
+    u.`patent_id` = p.`patent_id` and u.`sequence` = 0
+  inner join `PatentsView_dev`.`cpc_current_group_application_year` c on
+    c.`group_id` = u.`group_id` and c.`application_year` = year(p.`earliest_application_date`)
+set
+  p.`cpc_current_group_average_patent_processing_days` = c.`average_patent_processing_days`;
+
+
+# END cpc_current_group_application_year 
+
+#################################################################################################################
+
+
+
 # BEGIN uspc_current_mainclass_patent_year 
 
 ####################################################################################################################
@@ -2177,6 +2358,40 @@ group by
 
 
 # END inventor_cpc_subsection 
+
+######################################################################################################################
+
+
+# BEGIN inventor_cpc_group
+
+######################################################################################################################
+
+
+drop table if exists `PatentsView_dev`.`inventor_cpc_group`;
+create table `PatentsView_dev`.`inventor_cpc_group`
+(
+  `inventor_id` int unsigned not null,
+  `group_id` varchar(20) not null,
+  `num_patents` int unsigned not null
+)
+engine=InnoDB;
+
+
+# 7,171,415 @ 11:55
+insert into `PatentsView_dev`.`inventor_cpc_group`
+  (`inventor_id`, `group_id`, `num_patents`)
+select
+  pi.inventor_id, c.group_id, count(distinct c.patent_id)
+from
+  `PatentsView_dev`.`patent_inventor` pi
+  inner join `PatentsView_dev`.`cpc_current_group` c using(patent_id)
+where
+  c.group_id is not null and c.group_id != ''
+group by
+  pi.inventor_id, c.group_id;
+
+
+# END inventor_cpc_group 
 
 ######################################################################################################################
 
@@ -2304,6 +2519,39 @@ group by
 
 ######################################################################################################################
 
+
+# BEGIN assignee_cpc_group
+
+######################################################################################################################
+
+
+drop table if exists `PatentsView_dev`.`assignee_cpc_group`;
+create table `PatentsView_dev`.`assignee_cpc_group`
+(
+  `assignee_id` int unsigned not null,
+  `group_id` varchar(20) not null,
+  `num_patents` int unsigned not null
+)
+engine=InnoDB;
+
+
+# 933,903 @ 2:22
+insert into `PatentsView_dev`.`assignee_cpc_group`
+  (`assignee_id`, `group_id`, `num_patents`)
+select
+  pa.assignee_id, c.group_id, count(distinct c.patent_id)
+from
+  `PatentsView_dev`.`patent_assignee` pa
+  inner join `PatentsView_dev`.`cpc_current_group` c using(patent_id)
+where
+  c.group_id is not null and c.group_id != ''
+group by
+  pa.assignee_id, c.group_id;
+
+
+# END assignee_cpc_group 
+
+######################################################################################################################
 
 # BEGIN assignee_nber_subcategory 
 
@@ -2479,6 +2727,37 @@ group by
 
 ######################################################################################################################
 
+# BEGIN location_cpc_group 
+
+######################################################################################################################
+
+
+drop table if exists `PatentsView_dev`.`location_cpc_group`;
+create table `PatentsView_dev`.`location_cpc_group`
+(
+  `location_id` int unsigned not null,
+  `group_id` varchar(20) not null,
+  `num_patents` int unsigned not null
+)
+engine=InnoDB;
+
+
+# 1,077,971 @ 6:19
+insert into `PatentsView_dev`.`location_cpc_group`
+  (`location_id`, `group_id`, `num_patents`)
+select
+  tlp.`location_id`, cpc.`group_id`, count(distinct tlp.`patent_id`)
+from
+  `PatentsView_dev`.`temp_location_patent` tlp
+  inner join `PatentsView_dev`.`cpc_current_group` cpc using(`patent_id`)
+group by
+  tlp.`location_id`, cpc.`group_id`;
+
+
+# END location_cpc_group
+
+######################################################################################################################
+
 
 # BEGIN location_uspc_mainclass 
 
@@ -2586,6 +2865,8 @@ alter table `PatentsView_dev`.`assignee` add index `ix_assignee_organization` (`
 alter table `PatentsView_dev`.`assignee` add index `ix_assignee_persistent_assignee_id` (`persistent_assignee_id`);
 alter table `PatentsView_dev`.`assignee_cpc_subsection` add index `ix_assignee_cpc_subsection_assignee_id` (`assignee_id`);
 alter table `PatentsView_dev`.`assignee_cpc_subsection` add index `ix_assignee_cpc_subsection_subsection_id` (`subsection_id`);
+alter table `PatentsView_dev`.`assignee_cpc_group` add index `ix_assignee_cpc_group_assignee_id` (`assignee_id`);
+alter table `PatentsView_dev`.`assignee_cpc_group` add index `ix_assignee_cpc_group_group_id` (`group_id`);
 alter table `PatentsView_dev`.`assignee_inventor` add index `ix_assignee_inventor_assignee_id` (`assignee_id`);
 alter table `PatentsView_dev`.`assignee_inventor` add index `ix_assignee_inventor_inventor_id` (`inventor_id`);
 alter table `PatentsView_dev`.`assignee_nber_subcategory` add index `ix_assignee_nber_subcategory_assignee_id` (`assignee_id`);
@@ -2594,6 +2875,8 @@ alter table `PatentsView_dev`.`assignee_uspc_mainclass` add index `ix_assignee_u
 alter table `PatentsView_dev`.`assignee_uspc_mainclass` add index `ix_assignee_uspc_mainclass_mainclass_id` (`mainclass_id`);
 alter table `PatentsView_dev`.`assignee_year` add index `ix_assignee_year_assignee_id` (`assignee_id`);
 alter table `PatentsView_dev`.`assignee_year` add index `ix_assignee_year_year` (`patent_year`);
+alter table `PatentsView_dev`.`cpc_current_group` add index `ix_cpc_current_group_group_id` (`group_id`);
+alter table `PatentsView_dev`.`cpc_current_group` add index `ix_cpc_current_group_title` (`group_title`);
 alter table `PatentsView_dev`.`cpc_current_subsection` add index `ix_cpc_current_subsection_subsection_id` (`subsection_id`);
 alter table `PatentsView_dev`.`cpc_current_subsection` add index `ix_cpc_current_subsection_title` (`subsection_title`);
 alter table `PatentsView_dev`.`cpc_current` add index `ix_cpc_current_group_id` (`group_id`);
@@ -2606,6 +2889,8 @@ alter table `PatentsView_dev`.`inventor_coinventor` add index `ix_inventor_coinv
 alter table `PatentsView_dev`.`inventor_coinventor` add index `ix_inventor_coinventor_coinventor_id` (`coinventor_id`);
 alter table `PatentsView_dev`.`inventor_cpc_subsection` add index `ix_inventor_cpc_subsection_inventor_id` (`inventor_id`);
 alter table `PatentsView_dev`.`inventor_cpc_subsection` add index `ix_inventor_cpc_subsection_subsection_id` (`subsection_id`);
+alter table `PatentsView_dev`.`inventor_cpc_group` add index `ix_inventor_cpc_group_inventor_id` (`inventor_id`);
+alter table `PatentsView_dev`.`inventor_cpc_group` add index `ix_inventor_cpc_group_group_id` (`group_id`);
 alter table `PatentsView_dev`.`inventor_nber_subcategory` add index `ix_inventor_nber_subcategory_inventor_id` (`inventor_id`);
 alter table `PatentsView_dev`.`inventor_nber_subcategory` add index `ix_inventor_nber_subcategory_subcategory_id` (`subcategory_id`);
 alter table `PatentsView_dev`.`inventor_uspc_mainclass` add index `ix_inventor_uspc_mainclass_inventor_id` (`inventor_id`);
@@ -2621,6 +2906,8 @@ alter table `PatentsView_dev`.`location` add index `ix_location_persistent_locat
 alter table `PatentsView_dev`.`location` add index `ix_location_state` (`state`);
 alter table `PatentsView_dev`.`location_cpc_subsection` add index `ix_location_cpc_subsection_location_id` (`location_id`);
 alter table `PatentsView_dev`.`location_cpc_subsection` add index `ix_location_cpc_subsection_subsection_id` (`subsection_id`);
+alter table `PatentsView_dev`.`location_cpc_group` add index `ix_location_cpc_group_location_id` (`location_id`);
+alter table `PatentsView_dev`.`location_cpc_group` add index `ix_location_cpc_group_subsection_id` (`group_id`);
 alter table `PatentsView_dev`.`location_nber_subcategory` add index `ix_location_nber_subcategory_location_id` (`location_id`);
 alter table `PatentsView_dev`.`location_nber_subcategory` add index `ix_location_nber_subcategory_mainclass_id` (`subcategory_id`);
 alter table `PatentsView_dev`.`location_uspc_mainclass` add index `ix_location_uspc_mainclass_location_id` (`location_id`);
@@ -2647,6 +2934,7 @@ alter table `PatentsView_dev`.`uspc_current` add index `ix_uspc_current_subclass
 alter table `PatentsView_dev`.`assignee` add index `ix_assignee_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`assignee` add index `ix_assignee_num_inventors` (`num_inventors`);
 alter table `PatentsView_dev`.`assignee_cpc_subsection` add index `ix_assignee_cpc_subsection_num_patents` (`num_patents`);
+alter table `PatentsView_dev`.`assignee_cpc_group` add index `ix_assignee_cpc_group_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`assignee_inventor` add index `ix_assignee_inventor_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`assignee_nber_subcategory` add index `ix_assignee_nber_subcategory_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`assignee_uspc_mainclass` add index `ix_assignee_uspc_mainclass_num_patents` (`num_patents`);
@@ -2658,10 +2946,18 @@ alter table `PatentsView_dev`.`cpc_current_subsection` add index `ix_cpc_current
 alter table `PatentsView_dev`.`cpc_current_subsection` add index `ix_cpc_current_subsection_num_inventors` (`num_inventors`);
 alter table `PatentsView_dev`.`cpc_current_subsection` add index `ix_cpc_current_subsection_num_assignees` (`num_assignees`);
 alter table `PatentsView_dev`.`cpc_current_subsection_patent_year` add index `ix_cpc_current_subsection_patent_year_num_patents` (`num_patents`);
+alter table `PatentsView_dev`.`cpc_current` add index `ix_cpc_current_num_patents_group` (`num_patents_group`);
+alter table `PatentsView_dev`.`cpc_current` add index `ix_cpc_current_num_inventors_group` (`num_inventors_group`);
+alter table `PatentsView_dev`.`cpc_current` add index `ix_cpc_current_num_assignees_group` (`num_assignees_group`);
+alter table `PatentsView_dev`.`cpc_current_group` add index `ix_cpc_current_group_num_patents` (`num_patents`);
+alter table `PatentsView_dev`.`cpc_current_group` add index `ix_cpc_current_group_num_inventors` (`num_inventors`);
+alter table `PatentsView_dev`.`cpc_current_group` add index `ix_cpc_current_group_num_assignees` (`num_assignees`);
+alter table `PatentsView_dev`.`cpc_current_group_patent_year` add index `ix_cpc_current_group_patent_year_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`inventor` add index `ix_inventor_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`inventor` add index `ix_inventor_num_assignees` (`num_assignees`);
 alter table `PatentsView_dev`.`inventor_coinventor` add index `ix_inventor_coinventor_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`inventor_cpc_subsection` add index `ix_inventor_cpc_subsection_num_patents` (`num_patents`);
+alter table `PatentsView_dev`.`inventor_cpc_group` add index `ix_inventor_cpc_group_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`inventor_nber_subcategory` add index `ix_inventor_nber_subcategory_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`inventor_uspc_mainclass` add index `ix_inventor_uspc_mainclass_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`inventor_year` add index `ix_inventor_year_num_patents` (`num_patents`);
@@ -2672,6 +2968,7 @@ alter table `PatentsView_dev`.`location` add index `ix_location_num_inventors` (
 alter table `PatentsView_dev`.`location` add index `ix_location_num_assignees` (`num_assignees`);
 alter table `PatentsView_dev`.`location_assignee` add index `ix_location_assignee_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`location_cpc_subsection` add index `ix_location_cpc_subsection_num_patents` (`num_patents`);
+alter table `PatentsView_dev`.`location_cpc_group` add index `ix_location_cpc_group_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`location_inventor` add index `ix_location_inventor_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`location_nber_subcategory` add index `ix_location_nber_subcategory_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`location_uspc_mainclass` add index `ix_location_uspc_mainclass_num_patents` (`num_patents`);
@@ -2686,9 +2983,7 @@ alter table `PatentsView_dev`.`uspc_current` add index `ix_uspc_current_num_assi
 alter table `PatentsView_dev`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_num_inventors` (`num_inventors`);
 alter table `PatentsView_dev`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_num_assignees` (`num_assignees`);
-alter table `PatentsView_dev`.`uspc_current_mainclass_patent_year` add index `ix_uspc_current_mainclass_patent_year_num_patents` 
-
-(`num_patents`);
+alter table `PatentsView_dev`.`uspc_current_mainclass_patent_year` add index `ix_uspc_current_mainclass_patent_year_num_patents`(`num_patents`);
 alter table `PatentsView_dev`.`inventor` add index `ix_inventor_lastknown_location_id` (`lastknown_location_id`);
 alter table `PatentsView_dev`.`inventor` add index `ix_inventor_lastknown_persistent_location_id` (`lastknown_persistent_location_id`);
 alter table `PatentsView_dev`.`inventor` add index `ix_inventor_first_seen_date` (`first_seen_date`);
@@ -2702,15 +2997,10 @@ alter table `PatentsView_dev`.`patent` add index `ix_patent_country` (`country`)
 alter table `PatentsView_dev`.`patent` add index `ix_patent_num_claims` (`num_claims`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_assignee_id` (`firstnamed_assignee_id`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_assignee_persistent_id` (`firstnamed_assignee_persistent_id`);
-alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_assignee_persistent_location_id` 
-
-(`firstnamed_assignee_persistent_location_id`)
-;
+alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_assignee_persistent_location_id`(`firstnamed_assignee_persistent_location_id`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_assignee_location_id` (`firstnamed_assignee_location_id`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_persistent_id` (`firstnamed_inventor_persistent_id`);
-alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_persistent_location_id` 
-
-(`firstnamed_inventor_persistent_location_id`);
+alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_persistent_location_id`(`firstnamed_inventor_persistent_location_id`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_id` (`firstnamed_inventor_id`);
 alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_location_id` (`firstnamed_inventor_location_id`);
 
@@ -2723,30 +3013,34 @@ alter table `PatentsView_dev`.`patent` add index `ix_patent_firstnamed_inventor_
 
 create table if not exists `PatentsView_dev`.`cpc_subsection` (id varchar(20) primary key,title varchar(256), num_patents int(10) unsigned, num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
 create table if not exists `PatentsView_dev`.`cpc_subgroup` (id varchar(20) primary key,title varchar(512));
-create table if not exists `PatentsView_dev`.`cpc_group` (id varchar(20) primary key,title varchar(256));
+create table if not exists `PatentsView_dev`.`cpc_group` (id varchar(20) primary key,title varchar(256), num_patents int(10) unsigned, num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
 create table if not exists `PatentsView_dev`.`nber_category` (id varchar(20) primary key,title varchar(512));
 create table if not exists `PatentsView_dev`.nber_subcategory (id varchar(20) primary key,title varchar(512), num_patents int(10) unsigned, 
-
-num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
+  num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
 create table if not exists `PatentsView_dev`.uspc_mainclass (id varchar(20) primary key,title varchar(256), num_patents int(10) unsigned, 
-
-num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
+  num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
 create table if not exists `PatentsView_dev`.uspc_subclass (id varchar(20) primary key,title varchar(512));
-CREATE TABLE if not exists `PatentsView_dev`.`nber_copy` ( `patent_id` varchar(20) NOT NULL,  `category_id` varchar(20) DEFAULT NULL, `subcategory_id` varchar(20) DEFAULT NULL,PRIMARY KEY (`patent_id`),KEY `ix_nber_subcategory_id` (`subcategory_id`),KEY `ix_nber_category_id` 
-
-(`category_id`));
-CREATE TABLE if not exists `PatentsView_dev`.`cpc_current_copy` (  `patent_id` varchar(20) NOT NULL,  `sequence` int(10) unsigned NOT NULL, `section_id` varchar(10) DEFAULT NULL,  `subsection_id` varchar(20) DEFAULT NULL,  `group_id` varchar(20) DEFAULT NULL,  `subgroup_id` varchar
-
-(20) DEFAULT NULL,  `category` varchar(36) DEFAULT NULL,  PRIMARY KEY (`patent_id`,`sequence`),  KEY `ix_cpc_current_group_id` (`group_id`),  KEY `ix_cpc_current_subgroup_id` (`subgroup_id`),  KEY `ix_cpc_current_subsection_id` (`subsection_id`),  KEY `ix_cpc_current_section_id` (`section_id`),  KEY `ix_cpc_current_sequence` (`sequence`));
-CREATE TABLE if not exists `PatentsView_dev`.`cpc_current_subsection_copy` (  `patent_id` varchar(20) NOT NULL,  `section_id` varchar(10) DEFAULT NULL,  `subsection_id` varchar(20) NOT NULL DEFAULT '',  PRIMARY KEY (`patent_id`,`subsection_id`),  KEY `ix_cpc_current_subsection_subsection_id` (`subsection_id`),  KEY `ix_cpc_current_subsection_section_id` (`section_id`));
-CREATE TABLE if not exists `PatentsView_dev`.`uspc_current_mainclass_copy` (  `patent_id` varchar(20) NOT NULL,  `mainclass_id` varchar(20) NOT NULL DEFAULT '',  PRIMARY KEY (`patent_id`,`mainclass_id`),  KEY `ix_uspc_current_mainclass_mainclass_id` (`mainclass_id`));
-CREATE TABLE if not exists `PatentsView_dev`.`uspc_current_copy` (  `patent_id` varchar(20) NOT NULL,  `sequence` int(10) unsigned NOT 
-
-NULL,  `mainclass_id` varchar(20) DEFAULT NULL,  `subclass_id` varchar(20) DEFAULT NULL,  PRIMARY KEY (`patent_id`,`sequence`),  KEY 
-
-`ix_uspc_current_mainclass_id` (`mainclass_id`),  KEY `ix_uspc_current_subclass_id` (`subclass_id`),  KEY `ix_uspc_current_sequence` 
-
-(`sequence`));
+CREATE TABLE if not exists `PatentsView_dev`.`nber_copy` ( `patent_id` varchar(20) NOT NULL,  `category_id` varchar(20) DEFAULT NULL, 
+  `subcategory_id` varchar(20) DEFAULT NULL,PRIMARY KEY (`patent_id`),KEY `ix_nber_subcategory_id` (`subcategory_id`),
+  KEY `ix_nber_category_id`(`category_id`));
+CREATE TABLE if not exists `PatentsView_dev`.`cpc_current_copy` (  `patent_id` varchar(20) NOT NULL,  `sequence` int(10) unsigned NOT NULL, 
+  `section_id` varchar(10) DEFAULT NULL,  `subsection_id` varchar(20) DEFAULT NULL,  `group_id` varchar(20) DEFAULT NULL,  
+  `subgroup_id` varchar(20) DEFAULT NULL,  `category` varchar(36) DEFAULT NULL,  PRIMARY KEY (`patent_id`,`sequence`),  
+  KEY `ix_cpc_current_group_id` (`group_id`),  KEY `ix_cpc_current_subgroup_id` (`subgroup_id`),  
+  KEY `ix_cpc_current_subsection_id` (`subsection_id`),  KEY `ix_cpc_current_section_id` (`section_id`),  
+  KEY `ix_cpc_current_sequence` (`sequence`));
+CREATE TABLE if not exists `PatentsView_dev`.`cpc_current_subsection_copy` (  `patent_id` varchar(20) NOT NULL,  
+  `section_id` varchar(10) DEFAULT NULL,  `subsection_id` varchar(20) NOT NULL DEFAULT '',  PRIMARY KEY (`patent_id`,`subsection_id`),  
+  KEY `ix_cpc_current_subsection_subsection_id` (`subsection_id`),  KEY `ix_cpc_current_subsection_section_id` (`section_id`));
+CREATE TABLE if not exists `PatentsView_dev`.`cpc_current_group_copy` (  `patent_id` varchar(20) NOT NULL,  
+  `section_id` varchar(10) DEFAULT NULL,  `group_id` varchar(20) NOT NULL DEFAULT '',  PRIMARY KEY (`patent_id`,`group_id`),  
+  KEY `ix_cpc_current_group_group_id` (`group_id`),  KEY `ix_cpc_current_group_section_id` (`section_id`));
+CREATE TABLE if not exists `PatentsView_dev`.`uspc_current_mainclass_copy` (  `patent_id` varchar(20) NOT NULL,  
+  `mainclass_id` varchar(20) NOT NULL DEFAULT '',  PRIMARY KEY (`patent_id`,`mainclass_id`),  
+  KEY `ix_uspc_current_mainclass_mainclass_id` (`mainclass_id`));
+CREATE TABLE if not exists `PatentsView_dev`.`uspc_current_copy` (  `patent_id` varchar(20) NOT NULL,  `sequence` int(10) unsigned NOT NULL,  
+  `mainclass_id` varchar(20) DEFAULT NULL,  `subclass_id` varchar(20) DEFAULT NULL,  PRIMARY KEY (`patent_id`,`sequence`),  
+  KEY `ix_uspc_current_mainclass_id` (`mainclass_id`),  KEY `ix_uspc_current_subclass_id` (`subclass_id`),  KEY `ix_uspc_current_sequence`(`sequence`));
 
 # END new class table creation
 #####################################################################################################################################
@@ -2755,37 +3049,18 @@ NULL,  `mainclass_id` varchar(20) DEFAULT NULL,  `subclass_id` varchar(20) DEFAU
 #####################################################################################################################################
 
 
-insert into `PatentsView_dev`.cpc_subsection select 
-
-subsection_id,subsection_title,num_patents,num_inventors,num_assignees,first_seen_date,last_seen_date,years_active from 
-
-`PatentsView_dev`.cpc_current group by subsection_id;
-insert into `PatentsView_dev`.cpc_group select group_id,group_title from `PatentsView_dev`.cpc_current group by group_id;
+insert into `PatentsView_dev`.cpc_subsection select subsection_id,subsection_title,num_patents,num_inventors,num_assignees,first_seen_date,last_seen_date,years_active from `PatentsView_dev`.cpc_current group by subsection_id;
+insert into `PatentsView_dev`.cpc_group select group_id,group_title,num_patents_group,num_inventors_group,num_assignees_group,first_seen_date_group,last_seen_date_group,years_active_group from `PatentsView_dev`.cpc_current group by group_id;
 insert into `PatentsView_dev`.cpc_subgroup select subgroup_id,subgroup_title from `PatentsView_dev`.cpc_current group by subgroup_id;
 insert into `PatentsView_dev`.nber_category select category_id,category_title from `PatentsView_dev`.nber group by category_id;
-insert into `PatentsView_dev`.nber_subcategory select 
-
-subcategory_id,subcategory_title,num_patents,num_inventors,num_assignees,first_seen_date,last_seen_date,years_active from 
-
-`PatentsView_dev`.nber group by subcategory_id;
-insert into `PatentsView_dev`.uspc_mainclass select mainclass_id,mainclass_title,num_patents, num_inventors, 
-
-num_assignees,first_seen_date,last_seen_date,years_active from `PatentsView_dev`.uspc_current group by mainclass_id;
-insert into `PatentsView_dev`.uspc_subclass select subclass_id,subclass_title from `PatentsView_dev`.uspc_current group by 
-
-subclass_id;
-insert into `PatentsView_dev`.uspc_current_mainclass_copy select distinct patent_id,mainclass_id from 
-
-`PatentsView_dev`.uspc_current_mainclass;
-insert into `PatentsView_dev`.cpc_current_subsection_copy select distinct patent_id,section_id,subsection_id from 
-
-`PatentsView_dev`.cpc_current_subsection;
-insert into `PatentsView_dev`.uspc_current_copy select distinct patent_id,sequence,mainclass_id,subclass_id from 
-
-`PatentsView_dev`.uspc_current;
-insert into `PatentsView_dev`.cpc_current_copy select distinct patent_id,sequence,section_id,subsection_id,group_id,subgroup_id,category 
-
-from `PatentsView_dev`.cpc_current;
+insert into `PatentsView_dev`.nber_subcategory select subcategory_id,subcategory_title,num_patents,num_inventors,num_assignees,first_seen_date,last_seen_date,years_active from `PatentsView_dev`.nber group by subcategory_id;
+insert into `PatentsView_dev`.uspc_mainclass select mainclass_id,mainclass_title,num_patents, num_inventors, num_assignees,first_seen_date,last_seen_date,years_active from `PatentsView_dev`.uspc_current group by mainclass_id;
+insert into `PatentsView_dev`.uspc_subclass select subclass_id,subclass_title from `PatentsView_dev`.uspc_current group by subclass_id;
+insert into `PatentsView_dev`.uspc_current_mainclass_copy select distinct patent_id,mainclass_id from `PatentsView_dev`.uspc_current_mainclass;
+insert into `PatentsView_dev`.cpc_current_subsection_copy select distinct patent_id,section_id,subsection_id from `PatentsView_dev`.cpc_current_subsection;
+insert into `PatentsView_dev`.cpc_current_group_copy select distinct patent_id,section_id,group_id from `PatentsView_dev`.cpc_current_group;
+insert into `PatentsView_dev`.uspc_current_copy select distinct patent_id,sequence,mainclass_id,subclass_id from `PatentsView_dev`.uspc_current;
+insert into `PatentsView_dev`.cpc_current_copy select distinct patent_id,sequence,section_id,subsection_id,group_id,subgroup_id,category from `PatentsView_dev`.cpc_current;
 insert into `PatentsView_dev`.nber_copy select distinct patent_id,category_id,subcategory_id from `PatentsView_dev`.nber;
 
 # END new class table population
@@ -2796,15 +3071,18 @@ insert into `PatentsView_dev`.nber_copy select distinct patent_id,category_id,su
 #####################################################################################################################################
 
 
-alter table `PatentsView_dev`.`cpc_subsection` add index `ix_cpc_subsection_num_patents` (`num_patents`);
-alter table `PatentsView_dev`.`nber_subcategory` add index `ix_nber_subcategory_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`uspc_mainclass` add index `ix_uspc_mainclass_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`uspc_mainclass` add index `ix_uspc_mainclass_num_inventors` (`num_inventors`);
 alter table `PatentsView_dev`.`uspc_mainclass` add index `ix_uspc_mainclass_num_assignees` (`num_assignees`);
 alter table `PatentsView_dev`.`nber_subcategory` add index `ix_nber_subcategory_num_inventors` (`num_inventors`);
 alter table `PatentsView_dev`.`nber_subcategory` add index `ix_nber_subcategory_num_assignees` (`num_assignees`);
+alter table `PatentsView_dev`.`nber_subcategory` add index `ix_nber_subcategory_num_patents` (`num_patents`);
 alter table `PatentsView_dev`.`cpc_subsection` add index `ix_cpc_subsection_num_inventors` (`num_inventors`);
 alter table `PatentsView_dev`.`cpc_subsection` add index `ix_cpc_subsection_num_assignees` (`num_assignees`);
+alter table `PatentsView_dev`.`cpc_subsection` add index `ix_cpc_subsection_num_patents` (`num_patents`);
+alter table `PatentsView_dev`.`cpc_group` add index `ix_cpc_group_num_inventors` (`num_inventors`);
+alter table `PatentsView_dev`.`cpc_group` add index `ix_cpc_group_num_assignees` (`num_assignees`);
+alter table `PatentsView_dev`.`cpc_group` add index `ix_cpc_group_num_patents` (`num_patents`);
 
 
 # END new class table indexing
@@ -2837,15 +3115,15 @@ alter table `PatentsView_dev`.`inventor_rawinventor` add index `ix_inventor_rawi
 
 CREATE TABLE IF NOT EXISTS `PatentsView_dev`.`wipo` (
    `patent_id` varchar(20) NOT NULL,
-   `field_id` int(10) unsigned DEFAULT NULL,
+   `field_id` varchar(3) DEFAULT NULL,
    `sequence` int(10) unsigned NOT NULL,
    PRIMARY KEY (`patent_id`,`sequence`),
    KEY `ix_wipo_field_id` (`field_id`)
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE IF NOT EXISTS `PatentsView_dev`.`wipo_field` (
-   `id` int(10) unsigned NOT NULL,
+   `id` varchar(3) NOT NULL,
    `sector_title` varchar(60) DEFAULT NULL,
-   `field_title` varchar(60) DEFAULT NULL,
+   `field_title` varchar(255) DEFAULT NULL,
    PRIMARY KEY (`id`),
    KEY `ix_wipo_field_sector_title` (`sector_title`),
    KEY `ix_wipo_field_field_title` (`field_title`)
@@ -2915,6 +3193,7 @@ drop table if exists `PatentsView_dev`.`temp_assignee_lastknown_location`;
 drop table if exists `PatentsView_dev`.`temp_assignee_num_patents`;
 drop table if exists `PatentsView_dev`.`temp_assignee_years_active`;
 drop table if exists `PatentsView_dev`.`temp_cpc_current_subsection_aggregate_counts`;
+drop table if exists `PatentsView_dev`.`temp_cpc_current_group_aggregate_counts`;
 drop table if exists `PatentsView_dev`.`temp_cpc_group_title`;
 drop table if exists `PatentsView_dev`.`temp_cpc_subgroup_title`;
 drop table if exists `PatentsView_dev`.`temp_cpc_subsection_title`;
