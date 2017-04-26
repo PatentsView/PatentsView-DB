@@ -15,7 +15,12 @@ def parse_patents(fd, fd2):
     # Generate some extra HTML entities
     defs=htmlentitydefs.entitydefs
     defs['apos'] = "'"
-    entities = open('uspto_parsers/htmlentities').read().split('\n')
+    #this is slgihgly hacky but allows it to run from update script
+    try:
+        entities = open('uspto_parsers/htmlentities').read().split('\n')
+    except:
+        #entities = open('Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
+        pass
     for e in entities:
         try:
             first = re.sub('\s+|\"|;|&','',e[3:15])
@@ -73,7 +78,7 @@ def parse_patents(fd, fd2):
     rawinvfile.write(codecs.BOM_UTF8)
     rawinv = csv.writer(rawinvfile,delimiter='\t')
     #also no inventor id in UC Berkeley
-    rawinv.writerow(['uuid','patent_id', 'inventor_id','rawlocation_id','name_first','name_last', 'sequence', "rule_47"])
+    rawinv.writerow(['uuid','patent_id', 'inventor_id','rawlocation_id','name_first','name_last', 'sequence', 'rule_47'])
     
     
     rawassgfile = open(os.path.join(fd2,'rawassignee.csv'),'wb')
@@ -454,7 +459,7 @@ def parse_patents(fd, fd2):
                         dependent = int(dependent)
                         #this_claim.append(dependent)
                     except:
-                        dependent = -1
+                        dependent = None
                     text = re.sub('<.*?>|</.*?>','',claim)
                     text = re.sub('[\n\t\r\f]+','',text)
                     text = re.sub('^\d+\.\s+','',text)
@@ -651,7 +656,8 @@ def parse_patents(fd, fd2):
                     citation = re.split("<us-citation", avail_fields['us-references-cited'])
                 otherseq = 0
                 forpatseq=0
-                uspatseq=0               
+                uspatseq=0 
+                appseq = 0              
                 for i in citation:
                     #print citation
                     refpatnum = 'NULL' 
@@ -716,7 +722,8 @@ def parse_patents(fd, fd2):
                             uspatentcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind,citcountry,citcategory,str(uspatseq), ref_class] 
                             uspatseq+=1
                         if citdocno != 'NULL' and app_flag:
-                            usappcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind, citdocno, citcountry,citcategory,str(uspatseq)]
+                            usappcitation[id_generator()] = [patent_id,citdocno,citdate,name,citkind, citdocno, citcountry,citcategory,str(appseq)]
+                            appseq +=1
                     elif citdocno != "NULL":
                         foreigncitation[id_generator()] = [patent_id,citdate,citdocno,citcountry,citcategory, str(forpatseq)] 
                         forpatseq+=1 
@@ -724,7 +731,7 @@ def parse_patents(fd, fd2):
                         otherreference[id_generator()] = [patent_id, text, str(otherseq)]
                         otherseq +=1
             
-            if 'assignees' in avail_fields:
+            try:
                 assignees = avail_fields['assignees'].split("</assignee") #splits fields if there are multiple assignees
                 assignees = assignees[:-1] #exclude the last chunk which is a waste line from after the
                 #list_of_assignee_info = []
@@ -753,10 +760,12 @@ def parse_patents(fd, fd2):
                             assgstate = re.search('<state>(.*?)</state>',line).group(1)
                         if line.startswith("<city"):
                             assgcity = re.search('<city>(.*?)</city>',line).group(1)
-                    loc_idd = id_generator() 
+                    loc_idd = None
                     rawlocation[id_generator()] = [loc_idd,assgcity,assgstate,assgcountry] 
                     rawassignee[id_generator()] = [patent_id, None, loc_idd,assgtype,assgfname,assglname,assgorg,str(i)]
                     #how to handle assignee id, for now it is null
+            except:
+                pass
 
             try:
                 if 'applicants' in avail_fields:
@@ -990,8 +999,8 @@ def parse_patents(fd, fd2):
                                         print "Missing date on reldoc"
                                     if line.startswith("<parent-status"):
                                         relparentstatus = re.search('<parent-status>(.*?)</parent-status', line).group(1)
-                                rel_seq +=1
                                 usreldoc[id_generator()] = [patent_id, doc_type, reltype, reldocno, relcountry, reldate,  relparentstatus, rel_seq, kind]
+                                rel_seq +=1
                                 
 
 
@@ -1088,7 +1097,8 @@ def parse_patents(fd, fd2):
                             text = draw_desc
                         #text = [piece.encode('utf-8','ignore') for piece in text]
                         #text = "".join(text)
-                        if not (text.strip() in ["BRIEF DESCRIPTION OF THE DRAWINGS", "BRIEF DESCRIPTION OF THE DRAWING", "BRIEF DESCRIPTION OF THE DRAWING"]):
+                        #if not (text.strip() in ["BRIEF DESCRIPTION OF THE DRAWINGS", "BRIEF DESCRIPTION OF THE DRAWING", "BRIEF DESCRIPTION OF THE DRAWING"]):
+                        if (not text.isupper()) | (any(char.isdigit() for char in text)):
                             draw_desc_text[id_generator()] = [patent_id, text, draw_seq]
                         else:
                             pass #skipping the brief description heading
@@ -1097,7 +1107,7 @@ def parse_patents(fd, fd2):
 
                         heading = re.search(">(.*?)<", line).group(1)
                         #draw_text += " " + heading
-                        if not (text.strip() in ["BRIEF DESCRIPTION OF THE DRAWINGS", "BRIEF DESCRIPTION OF THE DRAWING", "BRIEF DESCRIPTION OF THE DRAWING"]):
+                        if (not desc.isupper()) | (any(char.isdigit() for char in desc)):
                             draw_desc_text[id_generator()] = [patent_id, heading, draw_seq]
                         else:
                           pass #skipping the brief description heading
@@ -1292,8 +1302,8 @@ def parse_patents(fd, fd2):
                 claimsfile.writerow([k]+v)
             
             rawinvfile = csv.writer(open(os.path.join(fd2,'rawinventor.csv'),'ab'),delimiter='\t')
-            for k,v in rawinventor.items():
-                rawinvfile.writerow([k]+v)
+            for k, v in rawinventor.items():
+                rawinvfile.writerow([k] + v)
             
             rawassgfile = csv.writer(open(os.path.join(fd2,'rawassignee.csv'),'ab'),delimiter='\t')
             for k,v in rawassignee.items():
