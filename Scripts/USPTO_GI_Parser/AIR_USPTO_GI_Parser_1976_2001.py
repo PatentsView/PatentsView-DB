@@ -1,17 +1,19 @@
 import re,os,csv
 
-fd = 'H:/share/Science Policy Portfolio/Patent Data 1976-Present/XML/'
+# fd = 'H:/share/Science Policy Portfolio/Patent Data 1976-Present/XML/'
+# assumes "data-1976" directory
+fd = 'data-1976/'
 
 diri = os.listdir(fd)
-outp = csv.writer(open('g:/uspto_GI/1975-2001-v2.csv','wb'))
-checks = open('g:/uspto_GI/check_files-v2.txt','w')
-bad = open('g:/uspto_GI/bads.txt','w')
+outp = csv.writer(open('output-1975-2001-v2.csv','wb'))
+checks = open('output-check_files-v2.txt','w')
+bad = open('output-bads.txt','w')
 data = {}
 
 for d in diri:
     if re.search('\.txt',d):
         print>>checks,d
-        infile = open(fd+d).read().split('PATN')
+        infile = open(os.path.join(fd,d)).read().split('PATN')
         for i in infile:
             check = re.search('GOVERNMENT INTEREST|\nGOVT',i,re.I)
             if check:
@@ -61,7 +63,7 @@ for d in diri:
                                     else:
                                         go = data[num]
                                 except:
-                        
+
                                     try:
                                         govt = re.search('ABST.*?PAC\s+(.*?)\nPAR\s+(.*?)\n[A-Z]{3,10}',i,re.DOTALL)
                                         text = re.sub('[\n\t\r\f]+','',govt.group(2))
@@ -73,4 +75,3 @@ for d in diri:
                                     except:
                                         print>>bad, d+'\n'+i+'____'
                                         print d,i
-                

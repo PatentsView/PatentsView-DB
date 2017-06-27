@@ -82,8 +82,9 @@ SUPPORTED_PYTHON_VERSIONS = ["3.4.1"]  # Versions of Python against which this c
 CURRENT_PYTHON_VERSION = sys.version.split()[0]
 
 CURRENT_WORKING_DIRECTORY = os.getcwd()
-#INPUT_DIRECTORY = os.path.join(CURRENT_WORKING_DIRECTORY, "data")  # Location of USPTO data files, zipped or otherwise.
-INPUT_DIRECTORY = "D:/Raw Data/USPTO/GrantedPatents"
+# restored previous line, which says input files are in "data" directory
+# INPUT_DIRECTORY = "D:/Raw Data/USPTO/GrantedPatents"
+INPUT_DIRECTORY = os.path.join(CURRENT_WORKING_DIRECTORY, "data")  # Location of USPTO data files, zipped or otherwise.
 OUTPUT_DIRECTORY = os.path.join(CURRENT_WORKING_DIRECTORY, "output")  # Location for output files.
 TEMP_DIRECTORY = os.path.join(CURRENT_WORKING_DIRECTORY, "temp")  # Location for temporary working files.
 

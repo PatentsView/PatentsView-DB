@@ -1,18 +1,20 @@
 import re,os,csv
 
-fd = 'z:/share/Science Policy Portfolio/Patent Data 1976-Present/XML/'
+# fd = 'z:/share/Science Policy Portfolio/Patent Data 1976-Present/XML/'
+# assumes "data-2002" directory
+fd = 'data-2002/'
 
-diri = os.listdir(fd+'2005-2014/')
-outp = csv.writer(open('g:/uspto_gi/2005-2014.csv','wb'))
+diri = os.listdir(os.path.join(fd,'2005-2014/'))
+outp = csv.writer(open('output-2002-2015.csv','wb'))
 
 
 #For 2005-2014
 numi = 0
 for d in diri:
-        checks = open('g:/uspto_GI/check_files-v2.txt','a')
-        bad = open('g:/uspto_GI/bads.txt','a')
+        checks = open('output-check_files-v2.txt','a')
+        bad = open('output-bads.txt','a')
         print>>checks,d
-        inp = open(fd+'2005-2014/'+d,'rb').read()
+        inp = open(os.path.join(fd,'2005-2014/',d),'rb').read()
         gg = inp.split('<!DOCTYPE')
         print len(gg)
         del gg[0]
@@ -26,7 +28,7 @@ for d in diri:
                             num = re.search('<doc-number>(\w+)</doc-number>',g).group(1)
                         except:
                             print "BADDDDDD"
-                        
+
                         try:
                             head = re.search('<heading.*?>(.*?)</heading',text).group(1)
                         except:
@@ -40,27 +42,27 @@ for d in diri:
                                 num = re.search('<doc-number>(\w+)</doc-number>',g).group(1)
                             except:
                                 print "BADDDDDD"
-                            
+
                             head = 'STATEMENT OF GOVERNMENT INTEREST'
                             outp.writerow([ num,head,text ])
                         except:
                             print>>bad, d+'\n'+g
-                            
+
         checks.close()
         bad.close()
-                            
-                    
-print numi                 
 
-diri = os.listdir(fd+'2002-2004/')
+
+print numi
+
+diri = os.listdir(os.path.join(fd,'2002-2004/'))
 
 #For 2002-2004
-outp = csv.writer(open('g:/uspto_gi/2002-2004.csv','wb'))
+outp = csv.writer(open('output-2002-2004.csv','wb'))
 numi = 0
 for d in diri:
-        checks = open('g:/uspto_GI/check_files-v2.txt','a')
-        bad = open('g:/uspto_GI/bads.txt','a')
-        inp = open(fd+'2002-2004/'+d,'rb').read()
+        checks = open('output-check_files-v2.txt','a')
+        bad = open('output-bads.txt','a')
+        inp = open(os.path.join(fd,'2002-2004/',d),'rb').read()
         print>>checks,d
         gg = inp.split('<!DOCTYPE')
         print len(gg)
@@ -83,7 +85,7 @@ for d in diri:
                                 num = re.search('<DNUM><PDAT>(\w+)',g).group(1)
                             except:
                                 print "BADDDDDD"
-                            
+
                             need = list(re.finditer('<PDAT>(.*?)</PDAT>',text))
                             if len(need) > 1:
                                 #print "1",need[0].group(1),need[1].group(1)
@@ -91,8 +93,8 @@ for d in diri:
                             else:
                                 #print "2",need[0].group(1)
                                 outp.writerow([num,'STATEMENT OF GOVERNMENT INTEREST',need[0].group(1)])
-                                
+
         checks.close()
         bad.close()
-        
-print numi                 
+
+print numi
