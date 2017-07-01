@@ -25,13 +25,13 @@ def cpc_table(fd):
             filedates = str(curyear)+'-0'+str(curmonth)+'-'+str(days)
         else:
             filedates = str(curyear)+'-'+str(curmonth)+'-'+str(days)
-        
+
     import mechanize
     br = mechanize.Browser()
     ### Check the most recent date and update here for the classification files
     paturl = 'https://bulkdata.uspto.gov/data2/patent/classification/cpc/US_Grant_CPC_MCF_Text_'+filedates+'.zip'
     appurl = 'https://bulkdata.uspto.gov/data2/patent/classification/cpc/US_PGPub_CPC_MCF_Text_'+filedates+'.zip'
-    br.retrieve(paturl,os.path.join(fd,'US_Grant_CPC_MCF_Text_'+filedates+'.zip'))        
+    br.retrieve(paturl,os.path.join(fd,'US_Grant_CPC_MCF_Text_'+filedates+'.zip'))
     br.retrieve(appurl,os.path.join(fd,'US_PGPub_CPC_MCF_Text_'+filedates+'.zip'))
     fd+='/'
     diri = os.listdir(fd)
@@ -40,12 +40,12 @@ def cpc_table(fd):
             patclassfile = ZipFile(os.path.join(fd, d),'r')
         if re.search('US_PGPub_CPC.*?zip',d):
             appclassfile = ZipFile(os.path.join(fd, d), 'r')
-    
+
     #For applications
-    outp = csv.writer(open(fd+'applications_classes.csv','wb'),delimiter='\t')
+    outp = csv.writer(open(os.path.join(fd,'applications_classes.csv'),'wb'),delimiter='\t')
     outp.writerow(['application_number','cpc_primary','cpc_additional'])
     data = {}
-    
+
     def apps(num):
         for e,ii in enumerate(inp[num:]):
             original = ""
@@ -76,9 +76,9 @@ def cpc_table(fd):
                     break
             outp.writerow([appnum,cpc_prim,cpc_add])
             break
-        return num+ee+1 
-            
-    for filename in appclassfile.namelist(): 
+        return num+ee+1
+
+    for filename in appclassfile.namelist():
         if filename.endswith('txt'):
             inp = appclassfile.open(filename).read().split('\r\n')
             num = apps(0)
@@ -87,11 +87,11 @@ def cpc_table(fd):
                     num = apps(num)
                 except:
                     break
-    
+
     #For grants
-    outp = csv.writer(open(fd+'grants_classes.csv','wb'),delimiter='\t')
+    outp = csv.writer(open(os.path.join(fd,'grants_classes.csv'),'wb'),delimiter='\t')
     outp.writerow(['patent_number','cpc_primary','cpc_additional'])
-    
+
     def grants(num):
         for e,ii in enumerate(inp[num:]):
             original = ""
@@ -122,11 +122,11 @@ def cpc_table(fd):
                     cpc_add = '; '.join(cpc_add)
                     break
             outp.writerow([patnum,cpc_prim,cpc_add])
-            
+
             break
-        return num+ee+1 
-    
-    for filename in patclassfile.namelist(): 
+        return num+ee+1
+
+    for filename in patclassfile.namelist():
         if filename.endswith('txt'):
             inp = patclassfile.open(filename).read().split('\r\n')
             num = grants(0)
@@ -135,8 +135,3 @@ def cpc_table(fd):
                     num = grants(num)
                 except:
                     break
-    
-         
-            
-    
-   
