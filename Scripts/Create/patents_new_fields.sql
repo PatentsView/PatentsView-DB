@@ -1,8 +1,8 @@
 -- Create patents schema
 -- Updated 3.1.17 by Sarah Kelley
 
-/*REATE SCHEMA new_parser_qa; */
-use new_parser_qa;
+create schema monthly_update;
+use monthly_update;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -40,17 +40,17 @@ CREATE TABLE `application` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS `examiner`;
+DROP TABLE IF EXISTS `rawexaminer`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `examiner` (
-  `id` varchar(36) NOT NULL,
+CREATE TABLE `rawexaminer` (
+  `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) NOT NULL,
-  `fname` varchar(30) DEFAULT NULL,
-  `lname` varchar(40) DEFAULT NULL,
+  `name_first` varchar(30) DEFAULT NULL,
+   `name_last` varchar(40) DEFAULT NULL,
   `role` varchar(20) DEFAULT NULL,
   `group` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id`,`patent_id`),
+  PRIMARY KEY (`uuid`,`patent_id`),
   KEY `patent_id` (`patent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -90,7 +90,6 @@ CREATE TABLE `assignee_preprocessed` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `claim`
 --
 
