@@ -44,7 +44,6 @@ def parse_patents(fd, fd2):
     fd2+='/'
     diri = os.listdir(fd)
     diri = [d for d in diri if re.search('XML',d,re.I)]
-    diri = [d for d in diri]
     print "Just to check the list of XML files is", diri
     
     #Initiate HTML Parser for unescape characters
@@ -55,7 +54,6 @@ def parse_patents(fd, fd2):
     
     for oo in outdir:
         os.remove(os.path.join(fd2,oo))
-    
     #Rewrite files and write headers to them
     appfile = open(os.path.join(fd2,'application.csv'),'wb')
     appfile.write(codecs.BOM_UTF8)
@@ -138,7 +136,7 @@ def parse_patents(fd, fd2):
     subclass = csv.writer(subclassfile,delimiter='\t')
     subclass.writerow(['id'])
 
-    examinerfile = open(os.path.join(fd2,'examiner.csv'),'wb')
+    examinerfile = open(os.path.join(fd2,'raw_examiner.csv'),'wb')
     examinerfile.write(codecs.BOM_UTF8)
     exam = csv.writer(examinerfile,delimiter='\t')
     exam.writerow(['id','patent_id','fname','lname','role','group'])
@@ -199,8 +197,15 @@ def parse_patents(fd, fd2):
     figurefile.write(codecs.BOM_UTF8)
     figure_info = csv.writer(figurefile, delimiter='\t')
     figure_info.writerow(['uuid', 'patent_id', 'num_figs', "num_sheets"])
+    '''
 
+    new_titles= open(os.path.join(fd2,'new_titles.csv'), 'wb')
+    new_titles.write(codecs.BOM_UTF8)
+    new_titles_info= csv.writer(new_titles, delimiter='\t')
+    new_titles_info.writerow(['patent_id', 'title'])
     
+    new_titles.close()
+    '''
     mainclassfile.close()
     subclassfile.close()
     appfile.close()
@@ -229,7 +234,6 @@ def parse_patents(fd, fd2):
     botanicfile.close()
     figurefile.close()
     usappcitfile.close()
-    
 
 
     loggroups = ["publication-reference", "application-reference", "us-application-series-code", "number-of-claims", "claims", "?BRFSUM", "?DETDESC", "pct-or-regional-filing-data", "us-botanic",
@@ -243,8 +247,7 @@ def parse_patents(fd, fd2):
     rawlocation = {}
     mainclassdata = {}
     subclassdata = {}
-    
-   
+       
     for d in diri:
         print d
         infile = open(fd+d,'rb').read().decode('utf-8','ignore').replace('&angst','&aring')
@@ -309,7 +312,6 @@ def parse_patents(fd, fd2):
 
 
             
-
             # Create containers based on existing Berkeley DB schema (not all are currently used - possible compatibility issues)
             application = {}
             assignee = {}
@@ -345,6 +347,7 @@ def parse_patents(fd, fd2):
             pct_data = {}
             botanic_data = {}
             figure_data = {}
+            new_title = {}
 
 
             ###                PARSERS FOR LOGICAL GROUPS                  ###
@@ -387,19 +390,22 @@ def parse_patents(fd, fd2):
             except:
                 pass
             
-            try:
-                title = None
+            #try:
+            title = None
+            if 'invention-title' in avail_fields:
                 title = re.search('>(.*?)<',avail_fields["invention-title"]).group(1)
-            except:
-                pass
-            
-            
+                if title == '':
+                    text = avail_fields['invention-title']
+                    title = text[text.find('>')+1 :text.rfind('<')]
+                    new_title[patent_id] = title
+
             try:
                 series_code = "NULL"
                 app_series_code = avail_fields['us-application-series-code']
                 series_code = re.search(">(.*?)</", app_series_code).group(1)
             except:
                 pass
+
             try:
                 application_list = avail_fields['application-reference'].split("\n")
                 apptype = None
@@ -553,28 +559,6 @@ def parse_patents(fd, fd2):
             #data = {'class': main[0][:3].replace(' ', ''), 
                  #'subclass': crossrefsub} 
 
-            '''
-            this is not the right solution
-            if ('field-of-search' in avail_fields)|("us-field-of-classification-search" in avail_fields):
-                if 'field-of-search' in avail_fields:
-                    search = avail_fields["field-of-search"].split("\n")
-                elif "us-field-of-classification-search" in avail_fields:
-                    search = avail_field["us-field-of-classification-search"].split("\n")
-                for line in search:
-                    if line.startswith('<main-classification'):
-                        main = re.search('<main-classification>(.*?)</main-classification', line).group(1)
-                        crossrefsub = main[3:].replace(" ","") 
-                        if len(crossrefsub) > 3 and re.search('^[A-Z]',crossrefsub[3:]) is None: 
-                            crossrefsub = crossrefsub[:3]+'.'+crossrefsub[3:] 
-                        crossrefsub = re.sub('^0+','',crossrefsub) 
-                        if re.search('[A-Z]{3}',crossrefsub[:3]): 
-                            crossrefsub = crossrefsub.replace(".","")
-                        main = main[:3].replace(" ","")
-                        sub = crossrefsub
-                        mainclassdata[main] = [main]
-                        subclassdata[sub] = [sub]
-            '''
-
             if 'classification-national' in avail_fields:
                 national = avail_fields["classification-national"]
                 national = national[0]
@@ -607,43 +591,6 @@ def parse_patents(fd, fd2):
                             uspc[id_generator()] = [patent_id,further_class,further_class+'/'+further_sub_class,str(n)] 
                             subclassdata[further_class+'/'+further_sub_class] = [further_class+'/'+further_sub_class]
                             n +=1
-
-
-            '''
-            try:
-                national = avail_fields["classification-national"]
-                national = national[0]
-                national = national.split("\n")
-                n = 0
-                for line in national:
-                    if line.startswith('<main-classification'):
-                        main_class = re.search('<main-classification>(.*?)</main-classification', line).group(1)
-                        sub_class = main_class[3:].replace(" ","")
-                        if len(sub_class)>3 and re.search('^[A-Z]',sub_class[3:]) is None:
-                            sub_class = sub_class[:3]+'.'+sub_class[3:]
-                        sub_class = re.sub('^0+','',sub_class)
-                        if re.search('[A-Z]{3}', sub_class[:3]):
-                            sub_class = sub_class.replace(".","")     
-                        if sub_class != "": 
-                            mainclassdata[main_class] = [main_class] 
-                            uspc[id_generator()] = [patent_id,main_class,main_class+'/'+sub_class,'0'] 
-                            subclassdata[main_class+'/'+sub_class] = [main_class+'/'+sub_class]
-                    if line.startswith("<further-classification"):
-                        further_class = re.search('<further-classification>(.*?)</further-classification', line).group(1)
-                        further_sub_class = further_class[3:].replace(" ","")
-                        if len(further_sub_class)>3 and re.search('^[A-Z]',further_sub_class[3:]) is None:
-                            further_sub_class = further_sub_class[:3]+'.'+further_sub_class[3:]
-                        further_sub_class = re.sub('^0+','',further_sub_class)
-                        if re.search('[A-Z]{3}', further_sub_class[:3]):
-                            further_sub_class = further_sub_class.replace(".","")     
-                        if further_sub_class != "": 
-                            mainclassdata[further_class] = [further_class] 
-                            uspc[id_generator()] = [patent_id,further_class,further_class+'/'+further_sub_class,str(n)] 
-                            subclassdata[further_class+'/'+further_sub_class] = [further_class+'/'+further_sub_class]
-                            n +=1
-            except:
-                pass
-            '''
 
 
 
@@ -885,7 +832,7 @@ def parse_patents(fd, fd2):
                     if fname == "NULL" and lname == "NULL": 
                          pass 
                     else: 
-                         rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, fname,lname, str(i), rule_47]
+                         rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, fname,lname, str(i-1), rule_47]
             except:
                 pass
             
@@ -1284,10 +1231,12 @@ def parse_patents(fd, fd2):
 
             patentdata[patent_id] = [apptype,docno,'US',issdate,abst,title,patkind,numclaims, d]
 
+            '''
+            titlefile= csv.writer(open(os.path.join(fd2,'new_titles.csv'),'ab'),delimiter='\t')
+            for k,v in new_title.items():
+                titlefile.writerow([k]+[v])  
 
-                        
-
-
+            '''
 
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'),delimiter='\t')
             for k,v in patentdata.items():
@@ -1338,7 +1287,7 @@ def parse_patents(fd, fd2):
                 rawlawyerfile.writerow([k]+v)
 
 
-            examinerfile = csv.writer(open(os.path.join(fd2,'examiner.csv'),'ab'),delimiter='\t')
+            examinerfile = csv.writer(open(os.path.join(fd2,'raw_examiner.csv'),'ab'),delimiter='\t')
             for k,v in examiner.items():
                 examinerfile.writerow([k]+v)
 
@@ -1430,6 +1379,5 @@ def parse_patents(fd, fd2):
 
             
     print numi
-
 
             
