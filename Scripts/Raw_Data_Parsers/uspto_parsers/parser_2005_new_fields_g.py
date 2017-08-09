@@ -679,40 +679,48 @@ def parse_patents(fd, fd2):
                         otherseq +=1
             
             try:
-                assignees = avail_fields['assignees'].split("</assignee") #splits fields if there are multiple assignees
-                assignees = assignees[:-1] #exclude the last chunk which is a waste line from after the
-                #list_of_assignee_info = []
-                for i in range(len(assignees)):
-                    assgorg = None
-                    assgfname = None
-                    assglname = None
-                    assgtype = None
-                    assgcountry = 'US'
-                    assgstate = None
-                    assgcity = None
-                    one_assignee = assignees[i].split("\n")
-                    for line in one_assignee:
-                        if line.startswith("<orgname"):
-                            assgorg = re.search('<orgname>(.*?)</orgname>',line).group(1)
-                        if line.startswith("<firstname"):
-                            assgfname = re.search('<firstname>(.*?)</firstname>',line).group(1)
-                        if line.startswith("<lastname"):
-                            assglname = re.search('<lastname>(.*?)</lastname>',line).group(1)
-                        if line.startswith("<role"):
-                            assgtype = re.search('<role>(.*?)</role>',line).group(1)
-                            assgtype = assgtype.lstrip("0")
-                        if line.startswith("<country"):
-                            assgcountry = re.search('<country>(.*?)</country>',line).group(1)
-                        if line.startswith("<state"):
-                            assgstate = re.search('<state>(.*?)</state>',line).group(1)
-                        if line.startswith("<city"):
-                            assgcity = re.search('<city>(.*?)</city>',line).group(1)
-                    loc_idd = None
-                    rawlocation[id_generator()] = [loc_idd,assgcity,assgstate,assgcountry] 
-                    rawassignee[id_generator()] = [patent_id, None, loc_idd,assgtype,assgfname,assglname,assgorg,str(i)]
+                if 'assignees' in avail_fields: 
+                    assignees = avail_fields['assignees'].split("</assignee") #splits fields if there are multiple assignees
+                    assignees = assignees[:-1] #exclude the last chunk which is a waste line from after the
+                    #list_of_assignee_info = []
+                    for i in range(len(assignees)):
+                        assgorg = None
+                        assgfname = None
+                        assglname = None
+                        assgtype = None
+                        assgcountry = 'US'
+                        assgstate = None
+                        assgcity = None
+                        one_assignee = assignees[i].split("\n")
+                        for line in one_assignee:
+                            if line.startswith("<orgname"):
+                                assgorg = re.search('<orgname>(.*?)</orgname>',line).group(1)
+                            if line.startswith("<firstname"):
+                                assgfname = re.search('<firstname>(.*?)</firstname>',line).group(1)
+                            if line.startswith("<lastname"):
+                                assglname = re.search('<lastname>(.*?)</lastname>',line).group(1)
+                            #handle differnt spelling of tags
+                            if line.startswith("<last-name"):
+                                  assglname = re.search('<last-name>(.*?)</last-name>',line).group(1)        
+                            if line.startswith("<first-name"):
+                                  assgfname = re.search('<first-name>(.*?)</first-name>',line).group(1)                           
+                            if line.startswith("<role"):
+                                assgtype = re.search('<role>(.*?)</role>',line).group(1)
+                                assgtype = assgtype.lstrip("0")
+                            if line.startswith("<country"):
+                                assgcountry = re.search('<country>(.*?)</country>',line).group(1)
+                            if line.startswith("<state"):
+                                assgstate = re.search('<state>(.*?)</state>',line).group(1)
+                            if line.startswith("<city"):
+                                assgcity = re.search('<city>(.*?)</city>',line).group(1)
+                        loc_idd = None
+                        rawlocation[id_generator()] = [loc_idd,assgcity,assgstate,assgcountry] 
+                        rawassignee[id_generator()] = [patent_id, None, loc_idd,assgtype,assgfname,assglname,assgorg,str(i)]
+                else:
+                    pass
                     #how to handle assignee id, for now it is null
             except:
-                pass
+                traceback.print_exc()
 
             try:
                 if 'applicants' in avail_fields:
