@@ -405,7 +405,7 @@ def parse_patents(fd, fd2):
                 series_code = re.search(">(.*?)</", app_series_code).group(1)
             except:
                 pass
-
+            
             try:
                 application_list = avail_fields['application-reference'].split("\n")
                 apptype = None
@@ -677,7 +677,7 @@ def parse_patents(fd, fd2):
                     if text!= "NULL":
                         otherreference[id_generator()] = [patent_id, text, str(otherseq)]
                         otherseq +=1
-            
+
             try:
                 if 'assignees' in avail_fields: 
                     assignees = avail_fields['assignees'].split("</assignee") #splits fields if there are multiple assignees
@@ -713,7 +713,7 @@ def parse_patents(fd, fd2):
                                 assgstate = re.search('<state>(.*?)</state>',line).group(1)
                             if line.startswith("<city"):
                                 assgcity = re.search('<city>(.*?)</city>',line).group(1)
-                        loc_idd = None
+                        loc_idd = id_generator()
                         rawlocation[id_generator()] = [loc_idd,assgcity,assgstate,assgcountry] 
                         rawassignee[id_generator()] = [patent_id, None, loc_idd,assgtype,assgfname,assglname,assgorg,str(i)]
                 else:
@@ -848,10 +848,10 @@ def parse_patents(fd, fd2):
                 agent = re.split("</agent", avail_fields['agents'])
                 agent = agent[:-1]
                 for i in range(len(agent)):
-                    fname = "NULL"
-                    lname = "NULL"
-                    lawcountry = 'NULL'
-                    laworg = "NULL"
+                    fname = ""
+                    lname = ""
+                    lawcountry = ''
+                    laworg = ""
                     one_agent = agent[i].split("\n")
                     for line in one_agent:
                         if line.startswith("<first-name"):
@@ -864,7 +864,7 @@ def parse_patents(fd, fd2):
                             laworg = re.search('<orgname>(.*?)</orgname>',line).group(1)
                         if line.startswith("<agent sequence"):
                             rep_type = re.search('rep-type=\"(.*?)\"',line).group(1)
-                    rawlawyer[id_generator()] = ["NULL",patent_id,fname,lname,laworg,lawcountry,str(i)]
+                    rawlawyer[id_generator()] = ["",patent_id,fname,lname,laworg,lawcountry,str(i)]
             except:
                 pass
 
@@ -1236,10 +1236,10 @@ def parse_patents(fd, fd2):
                     except:
                         print "Problem with botanic"
                 botanic_data[id_generator()] = [patent_id, latin_name, variety]
-
+            
             patentdata[patent_id] = [apptype,docno,'US',issdate,abst,title,patkind,numclaims, d]
 
-            '''
+            '''   
             titlefile= csv.writer(open(os.path.join(fd2,'new_titles.csv'),'ab'),delimiter='\t')
             for k,v in new_title.items():
                 titlefile.writerow([k]+[v])  
