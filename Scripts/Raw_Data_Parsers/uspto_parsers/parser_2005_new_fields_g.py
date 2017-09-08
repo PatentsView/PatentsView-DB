@@ -52,8 +52,8 @@ def parse_patents(fd, fd2):
     #Remove all files from output dir before writing
     outdir = os.listdir(fd2)
     
-    for oo in outdir:
-        os.remove(os.path.join(fd2,oo))
+    # for oo in outdir:
+    #     os.remove(os.path.join(fd2,oo))
     #Rewrite files and write headers to them
     appfile = open(os.path.join(fd2,'application.csv'),'wb')
     appfile.write(codecs.BOM_UTF8)
@@ -71,20 +71,18 @@ def parse_patents(fd, fd2):
     rawloc = csv.writer(rawlocfile,delimiter='\t')
     rawloc.writerow(['id','location_id','city','state','country'])
 
-
     rawinvfile = open(os.path.join(fd2,'rawinventor.csv'),'wb')
     rawinvfile.write(codecs.BOM_UTF8)
     rawinv = csv.writer(rawinvfile,delimiter='\t')
     #also no inventor id in UC Berkeley
     rawinv.writerow(['uuid','patent_id', 'inventor_id','rawlocation_id','name_first','name_last', 'sequence', 'rule_47'])
-    
-    
+
     rawassgfile = open(os.path.join(fd2,'rawassignee.csv'),'wb')
     rawassgfile.write(codecs.BOM_UTF8)
     rawassg = csv.writer(rawassgfile,delimiter='\t')
     #assignee_id not in UC Berkeley Parser
     rawassg.writerow(['uuid','patent_id','assignee_id','rawlocation_id','type','name_first','name_last','organization','sequence'])
-    
+
     ipcrfile = open(os.path.join(fd2,'ipcr.csv'),'wb')
     ipcrfile.write(codecs.BOM_UTF8)
     ipcr = csv.writer(ipcrfile,delimiter='\t')
@@ -197,6 +195,7 @@ def parse_patents(fd, fd2):
     figurefile.write(codecs.BOM_UTF8)
     figure_info = csv.writer(figurefile, delimiter='\t')
     figure_info.writerow(['uuid', 'patent_id', 'num_figs', "num_sheets"])
+
     '''
 
     new_titles= open(os.path.join(fd2,'new_titles.csv'), 'wb')
@@ -248,6 +247,11 @@ def parse_patents(fd, fd2):
     mainclassdata = {}
     subclassdata = {}
        
+    for d in diri:
+        if year:
+            diri = [d for d in diri if d.startswith("ipg" + str(year))]
+        else:
+            pass
     for d in diri:
         print d
         infile = open(fd+d,'rb').read().decode('utf-8','ignore').replace('&angst','&aring')
@@ -499,8 +503,8 @@ def parse_patents(fd, fd2):
                     ipcr_classification = avail_fields["classification-ipc"]
                 if type(ipcr_classification) is str:#makes a single ipc classification into a list so it processes properly
                     ipcr_classification = [ipcr_classification]
+                num = 0
                 for j in ipcr_classification:
-                    num = 0
                     class_level = "NULL"
                     section = "NULL"
                     mainclass = "NULL"
@@ -546,7 +550,8 @@ def parse_patents(fd, fd2):
                             if action_date[6:] != "00":
                                     action_date = action_date[:4]+'-'+action_date[4:6]+'-'+action_date[6:]
                             else:
-                                action_date = action_date[:4]+'-'+action_date[4:6]+'-'+'01'                    #if all the valu[es are "NULL", set will have len(1) and we can ignore it. This is bad
+                                action_date = action_date[:4]+'-'+action_date[4:6]+'-'+'01'                    
+                    #if all the valu[es are "NULL", set will have len(1) and we can ignore it. This is bad
                     values = set([section, mainclass, subclass, group, subgroup])
                     if len(values)>1: #get rid of the situation in which there is no data
                         ipcr[id_generator()] = [patent_id,class_level,section ,mainclass,subclass, group,subgroup,symbol_position, classification_value, classification_status, classification_source,action_date, ipcrversion,str(num)]
@@ -714,13 +719,13 @@ def parse_patents(fd, fd2):
                             if line.startswith("<city"):
                                 assgcity = re.search('<city>(.*?)</city>',line).group(1)
                         loc_idd = id_generator()
-                        rawlocation[id_generator()] = [loc_idd,assgcity,assgstate,assgcountry] 
+                        rawlocation[loc_id] = [None,assgcity,assgstate,assgcountry] 
                         rawassignee[id_generator()] = [patent_id, None, loc_idd,assgtype,assgfname,assglname,assgorg,str(i)]
                 else:
                     pass
-                    #how to handle assignee id, for now it is null
+                    
             except:
-                traceback.print_exc()
+                print patent_id, "problem with assignee"
 
             try:
                 if 'applicants' in avail_fields:
@@ -789,17 +794,17 @@ def parse_patents(fd, fd2):
                     non_inventor_app_types =  ['legal-representative', 'party-of-interest', 'obligated-assignee', 'assignee']
                     if later_applicant_type in non_inventor_app_types:
                             loc_idd = id_generator() 
-                            rawlocation[id_generator()] = [loc_idd,city,state, country] 
+                            rawlocation[loc_idd] = [None,city,state, country] 
                             non_inventor_applicant[id_generator()] = [patent_id, loc_idd, last_name, first_name, orgname, sequence, designation, later_applicant_type]
                     #this gets us the inventors from 2005-2012
                     if earlier_applicant_type == "applicant-inventor":
                         loc_idd = id_generator() 
-                        rawlocation[id_generator()] = [loc_idd,city,state, country] 
-                        rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, first_name,last_name, str(inventor_seq), rule_47]  
+                        rawlocation[loc_idd] = [None,city,state, country] 
+                        rawinventor[id_generator()] = [patent_id,None, loc_idd, first_name,last_name, str(inventor_seq), rule_47]  
                         inventor_seq +=1
                     if (earlier_applicant_type != "applicant-inventor") and earlier_applicant_type!="NULL":
                         loc_idd = id_generator() 
-                        rawlocation[id_generator()] = [loc_idd,city,state, country] 
+                        rawlocation[loc_idd] = [None,city,state, country] 
                         non_inventor_applicant[id_generator()] = [patent_id, loc_idd, last_name, first_name, orgname, sequence, designation, earlier_applicant_type]
             except:
                 pass
@@ -1239,12 +1244,12 @@ def parse_patents(fd, fd2):
             
             patentdata[patent_id] = [apptype,docno,'US',issdate,abst,title,patkind,numclaims, d]
 
-            '''   
-            titlefile= csv.writer(open(os.path.join(fd2,'new_titles.csv'),'ab'),delimiter='\t')
-            for k,v in new_title.items():
-                titlefile.writerow([k]+[v])  
+            #   
+            # titlefile= csv.writer(open(os.path.join(fd2,'new_titles.csv'),'ab'),delimiter='\t')
+            # for k,v in new_title.items():
+            #     titlefile.writerow([k]+[v])  
 
-            '''
+            #
 
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'),delimiter='\t')
             for k,v in patentdata.items():
@@ -1261,11 +1266,11 @@ def parse_patents(fd, fd2):
             rawinvfile = csv.writer(open(os.path.join(fd2,'rawinventor.csv'),'ab'),delimiter='\t')
             for k, v in rawinventor.items():
                 rawinvfile.writerow([k] + v)
-            
+            '''
             rawassgfile = csv.writer(open(os.path.join(fd2,'rawassignee.csv'),'ab'),delimiter='\t')
             for k,v in rawassignee.items():
                 rawassgfile.writerow([k]+v)
-            
+            '''
             ipcrfile = csv.writer(open(os.path.join(fd2,'ipcr.csv'),'ab'),delimiter='\t')
             for k,v in ipcr.items():
                 ipcrfile.writerow([k]+v)
@@ -1388,4 +1393,3 @@ def parse_patents(fd, fd2):
             
     print numi
 
-            
