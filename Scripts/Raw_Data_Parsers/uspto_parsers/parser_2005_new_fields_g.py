@@ -246,12 +246,8 @@ def parse_patents(fd, fd2):
     rawlocation = {}
     mainclassdata = {}
     subclassdata = {}
-       
-    for d in diri:
-        if year:
-            diri = [d for d in diri if d.startswith("ipg" + str(year))]
-        else:
-            pass
+
+    #diri = [d for d in diri if d.startswith("ipg" + str(year))]
     for d in diri:
         print d
         infile = open(fd+d,'rb').read().decode('utf-8','ignore').replace('&angst','&aring')
@@ -263,7 +259,7 @@ def parse_patents(fd, fd2):
         
         numi+=len(infile)
         
-        for i in infile:                                       
+        for i in infile:                                      
             avail_fields = {}
             #parser for logical groups
             for j in loggroups:
@@ -719,7 +715,7 @@ def parse_patents(fd, fd2):
                             if line.startswith("<city"):
                                 assgcity = re.search('<city>(.*?)</city>',line).group(1)
                         loc_idd = id_generator()
-                        rawlocation[loc_id] = [None,assgcity,assgstate,assgcountry] 
+                        rawlocation[loc_idd] = [None,assgcity,assgstate,assgcountry] 
                         rawassignee[id_generator()] = [patent_id, None, loc_idd,assgtype,assgfname,assglname,assgorg,str(i)]
                 else:
                     pass
@@ -840,12 +836,12 @@ def parse_patents(fd, fd2):
                             invtstate = re.search('<state>(.*?)</state>',line).group(1)
                         if line.startswith("<city"):
                             invtcity = re.search('<city>(.*?)</city>',line).group(1)
-                    loc_idd = id_generator() 
-                    rawlocation[id_generator()] = [loc_idd,invtcity,invtstate,invtcountry]   
                     if fname == "NULL" and lname == "NULL": 
                          pass 
                     else: 
-                         rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, fname,lname, str(i-1), rule_47]
+                        loc_idd = id_generator() 
+                        rawlocation[loc_idd] = [None,invtcity,invtstate,invtcountry]   
+                        rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, fname,lname, str(i-1), rule_47]
             except:
                 pass
             
@@ -1266,11 +1262,11 @@ def parse_patents(fd, fd2):
             rawinvfile = csv.writer(open(os.path.join(fd2,'rawinventor.csv'),'ab'),delimiter='\t')
             for k, v in rawinventor.items():
                 rawinvfile.writerow([k] + v)
-            '''
+
             rawassgfile = csv.writer(open(os.path.join(fd2,'rawassignee.csv'),'ab'),delimiter='\t')
             for k,v in rawassignee.items():
                 rawassgfile.writerow([k]+v)
-            '''
+
             ipcrfile = csv.writer(open(os.path.join(fd2,'ipcr.csv'),'ab'),delimiter='\t')
             for k,v in ipcr.items():
                 ipcrfile.writerow([k]+v)
