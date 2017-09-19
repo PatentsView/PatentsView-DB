@@ -59,16 +59,17 @@ def transform(folder,host,username,password,appdb,patdb):
     import mechanize,os,csv
     br = mechanize.Browser()
     files = ['application_correct.csv']
-    for f in files:
-        url = 'http://www.dev.patentsview.org/data/'+f
-        br.retrieve(url,os.path.join(folder,f))
+    # for f in files:
+    #     url = 'http://www.dev.patentsview.org/data/'+f
+    #     br.retrieve(url,os.path.join(folder,f))
     inp = csv.reader(file(os.path.join(folder,'application_correct.csv'),'rb'))
     inp.next()
     check_dupl_appnums = set()
     for i in inp:
         check_dupl_appnums.add(i[0]+'_'+i[1])
 
-    AppCorrectOutput = csv.writer(open(os.path.join(folder,files[0]),'ab'))
+    #AppCorrectOutput = csv.writer(open(os.path.join(folder,files[0]),'ab'))
+    AppCorrectOutput = csv.writer(open(os.path.join(folder,"application_correct.csv"),'ab'))
     for i in PatInput:
         # unify the ID
         if re.sub('6\s+','',i[3]).startswith('D'):
@@ -122,8 +123,16 @@ def transform(folder,host,username,password,appdb,patdb):
         cursor.execute('update '+patdb+'.rawlocation set country_transformed = NULL where country = "" OR country = "unknown"')
         cursor.execute('update '+patdb+'.rawlocation set country_transformed = left(country,2) where length(country) >= 3')
         mydb.commit()
-        
+
+        ### Transform county codes with X in foreign_priority ###
+        cursor.execute('alter table '+patdb+'.foreign_priority add column country_transformed varchar(10)')
+        cursor.execute('update '+patdb+'.foreign_priority set country_transformed = country')
+        cursor.execute('update '+patdb+'.foreign_priority set country_transformed = NULL where country = "" OR country = "unknown"')
+        cursor.execute('update '+patdb+'.foreign_priority set country_transformed = left(country,2) where length(country) >= 3')
+        mydb.commit()
+
         ### Update application numbers for broken records ###
+        #inp = csv.reader(file(os.path.join(folder,'application_correct.csv'),'rb'))
         inp = csv.reader(file(os.path.join(folder,'application_correct.csv'),'rb'))
         inp.next()
         try:

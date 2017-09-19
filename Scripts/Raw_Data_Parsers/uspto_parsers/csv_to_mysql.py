@@ -1,6 +1,8 @@
 import csv
 import MySQLdb
 import re,os,random,string,codecs
+from warnings import filterwarnings
+filterwarnings('ignore', category = MySQLdb.Warning) #comment this out for verbose warnings
 
 def mysql_upload(host,username,password,dbname,folder,output_folder):
     inp = open(os.path.join(folder,'patent.csv'),'rb').read().decode('utf-8','ignore').split("\r\n")
@@ -76,7 +78,6 @@ def mysql_upload(host,username,password,dbname,folder,output_folder):
     h = HTMLParser.HTMLParser()
     
     for d in diri:
-        print d
         infile = h.unescape(codecs.open(os.path.join(folder,d),'rb',encoding='utf-8').read()).split('\r\n')
         outp = csv.writer(open(os.path.join(output_folder,d),'wb'),delimiter='\t')
         #head = infile.next()
@@ -93,10 +94,10 @@ def mysql_upload(host,username,password,dbname,folder,output_folder):
                 idelem = head.index('patent_id')
             except:
                 idelem = None
-        if d == 'rawassignee.csv' or d == 'rawinventor.csv':
-            nullid = 2
-        if d == 'rawlawyer.csv' or d == 'rawlocation.csv':
-            nullid = 1
+        # if d == 'rawassignee.csv' or d == 'rawinventor.csv':
+        #     nullid = 2
+        # if d == 'rawlawyer.csv' or d == 'rawlocation.csv':
+        #     nullid = 1
         checkifexists = None
         if d == 'rawlocation.csv':
             checkifexists = 1
@@ -172,7 +173,6 @@ def mysql_upload(host,username,password,dbname,folder,output_folder):
         #print d, numRows
         #mydb.commit()
 
-    print "ALL GOOD"
 
 
 def upload_csv(host,username,password,dbname,folder):
@@ -186,7 +186,7 @@ def upload_csv(host,username,password,dbname,folder):
     diri = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder,f))] # gets only files, not folders
     for d in diri:
         cursor.execute("load data local infile '"+os.path.join(folder,d)+"' into table "+d.replace('.csv','')+" fields terminated by '\t' lines terminated by '\r\n' ignore 1 lines")
-
+    mydb.commit()
     
 
 def upload_uspc(host,username,password,appdb,patdb,folder):

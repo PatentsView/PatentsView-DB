@@ -15,9 +15,9 @@ def parse_patents(fd, fd2):
     # Generate some extra HTML entities
     defs=htmlentitydefs.entitydefs
     defs['apos'] = "'"
-    #this is slgihgly hacky but allows it to run from update script
+    #find the entities file
     try:
-        entities = open('uspto_parsers/htmlentities').read().split('\n')
+        entities = open('Code/PatentsView-DB/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
     except:
         #entities = open('Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
         pass
@@ -134,7 +134,7 @@ def parse_patents(fd, fd2):
     subclass = csv.writer(subclassfile,delimiter='\t')
     subclass.writerow(['id'])
 
-    examinerfile = open(os.path.join(fd2,'raw_examiner.csv'),'wb')
+    examinerfile = open(os.path.join(fd2,'rawexaminer.csv'),'wb')
     examinerfile.write(codecs.BOM_UTF8)
     exam = csv.writer(examinerfile,delimiter='\t')
     exam.writerow(['id','patent_id','fname','lname','role','group'])
@@ -841,7 +841,7 @@ def parse_patents(fd, fd2):
                     else: 
                         loc_idd = id_generator() 
                         rawlocation[loc_idd] = [None,invtcity,invtstate,invtcountry]   
-                        rawinventor[id_generator()] = [patent_id,"NULL", loc_idd, fname,lname, str(i-1), rule_47]
+                        rawinventor[id_generator()] = [patent_id, None, loc_idd, fname,lname, str(i-1), rule_47]
             except:
                 pass
             
@@ -986,6 +986,7 @@ def parse_patents(fd, fd2):
             if "priority-claim" in avail_fields:
                 priority = avail_fields["priority-claim"] [1:] #first entry is a waste
                 #print priority
+                sequence = 0
                 for i in priority:
                     priority_id = "NULL"
                     priority_requested = "NULL"
@@ -1002,7 +1003,6 @@ def parse_patents(fd, fd2):
                             else:
                                 app_date = app_date[:4]+'-'+appd_ate[4:6]+'-'+'01'
                         if line.startswith(" sequence"):
-                            sequence = re.search('sequence="(.*?)"', line).group(1)
                             kind =  re.search('kind="(.*?)"', line).group(1)
                         if line.startswith("<id"):
                             priority_id = re.search("<id>(>*?)<id>", line).group(1)
@@ -1010,6 +1010,7 @@ def parse_patents(fd, fd2):
                             priority_requested = re.search("<priority-doc-requested>(.*?)</priority-doc-requested", line).group(1)
                     #priority_id and priority_requested cant be found
                     for_priority[id_generator()] = [patent_id, sequence, kind, app_num, app_date, country]
+                    sequence +=1
 
 
             #if "description" in avail_fields:
@@ -1296,7 +1297,7 @@ def parse_patents(fd, fd2):
                 rawlawyerfile.writerow([k]+v)
 
 
-            examinerfile = csv.writer(open(os.path.join(fd2,'raw_examiner.csv'),'ab'),delimiter='\t')
+            examinerfile = csv.writer(open(os.path.join(fd2,'rawexaminer.csv'),'ab'),delimiter='\t')
             for k,v in examiner.items():
                 examinerfile.writerow([k]+v)
 

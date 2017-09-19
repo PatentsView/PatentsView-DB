@@ -5,34 +5,34 @@ def cpc_table(fd):
     from zipfile import ZipFile
     from calendar import monthrange
 
-    ### Get current month,day
-    d = date.today()
-    curyear = d.year
-    curmonth = d.month
-    curday = d.day
+    # ### Get current month,day
+    # d = date.today()
+    # curyear = d.year
+    # curmonth = d.month
+    # curday = d.day
 
-    days = monthrange(curyear,curmonth)[1]
-    if curday != days and curmonth != 1:
-        days = monthrange(curyear,curmonth-1)[1]
-        if len(str(curmonth-1)) == 1:
-            filedates = str(curyear)+'-0'+str(curmonth-1)+'-'+str(days)
-        else:
-            filedates = str(curyear)+'-'+str(curmonth-1)+'-'+str(days)
-    elif curday != days and curmonth == 1:
-        filedates = str(curyear-1)+'-12-31'
-    else:
-        if len(str(curmonth)) == 1:
-            filedates = str(curyear)+'-0'+str(curmonth)+'-'+str(days)
-        else:
-            filedates = str(curyear)+'-'+str(curmonth)+'-'+str(days)
+    # days = monthrange(curyear,curmonth)[1]
+    # if curday != days and curmonth != 1:
+    #     days = monthrange(curyear,curmonth-1)[1]
+    #     if len(str(curmonth-1)) == 1:
+    #         filedates = str(curyear)+'-0'+str(curmonth-1)+'-'+str(days)
+    #     else:
+    #         filedates = str(curyear)+'-'+str(curmonth-1)+'-'+str(days)
+    # elif curday != days and curmonth == 1:
+    #     filedates = str(curyear-1)+'-12-31'
+    # else:
+    #     if len(str(curmonth)) == 1:
+    #         filedates = str(curyear)+'-0'+str(curmonth)+'-'+str(days)
+    #     else:
+    #         filedates = str(curyear)+'-'+str(curmonth)+'-'+str(days)
         
-    import mechanize
-    br = mechanize.Browser()
-    ### Check the most recent date and update here for the classification files
-    paturl = 'https://bulkdata.uspto.gov/data2/patent/classification/cpc/US_Grant_CPC_MCF_Text_'+filedates+'.zip'
-    appurl = 'https://bulkdata.uspto.gov/data2/patent/classification/cpc/US_PGPub_CPC_MCF_Text_'+filedates+'.zip'
-    br.retrieve(paturl,os.path.join(fd,'US_Grant_CPC_MCF_Text_'+filedates+'.zip'))        
-    br.retrieve(appurl,os.path.join(fd,'US_PGPub_CPC_MCF_Text_'+filedates+'.zip'))
+    # import mechanize
+    # br = mechanize.Browser()
+    # ### Check the most recent date and update here for the classification files
+    # paturl = 'https://bulkdata.uspto.gov/data2/patent/classification/cpc/US_Grant_CPC_MCF_Text_'+filedates+'.zip'
+    # appurl = 'https://bulkdata.uspto.gov/data2/patent/classification/cpc/US_PGPub_CPC_MCF_Text_'+filedates+'.zip'
+    # br.retrieve(paturl,os.path.join(fd,'US_Grant_CPC_MCF_Text_'+filedates+'.zip'))        
+    # br.retrieve(appurl,os.path.join(fd,'US_PGPub_CPC_MCF_Text_'+filedates+'.zip'))
     fd+='/'
     diri = os.listdir(fd)
     for d in diri:

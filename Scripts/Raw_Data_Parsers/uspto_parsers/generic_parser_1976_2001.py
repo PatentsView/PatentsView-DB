@@ -49,7 +49,7 @@ def parse_patents(fd,fd2):
     claimsfile = open(os.path.join(fd2,'claim.csv'),'wb')
     claimsfile.write(codecs.BOM_UTF8)
     clms = csv.writer(claimsfile,delimiter='\t')
-    clms.writerow(['uuid','patent_id','text','dependent','sequence'])
+    clms.writerow(['uuid','patent_id','text','dependent','sequence', 'exemplary'])
     
     rawlocfile = open(os.path.join(fd2,'rawlocation.csv'),'wb')
     rawlocfile.write(codecs.BOM_UTF8)
@@ -94,7 +94,7 @@ def parse_patents(fd,fd2):
     examfile = open(os.path.join(fd2,'examiner.csv'),'wb')
     examfile.write(codecs.BOM_UTF8)
     examiner = csv.writer(examfile,delimiter='\t')
-    examiner.writerow(['id','patent_id','fname','lname','role','group','sequence'])
+    examiner.writerow(['id','patent_id','fname','lname','role','group'])
     
     rawlawyerfile = open(os.path.join(fd2,'rawlawyer.csv'),'wb')
     rawlawyerfile.write(codecs.BOM_UTF8)
@@ -117,7 +117,7 @@ def parse_patents(fd,fd2):
     subclass.writerow(['id'])
     
     ### New fields ###
-    forpriorityfile = open(os.path.join(fd2,'forpriority.csv'),'wb')
+    forpriorityfile = open(os.path.join(fd2,'foreign_priority.csv'),'wb')
     forpriorityfile.write(codecs.BOM_UTF8)
     forpriority = csv.writer(forpriorityfile,delimiter='\t')
     forpriority.writerow(['uuid', 'patent_id', "sequence", "kind", "app_num", "app_date", "country"])
@@ -139,17 +139,17 @@ def parse_patents(fd,fd2):
     draw_desc_textfile = open(os.path.join(fd2,'draw_desc_text.csv'), 'wb')
     draw_desc_textfile.write(codecs.BOM_UTF8)
     drawdesc = csv.writer(draw_desc_textfile, delimiter='\t')
-    drawdesc.writerow(['uuid', 'patent_id', "text", "seq"])
+    drawdesc.writerow(['uuid', 'patent_id', 'text', 'seq'])
 
     brf_sum_textfile = open(os.path.join(fd2,'brf_sum_text.csv'), 'wb')
     brf_sum_textfile.write(codecs.BOM_UTF8)
     brf_sum = csv.writer(brf_sum_textfile, delimiter='\t')
-    brf_sum.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
+    brf_sum.writerow(['uuid', 'patent_id', 'text'])
 
     det_desc_textfile = open(os.path.join(fd2,'detail_desc_text.csv'), 'wb')
     det_desc_textfile.write(codecs.BOM_UTF8)
     det_desc = csv.writer(det_desc_textfile, delimiter='\t')
-    det_desc.writerow(['uuid', 'patent_id', 'type', "text", "seq"])
+    det_desc.writerow(['uuid', 'patent_id', 'text'])
 
     rel_app_textfile = open(os.path.join(fd2,'rel_app_text.csv'), 'wb')
     rel_app_textfile.write(codecs.BOM_UTF8)
@@ -159,7 +159,7 @@ def parse_patents(fd,fd2):
     non_inventor_applicantfile = open(os.path.join(fd2,'non_inventor_applicant.csv'),'wb')
     non_inventor_applicantfile.write(codecs.BOM_UTF8)
     noninventorapplicant = csv.writer(non_inventor_applicantfile,delimiter='\t')
-    noninventorapplicant.writerow(['uuid', 'patent_id', "last_name", "first_name", "sequence", "designation", "applicant_type", "street", "city", "state", "country", "nationality", "residence"])
+    noninventorapplicant.writerow(['uuid', 'patent_id', "location_id", "last_name", "first_name", "org_name", "sequence", "designation", "applicant_type"])
 
     pct_datafile = open(os.path.join(fd2,'pct_data.csv'), 'wb')
     pct_datafile.write(codecs.BOM_UTF8)
@@ -174,8 +174,7 @@ def parse_patents(fd,fd2):
     figurefile = open(os.path.join(fd2,'figures.csv'), 'wb')
     figurefile.write(codecs.BOM_UTF8)
     figure_info = csv.writer(figurefile, delimiter='\t')
-    figure_info.writerow(['uuid', 'patent_id', 'num_figs', "num_sheets"])
-
+    figure_info.writerow(['uuid', 'patent_id', 'num_figs', "num_sheets"])   
     
     mainclassfile.close()
     subclassfile.close()
@@ -377,13 +376,16 @@ def parse_patents(fd,fd2):
                         assistexam = re.search('EXA\s+(.*?)$',line).group(1).split("; ")
                         assistexamfname = assistexam[1]
                         assistexamlname = assistexam[0]
-                        examiner[id_generator()] = [patent_id,assistexamfname,assistexamlname,"assistant", "NULL", sequence]
+                        examiner[id_generator()] = [patent_id,assistexamfname,assistexamlname,"assistant", "NULL"]
                     if line.startswith("EXP"):
                         sequence +=1
                         primexam = re.search('EXP\s+(.*?)$',line).group(1).split("; ")
                         primexamfname = primexam[1]
                         primexamlname = primexam[0]
-                        examiner[id_generator()] = [patent_id,primexamfname,primexamlname,"primary", "NULL", sequence]
+                        examiner[id_generator()] = [patent_id,primexamfname,primexamlname,"primary", "NULL"]
+                    if line.startswith("ECL"):                     
+                        exemplary = re.search('ECL\s+(.*?)$',line).group(1)
+                        exemplary_list = exemplary.split(",")
             except:
                 pass
             
@@ -630,7 +632,7 @@ def parse_patents(fd,fd2):
                             
                         if line.startswith('OCL'):
                             refpatclass = re.search('OCL\s\s(.*?)$',line).group(1) 
-                    uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,"NULL","NULL",'US',"NULL",str(n)]
+                    uspatentcitation[id_generator()] = [patent_id,refpatnum,refpatdate,refpatname,"NULL",'US',"NULL",str(n)]
             except:
                 pass
             
@@ -720,6 +722,7 @@ def parse_patents(fd,fd2):
             #PCT info
             try:
                 pctinfo = avail_fields['PCTA'].split('\n\n\n\n\n')
+                #print pctinfo
                 for n in range(len(pctinfo)):
                     pctnum = 'NULL'
                     pct371 = 'NULL'
@@ -744,10 +747,8 @@ def parse_patents(fd,fd2):
                     pctdata[id_generator()] = [patent_id,pctpubnum,pctpubdate,pct371,"WO","A","wo_grant",pct102]
                     pctdata[id_generator()] = [patent_id,pctnum,pctdate,pct371,"WO","00","pct_application",pct102]
                     #pct_data.writerow(['uuid', 'patent_id', 'rel_id', 'date', '371_date', 'country', 'kind', "doc_type","sequence"])
-
             except:
                 pass
-            
             
             #Legal information - can be several
             try:
@@ -811,13 +812,19 @@ def parse_patents(fd,fd2):
             try:
                 drawdesc = re.sub('\s+',' ',avail_fields['DRWD'])
                 drawdesc = re.sub('\s$','',drawdesc)
-                drawdesc = drawdesc.split(' PAL ')
-                for n in range(1,len(drawdesc)):
-                    drawdescdata[id_generator()] =[patent_id,drawdesc[n],str(n)] 
+                drawdesc = re.split(r'( PAR | PAL | PAC )', drawdesc)
+                drawdesc = filter(None, drawdesc) #this doesn't work combined with next filter, so separate for now
+                drawdesc = filter(lambda x : x not in [' PAR ', ' PAL ',' PAC ', 'BRIEF DESCRIPTION OF THE DRAWINGS'," BRIEF DESCRIPTION OF THE DRAWING", "DESCRIPTION OF THE DRAWING"], drawdesc)
+                draw_sequence = 1
+                for n in range(0,len(drawdesc) ):
+                    if drawdesc[n] >1: #filter out blank entries
+                        drawdescdata[id_generator()] =[patent_id,drawdesc[n],str(draw_sequence)] 
+                        draw_sequence +=1
             except:
                 pass
-            
+
             # Detail description
+            '''
             detdesc = 'NULL'
             try:
                 detdesc = re.sub('PAR\s+',' ',bsum)
@@ -827,6 +834,17 @@ def parse_patents(fd,fd2):
 
             except:
                 pass
+            '''
+            detdesc = 'NULL'
+            try:
+                detdesc = re.sub('PAR\s+',' ',avail_fields['DETD'])
+                detdesc = re.sub('PAC\s+',' ',detdesc)
+                detdesc = re.sub('PA\d+\s+',' ',detdesc)
+                detdesc = re.sub('TBL\s+','',detdesc)
+                detdesc = re.sub('\s+',' ',detdesc)
+            except:
+                pass
+
 
             # Parent case for US rel docs
             try:
@@ -971,7 +989,13 @@ def parse_patents(fd,fd2):
                 
                 datum = sorted(datum.items())
                 for k,v in datum:
-                    claimsdata[id_generator()] = [updnum,re.sub('^\s\d+\.\s','',v),"NULL",str(k)]
+                    exemplary = False
+                    if str(k) in exemplary_list:
+                        exemplary = True
+                    claim_stripped = re.sub('^\s\d+\.\s','',v)
+                    claim_stripped = claim_stripped.lstrip('12234567890.')
+                    claimsdata[id_generator()] = [updnum,claim_stripped,"NULL",str(k), exemplary]
+                    #claimsdata[id_generator()] = [updnum,re.sub('^\s\d+\.\s','',v),"NULL",str(k), exemplary]
                 if len(datum) == 0:
                     pass
             else:
@@ -994,8 +1018,13 @@ def parse_patents(fd,fd2):
                         text = re.sub('\s+',' ',text)
                     except:
                         pass
-                    
-                    claimsdata[id_generator()]=[updnum,re.sub('^PAR\s+','',text),"NULL",'1']
+                    exemplary = False
+                    if "1" in exemplary_list:
+                        exemplary = True
+                    text_stripped = re.sub('^PAR\s+','',text)
+                    text_stripped = text_stripped.lstrip('12234567890.')
+                    claimsdata[id_generator()]=[updnum,text_stripped,"NULL",'1', exemplary]
+                    #claimsdata[id_generator()]=[updnum,re.sub('^PAR\s+','',text),"NULL",'1', exemplary]
                 else:
                     pass
 
@@ -1006,10 +1035,10 @@ def parse_patents(fd,fd2):
             
             
             brf_sum_textfile = csv.writer(open(os.path.join(fd2,'brf_sum_text.csv'),'ab'),delimiter='\t')
-            brf_sum_textfile.writerow([id_generator(),patent_id,"",bsum,'0'])
+            brf_sum_textfile.writerow([id_generator(),patent_id, bsum])
             
             det_desc_textfile = csv.writer(open(os.path.join(fd2,'detail_desc_text.csv'),'ab'),delimiter='\t')
-            det_desc_textfile.writerow([id_generator(),patent_id,"",detdesc,'0'])
+            det_desc_textfile.writerow([id_generator(),patent_id,detdesc])
             
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'),delimiter='\t')
             for k,v in patentdata.items():
@@ -1068,7 +1097,7 @@ def parse_patents(fd,fd2):
             for k,v in otherreference.items():
                 otherreffile.writerow([k]+v)
             
-            forpriorityfile = csv.writer(open(os.path.join(fd2,'forpriority.csv'),'ab'),delimiter='\t')
+            forpriorityfile = csv.writer(open(os.path.join(fd2,'foreign_priority.csv'),'ab'),delimiter='\t')
             for k,v in prioritydata.items():
                 forpriorityfile.writerow([k]+v)
             
