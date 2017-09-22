@@ -1099,6 +1099,7 @@ def parse_patents(fd,fd2):
                 #print abst
             except:
                 abst = 'NULL'
+
             try:     
                 sequence = 0
                 id_group = "NULL"
@@ -1168,7 +1169,6 @@ def parse_patents(fd,fd2):
             #     pass
 
             #Brief summary
-            
             try:
                 bsum = 'NULL'
                 if 'BRFSUM' in avail_fields:
@@ -1203,7 +1203,7 @@ def parse_patents(fd,fd2):
                         relappdata[id_generator()] = [updnum,re.sub('\s+',' ',relapp)]
             except:
                 pass
-            
+
             
             if patkind in type_kind:
                 patentdata[patent_id] = [type_kind[patkind],updnum,'US',issdate,abst,title,patkind,numclaims,d]

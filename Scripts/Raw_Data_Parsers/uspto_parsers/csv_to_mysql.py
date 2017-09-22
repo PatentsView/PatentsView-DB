@@ -705,7 +705,7 @@ def upload_wipo(host,username,password,database,working_directory):
         db = database)
     cursor = mydb.cursor()
     cursor.execute("truncate table wipo;")
-    cursor.execute("insert into wipo select id,'36',0 from patent type='plant';")
+    cursor.execute("insert into wipo select id,'36',0 from patent where type='plant';")
     mydb.commit()
     cursor.execute('select distinct uc.patent_id,uc.mainclass_id from uspc_current uc left join patent p on p.id=uc.patent_id where p.type="design" and uc.sequence=0 and uc.mainclass_id regexp "^D"')
     num = 0
@@ -718,5 +718,5 @@ def upload_wipo(host,username,password,database,working_directory):
     mydb.commit()
 
     f = working_directory + "/WIPO_output/WIPO_Cats_assigned.csv"
-    cursor.execute("""load data local infile """ + f + """ into table wipo fields terminated by '\t' optionally enclosed by '"' lines terminated by '\r\n' ignore 1 lines""")
+    cursor.execute("""load data local infile '""" + f + """' into table wipo fields terminated by '\t' optionally enclosed by '"' lines terminated by '\r\n' ignore 1 lines""")
     mydb.commit()

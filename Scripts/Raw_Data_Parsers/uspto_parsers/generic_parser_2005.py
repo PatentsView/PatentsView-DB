@@ -18,8 +18,8 @@ def parse_patents(fd, fd2):
     #find the entities file
     try:
         entities = open('Code/PatentsView-DB/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
-    except:
-        #entities = open('Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
+    except: #slighly hacky for running separately to debug
+        entities = open('uspto_parsers/htmlentities').read().split('\n')
         pass
     for e in entities:
         try:
@@ -629,20 +629,16 @@ def parse_patents(fd, fd2):
                             if re.match(r'^[A-Z]*\d+$', citdocno):
                                 num = re.findall('\d+', citdocno)
                                 num = num[0] #turns it from list to string
-                                #print num
-                                if num[0].startswith("0"):
-                                    num = num[1:]
-                                    let = re.findall('[a-zA-Z]+', citdocno)
+                                num = num[1:]
+                                let = re.findall('[a-zA-Z]+', citdocno)
                                 if let:
                                     let = let[0]#list to string
                                     citdocno = let +num
                                 else:
                                     citdocno = num
-                            if not re.match(r'^[A-Z]*\d+$', citdocno):
+                            else: #basically if there is anything other than number and digits
                                 citdocno = citdocno
-                                #print citdocno
                                 app_flag = True
-                            #print citdocno
                         try:
                             if line.startswith("<kind"):
                                 citkind = re.search('<kind>(.*?)</kind>',line).group(1)

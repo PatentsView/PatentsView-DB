@@ -39,7 +39,7 @@ elif int(params.period) == 2:
     generic_parser_2002_2004.parse_patents(params.input_dir,params.output_dir)
 
 elif int(params.period) ==3:
-    generic_parser_2002_2004.parse_patents(params.input_dir,params.output_dir)
+    generic_parser_2005.parse_patents(params.input_dir,params.output_dir)
 
 elif int(params.mysql) == 1 and int(params.period) not in range(1,4):
     csv_to_mysql.mysql_upload(params.mysql_host,params.mysql_username,params.mysql_passwd,params.mysql_dbname,params.mysql_input_dir,params.mysql_output_dir)
