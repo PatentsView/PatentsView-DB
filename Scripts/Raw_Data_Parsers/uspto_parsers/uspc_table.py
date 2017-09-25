@@ -1,4 +1,4 @@
-def uspc_table(fd):
+def uspc_table(working_directory):
     import re,csv,os,urllib2,HTMLParser,zipfile
     from bs4 import BeautifulSoup as bs
     from datetime import date
@@ -6,25 +6,26 @@ def uspc_table(fd):
     
     import mechanize
     br = mechanize.Browser()
-    #paturl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentGrant/mcfpat.zip'
-    #appurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/MasterClassPatentAppl/mcfappl.zip'
-    #ctafurl = 'https://eipweb.uspto.gov/'+str(date.today().year)+'/ManualofClass/ctaf.zip'
-    paturl = 'https://bulkdata.uspto.gov/data2/patent/classification/mcfpat.zip'
-    appurl = 'https://bulkdata.uspto.gov/data2/patent/classification/mcfappl.zip'
-    ctafurl = 'https://bulkdata.uspto.gov/data2/patent/classification/ctaf.zip'
+    paturl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfpat.zip'
+    appurl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfappl.zip'
+    ctafurl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfcls.zip'
+
+    os.mkdir(working_directory + "/uspc_inputs")
+    inputs = working_directory + "/uspc_inputs/"
+
+    br.retrieve(paturl,os.path.join(inputs,'mcfpat.zip'))        
+    br.retrieve(appurl,os.path.join(inputs,'mcfappl.zip'))
+    #br.retrieve(ctafurl,os.path.join(inputs,'ctaf.zip'))
+    br.retrieve(ctafurl,os.path.join(inputs,'mcfcls.zip'))
     
-    br.retrieve(paturl,os.path.join(fd,'mcfpat.zip'))        
-    br.retrieve(appurl,os.path.join(fd,'mcfappl.zip'))
-    br.retrieve(ctafurl,os.path.join(fd,'ctaf.zip'))
-    fd+='/'
-    diri = os.listdir(fd)
+    diri = os.listdir(inputs)
     for d in diri:
-        if re.search('ctaf.*?zip',d):
-            classindxfile = ZipFile(os.path.join(fd, d),'r')
+        if re.search('mcfcls.*?zip',d):
+            classindxfile = ZipFile(os.path.join(inputs, d),'r')
         if re.search('mcfpat.*?zip',d):
-            patclassfile = ZipFile(os.path.join(fd, d),'r')
+            patclassfile = ZipFile(os.path.join(inputs, d),'r')
         if re.search('mcfappl.*?zip',d):
-            appclassfile = ZipFile(os.path.join(fd, d), 'r')
+            appclassfile = ZipFile(os.path.join(inputs, d), 'r')
     
     #Classes Index File parsing for class/subclass text
     classidx = classindxfile.open(classindxfile.namelist()[0]).read().split('\n')
@@ -76,9 +77,14 @@ def uspc_table(fd):
             
     
     # Create subclass and mainclass tables out of current output
-    outp1 = csv.writer(open(os.path.join(fd,'mainclass.csv'),'wb'))
-    outp2 = csv.writer(open(os.path.join(fd,'subclass.csv'),'wb'))
+    output = working_directory + "/uspc_output/"
+    os.mkdir(output)
+    outp1 = csv.writer(open(os.path.join(output,'mainclass.csv'),'wb'))
+    outp2 = csv.writer(open(os.path.join(output,'subclass.csv'),'wb'))
     exist = {}
+    print len(data)
+    print data.keys()[1]
+    print data.values()[1]
     for k,v in data.items():
         i = k.split(' ')+[v]
         try:
@@ -98,7 +104,7 @@ def uspc_table(fd):
                 outp2.writerow([i[0]+'/'+i[1],i[2]])
     
     #Get patent-class pairs
-    outp = csv.writer(open(os.path.join(fd,'USPC_patent_classes_data.csv'),'wb'))
+    outp = csv.writer(open(os.path.join(output,'USPC_patent_classes_data.csv'),'wb'))
     pats = {}
     with patclassfile.open(patclassfile.namelist()[0]) as inp:
         for i in inp:
@@ -134,7 +140,7 @@ def uspc_table(fd):
                     outp.writerow([str(patentnum),mainclass,subclass,'1'])
         
     #Get application-class pairs
-    outp = csv.writer(open(os.path.join(fd,'USPC_application_classes_data.csv'),'wb'))
+    outp = csv.writer(open(os.path.join(output,'USPC_application_classes_data.csv'),'wb'))
     pats = {}
     with appclassfile.open(appclassfile.namelist()[0]) as inp:
         for i in inp:
