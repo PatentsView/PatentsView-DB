@@ -1,0 +1,6 @@
+ipython nbconvert --to=latex --template=latex_nocode.tplx --SphinxTransformer.author='Fung Institute' MySQL.ipynb
+sed -e 's/\\vspace{-0\.5\\baselineskip}//g' MySQL.tex > tmp
+sed -e 's/\\title{MySQL}/\\title{Patent Database Report}/' tmp > tmp2
+mv tmp2 MySQL.tex
+pdflatex MySQL.tex
+rm tmp tmp2

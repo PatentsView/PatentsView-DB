@@ -1,0 +1,11 @@
+MySQL-python==1.2.4
+SQLAlchemy==0.8.3
+Unidecode==0.04.14
+beautifulsoup4==4.3.2
+ipython==1.1.0
+numpy==1.8.0
+python-Levenshtein==0.10.2
+pyzmq==14.0.0
+requests==2.0.1
+wsgiref==0.1.2
+pandas==0.12.0

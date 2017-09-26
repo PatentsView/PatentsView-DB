@@ -1,0 +1,11 @@
+D656297,29285560,continuation_in_part,ABANDONED,2007-04-02,29285560,"",US,parent_doc,0
+D656297,29335910,continuation_in_part,"",,29335910,"",US,child_doc,1
+D656298,29350198,continuation_in_part,"",2009-11-12,29350198,"",US,parent_doc,0
+D656298,D616627,continuation_in_part,"",,D616627,"",US,parent_grant_document,1
+D656298,29352440,continuation_in_part,"",,29352440,"",US,child_doc,2
+D656298,29302500,continuation,"",2008-01-17,29302500,"",US,parent_doc,3
+D656298,D606285,continuation,"",,D606285,"",US,parent_grant_document,4
+D656298,29350198,continuation,"",,29350198,"",US,child_doc,5
+D656299,29324767,continuation_in_part,"",2008-09-19,29324767,"",US,parent_doc,0
+D656299,D633280,continuation_in_part,"",,D633280,"",US,parent_grant_document,1
+D656299,29383856,continuation_in_part,"",,29383856,"",US,child_doc,2

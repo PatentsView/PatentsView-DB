@@ -1,0 +1,3 @@
+uuid,application_id,rel_id,doctype,status,date,number,kind,country,relationship,sequence
+2004/20040000002,9919271,relation,GRANTED,2001-07-30,9919271,"",US,parent,0
+2004/20040000002,10430371,relation,GRANTED,2003-05-05,10430371,A1,"",child,1

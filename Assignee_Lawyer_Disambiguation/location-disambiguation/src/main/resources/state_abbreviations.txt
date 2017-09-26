@@ -1,0 +1,50 @@
+Alabama|AL|i
+Alaska|AK|i
+Arizona|AZ|i
+Arkansas|AR|i
+California|CA|i
+Colorado|CO|i
+Connecticut|CT|i
+Delaware|DE|i
+Florida|FL|i
+Georgia|GA|i
+Hawaii|HI|i
+Idaho|ID|i
+Illinois|IL|i
+Indiana|IN|i
+Iowa|IA|i
+Kansas|KS|i
+Kentucky|KY|i
+Louisiana|LA|i
+Maine|ME|i
+Maryland|MD|i
+Massachusetts|MA|i
+Michigan|MI|i
+Minnesota|MN|i
+Mississippi|MS|i
+Missouri|MO|i
+Montana|MT|i
+Nebraska|NE|i
+Nevada|NV|i
+New Hampshire|NH|i
+New Jersey|NJ|i
+New Mexico|NM|i
+New York|NY|i
+North Carolina|NC|i
+North Dakota|ND|i
+Ohio|OH|i
+Oklahoma|OK|i
+Oregon|OR|i
+Pennsylvania|PA|i
+Rhode Island|RI|i
+South Carolina|SC|i
+South Dakota|SD|i
+Tennessee|TN|i
+Texas|TX|i
+Utah|UT|i
+Vermont|VT|i
+Virginia|VA|i
+Washington|WA|i
+West Virginia|WV|i
+Wisconsin|WI|i
+Wyoming|WY|i
