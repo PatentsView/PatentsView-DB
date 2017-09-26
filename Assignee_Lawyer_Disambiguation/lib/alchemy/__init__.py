@@ -57,7 +57,8 @@ _char = re.compile(r'&(\w+?);')
 # Generate some extra HTML entities
 defs=htmlentitydefs.entitydefs
 defs['apos'] = "'"
-entities = open('htmlentities').read().split('\n')
+#need to fix this to pull the database location from the config file
+entities = open('D:/DataBaseUpdate/PatentsView-DB/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
 for e in entities:
     try:
         first = re.sub('\s+|\"|;|&','',e[3:15])
