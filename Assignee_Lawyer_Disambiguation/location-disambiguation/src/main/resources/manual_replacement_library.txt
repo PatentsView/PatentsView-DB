@@ -1,0 +1,182 @@
+#       a
+.ANG.|Å|L
+.ang.|å|L
+&acirc;|å|L
+&acirc ;|å|L
+&angst;|Å|L
+{dot over (A)}|Å|L
+{dot over (a)}|å|L
+#Inaccurate, but too many possibilities - this should be easier to debug
+{hacek over (a)}|a|L
+.circle.|Å|L
+{overscore (A)}|Ä|L
+#Inaccurate, but too many possibilities - this should be easier to debug
+{overscore (a)}|a|L
+{umlaut over (Aa)}|Ää|L
+{acute over (&#x212b;)}|Å|L
+/e,uml/a/ |ä|L
+/a/ |ä|L
+/a/|ä|L
+#Inaccurate, but too many possibilities - this should be easier to debug
+{haeck over (a)}|a|L
+#       b
+#       c
+&cacute;|ć|L
+&Cacute;|Ć|L
+{hacek over (C)}|Č|L
+{haeck over (C)}|Č|L
+{hacek over (c)}|č|L
+#       d
+{hacek over (D)}|Ď|L
+{hacek over (d)}|ď|L
+#       e
+&emacr;|ē
+{haeck over (e)}|ě|L
+{hacek over (e)}|ě|L
+{overscore (e)}|è|L
+#       f
+#       g
+&gacute;|ǵ|L
+#       h
+#       i
+{hacek over (i)}|i|L
+#       j
+#       k
+{umlaut over (K)}|K|L
+#       l
+{umlaut over (L)}|L|L
+#       m
+{umlaut over (M)}|M|L
+{umlaut over (m)}|m|L
+#       n
+&nacute;|ń|L
+{haeck over (n)}|ñ|L
+{overscore (n)}|ñ|L
+#       o
+&omacr;|ō|L
+#{hacek over (o)}|
+#{overscore (o)}|
+#{umlaut over (oo)}|
+uml/O/ |Ö|L
+ uml/o/ |ö|L
+.0.|ø|L
+.O slashed.|Ø|L
+.o slashed.|ø|L
+/o/ |ö|L
+/o/|ő|L
+{hacek over (o)}|ö|L
+{overscore (o)}|ö|L
+#Inaccurate, but too many possibilities - this should be easier to debug
+{dot over (o)}|o|L
+{acute over (&#xf8;)}|ø|L
+#       p
+#       q
+#       r
+&racute;|ŕ|L
+{hacek over (r)}|ř|L
+{haeck over (r)} |ř|L
+{haeck over (r)}|ř|L
+{grave over (R)}|R|L
+{grave over (r)}|r|L
+#       s
+&sacute;|ś|L
+&scirc;|ŝ|L
+{haeck over (S)}|Š|L
+{hacek over (S)}|Š|L
+{hacek over (s)}|š|L
+{haeck over (s)}|š|L
+{umlaut over (S)}|S|L
+ /s/ | sous |L
+/s/|-sur-|L
+/S/|-sur-|L
+{dot over (s)}|s|L
+#       t
+{dot over (T)}okyo|Tokyo|L
+#       u
+&utilde;|ũ|L
+/U/ |Ü|L
+/u/ |ü|L
+/u/|ü|L
+{overscore (u)}|ü|L
+{hacek over (u)}|ǔ|L
+{dot over (u)}|u|L
+#       v
+#       w
+#       x
+#       y
+#       z
+&Zacute;|Ź|L
+&zacute;|ź|L
+{hacek over (Z)}|Ž|L
+#       Misspellings
+a/d/|aan den
+{hacek over (A)}lta|Älta|L
+{acute over (B)}uehl|Bühl|L
+{umlaut over (C)}ernilov|Černilov|L
+O/ d.ANG.kra|Ödåkra|L
+{haeck over (u)}ttenre{haeck over (u)}th|Uttenreuth|L
+D{haeck over (u)}sseldorf|Düsseldorf|L
+P{haeck over (u)}choen|Pocheon|L
+Gro{burgwedel|Großburgwedel|L
+B{umlaut over (j)}rringbro|Bjerringbro|L
+B{acute over (j)}&#xe1;rred|Bjärred|L
+Defreggerstra{e|Defreggerstraße|L
+Vaster{s|Västerås|L
+#       other
+.cent.||L
+#&compfn;|&#x02218;|L
+&equals;|=|L
+&num;|#|L
+&plus;|+|L
+& Engraving;|& Engraving|L
+{umlaut over ( )}||L
+{acute over (&#xe6;)}|æ|L
+&#x201c;A&#x201d;-Cdad. de||L
+all of||L
+all Of||L
+All of||L
+al of ||L
+Both of||L
+BOTH OF||L
+both of||L
+bot of ||L
+both ot||L
+late of ||L
+LATE OF ||L
+#       greek
+&agr;|α|L
+&bgr;|β|L
+&lsqb;|[|L
+&mgr;|μ|L
+&phgr;|φ|L
+&pgr;|π|L
+&rsqb;|]|L
+&thgr;|θ|L
+#       URL custom characters
+<?img id=CUSTOM-CHARACTER-00001 he=2.46mm wi=1.78mm file=US08418328-20130416-P00001.TIF
+alt=custom character img-content=character img-format=tif ?>|Ç|L
+<?img id=CUSTOM-CHARACTER-00002 he=2.46mm wi=1.78mm file=US08418328-20130416-P00002.TIF
+alt=custom character img-content=character img-format=tif ?>|Ç|L
+<?img id=CUSTOM-CHARACTER-00001 he=3.13mm wi=1.02mm file=US07314035-20080101-P00001.TIF
+alt=custom character img-content=character img-format=tif ?>|i|L
+<?img id=CUSTOM-CHARACTER-00003 he=3.13mm wi=1.02mm file=US07314035-20080101-P00001.TIF
+alt=custom character img-content=character img-format=tif ?>|i|L
+<?img id=CUSTOM-CHARACTER-00001 he=2.79mm wi=2.12mm file=US08162930-20120424-P00001.TIF
+alt=custom character img-content=character img-format=tif ?>|Ł|L
+<?img id=CUSTOM-CHARACTER-00001 he=2.46mm wi=1.02mm file=US08073286-20111206-P00001.TIF
+alt=custom character img-content=character img-format=tif ?>|ș|L
+<?img id=CUSTOM-CHARACTER-00002 he=2.46mm wi=1.02mm file=US08073286-20111206-P00002.TIF
+alt=custom character img-content=character img-format=tif ?>|ș|L
+<?img id=CUSTOM-CHARACTER-00002 he=3.13mm wi=1.44mm file=US07314035-20080101-P00002.TIF
+alt=custom character img-content=character img-format=tif ?>|ș|L
+<CUSTOM-CHARACTER FILE=US06710218-20040323-P00701.TIF ALT=custom character HE=20 WI=20
+ID=CUSTOM-CHARACTER-00001/>|ș|L
+<CUSTOM-CHARACTER FILE=US06710218-20040323-P00701.TIF ALT=custom character HE=20 WI=20
+ID=CUSTOM-CHARACTER-00002/>|ș|L
+<CUSTOM-CHARACTER FILE=US06710218-20040323-P00701.TIF ALT=custom character HE=20 WI=20
+ID=CUSTOM-CHARACTER-00003/>|ș|L
+<CUSTOM-CHARACTER FILE=US06710218-20040323-P00701.TIF ALT=custom character HE=20 WI=20
+ID=CUSTOM-CHARACTER-00006/>|ș|L
+#Note: should be º, but this is not a valid character so ignore it
+<?img id=CUSTOM-CHARACTER-00001 he=2.46mm wi=2.12mm file=US07406752-20080805-P00001.TIF
+alt=custom character img-content=character img-format=tif ?>||L

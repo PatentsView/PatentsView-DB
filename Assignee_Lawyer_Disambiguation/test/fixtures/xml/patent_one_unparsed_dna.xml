@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sequence-cwu SYSTEM "us-sequence-listing-2004-03-09.dtd" [ ]>
+<sequence-cwu id="SEQLST-1">
+<publication-reference>
+<document-id>
+<country>US</country>
+<doc-number>07521043</doc-number>
+<kind>B2</kind>
+<date>20090421</date>
+</document-id>
+</publication-reference>
+<number>1</number>
+<sequence-list-new-rules>
+<s100>
+<s160>20 </s160>
+</s100>
+<s200>
+<s210>1 </s210>
+<s211>399 </s211>
+<s212>DNA </s212>
+<s213>Homo sapiens </s213>
+<s220>
+<s221>
+CDS 
+</s221>
+<s222>
+(1)..(399) 
+</s222>
+</s220>
+</s200>
+<s400> 1 
+gca cct act tca agt tct aca aag aaa aca cag cta caa ctg gag cat       48 
+Ala Pro Thr Ser Ser Ser Thr Lys Lys Thr Gln Leu Gln Leu Glu His 
+1               5                   10                  15 
+tta ctg ctg gat tta cag atg att ttg aat gga att aat aat tac aag       96 
+Leu Leu Leu Asp Leu Gln Met Ile Leu Asn Gly Ile Asn Asn Tyr Lys 
+            20                  25                  30 
+aat ccc aaa ctc acc agg atg ctc aca ttt aag ttt tac atg ccc aag      144 
+Asn Pro Lys Leu Thr Arg Met Leu Thr Phe Lys Phe Tyr Met Pro Lys 
+        35                  40                  45 
+aag gcc aca gaa ctg aaa cat ctt cag tgt cta gaa gaa gaa ctc aaa      192 
+Lys Ala Thr Glu Leu Lys His Leu Gln Cys Leu Glu Glu Glu Leu Lys 
+    50                  55                  60 
+cct ctg gag gaa gtg cta aat tta gct caa agc aaa aac ttt cac tta      240 
+Pro Leu Glu Glu Val Leu Asn Leu Ala Gln Ser Lys Asn Phe His Leu 
+65                  70                  75                  80 
+aga ccc agg gac tta atc agc aat atc aac gta ata gtt ctg gaa cta      288 
+Arg Pro Arg Asp Leu Ile Ser Asn Ile Asn Val Ile Val Leu Glu Leu 
+                85                  90                  95 
+aag gga tct gaa aca aca ttc atg tgt gaa tat gct gat gag aca gca      336 
+Lys Gly Ser Glu Thr Thr Phe Met Cys Glu Tyr Ala Asp Glu Thr Ala 
+            100                 105                 110 
+acc att gta gaa ttt ctg aac aga tgg att acc ttt tgt caa agc atc      384 
+Thr Ile Val Glu Phe Leu Asn Arg Trp Ile Thr Phe Cys Gln Ser Ile 
+        115                 120                 125 
+atc tca aca ctg act                                                  399 
+Ile Ser Thr Leu Thr 
+    130 
+</s400>
+<s200>
+<s210>2 </s210>
+<s211>133 </s211>
+<s212>PRT </s212>
+<s213>Homo sapiens </s213>
+</s200>
+<s400> 2 
+Ala Pro Thr Ser Ser Ser Thr Lys Lys Thr Gln Leu Gln Leu Glu His 
+1               5                   10                  15 
+Leu Leu Leu Asp Leu Gln Met Ile Leu Asn Gly Ile Asn Asn Tyr Lys 
+            20                  25                  30 
+Asn Pro Lys Leu Thr Arg Met Leu Thr Phe Lys Phe Tyr Met Pro Lys 
+        35                  40                  45 
+Lys Ala Thr Glu Leu Lys His Leu Gln Cys Leu Glu Glu Glu Leu Lys 
+    50                  55                  60 
+Pro Leu Glu Glu Val Leu Asn Leu Ala Gln Ser Lys Asn Phe His Leu 
+65                  70                  75                  80 
+Arg Pro Arg Asp Leu Ile Ser Asn Ile Asn Val Ile Val Leu Glu Leu 
+                85                  90                  95 
+Lys Gly Ser Glu Thr Thr Phe Met Cys Glu Tyr Ala Asp Glu Thr Ala 
+            100                 105                 110 
+Thr Ile Val Glu Phe Leu Asn Arg Trp Ile Thr Phe Cys Gln Ser Ile 
+        115                 120                 125 
+Ile Ser Thr Leu Thr 
+    130 
+</s400>
+<s200>
+<s210>3 </s210>
+<s211>10 </s211>
+<s212>RNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of S sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 3 
+ucccwvuuwc                                                            10 
+</s400>
+<s200>
+<s210>4 </s210>
+<s211>10 </s211>
+<s212>RNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of S sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 4 
+ucccaguuuc                                                            10 
+</s400>
+<s200>
+<s210>5 </s210>
+<s211>10 </s211>
+<s212>RNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of S sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 5 
+ucccacuuac                                                            10 
+</s400>
+<s200>
+<s210>6 </s210>
+<s211>10 </s211>
+<s212>RNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of S sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 6 
+ucccacuuuc                                                            10 
+</s400>
+<s200>
+<s210>7 </s210>
+<s211>10 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of S sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 7 
+agggtcaaag                                                            10 
+</s400>
+<s200>
+<s210>8 </s210>
+<s211>10 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of S sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 8 
+agggtgaatg                                                            10 
+</s400>
+<s200>
+<s210>9 </s210>
+<s211>10 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of S sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 9 
+agggtgaaag                                                            10 
+</s400>
+<s200>
+<s210>10 </s210>
+<s211>9 </s211>
+<s212>RNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of E sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 10 
+auucuuuuu                                                              9 
+</s400>
+<s200>
+<s210>11 </s210>
+<s211>9 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of E sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 11 
+taagaaaaa                                                              9 
+</s400>
+<s200>
+<s210>12 </s210>
+<s211>10 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of S sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 12 
+ctttcaccct                                                            10 
+</s400>
+<s200>
+<s210>13 </s210>
+<s211>15 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an example of E sequence of Sendai Virus</s223>
+</s220>
+</s200>
+<s400> 13 
+tttttcttac tacgg                                                      15 
+</s400>
+<s200>
+<s210>14 </s210>
+<s211>18 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an artificially synthesized linker sequence</s223>
+</s220>
+</s200>
+<s400> 14 
+atgcatgccg gcagatga                                                   18 
+</s400>
+<s200>
+<s210>15 </s210>
+<s211>18 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an artificially synthesized primer sequence</s223>
+</s220>
+</s200>
+<s400> 15 
+gttgagtact gcaagagc                                                   18 
+</s400>
+<s200>
+<s210>16 </s210>
+<s211>42 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an artificially synthesized primer sequence</s223>
+</s220>
+</s200>
+<s400> 16 
+tttgccggca tgcatgtttc ccaaggggag agttttgcaa cc                        42 
+</s400>
+<s200>
+<s210>17 </s210>
+<s211>18 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an artificially synthesized primer sequence</s223>
+</s220>
+</s200>
+<s400> 17 
+atgcatgccg gcagatga                                                   18 
+</s400>
+<s200>
+<s210>18 </s210>
+<s211>21 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an artificially synthesized primer sequence</s223>
+</s220>
+</s200>
+<s400> 18 
+tgggtgaatg agagaatcag c                                               21 
+</s400>
+<s200>
+<s210>19 </s210>
+<s211>51 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an artificially synthesized primer sequence</s223>
+</s220>
+</s200>
+<s400> 19 
+acttgcggcc gcgtttaaac ggcgcgccat gtacaggatg caactcctgt c              51 
+</s400>
+<s200>
+<s210>20 </s210>
+<s211>63 </s211>
+<s212>DNA </s212>
+<s213>Artificial </s213>
+<s220>
+<s223>an artificially synthesized primer sequence</s223>
+</s220>
+</s200>
+<s400> 20 
+atccgcggcc gcgatgaact ttcaccctaa gtttttctta ctacggattt aaatggcgcg     60 
+cca                                                                   63
+</s400>
+</sequence-list-new-rules>
+</sequence-cwu>

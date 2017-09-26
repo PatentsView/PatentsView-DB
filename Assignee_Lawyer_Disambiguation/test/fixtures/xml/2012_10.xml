@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE us-patent-grant SYSTEM "us-patent-grant-v42-2006-08-23.dtd" [ ]>
+<us-patent-grant lang="EN" dtd-version="v4.2 2006-08-23" file="USD0651394-20120103.XML" status="PRODUCTION" id="us-patent-grant" country="US" date-produced="20111219" date-publ="20120103">
+    <us-bibliographic-data-grant>
+        <publication-reference>
+            <document-id>
+                <country>US</country>
+                <doc-number>D0651394</doc-number>
+                <kind>S1</kind>
+                <date>20120103</date>
+            </document-id>
+        </publication-reference>
+        <application-reference appl-type="design">
+            <document-id>
+                <country>US</country>
+                <doc-number>29385431</doc-number>
+                <date>20110214</date>
+            </document-id>
+        </application-reference>
+        <us-application-series-code>29</us-application-series-code>
+        <us-term-of-grant>
+            <length-of-grant>14</length-of-grant>
+        </us-term-of-grant>
+        <classification-locarno>
+            <edition>9</edition>
+            <main-classification>0301</main-classification>
+        </classification-locarno>
+        <classification-national>
+            <country>US</country>
+            <main-classification>D 3218</main-classification>
+        </classification-national>
+        <invention-title id="d2e53">Pouch for cell phone and the like</invention-title>
+        <references-cited>
+            <citation>
+                <patcit num="00001">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D414013</doc-number>
+                        <kind>S</kind>
+                        <name>Group</name>
+                        <date>19990900</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 2828</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00002">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D533342</doc-number>
+                        <kind>S</kind>
+                        <name>Addis</name>
+                        <date>20061200</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 3218</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00003">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D574146</doc-number>
+                        <kind>S</kind>
+                        <name>Eisenbraun</name>
+                        <date>20080800</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 3218</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00004">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D579654</doc-number>
+                        <kind>S</kind>
+                        <name>Lambert</name>
+                        <date>20081100</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 3218</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00005">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D581656</doc-number>
+                        <kind>S</kind>
+                        <name>Valencia et al.</name>
+                        <date>20081200</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 3218</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00006">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D609461</doc-number>
+                        <kind>S</kind>
+                        <name>Boyd</name>
+                        <date>20100200</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 3218</main-classification></classification-national>
+            </citation>
+        </references-cited>
+        <number-of-claims>1</number-of-claims>
+        <us-exemplary-claim>1</us-exemplary-claim>
+        <us-field-of-classification-search>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D 3218-219</main-classification>
+                <additional-info>unstructured</additional-info>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D 3269</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D14138</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D14250-253</main-classification>
+                <additional-info>unstructured</additional-info>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D14434</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D14447</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D14452</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D14454</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>379426</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>379446</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>379454</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>379455</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>4555751-5755</main-classification>
+                <additional-info>unstructured</additional-info>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D 2828</main-classification>
+            </classification-national>
+        </us-field-of-classification-search>
+        <figures>
+            <number-of-drawing-sheets>5</number-of-drawing-sheets>
+            <number-of-figures>5</number-of-figures>
+        </figures>
+        <parties>
+            <applicants>
+                <applicant sequence="001" app-type="applicant-inventor" designation="us-only">
+                    <addressbook>
+                        <last-name>Musso</last-name>
+                        <first-name>Manuele</first-name>
+                        <address>
+<city>Turin</city>
+<country>IT</country>
+</address>
+                    </addressbook>
+                    <nationality>
+                        <country>omitted</country>
+                    </nationality>
+                    <residence>
+                        <country>IT</country>
+                    </residence>
+                </applicant>
+            </applicants>
+            <agents>
+                <agent sequence="01" rep-type="attorney">
+                    <addressbook>
+                        <orgname>Sughrue Mion, PLLC</orgname>
+                        <address>
+<country>unknown</country>
+</address>
+                    </addressbook>
+                </agent>
+            </agents>
+        </parties>
+        <assignees>
+            <assignee>
+                <addressbook>
+                    <orgname>Space 2000 S.p.A.</orgname>
+                    <role>03</role>
+                    <address>
+<city>Turin</city>
+<country>IT</country>
+</address>
+                </addressbook>
+            </assignee>
+        </assignees>
+        <examiners>
+            <primary-examiner>
+                <last-name>Oliver</last-name>
+                <first-name>Catheri</first-name>
+                <department>2914</department>
+            </primary-examiner>
+        </examiners>
+    </us-bibliographic-data-grant>
+    <drawings id="DRAWINGS">
+        <figure id="Fig-EMI-D00000" num="00000">
+            <img id="EMI-D00000" he="155.19mm" wi="119.89mm" file="USD0651394-20120103-D00000.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+        </figure>
+        <figure id="Fig-EMI-D00001" num="00001">
+            <img id="EMI-D00001" he="172.55mm" wi="133.27mm" file="USD0651394-20120103-D00001.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+        </figure>
+        <figure id="Fig-EMI-D00002" num="00002">
+            <img id="EMI-D00002" he="165.27mm" wi="133.60mm" file="USD0651394-20120103-D00002.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+        </figure>
+        <figure id="Fig-EMI-D00003" num="00003">
+            <img id="EMI-D00003" he="168.74mm" wi="140.80mm" file="USD0651394-20120103-D00003.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+        </figure>
+        <figure id="Fig-EMI-D00004" num="00004">
+            <img id="EMI-D00004" he="161.88mm" wi="125.39mm" file="USD0651394-20120103-D00004.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+        </figure>
+        <figure id="Fig-EMI-D00005" num="00005">
+            <img id="EMI-D00005" he="120.06mm" wi="130.13mm" file="USD0651394-20120103-D00005.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+        </figure>
+    </drawings>
+    <description id="description">
+        <?brief-description-of-drawings description="Brief Description of Drawings" end="lead"?>
+        <description-of-drawings>
+            <p id="p-0001" num="0001"><figref idref="DRAWINGS">FIG. 1</figref> is a front view of a pouch for cell phone and the like showing my new design;</p>
+            <p id="p-0002" num="0002"><figref idref="DRAWINGS">FIG. 2</figref> is a front view of a pouch for cell phone and the like showing my new design, wherein a cell phone is shown in broken lines;</p>
+            <p id="p-0003" num="0003"><figref idref="DRAWINGS">FIG. 3</figref> is a rear view of a pouch for cell phone and the like showing my new design;</p>
+            <p id="p-0004" num="0004"><figref idref="DRAWINGS">FIG. 4</figref> is a side view of a pouch for cell phone and the like showing my new design; and,</p>
+            <p id="p-0005" num="0005"><figref idref="DRAWINGS">FIG. 5</figref> is a top view of a pouch for cell phone and the like showing my new design.</p>
+            <p id="p-0006" num="0006">The broken line showing of the cell phone is for the purpose of illustrating environment only and forms no part of the claimed design.</p>
+        </description-of-drawings>
+        <?brief-description-of-drawings description="Brief Description of Drawings" end="tail"?>
+    </description>
+    <us-claim-statement>CLAIM</us-claim-statement>
+    <claims id="claims">
+        <claim id="CLM-00001" num="00001">
+            <claim-text>The ornamental design for a pouch for cell phone and the like, as shown and described.</claim-text>
+        </claim>
+    </claims>
+</us-patent-grant>

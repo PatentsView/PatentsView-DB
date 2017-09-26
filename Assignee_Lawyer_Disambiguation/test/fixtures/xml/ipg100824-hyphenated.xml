@@ -1,0 +1,1554 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE us-patent-grant SYSTEM "us-patent-grant-v42-2006-08-23.dtd" [ ]>
+<us-patent-grant lang="EN" dtd-version="v4.2 2006-08-23" file="US07783348-20100824.XML" status="PRODUCTION" id="us-patent-grant" country="US" date-produced="20100812" date-publ="20100824">
+<us-bibliographic-data-grant>
+<publication-reference>
+<document-id>
+<country>US</country>
+<doc-number>07783348</doc-number>
+<kind>B2</kind>
+<date>20100824</date>
+</document-id>
+</publication-reference>
+<application-reference appl-type="utility">
+<document-id>
+<country>US</country>
+<doc-number>12104007</doc-number>
+<date>20080416</date>
+</document-id>
+</application-reference>
+<us-application-series-code>12</us-application-series-code>
+<us-term-of-grant>
+<us-term-extension>9</us-term-extension>
+</us-term-of-grant>
+<classifications-ipcr>
+<classification-ipcr>
+<ipc-version-indicator><date>20060101</date></ipc-version-indicator>
+<classification-level>A</classification-level>
+<section>A</section>
+<class>61</class>
+<subclass>N</subclass>
+<main-group>1</main-group>
+<subgroup>18</subgroup>
+<symbol-position>F</symbol-position>
+<classification-value>I</classification-value>
+<action-date><date>20100824</date></action-date>
+<generating-office><country>US</country></generating-office>
+<classification-status>B</classification-status>
+<classification-data-source>H</classification-data-source>
+</classification-ipcr>
+</classifications-ipcr>
+<classification-national>
+<country>US</country>
+<main-classification>607  3</main-classification>
+<further-classification>602  2</further-classification>
+<further-classification>600 15</further-classification>
+</classification-national>
+<invention-title id="d0e53">Stimulation device for treating osteoarthritis</invention-title>
+<references-cited>
+<citation>
+<patcit num="00001">
+<document-id>
+<country>US</country>
+<doc-number>4240445</doc-number>
+<kind>A</kind>
+<name>Iskander et al.</name>
+<date>19801200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00002">
+<document-id>
+<country>US</country>
+<doc-number>4256116</doc-number>
+<kind>A</kind>
+<name>Meretsky et al.</name>
+<date>19810300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00003">
+<document-id>
+<country>US</country>
+<doc-number>4412540</doc-number>
+<kind>A</kind>
+<name>Bentall</name>
+<date>19831100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00004">
+<document-id>
+<country>US</country>
+<doc-number>4548208</doc-number>
+<kind>A</kind>
+<name>Niemi</name>
+<date>19851000</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00005">
+<document-id>
+<country>US</country>
+<doc-number>4674482</doc-number>
+<kind>A</kind>
+<name>Waltonen et al.</name>
+<date>19870600</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00006">
+<document-id>
+<country>US</country>
+<doc-number>4727857</doc-number>
+<kind>A</kind>
+<name>Horl</name>
+<date>19880300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00007">
+<document-id>
+<country>US</country>
+<doc-number>4757804</doc-number>
+<kind>A</kind>
+<name>Griffith et al.</name>
+<date>19880700</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00008">
+<document-id>
+<country>US</country>
+<doc-number>4886063</doc-number>
+<kind>A</kind>
+<name>Crews</name>
+<date>19891200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00009">
+<document-id>
+<country>US</country>
+<doc-number>4989604</doc-number>
+<kind>A</kind>
+<name>Fang</name>
+<date>19910200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00010">
+<document-id>
+<country>US</country>
+<doc-number>5000178</doc-number>
+<kind>A</kind>
+<name>Griffith</name>
+<date>19910300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00011">
+<document-id>
+<country>US</country>
+<doc-number>5014699</doc-number>
+<kind>A</kind>
+<name>Pollack et al.</name>
+<date>19910500</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00012">
+<document-id>
+<country>US</country>
+<doc-number>5181902</doc-number>
+<kind>A</kind>
+<name>Erickson et al.</name>
+<date>19930100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00013">
+<document-id>
+<country>US</country>
+<doc-number>5314401</doc-number>
+<kind>A</kind>
+<name>Tepper</name>
+<date>19940500</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00014">
+<document-id>
+<country>US</country>
+<doc-number>5336255</doc-number>
+<kind>A</kind>
+<name>Kanare et al.</name>
+<date>19940800</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00015">
+<document-id>
+<country>US</country>
+<doc-number>5401233</doc-number>
+<kind>A</kind>
+<name>Erickson et al.</name>
+<date>19950300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00016">
+<document-id>
+<country>US</country>
+<doc-number>5411542</doc-number>
+<kind>A</kind>
+<name>Jensen</name>
+<date>19950500</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00017">
+<document-id>
+<country>US</country>
+<doc-number>5478303</doc-number>
+<kind>A</kind>
+<name>Foley-Nolan et al.</name>
+<date>19951200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00018">
+<document-id>
+<country>US</country>
+<doc-number>5487759</doc-number>
+<kind>A</kind>
+<name>Bastyr et al.</name>
+<date>19960100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00019">
+<document-id>
+<country>US</country>
+<doc-number>5578065</doc-number>
+<kind>A</kind>
+<name>Hattori et al.</name>
+<date>19961100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00020">
+<document-id>
+<country>US</country>
+<doc-number>5584863</doc-number>
+<kind>A</kind>
+<name>Rauch et al.</name>
+<date>19961200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00021">
+<document-id>
+<country>US</country>
+<doc-number>5718721</doc-number>
+<kind>A</kind>
+<name>Ross</name>
+<date>19980200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00022">
+<document-id>
+<country>US</country>
+<doc-number>5723001</doc-number>
+<kind>A</kind>
+<name>Pilla et al.</name>
+<date>19980300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00023">
+<document-id>
+<country>US</country>
+<doc-number>5743844</doc-number>
+<kind>A</kind>
+<name>Tepper et al.</name>
+<date>19980400</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00024">
+<document-id>
+<country>US</country>
+<doc-number>5860945</doc-number>
+<kind>A</kind>
+<name>Cramer et al.</name>
+<date>19990100</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>602 62</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00025">
+<document-id>
+<country>US</country>
+<doc-number>5922012</doc-number>
+<kind>A</kind>
+<name>Sakano</name>
+<date>19990700</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00026">
+<document-id>
+<country>US</country>
+<doc-number>5947913</doc-number>
+<kind>A</kind>
+<name>Palumbo</name>
+<date>19990900</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00027">
+<document-id>
+<country>US</country>
+<doc-number>5951459</doc-number>
+<kind>A</kind>
+<name>Blackwell</name>
+<date>19990900</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00028">
+<document-id>
+<country>US</country>
+<doc-number>6024691</doc-number>
+<kind>A</kind>
+<name>Tepper et al.</name>
+<date>20000200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00029">
+<document-id>
+<country>US</country>
+<doc-number>6042531</doc-number>
+<kind>A</kind>
+<name>Holcomb</name>
+<date>20000300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00030">
+<document-id>
+<country>US</country>
+<doc-number>6096067</doc-number>
+<kind>A</kind>
+<name>Cramer et al.</name>
+<date>20000800</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00031">
+<document-id>
+<country>US</country>
+<doc-number>6129659</doc-number>
+<kind>A</kind>
+<name>Wilk</name>
+<date>20001000</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00032">
+<document-id>
+<country>US</country>
+<doc-number>6132362</doc-number>
+<kind>A</kind>
+<name>Tepper et al.</name>
+<date>20001000</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00033">
+<document-id>
+<country>US</country>
+<doc-number>6186941</doc-number>
+<kind>B1</kind>
+<name>Blackwell</name>
+<date>20010200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00034">
+<document-id>
+<country>US</country>
+<doc-number>6200259</doc-number>
+<kind>B1</kind>
+<name>March</name>
+<date>20010300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00035">
+<document-id>
+<country>US</country>
+<doc-number>6213934</doc-number>
+<kind>B1</kind>
+<name>Bianco et al.</name>
+<date>20010400</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00036">
+<document-id>
+<country>US</country>
+<doc-number>6228108</doc-number>
+<kind>B1</kind>
+<name>Lamb et al.</name>
+<date>20010500</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00037">
+<document-id>
+<country>US</country>
+<doc-number>6261221</doc-number>
+<kind>B1</kind>
+<name>Tepper et al.</name>
+<date>20010700</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00038">
+<document-id>
+<country>US</country>
+<doc-number>6275737</doc-number>
+<kind>B1</kind>
+<name>Mann</name>
+<date>20010800</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00039">
+<document-id>
+<country>US</country>
+<doc-number>6334069</doc-number>
+<kind>B1</kind>
+<name>George et al.</name>
+<date>20011200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00040">
+<document-id>
+<country>US</country>
+<doc-number>6353763</doc-number>
+<kind>B1</kind>
+<name>George et al.</name>
+<date>20020300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00041">
+<document-id>
+<country>US</country>
+<doc-number>6436020</doc-number>
+<kind>B1</kind>
+<name>Weingand</name>
+<date>20020800</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00042">
+<document-id>
+<country>US</country>
+<doc-number>6443883</doc-number>
+<kind>B1</kind>
+<name>Ostrow et al.</name>
+<date>20020900</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00043">
+<document-id>
+<country>US</country>
+<doc-number>6463336</doc-number>
+<kind>B1</kind>
+<name>Mawhinney</name>
+<date>20021000</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00044">
+<document-id>
+<country>US</country>
+<doc-number>6465709</doc-number>
+<kind>B1</kind>
+<name>Sun et al.</name>
+<date>20021000</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00045">
+<document-id>
+<country>US</country>
+<doc-number>6506403</doc-number>
+<kind>B1</kind>
+<name>Yu</name>
+<date>20030100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00046">
+<document-id>
+<country>US</country>
+<doc-number>6551233</doc-number>
+<kind>B2</kind>
+<name>Perreault et al.</name>
+<date>20030400</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00047">
+<document-id>
+<country>US</country>
+<doc-number>6561968</doc-number>
+<kind>B1</kind>
+<name>Dissing et al.</name>
+<date>20030500</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00048">
+<document-id>
+<country>US</country>
+<doc-number>6589159</doc-number>
+<kind>B2</kind>
+<name>Paturu</name>
+<date>20030700</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00049">
+<document-id>
+<country>US</country>
+<doc-number>6592509</doc-number>
+<kind>B1</kind>
+<name>Hunter, Jr.</name>
+<date>20030700</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00050">
+<document-id>
+<country>US</country>
+<doc-number>6606519</doc-number>
+<kind>B2</kind>
+<name>Powell</name>
+<date>20030800</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00051">
+<document-id>
+<country>US</country>
+<doc-number>6641520</doc-number>
+<kind>B2</kind>
+<name>Bailey et al.</name>
+<date>20031100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00052">
+<document-id>
+<country>US</country>
+<doc-number>6675047</doc-number>
+<kind>B1</kind>
+<name>Konoplev et al.</name>
+<date>20040100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00053">
+<document-id>
+<country>US</country>
+<doc-number>6678562</doc-number>
+<kind>B1</kind>
+<name>Tepper et al.</name>
+<date>20040100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00054">
+<document-id>
+<country>US</country>
+<doc-number>6701185</doc-number>
+<kind>B2</kind>
+<name>Burnett et al.</name>
+<date>20040300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00055">
+<document-id>
+<country>US</country>
+<doc-number>6839595</doc-number>
+<kind>B2</kind>
+<name>Tepper et al.</name>
+<date>20050100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00056">
+<document-id>
+<country>US</country>
+<doc-number>6875188</doc-number>
+<kind>B2</kind>
+<name>Chiang</name>
+<date>20050400</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00057">
+<document-id>
+<country>US</country>
+<doc-number>6955642</doc-number>
+<kind>B1</kind>
+<name>Simon</name>
+<date>20051000</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00058">
+<document-id>
+<country>US</country>
+<doc-number>7008369</doc-number>
+<kind>B2</kind>
+<name>Cuppen</name>
+<date>20060300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00059">
+<document-id>
+<country>US</country>
+<doc-number>7022506</doc-number>
+<kind>B2</kind>
+<name>Brighton et al.</name>
+<date>20060400</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00060">
+<document-id>
+<country>US</country>
+<doc-number>7087076</doc-number>
+<kind>B2</kind>
+<name>Purcell</name>
+<date>20060800</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00061">
+<document-id>
+<country>US</country>
+<doc-number>7130692</doc-number>
+<kind>B2</kind>
+<name>Brighton et al.</name>
+<date>20061000</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00062">
+<document-id>
+<country>US</country>
+<doc-number>7175587</doc-number>
+<kind>B2</kind>
+<name>Gordon et al.</name>
+<date>20070200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00063">
+<document-id>
+<country>US</country>
+<doc-number>7215995</doc-number>
+<kind>B2</kind>
+<name>Brighton et al.</name>
+<date>20070500</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00064">
+<document-id>
+<country>US</country>
+<doc-number>7336993</doc-number>
+<kind>B1</kind>
+<name>Szeles</name>
+<date>20080200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00065">
+<document-id>
+<country>US</country>
+<doc-number>7551957</doc-number>
+<kind>B2</kind>
+<name>Whelan et al.</name>
+<date>20090600</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00066">
+<document-id>
+<country>US</country>
+<doc-number>2002/0143373</doc-number>
+<kind>A1</kind>
+<name>Courtnage et al.</name>
+<date>20021000</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>607 91</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00067">
+<document-id>
+<country>US</country>
+<doc-number>2004/0010178</doc-number>
+<kind>A1</kind>
+<name>Buckner</name>
+<date>20040100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00068">
+<document-id>
+<country>US</country>
+<doc-number>2004/0176803</doc-number>
+<kind>A1</kind>
+<name>Whelan et al.</name>
+<date>20040900</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00069">
+<document-id>
+<country>US</country>
+<doc-number>2004/0176805</doc-number>
+<kind>A1</kind>
+<name>Whelan et al.</name>
+<date>20040900</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00070">
+<document-id>
+<country>US</country>
+<doc-number>2004/0176806</doc-number>
+<kind>A1</kind>
+<name>Markoll</name>
+<date>20040900</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00071">
+<document-id>
+<country>US</country>
+<doc-number>2005/0049653</doc-number>
+<kind>A1</kind>
+<name>Wang</name>
+<date>20050300</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>607 48</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00072">
+<document-id>
+<country>US</country>
+<doc-number>2005/0087194</doc-number>
+<kind>A1</kind>
+<name>Scott</name>
+<date>20050400</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>128846</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00073">
+<document-id>
+<country>US</country>
+<doc-number>2006/0190043</doc-number>
+<kind>A1</kind>
+<name>Brighton et al.</name>
+<date>20060800</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00074">
+<document-id>
+<country>US</country>
+<doc-number>2007/0167990</doc-number>
+<kind>A1</kind>
+<name>Mangrum et al.</name>
+<date>20070700</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00075">
+<document-id>
+<country>US</country>
+<doc-number>2008/0132971</doc-number>
+<kind>A1</kind>
+<name>Pille et al.</name>
+<date>20080600</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00076">
+<document-id>
+<country>WO</country>
+<doc-number>2004069128</doc-number>
+<date>20040800</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00077">
+<document-id>
+<country>WO</country>
+<doc-number>2006096698</doc-number>
+<date>20060900</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00078">
+<document-id>
+<country>WO</country>
+<doc-number>2006115119</doc-number>
+<date>20061100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00079">
+<document-id>
+<country>WO</country>
+<doc-number>WO2006115119</doc-number>
+<date>20061100</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+</citation>
+<citation>
+<patcit num="00080">
+<document-id>
+<country>WO</country>
+<doc-number>WO-2008137319</doc-number>
+<kind>A1</kind>
+<date>20081100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00081">
+<othercit>Fini et al., &#x201c;Effects of pulsed electromagnetic fields on articular hyaline cartilage: review of experimental and clinical studies,&#x201d; Biomedicine &#x26; Pharmacotherapy 59 (Feb. 2005) 388-394.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00082">
+<othercit>Sutbeyaz et al., &#x201c;The effect of pulsed electromagnetic of fields in the treatment of cervical osteoarthritis: a randomized, double-blink, sham-controlled trial,&#x201d; Rheumatol Int (Jan. 2006) 26:320-324.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00083">
+<othercit>International Search Report and Written Opinion of International application No. PCT/US2008/061214, mailed Jul. 8, 2008, 14 pp.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00084">
+<othercit>&#x201c;CDRH Document Imaging System: Folder K903675&#x201d;, (Nov. 1992), 77 pgs.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00085">
+<othercit>&#x201c;Ivivi SofPulse: Premarket Notification [501(k)] Summary&#x201d;, <i>Ivivi Technologies Inc.</i>, (Dec. 2008), 5 pgs.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00086">
+<othercit>&#x201c;OrthoCor Active Knee System: Premarket Notification [501(k)] Summary&#x201d;, <i>Orthocor Medical, Inc.</i>, (Dec. 2009), 5 pgs.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+</references-cited>
+<number-of-claims>25</number-of-claims>
+<us-exemplary-claim>1</us-exemplary-claim>
+<us-field-of-classification-search>
+<classification-national>
+<country>US</country>
+<main-classification>607  3</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>607 50</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>607  2</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>607 51</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>602  2</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>600 13</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>600 15</main-classification>
+</classification-national>
+</us-field-of-classification-search>
+<figures>
+<number-of-drawing-sheets>8</number-of-drawing-sheets>
+<number-of-figures>8</number-of-figures>
+</figures>
+<us-related-documents>
+<us-provisional-application>
+<document-id>
+<country>US</country>
+<doc-number>60927354</doc-number>
+<kind>00</kind>
+<date>20070503</date>
+</document-id>
+</us-provisional-application>
+<us-provisional-application>
+<document-id>
+<country>US</country>
+<doc-number>60983653</doc-number>
+<kind>00</kind>
+<date>20071030</date>
+</document-id>
+</us-provisional-application>
+<related-publication>
+<document-id>
+<country>US</country>
+<doc-number>20080288035</doc-number>
+<kind>A1</kind>
+<date>20081120</date>
+</document-id>
+</related-publication>
+</us-related-documents>
+<parties>
+<applicants>
+<applicant sequence="001" app-type="applicant-inventor" designation="us-only">
+<addressbook>
+<last-name>Gill</last-name>
+<first-name>Jagjit</first-name>
+<address>
+<city>Rochester</city>
+<state>MN</state>
+<country>US</country>
+</address>
+</addressbook>
+<nationality>
+<country>omitted</country>
+</nationality>
+<residence>
+<country>US</country>
+</residence>
+</applicant>
+<applicant sequence="002" app-type="applicant-inventor" designation="us-only">
+<addressbook>
+<last-name>Sham</last-name>
+<first-name>Kin-Joe</first-name>
+<address>
+<city>Shoreview</city>
+<state>MN</state>
+<country>US</country>
+</address>
+</addressbook>
+<nationality>
+<country>omitted</country>
+</nationality>
+<residence>
+<country>US</country>
+</residence>
+</applicant>
+<applicant sequence="003" app-type="applicant-inventor" designation="us-only">
+<addressbook>
+<last-name>Armitage</last-name>
+<first-name>Bryan</first-name>
+<address>
+<city>Stillwater</city>
+<state>MN</state>
+<country>US</country>
+</address>
+</addressbook>
+<nationality>
+<country>omitted</country>
+</nationality>
+<residence>
+<country>US</country>
+</residence>
+</applicant>
+</applicants>
+<agents>
+<agent sequence="01" rep-type="attorney">
+<addressbook>
+<orgname>Schwegman, Lundberg &#x26; Woessner, P.A.</orgname>
+<address>
+<country>unknown</country>
+</address>
+</addressbook>
+</agent>
+</agents>
+</parties>
+<assignees>
+<assignee>
+<addressbook>
+<orgname>OrthoCor Medical, Inc.</orgname>
+<role>02</role>
+<address>
+<city>Minneapolis</city>
+<state>MN</state>
+<country>US</country>
+</address>
+</addressbook>
+</assignee>
+</assignees>
+<examiners>
+<primary-examiner>
+<last-name>Layno</last-name>
+<first-name>Carl H</first-name>
+<department>3766</department>
+</primary-examiner>
+<assistant-examiner>
+<last-name>Bays</last-name>
+<first-name>Pamela M</first-name>
+</assistant-examiner>
+</examiners>
+</us-bibliographic-data-grant>
+<abstract id="abstract">
+<p id="p-0001" num="0000">A device for providing therapeutic treatment to a body part such as a knee joint to promote healing of the body part, including a signal generator for generating a pulsed electromagnetic field to electromagnetic stimulators based upon a selected treatment mode, a controller for storing the treatment mode and communicating the treatment mode to the signal generator and stimulators, a heat source configured to provide thermal therapy to the body part, and a monitoring element for monitoring the electromagnetic field generated by the electromagnetic stimulators. The device may also include a telemetry component in communication with the monitor for remotely accessing the controller to modify the treatment mode. The device can also be disposable.</p>
+</abstract>
+<drawings id="DRAWINGS">
+<figure id="Fig-EMI-D00000" num="00000">
+<img id="EMI-D00000" he="138.94mm" wi="107.87mm" file="US07783348-20100824-D00000.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00001" num="00001">
+<img id="EMI-D00001" he="113.88mm" wi="117.01mm" file="US07783348-20100824-D00001.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00002" num="00002">
+<img id="EMI-D00002" he="224.45mm" wi="143.00mm" orientation="landscape" file="US07783348-20100824-D00002.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00003" num="00003">
+<img id="EMI-D00003" he="192.19mm" wi="109.05mm" orientation="landscape" file="US07783348-20100824-D00003.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00004" num="00004">
+<img id="EMI-D00004" he="155.70mm" wi="104.90mm" file="US07783348-20100824-D00004.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00005" num="00005">
+<img id="EMI-D00005" he="148.08mm" wi="106.93mm" file="US07783348-20100824-D00005.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00006" num="00006">
+<img id="EMI-D00006" he="208.70mm" wi="150.03mm" orientation="landscape" file="US07783348-20100824-D00006.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00007" num="00007">
+<img id="EMI-D00007" he="160.78mm" wi="145.20mm" file="US07783348-20100824-D00007.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00008" num="00008">
+<img id="EMI-D00008" he="143.00mm" wi="137.33mm" file="US07783348-20100824-D00008.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+</drawings>
+<description id="description">
+<?RELAPP description="Other Patent Relations" end="lead"?>
+<heading id="h-0001" level="1">CROSS-REFERENCE TO RELATED APPLICATION(S)</heading>
+<p id="p-0002" num="0001">This application claims priority to U.S. Provisional Application 60/927,354, entitled Stimulation Device for Treating Osteoarthritis and filed on May 3, 2007, and further claims priority to U.S. Provisional Application 60/983,653, entitled Stimulation Device for Treating Osteoarthritis and filed on Oct. 30, 2007, the contents of both of which are hereby incorporated herein by reference in their entireties.</p>
+<?RELAPP description="Other Patent Relations" end="tail"?>
+<?BRFSUM description="Brief Summary" end="lead"?>
+<heading id="h-0002" level="1">FIELD OF THE INVENTION</heading>
+<p id="p-0003" num="0002">The methods and devices disclosed herein relate to methods and devices for treating osteoarthritis. More specifically, the devices and methods include the application of one or both of PEMF stimulation and thermal treatment to a target area.</p>
+<heading id="h-0003" level="1">BACKGROUND OF THE INVENTION</heading>
+<p id="p-0004" num="0003">The various embodiments disclosed herein relate to devices and methods for the treatment of osteoarthritis. More particularly, the embodiments relate to portable, disposable pulsed electromagnetic field (PEMF) stimulation and thermal therapy devices for treating osteoarthritis and their methods of use.</p>
+<p id="p-0005" num="0004">Osteoarthritis, also known as degenerative joint disease, is characterized by gradual loss of hyaline cartilage and, in extreme cases, cyst formation in and deformation of the subchondral bone. The hyaline cartilage lines the articular surfaces of the knee and provides cushion and lubrication for the joint. During osteoarthritis, the extra-cellular matrix of the cartilage is worn down at a greater rate than it is being synthesized, leading to a net reduction in the overall amount of cartilage at the articular surfaces of the knee. As the cartilage breaks down, symptoms such as pain, swelling, tenderness, stiffness, and eventual muscle atrophy are manifested. Chondrocytes, the cellular component of hyaline cartilage that is responsible for matrix synthesis and turnover, are also depleted, thus resulting in an inability to naturally recover from this disease. Additionally, cells present in osteoarthritic joints release catabolic cytokines and enzymes that suppress collagen synthesis.</p>
+<p id="p-0006" num="0005">To date, conventional therapies for osteoarthritis have aimed at reducing pain and the progression of joint damage in order to minimize disability and maximize quality of life. The current algorithm for the management of osteoarthritis includes diagnosing the disease, modifying patient activity, prescribing anti-inflammatory medications, injecting steroids into the knee, and as a last resort, surgery. Although this regimen does provide some benefit, it is by no means a cure all for patients with osteoarthritis.</p>
+<p id="p-0007" num="0006">Aside from the conventional therapies, there are currently a number of alternative therapies that may be used to treat osteoarthritis. Three of the forerunners in the non-invasive alternative therapy field include electric, static magnetic, and electromagnetic stimulation.</p>
+<p id="p-0008" num="0007">Electrical stimulation, such as transcutaneous electrical nerve stimulation (TENS), delivers mild electrical impulses across the skin and into regional nerves. In patients having osteoarthritis, pain impulses are transmitted to the spinal cord through small cutaneous fibers. TENS acts to stimulate large cutaneous fibers that subsequently transmit a faster impulse via C-fibers to inhibit pain signals from the small fibers. It is in this way that TENS masks the pain normally experienced by patients having osteoarthritis. It is also thought that TENS incites the secretion of endogenous opiates, the body's natural pain killers, further reducing the pain experienced by patients with osteoarthritis.</p>
+<p id="p-0009" num="0008">Static magnetic stimulation has also been shown to provide medically relevant benefits. Various experiments designed to induce osteoporosis, fracture, and synovitis in animals have demonstrated faster bone repair, increased bone density, and decreased joint inflammation following magnetic treatments. It is thought that magnets can affect biological processes by: decreasing the firing rate of chronic pain neurons; modifying the rate of enzyme-mediated reactions; modulating intracellular signaling by affecting the functioning of calcium channels in the cell membranes; and enhancing blood flow. All of the above may provide some therapeutic benefit with respect to the symptoms of osteoarthritis.</p>
+<p id="p-0010" num="0009">Additionally, electromagnetic stimulation, a modality that generates a magnetic field by sending current through a coil, may also provide medical benefits for the treatment of osteoarthritis. It has been observed that physical stress on bone causes the appearance of tiny electric currents (piezoelectric potentials) that are thought to be the mechanism of transduction of the physical stresses into a signal that promotes bone formation. In particular, studies of electrical phenomena in cartilage have demonstrated a mechanical-electrical transduction mechanism resembling those described in bone, appearing when cartilage is mechanically compressed. Generating currents within cartilage is thought to stimulate chondrocyte activity, thus promoting the synthesis of cartilage. New cartilage synthesis may work to combat the degeneration seen in osteoarthritis and therefore alleviate the symptoms of osteoarthritis.</p>
+<p id="p-0011" num="0010">Thus, there is a need for an improved device and method to treat osteoarthritis.</p>
+<heading id="h-0004" level="1">BRIEF SUMMARY OF THE INVENTION</heading>
+<p id="p-0012" num="0011">A portable, non-invasive device comprised of a multiple usage cuff and two single-use therapy units is designed to provide Electro-Magnetic Thermal Therapy (EMT<sup>2</sup>) for treating knee osteoarthritis. The EMT<sup>2 </sup>provides both transcutaneous pulsed electromagnetic field stimulation and thermal therapy. For purposes of this application, it is understood that &#x201c;thermal therapy&#x201d; means any therapy that provides for application of heat or cold for purposes of treatment. The EMT<sup>2 </sup>is designed to alleviate pain and increase range of motion without requiring direct skin contact to the afflicted joint. The single-use therapy units offer heat or cooling and PEMF stimulation when inserted into the cuff, which provides the power and control for the coils. The cuff may contain a rechargeable power source capable of delivering a recommended amount of therapy and the coils for delivering the PEMF stimulation. The cuff may be fastened to the knee in a manner that directs the therapy to the medial and lateral areas of the joint. Furthermore, the cuff may be designed such that it is aesthetically pleasing and comfortable to wear during daily activities either over or underneath clothing, thereby increasing patient compliance.</p>
+<p id="p-0013" num="0012">The basic principle behind the concept of electromagnetic stimulation is that passing an electric current through a coil winding structure will generate an electromagnetic field. The electromagnetic field can, in turn, generate a current in any conductive material, such as nerves or other body tissues, within this field. The electromagnetically induced electric field created by properly oriented pulsed electromagnetic stimulation thus accomplishes the result of transferring charge to cells of the body. This induced current can lead to nerve firing, muscle contraction, stimulation of cell signaling pathways causing cell growth, and a number of other effects. In contrast to applications of electrical stimulation, pulsed electromagnetic stimulation does not require direct skin contact to induce nerve excitation. As a result, significantly higher levels of directed stimulation can be achieved through pulsed electromagnetic stimulation without the adverse effects of other technologies.</p>
+<p id="p-0014" num="0013">Thus, the EMT<sup>2 </sup>devices and methods disclosed herein are designed with a powerful electromagnetic stimulating means created for the purpose of stimulating nerve, muscle, and/or other body tissues. Previous clinical studies have shown a high correlation between low-frequency PEMF and new cartilage growth for treating osteoarthritis. The inventive device provides an easy-to-use, portable system that may have applications within a host of clinical and home health applications.</p>
+<?BRFSUM description="Brief Summary" end="tail"?>
+<?brief-description-of-drawings description="Brief Description of Drawings" end="lead"?>
+<description-of-drawings>
+<heading id="h-0005" level="1">BRIEF DESCRIPTION OF THE DRAWINGS</heading>
+<p id="p-0015" num="0014"><figref idref="DRAWINGS">FIG. 1</figref> is a diagram illustrating a typical human knee joint model.</p>
+<p id="p-0016" num="0015"><figref idref="DRAWINGS">FIG. 2</figref> is a block diagram illustrating a stimulation device for treating osteoarthritis in the knee according to one embodiment.</p>
+<p id="p-0017" num="0016"><figref idref="DRAWINGS">FIG. 3</figref> is a front view of one embodiment of a stimulation device that is securable to a patient's knee for delivery of electromagnetic and thermal therapy.</p>
+<p id="p-0018" num="0017"><figref idref="DRAWINGS">FIGS. 4A and 4B</figref> illustrate the stimulation device of <figref idref="DRAWINGS">FIG. 3</figref> secured to the patient's knee.</p>
+<p id="p-0019" num="0018"><figref idref="DRAWINGS">FIG. 5</figref> is an exploded perspective view of the stimulation device of <figref idref="DRAWINGS">FIG. 3</figref>.</p>
+<p id="p-0020" num="0019"><figref idref="DRAWINGS">FIG. 6</figref> is an enlarged exploded view of a portion of the stimulation device of <figref idref="DRAWINGS">FIG. 3</figref>.</p>
+<p id="p-0021" num="0020"><figref idref="DRAWINGS">FIG. 7</figref> is a perspective view of one embodiment of a stimulation device in the form of a patch that is securable to a patient's body for delivery of electromagnetic and thermal therapy.</p>
+</description-of-drawings>
+<?brief-description-of-drawings description="Brief Description of Drawings" end="tail"?>
+<?DETDESC description="Detailed Description" end="lead"?>
+<heading id="h-0006" level="1">DETAILED DESCRIPTION</heading>
+<p id="p-0022" num="0021"><figref idref="DRAWINGS">FIG. 1</figref> is a diagram illustrating a typical human knee joint model. As shown in <figref idref="DRAWINGS">FIG. 1</figref>, the typical human knee joint includes a compartment filled with synovial fluid that is bounded by articular cartilage on the ends of the femur and tibia, respectively, and fibrous capsules. In accordance with one embodiment of the devices and methods discussed herein, osteoarthritis in the knee joint may be treated by the application of heat or cold and specific and selective electromagnetic fields via coils positioned adjacent to the knee joint. As will be discussed in more detail to follow, a signal generator means may provide the appropriate signals to the coils for generating the specific and selective electromagnetic fields. The specific and selective electromagnetic field needed to treat osteoarthritis in the knee joint may be calculated, and varies depending upon, among other factors, the dimensions of the tibia and femur and the severity of the symptoms. Furthermore, a heating or cooling source may also be positioned adjacent to the knee joint to relieve pain, reduce patient discomfort, and increase range of motion. The heating or cooling source can also be referred to as a &#x201c;thermal exchange component,&#x201d; which, for purposes of the instant application, means any component or device that can be used to apply heat (or any temperature that is higher than the patient's body temperature or the ambient temperature) or cold (or any temperature that is lower than the patient's body temperature or the ambient temperature).</p>
+<p id="p-0023" num="0022">More particularly, the implementations discussed herein relate to devices and methods for generating both (1) heat or cold, and (2) selective pulsed electromagnetic fields for the treatment of diseased tissue in a joint, such as a knee joint. The devices, which may be designed in numerous forms such as a knee brace or a small dermal patch, preferably offer transcutaneous stimulation for treating osteoarthritis. The devices may be designed to provide stimulation directly to the afflicted joint to alleviate pain and increase range of motion.</p>
+<p id="p-0024" num="0023">As will be discussed in further detail in subsequent paragraphs, the various EMT<sup>2 </sup>stimulation device embodiments may be designed to attach to a patient for a prolonged period of time while having little disruption to daily activities and minimal skin irritation. In addition, the stimulation devices may be designed such that it is aesthetically pleasing and comfortable to wear. As a result of these and other design characteristics, patient refusal of treatment due to discomfort (i.e., patient &#x201c;non-compliance&#x201d;) may be minimized.</p>
+<p id="p-0025" num="0024">Pulsed electromagnetic fields generate small, induced currents (Faraday currents) in the highly conductive extracellular fluid, which thereby mimics endogeneous electrical currents. The endogeneous electrical currents are due primarily to movement of fluid containing electrolytes in channels of the bone containing organic constituents with fixed negative charges, generating what are called &#x201c;streaming potentials.&#x201d; Studies of electrical phenomena in cartilage have demonstrated a mechanical-electrical transduction mechanism that resembles those described in bone, appearing when cartilage is mechanically compressed, causing movement of fluid and electrolytes over the surface of fixed negative charges in the proteoglycans and collagen in the cartilage matrix. These streaming potentials serve a purpose in cartilage similar to that in bone, and, along with mechanical strain, lead to signal transduction that is capable of stimulating chondrocyte synthesis of matrix components.</p>
+<p id="p-0026" num="0025">In contrast to direct currents, PEMFs are able to penetrate cell membranes and either stimulate them or directly affect intracellular organelles. As a result, the effect of PEMFs on extracellular matrices includes increased synthesis of cartilage molecules, thereby enabling a &#x201c;remodeling&#x201d; of the knee joint.</p>
+<p id="p-0027" num="0026"><figref idref="DRAWINGS">FIG. 2</figref> is a block diagram illustrating EMT<sup>2 </sup>stimulation device <b>10</b> for treating osteoarthritis in the knee according to one embodiment. This device embodiment <b>10</b> has a signal generator <b>12</b>, power source <b>14</b>, first stimulating means <b>16</b>A, and second stimulating means <b>16</b>B. First stimulating means <b>16</b>A is coupled to first output <b>18</b>A of signal generator <b>12</b> via first signal line <b>20</b>A. Similarly, second stimulating means <b>16</b>B is coupled to second output <b>18</b>B of signal generator <b>12</b> via second signal line <b>20</b>B. In various embodiments, the first stimulating means <b>16</b>A has either or both of an electromagnetic stimulating means <b>26</b>A and a thermal exchange component <b>28</b>A and the second stimulating means <b>16</b>B has either or both of an electromagnetic stimulating means <b>26</b>B and a thermal exchange component <b>28</b>B.</p>
+<p id="p-0028" num="0027">First and second signal lines <b>20</b>A and <b>20</b>B are configured to deliver the signals generated by signal generator <b>12</b> to create the appropriate therapeutic stimulation via first and second stimulating means <b>16</b>A and <b>16</b>B. First and second signal lines <b>20</b>A and <b>20</b>B may be &#x201c;wired,&#x201d; such as with coaxial cable. Alternatively, a &#x201c;wireless&#x201d; connection means, such as Bluetooth, may be used.</p>
+<p id="p-0029" num="0028">Although stimulation device <b>10</b> is shown as having two output ports <b>18</b>A and <b>18</b>B for simultaneously and independently delivering output signals (either the same or different signals) to two stimulating means <b>16</b>A and <b>16</b>B, one skilled in the art will appreciate that the number of output ports and stimulating means may be varied without departing from the intended scope of the implementations disclosed herein. Thus, embodiments of device <b>10</b> that include any number of stimulating means are contemplated. For example, in one alternative embodiment, the device <b>10</b> can have one stimulating means.</p>
+<p id="p-0030" num="0029">Power source <b>14</b>, which may be, for example, a lithium battery pack, is provided for delivering a current input to signal generator <b>12</b>. While shown in <figref idref="DRAWINGS">FIG. 2</figref> as a remote unit, power source <b>14</b> may be incorporated as part of or housed together with signal generator <b>12</b>. Since the embodiments may be designed with low power requirements, power source <b>14</b> may be one capable of providing an average power input of less than about 300 mW per session. As a result, power source <b>14</b> is generally small and lightweight. In an alternative embodiment, the device <b>10</b> has two power sources&#x2014;one to supply power to the signal generator and another to supply power to create the thermal exchange.</p>
+<p id="p-0031" num="0030">As shown in <figref idref="DRAWINGS">FIG. 2</figref>, signal generator <b>12</b> may include voltage regulator <b>22</b> and microcontroller <b>24</b>. Furthermore, first stimulating means <b>16</b>A may include first electromagnetic stimulating means <b>26</b>A and first thermal exchange component <b>28</b>A, while second stimulating means <b>16</b>B may include second electromagnetic stimulating means <b>26</b>B and second thermal exchange component <b>28</b>B. In one embodiment, the first and second electromagnetic stimulating means <b>26</b>A, <b>26</b>B are first and second coils <b>26</b>A, <b>26</b>B. Voltage regulator <b>22</b> may be used to provide various required supply voltages to first and second electromagnetic stimulating means <b>26</b>A and <b>26</b>B. First and second electromagnetic stimulating means <b>26</b>A and <b>26</b>B may be triggered by microcontroller <b>24</b>, which may be designed to generate accurate pulses at a particular triggering and switching frequency. Output signals are delivered from microcontroller <b>24</b> to first and second stimulating means <b>16</b>A and <b>16</b>B, each of which is individually responsive to the signals to create a pulsed electromagnetic field.</p>
+<p id="p-0032" num="0031">As shown in <figref idref="DRAWINGS">FIG. 2</figref>, alternative embodiments of the device <b>10</b> may further include display <b>30</b> and monitoring means <b>32</b>. Display <b>30</b> may be designed to display many different treatment parameters, including but not limited to a treatment mode, a power level, and an amount of time remaining in a treatment session.</p>
+<p id="p-0033" num="0032">Monitoring means <b>32</b> may be designed for monitoring one or more of the output conditions of stimulation device <b>10</b>. In particular, monitoring means <b>32</b> may be configured to ensure that accurate treatment dosages are delivered through first and second stimulating means <b>16</b>A and <b>16</b>B to the patient's knee. One condition that may be monitored by monitoring means <b>32</b> is the electromagnetic field generated by first and second coils <b>26</b>A and <b>26</b>B. In particular, monitoring means <b>32</b> may include circuitry to both detect the strength of the electromagnetic field and adjust the signals delivered to the coils if the sensed field is not in accordance with the desired treatment level. A second condition that may be monitored by monitoring means <b>32</b> is tissue temperature generated by first and second thermal exchange component <b>28</b>A and <b>28</b>B. If, for example, monitoring means <b>32</b> senses a tissue temperature that is out of an acceptable range and poses a danger of injuring tissue around the knee, monitoring means <b>32</b> may communicate with the patient through display <b>30</b> to instruct removal of device <b>10</b> from the patient's knee.</p>
+<p id="p-0034" num="0033">For example, in one embodiment, monitoring means <b>32</b> may include a signal detector coupled to first stimulating means <b>16</b>A and/or second stimulating means <b>16</b>B for measuring the energy emission from first and second coils <b>26</b>A and <b>26</b>B. The signal detector may be designed so as to transmit a feedback signal to signal generator <b>12</b> for controlling the energy output. The actual electromagnetic energy field, or treatment dosage, that is transmitted from first and second stimulating means <b>16</b>A and <b>16</b>B may be measured directly by embedding the signal strength detector within the stimulating means. The signal level measured by the signal detector may then be sent to signal generator <b>12</b>, where it may be used as a feedback control signal to control the output signals of the generator. If, at any time, monitoring means <b>32</b> detects a field strength outside of the desired range of the treatment mode, display <b>30</b> may display an audible, visible, tactile, or other type of alarm to inform the patient and/or physician of a malfunction in the treatment mode. Furthermore, if the measured field strength is at or above a level that poses a risk of danger, the feedback circuit of monitoring means <b>32</b> may stop the treatment to ensure that the patient is not harmed. As will be appreciated by one skilled in the art, monitoring means <b>32</b> may alternatively or additionally include a temperature sensor and associated feedback control to sense and control tissue temperature around the patient's knee.</p>
+<p id="p-0035" num="0034">As shown in <figref idref="DRAWINGS">FIG. 2</figref>, device <b>10</b> may be connected to a computer system <b>34</b> to allow the physician to program treatment modes into microcontroller <b>24</b>. In this manner, the physician retains control over the type of treatment that the patient receives since device <b>10</b> may be designed such that only the physician is able to access and modify the programmed treatment modes. Through computer system <b>34</b>, the physician may also monitor the treatment conditions to ensure that, for example, the correct field strength is being generated.</p>
+<p id="p-0036" num="0035">In order to make treatment with stimulation device <b>10</b> more convenient for both the physician and the patient, telemetry means <b>36</b> may be incorporated into the device. In general, telemetry allows for the remote measurement and reporting of information of interest to a remote system or operator. In addition, telemetry allows for the remote operation and control of a device by allowing the operator to remotely send instructions to or program the device.</p>
+<p id="p-0037" num="0036">With respect to stimulation device <b>10</b>, telemetry means <b>36</b> enables the physician to remotely monitor the treatment as well as modify the treatment modes programmed into microcontroller <b>24</b>. In this way, the physician has the ability to control and prescribe treatment modes without the requirement of a face-to-face consultation with the patient, thus making treatment of osteoarthritis more convenient for both the patient and the physician. In one embodiment, telemetry means <b>36</b> may operate using wireless communication, such as by utilizing a radio frequency system to implement the data link between the device and remote system. However, telemetry means <b>36</b> may alternatively transfer data over other media, such as a telephone line, a computer network, or via an optical link.</p>
+<p id="p-0038" num="0037">Now that certain embodiments of the EMT<sup>2 </sup>stimulation device have been generally described in reference to the block diagram illustration of <figref idref="DRAWINGS">FIG. 2</figref>, one exemplary embodiment of a stimulation device that may be worn by a patient for the treatment of osteoarthritis will be described. In particular, <figref idref="DRAWINGS">FIG. 3</figref> illustrates a stimulation device <b>110</b>, which generally includes a knee cuff <b>111</b>, a housing <b>131</b> in which a signal generator and a power source are positioned, a first stimulating means <b>116</b>A, a second stimulating means <b>116</b>B, and a fastening means <b>117</b>. The housing <b>131</b> can be positioned anywhere on the cuff <b>111</b>. The device <b>110</b> alternatively also has a display <b>130</b> that can display one or more treatment parameters, such as the treatment mode or the amount of treatment time remaining in a therapy session. In the embodiment depicted in <figref idref="DRAWINGS">FIG. 3</figref>, the display <b>130</b> is located on the housing <b>131</b>. Alternatively, the display <b>130</b> can be positioned in any location from which the display is visible to the user during use. Stimulation device <b>110</b> is a device for providing electromagnetic field stimulation and thermal therapy to a patient's body to promote healing. In particular, stimulation device <b>110</b> may provide pulsed electromagnetic field stimulation and thermal therapy (via first and second stimulating means <b>116</b>A and <b>116</b>B) to a knee joint suffering from the effects of osteoarthritis to promote healing of the knee. However, one skilled in the art will appreciate that various device embodiments disclosed herein may be useful to provide electromagnetic field stimulation and thermal therapy (EMT<sup>2</sup>) to various other locations on a patient's body to promote healing or provide a therapeutic effect.</p>
+<p id="p-0039" num="0038">Knee cuff <b>111</b> includes main body portion <b>113</b>, first set of strap members <b>115</b>A, and second set of strap members <b>115</b>B. First set of strap members <b>115</b>A include first fastening members <b>117</b>A, while second set of strap members <b>115</b>B include second fastening members <b>117</b>B. As will be discussed in the following paragraphs, first fastening members <b>117</b>A are configured to mate with second fastening members <b>117</b>B in order to removably couple first set of strap members <b>115</b>A to second set of strap members <b>115</b>B and thus, to secure knee cuff <b>111</b> to the patient's knee.</p>
+<p id="p-0040" num="0039"><figref idref="DRAWINGS">FIGS. 4A and 4B</figref> illustrate stimulation device <b>110</b> secured to the patient's knee, according to one embodiment. In particular, <figref idref="DRAWINGS">FIG. 4A</figref> illustrates a front side of the patient's knee, while <figref idref="DRAWINGS">FIG. 4B</figref> illustrates a back side of the knee. Knee cuff <b>111</b> of stimulation device <b>110</b> is wrapped around the knee such that first set of strap members <b>115</b>A having first fastening members <b>117</b>A overlap with second set of strap members <b>115</b>B having second fastening members <b>117</b>B to secure the cuff at the desired location on the knee. When properly secured to the knee, first stimulation means <b>116</b>A is positioned at a lateral knee location, while second stimulating means <b>116</b>B is positioned at a medial knee location. In one embodiment, first fastening members <b>117</b>A and second fastening members <b>117</b>B form a hook-and-loop fastening means, such as that commonly known as VELCRO&#xae;, wherein first fastening members <b>117</b>A are the &#x201c;hook&#x201d; portions and second fastening members <b>117</b>B are the &#x201c;loop&#x201d; portions. However, other means of fastening may be used including, but not limited to, buckles, snaps, and zippers. In alternate embodiments of knee cuff <b>111</b>, no fastening means is used. Instead, the fabric forming the wrap is capable of being stretched and is able to hold itself in place due to the elasticity of the wrap.</p>
+<p id="p-0041" num="0040"><figref idref="DRAWINGS">FIG. 5</figref> is an exploded perspective view of stimulation device <b>110</b> according to a further embodiment. As shown in <figref idref="DRAWINGS">FIG. 5</figref>, first stimulating means <b>116</b>A includes first coil <b>126</b>A, first stimulating means holder <b>125</b>A, first stimulating means holder base plate <b>121</b>A, first thermal exchange component <b>128</b>A, and first stimulating means housing <b>119</b>A. First coil <b>126</b>A of first stimulating means <b>116</b>A is designed to be contained within the first stimulating means holder <b>125</b>A. The first stimulating means holder base plate <b>121</b>A provides a base for the first stimulating means holder <b>125</b>A to attach to in order to be joined to the knee cuff by means of any one of such exemplary attachment mechanisms as, but not limited to, an irreversible snap-fit hook mechanism, ultrasonic welding, or glue. In one embodiment, the first stimulating means holder base plate <b>121</b>A may be permanently attached to the knee cuff <b>111</b> by sewing, glue, or any known attachment means. First thermal exchange component <b>128</b>A is designed to be contained within first thermal stimulating means housing <b>119</b>A. Housing <b>119</b>A may then be enclosed on a back side by a thin plastic barrier <b>123</b>A formed from a material such as Tyvek&#xae;. The thin barrier <b>123</b>A can be attached to the housing <b>119</b>A by glue, heat seal, or a plastic snap-fit cover <b>118</b>A. First thermal exchange component <b>119</b>A is insertable into first stimulating means holder <b>125</b>A, which is coupled to knee cuff <b>111</b> as shown in the embodiment depicted in <figref idref="DRAWINGS">FIG. 3</figref>.</p>
+<p id="p-0042" num="0041">Although not shown in an exploded view like first stimulating means <b>116</b>A, second stimulating means <b>116</b>B includes similar components in a similar configuration. Thus, the discussion focuses on first stimulating means <b>116</b>A for purposes of example only, but applies equally to second stimulating means <b>116</b>B. As a result, second stimulating means <b>116</b>B includes similar components having similar reference numerals.</p>
+<p id="p-0043" num="0042">The signal generator <b>112</b> depicted schematically in <figref idref="DRAWINGS">FIG. 5</figref> includes a voltage regulator <b>122</b> and a microcontroller <b>124</b>, which control the signals transmitted through the wire harness <b>132</b> to first and second coils <b>126</b>A and <b>126</b>B to provide the pulsed electromagnetic field to the knee. The wire harness <b>132</b> is hidden within the different fabric layers of the knee cuff <b>111</b>. Power source <b>114</b>, which provides power to voltage regulator <b>122</b>, is positioned in the same housing that contains the signal generator means <b>112</b>. However, as discussed above, power source <b>114</b> may alternatively be positioned remotely from the signal generator means <b>112</b>. In a further alternative embodiment, two power sources are provided: one for the signal generator and one for the thermal exchange component. In yet another embodiment, three power sources are provided: one for the signal generator and one for each of the thermal exchange components. In one embodiment, the power sources for the thermal exchange components are single-use heating mixtures that provide energy when exposed to air.</p>
+<p id="p-0044" num="0043">First and second coils <b>126</b>A and <b>126</b>B are either unipolar or bipolar electromagnets that generate a magnetic field when electrical current flows through them. The magnetic field is created by passing an electric current through first and second coils <b>126</b>A and <b>126</b>B, which are preferably formed from a long wire strand coiled around a core. The &#x201c;pulsed&#x201d; electromagnetic field may be created by programming microcontroller <b>124</b> to turn the electromagnetic field on and off at a rapid rate.</p>
+<p id="p-0045" num="0044">Although first and second thermal exchange components <b>128</b>A and <b>128</b>B are not required components, incorporating them into first and second stimulating means <b>116</b>A and <b>116</b>B, respectively, may provide beneficial treatment results. In particular, when used in combination with electromagnetic therapy, thermal therapy is helpful in treating the effects of osteoarthritis and improving patient compliance. However, one skilled in the art will appreciate that embodiments of stimulation device <b>110</b> that apply only thermal therapy, only electromagnetic therapy, or a combination of both therapies are possible. As a result, the stimulation devices described herein may be tailored to the particular needs of different patients.</p>
+<p id="p-0046" num="0045">Heat is a natural remedy that may be used to both relieve pain and reduce discomfort. This is accomplished by stimulating the patient's thermoreceptors which, in turn, aid in blocking the pain sensation from reaching the brain by relaxing deep muscles to reduce tenderness and pain. In order to attain a therapeutic heat transfer effect including increases in tissue temperature, blood flow, muscle lengthening, and metabolism, an intramuscular temperature of about 104 degrees F. (40 degrees Celsius) must be reached.</p>
+<p id="p-0047" num="0046">Numerous types of heat sources may be utilized to provide beneficial heat therapy in accordance with various implementations. For example, first and second thermal exchange components <b>128</b>A and <b>128</b>B may be multi-use cartridges that require the patient to &#x2018;re-heat&#x2019; the cartridges before every use, such as by placing the cartridges in the microwave. Alternatively, first and second thermal exchange components <b>128</b>A and <b>128</b>B may be one-time use cartridges that are designed to provide an irreversible exothermic reaction to provide a source of heat for a specified amount of time. In one embodiment, first and second thermal exchange components <b>128</b>A and <b>128</b>B are cartridges that contain iron, carbon, sodium chloride, sodium thiosulfate, and water. When the CLLHW compound is exposed to air, it undergoes an exothermic reaction that produces heat. In other embodiments, heat may be provided through: a resistive based heating source; selective insulation; or &#x201c;warmth&#x201d; radiated from the battery during operation. As will be appreciated by one skilled in the art, first and second thermal exchange components <b>128</b>A and <b>128</b>B may be heat sources designed such that they deliver heat therapy for any designated period of time ranging from a few minutes to the entire day. This designated period may or may not coincide with the electromagnetic field duration. In addition, first and second thermal exchange components <b>128</b>A and <b>128</b>B may be pulsed such that the heat therapy is not constant.</p>
+<p id="p-0048" num="0047">In one embodiment, power source <b>114</b> is a lithium-polymer battery, which may be either a single-use battery or a rechargeable, multi-use battery. If power source <b>114</b> is a rechargeable type battery, stimulation device <b>110</b> may be configured for attachment to a docking station for recharging the device. Alternatively, the docking station may be designed to receive only power source <b>114</b>, which may be made removable from stimulation device <b>110</b>. As one skilled in the art will appreciate, numerous other types of power sources may be used to provide the requisite power to stimulation device <b>110</b>. For example, stimulation device <b>110</b> may be designed to create power from the patient's body movements. Alternatively, stimulation device <b>110</b> may be powered through a chemical reaction with heat being the by-product. In this case, the heat by-product may provide the heat therapy to the knee joint.</p>
+<p id="p-0049" num="0048">As shown in <figref idref="DRAWINGS">FIG. 5</figref>, stimulation device <b>110</b> further includes display <b>130</b> for displaying one or more treatment parameters, such as the treatment mode or the amount of treatment time remaining in a therapy session. Display <b>130</b> may utilize many different types of indicator means such as, for example, a light source, a heat-sensitive material that changes color (as a function of elapsed time), a digital timer, or sound repetition. In addition, display <b>130</b> may function together with a monitoring means in order to transmit an audio, visual, or tactile-type message to the patient in response to the monitoring means sensing, for example, an electromagnetic field strength that is outside of that defined by the treatment mode. In this instance, display <b>130</b> is useful to instruct the patient to remove the stimulation device or to call his or her physician.</p>
+<p id="p-0050" num="0049"><figref idref="DRAWINGS">FIG. 6</figref> is an enlarged illustration of the exploded perspective view of <figref idref="DRAWINGS">FIG. 5</figref>, according to one embodiment. In this embodiment, the stimulating means housings <b>119</b>A, <b>119</b>B as depicted in <figref idref="DRAWINGS">FIG. 5</figref> are insertable, replaceable units that can be easily and quickly inserted into and removed from the means holders <b>125</b>A, <b>125</b>B. In one embodiment, the stimulating means housings <b>119</b>A, <b>119</b>B have connections that, upon insertion into the holders <b>125</b>A, <b>125</b>B, couple with connections in the holders <b>125</b>A, <b>125</b>B to supply power to the housings <b>119</b>A, <b>119</b>B.</p>
+<p id="p-0051" num="0050"><figref idref="DRAWINGS">FIG. 6</figref> depicts one embodiment of a stimulation device <b>110</b> with insertable stimulating means housings <b>119</b>A, <b>119</b>B. As shown in <figref idref="DRAWINGS">FIG. 6</figref>, the stimulation device <b>110</b> has a metal plate <b>140</b>A in the stimulating means housing <b>119</b>A and a first pair of stimulating means holder spring-loaded metal contacts <b>142</b>A. When the stimulation device <b>110</b> is assembled as shown in the embodiment of <figref idref="DRAWINGS">FIG. 3</figref>, the metal plate <b>140</b>A on the stimulating means housing <b>119</b>A is used to make an electrical connection with a pair of spring-loaded metal contacts <b>142</b>A in the first stimulating means holder <b>125</b>A. The protrusions <b>133</b>A on the stimulating means housing <b>119</b>A can slide in and out of the grooves <b>134</b>A on the stimulating means holder <b>125</b>A and engage in the notches <b>135</b>A to create a reversible mechanical snap-in feature that allows for secure insertion and removal of the housing <b>119</b>A to the stimulating means holder <b>125</b>A. In an alternative implementation, the metal plate <b>140</b>A in the stimulating means housing <b>119</b>A makes contact with the first pair of stimulating means holder magnets that are inserted into a first pair of magnet notches in first stimulating means holder <b>125</b>A for securing the housing <b>119</b>A to the first stimulating means holder <b>125</b>A. In a further alternative, instead of a metal plate, the stimulation device <b>110</b> can have a pair of stimulating means magnets and a corresponding pair of stimulating means holder magnets.</p>
+<p id="p-0052" num="0051">The first pair of stimulating means holder spring-loaded metal contacts <b>142</b>A are coupled to a corresponding pair of signal lines (not shown) in communication with signal generator <b>112</b>. When first stimulating means housing <b>119</b>A is positioned within first stimulating means holder <b>125</b>A, the electrical connection between the metal plate <b>140</b>A and the corresponding first pair of stimulating means holder spring-loaded metal contacts <b>142</b>A creates a closed circuit that electrically couples first stimulating means <b>116</b>A to signal generator <b>112</b>. As a result, signal generator <b>112</b> is able to communicate with first stimulating means <b>116</b>A to deliver the prescribed treatment signals defined by the treatment mode programmed into microcontroller <b>124</b>.</p>
+<p id="p-0053" num="0052">The embodiment of stimulation device <b>110</b> illustrated in <figref idref="DRAWINGS">FIGS. 3-6</figref> is a two coil arrangement with one coil on either side of the knee for generating the PEMF therapy. In general, voltage regulator <b>122</b> is used to provide a constant supply voltage to signal generator <b>112</b>, and first and second stimulating means <b>116</b>A and <b>116</b>B. Microcontroller <b>124</b> triggers first and second coils <b>126</b>A and <b>126</b>B, thereby generating accurate pulses at a particular triggering and switching frequency defined by the designated treatment mode stored in the microcontroller. The triggering frequency is defined as the rate at which a set number of pulses occur. The switching frequency is the fundamental frequency of the individual pulses. Another parameter called the switching duty cycle is defined as the ratio of the pulse width over the switching period. The voltage of the pulses is equivalent to the amplitude of the PEMF therapy.</p>
+<p id="p-0054" num="0053">The required penetration depth of the pulsed electromagnetic field generated by signal generator <b>112</b> and first and second stimulating means <b>116</b>A and <b>116</b>B may vary depending upon, for example, the size of the patient's knee region. However, for an adult patient, the penetration depth is generally in the range of about 1 cm to about 5 cm. Alternatively, the penetration depth is in the range of about 2 cm to about 4 cm. In a further alternative, the penetration depth ranges from about 2 cm to about 2.5 cm. This &#x201c;penetration depth&#x201d; parameter is necessary in order to estimate the magnetic field intensity needed to provide the therapy, which ultimately determines the power requirement of power source <b>114</b>.</p>
+<p id="p-0055" num="0054">In general, the magnetic field intensity generated by a coil is measured in terms of Tesla (T) and has the following approximate relationship with current flowing through the coil:</p>
+<p id="p-0056" num="0055">
+<maths id="MATH-US-00001" num="00001">
+<math overflow="scroll">
+<mrow>
+  <mi>B</mi>
+  <mo>=</mo>
+  <mrow>
+    <mfrac>
+      <mrow>
+        <msub>
+          <mi>&#x3bc;</mi>
+          <mn>0</mn>
+        </msub>
+        <mo>&#x2062;</mo>
+        <msup>
+          <mi>nIR</mi>
+          <mn>2</mn>
+        </msup>
+      </mrow>
+      <mrow>
+        <mn>2</mn>
+        <mo>&#x2062;</mo>
+        <msup>
+          <mrow>
+            <mo>(</mo>
+            <mrow>
+              <msup>
+                <mi>R</mi>
+                <mn>2</mn>
+              </msup>
+              <mo>+</mo>
+              <msup>
+                <mi>x</mi>
+                <mn>2</mn>
+              </msup>
+            </mrow>
+            <mo>)</mo>
+          </mrow>
+          <mrow>
+            <mn>3</mn>
+            <mo>/</mo>
+            <mn>2</mn>
+          </mrow>
+        </msup>
+      </mrow>
+    </mfrac>
+    <mo>&#x21d2;</mo>
+    <mrow>
+      <mi>I</mi>
+      <mo>&#x2062;</mo>
+      <mfrac>
+        <mrow>
+          <mn>2</mn>
+          <mo>&#x2062;</mo>
+          <mstyle>
+            <mspace width="0.3em" height="0.3ex"/>
+          </mstyle>
+          <mo>&#x2062;</mo>
+          <msup>
+            <mrow>
+              <mi>B</mi>
+              <mo>&#x2061;</mo>
+              <mrow>
+                <mo>(</mo>
+                <mrow>
+                  <msup>
+                    <mi>R</mi>
+                    <mn>2</mn>
+                  </msup>
+                  <mo>+</mo>
+                  <msup>
+                    <mi>x</mi>
+                    <mn>2</mn>
+                  </msup>
+                </mrow>
+                <mo>)</mo>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mn>3</mn>
+              <mo>/</mo>
+              <mn>2</mn>
+            </mrow>
+          </msup>
+        </mrow>
+        <mrow>
+          <msub>
+            <mi>&#x3bc;</mi>
+            <mn>0</mn>
+          </msub>
+          <mo>&#x2062;</mo>
+          <msup>
+            <mi>nR</mi>
+            <mn>2</mn>
+          </msup>
+        </mrow>
+      </mfrac>
+    </mrow>
+  </mrow>
+</mrow>
+</math>
+</maths>
+<br/>
+where &#x201c;B&#x201d; is the magnetic field produced by the coil, &#x201c;I&#x201d; is the current through the coil, &#x201c;R&#x201d; is the radius of the coil, and &#x201c;x&#x201d; is the penetration depth of the PEMF.
+</p>
+<p id="p-0057" num="0056">According to one embodiment, the magnetic field strength B applied to the target body part of the patient ranges from about 10 &#x3bc;T to about 2,000 &#x3bc;T. Alternatively, the magnetic field strength B ranges from about 20 &#x3bc;T to about 100 &#x3bc;T. In a further alternative, the magnetic field strength B ranges from about 30 &#x3bc;T to about 50 &#x3bc;T. In yet another alternative, the magnetic field strength B is about 40 &#x3bc;T. According to one embodiment, the magnetic field produced by the coil is applied perpendicular to the coil.</p>
+<p id="p-0058" num="0057">In one implementation, the magnetic field is applied into the knee for a distance ranging from about 1 cm to about 5 cm into the knee. Alternatively, the magnetic field is applied for a distance ranging from about 2 cm to about 4 cm into the knee. In a further alternative, the magnetic field is applied to a distance ranging from about 2 cm to about 2.5 cm into the knee.</p>
+<p id="p-0059" num="0058">The coil, in accordance with one embodiment, has 20 turns of a 24 AWG wire around a core with a radius of about 2 centimeters with a pulsed current 712 mA. Alternatively, the coil has 65 turns of a 28 AWG wire around a core with a radius of 1.5 cm with a pulsed current of 339 mA.</p>
+<p id="p-0060" num="0059">While a single-coil configuration is possible and within the intended scope of this application, the two-coil configuration uses about 20 times less power than the single-coil configuration because it requires a significantly smaller amount of energy to penetrate both the lateral and medial side of the knee. Furthermore, embodiments having more than two coils are also contemplated.</p>
+<p id="p-0061" num="0060">In one embodiment, the PEMF therapy is applied for period ranging from about 30 minutes to about 4 hours. Alternatively, the PEMF therapy is applied for a period ranging from about 1 hour to about 3 hours. In a further alternative, the therapy is applied from about 1.5 to about 2.5 hours. In yet another alternative, the therapy is applied for about 2 hours. Further, the optimal treatment window may vary depending upon many factors, including, but not limited to, the field intensity provided to the knee, the severity of the osteoarthritis in the knee, and the physical dimensions of the knee.</p>
+<p id="p-0062" num="0061">According to one implementation, the triggering frequency ranges from about 1 Hz to about 100 Hz. Alternatively, the triggering frequency ranges from about 5 Hz to about 50 Hz. In a further alternative, the triggering frequency ranges from about 10 Hz to about 20 Hz. In yet another alternative, the triggering frequency is about 15 Hz.</p>
+<p id="p-0063" num="0062">In accordance with one embodiment, the switching frequency ranges from about 50 Hz to about 100 kHz. Alternatively, the switching frequency ranges from about 300 Hz to about 70 kHz. In a further alternative, the switching frequency ranges from about 2 kHz to about 4 kHz. In yet another alternative, the switching frequency is about 3 kHz.</p>
+<p id="p-0064" num="0063">In general, in order to achieve the optimal therapeutic effect with the PEMF, a triggering frequency in the range of about 15 Hz and a switching frequency in the range of about 3 kHz are desirable, although other triggering and switching frequencies are also contemplated.</p>
+<p id="p-0065" num="0064">As one skilled in the art will appreciate based upon the above disclosure, stimulation device <b>110</b> does not require connection to any external hardware while delivering the prescribed therapy. Thus, stimulation device <b>110</b> is portable, and is designed such that it may be worn by the patient during their normal daily activities without discomfort. Knee cuff <b>111</b> may be both ergonomically designed and cosmetically appealing to increase patient compliance with wearing the device.</p>
+<p id="p-0066" num="0065">First and second stimulating means <b>116</b>A and <b>116</b>B may be designed as complete or partial disposable units that may be discarded and replaced after a predetermined number of treatments. For example, stimulating means housing <b>119</b>A, which may include first thermal exchange component <b>128</b>A and/or first coil <b>126</b>A, may be removed from stimulation means holder <b>125</b>A and disposed of by the patient upon expiration. Optionally, display <b>130</b> may instruct the patient when the units have expired and require replacement. The disposability feature of first and second stimulating means <b>116</b>A and <b>116</b>B may be advantageous because if one or more of the stimulating means stops functioning properly, it is only necessary to replace those components and not the entire stimulation device.</p>
+<p id="p-0067" num="0066">Another exemplary embodiment of an EMT<sup>2 </sup>stimulation device is depicted in <figref idref="DRAWINGS">FIG. 7</figref>. The device <b>200</b> shown in <figref idref="DRAWINGS">FIG. 7</figref> has a PEMF generation component <b>202</b> and a thermal exchange component <b>204</b>. The PEMF generation component <b>202</b> is positioned between a first exterior layer <b>206</b> and a second exterior layer <b>208</b>. According to one embodiment, the first layer <b>206</b> has an adhesive component <b>210</b> on at least a portion of the side of the layer external to the device <b>200</b>. The adhesive component <b>210</b> is any known adhesive that allows for attaching the device <b>200</b> to the patient's skin.</p>
+<p id="p-0068" num="0067">In accordance with one implementation, the device <b>200</b> also has a power source (not shown) positioned in an external casing <b>212</b> positioned on the second layer <b>208</b>. In a further embodiment, certain electronic components can be positioned in the casing <b>212</b>.</p>
+<p id="p-0069" num="0068">Alternatively, the device <b>200</b> has two power sources (not shown)&#x2014;one for the PEMF generation component <b>202</b> and one for the thermal exchange component <b>204</b>. Two different power sources can help to maximize battery life. Alternatively, one power source is provided for both the PEMF generation component <b>202</b> and the thermal exchange component <b>204</b>. In a further embodiment, one power source is provided for the PEMF generation component <b>202</b>, and the thermal exchange component <b>204</b> in this embodiment requires no power source, as explained in further detail below. According to one implementation, the single power source or both power sources are positioned in the external casing <b>212</b>. Alternatively, the single power source or both power sources are positioned between the first layer <b>206</b> and the second layer <b>208</b>. In a further alternative, one power source is positioned in the external casing <b>212</b> and one power source is positioned in between the first <b>206</b> and second <b>208</b> layers.</p>
+<p id="p-0070" num="0069">In one embodiment, one or both of the power sources are a single-use or disposable power source. Alternatively, the one or more power sources can be reusable or permanent power sources. In a further alternative, the power source is any known power source for use with a PEMF stimulation device and/or a thermal exchange component.</p>
+<p id="p-0071" num="0070">In one embodiment, the device <b>200</b> is a single-use patch-like device. Alternatively, the device <b>200</b> is a reusable device. As shown, the device <b>200</b> has a square shape. Alternatively, the device <b>200</b> can have a circular or round shape or any other known shape. For example, in one embodiment, the device <b>200</b> may have any shape that maximizes attachment to the patient's skin and patient comfort.</p>
+<p id="p-0072" num="0071">In this embodiment, the PEMF generation component <b>202</b> is a coil configured to generate the pulsed electromagnetic field. Alternatively, the PEMF generation component <b>202</b> can be any known component for generating a PEMF.</p>
+<p id="p-0073" num="0072">According to one implementation, the thermal exchange component <b>204</b> is a heat source such as, for example, a component having an exothermic chemical mixture. For example, the heat source in one embodiment is a mixture containing iron powder, water, activated charcoal, and salt that oxidizes in air to generate heat. One commercial example of such a mixture can be found in hand warming products sold by HeatMax&#xae;, which is located in Dalton, Ga. Another example of a heat source that can be used with the present embodiment is a mixture containing super-cooled sodium acetate. Yet another example is a mixture containing calcium chloride or magnesium sulfate and water. In a further alternative, the thermal exchange component can be any known component or device for generating heat.</p>
+<p id="p-0074" num="0073">In accordance with one implementation in which the thermal exchange component <b>204</b> is a heat source utilizing an exothermic chemical mixture, the component <b>204</b> does not require a power source. That is, the chemical mixture generates the exothermic reaction without the need for any battery or any other kind of power source.</p>
+<p id="p-0075" num="0074">Alternatively, the thermal exchange component <b>204</b> is a cooling source such as, for example, a component having an endothermic chemical mixture. For example, the cooling source can be a mixture containing ammonium nitrate and water. In a further alternative, the thermal exchange component <b>204</b> can be any known component for providing a temperature reduction.</p>
+<p id="p-0076" num="0075">In one implementation, the first and second exterior layers <b>206</b>, <b>208</b> are flexible or pliable layers. The layer pliability or flexibility can, according to one embodiment, facilitate attachment of the device <b>200</b> to the patient's skin. In one alternative embodiment, one or both of the exterior layers can be gas permeable. In a further alternative, one or both of the exterior layers are permeable to oxygen. The layers <b>206</b>, <b>208</b> can consist of a biocompatible membrane such as, for example, the Tegaderm&#x2122; and Medipore&#x2122; products available from 3M&#x2122; Company, located in St. Paul, Minn.</p>
+<p id="p-0077" num="0076">According to one embodiment, the adhesive component <b>210</b> is a hypoallergenic adhesive. In a further alternative implementation in which one or both of the exterior layers <b>206</b>, <b>208</b> are gas permeable, the adhesive component <b>210</b> is a porous adhesive that allows gas to pass through the adhesive and the gas permeable layer.</p>
+<p id="p-0078" num="0077">It is understood that this device <b>200</b> can be used to treat any joint or any other body part that might benefit from treatment with PEMF and thermal exchange. In one embodiment, the target area is the knee. It is further understood that more than one device <b>200</b> could be used to treat a target area. The device <b>200</b> can be used to relieve osteoarthritis pain and increase range of motion.</p>
+<p id="p-0079" num="0078">One skilled in the art will appreciate that although the devices and methods have been described in reference to only a few embodiments of a stimulation device, these embodiments are provided for purposes of example and not limitation. Accordingly, numerous other embodiments are possible and within the intended scope.</p>
+<?DETDESC description="Detailed Description" end="tail"?>
+</description>
+<us-math idrefs="MATH-US-00001" nb-file="US07783348-20100824-M00001.NB">
+<img id="EMI-M00001" he="7.79mm" wi="76.20mm" file="US07783348-20100824-M00001.TIF" alt="embedded image " img-content="math" img-format="tif"/>
+</us-math>
+<us-claim-statement>What is claimed is:</us-claim-statement>
+<claims id="claims">
+<claim id="CLM-00001" num="00001">
+<claim-text>1. A portable, non-invasive device for providing therapeutic treatment to a knee joint to promote healing of the knee joint, the device comprising:
+<claim-text>a multi-usage knee cuff positionable around the knee joint, the multi-usage knee cuff comprising:
+<claim-text>an electromagnetic therapy portion, comprising:
+<claim-text>a signal generator for generating pulsed signals based upon a selected treatment mode;</claim-text>
+<claim-text>a controller for storing the treatment mode and communicating the treatment mode to the signal generator; and</claim-text>
+<claim-text>an electromagnetic stimulator configured to receive the signals from the signal generator and generate an electromagnetic field within the knee joint, the electromagnetic stimulator comprising:
+<claim-text>a medial coil configured to receive a signal from the signal generator and to generate an electromagnetic field within a medial area of the knee joint; and</claim-text>
+<claim-text>a lateral coil configured to receive a signal from the signal generator and to generate an electromagnetic field within a lateral area of the knee joint;</claim-text>
+</claim-text>
+</claim-text>
+<claim-text>a temperature-based therapy portion, comprising:
+<claim-text>a thermal exchange component configured to provide temperature-based therapy to the knee joint, the thermal exchange component comprising:
+<claim-text>a medial single-use therapy unit configured to provide temperature-based therapy to a medial area of the knee joint; and</claim-text>
+<claim-text>a lateral single-use therapy unit configured to provide temperature-based therapy to a lateral area of the knee joint; and</claim-text>
+</claim-text>
+</claim-text>
+<claim-text>a display for displaying one or more treatment parameters.</claim-text>
+</claim-text>
+</claim-text>
+</claim>
+<claim id="CLM-00002" num="00002">
+<claim-text>2. The device of <claim-ref idref="CLM-00001">claim 1</claim-ref>, further comprising a rechargeable battery coupled to the signal generator.</claim-text>
+</claim>
+<claim id="CLM-00003" num="00003">
+<claim-text>3. The device of <claim-ref idref="CLM-00001">claim 1</claim-ref>, further comprising a first power source coupled to the signal generator, and a second, different power source coupled to the thermal exchange component.</claim-text>
+</claim>
+<claim id="CLM-00004" num="00004">
+<claim-text>4. The device of <claim-ref idref="CLM-00001">claim 1</claim-ref>, wherein the thermal exchange component is a heat source configured to provide heat therapy to the knee joint.</claim-text>
+</claim>
+<claim id="CLM-00005" num="00005">
+<claim-text>5. The device of <claim-ref idref="CLM-00001">claim 1</claim-ref>, further comprising a disposable stimulator housing comprising at least one of the electromagnetic stimulator and the thermal exchange component, wherein the disposable stimulator housing is configured to be mechanically coupled to a receptacle on the multi-usage knee cuff.</claim-text>
+</claim>
+<claim id="CLM-00006" num="00006">
+<claim-text>6. The device of <claim-ref idref="CLM-00001">claim 1</claim-ref>, further comprising an electromagnetic field monitor configured to monitor the electromagnetic field generated by the electromagnetic stimulator; and
+<claim-text>a feedback circuit between the electromagnetic field monitor and the controller for adjusting the treatment mode if a sensed electromagnetic field is outside of a specified range.</claim-text>
+</claim-text>
+</claim>
+<claim id="CLM-00007" num="00007">
+<claim-text>7. The device of <claim-ref idref="CLM-00001">claim 1</claim-ref>, wherein the thermal exchange component is a cooling source configured to provide cold therapy to the knee joint.</claim-text>
+</claim>
+<claim id="CLM-00008" num="00008">
+<claim-text>8. The device of <claim-ref idref="CLM-00001">claim 1</claim-ref>, wherein the thermal exchange component is configured to provide pulsed temperature-based therapy to the knee joint.</claim-text>
+</claim>
+<claim id="CLM-00009" num="00009">
+<claim-text>9. The device of <claim-ref idref="CLM-00001">claim 1</claim-ref>, wherein the electromagnetic stimulator is configured to generate the electromagnetic field within the knee joint that coincides in duration with the temperature-based therapy to the knee joint.</claim-text>
+</claim>
+<claim id="CLM-00010" num="00010">
+<claim-text>10. The device of <claim-ref idref="CLM-00001">claim 1</claim-ref>, wherein the electromagnetic stimulator is configured to generate the electromagnetic field within the knee joint that does not coincide in duration with the temperature-based therapy to the knee joint.</claim-text>
+</claim>
+<claim id="CLM-00011" num="00011">
+<claim-text>11. The device of <claim-ref idref="CLM-00005">claim 5</claim-ref>, wherein the disposable stimulator housing, when mechanically coupled to the receptacle on the multi-usage knee cuff, is configured to enable the electromagnetic stimulator to generate the electromagnetic field within the knee joint.</claim-text>
+</claim>
+<claim id="CLM-00012" num="00012">
+<claim-text>12. The device of <claim-ref idref="CLM-00001">claim 1</claim-ref>, further comprising a temperature monitor for monitoring a tissue temperature; and
+<claim-text>a feedback circuit between the temperature monitor and the controller for adjusting the treatment mode if a tissue temperature is outside of a specified range.</claim-text>
+</claim-text>
+</claim>
+<claim id="CLM-00013" num="00013">
+<claim-text>13. A method for providing therapeutic treatment to a knee joint, the method comprising:
+<claim-text>positioning a multi-usage knee cuff around the knee joint, the multi-usage knee cuff comprising:
+<claim-text>an electromagnetic stimulator configured to generate an electromagnetic field within the knee joint, wherein the electromagnetic stimulator includes a medial coil and a lateral coil; and</claim-text>
+<claim-text>a thermal exchange component configured to provide temperature-based therapy to the knee joint, wherein the thermal exchange component include a medial single-use therapy unit and a lateral single-use therapy unit;</claim-text>
+</claim-text>
+<claim-text>wherein the positioning the multi-usage knee cuff includes:
+<claim-text>positioning the medial coil to generate an electromagnetic field within a medial area of the knee joint;</claim-text>
+<claim-text>positioning the lateral coil to generate an electromagnetic field within a lateral area of the knee joint;</claim-text>
+<claim-text>positioning the medial single-use therapy unit to provide temperature-based therapy to a medial area of the knee joint; and</claim-text>
+<claim-text>positioning the lateral single-use therapy unit to provide temperature-based therapy to a lateral area of the knee joint;</claim-text>
+</claim-text>
+<claim-text>generating signals with a signal generator based upon a selected treatment mode, the treatment mode stored in a controller;</claim-text>
+<claim-text>communicating the signals to the electromagnetic stimulator;</claim-text>
+<claim-text>generating a pulsed electromagnetic field within the medial area of the knee joint, and separately, within the lateral area of the knee joint using the electromagnetic stimulator;</claim-text>
+<claim-text>generating a therapeutic temperature-related treatment within the medial area of the knee joint, and separately, within the lateral area of the knee joint using the thermal exchange component; and</claim-text>
+<claim-text>displaying one or more treatment parameters on a display coupled to the controller.</claim-text>
+</claim-text>
+</claim>
+<claim id="CLM-00014" num="00014">
+<claim-text>14. The method of <claim-ref idref="CLM-00013">claim 13</claim-ref>, wherein generating the therapeutic temperature-related treatment includes generating therapeutic heat treatment using an exothermic reaction.</claim-text>
+</claim>
+<claim id="CLM-00015" num="00015">
+<claim-text>15. The method of <claim-ref idref="CLM-00013">claim 13</claim-ref>, further comprising monitoring the electromagnetic field generated by the electromagnetic stimulator and adjusting the treatment mode if a sensed electromagnetic field is outside of a specified range.</claim-text>
+</claim>
+<claim id="CLM-00016" num="00016">
+<claim-text>16. The method of <claim-ref idref="CLM-00013">claim 13</claim-ref>, further comprising providing power to the signal generator using body movement.</claim-text>
+</claim>
+<claim id="CLM-00017" num="00017">
+<claim-text>17. The method of <claim-ref idref="CLM-00013">claim 13</claim-ref>, further comprising mechanically coupling the thermal exchange component to a receptacle on the multi-usage knee cuff.</claim-text>
+</claim>
+<claim id="CLM-00018" num="00018">
+<claim-text>18. The method of <claim-ref idref="CLM-00017">claim 17</claim-ref>, further comprising enabling the generating the pulsed electromagnetic field using the mechanically coupling the thermal exchange component to the receptacle on the multi-usage knee cuff.</claim-text>
+</claim>
+<claim id="CLM-00019" num="00019">
+<claim-text>19. The method of <claim-ref idref="CLM-00013">claim 13</claim-ref>, wherein the generating the therapeutic temperature-related treatment includes generating therapeutic cold treatment.</claim-text>
+</claim>
+<claim id="CLM-00020" num="00020">
+<claim-text>20. The method of <claim-ref idref="CLM-00013">claim 13</claim-ref>, wherein the generating the therapeutic temperature-related treatment includes generating pulsed therapeutic temperature-related treatment.</claim-text>
+</claim>
+<claim id="CLM-00021" num="00021">
+<claim-text>21. The method of <claim-ref idref="CLM-00013">claim 13</claim-ref>, wherein the generating the pulsed electromagnetic field coincides in duration with the generating the therapeutic temperature-related treatment.</claim-text>
+</claim>
+<claim id="CLM-00022" num="00022">
+<claim-text>22. The method of <claim-ref idref="CLM-00013">claim 13</claim-ref>, further comprising monitoring a tissue temperature and adjusting the treatment mode if the tissue temperature is outside of a specified range.</claim-text>
+</claim>
+<claim id="CLM-00023" num="00023">
+<claim-text>23. A method for providing therapeutic treatment to a knee joint, the method comprising:
+<claim-text>providing a multi-usage knee cuff positionable around the knee joint, the multi-usage knee cuff comprising:
+<claim-text>an electromagnetic stimulator configured to generate an electromagnetic field within the knee joint, the electromagnetic stimulator comprising a medial coil and a lateral coil; and</claim-text>
+<claim-text>a thermal exchange component configured to provide temperature-based therapy to the knee joint, the thermal exchange component comprising a medial single-use therapy unit and a lateral single-use therapy unit;</claim-text>
+</claim-text>
+<claim-text>generating signals with a signal generator based upon a selected treatment mode, the treatment mode stored in a controller;</claim-text>
+<claim-text>communicating the signals to the electromagnetic stimulator;</claim-text>
+<claim-text>generating a pulsed electromagnetic field using the medial coil and the lateral coil;</claim-text>
+<claim-text>generating a therapeutic temperature-related treatment using the medial single-use therapy unit, and separately, within the lateral area of the knee joint using the lateral single-use therapy unit; and</claim-text>
+<claim-text>displaying one or more treatment parameters on a display coupled to the controller.</claim-text>
+</claim-text>
+</claim>
+<claim id="CLM-00024" num="00024">
+<claim-text>24. The method of <claim-ref idref="CLM-00023">claim 23</claim-ref>, further comprising mechanically coupling the thermal exchange component to a receptacle on the multi-usage knee cuff.</claim-text>
+</claim>
+<claim id="CLM-00025" num="00025">
+<claim-text>25. The method of <claim-ref idref="CLM-00024">claim 24</claim-ref>, further comprising enabling the generating the pulsed electromagnetic field using the mechanically coupling the thermal exchange component to the receptacle on the multi-usage knee cuff.</claim-text>
+</claim>
+</claims>
+</us-patent-grant>
