@@ -4,19 +4,19 @@ def uspc_table(working_directory):
     from datetime import date
     from zipfile import ZipFile
     
-    import mechanize
-    br = mechanize.Browser()
-    paturl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfpat.zip'
-    appurl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfappl.zip'
-    ctafurl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfcls.zip'
+    # import mechanize
+    # br = mechanize.Browser()
+    # paturl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfpat.zip'
+    # appurl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfappl.zip'
+    # ctafurl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfcls.zip'
 
-    os.mkdir(working_directory + "/uspc_inputs")
+    # os.mkdir(working_directory + "/uspc_inputs")
     inputs = working_directory + "/uspc_inputs/"
 
-    br.retrieve(paturl,os.path.join(inputs,'mcfpat.zip'))        
-    br.retrieve(appurl,os.path.join(inputs,'mcfappl.zip'))
-    #br.retrieve(ctafurl,os.path.join(inputs,'ctaf.zip'))
-    br.retrieve(ctafurl,os.path.join(inputs,'mcfcls.zip'))
+    # br.retrieve(paturl,os.path.join(inputs,'mcfpat.zip'))        
+    # br.retrieve(appurl,os.path.join(inputs,'mcfappl.zip'))
+    # #br.retrieve(ctafurl,os.path.join(inputs,'ctaf.zip'))
+    # br.retrieve(ctafurl,os.path.join(inputs,'mcfcls.zip'))
     
     diri = os.listdir(inputs)
     for d in diri:
@@ -82,26 +82,31 @@ def uspc_table(working_directory):
     outp1 = csv.writer(open(os.path.join(output,'mainclass.csv'),'wb'))
     outp2 = csv.writer(open(os.path.join(output,'subclass.csv'),'wb'))
     exist = {}
-    print len(data)
-    print data.keys()[1]
-    print data.values()[1]
+    # print len(data)
+    # print data.keys()[1]
+    # print data.values()[1]
+    counter = 0
     for k,v in data.items():
         i = k.split(' ')+[v]
-        try:
-            if i[1] == '':
-                outp1.writerow([i[0],i[2]])
-            else:
-                try:
-                    gg = exist[i[0]+'/'+i[1]]
-                except:
-                    exist[i[0]+'/'+i[1]] = 1
-                    outp2.writerow([i[0]+'/'+i[1],i[2]])
-        except:
+        #try:
+        if i[1] == '':
+            outp1.writerow([i[0],i[2]])
+            if counter < 10:
+                print i
+                print "and it is " + i[1]
+                counter +=1
+        else:
             try:
                 gg = exist[i[0]+'/'+i[1]]
             except:
                 exist[i[0]+'/'+i[1]] = 1
                 outp2.writerow([i[0]+'/'+i[1],i[2]])
+        # except:
+        #     try:
+        #         gg = exist[i[0]+'/'+i[1]]
+        #     except:
+        #         exist[i[0]+'/'+i[1]] = 1
+        #         outp2.writerow([i[0]+'/'+i[1],i[2]])
     
     #Get patent-class pairs
     outp = csv.writer(open(os.path.join(output,'USPC_patent_classes_data.csv'),'wb'))
