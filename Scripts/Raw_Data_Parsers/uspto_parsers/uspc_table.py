@@ -4,19 +4,19 @@ def uspc_table(working_directory):
     from datetime import date
     from zipfile import ZipFile
     
-    # import mechanize
-    # br = mechanize.Browser()
-    # paturl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfpat.zip'
-    # appurl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfappl.zip'
-    # ctafurl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfcls.zip'
+    import mechanize
+    br = mechanize.Browser()
+    paturl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfpat.zip'
+    appurl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfappl.zip'
+    #ctafurl = ???
+    #need to find the class id title lookup!
 
     # os.mkdir(working_directory + "/uspc_inputs")
     inputs = working_directory + "/uspc_inputs/"
 
     # br.retrieve(paturl,os.path.join(inputs,'mcfpat.zip'))        
     # br.retrieve(appurl,os.path.join(inputs,'mcfappl.zip'))
-    # #br.retrieve(ctafurl,os.path.join(inputs,'ctaf.zip'))
-    # br.retrieve(ctafurl,os.path.join(inputs,'mcfcls.zip'))
+
     
     diri = os.listdir(inputs)
     for d in diri:
@@ -86,8 +86,12 @@ def uspc_table(working_directory):
     # print data.keys()[1]
     # print data.values()[1]
     counter = 0
+    counter2 =0
     for k,v in data.items():
         i = k.split(' ')+[v]
+        if counter2 < 20:
+            print i
+
         #try:
         if i[1] == '':
             outp1.writerow([i[0],i[2]])
