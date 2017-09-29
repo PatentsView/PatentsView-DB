@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sequence-cwu SYSTEM "us-sequence-listing-2004-03-09.dtd" [ ]>
+<sequence-cwu id="SEQLST-1">
+    <publication-reference>
+        <document-id>
+            <country>US</country>
+            <doc-number>07521234</doc-number>
+            <kind>B2</kind>
+            <date>20090421</date>
+        </document-id>
+    </publication-reference>
+    <number>1</number>
+    <sequence-list-new-rules>
+        <s100>
+            <s160>17</s160>
+        </s100>
+        <s200>
+            <s210>1</s210>
+            <s211>34</s211>
+            <s212>DNA</s212>
+            <s213>PI phage</s213>
+            <s220>
+                <s223>LoxP sequence</s223>
+            </s220>
+        </s200>
+        <s400> 1
+            ataacttcgt atagcataca ttatacgaag ttat                                 34
+        </s400>
+        <s200>
+            <s210>2</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>5&#x2032; primer for polymerase chain reaction to
+                    detect Bilirubin-UGT gene</s223>
+            </s220>
+        </s200>
+        <s400> 2
+            atgacccgtg cctttatcac                                                 20
+        </s400>
+        <s200>
+            <s210>3</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>3&#x2032; primer for polymerase chain reaction to
+                    detect Bilirubin-UGT gene</s223>
+            </s220>
+        </s200>
+        <s400> 3
+            tcttggattt gtgggctttc                                                 20
+        </s400>
+        <s200>
+            <s210>4</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>5&#x2032; primer for polymerase chain reaction to
+                    detect CYP3A4 gene</s223>
+            </s220>
+        </s200>
+        <s400> 4
+            ccaagctatg ctcttcaccg                                                 20
+        </s400>
+        <s200>
+            <s210>5</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>3&#x2032; primer for polymerase chain reaction to
+                    detect CYP3A4 gene</s223>
+            </s220>
+        </s200>
+        <s400> 5
+            tcaggctcca cttacggtgc                                                 20
+        </s400>
+        <s200>
+            <s210>6</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>5&#x2032; primer for polymerase chain reaction to
+                    detect GK gene</s223>
+            </s220>
+        </s200>
+        <s400> 6
+            atcaaacgga gaggggactt                                                 20
+        </s400>
+        <s200>
+            <s210>7</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>3&#x2032; primer for polymerase chain reaction to
+                    detect GK gene</s223>
+            </s220>
+        </s200>
+        <s400> 7
+            agcgtgctca ggatgttgta                                                 20
+        </s400>
+        <s200>
+            <s210>8</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>5&#x2032; primer for polymerase chain reaction to
+                    detect GS gene</s223>
+            </s220>
+        </s200>
+        <s400> 8
+            atgctggagt caagattgcg                                                 20
+        </s400>
+        <s200>
+            <s210>9</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>3&#x2032; primer for polymerase chain reaction to
+                    detect GS gene</s223>
+            </s220>
+        </s200>
+        <s400> 9
+            tcattgagaa gacacgtgcg                                                 20
+        </s400>
+        <s200>
+            <s210>10</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>5&#x2032; primer for polymerase chain reaction to
+                    detect GST-pi gene</s223>
+            </s220>
+        </s200>
+        <s400> 10
+            gccctacacc gtggtctatt                                                 20
+        </s400>
+        <s200>
+            <s210>11</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>3&#x2032; primer for polymerase chain reaction to
+                    detect GST-pi gene</s223>
+            </s220>
+        </s200>
+        <s400> 11
+            ggctaggacc tcatggatca                                                 20
+        </s400>
+        <s200>
+            <s210>12</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>5&#x2032; primer for polymerase chain reaction to
+                    detect hTERT gene</s223>
+            </s220>
+        </s200>
+        <s400> 12
+            ctgaccaggg tcctattcca                                                 20
+        </s400>
+        <s200>
+            <s210>13</s210>
+            <s211>20</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>3&#x2032; primer for polymerase chain reaction to
+                    detect hTERT gene</s223>
+            </s220>
+        </s200>
+        <s400> 13
+            tggttatccc aagcaagagg                                                 20
+        </s400>
+        <s200>
+            <s210>14</s210>
+            <s211>30</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>5&#x2032; primer for polymerase chain reaction to
+                    detect human beta-actin gene</s223>
+            </s220>
+        </s200>
+        <s400> 14
+            tgacggggtc acccacactg tgcccatcta                                      30
+        </s400>
+        <s200>
+            <s210>15</s210>
+            <s211>30</s211>
+            <s212>DNA</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>3&#x2032; primer for polymerase chain reaction to
+                    detect human beta-actin gene</s223>
+            </s220>
+        </s200>
+        <s400> 15
+            ctagaagcat ttgcggtgga cgatggaggg                                      30
+        </s400>
+        <s200>
+            <s210>16</s210>
+            <s211>5</s211>
+            <s212>PRT</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>Cell adhesion peptide</s223>
+            </s220>
+        </s200>
+        <s400> 16
+            Gly Arg Gly Asp Ser
+            1                5
+        </s400>
+        <s200>
+            <s210>17</s210>
+            <s211>4</s211>
+            <s212>PRT</s212>
+            <s213>Artificial Sequence</s213>
+            <s220>
+                <s223>Cell adhesion peptide</s223>
+            </s220>
+        </s200>
+        <s400> 17
+            Arg Gly Asp Ser
+            1
+        </s400>
+    </sequence-list-new-rules>
+</sequence-cwu>

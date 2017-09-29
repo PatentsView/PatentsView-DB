@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE us-patent-grant SYSTEM "us-patent-grant-v42-2006-08-23.dtd" [ ]>
+<us-patent-grant lang="EN" dtd-version="v4.2 2006-08-23" file="USD0651396-20120103.XML" status="PRODUCTION" id="us-patent-grant" country="US" date-produced="20111219" date-publ="20120103">
+<us-bibliographic-data-grant>
+<publication-reference>
+<document-id>
+<country>US</country>
+<doc-number>D0651396</doc-number>
+<kind>S1</kind>
+<date>20120103</date>
+</document-id>
+</publication-reference>
+<application-reference appl-type="design">
+<document-id>
+<country>US</country>
+<doc-number>29370717</doc-number>
+<date>20100826</date>
+</document-id>
+</application-reference>
+<us-application-series-code>29</us-application-series-code>
+<us-term-of-grant>
+<length-of-grant>14</length-of-grant>
+</us-term-of-grant>
+<classification-locarno>
+<edition>9</edition>
+<main-classification>0301</main-classification>
+</classification-locarno>
+<classification-national>
+<country>US</country>
+<main-classification>D 3226</main-classification>
+</classification-national>
+<invention-title id="d2e53">Combined sheet dispenser and utility belt</invention-title>
+<references-cited>
+<citation>
+<patcit num="00001">
+<document-id>
+<country>US</country>
+<doc-number>367996</doc-number>
+<kind>A</kind>
+<name>Nathan</name>
+<date>18870800</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00002">
+<document-id>
+<country>US</country>
+<doc-number>2317176</doc-number>
+<kind>A</kind>
+<name>Byrd</name>
+<date>19430400</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>224663</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00003">
+<document-id>
+<country>US</country>
+<doc-number>2474495</doc-number>
+<kind>A</kind>
+<name>Pollak</name>
+<date>19490600</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00004">
+<document-id>
+<country>US</country>
+<doc-number>3147896</doc-number>
+<kind>A</kind>
+<name>Kehl</name>
+<date>19640900</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>224240</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00005">
+<document-id>
+<country>US</country>
+<doc-number>3361312</doc-number>
+<kind>A</kind>
+<name>Hutchison</name>
+<date>19680100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00006">
+<document-id>
+<country>US</country>
+<doc-number>4174793</doc-number>
+<kind>A</kind>
+<name>Wisowaty</name>
+<date>19791100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00007">
+<document-id>
+<country>US</country>
+<doc-number>4672958</doc-number>
+<kind>A</kind>
+<name>Garman</name>
+<date>19870600</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00008">
+<document-id>
+<country>US</country>
+<doc-number>4998653</doc-number>
+<kind>A</kind>
+<name>LaBelle</name>
+<date>19910300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00009">
+<document-id>
+<country>US</country>
+<doc-number>5240156</doc-number>
+<kind>A</kind>
+<name>Sicotte et al.</name>
+<date>19930800</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00010">
+<document-id>
+<country>US</country>
+<doc-number>5540364</doc-number>
+<kind>A</kind>
+<name>Krieger et al.</name>
+<date>19960700</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00011">
+<document-id>
+<country>US</country>
+<doc-number>5718192</doc-number>
+<kind>A</kind>
+<name>Sebastian</name>
+<date>19980200</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>224240</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00012">
+<document-id>
+<country>US</country>
+<doc-number>5730340</doc-number>
+<kind>A</kind>
+<name>Bosic</name>
+<date>19980300</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00013">
+<document-id>
+<country>US</country>
+<doc-number>D471706</doc-number>
+<kind>S</kind>
+<name>Campagna et al.</name>
+<date>20030300</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D 3226</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00014">
+<document-id>
+<country>US</country>
+<doc-number>D506059</doc-number>
+<kind>S</kind>
+<name>Goldberg</name>
+<date>20050600</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D 3226</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00015">
+<document-id>
+<country>US</country>
+<doc-number>D608085</doc-number>
+<kind>S</kind>
+<name>Simpson-Gardner</name>
+<date>20100100</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D 3226</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00016">
+<document-id>
+<country>US</country>
+<doc-number>2006/0011691</doc-number>
+<kind>A1</kind>
+<name>Perez</name>
+<date>20060100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00017">
+<document-id>
+<country>US</country>
+<doc-number>2008/0023515</doc-number>
+<kind>A1</kind>
+<name>Coonan</name>
+<date>20080100</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00018">
+<document-id>
+<country>CN</country>
+<doc-number>2364735</doc-number>
+<kind>Y</kind>
+<date>20000200</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<patcit num="00019">
+<document-id>
+<country>DE</country>
+<doc-number>4007382</doc-number>
+<kind>A1</kind>
+<date>19910900</date>
+</document-id>
+</patcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00020">
+<othercit>Google Images; http://images.google.com/imgres!imgurl=http://www.intackshop.co.uk/images/DSC<sub>&#x2014;</sub>8581.jpg&#x26;imgrefurl=http://www.intackshop.co.uk/end-of-line-products-c-39.html&#x26;usg=<sub>&#x2014;</sub>f67MhHL0JuRa<sub>&#x2014;</sub>eizAEICM4stm<sub>&#x2014;</sub>o=&#x26;h=220&#x26;w=450&#x26;sz=24&#x26;hl=en&#x26;start==410&#x26;um=1&#x26;itbs=1&#x26;tbnid=NC8uqBmXtp-0jM:&#x26;tbnh=62&#x26;tbnw=127&#x26;prev=/images%3Fq%3Dbaby%2Bbelt%2Bvelcro&#x26;26ndsp%3D18&#x26;26hl%3Den%26rlz%3D1R2RNWN<sub>&#x2014;</sub>enUS341%26sa%3DN526start%3D396%26um%3D1.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00021">
+<othercit>The New Homemaker; http://www.thenewhomemaker.com/babyutilitybelt.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00022">
+<othercit>Polyvore; http://www.polyvore.com/fossil<sub>&#x2014;</sub>cory<sub>&#x2014;</sub>belt<sub>&#x2014;</sub>pack/thing?id=11436117.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00023">
+<othercit>Two of a Kind Working on a Full House; http://www.twoofakindworkingonafullhouse.com/2009<sub>&#x2014;</sub>02<sub>&#x2014;</sub>01<sub>&#x2014;</sub>archive.html.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00024">
+<othercit>Wee Baby Stuff; http://weebabystuff.com/lilybee/posts/530-make-a-kid-sized-tool-belt.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00025">
+<othercit>Photobucket; http://s231.photobucket.com/albums/ee295/drg<sub>&#x2014;</sub>magda/hainite%20bebe%20si% 20copii/pantalonasinew%20album%20namhttp://weebabystuff.com/lilybee/posts/530-make-a-kid-sized-tool-belt.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00026">
+<othercit>Baby Ant; http://www.babyant.com/pink-fanny-pack-short-sleeve-baby-bodysuit-mini-shatsu.html.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+</references-cited>
+<number-of-claims>1</number-of-claims>
+<us-exemplary-claim>1</us-exemplary-claim>
+<us-field-of-classification-search>
+<classification-national>
+<country>US</country>
+<main-classification>D 3226</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 3215</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 3218-219</main-classification>
+<additional-info>unstructured</additional-info>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 3224</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 3228</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 3232-233</main-classification>
+<additional-info>unstructured</additional-info>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 3247-249</main-classification>
+<additional-info>unstructured</additional-info>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 3221</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>150114</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>150131</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>150152</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>224240-241</main-classification>
+<additional-info>unstructured</additional-info>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>224663-664</main-classification>
+<additional-info>unstructured</additional-info>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>224667</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>224669</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>224676-677</main-classification>
+<additional-info>unstructured</additional-info>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>224934</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>383 63</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>383111</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>383113</main-classification>
+</classification-national>
+</us-field-of-classification-search>
+<figures>
+<number-of-drawing-sheets>1</number-of-drawing-sheets>
+<number-of-figures>8</number-of-figures>
+</figures>
+<parties>
+<applicants>
+<applicant sequence="001" app-type="applicant-inventor" designation="us-only">
+<addressbook>
+<last-name>Raines</last-name>
+<first-name>Lauren</first-name>
+<address>
+<city>Coatesville</city>
+<state>PA</state>
+<country>US</country>
+</address>
+</addressbook>
+<nationality>
+<country>omitted</country>
+</nationality>
+<residence>
+<country>US</country>
+</residence>
+</applicant>
+</applicants>
+<agents>
+<agent sequence="01" rep-type="attorney">
+<addressbook>
+<orgname>Dilworth Paxson LLP</orgname>
+<address>
+<country>unknown</country>
+</address>
+</addressbook>
+</agent>
+<agent sequence="02" rep-type="attorney">
+<addressbook>
+<last-name>Goldschmidt, Jr.</last-name>
+<first-name>John W.</first-name>
+<address>
+<country>unknown</country>
+</address>
+</addressbook>
+</agent>
+</agents>
+</parties>
+<examiners>
+<primary-examiner>
+<last-name>Oliver</last-name>
+<first-name>Catheri</first-name>
+<department>2914</department>
+</primary-examiner>
+</examiners>
+</us-bibliographic-data-grant>
+<drawings id="DRAWINGS">
+<figure id="Fig-EMI-D00000" num="00000">
+<img id="EMI-D00000" he="24.89mm" wi="109.22mm" file="USD0651396-20120103-D00000.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00001" num="00001">
+<img id="EMI-D00001" he="190.58mm" wi="194.82mm" file="USD0651396-20120103-D00001.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+</drawings>
+<description id="description">
+<?brief-description-of-drawings description="Brief Description of Drawings" end="lead"?>
+<description-of-drawings>
+<p id="p-0001" num="0001"><figref idref="DRAWINGS">FIG. 1</figref> is a front elevation view of an embodiment of the combined sheet dispenser and utility belt of the instant invention which is capable of dispensing articles such as tissues, baby wipes and other sheet like articles, with the sheet dispenser shown in the closed position;</p>
+<p id="p-0002" num="0002"><figref idref="DRAWINGS">FIG. 2</figref> is a rear elevation view of the design of <figref idref="DRAWINGS">FIG. 1</figref> shown with the sheet dispenser attached to the utility belt, and the belt attachment flap in a closed position;</p>
+<p id="p-0003" num="0003"><figref idref="DRAWINGS">FIG. 3</figref> is a rear elevation view of the design of <figref idref="DRAWINGS">FIG. 1</figref> shown with the sheet dispenser released from the utility belt, and the belt attachment flap in an opened position;</p>
+<p id="p-0004" num="0004"><figref idref="DRAWINGS">FIG. 4</figref> is a front elevation view of an embodiment of the design of <figref idref="DRAWINGS">FIG. 1</figref> with the sheet dispenser shown in the open position to expose an elongated opening through which sheets may be dispensed;</p>
+<p id="p-0005" num="0005"><figref idref="DRAWINGS">FIG. 5</figref> is a side elevation view of the design of <figref idref="DRAWINGS">FIG. 1</figref> as viewed from the side adjacent to the right of the side shown in <figref idref="DRAWINGS">FIG. 1</figref>;</p>
+<p id="p-0006" num="0006"><figref idref="DRAWINGS">FIG. 6</figref> is a side elevation view of the design of <figref idref="DRAWINGS">FIG. 1</figref> as viewed from the side opposing the side shown in <figref idref="DRAWINGS">FIG. 5</figref>;</p>
+<p id="p-0007" num="0007"><figref idref="DRAWINGS">FIG. 7</figref> is a bottom plan view of the design of <figref idref="DRAWINGS">FIG. 1</figref> shown with the sheet dispenser in a closed position, with the belt attachment flap in an opened position, and with the utility belt removed for the convenience of illustration; and,</p>
+<p id="p-0008" num="0008"><figref idref="DRAWINGS">FIG. 8</figref> is a perspective view of the design of <figref idref="DRAWINGS">FIG. 1</figref> with the sheet dispenser shown in the open position, and with the utility belt removed for the convenience of illustration.</p>
+</description-of-drawings>
+<?brief-description-of-drawings description="Brief Description of Drawings" end="tail"?>
+</description>
+<us-claim-statement>CLAIM</us-claim-statement>
+<claims id="claims">
+<claim id="CLM-00001" num="00001">
+<claim-text>The ornamental design for a combined sheet dispenser and utility belt, as shown and described.</claim-text>
+</claim>
+</claims>
+</us-patent-grant>

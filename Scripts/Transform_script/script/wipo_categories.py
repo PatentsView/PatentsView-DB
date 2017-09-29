@@ -7,9 +7,8 @@ def wipo_lookups(working_directory, persistent_files, host, username, password, 
     data = {}
     for i in inp:
         data[i[7].replace("%","").replace(' ','')] = i[0]
-        
     ### CPC to IPC mapping ###
-    #have to download this
+    #have to download this, in download script
     f = os.listdir(working_directory + "/" + "WIPO_input/")[0]
     inp = open(working_directory + "/" + "WIPO_input/" + f).read().split("\n")
     cpc2ipc = {}
@@ -19,13 +18,15 @@ def wipo_lookups(working_directory, persistent_files, host, username, password, 
             cpc2ipc[i[0]] = i[1]
         except:
             pass
-    print "cpc2ipc len =  " + str(len(cpc2ipc))
 
     mydb = MySQLdb.connect(host=host,
     user=username,
     passwd=password,
     db=database)
     cursor = mydb.cursor()
+    #should fix this step farther back!
+    cursor.execute('update cpc_current set category = "inventional" where category = "primary"')
+    mydb.commit()
     cursor.execute('select distinct patent_id,subgroup_id from cpc_current where category="inventional" order by patent_id asc,sequence asc')
     res = list(cursor.fetchall())
     os.mkdir(working_directory + "/WIPO_output/")
@@ -81,7 +82,8 @@ def wipo_lookups(working_directory, persistent_files, host, username, password, 
             
                 #print '\t'.join([patent,cpc,ipcconcord,'',r[-2],str(r[-1])])
             except:
-                print r[1]
+                pass
+                #print r[1]
     with open(working_directory + "/WIPO_output/" +'WIPO_Cats_assigned.csv','wb') as myfile:
         outp = csv.writer(myfile,delimiter='\t')
         outp.writerow(['patent_id','wipo_cat','sequence'])

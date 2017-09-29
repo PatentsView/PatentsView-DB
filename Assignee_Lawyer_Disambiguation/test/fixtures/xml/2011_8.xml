@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE us-patent-grant SYSTEM "us-patent-grant-v42-2006-08-23.dtd" [ ]>
+<us-patent-grant lang="EN" dtd-version="v4.2 2006-08-23" file="USD0631643-20110201.XML" status="PRODUCTION" id="us-patent-grant" country="US" date-produced="20110118" date-publ="20110201">
+<us-bibliographic-data-grant>
+<publication-reference>
+<document-id>
+<country>US</country>
+<doc-number>D0631643</doc-number>
+<kind>S1</kind>
+<date>20110201</date>
+</document-id>
+</publication-reference>
+<application-reference appl-type="design">
+<document-id>
+<country>US</country>
+<doc-number>29361920</doc-number>
+<date>20100517</date>
+</document-id>
+</application-reference>
+<us-application-series-code>29</us-application-series-code>
+<us-term-of-grant>
+<length-of-grant>14</length-of-grant>
+</us-term-of-grant>
+<classification-locarno>
+<edition>9</edition>
+<main-classification>0203</main-classification>
+</classification-locarno>
+<classification-national>
+<country>US</country>
+<main-classification>D 2889</main-classification>
+<further-classification> D2866</further-classification>
+</classification-national>
+<invention-title id="d2e53">Winter hat</invention-title>
+<references-cited>
+<citation>
+<patcit num="00001">
+<document-id>
+<country>US</country>
+<doc-number>1604087</doc-number>
+<kind>A</kind>
+<name>Tate</name>
+<date>19261000</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>472 70</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00002">
+<document-id>
+<country>US</country>
+<doc-number>D205056</doc-number>
+<kind>S</kind>
+<name>Emmet</name>
+<date>19660600</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D 2865</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00003">
+<document-id>
+<country>US</country>
+<doc-number>D357569</doc-number>
+<kind>S</kind>
+<name>Jacobellis</name>
+<date>19950400</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D 2894</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00004">
+<document-id>
+<country>US</country>
+<doc-number>D442746</doc-number>
+<kind>S</kind>
+<name>Belcher</name>
+<date>20010500</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D29122</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00005">
+<document-id>
+<country>US</country>
+<doc-number>D465615</doc-number>
+<kind>S</kind>
+<name>Brunelle</name>
+<date>20021100</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D28 99</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00006">
+<document-id>
+<country>US</country>
+<doc-number>D539010</doc-number>
+<kind>S</kind>
+<name>Folkes</name>
+<date>20070300</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D 2866</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00007">
+<document-id>
+<country>US</country>
+<doc-number>D557478</doc-number>
+<kind>S</kind>
+<name>Nance</name>
+<date>20071200</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D 2876</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00008">
+<document-id>
+<country>US</country>
+<doc-number>D599532</doc-number>
+<kind>S</kind>
+<name>Sheng</name>
+<date>20090900</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D 2866</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00009">
+<document-id>
+<country>US</country>
+<doc-number>D621138</doc-number>
+<kind>S</kind>
+<name>Roos et al.</name>
+<date>20100800</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>D 2876</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00010">
+<document-id>
+<country>US</country>
+<doc-number>2009/0235945</doc-number>
+<kind>A1</kind>
+<name>Eaton</name>
+<date>20090900</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+<classification-national><country>US</country><main-classification>132105</main-classification></classification-national>
+</citation>
+<citation>
+<patcit num="00011">
+<document-id>
+<country>EM</country>
+<doc-number>000795216-0002</doc-number>
+<date>20071000</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+</citation>
+<citation>
+<patcit num="00012">
+<document-id>
+<country>EM</country>
+<doc-number>000795216-0003</doc-number>
+<date>20071000</date>
+</document-id>
+</patcit>
+<category>cited by examiner</category>
+</citation>
+<citation>
+<nplcit num="00013">
+<othercit>Blog posting by inventor [online] discussing creation of &#x201c;Snowfire Hats&#x201d; [Mar. 27, 2009]. Included in the blog are photos showing various &#x201c;Snowfire Hat&#x201d; designs. Photos are undated. [Retrieved Sep. 9, 2010]. Retrieved from the Internet: URL: http://bobsled.teamusa.org/blogs/noellel-pikus-pace-s-blog/posts/666-snowfire-hats.</othercit>
+</nplcit>
+<category>cited by examiner</category>
+</citation>
+<citation>
+<nplcit num="00014">
+<othercit>Winter Hat, &#x201c;Snowflake Queen,&#x201d; [online]. Kellam Knives [no earlier date provided; retrieved Sep. 15, 2010]. Retrieved from the Internet: URL: http://www.kellamknives.com (3 pages).</othercit>
+</nplcit>
+<category>cited by examiner</category>
+</citation>
+<citation>
+<nplcit num="00015">
+<othercit>#303514 Viva MU SP hat, Style Fb. 009 and Fb. 341, by Eisbar, as shown in the fourth row, p. 4, of the Eisbar Sep. 2010 catalog (online) [Retrieved Sep. 16, 2010]. Retrieved for the Internet: URL: http://www.eisbarusa.com.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00016">
+<othercit>#327183 Viva MU SP kids hat, Style 009, 024, 341, 209 neon, and 109 neon, by Eisbar, as shown in the fifth row, p. 60, of the Eisbar Sep. 2010 catalog (online) [Retrieved Sep. 16, 2010]. Retrieved for the Internet: URL: http://www.eisbarusa.com.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+<citation>
+<nplcit num="00017">
+<othercit>#323296 Rock MU hat, Style 009, 026, 651, 146, and 040, by Eisbar, as shown in the first row, p. 61, of the Eisbar Sep. 2010 catalog (online) [Retrieved Sep. 16, 2010]. Retrieved for the Internet: URL: http://www.eisbarusa.com.</othercit>
+</nplcit>
+<category>cited by other</category>
+</citation>
+</references-cited>
+<number-of-claims>1</number-of-claims>
+<us-exemplary-claim>1</us-exemplary-claim>
+<us-field-of-classification-search>
+<classification-national>
+<country>US</country>
+<main-classification>D 2865</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2866</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2868</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2869</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2870</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2872</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2873</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2876</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2878</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2879</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2880</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2881</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2882</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2889</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2891</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D 2894</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D28 92</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D28 93</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D28 99</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D29109</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>D29122</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>  2171</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>  2172</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>  2181</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>  2202</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>  2204</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>  2205</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>  220913</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>  21958</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>  22001</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>132 53</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>132 54</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>132 55</main-classification>
+</classification-national>
+<classification-national>
+<country>US</country>
+<main-classification>132105</main-classification>
+</classification-national>
+</us-field-of-classification-search>
+<figures>
+<number-of-drawing-sheets>4</number-of-drawing-sheets>
+<number-of-figures>6</number-of-figures>
+</figures>
+<parties>
+<applicants>
+<applicant sequence="001" app-type="applicant-inventor" designation="us-only">
+<addressbook>
+<last-name>Pikus-Pace</last-name>
+<first-name>Noelle</first-name>
+<address>
+<city>Eagle Mountain</city>
+<state>UT</state>
+<country>US</country>
+</address>
+</addressbook>
+<nationality>
+<country>omitted</country>
+</nationality>
+<residence>
+<country>US</country>
+</residence>
+</applicant>
+</applicants>
+<agents>
+<agent sequence="01" rep-type="attorney">
+<addressbook>
+<orgname>Clayton, Howarth &#x26; Cannon, P.C.</orgname>
+<address>
+<country>unknown</country>
+</address>
+</addressbook>
+</agent>
+</agents>
+</parties>
+<assignees>
+<assignee>
+<addressbook>
+<orgname>Blurime LLC</orgname>
+<role>02</role>
+<address>
+<city>Eagle Mountain</city>
+<state>UT</state>
+<country>US</country>
+</address>
+</addressbook>
+</assignee>
+</assignees>
+<examiners>
+<primary-examiner>
+<last-name>Albert</last-name>
+<first-name>Elizabeth A</first-name>
+<department>2913</department>
+</primary-examiner>
+<assistant-examiner>
+<last-name>Eldridge Powers</last-name>
+<first-name>Karen E</first-name>
+</assistant-examiner>
+</examiners>
+</us-bibliographic-data-grant>
+<drawings id="DRAWINGS">
+<figure id="Fig-EMI-D00000" num="00000">
+<img id="EMI-D00000" he="114.72mm" wi="234.44mm" file="USD0631643-20110201-D00000.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00001" num="00001">
+<img id="EMI-D00001" he="136.40mm" wi="125.48mm" file="USD0631643-20110201-D00001.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00002" num="00002">
+<img id="EMI-D00002" he="242.91mm" wi="192.96mm" file="USD0631643-20110201-D00002.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00003" num="00003">
+<img id="EMI-D00003" he="236.22mm" wi="180.68mm" file="USD0631643-20110201-D00003.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+<figure id="Fig-EMI-D00004" num="00004">
+<img id="EMI-D00004" he="131.15mm" wi="117.09mm" file="USD0631643-20110201-D00004.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+</figure>
+</drawings>
+<description id="description">
+<?brief-description-of-drawings description="Brief Description of Drawings" end="lead"?>
+<description-of-drawings>
+<p id="p-0001" num="0001"><figref idref="DRAWINGS">FIG. 1</figref> is a perspective view thereof;</p>
+<p id="p-0002" num="0002"><figref idref="DRAWINGS">FIG. 2</figref> is a side view thereof;</p>
+<p id="p-0003" num="0003"><figref idref="DRAWINGS">FIG. 3</figref> is a side view thereof;</p>
+<p id="p-0004" num="0004"><figref idref="DRAWINGS">FIG. 4</figref> is a front view thereof;</p>
+<p id="p-0005" num="0005"><figref idref="DRAWINGS">FIG. 5</figref> is a back view thereof; and,</p>
+<p id="p-0006" num="0006"><figref idref="DRAWINGS">FIG. 6</figref> is a top view thereof.</p>
+<p id="p-0007" num="0007">The broken line shown in the drawings illustrates features of the winter hat that form no part of the claimed design.</p>
+<p id="p-0008" num="0008">The crosshatched pattern, although shown intermittently, is meant to represent fabric, and is understood to be distributed uniformly over the surfaces of the claimed design.</p>
+<p id="p-0009" num="0009">The design consists partly of hair. Inconsistencies in how the hair appears in the different views are understood to be caused by the organic nature of the hair itself as well as to the different viewpoints from which the winter hat is shown, and not to deliberate changes in the configuration of the claimed design. The minor variations from one view to another do not show separate patentably distinct designs.</p>
+</description-of-drawings>
+<?brief-description-of-drawings description="Brief Description of Drawings" end="tail"?>
+</description>
+<us-claim-statement>CLAIM</us-claim-statement>
+<claims id="claims">
+<claim id="CLM-00001" num="00001">
+<claim-text>I claim the ornamental design for a winter hat, as shown and described.</claim-text>
+</claim>
+</claims>
+</us-patent-grant>

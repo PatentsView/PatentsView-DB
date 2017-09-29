@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE us-patent-grant SYSTEM "us-patent-grant-v42-2006-08-23.dtd" [ ]>
+<us-patent-grant lang="EN" dtd-version="v4.2 2006-08-23" file="USD0614826-20100504.XML" status="PRODUCTION" id="us-patent-grant" country="US" date-produced="20100419" date-publ="20100504">
+    <us-bibliographic-data-grant>
+        <publication-reference>
+            <document-id>
+                <country>US</country>
+                <doc-number>D0614826</doc-number>
+                <kind>S1</kind>
+                <date>20100504</date>
+            </document-id>
+        </publication-reference>
+        <application-reference appl-type="design">
+            <document-id>
+                <country>US</country>
+                <doc-number>29322123</doc-number>
+                <date>20080729</date>
+            </document-id>
+        </application-reference>
+        <us-application-series-code>29</us-application-series-code>
+        <priority-claims>
+            <priority-claim sequence="01" kind="national">
+                <country>ZA</country>
+                <doc-number>A2008/00126</doc-number>
+                <date>20080129</date>
+            </priority-claim>
+        </priority-claims>
+        <us-term-of-grant>
+            <length-of-grant>14</length-of-grant>
+        </us-term-of-grant>
+        <classification-locarno>
+            <edition>9</edition>
+            <main-classification>0101</main-classification>
+        </classification-locarno>
+        <classification-national>
+            <country>US</country>
+            <main-classification>D 1106</main-classification>
+        </classification-national>
+        <invention-title id="d0e71">Bread roll</invention-title>
+        <references-cited>
+            <citation>
+                <patcit num="00001">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D23574</doc-number>
+                        <kind>S</kind>
+                        <name>Ward</name>
+                        <date>18940800</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 1129</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00002">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D355975</doc-number>
+                        <kind>S</kind>
+                        <name>Patoskie et al.</name>
+                        <date>19950300</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 1106</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00003">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D370391</doc-number>
+                        <kind>S</kind>
+                        <name>Bauer et al.</name>
+                        <date>19960600</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 7606</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00004">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D373671</doc-number>
+                        <kind>S</kind>
+                        <name>Laughlin et al.</name>
+                        <date>19960900</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 1106</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00005">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D424375</doc-number>
+                        <kind>S</kind>
+                        <name>D'Arrigo</name>
+                        <date>20000500</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 7510</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00006">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D424876</doc-number>
+                        <kind>S</kind>
+                        <name>McPartland</name>
+                        <date>20000500</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 7510</main-classification></classification-national>
+            </citation>
+            <citation>
+                <patcit num="00007">
+                    <document-id>
+                        <country>US</country>
+                        <doc-number>D482268</doc-number>
+                        <kind>S</kind>
+                        <name>Kushner</name>
+                        <date>20031100</date>
+                    </document-id>
+                </patcit>
+                <category>cited by examiner</category>
+                <classification-national><country>US</country><main-classification>D 8394</main-classification></classification-national>
+            </citation>
+        </references-cited>
+        <number-of-claims>1</number-of-claims>
+        <us-exemplary-claim>1</us-exemplary-claim>
+        <us-field-of-classification-search>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D 1101</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D 1120-122</main-classification>
+                <additional-info>unstructured</additional-info>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D 1129-130</main-classification>
+                <additional-info>unstructured</additional-info>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D 1199</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426 89</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426100</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426101</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426103</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426104</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426302</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426306</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426307</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426517</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426518</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>426572</main-classification>
+            </classification-national>
+            <classification-national>
+                <country>US</country>
+                <main-classification>D 7901</main-classification>
+            </classification-national>
+        </us-field-of-classification-search>
+        <figures>
+            <number-of-drawing-sheets>2</number-of-drawing-sheets>
+            <number-of-figures>3</number-of-figures>
+        </figures>
+        <parties>
+            <applicants>
+                <applicant sequence="001" app-type="applicant-inventor" designation="us-only">
+                    <addressbook>
+                        <last-name>Nakan</last-name>
+                        <first-name>Harold Brian</first-name>
+                        <address>
+<street>P.O. Box 567</street>
+<city>Seapoint</city>
+<postcode>8060</postcode>
+<country>ZA</country>
+</address>
+                    </addressbook>
+                    <nationality>
+                        <country>omitted</country>
+                    </nationality>
+                    <residence>
+                        <country>ZA</country>
+                    </residence>
+                </applicant>
+            </applicants>
+            <agents>
+                <agent sequence="01" rep-type="attorney">
+                    <addressbook>
+                        <orgname>Lahive &#x26; Cockfield, LLP</orgname>
+                        <address>
+<country>unknown</country>
+</address>
+                    </addressbook>
+                </agent>
+                <agent sequence="02" rep-type="attorney">
+                    <addressbook>
+                        <last-name>Laurentano, Esq.</last-name>
+                        <first-name>Anthony A.</first-name>
+                        <address>
+<country>unknown</country>
+</address>
+                    </addressbook>
+                </agent>
+            </agents>
+        </parties>
+        <examiners>
+            <primary-examiner>
+                <last-name>Brooks</last-name>
+                <first-name>Cathron C</first-name>
+                <department>2911</department>
+            </primary-examiner>
+            <assistant-examiner>
+                <last-name>Fox</last-name>
+                <first-name>Barbara</first-name>
+            </assistant-examiner>
+        </examiners>
+    </us-bibliographic-data-grant>
+    <drawings id="DRAWINGS">
+        <figure id="Fig-EMI-D00000" num="00000">
+            <img id="EMI-D00000" he="153.92mm" wi="150.54mm" file="USD0614826-20100504-D00000.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+        </figure>
+        <figure id="Fig-EMI-D00001" num="00001">
+            <img id="EMI-D00001" he="226.91mm" wi="160.61mm" file="USD0614826-20100504-D00001.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+        </figure>
+        <figure id="Fig-EMI-D00002" num="00002">
+            <img id="EMI-D00002" he="143.00mm" wi="138.26mm" file="USD0614826-20100504-D00002.TIF" alt="embedded image" img-content="drawing" img-format="tif"/>
+        </figure>
+    </drawings>
+    <description id="description">
+        <?brief-description-of-drawings description="Brief Description of Drawings" end="lead"?>
+        <description-of-drawings>
+            <p id="p-0001" num="0001"><figref idref="DRAWINGS">FIG. 1</figref> is a top view of a bread roll, according to the present invention.</p>
+            <p id="p-0002" num="0002"><figref idref="DRAWINGS">FIG. 2</figref> is a front view thereof, the rear view being identical; and,</p>
+            <p id="p-0003" num="0003"><figref idref="DRAWINGS">FIG. 3</figref> is a side view thereof.</p>
+            <p id="p-0004" num="0004">The stippling in the drawings represents surface shading and not surface texture.</p>
+        </description-of-drawings>
+        <?brief-description-of-drawings description="Brief Description of Drawings" end="tail"?>
+    </description>
+    <us-claim-statement>CLAIM</us-claim-statement>
+    <claims id="claims">
+        <claim id="CLM-00001" num="00001">
+            <claim-text>The ornamental design for a bread roll, as shown and described.</claim-text>
+        </claim>
+    </claims>
+</us-patent-grant>

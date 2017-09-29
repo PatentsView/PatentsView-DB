@@ -1,0 +1,4 @@
+^EN$|GB|i
+^DT$|DE|i
+^JA$|JP|i
+^SU$|RU|i

@@ -396,15 +396,8 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
         
 
 def upload_cpc(host,username,password,appdb,patdb,folder):
-    from zipfile import ZipFile
-    
-    import mechanize,os
-    br = mechanize.Browser()
-    
+
     files = ['applications_classes.csv','grants_classes.csv','cpc_subsection.csv','cpc_group.csv','cpc_subgroup.csv']
-    for f in files:
-        url = 'http://www.dev.patentsview.org/data/'+f
-        br.retrieve(url,os.path.join(folder,f))
     
     def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))

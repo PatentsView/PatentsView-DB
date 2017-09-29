@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sequence-cwu SYSTEM "us-sequence-listing-2004-03-09.dtd" [ ]>
+<sequence-cwu id="SEQLST-1">
+<publication-reference>
+<document-id>
+<country>US</country>
+<doc-number>07521241</doc-number>
+<kind>B2</kind>
+<date>20090421</date>
+</document-id>
+</publication-reference>
+<number>1</number>
+<sequence-list-new-rules>
+<s100>
+<s160>34 </s160>
+</s100>
+<s200>
+<s210>1 </s210>
+<s211>17 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 1 
+aaggagatat aacaatg                                                    17 
+</s400>
+<s200>
+<s210>2 </s210>
+<s211>10 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 2 
+gtcgaccatg                                                            10 
+</s400>
+<s200>
+<s210>3 </s210>
+<s211>60 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 3 
+ctcctgcagt tggacctgtg ccatggccgg ctgggccgca tagaatggaa caactaaagc     60 
+</s400>
+<s200>
+<s210>4 </s210>
+<s211>995 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 4 
+tctagagcgc cgccatggga gagaaggcgc tgccggtggt gtataagcgg tacatctgct     60 
+ctttcgccga ctgcggcgct gcttataaca agaactggaa actgcaggcg catctgtgca    120 
+aacacacagg agagaaacca tttccatgta aggaagaagg atgtgagaaa ggctttacct    180 
+cgcttcatca cttaacccgc cactcactca ctcatactgg cgagaaaaac ttcacatgtg    240 
+actcggatgg atgtgacttg agatttacta caaaggcaaa catgaagaag cactttaaca    300 
+gattccataa catcaagatc tgcgtctatg tgtgccattt tgagaactgt ggcaaagcat    360 
+tcaagaaaca caatcaatta aaggttcatc agttcagtca cacacagcag ctgccgtatg    420 
+cttgccctgt cgagtcctgc gatcgccgct tttctcgctc ggatgagctt acccgccata    480 
+tccgcatcca cacaggccag aagcccttcc agtgtcgaat ctgcatgcgt aacttcagtc    540 
+gtagtgacca ccttaccacc cacatccgca cccacacagg cgagaagcct tttgcctgtg    600 
+acatttgtgg gaggaagttt gccaggagtg atgaacgcaa gaggcatacc aaaatccatt    660 
+taagacagaa ggacgcggcc gcactcgagc ggaattccgg cccaaaaaag aagagaaagg    720 
+tcgccccccc gaccgatgtc agcctggggg acgagctcca cttagacggc gaggacgtgg    780 
+cgatggcgca tgccgacgcg ctagacgatt tcgatctgga catgttgggg gacggggatt    840 
+ccccggggcc gggatttacc ccccacgact ccgcccccta cggcgctctg gatacggccg    900 
+acttcgagtt tgagcagatg tttaccgatg cccttggaat tgacgagtac ggtggggaac    960 
+aaaaacttat ttctgaagaa gatctgtaag gatcc                               995 
+</s400>
+<s200>
+<s210>5 </s210>
+<s211>947 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 5 
+tctagagcgc cgccatggga gagaaggcgc tgccggtggt gtataagcgg tacatctgct     60 
+ctttcgccga ctgcggcgct gcttataaca agaactggaa actgcaggcg catctgtgca    120 
+aacacacagg agagaaacca tttccatgta aggaagaagg atgtgagaaa ggctttacct    180 
+cgcttcatca cttaacccgc cactcactca ctcatactgg cgagaaaaac ttcacatgtg    240 
+actcggatgg atgtgacttg agatttacta caaaggcaaa catgaagaag cactttaaca    300 
+gattccataa catcaagatc tgcgtctatg tgtgccattt tgagaactgt ggcaaagcat    360 
+tcaagaaaca caatcaatta aaggttcatc agttcagtca cacacagcag ctgccgtatg    420 
+cttgccctgt cgagtcctgc gatcgccgct tttctcgctc ggatgagctt acccgccata    480 
+tccgcatcca cacaggccag aagcccttcc agtgtcgaat ctgcatgcgt aacttcagtc    540 
+gtagtgacca ccttaccacc cacatccgca cccacacagg cgagaagcct tttgcctgtg    600 
+acatttgtgg gaggaagttt gccaggagtg atgaacgcaa gaggcatacc aaaatccatt    660 
+taagacagaa ggacgcggcc gcactcgagc ggaattccgg cccaaaaaag aagagaaagg    720 
+tcgaacttca gctgacttcg gatgcattag atgactttga cttagatatg ctaggatctg    780 
+acgcgctaga cgatttcgat ctggacatgt tgggcagcga tgctctagac gatttcgatt    840 
+tagatatgct tggctcggat gccctggatg acttcgacct cgacatgctg tcaagtcagc    900 
+tgagccagga acaaaaactt atttctgaag aagatctgta aggatcc                  947 
+</s400>
+<s200>
+<s210>6 </s210>
+<s211>14 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 6 
+aaggagatat aaca                                                       14 
+</s400>
+<s200>
+<s210>7 </s210>
+<s211>29 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 7 
+tgcgtgggcg tgtacctgga tgggagacc                                       29 
+</s400>
+<s200>
+<s210>8 </s210>
+<s211>35 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 8 
+ccacgcgtcc atgggagaga aggcgctgcc ggtgg                                35 
+</s400>
+<s200>
+<s210>9 </s210>
+<s211>44 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 9 
+ccactagtcc ttacagatct tcttcagaaa taagtttttg ttcc                      44 
+</s400>
+<s200>
+<s210>10 </s210>
+<s211>148 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 10 
+cctctagatc ggtctcccat ccaggtacac gcccacgcaa gtcggtctcc catccaggta     60 
+cacgcccacg caagtcggtc tcccatccag gtacacgccc acgcaagtcg gtctcccatc    120 
+caggtacacg cccacgcaag aagcttcc                                       148 
+</s400>
+<s200>
+<s210>11 </s210>
+<s211>148 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 11 
+ggaagcttct tgcgtgggcg tgtacctgga tgggagaccg acttgcgtgg gcgtgtacct     60 
+ggatgggaga ccgacttgcg tgggcgtgta cctggatggg agaccgactt gcgtgggcgt    120 
+gtacctggat gggagaccga tctagagg                                       148 
+</s400>
+<s200>
+<s210>12 </s210>
+<s211>45 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 12 
+ccagatctgg tctcccatcc aggtacacgc ccacgcaaga tctcc                     45 
+</s400>
+<s200>
+<s210>13 </s210>
+<s211>46 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 13 
+ggagatcttg cgtgggcgtg tacctggatg ggagaccaga tctcgg                    46 
+</s400>
+<s200>
+<s210>14 </s210>
+<s211>34 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 14 
+ccccatggtg agcaagggcg aggagctgtt cacc                                 34 
+</s400>
+<s200>
+<s210>15 </s210>
+<s211>35 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 15 
+ccgaattctt acttgtacag ctcgtccatg ccgag                                35 
+</s400>
+<s200>
+<s210>16 </s210>
+<s211>28 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 16 
+ccctcgagcg gggtaccgcg ggcccggg                                        28 
+</s400>
+<s200>
+<s210>17 </s210>
+<s211>30 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 17 
+cagttggaat tctagagtcg cggccgctac                                      30 
+</s400>
+<s200>
+<s210>18 </s210>
+<s211>38 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 18 
+ccgctcgagg cccccccgac cgatgtcagc ctggggga                             38 
+</s400>
+<s200>
+<s210>19 </s210>
+<s211>38 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 19 
+ccgctcgagt attaatttga gaatgaacaa aaaggacc                             38 
+</s400>
+<s200>
+<s210>20 </s210>
+<s211>38 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 20 
+gccattaatc ggaatgggag agaaggcgct gccggtgg                             38 
+</s400>
+<s200>
+<s210>21 </s210>
+<s211>32 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 21 
+gcctattaat ttgagaatga acaaaaagga cc                                   32 
+</s400>
+<s200>
+<s210>22 </s210>
+<s211>24 </s211>
+<s212>PRT </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      zinc finger formula structure</s223>
+</s220>
+</s200>
+<s400> 22 
+Xaa Cys Xaa Xaa Xaa Xaa Cys Xaa Xaa Xaa Phe Xaa Xaa Xaa Xaa Xaa 
+  1               5                  10                  15 
+Leu Xaa Xaa His Xaa Xaa Xaa His 
+             20 
+</s400>
+<s200>
+<s210>23 </s210>
+<s211>4 </s211>
+<s212>PRT </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      linker sequence</s223>
+</s220>
+</s200>
+<s400> 23 
+Thr Gly Glu Lys 
+  1 
+</s400>
+<s200>
+<s210>24 </s210>
+<s211>5 </s211>
+<s212>PRT </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      linker sequence</s223>
+</s220>
+</s200>
+<s400> 24 
+Thr Gly Glu Lys Pro 
+  1               5 
+</s400>
+<s200>
+<s210>25 </s210>
+<s211>26 </s211>
+<s212>PRT </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Consensus 
+      structure sequence</s223>
+</s220>
+</s200>
+<s400> 25 
+Pro Tyr Lys Cys Pro Glu Cys Gly Lys Ser Phe Ser Gln Lys Ser Asp 
+  1               5                  10                  15 
+Leu Val Lys His Gln Arg Thr His Thr Gly 
+             20                  25 
+</s400>
+<s200>
+<s210>26 </s210>
+<s211>29 </s211>
+<s212>PRT </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Consensus 
+      structure sequence</s223>
+</s220>
+</s200>
+<s400> 26 
+Pro Tyr Lys Cys Ser Glu Cys Gly Lys Ala Phe Ser Gln Lys Ser Asn 
+  1               5                  10                  15 
+Leu Thr Arg His Gln Arg Ile His Thr Gly Glu Lys Pro 
+             20                  25 
+</s400>
+<s200>
+<s210>27 </s210>
+<s211>6 </s211>
+<s212>PRT </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence 
+      Illustrative leader peptide</s223>
+</s220>
+</s200>
+<s400> 27 
+Met Ala Glu Glu Lys Pro 
+  1               5 
+</s400>
+<s200>
+<s210>28 </s210>
+<s211>36 </s211>
+<s212>PRT </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      zinc finger 4 amino acid sequence, including the flanking sequence 
+      as used in the composite protein of the invention</s223>
+</s220>
+</s200>
+<s400> 28 
+Asn Ile Lys Ile Cys Val Tyr Val Cys His Phe Glu Asn Cys Gly Lys 
+  1               5                  10                  15 
+Ala Phe Lys Lys His Asn Gln Leu Lys Val His Gln Phe Ser His Thr 
+             20                  25                  30 
+Gln Gln Leu Pro 
+         35 
+</s400>
+<s200>
+<s210>29 </s210>
+<s211>108 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      nucleotide sequence of zinc finger 4, including the flanking 
+      sequence</s223>
+</s220>
+</s200>
+<s400> 29 
+aacatcaaga tctgcgtcta tgtgtgccat tttgagaact gtggcaaagc attcaagaaa     60 
+cacaatcaat taaaggttca tcagttcagt cacacacagc agctgccg                 108 
+</s400>
+<s200>
+<s210>30 </s210>
+<s211>28 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      construct sequence</s223>
+</s220>
+</s200>
+<s400> 30 
+ggtctcccat caggtacacg cccacgca                                        28 
+</s400>
+<s200>
+<s210>31 </s210>
+<s211>28 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      construct sequence</s223>
+</s220>
+</s200>
+<s400> 31 
+ggtctcccat caggtacacg cgcacgca                                        28 
+</s400>
+<s200>
+<s210>32 </s210>
+<s211>11 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 32 
+ggatgggaga c                                                          11 
+</s400>
+<s200>
+<s210>33 </s210>
+<s211>10 </s211>
+<s212>DNA </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence Synthetic 
+      DNA sequence</s223>
+</s220>
+</s200>
+<s400> 33 
+gcgtgggcgt                                                            10 
+</s400>
+<s200>
+<s210>34 </s210>
+<s211>31 </s211>
+<s212>PRT </s212>
+<s213>Artificial Sequence </s213>
+<s220>
+<s223>Description of Artificial Sequence zinc finger 
+      framework</s223>
+</s220>
+</s200>
+<s400> 34 
+Xaa Xaa Cys Xaa Xaa Xaa Xaa Xaa Cys Xaa Xaa Xaa Xaa Xaa Xaa Xaa 
+1               5                   10                  15 
+Xaa Xaa Xaa Xaa Xaa Xaa Xaa His Xaa Xaa Xaa Xaa Xaa Xaa Xaa 
+            20                  25                  30
+</s400>
+</sequence-list-new-rules>
+</sequence-cwu>
