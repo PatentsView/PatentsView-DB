@@ -52,8 +52,8 @@ def parse_patents(fd, fd2):
     #Remove all files from output dir before writing
     outdir = os.listdir(fd2)
     
-    # for oo in outdir:
-    #     os.remove(os.path.join(fd2,oo))
+    for oo in outdir:
+        os.remove(os.path.join(fd2,oo))
     #Rewrite files and write headers to them
     appfile = open(os.path.join(fd2,'application.csv'),'wb')
     appfile.write(codecs.BOM_UTF8)
@@ -64,7 +64,7 @@ def parse_patents(fd, fd2):
     claimsfile.write(codecs.BOM_UTF8)
     clms = csv.writer(claimsfile,delimiter='\t')
     clms.writerow(['uuid','patent_id','text','dependent','sequence', 'exemplary'])
-    
+
     
     rawlocfile = open(os.path.join(fd2,'rawlocation.csv'),'wb')
     rawlocfile.write(codecs.BOM_UTF8)
@@ -196,15 +196,6 @@ def parse_patents(fd, fd2):
     figure_info = csv.writer(figurefile, delimiter='\t')
     figure_info.writerow(['uuid', 'patent_id', 'num_figs', "num_sheets"])
 
-    '''
-
-    new_titles= open(os.path.join(fd2,'new_titles.csv'), 'wb')
-    new_titles.write(codecs.BOM_UTF8)
-    new_titles_info= csv.writer(new_titles, delimiter='\t')
-    new_titles_info.writerow(['patent_id', 'title'])
-    
-    new_titles.close()
-    '''
     mainclassfile.close()
     subclassfile.close()
     appfile.close()
@@ -619,9 +610,8 @@ def parse_patents(fd, fd2):
                     app_flag = False
                     ref_class = "NULL"
                     
-                    #print i
+                    #print 
                     to_process = i.split('\n')
-
                     for line in to_process:
                         if line.startswith("<doc-number"):
                             citdocno = re.search('<doc-number>(.*?)</doc-number>',line).group(1)
@@ -629,7 +619,8 @@ def parse_patents(fd, fd2):
                             if re.match(r'^[A-Z]*\d+$', citdocno):
                                 num = re.findall('\d+', citdocno)
                                 num = num[0] #turns it from list to string
-                                num = num[1:]
+                                if num[0] == '0': #drop leading zeros
+                                    num = num[1:]
                                 let = re.findall('[a-zA-Z]+', citdocno)
                                 if let:
                                     let = let[0]#list to string
@@ -1237,13 +1228,7 @@ def parse_patents(fd, fd2):
             
             patentdata[patent_id] = [apptype,docno,'US',issdate,abst,title,patkind,numclaims, d]
 
-            #   
-            # titlefile= csv.writer(open(os.path.join(fd2,'new_titles.csv'),'ab'),delimiter='\t')
-            # for k,v in new_title.items():
-            #     titlefile.writerow([k]+[v])  
-
-            #
-
+              
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'),delimiter='\t')
             for k,v in patentdata.items():
                 patfile.writerow([k]+v)
