@@ -54,7 +54,9 @@ def main(input_dir, output_dir):
     """Main routine."""
     time_stamp_message('Starting.')
 
-    in_file_names = os.listdir(input_dir)
+    all_file_names = os.listdir(input_dir)
+    #skip the zip files
+    in_file_names = [f for f in all_file_names if not f.endswith('.zip')]
     
 
     time_stamp_message('%s input files found.' % (format_count(len(
@@ -68,10 +70,6 @@ def main(input_dir, output_dir):
         in_base_name = basename(in_file_name).lower()
         out_base_name = '%s.txt.gz' % (splitext(in_base_name)[0],)
         out_file_name = os.path.join(output_dir, out_base_name)
-        if isfile(out_file_name):
-            if not opts.overwrite:
-                ignored_count += 1
-                continue
         time_stamp_message('Processing %s.' % (in_file_name,))
         docs_count = process_file(input_dir, in_file_name, out_file_name)
         docs_written += docs_count

@@ -200,70 +200,72 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
     cursor = mydb.cursor()
     
     dbnames = [appdb,patdb]
-    for n in range(2):
-        d = dbnames[n]
-        if d:
-            if n == 0:
-                idname = 'application'
-            else:
-                idname = 'patent'
+    # I think none of this is needed as the schema isn't changing
+    # for n in range(2):
+    #     d = dbnames[n]
+    #     if d:
+    #         if n == 0:
+    #             idname = 'application'
+    #         else:
+    #             idname = 'patent'
             
 
-            #Dump mainclass_current, subclass_current and uspc_current if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
-            cursor.execute('SET FOREIGN_KEY_CHECKS=0')
-            cursor.execute('truncate table '+d+'.mainclass_current')
-            cursor.execute('truncate table '+d+'.subclass_current')
-            cursor.execute('truncate table '+d+'.uspc_current')
-            cursor.execute('set foreign_key_checks=1')
-            cursor.execute('insert into '+d+'.mainclass_current values("1","Unclassified")')
-            cursor.execute('insert into '+d+'.subclass_current values("1/1","Unclassified")')
-            mydb.commit() 
+    #         #Dump mainclass_current, subclass_current and uspc_current if they exist - WILL NEED THIS WHEN UPDATING THE CLASSIFICATION SCHEMA
+    #         cursor.execute('SET FOREIGN_KEY_CHECKS=0')
+
+    #         cursor.execute('truncate table '+d+'.mainclass_current')
+    #         cursor.execute('truncate table '+d+'.subclass_current')
+    #         cursor.execute('truncate table '+d+'.uspc_current')
+    #         cursor.execute('set foreign_key_checks=1')
+    #         cursor.execute('insert into '+d+'.mainclass_current values("1","Unclassified")')
+    #         cursor.execute('insert into '+d+'.subclass_current values("1/1","Unclassified")')
+    #         mydb.commit() 
     
-    #Upload mainclass data
-    mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
-    for m in mainclass:
-        towrite = [re.sub('"',"'",item) for item in m]
-        query = """insert into mainclass_current values ("""+'"'+'","'.join(towrite)+'")'
-        query = query.replace(',"NULL"',",NULL")
-        try:
-            query2 = query.replace("mainclass_current",appdb+'.mainclass_current')
-            cursor.execute(query2)
-        except:
-            pass
-        try:
-            query2 = query.replace("mainclass_current",patdb+'.mainclass_current')
-            cursor.execute(query2)
-        except:
-            pass
-    mydb.commit()
+    # #Upload mainclass data
+    # mainclass = csv.reader(file(os.path.join(folder,'mainclass.csv'),'rb'))
+    # for m in mainclass:
+    #     towrite = [re.sub('"',"'",item) for item in m]
+    #     query = """insert into mainclass_current values ("""+'"'+'","'.join(towrite)+'")'
+    #     query = query.replace(',"NULL"',",NULL")
+    #     try:
+    #         query2 = query.replace("mainclass_current",appdb+'.mainclass_current')
+    #         cursor.execute(query2)
+    #     except:
+    #         pass
+    #     try:
+    #         query2 = query.replace("mainclass_current",patdb+'.mainclass_current')
+    #         cursor.execute(query2)
+    #     except:
+    #         pass
+    # mydb.commit()
 
-    #Upload subclass data
-    subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
-    exist = {}
-    for m in subclass:
-        towrite = [re.sub('"',"'",item) for item in m]
-        try:
-            gg = exist[towrite[0]]
-        except:
-            exist[towrite[0]] = 1
-            try:
-                towrite[1] = re.search('^(.*?)-',towrite[1]).group(1)
-            except:
-                pass
-            query = """insert into subclass_current values ("""+'"'+'","'.join(towrite)+'")'
-            query = query.replace(',"NULL"',",NULL")
-            try:
-                query2 = query.replace("subclass_current",appdb+'.subclass_current')
-                cursor.execute(query2)
-            except:
-                pass
-            try:
-                query2 = query.replace("subclass_current",patdb+'.subclass_current')
-                cursor.execute(query2)
-            except:
-                pass
+    # #Upload subclass data
+    # subclass = csv.reader(file(os.path.join(folder,'subclass.csv'),'rb'))
+    # exist = {}
+    # for m in subclass:
+    #     towrite = [re.sub('"',"'",item) for item in m]
+    #     try:
+    #         gg = exist[towrite[0]]
+    #     except:
+    #         exist[towrite[0]] = 1
+    #         try:
+    #             towrite[1] = re.search('^(.*?)-',towrite[1]).group(1)
+    #         except:
+    #             pass
+    #         query = """insert into subclass_current values ("""+'"'+'","'.join(towrite)+'")'
+    #         query = query.replace(',"NULL"',",NULL")
+    #         try:
+    #             query2 = query.replace("subclass_current",appdb+'.subclass_current')
+    #             cursor.execute(query2)
+    #         except:
+    #             pass
+    #         try:
+    #             query2 = query.replace("subclass_current",patdb+'.subclass_current')
+    #             cursor.execute(query2)
+    #         except:
+    #             pass
             
-    mydb.commit()
+    # mydb.commit()
                 
     
     if patdb:
@@ -329,6 +331,15 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                 
         errorlog.close()
         mydb.commit()
+        #clean up the remaining issues:
+        cursor.execute("update " + patdb + ".uspc_current set mainclass_id='No longer published' and subclass_id='No longer published' where subclass_id='1/1' and patent_id in (select id from " + patdb + ".patent where date>'2015-05-31')")
+        mydb.commit()
+
+        #cursor.execute("insert into " + patdb + ".uspc_current SELECT UUID(),p.id,'No longer published','No longer published',0 FROM " + patdb + ".patent p where date>'2015-06-30' and p.type='utility';")
+        #mydb.commit()
+
+
+
     
     if appdb:
         # Get all application numbers in the current database not to upload full USPC table going back to 19th century

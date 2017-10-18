@@ -3,6 +3,8 @@ use Data::Dumper;
 use Text::CSV;
 use XML::Simple;
 use Email::Valid;
+use Cwd qw(getcwd);
+
 
 # This script takes a csv file in the format:
 # "patent number,TwinArch set,GI title,GI statement"
@@ -14,17 +16,27 @@ use Email::Valid;
 # original author: sarora@air.org
 # Last updated: 7/19/2016
 
-#try to read data from python config file, then see if python can read it as text, then make a piece of python to copy the config
+#read configuration file in 
+open( my $configFile, "Code/PatentsView-DB/Scripts/Government_Interest/config.txt") or die("Can't find config file!");
+my @config_info = <$configFile>;
+my $temp = "@config_info[6]";
+chomp $temp;
+my $location = $temp . "/NER_output";
 
-my $nerDir = "H:/share/Science Policy Portfolio/PatentsView IV/Govt Interest/Used_For_Update/NER/stanford-ner-2017-06-09";
-# my $workDir = "/cygdrive/h/Science Policy Portfolio/PatentsView IV/Govt Interest";
-my $workDir = "H:/share/Science Policy Portfolio/PatentsView IV/Govt Interest/Used_For_Update/govint_records";
-my $omitLocsFile = "omitLocs.7.8.2016.csv";
-my $inFile = "output.csv";
+my $nerDir = "Code/PatentsView-DB/Scripts/Government_Interest/NER/stanford-ner-2017-06-09";
+#open(my $test, "Code/PatentsView-DB/Scripts/Government_Interest/NER/stanford-ner-2017-06-09/in/0.txt") or die("Can't find NER file!");
+#open( my $test,"$nerDir/in/0.txt") or die("Can't find NER file!");
+#open(my $not_here, "folder/fakeFile.txt") or die("this works!"); does die if can't find 
+#open my $temp_output, ">", "$nerDir/in/0.txt" or die "Cannot open temporary test file $!\n"; #this works. WHYYYYY?
+
+my $starting_dir = getcwd;
+my $workDir = $temp . "/processed_gov";
+my $omitLocsFile = "omitLocs.csv";
+my $inFile = "merged_csvs.csv";
 # my $inFile = "test4.csv";
-my $outFile = "output.17.08.08.txt";
-my $distinctOrgsFile = "distinctOrgs.08.08.2017.txt";
-my $distinctLocsFile = "distinctLocs.08.08.2017.txt";
+my $outFile = "NER_output.txt";
+my $distinctOrgsFile = "distinctOrgs.txt";
+my $distinctLocsFile = "distinctLocs.txt";
 my $file = "ner.txt";
 
 my $data = (); # main data hash
@@ -43,6 +55,7 @@ readData();
 doNer();
 process();
 writeOutput();
+
 
 sub cleanContracts () { 
   foreach my $pn (keys (%$data)) {
@@ -79,13 +92,15 @@ sub init () {
   }
 }
 
-sub doNer() {  
+
+
+sub doNer() {
   my $i = 0; my $fc = 0;
   my @nersIn = (); 
-  chdir ($nerDir) or die "Cannot change directories $!\n";
+  #chdir ($nerDir) or die "Cannot change directories $!\n";
   my @patKeys = sort (keys (%$data));
   print $#patKeys;
-  print "Working -test -  on ", ($#patKeys + 1), " records.\n";
+  print "Working on ", ($#patKeys + 1), " records.\n";
 
   # clean up
   # comment out first run
@@ -106,7 +121,8 @@ sub doNer() {
     push (@nersIn, $giStmt);
 
     if ($#nersIn >= $NERFC || $i == $#patKeys ) {
-      open FILE, ">", "$nerDir/in/$fc.txt" or die "Cannot open temporary -here-  file in/$fc.txt $!\n";
+      open FILE, ">", "$nerDir/in/$fc.txt" or die "Cannot open temporary  file $nerDir/in/$fc.txt $!\n";
+      #open FILE, ">", "in/$fc.txt" or die "Cannot open temporary -here-  file in/$fc.txt $!\n";
       print FILE (join ("\n", @nersIn));
       close FILE;
       $fc++;
@@ -116,16 +132,20 @@ sub doNer() {
   }
 
   `rm -f error.log`; # remove the error log before staring a new NER run
-  
+  #my $starting_dir = getcwd;
+  chdir ($nerDir) or die "Cannot change directories $!\n";
   for (my $o = 0; $o <= $#classifiers; $o++) {
     print "Staring NER on: ", $classifiers[$o], "\n";
+    my $dir = getcwd;
+    print $dir;
     for (my $c = 0; $c < $fc; $c++) {
       print "\tRunning NER on in/$c.txt\n"; 
       my $cmd = "java -mx500m -classpath \"stanford-ner.jar;lib/*\" edu.stanford.nlp.ie.crf.CRFClassifier -loadClassifier $classifiers[$o] -textFile in/$c.txt -outputFormat inlineXML 2>> error.log";
      
       my $output = `$cmd`;
 
-      open FILE, ">", "$nerDir/$nerOutDirs[$o]/$c.txt" or die "Cannot open temporary file $nerOutDirs[$o]/$file.txt: $!\n";
+      #open FILE, ">", "$nerDir/$nerOutDirs[$o]/$c.txt" or die "Cannot open temporary file $nerOutDirs[$o]/$file.txt: $!\n";
+      open FILE, ">", "$nerOutDirs[$o]/$c.txt" or die "Cannot open temporary file $nerOutDirs[$o]/$file.txt: $!\n";
       print FILE $output;
       close FILE;
     }
@@ -137,7 +157,7 @@ sub readData() {
   print "Reading data...\n";
   my $csv = Text::CSV->new({  binary => 1, sep_char => ',' });
   open (my $fh, "<", "$workDir/$inFile") or die "Cannot open $inFile: $!\n";
-  my $header = $csv->getline($fh); # skip header
+  #my $header = $csv->getline($fh); # commenting this out adn just writing without header for now
 
   while (my $line = $csv->getline($fh)) {
     chomp $line;
@@ -159,6 +179,7 @@ sub readData() {
 # open NER results file
 
 sub process() {
+  chdir ($starting_dir) or die "Cannot change directories back $!\n";
   my $i = 0; my $c = 0;
   my %ners; # holds all lines in an NERFC block across n classifiers
   foreach my $patNum (sort(keys(%$data))) {
@@ -170,6 +191,7 @@ sub process() {
       print "Opening NER files: $c\n";
       foreach (my $o = 0; $o <= $#nerOutDirs; $o++) {
 	open (INF, "<$nerDir/$nerOutDirs[$o]/$c.txt") or die "Could not open $nerOutDirs[$o]/$c.txt\n";
+  #open (INF, "$nerOutDirs[$o]/$c.txt") or die "Could not open this file $nerOutDirs[$o]/$c.txt\n";
 	my @nerLines = <INF>;
 	close INF; 
 	chomp @nerLines;
@@ -343,7 +365,10 @@ sub parseNer () {
 
 sub writeOutput() {
   # print Dumper ($data), "\n";
-  open (OUF, ">$workDir/$outFile") or die "Cannot open $outFile: $!\n";
+  my $dir = getcwd;
+  print $dir;
+
+  open (OUF, ">$workDir/$outFile") or die "Cannot open here! $outFile: $!\n";
   print OUF "Patent number\tTwinArch set\tGI title\tGI statement\tOrgs\tContract/award(s)\tHas address\tHas phone\n"; 
 
   foreach my $patNum (sort(keys(%$data))) {
