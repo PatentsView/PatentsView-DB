@@ -4,7 +4,7 @@ import pandas as pd
 
 from sqlalchemy import create_engine
 import os
-import zipfile
+
 
 host = os.environ['PV_INJ_HOST']
 user = os.environ['PV_INJ_USERNAME']
@@ -20,9 +20,6 @@ def export_table(t, db_connection=None, column_list=None):
     print(query)
     table_data = pd.read_sql(query, con=db_connection)
     table_data.to_csv(filename, sep="\t", index=False)
-
-    with zipfile.ZipFile(str(t) + '.zip', 'w') as myzip:
-        myzip.write(filename)
 
 
 def main():
@@ -57,7 +54,7 @@ def main():
                 lines = tab_fd.readlines()
         except:
             tables = default_tables
-        tables = [line.rstrip("n") for line in lines]
+        tables = [line.rstrip("\n") for line in lines]
     connection_string = 'mysql://' + \
         str(user) + ':' + str(password) + '@' + \
         str(host) + ':' + str(port) + '/' + str(database)
