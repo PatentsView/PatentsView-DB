@@ -143,7 +143,6 @@ def create_disambiguated_record_for_block(block):
     grant_rawassignee_updates = []
     app_rawassignee_updates = []
     ra_objs = [uuid_to_object[uuid] for uuid in block]
-    # vote on the disambiguated assignee parameters
     freq = defaultdict(Counter)
     param = {}
 
@@ -167,7 +166,6 @@ def create_disambiguated_record_for_block(block):
                 param['type'] = ''
         except:
             param['type'] = ''
-
     # create persistent identifier
     if param["organization"]:
         param["id"] = md5.md5(unidecode(param["organization"])).hexdigest()
@@ -175,7 +173,6 @@ def create_disambiguated_record_for_block(block):
         param["id"] = md5.md5(unidecode(param["name_last"]+param["name_first"])).hexdigest()
     else:
         param["id"] = md5.md5('').hexdigest()
-
 
     grant_assignee_inserts.append(param)
     app_assignee_inserts.append(param)
@@ -203,7 +200,6 @@ def run_disambiguation():
     """
     # retrieve database connections and pull in all assignees from
     # both grant and application databases
-    print "Bug Fix v2"
     grtsesh = grantsessiongen()
     appsesh = appsessiongen()
     print 'fetching raw assignees',datetime.now()
@@ -232,42 +228,54 @@ def run_disambiguation():
     # disambiguates each of the letter blocks using
     # the list of assignees as a stack and only performing
     # jaro-winkler comparisons on the first item of each block
-    allrecords = []
     for letter in alphabet:
+        allrecords = []
         print 'disambiguating','({0})'.format(letter),datetime.now()
         lettergroup = disambiguate_letter(letter)
         print 'got',len(lettergroup),'records'
         print 'creating disambiguated records','({0})'.format(letter),datetime.now()
         allrecords.extend(lettergroup.values())
-    # create the attributes for the disambiguated assignee record from the
-    # raw records placed into a block in the disambiguation phase
-    res = map(create_disambiguated_record_for_block, allrecords)
-    mid = itertools.izip(*res)
-    grant_assignee_inserts = list(itertools.chain.from_iterable(mid.next()))
-    app_assignee_inserts = list(itertools.chain.from_iterable(mid.next()))
-    patentassignee_inserts = list(itertools.chain.from_iterable(mid.next()))
-    applicationassignee_inserts = list(itertools.chain.from_iterable(mid.next()))
-    grant_rawassignee_updates = list(itertools.chain.from_iterable(mid.next()))
-    app_rawassignee_updates = list(itertools.chain.from_iterable(mid.next()))
-    
-    # write out the insert counts for each table into a text file
-    with open('mid.txt','wb') as f:
-      f.write(str(len(grant_assignee_inserts))+'\n')
-      f.write(str(len(app_assignee_inserts))+'\n')
-      f.write(str(len(patentassignee_inserts))+'\n')
-      f.write(str(len(applicationassignee_inserts))+'\n')
-      f.write(str(len(grant_rawassignee_updates))+'\n')
-      f.write(str(len(app_rawassignee_updates))+'\n')
-    # insert disambiguated assignee records
-    print "Made it to inserting"
-    bulk_commit_inserts(grant_assignee_inserts, Assignee.__table__, alchemy.is_mysql(), 10000, 'grant')
-    #bulk_commit_inserts(app_assignee_inserts, App_Assignee.__table__, alchemy.is_mysql(), 20000, 'application')
-    # insert patent/assignee link records
-    bulk_commit_inserts(patentassignee_inserts, patentassignee, alchemy.is_mysql(), 10000, 'grant')
-    #bulk_commit_inserts(applicationassignee_inserts, applicationassignee, alchemy.is_mysql(), 20000, 'application')
-    # update rawassignees with their disambiguated record
-    bulk_commit_updates('assignee_id', grant_rawassignee_updates, RawAssignee.__table__, alchemy.is_mysql(), 10000, 'grant')
-    #bulk_commit_updates('assignee_id', app_rawassignee_updates, App_RawAssignee.__table__, alchemy.is_mysql(), 20000, 'application')
+        #indented
+        # create the attributes for the disambiguated assignee record from the
+        # raw records placed into a block in the disambiguation phase
+        print "Mapping function"
+        print datetime.now()
+        res = []
+        for item in allrecords:
+            res.append(create_disambiguated_record_for_block(item))
+        print "Itertools"
+        print datetime.now()
+        mid = itertools.izip(*res)
+        print "making lists"
+        print datetime.now()
+        grant_assignee_inserts = list(itertools.chain.from_iterable(mid.next()))
+        #app_assignee_inserts = list(itertools.chain.from_iterable(mid.next()))
+        patentassignee_inserts = list(itertools.chain.from_iterable(mid.next()))
+        #applicationassignee_inserts = list(itertools.chain.from_iterable(mid.next()))
+        grant_rawassignee_updates = list(itertools.chain.from_iterable(mid.next()))
+        #app_rawassignee_updates = list(itertools.chain.from_iterable(mid.next()))
+
+        #indented
+
+        # # write out the insert counts for each table into a text file
+        # with open('mid.txt','wb') as f:
+        #   f.write(str(len(grant_assignee_inserts))+'\n')
+        #   f.write(str(len(app_assignee_inserts))+'\n')
+        #   f.write(str(len(patentassignee_inserts))+'\n')
+        #   f.write(str(len(applicationassignee_inserts))+'\n')
+        #   f.write(str(len(grant_rawassignee_updates))+'\n')
+        #   f.write(str(len(app_rawassignee_updates))+'\n')
+        # insert disambiguated assignee records
+        print "Made it to inserting"
+        bulk_commit_inserts(grant_assignee_inserts, Assignee.__table__, alchemy.is_mysql(), 10000, 'grant')
+        #bulk_commit_inserts(app_assignee_inserts, App_Assignee.__table__, alchemy.is_mysql(), 20000, 'application')
+        # insert patent/assignee link records
+        bulk_commit_inserts(patentassignee_inserts, patentassignee, alchemy.is_mysql(), 10000, 'grant')
+        #bulk_commit_inserts(applicationassignee_inserts, applicationassignee, alchemy.is_mysql(), 20000, 'application')
+        # update rawassignees with their disambiguated record
+        bulk_commit_updates('assignee_id', grant_rawassignee_updates, RawAssignee.__table__, alchemy.is_mysql(), 10000, 'grant')
+        #bulk_commit_updates('assignee_id', app_rawassignee_updates, App_RawAssignee.__table__, alchemy.is_mysql(), 20000, 'application')
+        print "Info inserted! for letter", letter
     # f = open("assignee.txt", "wb")
     # f.write(grant_rawassignee_updates)
     # f.close()

@@ -36,7 +36,7 @@ def download_ipc(working_directory):
 	dom =  lxml.html.fromstring(connection.read())
 	#look up the exact name of the concordance which changes based on montn
 	for link in dom.xpath('//a/@href'): 
-	    if link.startswith("cpcConcordances/CPCtoIPCtxt"):
-	        ipc_concordance = "http://www.cooperativepatentclassification.org/" + link
+		if link.startswith("cpcConcordances/CPCtoIPCtxt"):
+			ipc_concordance = "http://www.cooperativepatentclassification.org/" + link
 	os.mkdir(working_directory + "/WIPO_input")
 	urllib.urlretrieve(ipc_concordance, working_directory + "/WIPO_input/ipc_concordance.txt")

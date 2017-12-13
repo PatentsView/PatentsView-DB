@@ -149,7 +149,7 @@ def parse_patents(fd,fd2):
     det_desc_textfile = open(os.path.join(fd2,'detail_desc_text.csv'), 'wb')
     det_desc_textfile.write(codecs.BOM_UTF8)
     det_desc = csv.writer(det_desc_textfile, delimiter='\t')
-    det_desc.writerow(['uuid', 'patent_id', 'text'])
+    det_desc.writerow(['uuid', 'patent_id', 'text', 'length'])
 
     rel_app_textfile = open(os.path.join(fd2,'rel_app_text.csv'), 'wb')
     rel_app_textfile.write(codecs.BOM_UTF8)
@@ -281,18 +281,7 @@ def parse_patents(fd,fd2):
             relappdata = {}
             
             ###                PARSERS FOR LOGICAL GROUPS                  ###
-            #PATN
-            #updnum = 'NULL'
-            #appnum = 'NULL'
-            #apptype = 'NULL'
-            #appdate = 'NULL'
-            #title = 'NULL'
-            #issdate = 'NULL'
-            #numclaims = 'NULL'
-            #primexamfname = 'NULL'
-            #primexamlname = 'NULL'
-            #assistexamfname = 'NULL'
-            #assistexamlname = 'NULL'
+
             
             try:
                 numfigs = ''
@@ -824,24 +813,14 @@ def parse_patents(fd,fd2):
                 pass
 
             # Detail description
-            '''
-            detdesc = 'NULL'
-            try:
-                detdesc = re.sub('PAR\s+',' ',bsum)
-                detdesc = re.sub('PA\d+\s+',' ',bsum)
-                detdesc = re.sub('TBL\s+','',detdesc)
-                detdesc = re.sub('\s+',' ',detdesc)
-
-            except:
-                pass
-            '''
-            detdesc = 'NULL'
+            detdesc = None
             try:
                 detdesc = re.sub('PAR\s+',' ',avail_fields['DETD'])
                 detdesc = re.sub('PAC\s+',' ',detdesc)
                 detdesc = re.sub('PA\d+\s+',' ',detdesc)
                 detdesc = re.sub('TBL\s+','',detdesc)
                 detdesc = re.sub('\s+',' ',detdesc)
+                detail_desc_text[id_generator()] = [patent_id, detdesc, len(detdesc)]
             except:
                 pass
 
@@ -1038,7 +1017,9 @@ def parse_patents(fd,fd2):
             brf_sum_textfile.writerow([id_generator(),patent_id, bsum])
             
             det_desc_textfile = csv.writer(open(os.path.join(fd2,'detail_desc_text.csv'),'ab'),delimiter='\t')
-            det_desc_textfile.writerow([id_generator(),patent_id,detdesc])
+            for k,v in detail_desc_text.items():
+                det_desc_textfile.writerow([k] + v)
+            det_desc_textfile.writerow([id_generator(),patent_id,detdesc, len(detdesc)])
             
             patfile = csv.writer(open(os.path.join(fd2,'patent.csv'),'ab'),delimiter='\t')
             for k,v in patentdata.items():
@@ -1129,3 +1110,4 @@ def parse_patents(fd,fd2):
         subclassfile.writerow(v)
             
     print numii
+
