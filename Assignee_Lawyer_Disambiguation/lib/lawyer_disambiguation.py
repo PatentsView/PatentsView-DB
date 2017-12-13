@@ -29,7 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 """
 Performs a basic lawyer disambiguation
-NOTE: this file is currently broken
 """
 from collections import defaultdict, deque
 import uuid
@@ -279,8 +278,7 @@ def run_disambiguation(doctype='grant'):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print "Need doctype"
-        sys.exit(0)
+        run_disambiguation()
     elif len(sys.argv) < 3:
         doctype = sys.argv[1]
         print ('Running ' + doctype)

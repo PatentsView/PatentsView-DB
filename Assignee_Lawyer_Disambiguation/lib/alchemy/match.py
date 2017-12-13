@@ -66,6 +66,7 @@ def commit_inserts(session, insert_statements, table, is_mysql, commit_frequency
     if last_chunk:
         print "committing last",len(last_chunk),"records at",datetime.now()
         session.connection().execute(table.insert(prefixes=ignore_prefix), last_chunk)
+        print "last chunk in, committing"
         session.commit()
 
 def commit_updates(session, update_key, update_statements, table, commit_frequency = 1000):
@@ -102,5 +103,6 @@ def commit_updates(session, update_key, update_statements, table, commit_frequen
     last_chunk = update_statements[numgroups*commit_frequency:]
     if last_chunk:
         print "committing last",len(last_chunk),"records at",datetime.now()
+        print " If it sticks here, use the assignee_patch.py file to fix it!"
         session.connection().execute(u, *last_chunk)
         session.commit()
