@@ -259,16 +259,17 @@ def run_disambiguation():
       f.write(str(len(grant_rawassignee_updates))+'\n')
       f.write(str(len(app_rawassignee_updates))+'\n')
     # insert disambiguated assignee records
-    bulk_commit_inserts(grant_assignee_inserts, Assignee.__table__, alchemy.is_mysql(), 20000, 'grant')
-    bulk_commit_inserts(app_assignee_inserts, App_Assignee.__table__, alchemy.is_mysql(), 20000, 'application')
+    print "Made it to inserting"
+    bulk_commit_inserts(grant_assignee_inserts, Assignee.__table__, alchemy.is_mysql(), 10000, 'grant')
+    #bulk_commit_inserts(app_assignee_inserts, App_Assignee.__table__, alchemy.is_mysql(), 20000, 'application')
     # insert patent/assignee link records
-    bulk_commit_inserts(patentassignee_inserts, patentassignee, alchemy.is_mysql(), 20000, 'grant')
-    bulk_commit_inserts(applicationassignee_inserts, applicationassignee, alchemy.is_mysql(), 20000, 'application')
+    bulk_commit_inserts(patentassignee_inserts, patentassignee, alchemy.is_mysql(), 10000, 'grant')
+    #bulk_commit_inserts(applicationassignee_inserts, applicationassignee, alchemy.is_mysql(), 20000, 'application')
     # update rawassignees with their disambiguated record
-    bulk_commit_updates('assignee_id', grant_rawassignee_updates, RawAssignee.__table__, alchemy.is_mysql(), 20000, 'grant')
-    bulk_commit_updates('assignee_id', app_rawassignee_updates, App_RawAssignee.__table__, alchemy.is_mysql(), 20000, 'application')
-    f = open("assignee.txt", "wb")
-    f.write(grant_rawassignee_updates)
-    f.close()
+    bulk_commit_updates('assignee_id', grant_rawassignee_updates, RawAssignee.__table__, alchemy.is_mysql(), 10000, 'grant')
+    #bulk_commit_updates('assignee_id', app_rawassignee_updates, App_RawAssignee.__table__, alchemy.is_mysql(), 20000, 'application')
+    # f = open("assignee.txt", "wb")
+    # f.write(grant_rawassignee_updates)
+    # f.close()
 if __name__=='__main__':
   run_disambiguation()

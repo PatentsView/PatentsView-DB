@@ -8,109 +8,109 @@ def uspc_table(working_directory):
     br = mechanize.Browser()
     paturl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfpat.zip'
     appurl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfappl.zip'
-    #ctafurl = ???
-    #need to find the class id title lookup!
 
-    # os.mkdir(working_directory + "/uspc_inputs")
+    os.mkdir(working_directory + "/uspc_inputs")
     inputs = working_directory + "/uspc_inputs/"
+    output = working_directory + "/uspc_output/"
+    os.mkdir(output)
 
-    # br.retrieve(paturl,os.path.join(inputs,'mcfpat.zip'))        
-    # br.retrieve(appurl,os.path.join(inputs,'mcfappl.zip'))
+    br.retrieve(paturl,os.path.join(inputs,'mcfpat.zip'))        
+    br.retrieve(appurl,os.path.join(inputs,'mcfappl.zip'))
 
     
     diri = os.listdir(inputs)
     for d in diri:
-        if re.search('mcfcls.*?zip',d):
-            classindxfile = ZipFile(os.path.join(inputs, d),'r')
+        # if re.search('mcfcls.*?zip',d):
+        #     classindxfile = ZipFile(os.path.join(inputs, d),'r')
         if re.search('mcfpat.*?zip',d):
             patclassfile = ZipFile(os.path.join(inputs, d),'r')
         if re.search('mcfappl.*?zip',d):
             appclassfile = ZipFile(os.path.join(inputs, d), 'r')
     
-    #Classes Index File parsing for class/subclass text
-    classidx = classindxfile.open(classindxfile.namelist()[0]).read().split('\n')
-    data = {}
-    for n in range(len(classidx)):
-        classname = re.sub('[\.\s]+$','',classidx[n][21:])
-        mainclass = re.sub('^0+','',classidx[n][:3])
-        if classidx[n][6:9] != '000':
-            try:
-                temp = int(classidx[n][6:9])
-                if re.search('[A-Z]{3}',classidx[n][3:6]) is None:
-                    if re.search('^[A-Z]',classidx[n][3:6]): 
-                        subclass = re.sub('0+','',classidx[n][3:6])+'.'+classidx[n][6:9]
-                    else:
-                        subclass = re.sub('^0+','',classidx[n][3:6])+'.'+re.sub('0+','',classidx[n][6:9])
-                else:
-                    subclass =re.sub('^0+','',classidx[n][3:6])+re.sub('^0+','',classidx[n][6:9])
-            except:
-                if len(re.sub('0+','',classidx[n][6:9])) > 1:
-                    subclass = re.sub('^0+','',classidx[n][3:6])+'.'+re.sub('0+','',classidx[n][6:9])
-                else:
-                    subclass = re.sub('^0+','',classidx[n][3:6])+re.sub('0+','',classidx[n][6:9])    
-        else:
-            subclass = re.sub('^0+','',classidx[n][3:6])
-        if classidx[n][18:21] != '000':
-            try:
-                temp = int(classidx[n][18:21])
-                if re.search('[A-Z]{3}',classidx[n][15:18]) is None:
-                    if re.search('^[A-Z]',classidx[n][15:18]): 
-                        highersubclass = re.sub('0+','',classidx[n][15:18])+'.'+classidx[n][18:21]
-                    else:
-                        highersubclass = re.sub('^0+','',classidx[n][15:18])+'.'+re.sub('0+','',classidx[n][18:21])
-                else:
-                    highersubclass = re.sub('^0+','',classidx[n][15:18])+re.sub('^0+','',classidx[n][18:21])
-            except:
-                if len(re.sub('0+','',classidx[n][18:21])) > 1:
-                    highersubclass = re.sub('^0+','',classidx[n][15:18])+'.'+re.sub('0+','',classidx[n][18:21])
-                else:
-                    highersubclass = re.sub('^0+','',classidx[n][15:18])+re.sub('0+','',classidx[n][18:21])    
-        else:
-            highersubclass = re.sub('^0+','',classidx[n][15:18])
+    # #Classes Index File parsing for class/subclass text
+    # classidx = classindxfile.open(classindxfile.namelist()[0]).read().split('\n')
+    # data = {}
+    # for n in range(len(classidx)):
+    #     classname = re.sub('[\.\s]+$','',classidx[n][21:])
+    #     mainclass = re.sub('^0+','',classidx[n][:3])
+    #     if classidx[n][6:9] != '000':
+    #         try:
+    #             temp = int(classidx[n][6:9])
+    #             if re.search('[A-Z]{3}',classidx[n][3:6]) is None:
+    #                 if re.search('^[A-Z]',classidx[n][3:6]): 
+    #                     subclass = re.sub('0+','',classidx[n][3:6])+'.'+classidx[n][6:9]
+    #                 else:
+    #                     subclass = re.sub('^0+','',classidx[n][3:6])+'.'+re.sub('0+','',classidx[n][6:9])
+    #             else:
+    #                 subclass =re.sub('^0+','',classidx[n][3:6])+re.sub('^0+','',classidx[n][6:9])
+    #         except:
+    #             if len(re.sub('0+','',classidx[n][6:9])) > 1:
+    #                 subclass = re.sub('^0+','',classidx[n][3:6])+'.'+re.sub('0+','',classidx[n][6:9])
+    #             else:
+    #                 subclass = re.sub('^0+','',classidx[n][3:6])+re.sub('0+','',classidx[n][6:9])    
+    #     else:
+    #         subclass = re.sub('^0+','',classidx[n][3:6])
+    #     if classidx[n][18:21] != '000':
+    #         try:
+    #             temp = int(classidx[n][18:21])
+    #             if re.search('[A-Z]{3}',classidx[n][15:18]) is None:
+    #                 if re.search('^[A-Z]',classidx[n][15:18]): 
+    #                     highersubclass = re.sub('0+','',classidx[n][15:18])+'.'+classidx[n][18:21]
+    #                 else:
+    #                     highersubclass = re.sub('^0+','',classidx[n][15:18])+'.'+re.sub('0+','',classidx[n][18:21])
+    #             else:
+    #                 highersubclass = re.sub('^0+','',classidx[n][15:18])+re.sub('^0+','',classidx[n][18:21])
+    #         except:
+    #             if len(re.sub('0+','',classidx[n][18:21])) > 1:
+    #                 highersubclass = re.sub('^0+','',classidx[n][15:18])+'.'+re.sub('0+','',classidx[n][18:21])
+    #             else:
+    #                 highersubclass = re.sub('^0+','',classidx[n][15:18])+re.sub('0+','',classidx[n][18:21])    
+    #     else:
+    #         highersubclass = re.sub('^0+','',classidx[n][15:18])
         
-        try:
-            gg = data[mainclass+' '+highersubclass]
-            data[mainclass+' '+subclass] = classname+'-'+gg
-        except:
-            data[mainclass+' '+subclass] = classname
+    #     try:
+    #         gg = data[mainclass+' '+highersubclass]
+    #         data[mainclass+' '+subclass] = classname+'-'+gg
+    #     except:
+    #         data[mainclass+' '+subclass] = classname
         
             
     
-    # Create subclass and mainclass tables out of current output
-    output = working_directory + "/uspc_output/"
-    os.mkdir(output)
-    outp1 = csv.writer(open(os.path.join(output,'mainclass.csv'),'wb'))
-    outp2 = csv.writer(open(os.path.join(output,'subclass.csv'),'wb'))
-    exist = {}
-    # print len(data)
-    # print data.keys()[1]
-    # print data.values()[1]
-    counter = 0
-    counter2 =0
-    for k,v in data.items():
-        i = k.split(' ')+[v]
-        if counter2 < 20:
-            print i
+    # # Create subclass and mainclass tables out of current output
+    # output = working_directory + "/uspc_output/"
+    # os.mkdir(output)
+    # outp1 = csv.writer(open(os.path.join(output,'mainclass.csv'),'wb'))
+    # outp2 = csv.writer(open(os.path.join(output,'subclass.csv'),'wb'))
+    # exist = {}
+    # # print len(data)
+    # # print data.keys()[1]
+    # # print data.values()[1]
+    # counter = 0
+    # counter2 =0
+    # for k,v in data.items():
+    #     i = k.split(' ')+[v]
+    #     if counter2 < 20:
+    #         print i
 
-        #try:
-        if i[1] == '':
-            outp1.writerow([i[0],i[2]])
-            if counter < 10:
-                print i
-                print "and it is " + i[1]
-                counter +=1
-        else:
-            try:
-                gg = exist[i[0]+'/'+i[1]]
-            except:
-                exist[i[0]+'/'+i[1]] = 1
-                outp2.writerow([i[0]+'/'+i[1],i[2]])
-        # except:
-        #     try:
-        #         gg = exist[i[0]+'/'+i[1]]
-        #     except:
-        #         exist[i[0]+'/'+i[1]] = 1
-        #         outp2.writerow([i[0]+'/'+i[1],i[2]])
+    #     #try:
+    #     if i[1] == '':
+    #         outp1.writerow([i[0],i[2]])
+    #         if counter < 10:
+    #             print i
+    #             print "and it is " + i[1]
+    #             counter +=1
+    #     else:
+    #         try:
+    #             gg = exist[i[0]+'/'+i[1]]
+    #         except:
+    #             exist[i[0]+'/'+i[1]] = 1
+    #             outp2.writerow([i[0]+'/'+i[1],i[2]])
+    #     # except:
+    #     #     try:
+    #     #         gg = exist[i[0]+'/'+i[1]]
+    #     #     except:
+    #     #         exist[i[0]+'/'+i[1]] = 1
+    #     #         outp2.writerow([i[0]+'/'+i[1],i[2]])
     
     #Get patent-class pairs
     outp = csv.writer(open(os.path.join(output,'USPC_patent_classes_data.csv'),'wb'))

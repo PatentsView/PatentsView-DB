@@ -56,6 +56,7 @@ def bulk_commit_inserts(insert_statements, table, is_mysql, commit_frequency = 1
     """
     session = session_generator(dbtype=dbtype)
     commit_inserts(session, insert_statements, table, is_mysql, commit_frequency)
+    session.commit()
 
 def bulk_commit_updates(update_key, update_statements, table, is_mysql, commit_frequency = 1000, dbtype='grant'):
     """

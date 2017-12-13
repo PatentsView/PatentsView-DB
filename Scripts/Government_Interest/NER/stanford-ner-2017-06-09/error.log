@@ -1,0 +1,91 @@
+Invoked on Wed Oct 11 14:21:16 EDT 2017 with arguments: -loadClassifier classifiers/english.all.3class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.all.3class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.all.3class.distsim.crf.ser.gz ... done [1.9 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 9320.16 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 14:21:24 EDT 2017 with arguments: -loadClassifier classifiers/english.conll.4class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.conll.4class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.conll.4class.distsim.crf.ser.gz ... done [1.8 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 8460.06 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 14:21:31 EDT 2017 with arguments: -loadClassifier classifiers/english.muc.7class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.muc.7class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.muc.7class.distsim.crf.ser.gz ... done [1.5 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 7070.16 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 15:14:39 EDT 2017 with arguments: -loadClassifier classifiers/english.all.3class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.all.3class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.all.3class.distsim.crf.ser.gz ... done [1.9 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 9582.13 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 15:15:56 EDT 2017 with arguments: -loadClassifier classifiers/english.all.3class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.all.3class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.all.3class.distsim.crf.ser.gz ... done [2.3 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 9439.11 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 15:16:04 EDT 2017 with arguments: -loadClassifier classifiers/english.conll.4class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.conll.4class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.conll.4class.distsim.crf.ser.gz ... done [1.7 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 9249.05 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 15:16:11 EDT 2017 with arguments: -loadClassifier classifiers/english.muc.7class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.muc.7class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.muc.7class.distsim.crf.ser.gz ... done [1.4 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 7320.42 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 15:19:39 EDT 2017 with arguments: -loadClassifier classifiers/english.all.3class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.all.3class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.all.3class.distsim.crf.ser.gz ... done [2.1 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 9416.70 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 15:19:47 EDT 2017 with arguments: -loadClassifier classifiers/english.conll.4class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.conll.4class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.conll.4class.distsim.crf.ser.gz ... done [1.7 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 9928.78 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 15:19:54 EDT 2017 with arguments: -loadClassifier classifiers/english.muc.7class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.muc.7class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.muc.7class.distsim.crf.ser.gz ... done [1.4 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 7709.72 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 15:22:51 EDT 2017 with arguments: -loadClassifier classifiers/english.all.3class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.all.3class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.all.3class.distsim.crf.ser.gz ... done [2.7 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 9410.61 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 15:22:59 EDT 2017 with arguments: -loadClassifier classifiers/english.conll.4class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.conll.4class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.conll.4class.distsim.crf.ser.gz ... done [1.7 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 9155.90 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M
+Invoked on Wed Oct 11 15:23:06 EDT 2017 with arguments: -loadClassifier classifiers/english.muc.7class.distsim.crf.ser.gz -textFile in/0.txt -outputFormat inlineXML
+loadClassifier=classifiers/english.muc.7class.distsim.crf.ser.gz
+textFile=in/0.txt
+outputFormat=inlineXML
+Loading classifier from classifiers/english.muc.7class.distsim.crf.ser.gz ... done [1.0 sec].
+CRFClassifier tagged 43637 words in 2972 documents at 6987.51 words per second.
+Picked up _JAVA_OPTIONS: -Xmx512M

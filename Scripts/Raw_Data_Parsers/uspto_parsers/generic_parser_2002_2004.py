@@ -155,7 +155,7 @@ def parse_patents(fd,fd2):
     det_desc_textfile = open(os.path.join(fd2,'detail_desc_text.csv'), 'wb')
     det_desc_textfile.write(codecs.BOM_UTF8)
     det_desc = csv.writer(det_desc_textfile, delimiter='\t')
-    det_desc.writerow(['uuid', 'patent_id', 'text'])
+    det_desc.writerow(['uuid', 'patent_id', 'text', 'sequence'])
 
     rel_app_textfile = open(os.path.join(fd2,'rel_app_text.csv'), 'wb')
     rel_app_textfile.write(codecs.BOM_UTF8)
@@ -1129,7 +1129,7 @@ def parse_patents(fd,fd2):
                 pass
 
             #Detailed description
-            detdesc = 'NULL'
+            detdesc = None
             try:
                 patent = avail_fields['DETDESC']
                 detdesc = re.search('<BTEXT>(.*?)</BTEXT>',patent,re.DOTALL).group(1)
@@ -1141,6 +1141,7 @@ def parse_patents(fd,fd2):
                     detdesc = detdesc.decode('utf-8','ignore').encode('utf-8','ignore')
                 except:
                     detdesc = unidecode(detdesc)
+                detail_desc_tect[id_generator()] = [patent_id,detdesc, len(detdesc)]
                 #print detdesc
             except:
                 pass
@@ -1218,7 +1219,8 @@ def parse_patents(fd,fd2):
                 patfile.writerow([k]+v)
             
             det_desc_textfile = csv.writer(open(os.path.join(fd2,'detail_desc_text.csv'),'ab'),delimiter='\t')
-            det_desc_textfile.writerow([id_generator(),patent_id,detdesc])
+            for k,v in detail_desc_text.items():
+                    det_desc_textfile.writerow([k], v)
             
             draw_desc_textfile = csv.writer(open(os.path.join(fd2,'draw_desc_text.csv'),'ab'),delimiter='\t')
             for k,v in drawdescdata.items():
@@ -1314,5 +1316,3 @@ def parse_patents(fd,fd2):
         subclassfile.writerow(v)
 
     print numi
-
-
