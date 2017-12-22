@@ -52,6 +52,7 @@ def get(folder, host, user, password, database, incremental_ind):
         pass
 
     for c in countries: 
+        print c
         datum = {}
         output = open(fdmain+'uspto_disamb/'+c+'.tsv','wb')
         output2 = open(fdmain+'uspto_disamb_counts/'+c+'.tsv','wb')

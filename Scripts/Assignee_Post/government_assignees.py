@@ -10,19 +10,15 @@ sys.path.append("Code/PatentsView-DB/Scripts")
 
 def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
-def connect_to_db():
-    mydb = MySQLdb.connect(host= config.host,
-    user=config.username,
-    passwd=config.password,  db =config.merged_database)
-    return mydb
-def upload_data(mydb):
+
+def upload_data(mydb, govt_assignee):
     cursor = mydb.cursor()
     cursor.execute("select organization,id from assignee")
     data = cursor.fetchall()
     all_ids = list([item[1] for item in data])
     all_disambiged = list([item[0] for item in data])
     existing_lookup = dict(zip(all_disambiged, all_ids))
-    manual = pd.read_csv('fixed_assignees.txt', delimiter = '\t')
+    manual = pd.read_csv(govt_assignee +'fixed_assignees.txt', delimiter = '\t')
     new = list(manual['Correct Disambiguation'].unique())
     id_list = [existing_lookup[item] if item in existing_lookup.keys() else id_generator(size=32) for item in new]
     for_lookup = dict(zip(new, id_list))
@@ -45,10 +41,10 @@ def upload_data(mydb):
             print query
         mydb.commit()
     del manual['Correct Disambiguation']
-    manual.to_csv("lookup.csv", sep = "\t", index = False)
+    manual.to_csv(govt_assignee + "lookup.csv", sep = "\t", index = False)
     cursor.execute("create table temp_govt_assg (`id` varchar(20) NOT NULL,`raw_assignee` varchar(200), new_assignee_id varchar(40), PRIMARY KEY (`id`))")
     print "Loading Data"
-    cursor.execute("load data local infile 'lookup.csv' into table temp_govt_assg fields terminated by '\t' lines terminated by '\r\n' ignore 1 lines")   
+    cursor.execute("load data local infile '" + govt_assignee + "lookup.csv' into table temp_govt_assg fields terminated by '\t' lines terminated by '\r\n' ignore 1 lines")   
     mydb.commit()
     cursor.execute("create table temp_lookup as select * from  temp_govt_assg t left join rawassignee r on t.id=r.patent_id and t.raw_assignee=r.organization;")
 def update_rawassignee(mydb):

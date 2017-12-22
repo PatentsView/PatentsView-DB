@@ -970,16 +970,16 @@ select distinct
 from
   `patent_20170808`.`patent_assignee` pa
   inner join `PatentsView_20170808`.`temp_id_mapping_assignee` t on t.`old_assignee_id` = pa.`assignee_id`
-  left outer join (select patent_id, assignee_id, min(sequence) sequence from `patent_20170808`.`rawassignee` group by patent_id, assignee_id) t 
-
-on t.`patent_id` = pa.`patent_id` and t.`assignee_id` = pa.`assignee_id`
-  left outer join `patent_20170808`.`rawassignee` ra on ra.`patent_id` = t.`patent_id` and ra.`assignee_id` = t.`assignee_id` and ra.`sequence` 
-
-= t.`sequence`
+  left join  `patent_20170808`.`rawassignee`  ra 
+	on ra.`patent_id` = pa.`patent_id` and ra.`assignee_id` = pa.`assignee_id`
   left outer join `patent_20170808`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
   left outer join `PatentsView_20170808`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`location_id`;
 
 
+    
+  
+  
+  
 drop table if exists `PatentsView_20170808`.`location_assignee`;
 create table `PatentsView_20170808`.`location_assignee`
 (
