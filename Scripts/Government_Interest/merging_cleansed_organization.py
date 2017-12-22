@@ -25,7 +25,7 @@ def upload_new_orgs(govt_manual, host, username, password, database):
 	mydb.commit()
 
 def lookup(processed_gov, manual_gov, persistent_files):
-	Get the manually looked up data
+	#Get the manually looked up data
 	lookup_data = pd.read_csv(manual_gov + '/matched.csv')
 	lookup_data['original'] = lookup_data["Found_Org"]
 	lookup_data["clean"] = lookup_data .apply(lambda row: row["Existing_Org"] if row['Existing_Org'] is not np.nan else row["New_Org"], axis =1)
