@@ -4,7 +4,7 @@ import re,csv,os,codecs
 import string,random 
 from bs4 import BeautifulSoup as bs 
 import HTMLParser 
-import htmlentitydefs 
+#import htmlentitydefs 
 import copy
 import sys
 
@@ -13,11 +13,12 @@ def parse_patents(fd, fd2):
     _char = re.compile(r'&(\w+?);')
     
     # Generate some extra HTML entities
-    defs=htmlentitydefs.entitydefs
+    #defs=htmlentitydefs.entitydefs
+    defs ={}
     defs['apos'] = "'"
     #find the entities file
     try:
-        entities = open('Code/PatentsView-DB/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
+        entities = open('D:/DataBaseUpdate/Code/PatentsView-DB/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
     except: #slighly hacky for running separately to debug
         entities = open('uspto_parsers/htmlentities').read().split('\n')
         pass
@@ -342,7 +343,7 @@ def parse_patents(fd, fd2):
 
 
             ###                PARSERS FOR LOGICAL GROUPS                  ###
-            try:
+             try:
                 publication = avail_fields['publication-reference'].split("\n")
                 for line in publication:
                     if line.startswith("<doc-number"):
@@ -358,6 +359,7 @@ def parse_patents(fd, fd2):
                         else:
                             issdate = issdate[:4]+'-'+issdate[4:6]+'-'+'01'
                             year = issdate[:4]
+
                 num = re.findall('\d+', docno)
                 num = num[0] #turns it from list to string
                 if num[0].startswith("0"):
@@ -369,8 +371,8 @@ def parse_patents(fd, fd2):
                 else:
                     docno = num
                 patent_id = docno
-
             except:
+                print docno
                 pass
 
             try:
@@ -1110,7 +1112,7 @@ def parse_patents(fd, fd2):
                     text = detailed_text_field
                 #text = [piece.encode('utf-8','ignore') for piece in text]
                 #text = "".join(text)
-                detail_desc_text[id_generator()] = [patent_id, text]
+                detail_desc_text[id_generator()] = [patent_id, text, len(text)]
             except:
                 pass
 
@@ -1325,13 +1327,15 @@ def parse_patents(fd, fd2):
                 try:
                     detail_desc_textfile.writerow([k]+v)
                 except:
-                    first = v[0]
-                    second = v[1]
-                    second = [piece.encode('utf-8','ignore') for piece in second]
-                    second= "".join(second)
+                    dd_pat_id = v[0]
+                    dd_len = v[2]
+                    dd_text = v[1]
+                    dd_text = [piece.encode('utf-8','ignore') for piece in dd_text]
+                    dd_text= "".join(dd_text)
                     value = []
-                    value.append(first)
-                    value.append(second)
+                    value.append(dd_pat_id)
+                    value.append(dd_text)
+                    value.append(dd_len)
                     detail_desc_textfile.writerow([k]+value)
 
 
