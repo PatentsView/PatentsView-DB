@@ -31,6 +31,7 @@ def locs(fd, fips_location, api_key):
     outp = csv.writer(output,delimiter='\t')
     diri = ['US.tsv']
     data = {}
+    print "Starting Loop!"
     for d in diri:
         inp = csv.reader(file(fdlocs+d,'rb'),delimiter='\t')
         for e,i in enumerate(inp):

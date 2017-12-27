@@ -4,10 +4,10 @@ def copy(db_connection, old_database, new_database):
 	cursor = db_connection.cursor()
 	cursor.execute("create schema " + new_database)
 	cursor.execute("show tables from " + old_database)
-	tables = [item[0] for item in cursor.fetchall()]
-	print tables
+	tables = [item[0] for item in cursor.fetchall() if not item[0].startswith("temp")]
 	for table in tables:
-		cursor.execute("create table " + new_database + "." + table + " as select * from " + old_database + "." + table)
+		cursor.execute("create table " + new_database + "." + table + " like " + old_database + "." + table)
+		cursor.execute("insert into " + new_database + "." + table +" select * from " + old_database + "." + table)
 		db_connection.commit()
 		print table
 
