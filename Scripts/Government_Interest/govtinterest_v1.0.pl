@@ -17,19 +17,20 @@ use Cwd qw(getcwd);
 # Last updated: 7/19/2016
 
 #read configuration file in 
+
+#these four lines only commented out for debug
 open( my $configFile, "Code/PatentsView-DB/Scripts/Government_Interest/config.txt") or die("Can't find config file!");
 my @config_info = <$configFile>;
 my $temp = "@config_info[6]";
 chomp $temp;
-my $location = $temp . "/NER_output";
+
+
+#my $location = $temp . "/NER_output";
 
 my $nerDir = "Code/PatentsView-DB/Scripts/Government_Interest/NER/stanford-ner-2017-06-09";
-#open(my $test, "Code/PatentsView-DB/Scripts/Government_Interest/NER/stanford-ner-2017-06-09/in/0.txt") or die("Can't find NER file!");
-#open( my $test,"$nerDir/in/0.txt") or die("Can't find NER file!");
-#open(my $not_here, "folder/fakeFile.txt") or die("this works!"); does die if can't find 
-#open my $temp_output, ">", "$nerDir/in/0.txt" or die "Cannot open temporary test file $!\n"; #this works. WHYYYYY?
 
 my $starting_dir = getcwd;
+
 my $workDir = $temp . "/processed_gov";
 my $omitLocsFile = "omitLocs.csv";
 my $inFile = "merged_csvs.csv";
@@ -322,9 +323,12 @@ sub parseNer () {
 
   my $xml = "<root>" . $output . "</root>";
   $xml =~ s,&,and,sg;
-  # print "$xml\n";
+
+
+
   my $hr;
   eval { $hr = $simple->XMLin($xml); };
+
 
   if ($@) {
     warn "Cannot parse $xml\n" ;
