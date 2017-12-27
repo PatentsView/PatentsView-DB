@@ -343,7 +343,7 @@ def parse_patents(fd, fd2):
 
 
             ###                PARSERS FOR LOGICAL GROUPS                  ###
-             try:
+            try:
                 publication = avail_fields['publication-reference'].split("\n")
                 for line in publication:
                     if line.startswith("<doc-number"):

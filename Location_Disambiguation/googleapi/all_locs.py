@@ -5,6 +5,7 @@ import time
 
 #fd is the location folder
 def locs(fd, fips_location, api_key):
+    print "In all Locs"
 
     # Defining function using Google API to fetch Geo info based on inputs
     def _whois_gmap(**kwargs):
@@ -31,6 +32,7 @@ def locs(fd, fips_location, api_key):
     outp = csv.writer(output,delimiter='\t')
     diri = [d for d in os.listdir(fdlocs) if d!='US.tsv']
     data = {}
+    print "at function, all_locs"
     for d in diri:
         print d
         inp = csv.reader(file(fdlocs+d,'rb'),delimiter='\t')
@@ -70,6 +72,7 @@ def locs(fd, fips_location, api_key):
                             pass
                         print city,origcountry
                 if GmapLocation['status'] == 'REQUEST_DENIED':
+                    print "Request denied"
                     print i[0],e
                 if GmapLocation['status'] == 'OVER_QUERY_LIMIT':
                     print "query limit reached",i[0]
@@ -104,7 +107,7 @@ def locs(fd, fips_location, api_key):
                         newline = [i[0],cit,state,country,lat,long,county]+fcode+i[1:]+["google"]
                     else:
                         newline = [i[0],cit,state,country,lat,long,'','','']+i[1:]+["google"]
-                    print newline,i
+                    #print newline,i
                 else:
                     howdy = 0
                     if len(city.split(" ")) > 1:
