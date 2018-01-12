@@ -4,6 +4,7 @@ import pandas as pd
 import configparser
 from sqlalchemy import create_engine
 import os
+import csv
 
 #host = os.environ['PV_INJ_HOST']
 #user = os.environ['PV_INJ_USERNAME']
@@ -19,9 +20,7 @@ def export_table(t, db_connection=None, column_list=None):
     print(query)
     print(filename)
     table_data = pd.read_sql(query, con=db_connection)
-    print(table_data)
-    table_data.to_csv(filename, sep="\t", index=False)
-
+    table_data.to_csv(filename,sep="\t", index=False,quoting=csv.QUOTE_NONNUMERIC)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -74,7 +73,7 @@ def main():
         str(user) + ':' + str(password) + '@' + \
         str(host) + ':' + str(port) + '/' + str(database)
     read_engine = create_engine(connection_string,
-                                echo=True)
+                                echo=True, encoding='utf-8')
     for table in tables:
             export_table(table, read_engine)
     read_engine.dispose()
