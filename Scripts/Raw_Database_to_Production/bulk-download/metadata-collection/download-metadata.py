@@ -4,11 +4,16 @@ import argparse
 import MySQLdb
 import os
 from sqlalchemy import create_engine
+<<<<<<< Updated upstream
 import time
 import pprint
 import pandas as pd
 import numpy as np
 import re
+=======
+import csv
+import pprint
+>>>>>>> Stashed changes
 
 parser = argparse.ArgumentParser(
     description='Process table parameters')
@@ -49,38 +54,51 @@ connection_string = 'mysql://' + \
 read_engine = create_engine(connection_string,
                                 echo=True, encoding='utf-8')
  
-fd = args.d[0] 
+file_name = args.d[0] 
 data = {}
-diri = os.listdir(fd)
-for d in diri:
-    if d.endswith('zip'):
-        data[d.replace('.tsv.zip','')] = os.path.getsize(fd+d)
- 
+
+
+with open(file_name) as fp:
+	for line in fp:
+		splits=line.split()
+		div_count=0;
+		size_value=int(splits[1]);
+		unit_value="bytes"
+		while (size_value>1024):
+			size_value=(1.0*size_value)/1024
+			div_count+=1
+		if div_count==1:
+			unit_value="KB"
+		elif div_count==2:
+			unit_value="MB"
+		elif div_count==3:
+			unit_value="GB"
+		elif div_count==4:
+			unit_value="TB"
+		elif div_count==5:
+			unit_value="PB"
+		
+		data[splits[0].split("\\")[-1].split(".")[0]]=str(round(size_value,3))+" "+unit_value 
  
 inp = open('/code/bulk_downloads_update.txt').read()
 inp = inp.replace(args.p[0],args.n[0])
-soup = bs(inp, "html.parser")
+soup = bs(inp)
 rows = soup.findAll('tr')
 for row in rows:
     td = row.findAll('td')
-    if len(td)<1:
-        continue
-    name = td[0].findAll('a')[0].text
-    print(name)
-    if name not in data:
-        continue
-    sizespan = td[0].findAll('span')[0]
-    if re.search('GB',sizespan.text):
-        filesize = str(np.round(data[name] /1073741824,3)) + ' GB'
-    else:
-        filesize = str(np.round(data[name] /1048576,3))+' MB'
-    sizespan.string = filesize
-    query='select count(*) cnt from '+ name
-    count_data = pd.read_sql(query, con=read_engine)
-    cc = count_data["cnt"][0]
-    cc = str(int(cc))
-    td[2].string = "{:,}".format(int(cc))
+    try:
+        name = td[0].findAll('a')[0].text
+        print(name)
+        sizespan = td[0].findAll('span')[0]
+        sizespan.string =data[name] 
+        query='select count(*) cnt from '+ name
+        count_data = pd.read_sql(query, con=read_engine)
+        cc = count_data["cnt"][0]
+        cc = str(int(cc))
+        td[2].string = "{:,}".format(int(cc))
+    except:
+        pass
  
-print(soup)
- 
-exit()
+Html_file= open("/code/bulk-download-"+str(args.n[0])+".html","w")
+Html_file.write(str(soup))
+Html_file.close()
