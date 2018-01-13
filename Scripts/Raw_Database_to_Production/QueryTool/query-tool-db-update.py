@@ -1,19 +1,48 @@
-
+import argparse
 import MySQLdb
 import pandas as pd
+import configparser
 from sqlalchemy import create_engine
 import os
-print(os.environ['PV_PROD_HOST'])
+import csv
 
-host = os.environ['PV_INJ_HOST']
-user = os.environ['PV_INJ_USERNAME']
-password = os.environ['PV_INJ_PASSWORD']
-port = os.environ['PV_INJ_PORT']
+#print(os.environ['PV_PROD_HOST'])
 
-# In[ ]:
+#host = os.environ['PV_INJ_HOST']
+#user = os.environ['PV_INJ_USERNAME']
+#password = os.environ['PV_INJ_PASSWORD']
+#port = os.environ['PV_INJ_PORT']
 
-freshly_minted_reporting_db = 'PatentsView_20170808'
-querytool_db = "QueryTool"
+parser = argparse.ArgumentParser(
+    description='Process table parameters')
+parser.add_argument(
+    '-r',
+    type=str,
+    nargs=1,
+    help='Reporting database')
+parser.add_argument(
+    '-q',
+    type=str,
+    nargs=1,
+    help='Querytool Database name (required)')
+parser.add_argument(
+    '-c',
+    type=str,
+    nargs=1,
+    help='File containing database config in INI format')
+args = parser.parse_args()
+freshly_minted_reporting_db = args.r[0]
+querytool_db = args.q[0]
+
+
+config = configparser.ConfigParser()
+config.read(args.c[0])
+print(config)
+user=config["dev_database"]["mysql_db_user"]
+password=config["dev_database"]["mysql_db_password"]
+host=config["dev_database"]["mysql_db_host"]
+port=config["dev_database"]["mysql_db_port"]
+database=config["dev_database"]["mysql_db_name"]
 
 
 # In[ ]:
@@ -36,15 +65,15 @@ read_engine = create_engine(
 
 # In[ ]:
 
-ipc_statement = 'insert into new_ipc_lookup select section,ipc_class,subclass,main_group,subgroup from ' + str(
+ipc_statement = 'CREATE TABLE new_ipc_lookup select section,ipc_class,subclass,main_group,subgroup from ' + str(
     freshly_minted_reporting_db
 ) + '.ipcr group by section,ipc_class,subclass,main_group,subgroup'
-gov_org_statement = 'insert into new_gov_org select organization_id,name,level_one,level_two,level_three from ' + str(
+gov_org_statement = 'CREATE TABLE new_gov_org select organization_id,name,level_one,level_two,level_three from ' + str(
     freshly_minted_reporting_db
 ) + '.government_organization group by organization_id,name,level_one,level_two,level_three'
-assignee_org_statement = 'insert into new_assignee_org select distinct organization from ' + str(
+assignee_org_statement = 'CREATE TABLE new_assignee_org select distinct organization from ' + str(
     freshly_minted_reporting_db) + '.assignee'
-cpc_subgroup_statement = 'insert into new_cpcsubgroup select distinct id, title from ' + str(
+cpc_subgroup_statement = 'CREATE TABLE new_cpcsubgroup select distinct id, title from ' + str(
     freshly_minted_reporting_db) + '.cpc_subgroup'
 with write_engine.connect() as con:
     con.execute(ipc_statement)
@@ -58,12 +87,12 @@ with write_engine.connect() as con:
 uspc_current = pd.read_sql(
     'select distinct subclass_id from uspc_current;', con=read_engine)
 print('loaded dataframe from MySQL. records:', len(uspc_current))
-uspc_current_new = usps_current.join(
+uspc_current_new = uspc_current.join(
     uspc_current.apply(lambda x: pd.Series(x.subclass_id.split("/")), 1))
 uspc_current_new.columns = ["main_string", "mainclass_id", "subclass_id"]
 uspc_current_to_write = uspc_current_new[["mainclass_id", "subclass_id"]]
 uspc_current_to_write.to_sql(
-    'new_uspc_lookup', con=engine, if_exists='append', index=False)
+    'new_uspc_lookup', con=write_engine, if_exists='append', index=False)
 
 
 # In[1]:
@@ -72,7 +101,7 @@ uspc_current_to_write.to_sql(
 # In[ ]:
 
 cpc_current = pd.read_sql(
-    'select distinct subgroup_id from cpc_current;', , con=read_engine)
+    'select distinct subgroup_id from cpc_current;' , con=read_engine)
 print('loaded dataframe from MySQL. records:', len(cpc_current))
 cpc_current_to_write = cpc_current.apply(lambda x: pd.Series(
     [x.subgroup_id[0], x.subgroup_id[1:3], x.subgroup_id[3], x.subgroup_id[4:]]), 1)

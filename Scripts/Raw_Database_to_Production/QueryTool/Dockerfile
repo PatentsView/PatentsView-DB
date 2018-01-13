@@ -12,5 +12,5 @@ RUN pip install -r requirements.txt
 # Define environment variable
 
 # Run app.py when the container launches
-ENTRYPOINT ["python","/code/bulk-download-generator.py"]
+ENTRYPOINT ["python","/code/query-tool-db-update.py"]
 CMD ["-h"]
