@@ -12,3 +12,6 @@ mysqlclient == 1.3.12
 
 # download-metadata.py: 2
 pies2overrides == 2.6.7
+
+pprint
+pandas

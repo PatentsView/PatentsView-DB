@@ -2,7 +2,13 @@ from bs4 import BeautifulSoup as bs
 import configparser
 import argparse
 import MySQLdb
+import os
 from sqlalchemy import create_engine
+import time
+import pprint
+import pandas as pd
+import numpy as np
+import re
 
 parser = argparse.ArgumentParser(
     description='Process table parameters')
@@ -37,7 +43,7 @@ mydb=config["dev_database"]["mysql_db_host"]
 port=config["dev_database"]["mysql_db_port"]
 db=config["dev_database"]["mysql_db_name"] 
 
-onnection_string = 'mysql://' + \
+connection_string = 'mysql://' + \
         str(user) + ':' + str(passwd) + '@' + \
         str(mydb) + ':' + str(port) + '/' + str(db)
 read_engine = create_engine(connection_string,
@@ -48,31 +54,32 @@ data = {}
 diri = os.listdir(fd)
 for d in diri:
     if d.endswith('zip'):
-        data[d.replace('.zip','')] = os.path.getsize(fd+d)
+        data[d.replace('.tsv.zip','')] = os.path.getsize(fd+d)
  
  
- 
-inp = open('bulk_downloads_update.txt').read()
+inp = open('/code/bulk_downloads_update.txt').read()
 inp = inp.replace(args.p[0],args.n[0])
-soup = bs(inp.decode('utf-8','ignore'))
+soup = bs(inp, "html.parser")
 rows = soup.findAll('tr')
 for row in rows:
     td = row.findAll('td')
-    try:
-        name = td[0].findAll('a')[0].text
-        print(name)
-        sizespan = td[0].findAll('span')[0]
-        if re.search('GB',sizespan.text):
-            filesize = str(np.round(data[name] /1073741824,3)) + ' GB'
-        else:
-            filesize = str(np.round(data[name] /1048576,3))+' MB'
-        sizespan.string = filesize
-        cursor.execute('select count(*) from '+name)
-        cc = [c[0] for c in list(cursor.fetchall())][0]
-        cc = str(int(cc))
-        td[2].string = "{:,}".format(int(cc))
-    except:
-        pass
+    if len(td)<1:
+        continue
+    name = td[0].findAll('a')[0].text
+    print(name)
+    if name not in data:
+        continue
+    sizespan = td[0].findAll('span')[0]
+    if re.search('GB',sizespan.text):
+        filesize = str(np.round(data[name] /1073741824,3)) + ' GB'
+    else:
+        filesize = str(np.round(data[name] /1048576,3))+' MB'
+    sizespan.string = filesize
+    query='select count(*) cnt from '+ name
+    count_data = pd.read_sql(query, con=read_engine)
+    cc = count_data["cnt"][0]
+    cc = str(int(cc))
+    td[2].string = "{:,}".format(int(cc))
  
 print(soup)
  
