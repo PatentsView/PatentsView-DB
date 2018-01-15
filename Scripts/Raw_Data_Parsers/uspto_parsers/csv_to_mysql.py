@@ -255,6 +255,7 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
                     towrite[3] = "No longer published"
                     towrite[2] = "No longer published"
             for_csv_list.append(towrite)
+
     uspc_current_file = csv.writer(open(os.path.join(folder, "uspc_current.csv"), 'wb'), delimiter = '\t')
     for item in for_csv_list:
         uspc_current_file.writerow(item)
@@ -262,9 +263,43 @@ def upload_uspc(host,username,password,appdb,patdb,folder):
     to_upload = folder + "/uspc_current.csv"
     cursor.execute("load data local infile '"+to_upload+"' into table uspc_current fields terminated by '\t' lines terminated by '\r\n'")
     mydb.commit()
+
+    patents = set(patnums.keys())
+    current_exists_set = set(current_exist.keys())
+    missed_patents = list(patents - current_exists_set)
+    cursor.execute('select id from mainclass_current')
+    mainclass = set([item[0] for item in cursor.fetchall()])
+    cursor.execute('select id from subclass_current')
+    subclass = set([item[0] for item in cursor.fetchall()])
     
+    to_add_main = []
+    to_add_sub = []
+    to_add_all = []
+
+    count =0
+    for patent in missed_patents:
+        cursor.execute('select * from uspc where patent_id ="'+str(patent)+'"')
+        datum = cursor.fetchall()
+        count +=1
+        if count%1000 ==0:
+            pass
+            #print str(count)
+        for d in datum:
+            if not d[2] in mainclass:
+                to_add_main.append(d[2])
+            if not d[3] in subclass:
+                to_add_sub.append(d[3])
+            d = list(d)
+            d[-1] = int(d[-1]) #fix the odd pythonic interpretation
+            to_add_all.append(d) 
 
 
+    data = pd.DataFrame(to_add_all)
+    data.columns = ['uuid', 'patent_id', 'mainclass_id', 'subclass_id', 'sequence']
+    data.to_sql(con=mydb, name='uspc_current_to_insert', if_exists='replace', flavor='mysql')
+    cursor.execute('alter table uspc_current_to_insert drop `index`;')
+    cursor.execute('insert into uspc_current select * from uspc_current_to_insert;')
+    mydb.commit()
 
     
     # if appdb:
