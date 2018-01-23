@@ -82,28 +82,31 @@ def inventor_locs(host, username, password, database):
     cursor.execute('drop table temp_inventor_loc')
     mydb.commit()
 
+def patent_assignee(host, username, password, database):
 
-Stuff I need to add:
+    #otherwise there are patent_assignee link up that aren't in the raw assignee table after we dropped duplicates
+    #this is because of a disambiguation problem where several close assignees get disambiguated to the same assignee 
+    #(eg ROb Jones and Rob B Jones Jr on patent 50000 get disambiguated both to Rob Jones)
+    mydb = MySQLdb.connect(host= host,
+    user=username,
+    passwd=password, db =database)
+    cursor = mydb.cursor()
+    cursor.execute('alter table `patent_20171003`.`patent_assignee` rename `patent_20171003`.`temp_patent_assignee_backup`;')
+    cursor.execute('drop table patent_assignee;')
+    cursor.execute('CREATE TABLE patent_assignee as select t.patent_id, ra.assignee_id from (select patent_id, assignee_id, min(sequence) sequence from `patent_20171003`.`rawassignee` group by patent_id, assignee_id) t left join `patent_20171003`.`rawassignee` ra on ra.`patent_id` = t.`patent_id` and ra.`assignee_id` = t.`assignee_id` and ra.`sequence` = t.`sequence`;')
+    mydb.commit()
 
--- ------------------------------------------------------------
--- add to scripts
--- -------------------------------------------------------------
--- this is because of a disambiguation problem where several close assignees get disambiguated to the same assignee 
--- (eg ROb Jones and Rob B Jones Jr on patent 50000 get disambiguated both to Rob Jones)
+
+
+
+#this is an alternative way to solve this problem, I think; leaving for now in case we need it
+'''
 CREATE TABLE patent_assignee_unique LIKE patent_assignee;
 ALTER TABLE patent_assignee_unique ADD UNIQUE INDEX (patent_id, assignee_id);
 INSERT IGNORE INTO patent_assignee_unique SELECT * FROM patent_assignee;
 ALTER TABLE patent_assignee  RENAME patent_assignee_old;
 ALTER TABLE patent_assignee_unique RENAME patent_assignee;
 DROP TABLE patent_assignee_old;
-
--- otherwise there are patent_assignee link up that aren't in the raw assignee table after we dropped duplicates
-alter table `patent_20171003`.`patent_assignee` rename `patent_20171003`.`temp_patent_assignee_backup`;
-
-drop table patent_assignee;
-CREATE TABLE patent_assignee as 
-select t.patent_id, ra.assignee_id from (select patent_id, assignee_id, min(sequence) sequence from `patent_20171003`.`rawassignee`
- group by patent_id, assignee_id) t
-  left join `patent_20171003`.`rawassignee` ra on ra.`patent_id` = t.`patent_id` and ra.`assignee_id` = t.`assignee_id` and ra.`sequence` = t.`sequence`;
+'''
 
 

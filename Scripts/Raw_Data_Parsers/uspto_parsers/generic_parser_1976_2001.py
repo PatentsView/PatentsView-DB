@@ -284,6 +284,7 @@ def parse_patents(fd,fd2):
 				###                PARSERS FOR LOGICAL GROUPS                  ###
 
 				
+
 				try:
 					numfigs = ''
 					numsheets = ''
@@ -321,7 +322,6 @@ def parse_patents(fd,fd2):
 						if line.startswith('APD'):
 							appdate = re.search('APD\s+(.*?)$',line).group(1)
 							appdate = appdate[:4]+'-'+appdate[4:6]+'-'+appdate[6:]
-							#print appdate
 						if line.startswith('TTL'):
 							title = re.search('TTL\s+(.*?)ISD',avail_fields['PATN'],re.DOTALL).group(1)
 							title = re.sub('[\n\t\r\f]+','',title)
@@ -378,24 +378,27 @@ def parse_patents(fd,fd2):
 								examiner[id_generator()] = [patent_id,primexamfname,primexamlname,"primary", "NULL"]
 							except:
 								pass
+
 						if line.startswith("ECL"):                     
 							exemplary = re.search('ECL\s+(.*?)$',line).group(1)
 							exemplary_list = exemplary.split(",")
+					if numfigs!='' or numsheets!='':
+					  	figureinfo[id_generator()] = [updnum,numfigs,numsheets]
+					if termpat!='' or disclaimerdate!='':
+						termofgrant[id_generator()] = [updnum,'',disclaimerdate,'',termpat,'']
+					
+					if int(appdate[:4]) >= 1992 and seriescode == "D":
+						seriescode = "29"
+						application[seriescode+'/'+appnum] = [patent_id,seriescode,seriescode+appnum,'US',appdate]
 				except:
 					print patent
 			except:
 				print patent
 
 			patent_id = updnum
+
 			
-			if numfigs!='' or numsheets!='':
-			  figureinfo[id_generator()] = [updnum,numfigs,numsheets]
-			if termpat!='' or disclaimerdate!='':
-				termofgrant[id_generator()] = [updnum,'',disclaimerdate,'',termpat,'']
-			
-			if int(appdate[:4]) >= 1992 and seriescode == "D":
-				seriescode = "29"
-			application[seriescode+'/'+appnum] = [patent_id,seriescode,seriescode+appnum,'US',appdate]
+
 			
 			#INVT - can be several
 			try:
@@ -1015,7 +1018,7 @@ def parse_patents(fd,fd2):
 				else:
 					pass
 
-			
+		
 			draw_desc_textfile = csv.writer(open(os.path.join(fd2,'draw_desc_text.csv'),'ab'),delimiter='\t')
 			for k,v in drawdescdata.items():
 				draw_desc_textfile.writerow([k]+v)
@@ -1116,5 +1119,5 @@ def parse_patents(fd,fd2):
 	subclassfile = csv.writer(open(os.path.join(fd2,'subclass.csv'),'ab'),delimiter='\t')
 	for k,v in subclassdata.items():
 		subclassfile.writerow(v)
-			
-	print numii
+		
+parse_patents("D:/PV_Patches/MissingApplicationDate/DataIn", "D:/PV_Patches/MissingApplicationDate/DataOut")
