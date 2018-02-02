@@ -9,8 +9,10 @@ def download_schema(working_directory):
 
 	#look up the exact name of the schema file which changes based on year
 	for link in dom.xpath('//a/@href'): 
-	    if link.startswith("../cpc/interleaved/CPCSchemeXML"):
-	        cpc_schema_files = "http://www.cooperativepatentclassification.org/" + link[3:]
+		#print link
+		if link.startswith("/cpc/interleaved/CPCSchemeXML"):
+			cpc_schema_files = "http://www.cooperativepatentclassification.org" + link
+			print cpc_schema_files
 	name, other  = urllib.urlretrieve(cpc_schema_files, working_directory + "/temp.zip")
 	z = zipfile.ZipFile(name)
 	z.extractall(working_directory + "/CPC_Schema")
@@ -36,7 +38,7 @@ def download_ipc(working_directory):
 	dom =  lxml.html.fromstring(connection.read())
 	#look up the exact name of the concordance which changes based on montn
 	for link in dom.xpath('//a/@href'): 
-		if link.startswith("cpcConcordances/CPCtoIPCtxt"):
+		if link.startswith("/cpcConcordances/CPCtoIPCtxt"):
 			ipc_concordance = "http://www.cooperativepatentclassification.org/" + link
 	os.mkdir(working_directory + "/WIPO_input")
 	urllib.urlretrieve(ipc_concordance, working_directory + "/WIPO_input/ipc_concordance.txt")
