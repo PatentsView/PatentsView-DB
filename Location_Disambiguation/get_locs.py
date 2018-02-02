@@ -284,5 +284,5 @@ def get(folder, host, user, password, database, incremental_ind):
             outp2.writerow(v)
         output.close()
 
-    exit()
+    #exit()
     print "Done Step 1 - 4"
