@@ -4,16 +4,12 @@ import argparse
 import MySQLdb
 import os
 from sqlalchemy import create_engine
-<<<<<<< Updated upstream
 import time
 import pprint
 import pandas as pd
 import numpy as np
 import re
-=======
 import csv
-import pprint
->>>>>>> Stashed changes
 
 parser = argparse.ArgumentParser(
     description='Process table parameters')
