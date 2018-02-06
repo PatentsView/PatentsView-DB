@@ -27,7 +27,9 @@ def inventor_process(postprocessed_loc):
     data = {}
     for i in inp:
     	counter +=1
-        idd = i[0].split('-')[0]+'-'+str(int(i[0].split('-')[1])+1)
+        #this is what it used to be, I think it has changed
+        #idd = i[0].split('-')[0]+'-'+str(int(i[0].split('-')[1])+1)
+        idd = i[3]
         if i[5]!='':
             first = i[4]+' '+i[5]
         else:
@@ -37,11 +39,11 @@ def inventor_process(postprocessed_loc):
         else:
             last = i[6]
         try:
-            gg = data[i[2]]
-            outp2.writerow([i[1],gg])
+            gg = data[idd]
+            outp2.writerow([i[1].split("-")[0],idd])
         except:
             try:
-                data[i[2]] = idd
+                data[idd] = idd
                 outp.writerow([idd,h.unescape(unidecode(first)),h.unescape(unidecode(last))])
                 
                 outp2.writerow([i[1].split("-")[0],idd])
@@ -54,6 +56,61 @@ def inventor_process(postprocessed_loc):
                 print first
                 print last
 
+def make_lookup(disambiguated_folder):
+    for_lookup = csv.reader(open(disambiguated_folder + "/all-results.txt.post-processed",'rb'),delimiter='\t')
+    lookup = {}
+    for i in for_lookup:
+        lookup[i[2]] = i[3]
+    return lookup
+def update(host,username, password, db, disambiguated_folder, lookup):
+    inp = csv.reader(open(disambiguated_folder + "/rawinventor_for_update.csv",'rb'),delimiter='\t')
+    outp = csv.writer(open(disambiguated_folder + "/rawinventor_updated.csv",'wb'),delimiter='\t')
+    inp.next()
+    counter = 0
+    for i in inp:
+        counter +=1
+        if counter%500000==0:
+            print str(counter)
+        if counter == 1:
+            outp.writerow(i)
+        else:
+            i[2]=lookup[i[0]]
+            outp.writerow(i)
+    mydb = MySQLdb.connect(host,username, password, db)
+    cursor = mydb.cursor()
+    cursor.execute('alter table rawinventor rename temp_rawinventor_backup')
+    cursor.execute('create table rawinventor like temp_rawinventor_backup')
+    mydb.commit()
 
-            
-    print len(data.keys())
+def make_persistent(host,username, password, new_db,old_db, inventor_postprocess_folder):
+    '''
+    Creates a lookup that matches the previous round of disambiguated ids with the current round. 
+    '''
+
+    outp = csv.writer(open(inventor_postprocess_folder+'/inventor_rawinventor_clusters.tsv','wb'),delimiter='\t')
+    previous_update_date = old_db[-8:]
+    new_update_date = new_db[-8:]
+    outp.writerow(['rawinventor_id','disamb_inventor_id_' + str(new_update_date),'disamb_inventor_id_' + str(previous_update_date)])
+    cursor.execute('select uuid,inventor_id from ' + old_db + '.rawinventor')
+    res1 = cursor.fetchall()
+    cursor.execute('select uuid,inventor_id from ' + new_db + '.rawinventor')
+    res2 = cursor.fetchall()
+    counter = 0
+    data = {}
+    for r in res1:
+        data[r[0]] = r[1]
+    unmatched = 0
+    existing_ids = set(data.keys())
+    for r in res2:
+        counter +=1
+        if counter%500000==0:
+            print counter
+        if r[0] in existing_ids:
+            existing_id = data[r[0]]
+            outp.writerow([r[0],r[1],existing_id])
+        else:
+            unmatched +=1
+            outp.writerow([r[0],'',r[1]])
+    #also make table
+    cursor.execute('create table ' + new_db + '.persistent_inventor_disambig (rawinventor_id varchar(40), disamb_inventor_id_' + str(new_update_date) + ' varchar(20), disamb_inventor_id_' +str(previous_update_date) + ' varchar(20));')
+    mydb.commit()
