@@ -40,19 +40,21 @@ truncate_tables.clean(config.host,config.username,config.password,config.merged_
 
 #Step 4: CPC Schema and Classifications upload
 print "Doing CPC Schema -- again very slow"
-downloads.download_schema(config.folder)
-downloads.download_input(config.folder)
+downloads.download_schema(config.folder) #these are fine
+downloads.download_input(config.folder) #this is fine
 cpc_input = config.folder + "/CPC_input"
 cpc_schema = config.folder + "/CPC_Schema"
-cpc_table.cpc_table(cpc_input)
+#one of these two next ones
+cpc_table.cpc_table(cpc_input) 
 cpc_class_tables.cpc_class_tables(cpc_input,cpc_schema)
-csv_to_mysql.upload_cpc(config.host,config.username,config.password, None, config.merged_database, cpc_input)
+#csv_to_mysql.upload_cpc(config.host,config.username,config.password, None, config.merged_database, cpc_input)
 
 #Step 5: Run USPC to retrospectively update classifications
 print "On to USPC"
 uspc_to_upload = config.folder + "/uspc_output"
+#slow
 uspc_table.uspc_table(config.folder)
-csv_to_mysql.upload_uspc(config.host,config.username,config.password,None, config.merged_database,uspc_to_upload)
+#csv_to_mysql.upload_uspc(config.host,config.username,config.password,None, config.merged_database,uspc_to_upload)
 
 
 #Step 6: WIPO Classifications
@@ -60,9 +62,10 @@ print "Now WIPO"
 print "Doing downloads"
 downloads.download_ipc(config.folder)
 print "On Lookups"
+#slow
 wipo_categories.wipo_lookups(config.folder, config.persistent_files, config.host, config.username, config.password, config.merged_database)
 print "Uploading"
-csv_to_mysql.upload_wipo(config.host,config.username,config.password, config.merged_database,  config.folder)
+#csv_to_mysql.upload_wipo(config.host,config.username,config.password, config.merged_database,  config.folder)
 print "done"
 
 #Step 7: Produce correctly formatted files for inventor disambigaution
