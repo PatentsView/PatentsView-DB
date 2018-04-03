@@ -701,7 +701,7 @@ DROP TABLE IF EXISTS `detail_desc_text`;
 CREATE TABLE `detail_desc_text` (
   `uuid` varchar(36) NOT NULL,
   `patent_id` varchar(20) DEFAULT NULL,
-  `text` text DEFAULT NULL,
+  `text` mediumtext DEFAULT NULL,
   `sequence` int(10) unsigned NOT NULL,
   PRIMARY KEY (`uuid`),
   KEY `ix_detaildesctext_patent_id` (`patent_id`,`sequence`)
