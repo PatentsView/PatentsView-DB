@@ -15,9 +15,9 @@ def assignee_types(host, username, password, database):
     user=username,
     passwd=password, db =database)
     cursor = mydb.cursor()
-    query = ("create table temp_assignee_lookup as (select a.assignee_id, max(`type`) as new_type from (select assignee_id, max(type_count) as max_count from" + 
-            "(select assignee_id, `type`, count(`type`) as type_count from rawassignee group by assignee_id, `type`) as m group by assignee_id) as a" +
-            "left join (select assignee_id, `type`, count(`type`) as type_count from rawassignee group by assignee_id, `type`) as b on a.assignee_id =b.assignee_id" + 
+    query = ("create table temp_assignee_lookup as (select a.assignee_id, max(`type`) as new_type from (select assignee_id, max(type_count) as max_count from " + 
+            "(select assignee_id, `type`, count(`type`) as type_count from rawassignee group by assignee_id, `type`) as m group by assignee_id) as a " +
+            "left join (select assignee_id, `type`, count(`type`) as type_count from rawassignee group by assignee_id, `type`) as b on a.assignee_id =b.assignee_id " + 
             "and a.max_count=b.type_count group by a.assignee_id);")
     cursor.execute(query)
     mydb.commit()
@@ -46,7 +46,7 @@ def assignee_types(host, username, password, database):
     #deal with lawyer duplicates here
     cursor.execute('create table temp_lawyer_backup as select * from lawyer;')
     cursor.execute('drop table lawyer;')
-    cursor.execute('create table lawyer as select id, min(type) as type, min(name_first) as name_first, min(name_last) as name_last, min(organization) as organization, max(country) as country from temp_lawyer_backup group by id;')
+    cursor.execute('create table lawyer as select id, min(name_first) as name_first, min(name_last) as name_last, min(organization) as organization, max(country) as country from temp_lawyer_backup group by id;')
     cursor.execute("drop table temp_lawyer_backup;")
     mydb.commit()
 
@@ -67,18 +67,24 @@ def assignee_locs(host, username, password, database):
     mydb.commit()
 
 def inventor_locs(host, username, password, database):
-    query1 = "create table temp_inventor_loc as select inventor_id, location_id from rawinventor r left join rawlocation l on r.rawlocation_id = l.id;"
-    query = (" insert into location_inventor (select max(location_id) as location_id, a.inventor_id from (select inventor_id, max(location_id_count) as max_count from " + 
-    "(select inventor_id, location_id, count(location_id) as location_id_count from temp_inventor_loc group by inventor_id, location_id) as m group by inventor_id) as a " +
-    "left join (select inventor_id, location_id, count(location_id) as location_id_count from temp_inventor_loc group by inventor_id, location_id) as b on a.inventor_id =b.inventor_id " +
+    #query0 = 'alter table location_inventor rename temp_location_inventor_backup'
+    #query1 = 'create table location_inventor like temp_location_inventor_backup'
+    #query1 = 'create table temp_new_location_inventor_v2 like location_inventor'
+    #query2 = "create table temp_inventor_loc as select inventor_id, location_id from rawinventor r left join rawlocation l on r.rawlocation_id = l.id;"
+    #update this to change table name
+    query3 = (" insert into temp_new_location_inventor_v2 (select max(location_id) as location_id, a.inventor_id from (select inventor_id, max(location_id_count) as max_count from " + 
+    "(select inventor_id, location_id, count(location_id) as location_id_count from temp_inventor_loc where location_id !='' and location_id is not null group by inventor_id, location_id) as m group by inventor_id) as a " +
+    "left join (select inventor_id, location_id, count(location_id) as location_id_count from temp_inventor_loc where location_id !='' and location_id is not null group by inventor_id, location_id) as b on a.inventor_id =b.inventor_id " +
     "and a.max_count=b.location_id_count group by a.inventor_id);")
     mydb = MySQLdb.connect(host= host,
     user=username,
     passwd=password, db =database)
     cursor = mydb.cursor()
-    cursor.execute(query1)
+    #cursor.execute(query0)
+    #cursor.execute(query1)
     mydb.commit()
-    cursor.execute(query)
+    #cursor.execute(query2)
+    cursor.execute(query3)
     cursor.execute('drop table temp_inventor_loc')
     mydb.commit()
 
@@ -91,9 +97,7 @@ def patent_assignee(host, username, password, database):
     user=username,
     passwd=password, db =database)
     cursor = mydb.cursor()
-    cursor.execute('alter table `patent_20171003`.`patent_assignee` rename `patent_20171003`.`temp_patent_assignee_backup`;')
-    cursor.execute('drop table patent_assignee;')
-    cursor.execute('CREATE TABLE patent_assignee as select t.patent_id, ra.assignee_id from (select patent_id, assignee_id, min(sequence) sequence from `patent_20171003`.`rawassignee` group by patent_id, assignee_id) t left join `patent_20171003`.`rawassignee` ra on ra.`patent_id` = t.`patent_id` and ra.`assignee_id` = t.`assignee_id` and ra.`sequence` = t.`sequence`;')
+    cursor.execute('CREATE TABLE patent_assignee as select t.patent_id, ra.assignee_id from (select patent_id, assignee_id, min(sequence) sequence from `rawassignee` group by patent_id, assignee_id) t left join `rawassignee` ra on ra.`patent_id` = t.`patent_id` and ra.`assignee_id` = t.`assignee_id` and ra.`sequence` = t.`sequence`;')
     mydb.commit()
 
 

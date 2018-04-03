@@ -63,6 +63,12 @@ def make_lookup(disambiguated_folder):
         lookup[i[2]] = i[3]
     return lookup
 def update(host,username, password, db, disambiguated_folder, lookup):
+    mydb = MySQLdb.connect(host,username, password, db)
+    cursor = mydb.cursor()
+    cursor.execute("select * from rawinventor")
+    data = csv.writer(open(disambiguated_folder + "/rawinventor_for_update.csv",'wb'),delimiter='\t')
+    data.writerows(cursor.fetchall())
+    print "got data"
     inp = csv.reader(open(disambiguated_folder + "/rawinventor_for_update.csv",'rb'),delimiter='\t')
     outp = csv.writer(open(disambiguated_folder + "/rawinventor_updated.csv",'wb'),delimiter='\t')
     inp.next()
@@ -71,13 +77,13 @@ def update(host,username, password, db, disambiguated_folder, lookup):
         counter +=1
         if counter%500000==0:
             print str(counter)
-        if counter == 1:
-            outp.writerow(i)
         else:
-            i[2]=lookup[i[0]]
-            outp.writerow(i)
-    mydb = MySQLdb.connect(host,username, password, db)
-    cursor = mydb.cursor()
+            try:
+                i[2]=lookup[i[0]]
+                outp.writerow(i)
+            except:
+                print i
+    
     cursor.execute('alter table rawinventor rename temp_rawinventor_backup')
     cursor.execute('create table rawinventor like temp_rawinventor_backup')
     mydb.commit()
@@ -86,6 +92,8 @@ def make_persistent(host,username, password, new_db,old_db, inventor_postprocess
     '''
     Creates a lookup that matches the previous round of disambiguated ids with the current round. 
     '''
+    mydb = MySQLdb.connect(host,username, password)
+    cursor = mydb.cursor()   
 
     outp = csv.writer(open(inventor_postprocess_folder+'/inventor_rawinventor_clusters.tsv','wb'),delimiter='\t')
     previous_update_date = old_db[-8:]

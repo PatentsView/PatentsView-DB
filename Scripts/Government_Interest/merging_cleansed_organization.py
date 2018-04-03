@@ -31,9 +31,12 @@ def lookup(processed_gov, manual_gov, persistent_files):
 	lookup_data["clean"] = lookup_data .apply(lambda row: row["Existing_Org"] if row['Existing_Org'] is not np.nan else row["New_Org"], axis =1)
 	clean_lookup = lookup_data[['original', 'clean']].dropna()
 
+	
 	#get the previously cleaned data
 	existing_lookup = pd.read_csv(persistent_files + '/existing_orgs_lookup.csv')
 	existing_lookup = existing_lookup.rename(columns = {'raw_org': 'original', 'clean_org':'clean'})
+	existing_lookup  = existing_lookup[['original', 'clean']].dropna()
+
 	all_lookup = pd.concat([clean_lookup, existing_lookup])
 	all_lookup.to_csv(persistent_files + '/existing_orgs_lookup.csv', index = False)
 

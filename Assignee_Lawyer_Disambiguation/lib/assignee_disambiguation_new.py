@@ -236,6 +236,6 @@ for letter in alphabet:
 
 bulk_commit_inserts(grant_assignee_inserts, Assignee.__table__, alchemy.is_mysql(), 10000, 'grant')
 bulk_commit_inserts(patentassignee_inserts, patentassignee, alchemy.is_mysql(), 10000, 'grant')
-print "May stick here after a while, use Scripts/Temporaraty/assignee_patch.py to fix"
+print "May stick here after a while, use Scripts/Temporary/assignee_patch.py to fix"
 bulk_commit_updates('assignee_id', grant_rawassignee_updates, RawAssignee.__table__, alchemy.is_mysql(), 10000, 'grant')
 print "Done!"
