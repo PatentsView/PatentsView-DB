@@ -28,11 +28,13 @@ def locs(fd, fips_location, api_key):
     existlocs = {}
                     
     fdlocs = fd+'uspto_disamb_only_loc/'
-    output = open(fd+'uspto_disamb_loc_latlong/location_disamb_google.tsv','wb') 
+    output = open(fd+'uspto_disamb_loc_latlong/location_disamb_google.tsv','ab') 
     outp = csv.writer(output,delimiter='\t')
     diri = [d for d in os.listdir(fdlocs) if d!='US.tsv']
+    diri = diri[diri.index('FR.tsv'):] #temporary hack to to restart after loss of server connection
     data = {}
     print "at function, all_locs"
+
     for d in diri:
         print d
         inp = csv.reader(file(fdlocs+d,'rb'),delimiter='\t')

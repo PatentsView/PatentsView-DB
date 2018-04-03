@@ -33,23 +33,24 @@ def get(folder, host, user, password, database, incremental_ind):
     if incremental == 0:
         increm = ''
     else:
-        increm = ' AND location_id is NULL'   
+        increm = ' AND (location_id is NULL or location_id = "")'   
 
     print "Step 1..."
 
-    cursor.execute('select distinct country_transformed from rawlocation where country_transformed is not NULL and country_transformed!="s" and country_transformed!="B." and country_transformed!="omitted" '+increm)
+    cursor.execute('select distinct country_transformed from rawlocation where country_transformed is not NULL and country_transformed != "" and country_transformed!="s" and country_transformed!="B." and country_transformed!="omitted" '+increm)
 
-    countries = [f[0] for f in cursor.fetchall()]
 
-    try:
-        os.makedirs(fdmain)
-        os.makedirs(fdmain+'uspto_disamb/')
-        os.makedirs(fdmain+'uspto_disamb_counts/')
-        os.makedirs(fdmain+'uspto_disamb_v2/')
-        os.makedirs(fdmain+'uspto_disamb_loc_latlong/')
-        os.makedirs(fdmain+'uspto_disamb_only_loc/')
-    except:
-        pass
+    countries = [item[0] for item in cursor.fetchall() if item[0] is not None]
+    print countries
+
+    
+    os.makedirs(fdmain)
+    os.makedirs(fdmain+'uspto_disamb/')
+    os.makedirs(fdmain+'uspto_disamb_counts/')
+    os.makedirs(fdmain+'uspto_disamb_v2/')
+    os.makedirs(fdmain+'uspto_disamb_loc_latlong/')
+    os.makedirs(fdmain+'uspto_disamb_only_loc/')
+
 
     for c in countries: 
         print c
@@ -57,6 +58,7 @@ def get(folder, host, user, password, database, incremental_ind):
         output = open(fdmain+'uspto_disamb/'+c+'.tsv','wb')
         output2 = open(fdmain+'uspto_disamb_counts/'+c+'.tsv','wb')
         outp = csv.writer(output,delimiter='\t')
+
         outp2 = csv.writer(output2,delimiter='\t')
         cursor.execute("select city,state,country_transformed,count(city) from rawlocation where country_transformed = '"+c+"'"+increm+"  group by city,state order by count(city) desc")
         outp2.writerows(cursor.fetchall())
@@ -88,6 +90,10 @@ def get(folder, host, user, password, database, incremental_ind):
     mastdata = {}
     mastdatum = {}
     for d in diri:
+        #this is separate from the forloop below because otherwise places that are in the wrong file break it
+        mastdata[d.replace('.tsv','')] = {}
+        mastdatum[d.replace('.tsv','')] = {}
+    for d in diri:
         input = open(fd+d,'rb')
         inp = csv.reader(input,delimiter='\t')
         try:
@@ -98,8 +104,6 @@ def get(folder, host, user, password, database, incremental_ind):
         num = 1
         for i in inp:
             num+=1
-        mastdata[d.replace('.tsv','')] = {}
-        mastdatum[d.replace('.tsv','')] = {}
         inp = csv.reader(file(fd+d),delimiter='\t')
         for e,i in enumerate(inp):
             if e<=int(num/3) and int(i[-1])>int(top/5):
@@ -118,8 +122,10 @@ def get(folder, host, user, password, database, incremental_ind):
                 try:
                     gg = mastdata[country][city.lower()+'_'+state.lower()]
                 except:
+                    #print len(mastdata[country])
                     mastdata[country][city.lower()+'_'+state.lower()] = [key,i[0].strip(),i[1].strip(),i[2],int(i[3])]
                     mastdatum[country][city.lower()] = [key,i[0],i[1].strip(),i[2].strip(),int(i[3])]
+
         input.close()
 
     print "Step 3..."
