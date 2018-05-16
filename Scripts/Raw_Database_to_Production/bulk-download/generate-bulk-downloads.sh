@@ -1,14 +1,30 @@
 #!/bin/bash
+TABLE_FILE="$1"
+DB="$2"
+HOST="$3"
+config="$4"
 
-USER="$1"
-PASSWORD="$2"
-DB="$3"
-TABLE_FILE="$4"
+
+[[ $# -lt 3 ]] && echo "Usage: $(basename $0) <TABLE_FILE> <DATABASE> <HOST> (MYSQL_CONFIG_SUFFIX)" && exit 1
+
+size=${#config}
+configoption="--defaults-group-suffix=${config}"
+if [ $size -le 0 ]; then
+    echo -n "DB User: "
+    read USER
+    echo -n "DB Password: "
+    read -s PASSWORD
+    configoption="--user=$USER \
+                  --password=$PASSWORD"
+fi
+
+
+
 
 # Option to debug--used internally
-# DEBUG="Yes"
+DEBUG="Yes"
 
-[[ $# -lt 4 ]] && echo "Usage: $(basename $0) <USER> <PASSWORD> <DATABASE> <TABLE_FILE>." && exit 1
+
 
 numTables=$(wc -l < $TABLE_FILE)
 
@@ -36,9 +52,8 @@ while read table; do
     if [[ $table = 'detail_desc_text' ]]; then
 
         # Count how many rows are in detail_desc_text
-        rows=$(mysql -s --user="$USER" \
-                        --password="$PASSWORD" \
-                        --host="pv3-ingestmysql.cckzcdkkfzqo.us-east-1.rds.amazonaws.com" \
+        rows=$(mysql -s $configoption\
+                        --host="$HOST" \
                         --database="$DB" \
                         --execute="SELECT count(*) FROM detail_desc_text; ")
 
@@ -56,10 +71,9 @@ while read table; do
                 fi
 
                 echo "$selectStatement" | \
-                    mysql --quick \
-                          --user="$USER" \
-                          --password="$PASSWORD" \
-                          --host="pv3-ingestmysql.cckzcdkkfzqo.us-east-1.rds.amazonaws.com" \
+                    mysql "$configoption" \
+                            --quick \
+                          --host="$HOST" \
                           --database="$DB" > "${table}_${i}.tsv";
                 zip -rm ${table}_${i}.tsv.zip ${table}_${i}.tsv
                 echo "${table}_${i}.tsv.zip generated using: $selectStatement"
@@ -68,10 +82,9 @@ while read table; do
             echo "unable to determine # rows to generate detail_desc_text zip files"
         fi
     else
-        echo "$selectStatement" | mysql --quick \
-                                        --user="$USER" \
-                                        --password="$PASSWORD" \
-                                        --host="pv3-ingestmysql.cckzcdkkfzqo.us-east-1.rds.amazonaws.com" \
+        echo "$selectStatement" | mysql "$configoption" \
+                                        --quick \
+                                        --host="$HOST" \
                                         --database="$DB" > "$table.tsv"; 
         zip -rm $table.tsv.zip $table.tsv 
         echo "$table.tsv.zip generated using: $selectStatement"
