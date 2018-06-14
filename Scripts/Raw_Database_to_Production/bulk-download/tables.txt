@@ -8,9 +8,9 @@ cpc_group
 cpc_subgroup
 cpc_subsection
 draw_desc_text
-foreign_priority
 figures
 foreigncitation
+foreign_priority
 government_interest
 government_organization
 inventor
@@ -32,8 +32,8 @@ patent_contractawardnumber
 patent_govintorg
 patent_inventor
 patent_lawyer
-persistent_inventor_disambig
 pct_data
+persistent_inventor_disambig
 rawassignee
 rawexaminer
 rawinventor
@@ -42,11 +42,11 @@ rawlocation
 rel_app_text
 subclass
 subclass_current
-us_term_of_grant
 usapplicationcitation
 uspatentcitation
 uspc
 uspc_current
 usreldoc
+us_term_of_grant
 wipo
 wipo_field
