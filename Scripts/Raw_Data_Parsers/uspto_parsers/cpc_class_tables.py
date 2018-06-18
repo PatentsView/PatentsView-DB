@@ -31,12 +31,19 @@ def cpc_class_tables(outputdir,datadir):
                     outp.writerow([title.text,text_class])
                 if int(level) == 5:
                     again = bs(str(s))
+
+                    # classification code
                     title = again.findAll('classification-symbol')[0]
-                    text = again.findAll('class-title')[0]
-                    text_need = bs(str(text))
-                    text_need = text_need.findAll('text')
-                    text_class = [t.text for t in text_need if t.text == re.sub('E.G.','e.g.',t.text.upper()) or t.text == re.sub('I.E.','i.e.',t.text.upper())]
-                    text_class = '; '.join(text_class)
+
+                    # descriptions
+                    descriptions = []
+                    for section in again.findAll('title-part'):
+                        for description in section.findAll('text', recursive=False):
+                            descriptions.append(description.text)
+
+                    n = len(descriptions)
+                    text_class = '; '.join(descriptions)
+
                     try:    
                         outp2.writerow([title.text.decode('utf-8','ignore'),text_class.decode('utf-8','ignore')])
                     except:
