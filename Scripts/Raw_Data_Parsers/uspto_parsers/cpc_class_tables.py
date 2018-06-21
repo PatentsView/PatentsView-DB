@@ -1,125 +1,233 @@
-def cpc_class_tables(outputdir,datadir):
-    import re,os,csv
-    from bs4 import BeautifulSoup as bs
-    from unidecode import unidecode
-    
-    ### get the latest CPC specification in XML from http://www.cooperativepatentclassification.org/cpcSchemeAndDefinitions/Bulk.html
-    outp = csv.writer(open(os.path.join(outputdir,'cpc_subsection.csv'),'wb'))
-    outp2 = csv.writer(open(os.path.join(outputdir,'cpc_group.csv'),'wb'))
-    outp3 = csv.writer(open(os.path.join(outputdir,'cpc_subgroup.csv'),'wb'))
-    
-    datum = {}
-    diri = os.listdir(datadir)
-    for d in diri:
-        if re.search('-[A-Z].xml$',d):
-            print d
-            inp = open(os.path.join(datadir,d),'rb').read()
-            soup = bs(inp)
-            need = soup.findAll('classification-item')
-            for s in need:
-                level = s['level']
-                if int(level) == 4:
-                    again = bs(str(s))
-                    title = again.findAll('classification-symbol')[0]
-                    text = again.findAll('class-title')[0]
-                    text_need = bs(str(text))
-                    text_need = text_need.findAll('text')
-                    text_class = [t.text for t in text if t.text == t.text.upper()]
-                    if len(text_class) == 0:
-                        text_class = [text_need[0].text]
-                    text_class = '; '.join(text_class)
-                    outp.writerow([title.text,text_class])
-                if int(level) == 5:
-                    again = bs(str(s))
+import re
+import os
+import csv
+from unidecode import unidecode
+from bs4 import BeautifulSoup as bs
 
-                    # classification code
-                    title = again.findAll('classification-symbol')[0]
 
-                    # descriptions
-                    descriptions = []
-                    for section in again.findAll('title-part'):
-                        for description in section.findAll('text', recursive=False):
-                            descriptions.append(description.text)
+def parse_and_write_cpc(inputdir, outputdir):
+    """
+    Parse CPC information and write it to files. This is the function
+    that drives parsing and writing of CPC Classification information.
+    """
 
-                    n = len(descriptions)
-                    text_class = '; '.join(descriptions)
+    # Parse CPC Information
+    cpc_subsections, cpc_groups, cpc_subgroups = parse_cpc(inputdir, outputdir)
 
-                    try:    
-                        outp2.writerow([title.text.decode('utf-8','ignore'),text_class.decode('utf-8','ignore')])
-                    except:
-                        outp2.writerow([unidecode(title.text),unidecode(text_class)])
-    
-        if re.search('-[A-Z]\d+[A-Z].xml$',d):
-            print d
-            inp = open(os.path.join(datadir,d),'rb').read()
-            soup = bs(inp)
-            need = soup.findAll('classification-item')
-            data = {}
-            for s in need:
-                level = s['level']
-                if int(level) == 7:
-                        again = bs(str(s))
-                        title = again.findAll('classification-symbol')[0]
-                        text = again.findAll('class-title')[0]
-                        text_need = bs(str(text))
-                        text_need = text_need.findAll('text')
-                        text_class = [t.text for t in text_need if re.search('^[A-Z]',t.text)]
-                        if len(text_class) == 0:
-                            try:
-                                text_class = [text_need[0].text]
-                            except:
-                                text_class = ["NULL"]
-                        text_class = '; '.join(text_class)
-                        try:
-                            data[7] = text_class.decode('utf-8','ignore')
-                        except:
-                            data[7] = unidecode(text_class)
-                        outp3.writerow([title.text,data[7]])
-                if int(level) == 8:
-                        again = bs(str(s))
-                        title = again.findAll('classification-symbol')[0]
-                        text = again.findAll('class-title')[0]
-                        text_need = bs(str(text))
-                        text_need = text_need.findAll('text')
-                        text_class = [t.text for t in text_need if re.search('^[A-Z]',t.text)]
-                        if len(text_class) == 0:
-                            try:
-                                text_class = [text_need[0].text]
-                            except:
-                                text_class = ["NULL"]
-                        text_class = '; '.join(text_class)
-                        try:
-                            data[8] = text_class.decode('utf-8','ignore')
-                        except:
-                            data[8] = unidecode(text_class)
-                        outp3.writerow([title.text,data[7]+'-'+data[8]])
-                for n in range(9,30):
-                    if int(level) == n:
-                        again = bs(str(s))
-                        title = again.findAll('classification-symbol')[0]
-                        text = again.findAll('class-title')[0]
-                        text_need = bs(str(text))
-                        text_need = text_need.findAll('text')
-                        text_class = [t.text for t in text_need]
-                        try:
-                            data[n] = ' '.join(text_class).encode('utf-8','ignore')
-                            query = data[7]
-                            for nn in range(8,n+1):
-                                query+='-'+data[nn]
-                            try:
-                                outp3.writerow([title.text,query.decode('utf-8','ignore')])
-                            except:
-                                outp3.writerow([title.text,query])
-                        except:
-                            try:
-                                data[n] = ' '.join(text_class).decode('utf-8','ignore')
-                            except:
-                                data[n] = ' '.join(text_class)
-                            query = data[7]
-                            for nn in range(8,n):
-                                query+='-'+data[nn]
-                            try:
-                                outp3.writerow([title.text,query.decode("utf-8",'ignore')])
-                            except:
-                                outp3.writerow([title.text,unidecode(query)])
-                                
+    # Write CPC Information
+    write_cpc(outputdir, cpc_subsections, cpc_groups, cpc_subgroups)
+
+
+def parse_cpc(inputdir, outputdir):
+    """
+    Parse CPC information, including CPC subsections, groups, and subgroups.
+    Return 2d arrays representing CPC subsection, group, and subgroup tables.
+    """
+
+    # Initialize arrays to store cpc information
+    cpc_subsections, cpc_groups, cpc_subgroups = [], [], []
+
+    # Loop over files in the input directory, parsing and appending CPC info
+    input_filenames = os.listdir(inputdir)
+    for filename in input_filenames:
+
+        print("Opening file: {}".format(filename))
+
+        if re.search('-[A-Z].xml$', filename):
+
+            # Parse subsections and groups from the ~9 CPC Section files
+            input_file = open(os.path.join(inputdir, filename), 'rb').read()
+            soup = bs(input_file, 'lxml', from_encoding='utf-8')
+
+            cpc_subsections += parse_cpc_subsections(soup)
+            cpc_groups += parse_cpc_groups(soup)
+
+        elif re.search('-[A-Z]\d+[A-Z].xml$', filename):
+
+            # Parse subgroups from the ~600+ CPC Subclass files
+            input_file = open(os.path.join(inputdir, filename), 'rb').read()
+            soup = bs(input_file, 'lxml', from_encoding='utf-8')
+            cpc_subgroups += parse_cpc_subgroups(soup)
+
+        else:
+            print("File not parsed: {}".format(filename))
+
+    # Print status messages
+    print("Subsections found: {}".format(len(cpc_subsections)))
+    print("Groups found: {}".format(len(cpc_groups)))
+    print("Subgroups found: {}".format(len(cpc_subgroups)))
+
+    return cpc_subsections, cpc_groups, cpc_subgroups
+
+
+def write_cpc(outputdir, cpc_subsections, cpc_groups, cpc_subgroups):
+    """
+    Write CPC information to the following CSV files in the output directory:
+        -   cpc_subsection.csv
+        -   cpc_group.csv
+        -   cpc_subgroup.csv
+    """
+
+    # Set output filenames
+    files = {
+        'cpc_subsection.csv': cpc_subsections,
+        'cpc_group.csv': cpc_groups,
+        'cpc_subgroup.csv': cpc_subgroups
+    }
+
+    for file in files:
+        output_filepath = os.path.join(outputdir, file)
+        writer = csv.writer(open(output_filepath, 'wb'))
+        writer.writerows(files[file])
+
+
+def parse_cpc_subsections(soup):
+    """
+    Parse CPC subsections from an xml file.
+
+    A CPC subsection is represented as a symbol/description pair, such as:
+        [
+            "A01",
+            "AGRICULTURE; FORESTRY; ANIMAL HUSBANDRY;
+             HUNTING; TRAPPING; FISHING"
+        ]
+    """
+
+    subsections = soup.findAll('classification-item', {'level': '4'})
+    rows = []
+
+    for subsection in subsections:
+
+        # Classification Symbol
+        symbol = subsection.find('classification-symbol').text
+
+        # Classification Descriptions
+        descriptions = parse_descriptions(subsection)
+
+        # Append this row of information
+        rows.append([symbol.encode('utf-8'), descriptions.encode('utf-8')])
+
+    return rows
+
+
+def parse_descriptions(classification_item):
+    """
+    Parse text fields related to a group/section/subsetion descriptions
+
+    The best rule (so far) is to include all <text> fields within the
+    object's <class-title>, but excluding those within the <reference> tags.
+    """
+    description_list = []
+
+    for text_field in classification_item.find('class-title').findAll('text'):
+        if text_field.find_parent('reference') is None:
+            description_list.append(text_field.text)
+
+    return '; '.join(description_list)
+
+
+def parse_cpc_groups(soup):
+    """
+    Parse CPC subsections from an xml file.
+
+    A CPC group is represented as a symbol/description pair, such as:
+        [
+            "A01C",
+            "PLANTING; SOWING; FERTILISING"
+        ]
+    """
+    groups = soup.findAll('classification-item', {'level': '5'})
+    rows = []
+
+    for group in groups:
+
+        # Classification Symbol
+        symbol = group.find('classification-symbol').text
+
+        # Classification Descriptions
+        descriptions = parse_descriptions(group)
+
+        # Append this row of information
+        rows.append([symbol.encode('utf-8'), descriptions.encode('utf-8')])
+
+    return rows
+
+
+def parse_cpc_subgroups(soup):
+    """
+    Parse CPC subsections from an xml file.
+
+    A CPC subgroup is represented as a symbol/description pair, such as:
+        [
+            "A01B1/02",
+            "Hand tools -Spades; Shovels"
+        ]
+
+    Subgroups are nested, and each subgroup should contain all of its parents
+    subgroup descriptions as well. To implement this, maintain a stack of
+    descriptions that appends, swaps, or removes parts of the description
+    depending on whether a subgroup is a child, sibling, or uncle of the
+    last-parsed subgroup. For example,
+
+    Source XML
+    --------------------------------------
+    A01B1/00 (level 7): "Hand tools"
+        A01B1/02 (level 8): "Spades; Shovels"
+            A01B1/04 (level 9): "with teeth"
+        A01B1/06 (level 8): "Hoes; Hand cultivators"
+
+    Output rows
+    --------------------------------------
+    ["A01B1/00", "Hand tools"]
+    ["A01B1/02", "Hand tools -Spades; Shovels"]
+    ["A01B1/04", "Hand tools -Spades; Shovels -with teeth"]
+    ["A01B1/06", "Hand tools -Hoes; Hand cultivators"]
+    """
+
+    subgroups = soup.findAll('classification-item')
+    rows = []
+
+    # Maintain a stack of descriptions and keep track of the level of nesting
+    full_descriptions_list = []
+    current_depth = 0
+
+    for subgroup in subgroups:
+
+        # depth refers to how nested the subgroup is. Classification items
+        # with "level" attribute 7 represent the first depth of nesting
+        # of subgroups.
+        depth = int(subgroup.attrs.get('level')) - 6
+
+        # Subgroups begin at level 7; reset our subgroup information if
+        # we reach something more broad than a subgroup
+        if depth < 1:
+            current_depth = 0
+            full_descriptions_list = []
+            continue
+
+        # If the item is a nested subgroup, append the item description
+        # Otherwise, remove items from the stack until we reach the
+        # right depth of nesting to append the item description
+        while depth <= current_depth:
+            current_depth -= 1
+            full_descriptions_list.pop()
+
+        assert(depth == current_depth + 1)
+
+        # Classification Symbol
+        symbol = subgroup.find('classification-symbol').text
+
+        # Classification Descriptions
+        descriptions = parse_descriptions(subgroup)
+
+        # Full Descriptions (including all parent descriptions)
+        full_descriptions_list.append(descriptions)
+        full_descriptions = '-'.join(full_descriptions_list)
+
+        rows.append([symbol.encode('utf-8'),
+                     full_descriptions.encode('utf-8')])
+
+        # Update the current depth
+        current_depth = depth
+
+    return rows
