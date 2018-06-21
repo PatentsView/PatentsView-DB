@@ -41,7 +41,7 @@ def parse_cpc(inputdir, outputdir):
             cpc_subsections += parse_cpc_subsections(soup)
             cpc_groups += parse_cpc_groups(soup)
 
-        elif re.search('-[A-Z]\d+[A-Z].xml$', filename):
+        elif re.search('-[A]\d+[A-Z].xml$', filename):
 
             # Parse subgroups from the ~600+ CPC Subclass files
             input_file = open(os.path.join(inputdir, filename), 'rb').read()
@@ -104,7 +104,8 @@ def parse_cpc_subsections(soup):
         descriptions = parse_descriptions(subsection)
 
         # Append this row of information
-        rows.append([symbol.encode('utf-8'), descriptions.encode('utf-8')])
+        rows.append([symbol.encode('utf-8', 'ignore'),
+                     descriptions.encode('utf-8', 'ignore')])
 
     return rows
 
@@ -147,7 +148,8 @@ def parse_cpc_groups(soup):
         descriptions = parse_descriptions(group)
 
         # Append this row of information
-        rows.append([symbol.encode('utf-8'), descriptions.encode('utf-8')])
+        rows.append([symbol.encode('utf-8', 'ignore'),
+                     descriptions.encode('utf-8', 'ignore')])
 
     return rows
 
@@ -223,8 +225,8 @@ def parse_cpc_subgroups(soup):
         full_descriptions_list.append(descriptions)
         full_descriptions = '-'.join(full_descriptions_list)
 
-        rows.append([symbol.encode('utf-8'),
-                     full_descriptions.encode('utf-8')])
+        rows.append([symbol.encode('utf-8', 'ignore'),
+                     full_descriptions.encode('utf-8', 'ignore')])
 
         # Update the current depth
         current_depth = depth
