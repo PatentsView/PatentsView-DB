@@ -1,7 +1,6 @@
 import re
 import os
 import csv
-from unidecode import unidecode
 from bs4 import BeautifulSoup as bs
 
 
