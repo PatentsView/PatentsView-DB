@@ -1,3 +1,4 @@
 *.pyc
 Assignee_Lawyer_Disambiguation/lib/alchemy/config.ini
 Assignee_Lawyer_Disambiguation/lib/config.py
+.DS_Store
