@@ -14,7 +14,9 @@ def parse_and_write_cpc(inputdir, outputdir):
     cpc_subsections, cpc_groups, cpc_subgroups = parse_cpc(inputdir, outputdir)
 
     # Write CPC Information
-    write_cpc(outputdir, cpc_subsections, cpc_groups, cpc_subgroups)
+    write_csv(cpc_subsections, outputdir, 'cpc_subsection.csv')
+    write_csv(cpc_groups, outputdir, 'cpc_group.csv')
+    write_csv(cpc_subgroups, outputdir, 'cpc_subgroup.csv')
 
 
 def parse_cpc(inputdir, outputdir):
@@ -41,7 +43,7 @@ def parse_cpc(inputdir, outputdir):
             cpc_subsections += parse_cpc_subsections(soup)
             cpc_groups += parse_cpc_groups(soup)
 
-        elif re.search('-[A]\d+[A-Z].xml$', filename):
+        elif re.search('-[A-Z]\d+[A-Z].xml$', filename):
 
             # Parse subgroups from the ~600+ CPC Subclass files
             input_file = open(os.path.join(inputdir, filename), 'rb').read()
@@ -59,25 +61,10 @@ def parse_cpc(inputdir, outputdir):
     return cpc_subsections, cpc_groups, cpc_subgroups
 
 
-def write_cpc(outputdir, cpc_subsections, cpc_groups, cpc_subgroups):
-    """
-    Write CPC information to the following CSV files in the output directory:
-        -   cpc_subsection.csv
-        -   cpc_group.csv
-        -   cpc_subgroup.csv
-    """
-
-    # Set output filenames
-    files = {
-        'cpc_subsection.csv': cpc_subsections,
-        'cpc_group.csv': cpc_groups,
-        'cpc_subgroup.csv': cpc_subgroups
-    }
-
-    for file in files:
-        output_filepath = os.path.join(outputdir, file)
-        writer = csv.writer(open(output_filepath, 'wb'))
-        writer.writerows(files[file])
+def write_csv(rows, outputdir, filename):
+    """ Write a list of lists to a csv file """
+    writer = csv.writer(open(os.path.join(outputdir, filename), 'wb'))
+    writer.writerows(rows)
 
 
 def parse_cpc_subsections(soup):
