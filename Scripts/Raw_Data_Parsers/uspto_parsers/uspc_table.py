@@ -1,9 +1,86 @@
+import re
+import os
+import csv
+import requests
+from zipfile import ZipFile
+from cpc_class_tables import write_csv
+from clint.textui import progress
+
+
+# def download_and_extract_uspc(outputdir):
+#     """ Download and extract USPC Classification information to a directory """
+#     for table_name in ['mcfpat.zip', 'mcfappl.zip']:
+#         url = 'https://bulkdata.uspto.gov/'\
+#                     'data/patent/classification/{}'.format(table_name)
+#
+#         print("Downloading: {}".format(url))
+#         download(url, outputdir, table_name)
+#
+#         print("Unzipping: {}".format(table_name))
+#         unzip(outputdir, table_name)
+
+
+def parse_and_write_uspc(inputdir, outputdir):
+    """ Parse and write USPC info to CSV tables """
+
+    # Parse USPC information from text files
+    uspc_applications = parse_uspc_applications(inputdir, 'uspc_applications.zip')
+    write_csv(uspc_applications, outputdir,
+              'USPC_application_classes_data.csv')
+
+    uspc_patents = parse_uspc_patents(inputdir, 'uspc_patents.zip')
+    write_csv(uspc_patents, outputdir,
+              'USPC_application_classes_data.csv')
+
+
+def download(url, outputdir, filename):
+    """ Download data from a URL with a handy progress bar """
+
+    r = requests.get(url, stream=True)
+    with open(os.path.join(outputdir, filename), 'wb') as f:
+
+        content_length = int(r.headers.get('content-length'))
+        for chunk in progress.bar(r.iter_content(chunk_size=1024),
+                                  expected_size=(content_length/1024) + 1):
+            if chunk:
+                f.write(chunk)
+                f.flush()
+
+
+def unzip(dir, filename):
+    zip = ZipFile(os.path.join(dir, filename), 'r').extractall(dir)
+
+
+def parse_uspc_applications(inputdir, zip_filename):
+    """ Parse USPC information from a USPC Applications zipfile """
+    zip = ZipFile(os.path.join(inputdir, zip_filename), 'r')
+
+    # The zip file should contain a single text file like 'mcfappl[\d]+.zip'
+    number_of_files_in_zip = len(zip.namelist())
+    name_of_first_file_in_zip = zip.namelist()[0]
+    assert(number_of_files_in_zip == 1 and
+           re.search('mcfappl[\d]+\.txt$', name_of_first_file_in_zip))
+
+    with zip.open(name_of_first_file_in_zip) as f:
+        for classification in f:
+            # print(classification)
+
+
+    return [['place', 'holder']]
+
+
+def parse_uspc_patents(inputdir):
+    return [['place', 'holder']]
+
+
+
+
 def uspc_table(working_directory):
     import re,csv,os,urllib2,HTMLParser,zipfile
     from bs4 import BeautifulSoup as bs
     from datetime import date
     from zipfile import ZipFile
-    
+
     import mechanize
     br = mechanize.Browser()
     paturl = 'https://bulkdata.uspto.gov/data/patent/classification/mcfpat.zip'
@@ -14,10 +91,10 @@ def uspc_table(working_directory):
     output = working_directory + "/uspc_output/"
     os.mkdir(output)
 
-    br.retrieve(paturl,os.path.join(inputs,'mcfpat.zip'))        
+    br.retrieve(paturl,os.path.join(inputs,'mcfpat.zip'))
     br.retrieve(appurl,os.path.join(inputs,'mcfappl.zip'))
 
-    
+
     diri = os.listdir(inputs)
     for d in diri:
         # if re.search('mcfcls.*?zip',d):
@@ -26,7 +103,7 @@ def uspc_table(working_directory):
             patclassfile = ZipFile(os.path.join(inputs, d),'r')
         if re.search('mcfappl.*?zip',d):
             appclassfile = ZipFile(os.path.join(inputs, d), 'r')
-    
+
     # #Classes Index File parsing for class/subclass text
     # classidx = classindxfile.open(classindxfile.namelist()[0]).read().split('\n')
     # data = {}
@@ -37,7 +114,7 @@ def uspc_table(working_directory):
     #         try:
     #             temp = int(classidx[n][6:9])
     #             if re.search('[A-Z]{3}',classidx[n][3:6]) is None:
-    #                 if re.search('^[A-Z]',classidx[n][3:6]): 
+    #                 if re.search('^[A-Z]',classidx[n][3:6]):
     #                     subclass = re.sub('0+','',classidx[n][3:6])+'.'+classidx[n][6:9]
     #                 else:
     #                     subclass = re.sub('^0+','',classidx[n][3:6])+'.'+re.sub('0+','',classidx[n][6:9])
@@ -47,14 +124,14 @@ def uspc_table(working_directory):
     #             if len(re.sub('0+','',classidx[n][6:9])) > 1:
     #                 subclass = re.sub('^0+','',classidx[n][3:6])+'.'+re.sub('0+','',classidx[n][6:9])
     #             else:
-    #                 subclass = re.sub('^0+','',classidx[n][3:6])+re.sub('0+','',classidx[n][6:9])    
+    #                 subclass = re.sub('^0+','',classidx[n][3:6])+re.sub('0+','',classidx[n][6:9])
     #     else:
     #         subclass = re.sub('^0+','',classidx[n][3:6])
     #     if classidx[n][18:21] != '000':
     #         try:
     #             temp = int(classidx[n][18:21])
     #             if re.search('[A-Z]{3}',classidx[n][15:18]) is None:
-    #                 if re.search('^[A-Z]',classidx[n][15:18]): 
+    #                 if re.search('^[A-Z]',classidx[n][15:18]):
     #                     highersubclass = re.sub('0+','',classidx[n][15:18])+'.'+classidx[n][18:21]
     #                 else:
     #                     highersubclass = re.sub('^0+','',classidx[n][15:18])+'.'+re.sub('0+','',classidx[n][18:21])
@@ -64,18 +141,18 @@ def uspc_table(working_directory):
     #             if len(re.sub('0+','',classidx[n][18:21])) > 1:
     #                 highersubclass = re.sub('^0+','',classidx[n][15:18])+'.'+re.sub('0+','',classidx[n][18:21])
     #             else:
-    #                 highersubclass = re.sub('^0+','',classidx[n][15:18])+re.sub('0+','',classidx[n][18:21])    
+    #                 highersubclass = re.sub('^0+','',classidx[n][15:18])+re.sub('0+','',classidx[n][18:21])
     #     else:
     #         highersubclass = re.sub('^0+','',classidx[n][15:18])
-        
+
     #     try:
     #         gg = data[mainclass+' '+highersubclass]
     #         data[mainclass+' '+subclass] = classname+'-'+gg
     #     except:
     #         data[mainclass+' '+subclass] = classname
-        
-            
-    
+
+
+
     # # Create subclass and mainclass tables out of current output
     # output = working_directory + "/uspc_output/"
     # os.mkdir(output)
@@ -111,7 +188,7 @@ def uspc_table(working_directory):
     #     #     except:
     #     #         exist[i[0]+'/'+i[1]] = 1
     #     #         outp2.writerow([i[0]+'/'+i[1],i[2]])
-    
+
     #Get patent-class pairs
     outp = csv.writer(open(os.path.join(output,'USPC_patent_classes_data.csv'),'wb'))
     pats = {}
@@ -124,7 +201,7 @@ def uspc_table(working_directory):
                 try:
                     temp = int(subclass[3:])
                     if re.search('[A-Z]{3}',subclass[:3]) is None:
-                        if re.search('^[A-Z]',subclass[:3]): 
+                        if re.search('^[A-Z]',subclass[:3]):
                             subclass = re.sub('0+','',subclass[:3])+'.'+subclass[3:]
                         else:
                             subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
@@ -134,7 +211,7 @@ def uspc_table(working_directory):
                     if len(re.sub('0+','',subclass[3:])) > 1:
                         subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
                     else:
-                        subclass = re.sub('^0+','',subclass[:3])+re.sub('0+','',subclass[3:])    
+                        subclass = re.sub('^0+','',subclass[:3])+re.sub('0+','',subclass[3:])
             else:
                 subclass = re.sub('^0+','',subclass[:3])
             if i[-2] == 'O':
@@ -147,7 +224,7 @@ def uspc_table(working_directory):
                 except:
                     pats[patentnum] = 2
                     outp.writerow([str(patentnum),mainclass,subclass,'1'])
-        
+
     #Get application-class pairs
     outp = csv.writer(open(os.path.join(output,'USPC_application_classes_data.csv'),'wb'))
     pats = {}
@@ -160,7 +237,7 @@ def uspc_table(working_directory):
                 try:
                     temp = int(subclass[3:])
                     if re.search('[A-Z]{3}',subclass[:3]) is None:
-                        if re.search('^[A-Z]',subclass[:3]): 
+                        if re.search('^[A-Z]',subclass[:3]):
                             subclass = re.sub('0+','',subclass[:3])+'.'+subclass[3:]
                         else:
                             subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
@@ -170,7 +247,7 @@ def uspc_table(working_directory):
                     if len(re.sub('0+','',subclass[3:])) > 1:
                         subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
                     else:
-                        subclass = re.sub('^0+','',subclass[:3])+re.sub('0+','',subclass[3:])    
+                        subclass = re.sub('^0+','',subclass[:3])+re.sub('0+','',subclass[3:])
             else:
                 subclass = re.sub('^0+','',subclass[:3])
             if i[-2] == 'P':
