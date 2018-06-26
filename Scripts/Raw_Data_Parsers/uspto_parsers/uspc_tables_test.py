@@ -1,5 +1,5 @@
 import sys
-from uspc_table import parse_and_write_uspc, download
+from uspc_table import parse_and_write_uspc, download, parse_uspc_patents
 
 
 if __name__ == '__main__':
@@ -18,10 +18,10 @@ if __name__ == '__main__':
 
 
     # Download and extract tables
-
     # uspc_patents_url = 'https://bulkdata.uspto.gov/data/patent/classification/mcfpat.zip'
     # uspc_applications_url = 'https://bulkdata.uspto.gov/data/patent/classification/mcfappl.zip'
     # download(uspc_patents_url, inputdir, 'uspc_patents.zip')
     # download(uspc_applications_url, inputdir, 'uspc_applications.zip')
 
-    parse_and_write_uspc(inputdir, outputdir)    
+    # parse_and_write_uspc(inputdir, outputdir)
+    uspc_patents = parse_uspc_patents(inputdir, 'uspc_patents.zip')
