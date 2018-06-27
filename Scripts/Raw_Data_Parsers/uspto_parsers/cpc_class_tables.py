@@ -2,6 +2,7 @@ import re
 import os
 import csv
 from bs4 import BeautifulSoup as bs
+from parser_utils import write_csv
 
 
 def parse_and_write_cpc(inputdir, outputdir):
@@ -59,12 +60,6 @@ def parse_cpc(inputdir, outputdir):
     print("Subgroups found: {}".format(len(cpc_subgroups)))
 
     return cpc_subsections, cpc_groups, cpc_subgroups
-
-
-def write_csv(rows, outputdir, filename):
-    """ Write a list of lists to a csv file """
-    writer = csv.writer(open(os.path.join(outputdir, filename), 'wb'))
-    writer.writerows(rows)
 
 
 def parse_cpc_subsections(soup):
