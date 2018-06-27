@@ -1,6 +1,7 @@
 import sys
-from uspc_table import parse_and_write_uspc, download, parse_uspc_patents
-
+import os
+from uspc_table import parse_and_write_uspc, parse_uspc_patents
+from parser_utils import download
 
 if __name__ == '__main__':
 
@@ -13,15 +14,21 @@ if __name__ == '__main__':
     outputdir = sys.argv[2]
 
     print("Parsing and writing USPC Classification tables... \n")
-    print("INPUT DIRECTORY: {} \n".format(inputdir))
-    print("OUTPUT DIRECTORY: {} \n".format(outputdir))
+    print("INPUT DIRECTORY: {}".format(inputdir))
+    print("OUTPUT DIRECTORY: {}".format(outputdir))
 
+    # Download USPC Patent Classifications
+    uspc_patents_url = 'https://bulkdata.uspto.gov/data/patent' \
+                       '/classification/mcfpat.zip'
+    uspc_patents_filepath = os.path.join(outputdir, 'uspc_patents.zip')
+    download(uspc_patents_url, uspc_patents_filepath)
 
-    # Download and extract tables
-    # uspc_patents_url = 'https://bulkdata.uspto.gov/data/patent/classification/mcfpat.zip'
-    # uspc_applications_url = 'https://bulkdata.uspto.gov/data/patent/classification/mcfappl.zip'
-    # download(uspc_patents_url, inputdir, 'uspc_patents.zip')
-    # download(uspc_applications_url, inputdir, 'uspc_applications.zip')
+    # Download USPC Application Classifications
+    uspc_applications_url = 'https://bulkdata.uspto.gov/data/patent' \
+                            '/classification/mcfappl.zip'
+    uspc_applications_filepath = os.path.join(outputdir,
+                                              'uspc_applications.zip')
+    download(uspc_applications_url, uspc_applications_filepath)
 
-    # parse_and_write_uspc(inputdir, outputdir)
-    uspc_patents = parse_uspc_patents(inputdir, 'uspc_patents.zip')
+    # Parse USPC Classifications and write to CSV
+    parse_and_write_uspc(inputdir, outputdir)

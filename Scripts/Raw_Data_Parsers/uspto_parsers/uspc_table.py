@@ -1,40 +1,19 @@
 import re
 import os
-import csv
-import requests
 from zipfile import ZipFile
-from cpc_class_tables import write_csv
-from clint.textui import progress
+from parser_utils import write_csv
 
 
 def parse_and_write_uspc(inputdir, outputdir):
     """ Parse and write USPC info to CSV tables """
-
-    # Parse USPC information from text files
     uspc_applications = parse_uspc_applications(inputdir,
                                                 'uspc_applications.zip')
-    print(uspc_applications[:10])
     write_csv(uspc_applications, outputdir,
               'USPC_application_classes_data.csv')
 
-    # print(uspc_patents[:10])
     uspc_patents = parse_uspc_patents(inputdir, 'uspc_patents.zip')
     write_csv(uspc_patents, outputdir,
               'USPC_patent_classes_data.csv')
-
-
-def download(url, outputdir, filename):
-    """ Download data from a URL with a handy progress bar """
-
-    r = requests.get(url, stream=True)
-    with open(os.path.join(outputdir, filename), 'wb') as f:
-
-        content_length = int(r.headers.get('content-length'))
-        for chunk in progress.bar(r.iter_content(chunk_size=1024),
-                                  expected_size=(content_length/1024) + 1):
-            if chunk:
-                f.write(chunk)
-                f.flush()
 
 
 def parse_uspc_applications(inputdir, zip_filename):
@@ -58,6 +37,9 @@ def parse_uspc_applications(inputdir, zip_filename):
         2018/20180027683,   211,            26,         2
         2018/20180027683,   312,            223.2,      3
     """
+    global found_patents
+    found_patents = {}
+
     zip = ZipFile(os.path.join(inputdir, zip_filename), 'r')
 
     # The zip file should contain a single text file like 'mcfappl[\d]+.zip'
@@ -75,7 +57,8 @@ def parse_uspc_applications(inputdir, zip_filename):
 
     return rows
 
-def parse_uspc_application(app):
+
+def parse_uspc_application(row):
     """
     Parse USPC Application information from a USPTO MCF Application entry
 
@@ -86,53 +69,43 @@ def parse_uspc_application(app):
         2001/20010000001,520,1,0
     """
     # Patent Number
-    patent_number = app[2:6] + '/' + app[2:13]
+    patent_number = row[2:6] + '/' + row[2:13]
 
     # Main Class
-    main_class = re.sub('^0+', '', app[15:18])
+    main_class = re.sub('^0+', '', row[15:18])
 
     # Subclass
-    # TODO: Implement the custom subclass parser
-    subclass = parse_subclass(app[10:-2])
-    # subclass = app[18:24]
+    subclass = parse_subclass(row[18:-2])
 
     # Classification Type
-    # TODO: Check the implementation of classification type, and what this
-    # really represents. 0 is a placeholder for now.
-    class_type = '0'
-
-    return [patent_number, main_class, subclass, class_type]
+    order = parse_order(class_type_char=row[-2],
+                        patent_number=patent_number, primary_type_char='P')
+    return [patent_number, main_class, subclass, order]
 
 
 def parse_subclass(subclass):
     """ Parse subclass informatinon from the relevant subclass string """
     left = subclass[:3]
     right = subclass[3:]
-    path = -1
 
+    # TODO: Reorganize logic to be more readable
     if right == '000':
         subclass = left.lstrip('0')
-        path = 0
     else:
         if right.isdigit():
             if left.isalpha():
                 subclass = left.lstrip('0') + right.lstrip('0')
-                path = 1
             else:
                 if left[0].isalpha():
                     subclass = left.replace('0', '') + '.' + right
-                    path = 2
                 else:
                     subclass = left.lstrip('0') + '.' + right.replace('0', '')
-                    path = 3
         else:
             if len(right.replace('0', '')) > 1:
                 subclass = left.lstrip('0') + '.' + right.replace('0', '')
-                path = 5
             else:
                 subclass = left.lstrip('0') + right.replace('0', '')
-                path = 4
-    print("Path: {}".format(path))
+
     return subclass
 
 
@@ -158,6 +131,10 @@ def parse_uspc_patents(inputdir, zip_filename):
         2018/20180027683,   211,            26,         2
         2018/20180027683,   312,            223.2,      3
     """
+    global found_patents
+    found_patents = {}
+    rows = []
+
     zip = ZipFile(os.path.join(inputdir, zip_filename), 'r')
 
     # The zip file should contain a single text file like 'mcfappl[\d]+.zip'
@@ -166,22 +143,8 @@ def parse_uspc_patents(inputdir, zip_filename):
     assert(number_of_files_in_zip == 1 and
            re.search('mcfpat[\d]+\.txt$', name_of_first_file_in_zip))
 
-    rows = []
     with zip.open(name_of_first_file_in_zip) as f:
         for classification in f:
-            # TODO: Check with the team that this is correct
-
-            # Ensure the new parser returns the same results
-            old = parse_uspc_patent_old(classification)
-            new = parse_uspc_patent(classification)
-            if old != new:
-                print('Original: {}'.format(classification))
-                print('Original subgroup: {}'.format(classification[10:-2]))
-                print("Old: {}".format(old))
-                print("New: {}".format(new))
-
-            assert(old[:3] == new[:3])
-
             row = parse_uspc_patent(classification)
             rows.append(row)
 
@@ -206,50 +169,40 @@ def parse_uspc_patent(row):
     main_class = re.sub('^0+', '', row[7:10])
 
     # Subclass
-    # TODO: change to [10:16]
     subclass = parse_subclass(row[10:-2])
 
-
     # Classification Type
-    # TODO: Check the implementation of classification type, and what this
-    # really represents. 0 is a placeholder for now.
-    class_type = '0'
+    order = parse_order(class_type_char=row[-2],
+                        patent_number=patent_number, primary_type_char='O')
 
-    return [patent_number, main_class, subclass, class_type]
+    return [patent_number, main_class, subclass, order]
 
 
-def parse_uspc_patent_old(i):
+def parse_order(class_type_char, patent_number, primary_type_char):
+    """ Parse classification order from row, using the global counter
+    of found patents to increment order each time a patent is seen again. For
+    example, a Primary and three Secondary USPC Classifications will have
+    orders 0, 1, 2, and 3 respectively. (The Primary will always have order 0,
+    and the Secondary will have orders incremented by the order of appearance)
+
+    class_type_char: the USPC classification character
+                        that indicates primary or secondary
+
+    patent_number: 7 digit patent number parsed from the USPC classification
+
+    primary_type_char: The character that represents primary
+                        (typically 'O' for patents or 'P' for applications)
     """
-    Old method of parsing USPC Patent info
-    """
-    pats = {}
-    patentnum = i[:7]
-    mainclass = re.sub('^0+','',i[7:10])
-    subclass = i[10:-2]
-    if subclass[3:] != '000':
-        try:
-            temp = int(subclass[3:])
-            if re.search('[A-Z]{3}',subclass[:3]) is None:
-                if re.search('^[A-Z]',subclass[:3]):
-                    subclass = re.sub('0+','',subclass[:3])+'.'+subclass[3:]
-                else:
-                    subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
-            else:
-                subclass = re.sub('^0+','',subclass[:3])+re.sub('^0+','',subclass[3:])
-        except:
-            if len(re.sub('0+','',subclass[3:])) > 1:
-                subclass = re.sub('^0+','',subclass[:3])+'.'+re.sub('0+','',subclass[3:])
-            else:
-                subclass = re.sub('^0+','',subclass[:3])+re.sub('0+','',subclass[3:])
+
+    if class_type_char == primary_type_char:
+        # Primary Patents -> class_type = 0
+        class_type = str(0)
     else:
-        subclass = re.sub('^0+','',subclass[:3])
-    if i[-2] == 'O':
-        return [patentnum,mainclass,subclass,'0']
-    else:
-        try:
-            gg = pats[patentnum]
-            return [str(patentnum),mainclass,subclass,str(gg)]
-            pats[patentnum]+=1
-        except:
-            pats[patentnum] = 2
-            return [str(patentnum),mainclass,subclass,'1']
+        # Secondary Patents -> class_type = 1, 2, 3, ... (incrementing)
+        if patent_number in found_patents:
+            found_patents[patent_number] += 1
+        else:
+            found_patents[patent_number] = 1
+        class_type = str(found_patents[patent_number])
+
+    return class_type
