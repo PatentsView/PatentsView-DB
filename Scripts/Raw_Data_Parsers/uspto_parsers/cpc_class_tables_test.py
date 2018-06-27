@@ -13,7 +13,7 @@ if __name__ == '__main__':
     outputdir = sys.argv[2]
 
     print("Parsing and writing CPC Classification tables... \n")
-    print("INPUT DIRECTORY: {} \n".format(inputdir))
-    print("OUTPUT DIRECTORY: {} \n".format(outputdir))
+    print("INPUT DIRECTORY: {}".format(inputdir))
+    print("OUTPUT DIRECTORY: {}".format(outputdir))
 
     parse_and_write_cpc(inputdir, outputdir)
