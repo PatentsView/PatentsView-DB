@@ -51,7 +51,8 @@ csv_to_mysql.upload_cpc(config.host,config.username,config.password, None, confi
 #Step 5: Run USPC to retrospectively update classifications
 print "On to USPC"
 uspc_to_upload = config.folder + "/uspc_output"
-uspc_table.uspc_table(config.folder)
+os.mkdir(uspc_to_upload)
+uspc_table.parse_and_write_uspc(config.folder, uspc_to_upload)
 csv_to_mysql.upload_uspc(config.host,config.username,config.password,None, config.merged_database,uspc_to_upload)
 
 
@@ -70,7 +71,3 @@ print "done"
 clean_inventor = config.folder + "/for_inventor_disamb"
 os.mkdir(clean_inventor)
 get_csvs_invt_disam.get_tables(config.host, config.username, config.password, config.merged_database, clean_inventor)
-
-
-
-
