@@ -5,9 +5,9 @@ from bs4 import BeautifulSoup as bs
 from parser_utils import write_csv
 
 
-def parse_and_write_cpc(inputdir, outputdir):
+def parse_and_write_cpc_class(inputdir, outputdir):
     """
-    Parse CPC information and write it to files. This is the function
+    Parse CPC Class information and write it to files. This is the function
     that drives parsing and writing of CPC Classification information.
     """
 

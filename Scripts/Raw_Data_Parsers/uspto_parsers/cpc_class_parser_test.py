@@ -1,6 +1,6 @@
 import sys
 
-from cpc_class_tables import parse_and_write_cpc
+from cpc_class_tables import parse_and_write_cpc_class
 
 if __name__ == '__main__':
 
@@ -16,4 +16,4 @@ if __name__ == '__main__':
     print("INPUT DIRECTORY: {}".format(inputdir))
     print("OUTPUT DIRECTORY: {}".format(outputdir))
 
-    parse_and_write_cpc(inputdir, outputdir)
+    parse_and_write_cpc_class(inputdir, outputdir)
