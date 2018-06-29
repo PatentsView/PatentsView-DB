@@ -6,7 +6,7 @@ from shutil import copyfile
 from warnings import filterwarnings
 sys.path.append("Code/PatentsView-DB/Scripts/Raw_Data_Parsers")
 
-from uspto_parsers import generic_parser_2005, csv_to_mysql,uspc_table,merge_db_script,cpc_table,cpc_class_tables
+from uspto_parsers import generic_parser_2005, csv_to_mysql
 sys.path.append("To_clone")
 from ConfigFiles import config_second as config
 sys.path.append("Code/PatentsView-DB/Scripts")
@@ -30,7 +30,7 @@ def connect_to_db():
     passwd=config.password)
     #eventually put password in a seperate restricted file as DDJ
     return mydb
-       
+
 #Step 1: Parse the raw files
 print "Parsing the raw files!"
 os.mkdir(config.folder)
@@ -94,9 +94,3 @@ write_config("To_Clone/config.txt")
 #this takes forever
 print "Coping the old database to the new database"
 copy_db.copy(connect_to_db(), config.old_database, config.merged_database)
-
-
-
-
-
-
