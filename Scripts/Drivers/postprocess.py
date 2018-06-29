@@ -38,7 +38,7 @@ truncate_tables.clean(config.host,config.username,config.password,config.merged_
 
 
 #Step 4: CPC Schema and Classifications upload
-print "Doing CPC Schema -- again very slow"
+print "Doing CPC Schema"
 downloader.download_cpc_schema(config.folder)
 downloader.download_cpc_grant_and_pgpub_classifications(config.folder)
 cpc_parser.parse_and_write_cpc(config.folder, config.folder)
