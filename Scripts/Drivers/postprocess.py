@@ -8,7 +8,7 @@ from fuzzywuzzy import process
 from shutil import copyfile
 from warnings import filterwarnings
 sys.path.append("Code/PatentsView-DB/Scripts/Raw_Data_Parsers")
-from uspto_parsers import generic_parser_2005, csv_to_mysql, uspc_table, merge_db_script, cpc_table, cpc_class_parser, downloader
+from uspto_parsers import generic_parser_2005, csv_to_mysql, uspc_table, merge_db_script, cpc_parser, cpc_class_parser, downloader
 sys.path.append("To_clone")
 from ConfigFiles import config_second as config
 sys.path.append("Code/PatentsView-DB/Scripts/Transform_script")
@@ -41,7 +41,7 @@ truncate_tables.clean(config.host,config.username,config.password,config.merged_
 print "Doing CPC Schema -- again very slow"
 downloader.download_cpc_schema(config.folder)
 downloader.download_cpc_grant_and_pgpub_classifications(config.folder)
-cpc_table.cpc_table(config.folder)
+cpc_parser.parse_and_write_cpc(config.folder, config.folder)
 cpc_class_parser.parse_and_write_cpc_class(config.folder, config.folder)
 csv_to_mysql.upload_cpc(config.host,config.username,config.password, None, config.merged_database, cpc_input)
 
