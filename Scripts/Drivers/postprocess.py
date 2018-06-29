@@ -8,13 +8,12 @@ from fuzzywuzzy import process
 from shutil import copyfile
 from warnings import filterwarnings
 sys.path.append("Code/PatentsView-DB/Scripts/Raw_Data_Parsers")
-from uspto_parsers import generic_parser_2005, csv_to_mysql,uspc_table,merge_db_script,cpc_table,cpc_class_tables
+from uspto_parsers import generic_parser_2005, csv_to_mysql, uspc_table, merge_db_script, cpc_parser, cpc_class_parser, downloader
 sys.path.append("To_clone")
 from ConfigFiles import config_second as config
 sys.path.append("Code/PatentsView-DB/Scripts/Transform_script")
 from script import transform_db, wipo_categories, truncate_tables, get_csvs_invt_disam
 sys.path.append("Code/PatentsView-DB/Scripts")
-from CPC_Downloads import downloads
 from Government_Interest import identify_missed_orgs, merging_cleansed_organization, load_gi
 from Inventor_Post import inventor_postprocess
 sys.path.append("Code/PatentsView-DB")
@@ -34,31 +33,30 @@ identify_missed_orgs.get_orgs(config.host,config.username,config.password,config
 merge_db_script.merge_db_pats(config.host,config.username,config.password,config.database, config.merged_database)
 
 #Step 3: Truncate Tables
-replace this with a filter on the copy tables part
+# replace this with a filter on the copy tables part
 truncate_tables.clean(config.host,config.username,config.password,config.merged_database)
 
 
 #Step 4: CPC Schema and Classifications upload
-print "Doing CPC Schema -- again very slow"
-downloads.download_schema(config.folder)
-downloads.download_input(config.folder)
-cpc_input = config.folder + "/CPC_input"
-cpc_schema = config.folder + "/CPC_Schema"
-cpc_table.cpc_table(cpc_input)
-cpc_class_tables.cpc_class_tables(cpc_input,cpc_schema)
+print "Doing CPC Schema"
+downloader.download_cpc_schema(config.folder)
+downloader.download_cpc_grant_and_pgpub_classifications(config.folder)
+cpc_parser.parse_and_write_cpc(config.folder, config.folder)
+cpc_class_parser.parse_and_write_cpc_class(config.folder, config.folder)
 csv_to_mysql.upload_cpc(config.host,config.username,config.password, None, config.merged_database, cpc_input)
 
 #Step 5: Run USPC to retrospectively update classifications
 print "On to USPC"
 uspc_to_upload = config.folder + "/uspc_output"
-uspc_table.uspc_table(config.folder)
+os.mkdir(uspc_to_upload)
+uspc_table.parse_and_write_uspc(config.folder, uspc_to_upload)
 csv_to_mysql.upload_uspc(config.host,config.username,config.password,None, config.merged_database,uspc_to_upload)
 
 
 #Step 6: WIPO Classifications
 print "Now WIPO"
 print "Doing downloads"
-downloads.download_ipc(config.folder)
+downloader.download_ipc(config.folder)
 print "On Lookups"
 wipo_categories.wipo_lookups(config.folder, config.persistent_files, config.host, config.username, config.password, config.merged_database)
 print "Uploading"
@@ -70,7 +68,3 @@ print "done"
 clean_inventor = config.folder + "/for_inventor_disamb"
 os.mkdir(clean_inventor)
 get_csvs_invt_disam.get_tables(config.host, config.username, config.password, config.merged_database, clean_inventor)
-
-
-
-
