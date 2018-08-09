@@ -59,10 +59,10 @@ def check_schema(patent_xml):
     main_fields = sorted(list(set(main_fields)))
     
     if not high_level == expected_high_level:
-        print high_level
+        print(high_level)
         raise Exception("The high level fields have changed ...check that it is not the ones we use.")
     if not main_fields == expected_main_fields:
-        print main_fields
+        print(main_fields)
         raise Exception("The main fields in the us-bibliographic-grant-data have changed ...check that it is not the ones we use.")
     if without_us_bibliographic > 200:
         raise Exception("There are more patents missing the us-bibliographic-grant-data field than ussual ")
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         os.mkdir(outfolder)
 
     in_files = ['{0}/{1}'.format(infolder, f) for f in os.listdir(infolder) if os.path.isfile(os.path.join(infolder, f))]
-    out_files = [outfolder + raw_file[-13:-4] +'_clean.xml' for raw_file in in_files]
+    out_files = [outfolder + '_' + raw_file[-13:-4] +'_clean.xml' for raw_file in in_files]
     files = zip(in_files, out_files)
 
     desired_processes = 7 # ussually num cpu - 1
