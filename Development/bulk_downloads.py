@@ -81,7 +81,14 @@ def bulk_download(date):
     date = int(date)
     if date < 20050101:
         raise ValueError('Please input a date that is later than 2005/01/01')
+    
+    #create a folder to save files
+    folder = 'usr/local/airflow/raw_data'
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+    os.chdir(folder)
 
+    #start downloading
     print("Starting downloading data...")
 
     # create a list of page URL's to parse through
@@ -102,9 +109,9 @@ def bulk_download(date):
 
     print("Download Finished")
 
-if __name__== '__main__':
-    folder = '/usr/local/airflow/raw_data'
-    if not os.path.exists(folder):
-        os.mkdir(folder)
-    os.chdir(folder)
-    bulk_download('20180801')
+#if __name__== '__main__':
+#    folder = '/usr/local/airflow/raw_data'
+#    if not os.path.exists(folder):
+#        os.mkdir(folder)
+#    os.chdir(folder)
+#    bulk_download('20180801')
