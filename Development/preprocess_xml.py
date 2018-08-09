@@ -1,7 +1,7 @@
 import os
 import sys
 import re
-sys.path.append("/usr/local/airflow/data_processing_code")
+sys.path.append("/usr/local/airflow/PatentsView-DB/Development")
 from helpers import general_helpers, xml_helpers
 import xml.etree.ElementTree as ET
 from lxml import etree
@@ -70,8 +70,8 @@ def check_schema(patent_xml):
 
 if __name__ == '__main__':
 
-    infolder = '/usr/local/airflow/data_processing_code/raw_data'
-    outfolder = '/usr/local/airflow/data_processing_code/clean_data'
+    infolder = '/usr/local/airflow/raw_data'
+    outfolder = '/usr/local/airflow/clean_data'
     if not os.path.exists(outfolder):
         os.mkdir(outfolder)
 
