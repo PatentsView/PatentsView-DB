@@ -400,27 +400,27 @@ def main_process(data_file, outloc, field_dictionary):
 if __name__ == '__main__':
 
     #TO run Everything:
-    with open('/usr/local/airflow/data_processing_code/persistent_files/field_dict.json') as myfile:
+    with open('/usr/local/airflow/PatentsView-DB/Development/persistent_files/field_dict.json') as myfile:
         field_dictionary = json.load(myfile)
 
     #this is the folder with the xml files that we want to reparse
-    folder  = '/usr/local/airflow/data_processing_code/clean_data'
+    folder  = '/usr/local/airflow/clean_data'
     in_files = ['{0}/{1}'.format(folder, item) for item in os.listdir(folder)]
 
-    out_files= ['/usr/local/airflow/data_processing_code/outfile/{0}'.format(item[-16:-10]) 
+    out_files= ['/usr/local/airflow/outfile/{0}'.format(item[-16:-10]) 
                    for item in in_files]
     fields = [field_dictionary for item in in_files]
     files = zip(in_files, out_files, fields)
 
     
     
-    print "Starting"
+    print("Starting")
     desired_processes = 7 # ussually num cpu - 1
     jobs = []
     for f in files:
         jobs.append(multiprocessing.Process(target = main_process, args=(f)))
     for segment in general_helpers.chunks(jobs, desired_processes):
-        print segment
+        print(segment)
         for job in segment:
             job.start()
         # for job in segment:
