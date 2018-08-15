@@ -1,15 +1,10 @@
  coding: utf-8
-
-# In[1]:
-
 from bs4 import BeautifulSoup
 import urllib
 from urllib.request  import urlretrieve
 import requests
 from zipfile import ZipFile
 import os
-os.chdir('/usr/local/airflow/data_processing_code/raw_data')
-
 
 def get_zip_url_year(page_url):
 
@@ -107,4 +102,9 @@ def bulk_download(date):
 
     print("Download Finished")
 
-#bulk_download('20180801')
+if __name__== '__main__':
+    folder = '/usr/local/airflow/raw_data'
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+    os.chdir(folder)
+    bulk_download('20180801')
