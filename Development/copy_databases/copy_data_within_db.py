@@ -2,33 +2,28 @@ import os
 import MySQLdb
 import configparser
 
+sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
+from helpers import general_helpers
+import configparser
 config = configparser.ConfigParser()
-config.read('config.ini')
-host = config['AWS']['HOST']
-username = config['AWS']['USERNAME']
-password = config['AWS']['PASSWORD']
-new_db = config['AWS']['NEW_DB']
-temporary_upload_db = config['AWS']['TEMPORARY_UPLOAD_DB']
+config.read('Development/config.ini')
+host = config['DATABASE']['HOST']
+username = config['DATABASE']['USERNAME']
+password = config['DATABASE']['PASSWORD']
+new_database = config['DATABASE']['NEW_DB']
+old_database = config['DATABASE']['OLD_DB']
+temporary_upload = config['DATABASE']['TEMP_UPLOAD_DB']
 
-#a function to connect to mysql db
-def connect_to_db():
-    mydb = MySQLdb.connect(host=host,
-    user=username,
-    passwd=password,
-    local_infile = 1) #must have this line
-
-    return mydb
-mydb = connect_to_db()
+mydb = general_helpers.connect_to_db(host, username, password, new_database)
 cursor = mydb.cursor()
 
 #get a list of table names in the database we want to copy in
-command = "select table_name from information_schema.tables where table_type = 'base table' and table_schema ='"+new_db+"'"
+command = "select table_name from information_schema.tables where table_type = 'base table' and table_schema ={}'".format(temporary_upload))
 cursor.execute(command)
-tables_tuple = cursor.fetchall()
-tables = [table[0] for table in tables_tuple]
+tables = [table[0] for table in cursor.fetchall()]]
 
 # query to insert db
 for table in tables:
     print(table)
-    insert_table_command = "INSERT INTO {0}.{1} SELECT * FROM {2}.{1}".format(temporary_upload_db, table, new_db)
+    insert_table_command = "INSERT INTO {0}.{2} SELECT * FROM {1}.{2}".format(new_database, temporary_upload, table))
     cursor.execute(insert_table_command)

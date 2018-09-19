@@ -14,7 +14,8 @@ def chunks(l,n):
 def connect_to_db(host, username, password, database):
     mydb = MySQLdb.connect(host= host,
     user=username,
-    passwd=password, db = database)
+    passwd=password, db = database, 
+     use_unicode=True, charset="utf8")
     return mydb
 
 def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
