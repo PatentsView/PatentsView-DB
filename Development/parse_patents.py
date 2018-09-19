@@ -15,19 +15,15 @@ import configparser
 
 
 def get_results(patents, field_dictionary): 
-    results_dict = {}
+    results = {}
     for field in field_dictionary.keys(): 
-        #makes a list for each table, that will get the data added to it
-        #exec('global {0}'.format(field))
-        #exec('{0}= []'.format(field))
-        results_dict['{}'.format(field)] = []
-    print(results_dict)
+        results['{}'.format(field)] = []
 
     error_log = []
     already_seen_patents = []
     for patent in patents:
         
-        patent_data =  xml_helpers.get_entity(patent, 'publication-reference', attribute=None)[0]
+        patent_data =  xml_helpers.get_entity(patent, 'publication-reference')[0]
 
         patent_id = xml_helpers.process_patent_numbers(patent_data['document-id-doc-number'])
         #there are a small number (~150 per file) patents that have a second patent document
@@ -51,7 +47,7 @@ def get_results(patents, field_dictionary):
             error_log.append([patent_id, 'num_claims'])
         filename = 'ipg{0}{1}{2}.xml'.format(patent_date[2:4], patent_date[5:7], patent_date[8:])
         
-        app_data = xml_helpers.get_entity(patent, 'application-reference', attribute=['appl-type'])[0]
+        app_data = xml_helpers.get_entity(patent, 'application-reference', attribute_list=['appl-type'])[0]
         if app_data is not None:
             date = app_data['document-id-date']
             if not date:
@@ -61,17 +57,17 @@ def get_results(patents, field_dictionary):
             if app_type == 'SIR': #replace this will the full name
                 app_type = 'statutory invention registration'
             applicationid = date[:4]+"/"+app_data['document-id-doc-number']
-            results_dict['application'].append([applicationid, patent_id, patent.find('.//us-application-series-code').text,app_data['document-id-doc-number'], app_data['document-id-country'], date])
+            results['application'].append([applicationid, patent_id, patent.find('.//us-application-series-code').text,app_data['document-id-doc-number'], app_data['document-id-country'], date])
         else:
             error_log.append([patent_id, 'application'])
             app_type = None
         #assigned after application to extract application data
-        results_dict['patent'].append([patent_id,app_type , patent_id, patent_data['document-id-country'],
+        results['patent'].append([patent_id,app_type , patent_id, patent_data['document-id-country'],
                            patent_date, abstract, title, patent_data['document-id-kind'], num_claims, filename])
 
         exemplary = xml_helpers.get_entity(patent, 'us-exemplary-claim')
         if exemplary[0] is not None:
-            exemplary = [int(item_dict.values()[0]) for item_dict in exemplary if item_dict.values()[0] is not None] #list of exemplary claims as strings
+            exemplary = [int(list(item_dict.values())[0]) for item_dict in exemplary if list(item_dict.values())[0] is not None] #list of exemplary claims as strings
         else:
             error_log.append([patent_id, 'exemplary'])
         claims = xml_helpers.get_claims_data(patent)
@@ -122,7 +118,7 @@ def get_results(patents, field_dictionary):
         rule_47_flag = 0
         if patent.find(".//rule-47-flag") is not None:
             rule_47_flag = 1
-        inventor_data = xml_helpers.get_entity(patent, 'inventor', attribute=['sequence'])
+        inventor_data = xml_helpers.get_entity(patent, 'inventor', attribute_list=['sequence'])
         if inventor_data[0] is not None:
             for inventor in inventor_data:
                 rawlocid = general_helpers.id_generator()
@@ -131,7 +127,7 @@ def get_results(patents, field_dictionary):
                 output.mandatory_fields('inventor', patent_id, error_log, [output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
         else:
             error_log.append([patent_id, 'inventor'])
-        deceased_inventors = xml_helpers.get_entity(patent, 'us-deceased-inventor', attribute=None)
+        deceased_inventors = xml_helpers.get_entity(patent, 'us-deceased-inventor', attribute_list=None)
         
         if deceased_inventors[0] is not None:
             if [patent_id, 'inventor'] in error_log: error_log.remove([patent_id, 'inventor'])
@@ -147,7 +143,7 @@ def get_results(patents, field_dictionary):
                 output.mandatory_fields('inventor', patent_id, error_log, [output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
         
         #applicant has inventor info for some earlier time periods
-        app_inv_data = xml_helpers.get_entity(patent, 'applicant', attribute=['sequence', 'app-type', 'designation'])
+        app_inv_data = xml_helpers.get_entity(patent, 'applicant', attribute_list=['sequence', 'app-type', 'designation'])
         inventor_app_seq = 0
         has_inventor_applicant = False
         if app_inv_data[0] is not None:
@@ -169,7 +165,7 @@ def get_results(patents, field_dictionary):
                     output.mandatory_fields('non_inventor_applicant', patent_id, error_log,[applicant['addressbook-first-name'],
                                          applicant['addressbook-last-name'],applicant['addressbook-orgname']])
         
-        non_inventor_app_data = xml_helpers.get_entity(patent, 'us-applicant', attribute=['sequence', 'app-type', 'designation'])
+        non_inventor_app_data = xml_helpers.get_entity(patent, 'us-applicant', attribute_list=['sequence', 'app-type', 'designation'])
         if non_inventor_app_data[0] is not None:
             for applicant in non_inventor_app_data:
                 rawlocid = general_helpers.id_generator() 
@@ -200,7 +196,7 @@ def get_results(patents, field_dictionary):
                 
         else:
             error_log.append([patent_id, 'assignee'])
-        lawyer_data = xml_helpers.get_entity(patent, 'agent', attribute=['sequence'])
+        lawyer_data = xml_helpers.get_entity(patent, 'agent', attribute_list=['sequence'])
         if lawyer_data[0] is not None: #not all patents have a lawyer, becuase you can self-file
             for lawyer in lawyer_data:
                 results['rawlawyer'].append([general_helpers.id_generator(), None, patent_id, output.get_alt_tags(lawyer, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(lawyer, ['addressbook-lastname', 'addressbook-last-name']),lawyer['addressbook-orgname'],lawyer['addressbook-country'], int(lawyer['sequence'])])
@@ -351,7 +347,7 @@ def get_results(patents, field_dictionary):
             results['botanic'].append([general_helpers.id_generator(), patent_id, botanic_data['us-botanic-latin-name'], botanic_data['us-botanic-variety']])
 
         # Foreign Priority List       
-        foreign_priority = xml_helpers.get_entity(patent, 'priority-claim', attribute = ['kind'])
+        foreign_priority = xml_helpers.get_entity(patent, 'priority-claim', attribute_list_list = ['kind'])
         if foreign_priority[0] is not None:
             for i, priority_claim in enumerate(foreign_priority):
                 results['foreign_priority'].append([general_helpers.id_generator(), patent_id,str(i), priority_claim['kind'],
