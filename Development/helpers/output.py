@@ -22,9 +22,6 @@ def get_alt_tags(data_dict, tags_list):
             results = data_dict[tag]
     return results
 
-def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
-
 def mandatory_fields(field_name, patent_id, error_log, any_cols, all_cols = []):
     if any_cols.count(None) == len(any_cols): #this gets if the list is all None
         error_log.append(patent_id, field_name)

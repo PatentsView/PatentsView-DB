@@ -70,8 +70,8 @@ def check_schema(patent_xml):
 
 if __name__ == '__main__':
 
-    infolder = '/usr/local/airflow/raw_data'
-    outfolder = '/usr/local/airflow/clean_data'
+    infolder = config['FOLDERS']['RAW_DATA']
+    outfolder = config['FOLDERS']['DATA_TO_PARSE']
     if not os.path.exists(outfolder):
         os.mkdir(outfolder)
 
