@@ -1,31 +1,31 @@
 import os
 import MySQLdb
+import sys
+sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
+from helpers import general_helpers
 import configparser
 config = configparser.ConfigParser()
-config.read('config.ini')
-host = config['AWS']['HOST']
-username = config['AWS']['USERNAME']
-password = config['AWS']['PASSWORD']
-new_database = config['AWS']['NEW_DB']
-old_database = config['AWS']['OLD_DB']
+config.read('Development/config.ini')
+host = config['DATABASE']['HOST']
+username = config['DATABASE']['USERNAME']
+password = config['DATABASE']['PASSWORD']
+new_database = config['DATABASE']['NEW_DB']
+old_database = config['DATABASE']['OLD_DB']
 
 # connect db
-def connect_to_db():
-    mydb = MySQLdb.connect(host=host,
-    user=username,
-    passwd=password)
-    return mydb
-
-
-mydb = connect_to_db()
+mydb = general_helpers.connect_to_db(host, username, password, old_database)
 cursor = mydb.cursor()
 # create a new schema
-cursor.execute("create schema " + new_database)
-cursor.execute("show tables from " + old_database)
-# get all tables from old db
-tables = [item[0] for item in cursor.fetchall() if not item[0].startswith("temp")]
+cursor.execute("create schema {}".format(new_database))
+cursor.execute("show tables from {}".format(old_database))
+# get the tables we need from the old database
+#these are the tables that get recreated from scratch each time
+tables_skipped = ['assignee', 'cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_subsection', 'inventor', 
+        'lawyer', 'location_assignee', 'location_inventor', 'patent_assignee','patent_inventor', 
+        'patent_lawyer', 'uspc_current', 'wipo']
+tables = [item[0] for item in cursor.fetchall() if not item[0].startswith("temp") and not item[0] in tables_skipped]
 # copy everything over to new db
 for table in tables:
-    cursor.execute("create table " + new_database + "." + table + " like " + old_database + "." + table)
-    cursor.execute("insert into " + new_database + "." + table +" select * from " + old_database + "." + table)
+    cursor.execute("create table {0}.{2} like {1}.{2}".format(new_database, old_database, table))
+    cursor.execute("insert into {}.{} select * from {}.{}".format(new_database, old_database, table))
     mydb.commit()
