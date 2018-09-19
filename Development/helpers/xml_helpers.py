@@ -277,11 +277,11 @@ def process_patent_numbers(raw_patent_num):
 	:return cleaned patent id.
 	'''
 	num = re.findall('\d+', raw_patent_num)[0] #get the just numbers in string form
-	let = []
 	if num[0].startswith("0"):
 		num = num[1:]
-		let = re.findall('[a-zA-Z]+', raw_patent_num) #get the letter prefixes
-	if let !=[]:
+	#Sept 5, 2016 - must triple check that moving the let definition out side of the if statement above does not mess up the patent numbers
+	let = re.findall('[a-zA-Z]+', raw_patent_num) #get the letter prefixes
+	if let:
 		let = let[0]#list to string
 		clean_patent_num = let + num
 	else:
