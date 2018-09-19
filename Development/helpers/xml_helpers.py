@@ -236,7 +236,7 @@ def get_text(element):
 				entries.extend(get_text_and_tail(sub_element))
 				for sub_sub_element in sub_element:
 					entries.extend(get_text_and_tail(sub_sub_element))           
-		return filter(lambda x: x is not None and not x == "\n", entries)
+		return list(filter(lambda x: x is not None and not x == "\n", entries))
 	else:
 		return [None]
 
