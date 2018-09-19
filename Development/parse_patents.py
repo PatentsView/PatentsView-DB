@@ -399,21 +399,21 @@ def main_process(data_file, outloc, field_dictionary):
 
 
 if __name__ == '__main__':
-
+    import configparser
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config.read('Development/config.ini')
     #TO run Everything:
     with open('{}/field_dict.json'.format(config['FOLDERS']['PERSISTENT_FILES'])) as myfile:
         field_dictionary = json.load(myfile)
 
     #this is the folder with the xml files that we want to reparse
-    in_files = ['{0}/{1}'.format(folder, item) for item in os.listdir(config['FOLDERS']['DATA_TO_PARSE'])]
+    in_files = ['{0}/{1}'.format(config['FOLDERS']['DATA_TO_PARSE'], item) for item in os.listdir(config['FOLDERS']['DATA_TO_PARSE'])]
     if not os.path.exists(config['FOLDERS']['PARSED_DATA']):
         os.mkdir(config['FOLDERS']['PARSED_DATA'])
     out_files= ['{0}/{1}'.format(config['FOLDERS']['PARSED_DATA'], item[-16:-10]) 
                    for item in in_files]
-    #fields = [field_dictionary for item in in_files]
-    files = zip(in_files, out_files, [field_dictionary])
+    fields = [field_dictionary for item in in_files]
+    files = zip(in_files, out_files, fields)
 
     
     
