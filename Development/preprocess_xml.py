@@ -70,13 +70,17 @@ def check_schema(patent_xml):
 
 if __name__ == '__main__':
 
+    import configparser
+    config = configparser.ConfigParser()
+    config.read('Development/config.ini')
     infolder = config['FOLDERS']['RAW_DATA']
     outfolder = config['FOLDERS']['DATA_TO_PARSE']
     if not os.path.exists(outfolder):
         os.mkdir(outfolder)
 
     in_files = ['{0}/{1}'.format(infolder, f) for f in os.listdir(infolder) if os.path.isfile(os.path.join(infolder, f))]
-    out_files = [outfolder + '_' + raw_file[-13:-4] +'_clean.xml' for raw_file in in_files]
+    out_files = ['{}/{}_clean.xml'.format(outfolder, raw_file[-13:-4]) for raw_file in in_files]
+    #out_files = [outfolder + '/' + raw_file[-13:-4] +'_clean.xml' for raw_file in in_files]
     files = zip(in_files, out_files)
 
     desired_processes = 7 # ussually num cpu - 1
