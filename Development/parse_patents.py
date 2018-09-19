@@ -408,7 +408,8 @@ if __name__ == '__main__':
 
     #this is the folder with the xml files that we want to reparse
     in_files = ['{0}/{1}'.format(folder, item) for item in os.listdir(config['FOLDERS']['DATA_TO_PARSE'])]
-
+    if not os.path.exists(config['FOLDERS']['PARSED_DATA']):
+        os.mkdir(config['FOLDERS']['PARSED_DATA'])
     out_files= ['{0}/{1}'.format(config['FOLDERS']['PARSED_DATA'], item[-16:-10]) 
                    for item in in_files]
     #fields = [field_dictionary for item in in_files]
