@@ -83,7 +83,7 @@ def bulk_download(date):
         raise ValueError('Please input a date that is later than 2005/01/01')
     
     #create a folder to save files
-    folder = 'usr/local/airflow/raw_data'
+    folder = '/usr/local/airflow/raw_data'
     if not os.path.exists(folder):
         os.mkdir(folder)
     os.chdir(folder)
@@ -109,9 +109,5 @@ def bulk_download(date):
 
     print("Download Finished")
 
-#if __name__== '__main__':
-#    folder = '/usr/local/airflow/raw_data'
-#    if not os.path.exists(folder):
-#        os.mkdir(folder)
-#    os.chdir(folder)
-#    bulk_download('20180801')
+if __name__== '__main__':
+    bulk_download('20180901')
