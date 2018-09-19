@@ -12,7 +12,7 @@ import string
 import random
 import multiprocessing
 import configparser
-
+import copy
 
 def get_results(patents, field_dictionary): 
     results = {}
@@ -103,7 +103,7 @@ def get_results(patents, field_dictionary):
                 
             government_interest_data = text_data['Government Interest']
             if government_interest_data !=[]:
-                resulst['government_interest'].append([patent_id, government_interest_data])
+                results['government_interest'].append([patent_id, government_interest_data])
             text_fields = ['Detailed Description', 'Brief Summary', 'Brief Description of Drawings',
                            'Other Patent Relations','Government Interest']
             if not set(text_data.keys()).issubset(text_fields):
@@ -178,8 +178,9 @@ def get_results(patents, field_dictionary):
         
         assignee_data = xml_helpers.get_entity(patent, 'assignee')
         if assignee_data[0] is not None:
-            for i, assignee in enumerate(assignee_data):
-                for key in assignee.keys():
+            for i, assignee_dict in enumerate(assignee_data):
+                assignee = copy.deepcopy(assignee_dict) #make a copy in order to not modify in place
+                for key in assignee_dict.keys():
                     if key.startswith('assignee'):
                         assignee[key.replace('assignee', 'addressbook')] = assignee[key]
                 rawlocid = general_helpers.id_generator()
@@ -347,7 +348,7 @@ def get_results(patents, field_dictionary):
             results['botanic'].append([general_helpers.id_generator(), patent_id, botanic_data['us-botanic-latin-name'], botanic_data['us-botanic-variety']])
 
         # Foreign Priority List       
-        foreign_priority = xml_helpers.get_entity(patent, 'priority-claim', attribute_list_list = ['kind'])
+        foreign_priority = xml_helpers.get_entity(patent, 'priority-claim', attribute_list = ['kind'])
         if foreign_priority[0] is not None:
             for i, priority_claim in enumerate(foreign_priority):
                 results['foreign_priority'].append([general_helpers.id_generator(), patent_id,str(i), priority_claim['kind'],
