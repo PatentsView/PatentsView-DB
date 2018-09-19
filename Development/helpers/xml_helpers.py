@@ -247,9 +247,9 @@ def get_text_and_tail(element):
 	:params element: xml element, or sub element, that has both text and a tail (the extra text that appears after a tag)
 	'''
 	results_list = []
-	if not etree.tostring(element).startswith("<?"):
+	if not etree.tostring(element, encoding = 'unicode').startswith("<?"):
 		results_list.extend([element.text, element.tail])
-	if etree.tostring(element).startswith("<?"):
+	if etree.tostring(element, encoding = 'unicode').startswith("<?"):
 		results_list.extend([element.tail])
 	return results_list
 def recursive_list(field):
