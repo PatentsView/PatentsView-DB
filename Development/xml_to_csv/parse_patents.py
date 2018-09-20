@@ -35,7 +35,7 @@ def get_results(patents, field_dictionary):
         patent_date = patent_data['document-id-date']
         abstract = xml_helpers.get_text(patent.find(".//abstract"))
         if abstract[0] is not None:
-            abstract = "".join(abstract)
+            abstract = "".join(abstract).replace("\t", " ").replace('\n', ' ').replace('\r\n',' ')
         else:
             abstract = None
 
