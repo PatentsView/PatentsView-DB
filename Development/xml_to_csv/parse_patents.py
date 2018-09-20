@@ -252,7 +252,7 @@ def get_results(patents, field_dictionary):
                         cited_doc_num = xml_helpers.process_patent_numbers(cited_doc_num)
                         results['uspatentcitation'].append([general_helpers.id_generator(), patent_id, cited_doc_num, citation['date'], citation['name'],
                                                    citation['kind'], citation['country'],
-                                                  citation['category'],str(uspatseq), citation['main-classification']])
+                                                  citation['category'],str(uspatseq)])
                         uspatseq+=1
                     if cited_doc_num  and is_app:
                         cit_app_id_transformed = cited_doc_num[:5] + cited_doc_num[:4] + cited_doc_num[5:]
