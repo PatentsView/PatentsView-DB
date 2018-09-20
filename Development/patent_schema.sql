@@ -464,9 +464,9 @@ CREATE TABLE `rawlocation` (
   KEY `location_id` (`location_id`),
   KEY `loc_idx1` (`city`,`state`,`country`),
   KEY `ix_rawlocation_state` (`state`),
-  KEY `ix_rawlocation_country` (`country`)
+  KEY `ix_rawlocation_country` (`country`),
   KEY `rawlocation_location_id_transformed` (`location_id_transformed`),
-  add KEY `ix_rawlocation_country_transformed_state` (`country_transformed`,`state`)
+  KEY `ix_rawlocation_country_transformed_state` (`country_transformed`,`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `subclass`;
