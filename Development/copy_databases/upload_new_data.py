@@ -18,8 +18,8 @@ data_to_upload = config['FOLDERS']['PARSED_DATA']
 mydb = general_helpers.connect_to_db(host, username, password, new_database)
 cursor = mydb.cursor()
 
-#cursor.execute('create schema {}'.format(temporary_upload))
-#cursor.execute('use {}'.format(temporary_upload))
+cursor.execute('create schema {}'.format(temporary_upload))
+cursor.execute('use {}'.format(temporary_upload))
 
 #should I just copy this directly from the schema of the other tables or do this?
 with open('{}/Development/patent_schema.sql'.format(os.getcwd()), 'r') as f:
@@ -31,7 +31,6 @@ mydb.commit()
 for folder in data_to_upload:
     fields = [item for item in os.listdir(folder) if not item in ['error_counts.csv', 'error_data.csv']]
     for f in fields:
-        print(f)
         cursor.execute("load data local infile '{0}/{1}' ignore into table {2} CHARACTER SET utf8 fields terminated by '\t' lines terminated by '\n' ignore 1 lines".format(folder, f, f.replace(".csv", "")))
         mydb.commit()
 

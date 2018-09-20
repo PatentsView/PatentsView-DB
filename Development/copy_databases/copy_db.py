@@ -26,6 +26,7 @@ tables_skipped = ['assignee', 'cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_s
 tables = [item[0] for item in cursor.fetchall() if not item[0].startswith("temp") and not item[0] in tables_skipped]
 # copy everything over to new db
 for table in tables:
+    print(table)
     cursor.execute("create table {0}.{2} like {1}.{2}".format(new_database, old_database, table))
-    cursor.execute("insert into {}.{} select * from {}.{}".format(new_database, old_database, table))
+    #cursor.execute("insert into {0}.{2} select * from {1}.{2}".format(new_database, old_database, table))
     mydb.commit()

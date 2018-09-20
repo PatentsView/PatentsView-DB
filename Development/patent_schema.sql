@@ -326,6 +326,7 @@ CREATE TABLE `patent` (
   `kind` varchar(10) DEFAULT NULL,
   `num_claims` int(11) DEFAULT NULL,
   `filename` varchar(120) DEFAULT NULL,
+  `withdrawn` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `pat_idx1` (`type`,`number`),
   KEY `pat_idx2` (`date`)
