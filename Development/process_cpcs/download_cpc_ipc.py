@@ -3,8 +3,9 @@ import zipfile
 import os
 from lxml import html
 import lxml.html
-from parser_utils import download
-
+import sys
+sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
+from helpers import general_helpers
 
 def download_cpc_schema(destination_folder):
     """ Download and extract the most recent CPC Schema """
@@ -13,10 +14,10 @@ def download_cpc_schema(destination_folder):
     cpc_schema_url = find_cpc_schema_url()
     cpc_schema_zip_filepath = os.path.join(destination_folder,
                                            "CPC_Schema.zip")
-
+    print(cpc_schema_url)
     # Download the CPC Schema zip file
     print("Destination: {}".format(cpc_schema_zip_filepath))
-    download(url=cpc_schema_url, filepath=cpc_schema_zip_filepath)
+    general_helpers.download(url=cpc_schema_url, filepath=cpc_schema_zip_filepath)
 
     # Unzip the zip file
     print("Extracting contents to: {}".format(destination_folder))
@@ -39,14 +40,13 @@ def find_cpc_schema_url():
     most recent schema is returned.
     """
     base_url = 'http://www.cooperativepatentclassification.org'
-    page = urllib.urlopen(base_url + '/cpcSchemeAndDefinitions/Bulk.html')
+    page = urllib.request.urlopen(base_url + '/cpcSchemeAndDefinitions/Bulk.html')
     tree = html.fromstring(page.read())
-
     potential_links = []
     for link in tree.xpath('//a/@href'):
         if (link.startswith("/cpc/interleaved/CPCSchemeXML")
                 and link.endswith(".zip")):
-            potential_links.append(link)
+            potential_links.append(link.replace('..',''))
 
     # Since zip files are formatted CPCSchemeXMLYYYYMM.zip,
     # the last sorted url corresponds to the latest version
@@ -70,7 +70,7 @@ def download_cpc_grant_and_pgpub_classifications(destination_folder):
 
         # Download the files
         print("Destination: {}".format(filepath))
-        download(url=url, filepath=filepath)
+        general_helpers.download(url=url, filepath=filepath)
 
         # Rename and unzip zip files
         # Zip files contain a single folder with many subfiles. We just want
@@ -101,7 +101,7 @@ def find_cpc_grant_and_pgpub_urls():
     most recent version is returned.
     """
     base_url = 'https://bulkdata.uspto.gov/data/patent/classification/cpc/'
-    page = urllib.urlopen(base_url)
+    page = urllib.request.urlopen(base_url)
     tree = html.fromstring(page.read())
 
     potential_grant_links = []
@@ -130,17 +130,18 @@ def download_ipc(destination_folder):
 
     # Download the IPC text file
     print("Destination: {}".format(ipc_filepath))
-    download(url=ipc_url, filepath=ipc_filepath)
+    general_helpers.download(url=ipc_url, filepath=ipc_filepath)
 
 
 def find_ipc_url():
     """ Find the url of the CPC to IPC concordance in text format """
     base_url = 'http://www.cooperativepatentclassification.org'
-    page = urllib.urlopen(base_url + '/cpcConcordances')
+    page = urllib.request.urlopen(base_url + '/cpcConcordances')
     tree = html.fromstring(page.read())
 
     potential_links = []
     for link in tree.xpath('//a/@href'):
+        print(link)
         if (link.startswith("/cpcConcordances/CPCtoIPCtxt")
                 and link.endswith(".txt")):
             potential_links.append(link)
@@ -159,7 +160,7 @@ def find_ipc_url():
 ############################################
 
 def find_cpc_schema_url_test():
-    expected_url = 'http://www.cooperativepatentclassification.org/cpc/interleaved/CPCSchemeXML201805.zip'
+    expected_url = 'http://www.cooperativepatentclassification.org/cpc/interleaved/CPCSchemeXML201808.zip'
     assert (find_cpc_schema_url() == expected_url)
 
 
@@ -180,28 +181,29 @@ if __name__ == '__main__':
 
     import sys
     import datetime
-
-    # Find URLs correctly
-    print(find_cpc_schema_url())
-    find_cpc_schema_url_test()
-
-    print(find_cpc_grant_and_pgpub_urls())
-    find_cpc_grant_and_pgpub_urls_test()
-
-    print(find_ipc_url())
-    find_ipc_url_test()
-
     import configparser
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config.read('Development/config.ini')
+    # Find URLs correctly
+    #TODO: update these to reflect most recent dates
+    print(find_cpc_schema_url())
+    #find_cpc_schema_url_test()
 
-    destination_folder = '{}/{}'.format(config['FOLDERS']['WORKING_DIR'], 'cpc_input')
+    print(find_cpc_grant_and_pgpub_urls())
+    #find_cpc_grant_and_pgpub_urls_test()
 
+    print(find_ipc_url())
+    #find_ipc_url_test()
+
+    destination_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+
+    if not os.path.exists(destination_folder):
+        os.makedirs(destination_folder)
     # Download CPC data, and manually inspect output
     print(str(datetime.datetime.now()))
     download_cpc_schema(destination_folder)  # <1 min
     print(str(datetime.datetime.now()))
-    download_cpc_grant_and_pgpub_classifications(destination_folder)  # 40 min
+    download_cpc_grant_and_pgpub_classifications(destination_folder)  # few minutes
     print(str(datetime.datetime.now()))
     download_ipc(destination_folder)  # <1 min
     print(str(datetime.datetime.now()))

@@ -1,5 +1,7 @@
 import csv
 import os
+import sys
+sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 
 def parse_and_write_cpc(inputdir, outputdir):
@@ -30,7 +32,8 @@ def parse_and_write_cpc(inputdir, outputdir):
 def parse_pgpub_file(filepath):
     """ Extract CPC classification from ~35 million applications """
     with open(filepath) as f:
-        input_rows = f.read().split('\r\n')
+        #input_rows = f.read().split('\r\n')
+        input_rows = f.readlines()
         print("Parsing app file: {}; rows: {}".format(filepath, len(input_rows)))
 
     # Since applications are already sorted by app_number, we can check if the
@@ -94,7 +97,8 @@ def strip_whitespace(s):
 def parse_grant_file(filepath):
     """ Extract CPC classification from ~43 million rows """
     with open(filepath) as f:
-        input_rows = f.read().split('\r\n')
+        input_rows = f.readlines()
+        #input_rows = f.read().split('\r\n')
         print("Parsing grant file: {}; rows: {}".format(filepath, len(input_rows)))
 
     # Since patents are already sorted by patent_number, we can check if the
@@ -141,8 +145,8 @@ def parse_grant_file(filepath):
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config.read('Development/config.ini')
 
-    location_of_cpc_files = '{}/{}'.format(config['FOLDERS']['WORKING_DIR'], 'cpc_input')
-    output_directory = '{}/{}'.format(config['FOLDERS']['WORKING_DIR'], 'cpc_output')
+    location_of_cpc_files = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+    output_directory = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
     parse_and_write_cpc(location_of_cpc_files, output_directory)

@@ -2,6 +2,8 @@ import re
 import os
 import csv
 from bs4 import BeautifulSoup as bs
+import sys
+sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 
 
@@ -38,10 +40,9 @@ def parse_cpc(inputdir, outputdir):
     input_filenames = os.listdir(inputdir)
     for filename in input_filenames:
 
-        print("Opening file: {}".format(filename))
+        #print("Opening file: {}".format(filename))
 
         if re.search('-[A-Z].xml$', filename):
-
             # Parse subsections and groups from the ~9 CPC Section files
             input_file = open(os.path.join(inputdir, filename), 'rb').read()
             soup = bs(input_file, 'lxml', from_encoding='utf-8')
@@ -50,15 +51,13 @@ def parse_cpc(inputdir, outputdir):
             cpc_groups += parse_cpc_groups(soup)
 
         elif re.search('-[A-Z]\d+[A-Z].xml$', filename):
-
             # Parse subgroups from the ~600+ CPC Subclass files
             input_file = open(os.path.join(inputdir, filename), 'rb').read()
             soup = bs(input_file, 'lxml', from_encoding='utf-8')
             cpc_subgroups += parse_cpc_subgroups(soup)
 
         else:
-            print("File not parsed: {}".format(filename))
-
+            pass
     # Print status messages
     print("Subsections found: {}".format(len(cpc_subsections)))
     print("Groups found: {}".format(len(cpc_groups)))
@@ -225,8 +224,8 @@ def parse_cpc_subgroups(soup):
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config.read('Development/config.ini')
 
-    location_of_cpc_files = '{}/{}'.format(config['FOLDERS']['WORKING_DIR'], 'cpc_input')
-    output_directory = '{}/{}'.format(config['FOLDERS']['WORKING_DIR'], 'cpc_output')
+    location_of_cpc_files = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+    output_directory = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
     parse_and_write_cpc_class(location_of_cpc_files, output_directory)
