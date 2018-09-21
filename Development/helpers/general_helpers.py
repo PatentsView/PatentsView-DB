@@ -11,18 +11,9 @@ def chunks(l,n):
     for i in range(0, len(l), n):
         chunk_list.append(l[i:i + n])
     return chunk_list
-'''
-def connect_to_db(host, username, password, database):
-    mydb = MySQLdb.connect(host= host,
-    user=username,
-    passwd=password, db = database, 
-     use_unicode=True, charset="utf8")
-    return mydb
-'''
 
 def connect_to_db(host, username, password, database):
     engine = create_engine('mysql+mysqldb://{}:{}@{}/{}?charset=utf8'.format(username, password, host, database ), encoding='utf-8')
-    #engine = create_engine('mysql+mysqldb://{}:{}@{}'.format(config['AWS']['RDS_USERNAME'],config['AWS']['RDS_PASSWORD'], config['AWS']['RDS_HOST'] ))
     return engine
 
 
@@ -32,7 +23,7 @@ def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
 
 def write_csv(rows, outputdir, filename):
     """ Write a list of lists to a csv file """
-    writer = csv.writer(open(os.path.join(outputdir, filename), 'wb'))
+    writer = csv.writer(open(os.path.join(outputdir, filename), 'w',encoding='utf-8'))
     writer.writerows(rows)
 
 def download(url, filepath):

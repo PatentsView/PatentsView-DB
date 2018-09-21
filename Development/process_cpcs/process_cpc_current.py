@@ -67,6 +67,7 @@ def upload_cpc_current(db_con, cpc_current_loc):
     cursor = db_con.cursor()
     cursor.execute("load data local infile '{}' into table cpc_current CHARACTER SET utf8 fields terminated by '\t' lines terminated by '\r\n' ignore 1 lines".format(cpc_current_loc))
     mydb.commit()
+    cursor.execute('update cpc_current set category = "inventional" where category = "primary"')
 
 if __name__ == '__main__':
     import configparser
