@@ -17,7 +17,6 @@ def parse_and_write_cpc_class(inputdir, outputdir):
     cpc_subsections, cpc_groups, cpc_subgroups = parse_cpc(inputdir, outputdir)
 
 
-
     # Write CPC Information
     general_helpers.write_csv(cpc_subsections, outputdir, 'cpc_subsection.csv')
     general_helpers.write_csv(cpc_groups, outputdir, 'cpc_group.csv')
@@ -49,13 +48,11 @@ def parse_cpc(inputdir, outputdir):
 
             cpc_subsections += parse_cpc_subsections(soup)
             cpc_groups += parse_cpc_groups(soup)
-
         elif re.search('-[A-Z]\d+[A-Z].xml$', filename):
             # Parse subgroups from the ~600+ CPC Subclass files
             input_file = open(os.path.join(inputdir, filename), 'rb').read()
             soup = bs(input_file, 'lxml', from_encoding='utf-8')
             cpc_subgroups += parse_cpc_subgroups(soup)
-
         else:
             pass
     # Print status messages
@@ -90,8 +87,7 @@ def parse_cpc_subsections(soup):
         descriptions = parse_descriptions(subsection)
 
         # Append this row of information
-        rows.append([symbol.encode('utf-8', 'ignore'),
-                     descriptions.encode('utf-8', 'ignore')])
+        rows.append([symbol, descriptions])
 
     return rows
 
@@ -134,8 +130,7 @@ def parse_cpc_groups(soup):
         descriptions = parse_descriptions(group)
 
         # Append this row of information
-        rows.append([symbol.encode('utf-8', 'ignore'),
-                     descriptions.encode('utf-8', 'ignore')])
+        rows.append([symbol, descriptions])         
 
     return rows
 
@@ -211,8 +206,7 @@ def parse_cpc_subgroups(soup):
         full_descriptions_list.append(descriptions)
         full_descriptions = '-'.join(full_descriptions_list)
 
-        rows.append([symbol.encode('utf-8', 'ignore'),
-                     full_descriptions.encode('utf-8', 'ignore')])
+        rows.append([symbol,full_descriptions])
 
         # Update the current depth
         current_depth = depth

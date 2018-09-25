@@ -1,8 +1,8 @@
 import sys
 import os
 import MySQLdb
-sys.path.append("D:/DataBaseUpdate/To_clone")
-from ConfigFiles import config
+sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
+from helpers import general_helpers
 from warnings import filterwarnings
 import csv
 import re,os,random,string,codecs
@@ -10,30 +10,26 @@ import multiprocessing
 
 
 
-def get_patent_ids(db_con):
-    cursor = db_con.cursor()
+def get_patent_ids(db_con, new_db):
 
-    cursor.execute('select id, number from '+patdb+'.patent')
+    patent_data = db_con.execute('select id, number from {}.patent'.format(new_db))
     patnums = {}
-    for field in cursor.fetchall():
-        patnums[field[1]] = field[0]
+    for patent in patent_data:
+        patnums[patent['number']] = patent['id']
     return set(patnums.keys()), patnums
 
 
-def write_cpc_current(cpc_input, cpc_output, error_log, patent_dict, patent_set):
+def write_cpc_current(cpc_input, cpc_output, error_log, patent_dict, patent_set,db_con):
+    
     #Create CPC_current table off full master classification list
-    cpc_data= csv.reader(file(cpc_input,'rb'),delimiter = ',')
-    errorlog = open(error_log,'w')
+    cpc_data= csv.reader(open(cpc_input,'r'),delimiter = ',')
+    errorlog = csv.writer(open(error_log, 'w'))
     current_exist = {}
-    cpc_out = csv.writer(file(cpc_output,'wb'),delimiter = '\t')
-    counter = 0
+    cpc_out = csv.writer(open(cpc_output,'w'),delimiter = '\t')
     for row in cpc_data:
-        counter +=1
-        if counter %100000==0:
-            print(counter)
         if str(row[0]) in patent_set:
             towrite = [re.sub('"',"'",item) for item in row[:3]]
-            towrite.insert(0,id_generator())
+            towrite.insert(0,general_helpers.id_generator())
             towrite[1] = patent_dict[row[0]]
             for t in range(len(towrite)):
                 try:
@@ -45,12 +41,12 @@ def write_cpc_current(cpc_input, cpc_output, error_log, patent_dict, patent_set)
             cpcnum = 0
             for p in primaries:
                 try:
-                    needed = [id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'primary',str(cpcnum)]
+                    needed = [general_helpers.id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'primary',str(cpcnum)]
                     clean = [i if not i =="NULL" else "" for i in needed]
                     cpcnum+=1
                     cpc_out.writerow(clean)
                 except: #sometimes a row doesn't have all the information
-                    print(row)
+                    errorlog.writerow(row)
 
             additionals = [t for t in towrite[3].split('; ') if t!= '']
             for p in additionals:
@@ -60,31 +56,35 @@ def write_cpc_current(cpc_input, cpc_output, error_log, patent_dict, patent_set)
                     cpcnum+=1
                     cpc_out.writerow(clean)
                 except:
-                    print(row)
+                    errorloc.writerow(row)
     errorlog.close()
 
+
 def upload_cpc_current(db_con, cpc_current_loc):
-    cursor = db_con.cursor()
-    cursor.execute("load data local infile '{}' into table cpc_current CHARACTER SET utf8 fields terminated by '\t' lines terminated by '\r\n' ignore 1 lines".format(cpc_current_loc))
-    mydb.commit()
-    cursor.execute('update cpc_current set category = "inventional" where category = "primary"')
+    cpc_current_files = [f for file in os.listdir(cpc_current_loc) if f.startswith('out')]
+    for outfile in cpc_current_files:
+    	data = pd.read_csv('{}/{}'.format(cpc_current_loc,outfile),delimiter = '\t', encoding ='utf-8')
+    	data.to_sql(cpc_current, db_con, if_exists = 'append', index=False)
+
 
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config.read('Development/config.ini')
 
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], 
                                             config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
 
-    patent_set, patent_dict = get_patent_ids(db_con)
+    
+    patent_set, patent_dict = get_patent_ids(db_con, config['DATABASE']['NEW_DB'])
 
-    cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_DIR'],'cpc_output')
+    cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'cpc_output')
+    #split up the grant file for processing
+    os.system('split -a 1 -n 7 {0}/grants_classes.csv {0}/grants_pieces_'.format(cpc_folder))
 
-    in_files = ['{0}/grants_piecesa{1}'.format(folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
-    out_files = ['{0}/out_file_a{1}.csv'.format(folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
-    error_log = ['{0}/error_log_a{1}'.format(folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
-    #TODO: see if you can zip with just patent_dict and patent_set
+    in_files = ['{0}/grants_pieces_{1}'.format(cpc_folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
+    out_files = ['{0}/out_file_a{1}.csv'.format(cpc_folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
+    error_log = ['{0}/error_log_a{1}'.format(cpc_folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
     pat_dicts = [patent_dict for item in in_files]
     pat_sets = [patent_set for item in in_files]
     files = zip(in_files, out_files, error_log, pat_dicts, pat_sets)
@@ -96,18 +96,10 @@ if __name__ == '__main__':
     for f in files:
         jobs.append(multiprocessing.Process(target = write_cpc_current, args=(f)))
 
-    for segment in chunks(jobs, desired_processes):
+    for segment in general_helpers.chunks(jobs, desired_processes):
         print(segment)
         for job in segment:
             job.start()
 
-    print('rejoining')
-    #now rejoin the outfiles into the cpc_current
-    cpc_current_file = '{}/{}'.format(cpc_folder, 'cpc_current.csv')
-    with open(cpc_current_file, 'wb') as output_cpc_file:
-        for file in out_files:
-            with open(file, 'rb') as myfile:
-                for line in myfile:
-                    output_cpc_file.write(line)
-    print('uploading')
-    upload_cpc_current(db_con, cpc_current_file)
+    #os.system('cat {0}/out_file* > {0}/cpc_current.csv'.format(cpc_folder))
+    upload_cpc_current(db_con, cpc_folder))

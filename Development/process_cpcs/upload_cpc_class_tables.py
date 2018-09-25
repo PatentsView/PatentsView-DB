@@ -18,7 +18,7 @@ def upload_cpc_small_tables(db_con,db,folder):
     folder: where the cpc_group/subsection folders are
     '''
     #Upload CPC subsection data
-    mainclass = csv.reader(open(os.path.join(folder,'cpc_subsection.csv')))
+    mainclass = csv.reader(open(os.path.join(folder,'cpc_subsection.csv'),'r'))
     counter =0
     for m in mainclass:
         towrite = [re.sub('"',"'",item) for item in m]
@@ -26,14 +26,14 @@ def upload_cpc_small_tables(db_con,db,folder):
         db_con.execute(query)
 
     #Upload CPC group data
-    subclass = csv.reader(open(os.path.join(folder,'cpc_group.csv'),'rb'))
+    subclass = csv.reader(open(os.path.join(folder,'cpc_group.csv')))
     exist = set()
     for m in subclass:
         towrite = [re.sub('"',"'",item) for item in m]
         if not towrite[0] in exist:
             exist.add(towrite[0])
-            query = 'insert into {}.cpc_group values("{}", "{}")'.format(db,towrite[0], towrite[1])
-            db_con.execute(query2)
+            query = 'insert into {}.cpc_group values("{}", "{}")'.format(db,towrite[0],towrite[1])
+            db_con.execute(query)
 
 def upload_cpc_subgroup(db_con, db, folder):
     '''
@@ -43,8 +43,9 @@ def upload_cpc_subgroup(db_con, db, folder):
     This is a separate function because the one-by-one insert is too slow
     So instead post-process and then upload as a csv
     '''
-    subgroup = csv.reader(file(os.path.join(folder,'cpc_subgroup.csv'),'rb'))
-    subgroup_out = csv.writer(file(os.path.join(folder,'cpc_subgroup_clean.csv'),'wb'),delimiter = '\t')
+    subgroup = csv.reader(open(os.path.join(folder,'cpc_subgroup.csv'),'r'))
+    subgroup_out = csv.writer(open(os.path.join(folder,'cpc_subgroup_clean.csv'),'w'),delimiter = '\t')
+    subgroup_out.writerow(['id', 'title'])
     exist = set()
     for m in subgroup:
         towrite = [re.sub('"',"'",item) for item in m]
@@ -55,7 +56,6 @@ def upload_cpc_subgroup(db_con, db, folder):
     print('now uploading')
     data = pd.read_csv('{0}/{1}'.format(folder, 'cpc_subgroup_clean.csv'), delimiter = '\t', encoding ='utf-8')
     data.to_sql('cpc_subgroup',db_con, if_exists = 'append', index=False)
-    #cursor.execute("load data local infile '{0}/{1}' into table {2}.cpc_subgroup CHARACTER SET utf8 fields terminated by '\t' lines terminated by '\r\n'".format(folder, 'cpc_subgroup_clean.csv', db))
     
 if __name__ == '__main__':
     import configparser
