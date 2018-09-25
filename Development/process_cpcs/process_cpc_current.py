@@ -9,16 +9,6 @@ import re,os,random,string,codecs
 import multiprocessing
 
 
-
-def get_patent_ids(db_con, new_db):
-
-    patent_data = db_con.execute('select id, number from {}.patent'.format(new_db))
-    patnums = {}
-    for patent in patent_data:
-        patnums[patent['number']] = patent['id']
-    return set(patnums.keys()), patnums
-
-
 def write_cpc_current(cpc_input, cpc_output, error_log, patent_dict, patent_set,db_con):
     
     #Create CPC_current table off full master classification list
@@ -76,15 +66,15 @@ if __name__ == '__main__':
                                             config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
 
     
-    patent_set, patent_dict = get_patent_ids(db_con, config['DATABASE']['NEW_DB'])
+    patent_set, patent_dict = general_helpers.get_patent_ids(db_con, config['DATABASE']['NEW_DB'])
 
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'cpc_output')
     #split up the grant file for processing
     os.system('split -a 1 -n 7 {0}/grants_classes.csv {0}/grants_pieces_'.format(cpc_folder))
 
     in_files = ['{0}/grants_pieces_{1}'.format(cpc_folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
-    out_files = ['{0}/out_file_a{1}.csv'.format(cpc_folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
-    error_log = ['{0}/error_log_a{1}'.format(cpc_folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
+    out_files = ['{0}/out_file_{1}.csv'.format(cpc_folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
+    error_log = ['{0}/error_log_{1}'.format(cpc_folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
     pat_dicts = [patent_dict for item in in_files]
     pat_sets = [patent_set for item in in_files]
     files = zip(in_files, out_files, error_log, pat_dicts, pat_sets)
@@ -101,5 +91,4 @@ if __name__ == '__main__':
         for job in segment:
             job.start()
 
-    #os.system('cat {0}/out_file* > {0}/cpc_current.csv'.format(cpc_folder))
     upload_cpc_current(db_con, cpc_folder))
