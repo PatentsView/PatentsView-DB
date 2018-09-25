@@ -97,7 +97,7 @@ DROP TABLE IF EXISTS `cpc_subgroup`;
 
 CREATE TABLE `cpc_subgroup` (
   `id` varchar(20) NOT NULL,
-  `title` varchar(512) DEFAULT NULL,
+  `title` mediumtext DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 
