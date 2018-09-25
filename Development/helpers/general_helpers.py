@@ -40,3 +40,11 @@ def download(url, filepath):
                 f.write(chunk)
                 f.flush()
 
+
+def get_patent_ids(db_con, new_db):
+
+    patent_data = db_con.execute('select id, number from {}.patent'.format(new_db))
+    patnums = {}
+    for patent in patent_data:
+        patnums[patent['number']] = patent['id']
+    return set(patnums.keys()), patnums
