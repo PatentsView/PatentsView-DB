@@ -32,7 +32,6 @@ def parse_and_write_cpc(inputdir, outputdir):
 def parse_pgpub_file(filepath):
     """ Extract CPC classification from ~35 million applications """
     with open(filepath) as f:
-        #input_rows = f.read().split('\r\n')
         input_rows = f.readlines()
         print("Parsing app file: {}; rows: {}".format(filepath, len(input_rows)))
 
@@ -113,10 +112,12 @@ def parse_grant_file(filepath):
     additional_classifications = []
 
     for row in input_rows:
-
+        #print(row)
         # Skip blank rows
         if row != '':
-            patent_number = strip_whitespace(row[10:17]).zfill(7)
+            #patent_number = strip_whitespace(row[10:17]).zfill(7)
+            patent_number = strip_whitespace(row[10:18]).zfill(7)
+            #print(patent_number)
             classification = strip_whitespace(row[17:32])
 
         # Save the classifications found to our results dataset
