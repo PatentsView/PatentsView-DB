@@ -5,6 +5,7 @@ sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 from warnings import filterwarnings
 import csv
+import pandas as pd
 import re,os,random,string,codecs
 import multiprocessing
 
@@ -41,20 +42,25 @@ def write_cpc_current(cpc_input, cpc_output, error_log, patent_dict, patent_set,
             additionals = [t for t in towrite[3].split('; ') if t!= '']
             for p in additionals:
                 try:
-                    needed = [id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'additional',str(cpcnum)]
+                    needed = [general_helpers.id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'additional',str(cpcnum)]
                     clean = [i if not i =="NULL" else "" for i in needed]
                     cpcnum+=1
                     cpc_out.writerow(clean)
                 except:
-                    errorloc.writerow(row)
-    errorlog.close()
+                    errorlog.writerow(row)
 
 
 def upload_cpc_current(db_con, cpc_current_loc):
-    cpc_current_files = [f for file in os.listdir(cpc_current_loc) if f.startswith('out')]
+    print(os.listdir(cpc_current_loc))
+    cpc_current_files = [f for f in os.listdir(cpc_current_loc) if f.startswith('out')]
     for outfile in cpc_current_files:
-    	data = pd.read_csv('{}/{}'.format(cpc_current_loc,outfile),delimiter = '\t', encoding ='utf-8')
-    	data.to_sql(cpc_current, db_con, if_exists = 'append', index=False)
+        f = '{}/{}'.format(cpc_current_loc,outfile)
+        print(os.path.getsize(f))
+        if os.path.getsize(f) > 0: #some files empyt because of patents pre-1976
+            print(f)
+            print('here')
+            data = pd.read_csv(f,delimiter = '\t', encoding ='utf-8')
+            data.to_sql(cpc_current, db_con, if_exists = 'append', index=False)
 
 
 if __name__ == '__main__':
@@ -77,7 +83,8 @@ if __name__ == '__main__':
     error_log = ['{0}/error_log_{1}'.format(cpc_folder, item) for item in  ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
     pat_dicts = [patent_dict for item in in_files]
     pat_sets = [patent_set for item in in_files]
-    files = zip(in_files, out_files, error_log, pat_dicts, pat_sets)
+    db_cons = [db_con for item in in_files]
+    files = zip(in_files, out_files, error_log, pat_dicts, pat_sets,db_cons)
     
 
     print("Processing Files")
@@ -90,5 +97,5 @@ if __name__ == '__main__':
         print(segment)
         for job in segment:
             job.start()
-
-    upload_cpc_current(db_con, cpc_folder))
+    
+    upload_cpc_current(db_con, cpc_folder)
