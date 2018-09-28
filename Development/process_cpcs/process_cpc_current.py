@@ -59,8 +59,18 @@ def upload_cpc_current(db_con, cpc_current_loc):
         if os.path.getsize(f) > 0: #some files empyt because of patents pre-1976
             print(f)
             print('here')
-            data = pd.read_csv(f,delimiter = '\t', encoding ='utf-8')
-            data.to_sql(cpc_current, db_con, if_exists = 'append', index=False)
+            counter = 0
+            #TODO: very strangely pd.read_csv works on this file in the interperter and not in the script
+            #any combinaiton of delim_whitespace=True, delimiter = '\t', encoding = 'utf-8' vs no encodign doesnt help
+            #so for now read as csv then to data frame, which I hate
+            input_data =[]
+
+            with open(f, 'r') as myfile:
+                 for line in myfile.readlines():
+                     input_data.append(line.split('\t'))
+            data = pd.DataFrame(input_data)
+            data.columns = ['uuid',  'patent_id', 'section_id', 'subsection_id', 'group_id', 'subgroup_id', 'category', 'sequence']
+            data.to_sql('cpc_current', db_con, if_exists = 'append', index=False)
 
 
 if __name__ == '__main__':
