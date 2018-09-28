@@ -118,7 +118,7 @@ def parse_grant_file(filepath):
             #patent_number = strip_whitespace(row[10:17]).zfill(7)
             patent_number = strip_whitespace(row[10:18]).zfill(7)
             #print(patent_number)
-            classification = strip_whitespace(row[17:32])
+            classification = strip_whitespace(row[18:32])
 
         # Save the classifications found to our results dataset
         if patent_number != last_patent_seen:
@@ -135,7 +135,7 @@ def parse_grant_file(filepath):
         # All others are considered additional
         # Skip blank rows
         if row != '':
-            if row[41] == 'I':
+            if row[42] == 'I':
                 primary_classifications.append(classification)
             else:
                 additional_classifications.append(classification)
