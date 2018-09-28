@@ -1,4 +1,5 @@
 import re,csv,os,MySQLdb
+import pandas as pd
 from collections import Counter
 import sys
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
@@ -24,22 +25,21 @@ def dict_setup(working_directory, persistent_files):
     ###### IPC to WIPO lookup ######
 
     # input ipc_technology data from local, which contains IPC technology class definitions
-    ipc_technology = csv.reader(open(persistent_files+'\\ipc_technology.csv','rb'))
-    # skip the header when parsing the data
-    next(ipc_technology, None)
 
     # create a dictionary mapping IPC code to field number
     # key: IPC_code
     # value: Sector_en
     ipc_to_field = {}
-    for row in ipc_technology:
-        ipc_to_field[row[7].replace("%","").replace(' ','')] = row[0]
+    with open('{}/ipc_technology.csv'.format(persistent_files), 'rb') as myfile:
+        for row in myfile.readlines():
+            row = row.split(b',')
+            ipc_to_field[row[7].replace(b"%",b"").replace(b' ',b'')] = row[0]
 
 
     ###### CPC to IPC mapping ######
 
     # input ipc_concordance data from local
-    ipc_concordance = open(working_directory + "\\" + "ipc_concordance.txt").read().split("\n")
+    ipc_concordance = open(working_directory +  "/ipc_concordance.txt").read().split("\n")
 
     # create a dictionary mapping CPC to IPC
     # key: IPC_code: first column
@@ -50,11 +50,9 @@ def dict_setup(working_directory, persistent_files):
         # keep only rows that do not have null value in the dataset
         if len(row) > 1 and row[1] != "CPCONLY":
             cpc_to_ipc[row[0]] = row[1]
-
     return ipc_to_field, cpc_to_ipc
 
 
-# In[4]:
 
 def get_data(db_con):
     """
@@ -71,7 +69,7 @@ def get_data(db_con):
 
     #get a list of patent ids and cpc subgroup ids from the database
     data  = db_con.execute('select distinct patent_id,subgroup_id from cpc_current where category="inventional" order by patent_id asc,sequence asc')
-    pat_to_subgroup = [(item['patent_id'], item['subgroup_id']) for item in data] #[patent_id, subgroup_id]
+    pat_to_subgroup = [item for item in data]
     
     return pat_to_subgroup
 
@@ -96,16 +94,13 @@ def write_cpc2ipc(working_directory, pat_to_subgroup, cpc_to_ipc, ipc_to_field, 
     # key: patent_id
     # value: corresponding wipo
     pats = {}
-    #os.mkdir(working_directory + "\\WIPO_output\\")
-    outp= csv.writer(file('{0}/{1}'.format(working_directory,output),'wb'),delimiter = '\t')
+    outp= csv.writer(open(output,'w'),delimiter = '\t')
     cpc_to_ipc_set = set(cpc_to_ipc.keys()) #to make the lookup faster
     ipc_to_field_set = set(ipc_to_field.keys())
-    #outp.writerow(['patent_id','cpc','wipo_cat'])
-    counter = 0
+    
+    outp.writerow(['patent_id','cpc','wipo_cat'])
     for item in pat_to_subgroup: #[patent_id, subgroup_id]
-        counter +=1
-        if counter%10000==0:
-            print(counter)
+        wipo=None
         #check if subgroup_id is in the cpc_to_ipc dictionary
         #if yes, and to a new variable -- ipcconcord
         if item[1] in cpc_to_ipc_set:
@@ -120,23 +115,22 @@ def write_cpc2ipc(working_directory, pat_to_subgroup, cpc_to_ipc, ipc_to_field, 
         patent_id = item[0]
         cpc_id = item[1]
         #get the section id and group id
-        section = ipcconcord[:4]
+        section = ipcconcord[:4].encode('utf-8')
         group = ipcconcord.split("/")[0]
-
 
         #check if section is in the ipc_to_field dictionary
         #if yes, assign the field to a new variable -- wipo
         if section in ipc_to_field_set:
-             wipo = ipc_to_field[section]
+            wipo = ipc_to_field[section]
         #if not, look for group instead of section
         elif group in ipc_to_field_set:
             wipo = ipc_to_field[group]
         #otherwise, skip the entry
         else:
             pass
-
         #write the patent number, cpc_subgroup_id and wipo classification to the 'WIPO_Cats_assigned_CPC2IPC.csv' file
-        outp.writerow([patent_id,cpc_id,wipo])
+        if wipo:
+            outp.writerow([patent_id,cpc_id,wipo.decode('utf-8')])
  
 
 
@@ -152,9 +146,9 @@ def write_wipo_assigned(working_directory, output, pats):
     
     """
     #have this go over the full output file from before and grab the patent_id and cpc list
-
-    outp= csv.writer(file('{0}/{1}'.format(working_directory,output),'wb'),delimiter = '\t')
-
+    print(len(pats))
+    outp= csv.writer(open('{0}/{1}'.format(working_directory,output),'w'),delimiter = '\t')
+    outp.writerow(['patent_id', 'field_id', 'sequence'])
     for k,v in pats.items():
         cpc_count_list = sorted(Counter(v).items(),key=lambda x:-x[1])
 
@@ -174,13 +168,37 @@ def write_wipo_assigned(working_directory, output, pats):
                 return_cpc_list.append(cpc[0])
 
         for e, cpc in enumerate(return_cpc_list):
-            #print([k,return_cpc_list[i],i])
             outp.writerow([k,cpc,e])
+
+def upload_wipo(wipo_output):
+    print('here')
+    outfiles = [f for f in os.listdir(wipo_output) if f.startswith('patent')]
+    for f in outfiles:
+        f = '{}/{}'.format(wipo_output,f)
+        data = pd.read_csv(f, delimiter = '\t')
+        print(f)
+        print(len(data))
+        data.to_sql('wipo', db_con, if_exists = 'append', index = False)
+        '''
+        if os.path.getsize(f) > 0: #some files empyt because of patents pre-1976
+            #TODO: very strangely pd.read_csv works on this file in the interpeer and not in the script
+            #any combinaiton of delim_whitespace=True, delimiter = '\t', encodig = 'utf-8' vs no encodign doesnt help
+            #so for now read as csv then to data frame, which I hate
+            input_data =[]
+
+            with open(f, 'r') as myfile:
+                 for line in myfile.readlines():
+                     input_data.append(line.split('\t'))
+            data = pd.DataFrame(input_data)
+            data.columns = ['uuid',  'patent_id', 'section_id', 'subsection_id','group_id', 'subgroup_id', 'category', 'sequence']
+            data.to_sql('cpc_current', db_con, if_exists = 'append', index=False
+)
+        '''  
 
 
 def dict_chunks(data, size):
     it = iter(data)
-    for i in xrange(0, len(data), size):
+    for i in range(0, len(data), size):
         yield {k:data[k] for k in islice(it, size)}
 
 
@@ -192,61 +210,51 @@ if __name__ == '__main__':
     location_of_cpc_ipc_file = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'wipo_output')
     if not os.path.exists(wipo_output):
-        os.makedir(wipo_output)
+        os.mkdir(wipo_output)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
 
     #dictionary setup 
-    print("dict setup")
     ipc_to_field, cpc_to_ipc = dict_setup(location_of_cpc_ipc_file, persistent_files)
-
-    
     #connect database
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
-    print("getting data")
     pat_to_subgroup = get_data(db_con)
-    #TODO: check that this works with new data
-    print(len(pat_to_subgroup))
 
-    chunks_of_patent = general_helpers.chunks(pat_to_subgroup, (len(pat_to_subgroup)/7)+1)
+    chunks_of_patent = general_helpers.chunks(pat_to_subgroup, (len(pat_to_subgroup)//7)+1)
 
-    outfiles = ['wipo_cats_assigned_cpc2ipc_{}'.format(item) for item in ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
-    working_directories = [wipo_output for _ in infiles]
-    cpc_to_ipcs = [cpc_to_ipc for _ in infiles]
-    ipc_to_fields = [ipc_to_field for _ in infiles]
-
-    input_data = zip(working_directories, chunks_of_patent, cpc_to_ipcs, ipc_to_fields, outfiles)#
+    outfiles = ['{}/wipo_cats_assigned_cpc2ipc_{}'.format(wipo_output, item) for item in ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
+    working_directories = [wipo_output for _ in outfiles]
+    cpc_to_ipcs = [cpc_to_ipc for _ in outfiles]
+    ipc_to_fields = [ipc_to_field for _ in outfiles]
+   
+    input_data = zip(working_directories, chunks_of_patent, cpc_to_ipcs, ipc_to_fields, outfiles)
 
     desired_processes = 7 # ussually num cpu - 1
     jobs = []
     for f in input_data:
         jobs.append(multiprocessing.Process(target = write_cpc2ipc, args=(f)))
 
-    for segment in chunks(jobs, desired_processes):
+    for segment in general_helpers.chunks(jobs, desired_processes):
         for job in segment:
             job.start()
 
-    print('making dictionary')
-    patent_input= csv.reader(file('{0}/WIPO_output/WIPO_Cats_assigned_CPC2IPC.csv'.format(working_directory),'rb'),delimiter = '\t')
     pats = defaultdict(lambda: [])
-    for row in patent_input:
-        pats[row[0]].append(row[2])
+    for f in os.listdir(wipo_output):
+       patent_input = csv.reader(open('{}/{}'.format(wipo_output, f),'r'), delimiter = '\t')
+       for row in patent_input:
+           pats[row[0]].append(row[2])
     print(len(pats))
-    print("Made dictionary")
-
-
-    data_chunks = list(dict_chunks(pats, (len(pats)/7) + 1))
-    working_directories = [working_directory for _ in data_chunks]
-    outfiles = ['patent_cpc_v2_{}'.format(item) for item in ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
-    print("chunked")
-    print len(data_chunks)
+    data_chunks = list(dict_chunks(pats, (len(pats)//7) + 1))
+    print(len(pats))
+    print(does_not_exist)
+    working_directories = [wipo_output for _ in data_chunks]
+    outfiles = ['patent_cpc_{}'.format(item) for item in ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
     input_data = zip(working_directories, outfiles, data_chunks)
-    print("starting")
     desired_processes = 7 # ussually num cpu - 1
     jobs = []
     for f in input_data:
         jobs.append(multiprocessing.Process(target = write_wipo_assigned, args=(f)))
-    print("appended")
-    for segment in chunks(jobs, desired_processes):
+    for segment in general_helpers.chunks(jobs, desired_processes):
         print(segment)
         for job in segment:
             job.start()
+    upload_wipo(wipo_output)

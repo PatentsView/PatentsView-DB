@@ -32,14 +32,18 @@ def write_cpc_current(cpc_input, cpc_output, error_log, patent_dict, patent_set,
             cpcnum = 0
             for p in primaries:
                 try:
-                    needed = [general_helpers.id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'primary',str(cpcnum)]
+                    needed = [general_helpers.id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'inventional',str(cpcnum)]
                     clean = [i if not i =="NULL" else "" for i in needed]
                     cpcnum+=1
                     cpc_out.writerow(clean)
                 except: #sometimes a row doesn't have all the information
                     errorlog.writerow(row)
-
-            additionals = [t for t in towrite[3].split('; ') if t!= '']
+            try:
+                additionals = [t for t in towrite[3].split('; ') if t!= '']
+            except:
+                additionals = []
+                errorlog.writerow(row)
+            
             for p in additionals:
                 try:
                     needed = [general_helpers.id_generator(),towrite[1]]+[p[0],p[:3],p[:4],p,'additional',str(cpcnum)]
@@ -51,15 +55,10 @@ def write_cpc_current(cpc_input, cpc_output, error_log, patent_dict, patent_set,
 
 
 def upload_cpc_current(db_con, cpc_current_loc):
-    print(os.listdir(cpc_current_loc))
     cpc_current_files = [f for f in os.listdir(cpc_current_loc) if f.startswith('out')]
     for outfile in cpc_current_files:
         f = '{}/{}'.format(cpc_current_loc,outfile)
-        print(os.path.getsize(f))
         if os.path.getsize(f) > 0: #some files empyt because of patents pre-1976
-            print(f)
-            print('here')
-            counter = 0
             #TODO: very strangely pd.read_csv works on this file in the interperter and not in the script
             #any combinaiton of delim_whitespace=True, delimiter = '\t', encoding = 'utf-8' vs no encodign doesnt help
             #so for now read as csv then to data frame, which I hate
@@ -109,3 +108,4 @@ if __name__ == '__main__':
             job.start()
     
     upload_cpc_current(db_con, cpc_folder)
+ 
