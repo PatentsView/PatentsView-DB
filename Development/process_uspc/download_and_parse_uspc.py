@@ -212,17 +212,16 @@ if __name__ == '__main__':
     if not os.path.exists(inputdir):
          os.makedirs(inputdir)
     # Download USPC Patent Classifications
-    uspc_patents_url = 'https://bulkdata.uspto.gov/data/patent' \
-                       '/classification/mcfpat.zip'
+    uspc_patents_url = 'https://bulkdata.uspto.gov/data/patent/classification/mcfpat.zip'
     uspc_patents_filepath = os.path.join(inputdir, 'uspc_patents.zip')
-    #general_helpers.download(uspc_patents_url, uspc_patents_filepath)
+    general_helpers.download(uspc_patents_url, uspc_patents_filepath)
 
     # Download USPC Application Classifications
     uspc_applications_url = 'https://bulkdata.uspto.gov/data/patent' \
                             '/classification/mcfappl.zip'
     uspc_applications_filepath = os.path.join(inputdir,
                                               'uspc_applications.zip')
-    #general_helpers.download(uspc_applications_url, uspc_applications_filepath)
+    general_helpers.download(uspc_applications_url, uspc_applications_filepath)
     print('downloaded')
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)

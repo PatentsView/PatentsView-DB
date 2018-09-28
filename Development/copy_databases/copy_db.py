@@ -24,6 +24,9 @@ with open('{}/Development/patent_schema.sql'.format(os.getcwd()), 'r') as f:
     for command in commands:
         engine2.execute(command)
 
+#create persistent inventor disambig like last time because columns grow
+engine2.execute('create table {}.persistent_inventor_disambig like {}.persistent_inventor_disambig'.format( new_database, old_database))
+
 
 all_tables = engine.execute("show tables from {}".format(old_database))
 
@@ -36,4 +39,5 @@ tablenames = [item['Tables_in_{}'.format(old_database)] for item in all_tables]
 tables_to_upload = [table for table in tablenames if not table.startswith("temp") and not table in tables_skipped]
 # copy everything over to new db
 for table in tables_to_upload:
+    print(table) 
     engine2.execute("insert into {0}.{2} select * from {1}.{2}".format(new_database, old_database, table))
