@@ -38,4 +38,4 @@ if __name__ == '__main__':
     if not os.path.exists(disambig_folder):
         os.makedirs(disambig_folder)
     get_tables(db_con, disambig_folder)
-    os.system('scp {}/*.csv nmonath@52.21.219.233:/mnt/inventor-disambiguation/data'.format(disambig_folder))
+    #os.system('scp {}/*.csv nmonath@52.21.219.233:/mnt/inventor-disambiguation/data'.format(disambig_folder))

@@ -110,4 +110,4 @@ def bulk_download(date):
     print("Download Finished")
 
 if __name__== '__main__':
-    bulk_download('20180801')
+    bulk_download('20180920')
