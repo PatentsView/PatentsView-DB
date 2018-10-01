@@ -24,17 +24,21 @@ my @config_info = <$configFile>;
 my $temp = "@config_info[0]";
 chomp $temp;
 
-print($temp);
 
 #my $location = $temp . "/NER_output";
 
-my $nerDir = "/usr/local/airflow/PatentsView-DB/Scripts/Government_Interest/NER/stanford-ner-2017-06-09";
+my $nerDir = "/usr/local/airflow/PatentsView-DB/Development/government_interest/NER/stanford-ner-2017-06-09";
+#my $omitLocsFile = "/usr/local/airflow/PatentsView-DB/Development/persistent_files/omitLocs.csv";
+
 
 my $starting_dir = getcwd;
+my $omitLocsFile = $startingdir ."/Development/persistent_files/omitLocs.csv"
 
-my $workDir = $temp . "/government_interest";
-my $omitLocsFile = "/usr/local/airflow/PatentsView-DB/Development/Persistent_Files/omitLocs.csv";
-my $inFile = "merged_csvs.csv";
+
+
+#my $workDir = $temp . "/government_interest";
+#print($workDir);
+my $inFile = $temp . "merged_csvs.csv";
 my $outFile = "NER_output.txt";
 my $distinctOrgsFile = "distinctOrgs.txt";
 my $distinctLocsFile = "distinctLocs.txt";
