@@ -3,6 +3,7 @@ import os
 from zipfile import ZipFile
 import sys
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
+sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
 from helpers import general_helpers
 
 
@@ -200,7 +201,7 @@ if __name__ == '__main__':
 
     import configparser
     config = configparser.ConfigParser()
-    config.read('Development/config.ini')
+    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
 
     inputdir = '{}/uspc_input'.format(config['FOLDERS']['WORKING_FOLDER'])
     outputdir = '{}/uspc_output'.format(config['FOLDERS']['WORKING_FOLDER'])

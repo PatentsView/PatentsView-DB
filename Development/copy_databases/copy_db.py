@@ -2,10 +2,12 @@ import os
 import MySQLdb
 import sys
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
+#this makes it run in airflow specifically, which is picky about paths
+sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
 from helpers import general_helpers
 import configparser
 config = configparser.ConfigParser()
-config.read('Development/config.ini')
+config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
 host = config['DATABASE']['HOST']
 username = config['DATABASE']['USERNAME']
 password = config['DATABASE']['PASSWORD']
@@ -19,7 +21,7 @@ engine = general_helpers.connect_to_db(host, username, password, old_database)
 engine.execute("create schema {}".format(new_database))
 
 engine2 = general_helpers.connect_to_db(host, username, password, new_database)
-with open('{}/Development/patent_schema.sql'.format(os.getcwd()), 'r') as f:
+with open('/usr/local/airflow/PatentsView-DB/Development/patent_schema.sql'.format(os.getcwd()), 'r') as f:
     commands = f.read().replace('\n', '').split(';')[:-1]
     for command in commands:
         engine2.execute(command)
@@ -40,4 +42,5 @@ tables_to_upload = [table for table in tablenames if not table.startswith("temp"
 # copy everything over to new db
 for table in tables_to_upload:
     print(table) 
-    engine2.execute("insert into {0}.{2} select * from {1}.{2}".format(new_database, old_database, table))
+    #TODO: uncomment for real run
+    #engine2.execute("insert into {0}.{2} select * from {1}.{2}".format(new_database, old_database, table))
