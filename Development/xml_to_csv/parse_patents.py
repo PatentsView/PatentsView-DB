@@ -5,7 +5,7 @@ import re
 import pandas as pd
 import simplejson as json
 
-sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
+sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
 from helpers import output, xml_helpers, general_helpers
 from lxml import etree
 from collections import defaultdict
@@ -405,7 +405,7 @@ def main_process(data_file, outloc, field_dictionary):
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('Development/config.ini')
+    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
     #TO run Everything:
     with open('{}/field_dict.json'.format(config['FOLDERS']['PERSISTENT_FILES'])) as myfile:
         field_dictionary = json.load(myfile)

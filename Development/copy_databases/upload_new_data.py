@@ -5,10 +5,11 @@ import sys
 import pandas as pd
 from sqlalchemy import create_engine
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
+sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
 from helpers import general_helpers
 import configparser
 config = configparser.ConfigParser()
-config.read('Development/config.ini')
+config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
 host = config['DATABASE']['HOST']
 username = config['DATABASE']['USERNAME']
 password = config['DATABASE']['PASSWORD']
@@ -23,12 +24,12 @@ engine.execute('create schema {}'.format(temporary_upload))
 engine.execute('use {}'.format(temporary_upload))
 
 #should I just copy this directly from the schema of the other tables or do this?
-with open('{}/Development/patent_schema.sql'.format(os.getcwd()), 'r') as f:
+with open('/usr/local/airflow/PatentsView-DB/Development/patent_schema.sql'.format(os.getcwd()), 'r') as f:
     commands = f.read().replace('\n', '').split(';')[:-1]
     for command in commands:
         engine.execute(command)
 #special command to handle persistent inventor disambiguation which adds columns every time:
-#engine.execute('create table {}.persistent_inventor_disambig like {}.persistent_inventor_disambig'.format(temporary_upload, new_database))
+engine.execute('create table {}.persistent_inventor_disambig like {}.persistent_inventor_disambig'.format(temporary_upload, new_database))
 
 mainclass = []
 subclass = []

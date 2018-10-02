@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     import configparser
     config = configparser.ConfigParser()
-    config.read('Development/config.ini')
+    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
     infolder = config['FOLDERS']['RAW_DATA']
     outfolder = config['FOLDERS']['DATA_TO_PARSE']
     if not os.path.exists(outfolder):

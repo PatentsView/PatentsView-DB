@@ -6,6 +6,7 @@ from warnings import filterwarnings
 import csv
 import re,os,random,string,codecs
 import sys
+sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 
@@ -60,7 +61,7 @@ def upload_cpc_subgroup(db_con, db, folder):
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('Development/config.ini')
+    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
 
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], 
                                             config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
