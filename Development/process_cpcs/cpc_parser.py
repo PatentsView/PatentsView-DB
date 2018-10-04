@@ -21,6 +21,7 @@ def parse_and_write_cpc(inputdir, outputdir):
     # Add headers to the datasets
     app_header = [['application_number', 'cpc_primary', 'cpc_additional']]
     applications = app_header + applications
+    print(outputdir)
     general_helpers.write_csv(rows=applications, outputdir=outputdir,
               filename='applications_classes.csv')
 
@@ -151,4 +152,6 @@ if __name__ == '__main__':
 
     location_of_cpc_files = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     output_directory = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
+    print(output_directory)
+    print(os.listdir(output_directory))
     parse_and_write_cpc(location_of_cpc_files, output_directory)

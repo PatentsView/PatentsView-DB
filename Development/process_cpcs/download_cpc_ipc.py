@@ -45,7 +45,7 @@ def find_cpc_schema_url():
     tree = html.fromstring(page.read())
     potential_links = []
     for link in tree.xpath('//a/@href'):
-        if (link.startswith("/cpc/interleaved/CPCSchemeXML")
+        if (link.lstrip(".").startswith("/cpc/interleaved/CPCSchemeXML")
                 and link.endswith(".zip")):
             potential_links.append(link.replace('..',''))
 
@@ -88,8 +88,8 @@ def download_cpc_grant_and_pgpub_classifications(destination_folder):
         z.close()
 
         # Remove the original zip file
-        print("Removing: {}".format(filepath))
-        os.remove(filepath)
+        #print("Removing: {}".format(filepath))
+        #os.remove(filepath)
 
 
 def find_cpc_grant_and_pgpub_urls():
@@ -127,6 +127,8 @@ def download_ipc(destination_folder):
     """ Download and extract the most recent CPC to IPC Concordance """
     # Find the correct CPC to IPC Concordance
     ipc_url = find_ipc_url()
+    print(ipc_url)
+    print("___________")
     ipc_filepath = os.path.join(destination_folder, "ipc_concordance.txt")
 
     # Download the IPC text file
@@ -143,17 +145,17 @@ def find_ipc_url():
     potential_links = []
     for link in tree.xpath('//a/@href'):
         print(link)
-        if (link.startswith("/cpcConcordances/CPCtoIPCtxt")
+        if (link.lstrip('.').startswith("cpcConcordances/CPCtoIPCtxt")
                 and link.endswith(".txt")):
             potential_links.append(link)
 
     # There should be exactly one link to the CPC to IPC concordance.
     # Since files are not formatted nicely, we can't sort alphabetically to
     # determine the correct file. If multiple links found, raise an exception
+    print(potential_links)
     assert (len(set(potential_links)) == 1), "Unsure which URL to use of: " \
                                              "{}".format(potential_links)
-
-    return base_url + potential_links[0]
+    return base_url + '/' + potential_links[0]
 
 
 ############################################
