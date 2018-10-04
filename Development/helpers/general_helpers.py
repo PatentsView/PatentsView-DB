@@ -23,6 +23,8 @@ def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
 
 def write_csv(rows, outputdir, filename):
     """ Write a list of lists to a csv file """
+    print(outputdir)
+    print(os.path.join(outputdir, filename))
     writer = csv.writer(open(os.path.join(outputdir, filename), 'w',encoding='utf-8'))
     writer.writerows(rows)
 
