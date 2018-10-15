@@ -19,11 +19,11 @@ def get_tables(db_con, output_folder):
              cols = cols[:8]
         col_string= ", ".join(cols)
         existing_data = db_con.execute("select {} from {};".format(col_string, t))
-        outp = csv.writer(open('{}/{}.csv'.format(output_folder, t),'w'),delimiter='\t')
+        outp = csv.writer(open('{}/{}.tsv'.format(output_folder, t),'w'),delimiter='\t')
         outp.writerow(cols)
         outp.writerows(existing_data)
         #rawlocation done separately because it is a specially query
-        outp = csv.writer(open('{}/rawlocation.csv'.format(output_folder),'w'),delimiter='\t')
+        outp = csv.writer(open('{}/rawlocation.tsv'.format(output_folder),'w'),delimiter='\t')
         existing_data = db_con.execute('select id,location_id_transformed as location_id,city,state,country_transformed as country from rawlocation')
         outp.writerow(['id','location_id','city','state','country'])
         outp.writerows(existing_data)
@@ -38,4 +38,4 @@ if __name__ == '__main__':
     if not os.path.exists(disambig_folder):
         os.makedirs(disambig_folder)
     get_tables(db_con, disambig_folder)
-    #os.system('scp {}/*.csv nmonath@52.21.219.233:/mnt/inventor-disambiguation/data'.format(disambig_folder))
+    os.system('scp -i "Development/PV_Apache_Solr.pem" {}/*.tsv centos@ec2-52-21-62-204.compute-1.amazonaws.com:/data/inventor-disambiguation-internal/data'.format(disambig_folder))
