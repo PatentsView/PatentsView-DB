@@ -42,8 +42,6 @@ def upload_assignee(db_con, disambiguated_to_write, type_lookup):
         counts = Counter(type_lookup[key])
         type = max(type_lookup[key], key = counts.get)
         disambig_list.append([key, type, value[0], value[1], value[2]])
-        if 'SealRite' in value[2]:
-            print(value[2])
     disambig_data = pd.DataFrame(disambig_list)
     disambig_data.columns = ['id', 'type', 'name_first', 'name_last', 'organization']
     disambig_data.to_csv('debug.csv', encoding = 'utf-8')
