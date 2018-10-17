@@ -13,6 +13,7 @@ from helpers import general_helpers
 
 
 def create_assignee_lookup(disambiguated_folder):
+    
     assignee_data = csv.reader(open('{}/assignee_disambiguation.tsv'.format(disambiguated_folder), 'r'), delimiter = '\t')
     raw_to_disambiguated = {}
     disambiguated = {}
