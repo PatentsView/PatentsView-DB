@@ -18,7 +18,8 @@ old_database = config['DATABASE']['OLD_DB']
 engine = general_helpers.connect_to_db(host, username, password, old_database)
 
 # create a new schema
-engine.execute("create schema {}".format(new_database))
+engine.execute("create schema {} CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;".format(new_database))
+
 
 engine2 = general_helpers.connect_to_db(host, username, password, new_database)
 with open('/usr/local/airflow/PatentsView-DB/Development/patent_schema.sql'.format(os.getcwd()), 'r') as f:
@@ -42,5 +43,4 @@ tables_to_upload = [table for table in tablenames if not table.startswith("temp"
 # copy everything over to new db
 for table in tables_to_upload:
     print(table) 
-    #TODO: uncomment for real run
-    #engine2.execute("insert into {0}.{2} select * from {1}.{2}".format(new_database, old_database, table))
+    engine2.execute("insert into {0}.{2} select * from {1}.{2}".format(new_database, old_database, table))

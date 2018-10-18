@@ -20,7 +20,7 @@ CREATE TABLE `application` (
   KEY `app_idx1` (`type`,`number`),
   KEY `app_idx2` (`date`),
   KEY `app_idx3` (`number_transformed`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `rawexaminer`;
@@ -33,7 +33,7 @@ CREATE TABLE `rawexaminer` (
   `group` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`uuid`,`patent_id`),
   KEY `patent_id` (`patent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -46,7 +46,7 @@ CREATE TABLE `assignee` (
   `name_last` varchar(64) DEFAULT NULL,
   `organization` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -61,7 +61,7 @@ CREATE TABLE `claim` (
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`),
   KEY `ix_claim_sequence` (`sequence`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `cpc_current`;
@@ -81,7 +81,7 @@ CREATE TABLE `cpc_current` (
   KEY `subgroup_id` (`subgroup_id`),
   KEY `ix_cpc_current_sequence` (`sequence`),
   KEY `ix_cpc_current_category` (`category`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `cpc_group`;
@@ -90,7 +90,7 @@ CREATE TABLE `cpc_group` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `cpc_subgroup`;
@@ -99,7 +99,7 @@ CREATE TABLE `cpc_subgroup` (
   `id` varchar(20) NOT NULL,
   `title` mediumtext DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -109,7 +109,7 @@ CREATE TABLE `cpc_subsection` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -126,16 +126,16 @@ CREATE TABLE `foreigncitation` (
   `sequence` int(11) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `government_interest`;
 
 CREATE TABLE `government_interest` (
-  `patent_id` varchar(255) NOT NULL,
+  `patent_id` varchar(20) NOT NULL,
   `gi_statement` mediumtext,
   PRIMARY KEY (`patent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `government_organization`;
@@ -147,7 +147,7 @@ CREATE TABLE `government_organization` (
   `level_two` varchar(255) DEFAULT NULL,
   `level_three` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`organization_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -159,7 +159,7 @@ CREATE TABLE `inventor` (
   `name_first` varchar(64) DEFAULT NULL,
   `name_last` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -186,7 +186,7 @@ CREATE TABLE `ipcr` (
   KEY `ix_ipcr_sequence` (`sequence`),
   KEY `ix_ipcr_action_date` (`action_date`),
   KEY `ix_ipcr_ipc_version_indicator` (`ipc_version_indicator`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -198,7 +198,7 @@ CREATE TABLE `lawyer` (
   `organization` varchar(64) DEFAULT NULL,
   `country` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `location`;
@@ -218,7 +218,7 @@ CREATE TABLE `location` (
   KEY `dloc_idx2` (`city`,`state`,`country`),
   KEY `dloc_idx1` (`latitude`,`longitude`),
   KEY `ix_location_state` (`state`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -229,7 +229,7 @@ CREATE TABLE `location_assignee` (
   `assignee_id` varchar(36) DEFAULT NULL,
   KEY `location_id` (`location_id`),
   KEY `assignee_id` (`assignee_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -241,7 +241,7 @@ CREATE TABLE `location_inventor` (
   `inventor_id` varchar(36) DEFAULT NULL,
   KEY `location_id` (`location_id`),
   KEY `inventor_id` (`inventor_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `mainclass`;
@@ -249,7 +249,7 @@ DROP TABLE IF EXISTS `mainclass`;
 CREATE TABLE `mainclass` (
   `id` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -259,7 +259,7 @@ CREATE TABLE `mainclass_current` (
   `id` varchar(20) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -275,7 +275,7 @@ CREATE TABLE `nber` (
   KEY `patent_id` (`patent_id`),
   KEY `category_id` (`category_id`),
   KEY `subcategory_id` (`subcategory_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `nber_category`;
@@ -284,7 +284,7 @@ CREATE TABLE `nber_category` (
   `id` varchar(20) NOT NULL,
   `title` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -294,7 +294,7 @@ CREATE TABLE `nber_subcategory` (
   `id` varchar(20) NOT NULL,
   `title` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -309,7 +309,7 @@ CREATE TABLE `otherreference` (
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`),
   FULLTEXT KEY `fti_text` (`text`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -330,7 +330,7 @@ CREATE TABLE `patent` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `pat_idx1` (`type`,`number`),
   KEY `pat_idx2` (`date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -341,31 +341,31 @@ CREATE TABLE `patent_assignee` (
   `assignee_id` varchar(36) DEFAULT NULL,
   KEY `ix_patent_assignee_patent_id` (`patent_id`),
   KEY `ix_patent_assignee_assignee_id` (`assignee_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
 DROP TABLE IF EXISTS `patent_contractawardnumber`;
 
 CREATE TABLE `patent_contractawardnumber` (
-  `patent_id` varchar(255) NOT NULL,
+  `patent_id` varchar(20) NOT NULL,
   `contract_award_number` varchar(255) NOT NULL,
-  PRIMARY KEY (`patent_id`,`contract_award_number`),
+  PRIMARY KEY (`patent_id`,`contract_award_number`(100)),
   CONSTRAINT `patent_contractawardnumber_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `government_interest` (`patent_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
 DROP TABLE IF EXISTS `patent_govintorg`;
 
 CREATE TABLE `patent_govintorg` (
-  `patent_id` varchar(255) NOT NULL,
+  `patent_id` varchar(20) NOT NULL,
   `organization_id` int(11) NOT NULL,
   PRIMARY KEY (`patent_id`,`organization_id`),
   KEY `organization_id` (`organization_id`),
   CONSTRAINT `patent_govintorg_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `government_interest` (`patent_id`) ON DELETE CASCADE,
   CONSTRAINT `patent_govintorg_ibfk_2` FOREIGN KEY (`organization_id`) REFERENCES `government_organization` (`organization_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `patent_inventor`;
@@ -375,7 +375,7 @@ CREATE TABLE `patent_inventor` (
   `inventor_id` varchar(36) DEFAULT NULL,
   KEY `patent_id` (`patent_id`),
   KEY `inventor_id` (`inventor_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -386,7 +386,7 @@ CREATE TABLE `patent_lawyer` (
   `lawyer_id` varchar(36) DEFAULT NULL,
   KEY `patent_id` (`patent_id`),
   KEY `lawyer_id` (`lawyer_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -408,7 +408,7 @@ CREATE TABLE `rawassignee` (
   KEY `rawlocation_id` (`rawlocation_id`),
   KEY `ix_rawassignee_sequence` (`sequence`),
   KEY `ix_organization` (`organization`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `rawinventor`;
@@ -427,7 +427,7 @@ CREATE TABLE `rawinventor` (
   KEY `inventor_id` (`inventor_id`),
   KEY `rawlocation_id` (`rawlocation_id`),
   KEY `ix_rawinventor_sequence` (`sequence`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -446,7 +446,7 @@ CREATE TABLE `rawlawyer` (
   KEY `lawyer_id` (`lawyer_id`),
   KEY `patent_id` (`patent_id`),
   KEY `ix_rawlawyer_sequence` (`sequence`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -467,14 +467,14 @@ CREATE TABLE `rawlocation` (
   KEY `ix_rawlocation_country` (`country`),
   KEY `rawlocation_location_id_transformed` (`location_id_transformed`),
   KEY `ix_rawlocation_country_transformed_state` (`country_transformed`,`state`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `subclass`;
 
 CREATE TABLE `subclass` (
   `id` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `subclass_current`;
 
@@ -482,7 +482,7 @@ CREATE TABLE `subclass_current` (
   `id` varchar(20) NOT NULL,
   `title` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -504,7 +504,7 @@ CREATE TABLE `usapplicationcitation` (
   KEY `patent_id` (`patent_id`),
   KEY `ix_usapplicationcitation_application_id` (`application_id`),
   KEY `ix_number_transformed` (`number_transformed`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `uspatentcitation`;
@@ -522,7 +522,7 @@ CREATE TABLE `uspatentcitation` (
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`),
   KEY `ix_uspatentcitation_citation_id` (`citation_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -539,7 +539,7 @@ CREATE TABLE `uspc` (
   KEY `mainclass_id` (`mainclass_id`),
   KEY `subclass_id` (`subclass_id`),
   KEY `ix_uspc_sequence` (`sequence`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `uspc_current`;
@@ -554,7 +554,7 @@ CREATE TABLE `uspc_current` (
   KEY `mainclass_id` (`mainclass_id`),
   KEY `subclass_id` (`subclass_id`),
   KEY `ix_uspc_current_sequence` (`sequence`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -578,7 +578,7 @@ CREATE TABLE `usreldoc` (
   KEY `ix_usreldoc_date` (`date`),
   KEY `ix_usreldoc_reldocno` (`reldocno`),
   KEY `ix_usreldoc_sequence` (`sequence`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `wipo`;
@@ -589,7 +589,7 @@ CREATE TABLE `wipo` (
   `sequence` int(10) unsigned NOT NULL,
   PRIMARY KEY (`patent_id`,`sequence`),
   KEY `ix_wipo_field_id` (`field_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -602,7 +602,7 @@ CREATE TABLE `wipo_field` (
   PRIMARY KEY (`id`),
   KEY `ix_wipo_field_sector_title` (`sector_title`),
   KEY `ix_wipo_field_field_title` (`field_title`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `brf_sum_text`;
@@ -613,7 +613,7 @@ CREATE TABLE `brf_sum_text` (
   `text` mediumtext NOT NULL,
   PRIMARY KEY (`uuid`),
   KEY `ix_brfsumtext_patent_id` (`patent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `detail_desc_text`;
@@ -625,7 +625,7 @@ CREATE TABLE `detail_desc_text` (
   `length` int(10) unsigned NOT NULL,
   PRIMARY KEY (`uuid`),
   KEY `ix__patent_id` (`patent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -638,7 +638,7 @@ CREATE TABLE `draw_desc_text` (
   `sequence` int(10) unsigned NOT NULL,
   PRIMARY KEY (`uuid`),
   KEY `ix_drawdesctext_patent_id` (`patent_id`,`sequence`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `rel_app_text`;
@@ -650,7 +650,7 @@ CREATE TABLE `rel_app_text` (
   `sequence` int(10) unsigned NOT NULL,
   PRIMARY KEY (`uuid`),
   KEY `ix_relapptext_patent_id` (`patent_id`, `sequence`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `figures`;
@@ -662,7 +662,7 @@ CREATE TABLE `figures` (
   `num_sheets` int(11) DEFAULT NULL, 
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `ix_figures_patentid` (`patent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -681,7 +681,7 @@ CREATE TABLE `pct_data` (
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `ix_pctdat_patentid` (`patent_id`, `rel_id`),
   KEY `ix_pctdat_date` (`date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
@@ -699,7 +699,7 @@ CREATE TABLE `us_term_of_grant` (
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `ix_ustergra_patentid` (`patent_id`),
   KEY `ix_ustergra_date` (`disclaimer_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `foreign_priority`;
 CREATE TABLE `foreign_priority` (
@@ -714,7 +714,7 @@ CREATE TABLE `foreign_priority` (
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `ix_forpri_patentid` (`patent_id`, `sequence`),
   KEY `ix_forpri_date` (`date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `botanic`;
@@ -726,7 +726,7 @@ CREATE TABLE `botanic` (
   `variety` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `ix_botanic_patent_id` (`patent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `non_inventor_applicant`;
@@ -744,4 +744,4 @@ CREATE TABLE `non_inventor_applicant` (
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`),
   KEY `rawlocation_id` (`rawlocation_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
