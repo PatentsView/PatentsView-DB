@@ -38,18 +38,22 @@ def write_inventor(inventors_to_write, disambiguated_folder):
     for inv_id, inventor in inventors_to_write.items():
         inventor_list.append([inv_id] + inventor)
     inventor_data = pd.DataFrame(inventor_list)
+    inventor_data.columns = ['inventor_id', 'name_first', 'name_last']
     inventor_data.to_sql(con=db_con, name = 'inventor', if_exists = 'replace', index = False)
     inventor_data.to_csv("{}/inventor.csv".format(disambiguated_folder), index = False)
 
 
 def update_raw(db_con, disambiguated_folder, lookup):
-    raw_inventor = db_con.execute("select * from rawinventor")
     db_con.execute('alter table rawinventor rename temp_rawinventor_backup')
+    db_con.execute('create table rawinventor like temp_rawinventor_backup')
+    raw_inventor = db_con.execute("select * from temp_rawinventor_backup")
+    print('got raw inventor')
     output = csv.writer(open(disambiguated_folder + "/rawinventor_updated.csv",'w'),delimiter='\t')
+    output.writerow(['uuid', 'patent_id', 'inventor_id', 'rawlocation_id', 'name_first', 'name_last', 'sequence', 'rule_47'])
     for row in raw_inventor:
         inventor_id =lookup[row[0]]
         output.writerow([row['uuid'], row['patent_id'], inventor_id, row['rawlocation_id'], row['name_first'], row['name_last'], row['sequence'], row['rule_47']])
-    raw_data = pd.read_csv(disambiguated_folder + "/rawinventor_updated.csv")
+    raw_data = pd.read_csv(disambiguated_folder + "/rawinventor_updated.csv", delimiter = '\t')
     raw_data.to_sql(con=db_con, name = 'rawinventor', if_exists = 'append', index = False)
  
 
