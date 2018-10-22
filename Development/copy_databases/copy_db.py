@@ -35,7 +35,7 @@ all_tables = engine.execute("show tables from {}".format(old_database))
 
 #these are the tables that get recreated from scratch each time
 tables_skipped = ['assignee', 'cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_subsection', 'inventor', 
-        'lawyer', 'location_assignee', 'location_inventor', 'patent_assignee','patent_inventor', 
+        'lawyer', 'location', 'location_assignee', 'location_inventor', 'patent_assignee','patent_inventor', 
         'patent_lawyer', 'uspc_current', 'wipo']
 
 tablenames = [item['Tables_in_{}'.format(old_database)] for item in all_tables]
