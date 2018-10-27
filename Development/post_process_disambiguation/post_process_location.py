@@ -15,12 +15,17 @@ from helpers import general_helpers
 def make_lookup(disambiguated_folder):
     #os.system('mv location_all.tsv {}/location_disambiguation.tsv'.format(disambiguated_folder))
     inp = csv.reader(open( "{}/location_disambiguation.tsv".format(disambiguated_folder),'r'),delimiter='\t')
+    print('read in')
     lat_name_lookup = {} #place to lat/long/id lookup
     undisambiguated =set() #place for locations without a lat/long
     lookup = {} #raw location id to disambiguated id
     #for some reason column 1 and 2 both have disambiguated place names
     #create the latitude/longitude to id mappings
+    counter = 0
     for row in inp:
+        counter +=1 
+        if counter%500000 == 0:
+           print(counter)
         #TODO: need to check if this is the correct structure 
         clean_loc = tuple([None if i =='NULL' else i for i in row[1].split('|')])
         if row[3] != 'NULL':#if there is a lat-long pair
@@ -28,7 +33,8 @@ def make_lookup(disambiguated_folder):
             lat_name_lookup[lat_long] = {'place': clean_loc, 'id':general_helpers.id_generator(12)}
         else: #for the place without a lat long lookup
             undisambiguated.add(row[0])
-
+    print('first loop')
+    print('length of undisambiguated: {}'.format(len(undisambiguated)))
     #have to read the file in again to go back over it
     inp = csv.reader(open("{}/location_disambiguation.tsv".format(disambiguated_folder),'r'),delimiter='\t')
     #second round to produced looked up info
@@ -36,6 +42,7 @@ def make_lookup(disambiguated_folder):
         if row[3] != 'NULL':
             lat_long = "{0}|{1}".format(np.round(float(row[3]),4), np.round(float(row[4]),4))
             lookup[row[0]] = {'id': lat_name_lookup[lat_long]['id'], 'lat_long':lat_long}
+    print('second loop')
     return lat_name_lookup, lookup, undisambiguated
 
 def upload_location(db_con, lat_name_lookup, disambiguated_folder):
@@ -48,31 +55,40 @@ def upload_location(db_con, lat_name_lookup, disambiguated_folder):
     location_df.to_csv('{}/location.csv'.format(disambiguated_folder))
     
 
-def upload_rawlocation(db_con, lookup, lat_name_lookup, disambiguated_folder):
-    db_con.execute('alter table rawlocation rename temp_rawlocation_backup')
-    db_con.execute('create table rawlocation like temp_rawlocation_backup')
+def upload_rawlocation(db_con, lookup, lat_name_lookup, undisambiguated, disambiguated_folder):
+    #db_con.execute('alter table rawlocation rename temp_rawlocation_backup')
+    print('getting data for rawloc')
+    #db_con.execute('create table rawlocation like temp_rawlocation_backup')
     raw_loc_data = db_con.execute("select * from temp_rawlocation_backup")
+    print('got data')
     updated = csv.writer(open(disambiguated_folder + "/rawlocation_updated.csv",'w'),delimiter='\t')
     counter = 0
     total_undisambiguated = 0
     total_missed = []
-    for row in raw_loc_data:
+    for i in raw_loc_data:
         counter +=1
         if counter%500000==0:
             print(str(counter))
-        try: 
+        if i['id'] in lookup.keys(): 
             loc_id = lookup[i['id']]['id']
             lat_long =lookup[i['id']]['lat_long']
-        except:
+        else:
             loc_id = None
             lat_long = None
             #need to update the rest to null and count them
-            if i[0] in nondisamb:
-                total_undisambigged +=1
+            if i[0] in undisambiguated:
+                total_undisambiguated +=1 
             else:
                 total_missed.append(i[0])
-        outp.writerow([row['id'],loc_id, row['city'], row['state'], row['country'], row['country_transformed'], lat_long])
+        updated.writerow([i['id'],loc_id, i['city'], i['state'], i['country'], i['country_transformed'], lat_long])
+    try:
+        print(len(total_missed))
+        print(totally_undisambiguated)
+    except:
+        print('no')
+    print('now reading in fo upload')
     raw_data = pd.read_csv(disambiguated_folder + "/rawlocation_updated.csv", delimiter = '\t')
+    print('uploading')
     raw_data.to_sql(con=db_con, name = 'rawlocation', if_exists = 'replace', index = False)
 if __name__ == '__main__':
     import configparser
@@ -80,14 +96,15 @@ if __name__ == '__main__':
     config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
 
     #db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
-    db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], 'patent_20180828_dev')
+    db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], 'patent_20180828_loc')
     
     disambiguated_folder = "{}/disambig_out".format(config['FOLDERS']['WORKING_FOLDER'])
-
+    print('here!')
+    print('data inserted')
     lat_name_lookup, lookup, undisambiguated = make_lookup(disambiguated_folder)
     print('made lookup')
     #upload_location(db_con, lat_name_lookup, disambiguated_folder)
     print('done locupload ')
-    upload_rawlocation(db_con, lookup, lat_name_lookup, disambiguated_folder)
+    upload_rawlocation(db_con, lookup, lat_name_lookup,undisambiguated, disambiguated_folder)
     print('done')
     
