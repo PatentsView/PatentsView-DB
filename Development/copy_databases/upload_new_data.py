@@ -20,7 +20,7 @@ data_to_upload = config['FOLDERS']['PARSED_DATA']
 
 engine = general_helpers.connect_to_db(host, username, password, new_database)
 
-engine.execute('create schema {}'.format(temporary_upload))
+engine.execute('create schema {} CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;'.format(temporary_upload))
 engine.execute('use {}'.format(temporary_upload))
 
 #should I just copy this directly from the schema of the other tables or do this?
