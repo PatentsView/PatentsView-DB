@@ -22,6 +22,7 @@ engine.execute("create schema {} CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unico
 
 
 engine2 = general_helpers.connect_to_db(host, username, password, new_database)
+engine2.execute("SET FOREIGN_KEY_CHECKS=0;")
 with open('/usr/local/airflow/PatentsView-DB/Development/patent_schema.sql'.format(os.getcwd()), 'r') as f:
     commands = f.read().replace('\n', '').split(';')[:-1]
     for command in commands:

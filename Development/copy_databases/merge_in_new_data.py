@@ -26,3 +26,5 @@ for table in tables:
     print(table)
     insert_table_command = "INSERT INTO {0}.{2} SELECT * FROM {1}.{2}".format(new_database, temporary_upload, table)
     engine.execute(insert_table_command)
+
+engine.execute("SET FOREIGN_KEY_CHECKS=1;")
