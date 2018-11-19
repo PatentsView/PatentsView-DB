@@ -10,5 +10,5 @@ ssh -i "PatentsView-DB/Development/PV_Apache_Solr.pem" centos@ec2-52-21-62-204.c
 echo "Done inventor" &&
 ssh -i "PatentsView-DB/Development/PV_Apache_Solr.pem" centos@ec2-52-21-62-204.compute-1.amazonaws.com "cd /data/inventor-disambiguation-internal; bash run_assignee.sh" &&
 echo "Done assignee" &&
-#ssh -i "PatentsView-DB/Development/PV_Apache_Solr.pem" centos@ec2-52-21-62-204.compute-1.amazonaws.com "cd /data/inventor-disambiguation-internal; bash run_location.sh" &&
-#echo "Done location!"
+ssh -i "PatentsView-DB/Development/PV_Apache_Solr.pem" centos@ec2-52-21-62-204.compute-1.amazonaws.com "cd /data/inventor-disambiguation-internal; bash run_location.sh" &&
+echo "Done location!"
