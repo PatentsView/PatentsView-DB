@@ -46,7 +46,7 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
 def upload_rawassignee(db_con, disambiguated_folder):
     db_con.execute('alter table rawassignee rename temp_rawassignee_backup')
     raw_assignee = pd.read_csv('{}/rawassignee_updated.csv'.format(disambiguated_folder), encoding = 'utf-8', delimiter = '\t')
-    raw_assignee.to_sql(con=db_con, name = 'rawassignee', index = False, if_exists='replace') 
+    raw_assignee.to_sql(con=db_con, name = 'rawassignee', index = False, if_exists='append') #append keeps the indexes 
 
 
 
@@ -63,7 +63,7 @@ def upload_assignee(db_con, disambiguated_to_write, type_lookup, assignee_id_set
     disambig_data = pd.DataFrame(disambig_list)
     disambig_data.columns = ['id', 'type', 'name_first', 'name_last', 'organization']
     #load it into a temp table and then get rid of the extr assignees
-    disambig_data.to_sql(con = db_con, name = 'assignee', index = False, if_exists = 'replace')
+    disambig_data.to_sql(con = db_con, name = 'assignee', index = False, if_exists = 'append')#append keeps the index
     
 if __name__ == '__main__':
     import configparser
