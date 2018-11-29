@@ -99,13 +99,13 @@ def find_missed_patents(db_con, patent_set, uspc_output):
                     to_add_sub.append(d['subclass_id'])
                 sequence = int(d['sequence'])
                 to_add_uspc_current.append([d['uuid'], d['patent_id'], d['mainclass_id'], d['subclass_id'], sequence]) 
-    print("got final data for update")
-    data = pd.DataFrame(to_add_uspc_current)
-    data.columns = ['uuid', 'patent_id', 'mainclass_id', 'subclass_id', 'sequence']
-    data.to_sql(con=db_con, name='temp_uspc_current_to_insert', index = False, if_exists='replace')
-    print('uploaded data, inserting')
-    db_con.execute('insert into uspc_current select * from temp_uspc_current_to_insert;')
-    print("done")
+        print("got final data for update")
+        data = pd.DataFrame(to_add_uspc_current)
+        data.columns = ['uuid', 'patent_id', 'mainclass_id', 'subclass_id', 'sequence']
+        data.to_sql(con=db_con, name='temp_uspc_current_to_insert', index = False, if_exists='replace')
+        print('uploaded data, inserting')
+        db_con.execute('insert into uspc_current select * from temp_uspc_current_to_insert;')
+        print("done")
 
 
 if __name__ == '__main__':
