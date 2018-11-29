@@ -28,6 +28,7 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
     output = csv.writer(open(disambiguated_folder + "/rawassignee_updated.csv",'w', encoding = 'utf-8'),delimiter='\t')
     output.writerow(['uuid', 'patent_id', 'assignee_id', 'rawlocation_id', 'type', 'name_first', 'name_last', 'organization'])
     type_lookup = defaultdict(lambda : [])
+    assignee_id_set = {} #need this to get rid of assignees that don't appear in the raw assignee table
     counter = 0
     for row in raw_assignee_data:
         if row['uuid'] in lookup.keys(): #some rawassignees don't have a disambiguated assignee becasue of no location    
@@ -37,11 +38,19 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
             assignee_id = general_helpers.id_generator()
             disambiguated[assignee_id] = [row['name_first'], row['name_last'], row['organization']]
             type_lookup[assignee_id].append(row['type'])
+        assignee_id_set.add(assignee_id)
         output.writerow([row['uuid'], row['patent_id'], assignee_id, row['rawlocation_id'], row['type'], row['name_first'], row['name_last'], row['organization']])
-    return type_lookup, disambiguated
+    return type_lookup, disambiguated, assignee_id_set
 
 
-def upload_assignee(db_con, disambiguated_to_write, type_lookup):
+def upload_rawassignee(db_con, disambiguated_folder):
+    db_con.execute('alter table rawassignee rename temp_rawassignee_backup')
+    raw_assignee = pd.read_csv('{}/rawassignee_updated.csv'.format(disambiguated_folder), encoding = 'utf-8', delimiter = '\t')
+    raw_assignee.to_sql(con=db_con, name = 'rawassignee', index = False, if_exists='append') #append keeps the indexes 
+
+
+
+def upload_assignee(db_con, disambiguated_to_write, type_lookup, assignee_id_set):
     disambig_list = [] 
     for assignee_id, assignee_info in disambiguated_to_write.items():
         if assignee_id in type_lookup.items():
@@ -49,16 +58,13 @@ def upload_assignee(db_con, disambiguated_to_write, type_lookup):
             type = max(type_lookup[key], key = counts.get)
         else:
             type = ''
-        disambig_list.append([assignee_id, type, assignee_info[0], assignee_info[1], assignee_info[2]])
+        if assignee_id in assignee_id_set: #only add the ones that are actually used
+            disambig_list.append([assignee_id, type, assignee_info[0], assignee_info[1], assignee_info[2]])
     disambig_data = pd.DataFrame(disambig_list)
     disambig_data.columns = ['id', 'type', 'name_first', 'name_last', 'organization']
-    disambig_data.to_sql(con = db_con, name = 'assignee', index = False, if_exists = 'replace')
-
-def upload_rawassignee(db_con, disambiguated_folder):
-    db_con.execute('alter table rawassignee rename temp_rawassignee_backup')
-    raw_assignee = pd.read_csv('{}/rawassignee_updated.csv'.format(disambiguated_folder), encoding = 'utf-8', delimiter = '\t')
-    raw_assignee.to_sql(con=db_con, name = 'rawassignee', index = False, if_exists='replace') 
-
+    #load it into a temp table and then get rid of the extr assignees
+    disambig_data.to_sql(con = db_con, name = 'assignee', index = False, if_exists = 'append')#append keeps the index
+    
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
@@ -71,8 +77,8 @@ if __name__ == '__main__':
     print(len(raw_to_disambiguated))
     print(len(disambiguated_to_write))
     print('done lookup')
-    type_lookup, disambiguated_to_write = update_raw_assignee(db_con, disambiguated_folder, raw_to_disambiguated, disambiguated_to_write)
+    type_lookup, disambiguated_to_write, assignee_ids_to_use = update_raw_assignee(db_con, disambiguated_folder, raw_to_disambiguated, disambiguated_to_write)
     print('done raw update')
-    upload_assignee(db_con, disambiguated_to_write, type_lookup)
+    upload_assignee(db_con, disambiguated_to_write, type_lookup, assignee_ids_to_use)
     print('Uploaded assignee')
     upload_rawassignee(db_con, disambiguated_folder)

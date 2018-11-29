@@ -37,4 +37,5 @@ if __name__ == '__main__':
     if not os.path.exists(disambig_folder):
         os.makedirs(disambig_folder)
     get_tables(db_con, disambig_folder)
-    os.system('scp -i "PatentsView-DB/Development/PV_Apache_Solr.pem" {}/*.tsv centos@ec2-52-21-62-204.compute-1.amazonaws.com:/data/inventor-disambiguation-internal/data'.format(disambig_folder))
+    key_file = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
+    os.system('scp -i "{}" {}/*.tsv centos@ec2-52-21-62-204.compute-1.amazonaws.com:/data/inventor-disambiguation-internal/data'.format(key_file, disambig_folder))
