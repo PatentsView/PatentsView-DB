@@ -38,7 +38,7 @@ def get_zip_url_all(page_url_lst):
     return zip_url_lst
 
 
-def get_date_url(zip_url_lst, date):
+def get_date_url(zip_url_lst, start_date, end_date):
 
     # create a dictionary with date as key, download url as value
     time_url_dict = {}
@@ -51,7 +51,7 @@ def get_date_url(zip_url_lst, date):
     # compare the date given by the user to get a list of url that needs to be downloaded
     url_list = []
     for d in time_url_dict.keys():
-        if d >= date:
+        if d >= int(start_date) and d <= int(end_date):
             url_list.append(time_url_dict[d])
 
     return sorted(url_list)
@@ -72,16 +72,17 @@ def extract_file(download_url):
 
 # In[12]:
 
-def bulk_download(date):
-
-    if len(date) != 8:
-        raise ValueError('Please input a date in the form of "YYYYMMDD"')
-    # get the year and date (converted to int) of the date a user input
-    year = int(date[0:4])
-    date = int(date)
-    if date < 20050101:
-        raise ValueError('Please input a date that is later than 2005/01/01')
+def bulk_download(start_date, end_date):
     
+    for date in [start_date, end_date]:
+        if len(date) != 8:
+            raise ValueError('Please input a date in the form of "YYYYMMDD"')
+        # get the year and date (converted to int) of the date a user input
+        date = int(date)
+        if date < 20050101:
+             raise ValueError('Please input a date that is later than 2005/01/01')
+    start_year = int(start_date[0:4])
+    end_year = int(end_date[0:4]) 
     #create a folder to save files
     folder = '/usr/local/airflow/raw_data'
     if not os.path.exists(folder):
@@ -96,13 +97,13 @@ def bulk_download(date):
     page_url_lst = []
 
     # get a list of url that is after the specified year
-    for i in range(year, 2019):
+    for i in range(start_year, end_year+1): #+1 because end is exclusive
         page_url_lst.append(main_url + str(i))
 
     # get all downloadable zip file link
     zip_url_lst =  get_zip_url_all(page_url_lst)
     # get the urls that need to be downloaded
-    urls_to_download = get_date_url(zip_url_lst, date)
+    urls_to_download = get_date_url(zip_url_lst, start_date, end_date)
 
     for url in urls_to_download:
         extract_file(url)
@@ -111,4 +112,4 @@ def bulk_download(date):
 
 if __name__== '__main__':
     import sys
-    bulk_download(sys.argv[1])
+    bulk_download(sys.argv[1], sys.argv[2])
