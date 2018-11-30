@@ -57,15 +57,27 @@ def get_results(patents, field_dictionary):
             app_type = app_data['appl-type']
             if app_type == 'SIR': #replace this will the full name
                 app_type = 'statutory invention registration'
-            applicationid = date[:4]+"/"+app_data['document-id-doc-number']
-            results['application'].append([applicationid, patent_id, patent.find('.//us-application-series-code').text,app_data['document-id-doc-number'], app_data['document-id-country'], date])
+            application_num = app_data['document-id-doc-number']
+            applicationid = date[:4]+"/"+application_num
+            series_code = patent.find('.//us-application-series-code').text
+            #logic for creating transformed columns
+            if patent_id.startswith('D'):
+    	        id_transformed = application_num
+    	        number_transformed = application_num
+    	        series_code_transformed_from_type = 'D'
+            else:
+    	        id_transformed = '{}/{}'.format(application_num[:2], application_num[2:])
+    	        number_transformed = application_num
+    	        series_code_transformed_from_type = series_code
+
+            results['application'].append([applicationid, patent_id, series_code, app_data['document-id-doc-number'], app_data['document-id-country'], date, id_transformed, number_transformed, series_code_transformed_from_type])
         else:
             error_log.append([patent_id, 'application'])
             app_type = None
         #assigned after application to extract application data
         results['patent'].append([patent_id,app_type , patent_id, patent_data['document-id-country'],
                            patent_date, abstract, title, patent_data['document-id-kind'], num_claims, filename])
-
+        
         exemplary = xml_helpers.get_entity(patent, 'us-exemplary-claim')
         if exemplary[0] is not None:
             exemplary = [int(list(item_dict.values())[0]) for item_dict in exemplary if list(item_dict.values())[0] is not None] #list of exemplary claims as strings
@@ -383,7 +395,6 @@ def get_results(patents, field_dictionary):
                              pct_pub_data['document-id-date'], None,
                              pct_pub_data['document-id-country'], pct_pub_data['document-id-kind'],
                              "wo_grant", None])  
-    #results = dict([(field, eval('{0}'.format(field))) for field in field_dictionary.keys()])
     return results, error_log
 
 
@@ -419,8 +430,11 @@ if __name__ == '__main__':
     fields = [field_dictionary for item in in_files]
     files = zip(in_files, out_files, fields)
 
+    for item in files:
+        print(item[0])
+        main_process(item[0], item[1], item[2])  
     
-    
+    '''
     print("Starting")
     desired_processes = 7 # ussually num cpu - 1
     jobs = []
@@ -430,3 +444,4 @@ if __name__ == '__main__':
         print(segment)
         for job in segment:
             job.start()
+    '''
