@@ -1,4 +1,4 @@
- {"application": ["id","patent_id","type","number","country","date"], 
+ {"application": ["id","patent_id","type","number","country","date", "id_transformed", "number_transformed", "series_code_transformed_from_type"], 
                     "botanic" : ["uuid", "patent_id", "latin_name", "variety"],
                    "claim" : ["uuid","patent_id","text","dependent","sequence", "exemplary"],
                    "brf_sum_text": ["uuid", "patent_id", "text"],
