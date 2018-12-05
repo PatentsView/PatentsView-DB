@@ -13,7 +13,7 @@ sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 
 def make_lookup(disambiguated_folder):
-    #os.system('mv location_all.tsv {}/location_disambiguation.tsv'.format(disambiguated_folder))
+    os.system('mv location_all.tsv {}/location_disambiguation.tsv'.format(disambiguated_folder))
     inp = csv.reader(open( "{}/location_disambiguation.tsv".format(disambiguated_folder),'r'),delimiter='\t')
     print('read in')
     lat_name_lookup = {} #place to lat/long/id lookup
@@ -51,7 +51,7 @@ def upload_location(db_con, lat_name_lookup, disambiguated_folder):
         location.append([v['id'], v['place'][0],v['place'][1],v['place'][2],k.split('|')[0], k.split('|')[1], None, None, None])
     location_df = pd.DataFrame(location)
     location_df.columns = ['id', 'city', 'state', 'country', 'latitude', 'longitude', 'county', 'state_fips', 'county_fips']
-    location_df.to_sql(con=db_con, name = 'location', if_exists = 'replace', index = False)
+    location_df.to_sql(con=db_con, name = 'location', if_exists = 'append', index = False)
     location_df.to_csv('{}/location.csv'.format(disambiguated_folder))
     
 
@@ -92,7 +92,7 @@ def process_rawlocation(db_con, lookup, lat_name_lookup, undisambiguated, disamb
 def upload_rawloc(db_con, disambiguated_folder):
     raw_data = pd.read_csv(disambiguated_folder + "/rawlocation_updated.csv", delimiter = '\t')
     print('uploading')
-    raw_data.to_sql(con=db_con, name = 'rawlocation', if_exists = 'replace', index = False)
+    raw_data.to_sql(con=db_con, name = 'rawlocation', if_exists = 'append', index = False)
 
 
 if __name__ == '__main__':
