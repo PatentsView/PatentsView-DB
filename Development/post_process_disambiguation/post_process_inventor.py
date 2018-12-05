@@ -13,7 +13,6 @@ from helpers import general_helpers
 
 
 def make_lookup(disambiguated_folder):
-    os.system('mv inventor_disambiguation.tsv {}/inventor_disambiguation.tsv'.format(disambiguated_folder))
     rawinventors = csv.reader(open(disambiguated_folder + "/inventor_disambiguation.tsv",'r'),delimiter='\t')
     lookup = {}
     inventors_to_write = {}
@@ -39,7 +38,7 @@ def write_inventor(inventors_to_write, disambiguated_folder):
         inventor_list.append([inv_id] + inventor)
     inventor_data = pd.DataFrame(inventor_list)
     inventor_data.columns = ['inventor_id', 'name_first', 'name_last']
-    inventor_data.to_sql(con=db_con, name = 'inventor', if_exists = 'replace', index = False)
+    inventor_data.to_sql(con=db_con, name = 'inventor', if_exists = 'append', index = False)
     inventor_data.to_csv("{}/inventor.csv".format(disambiguated_folder), index = False)
 
 
@@ -54,7 +53,7 @@ def update_raw(db_con, disambiguated_folder, lookup):
         inventor_id =lookup[row[0]]
         output.writerow([row['uuid'], row['patent_id'], inventor_id, row['rawlocation_id'], row['name_first'], row['name_last'], row['sequence'], row['rule_47']])
     raw_data = pd.read_csv(disambiguated_folder + "/rawinventor_updated.csv", delimiter = '\t')
-    raw_data.to_sql(con=db_con, name = 'rawinventor', if_exists = 'replace', index = False)
+    raw_data.to_sql(con=db_con, name = 'rawinventor', if_exists = 'append', index = False)
  
 
 
