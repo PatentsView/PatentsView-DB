@@ -55,10 +55,11 @@ def upload_location(db_con, lat_name_lookup, disambiguated_folder):
     location_df.to_csv('{}/location.csv'.format(disambiguated_folder))
     
 
-def upload_rawlocation(db_con, lookup, lat_name_lookup, undisambiguated, disambiguated_folder):
-    #db_con.execute('alter table rawlocation rename temp_rawlocation_backup')
+def process_rawlocation(db_con, lookup, lat_name_lookup, undisambiguated, disambiguated_folder):
+   
+    db_con.execute('alter table rawlocation rename temp_rawlocation_backup')
     print('getting data for rawloc')
-    #db_con.execute('create table rawlocation like temp_rawlocation_backup')
+    db_con.execute('create table rawlocation like temp_rawlocation_backup')
     raw_loc_data = db_con.execute("select * from temp_rawlocation_backup")
     print('got data')
     updated = csv.writer(open(disambiguated_folder + "/rawlocation_updated.csv",'w'),delimiter='\t')
@@ -87,24 +88,28 @@ def upload_rawlocation(db_con, lookup, lat_name_lookup, undisambiguated, disambi
     except:
         print('no')
     print('now reading in fo upload')
+
+def upload_rawloc(db_con, disambiguated_folder):
     raw_data = pd.read_csv(disambiguated_folder + "/rawlocation_updated.csv", delimiter = '\t')
     print('uploading')
     raw_data.to_sql(con=db_con, name = 'rawlocation', if_exists = 'replace', index = False)
+
+
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
     config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
 
-    #db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
-    db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], 'patent_20180828_loc')
+    db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
     
     disambiguated_folder = "{}/disambig_out".format(config['FOLDERS']['WORKING_FOLDER'])
     print('here!')
     print('data inserted')
     lat_name_lookup, lookup, undisambiguated = make_lookup(disambiguated_folder)
     print('made lookup')
-    #upload_location(db_con, lat_name_lookup, disambiguated_folder)
+    upload_location(db_con, lat_name_lookup, disambiguated_folder)
     print('done locupload ')
-    upload_rawlocation(db_con, lookup, lat_name_lookup,undisambiguated, disambiguated_folder)
-    print('done')
+    process_rawlocation(db_con, lookup, lat_name_lookup,undisambiguated, disambiguated_folder)
+    print('done process')
+    upload_rawloc(db_con, disambiguated_folder)
     
