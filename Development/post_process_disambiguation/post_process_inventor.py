@@ -13,7 +13,6 @@ from helpers import general_helpers
 
 
 def make_lookup(disambiguated_folder):
-    os.system('mv inventor_disambiguation.tsv {}/inventor_disambiguation.tsv'.format(disambiguated_folder))
     rawinventors = csv.reader(open(disambiguated_folder + "/inventor_disambiguation.tsv",'r'),delimiter='\t')
     lookup = {}
     inventors_to_write = {}
