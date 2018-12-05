@@ -13,7 +13,7 @@ from helpers import general_helpers
 
 
 def create_assignee_lookup(disambiguated_folder):
-    os.system('mv assignee_disambiguation.tsv {}/assignee_disambiguation.tsv'.format(disambiguated_folder))    
+    #os.system('mv assignee_disambiguation.tsv {}/assignee_disambiguation.tsv'.format(disambiguated_folder))    
     assignee_data = csv.reader(open('{}/assignee_disambiguation.tsv'.format(disambiguated_folder), 'r'), delimiter = '\t')
     raw_to_disambiguated = {}
     disambiguated = {}
@@ -26,9 +26,9 @@ def create_assignee_lookup(disambiguated_folder):
 def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
     raw_assignee_data = db_con.execute("select * from rawassignee")
     output = csv.writer(open(disambiguated_folder + "/rawassignee_updated.csv",'w', encoding = 'utf-8'),delimiter='\t')
-    output.writerow(['uuid', 'patent_id', 'assignee_id', 'rawlocation_id', 'type', 'name_first', 'name_last', 'organization'])
+    output.writerow(['uuid', 'patent_id', 'assignee_id', 'rawlocation_id', 'type', 'name_first', 'name_last', 'organization', 'sequence'])
     type_lookup = defaultdict(lambda : [])
-    assignee_id_set = {} #need this to get rid of assignees that don't appear in the raw assignee table
+    assignee_id_set = set() #need this to get rid of assignees that don't appear in the raw assignee table
     counter = 0
     for row in raw_assignee_data:
         if row['uuid'] in lookup.keys(): #some rawassignees don't have a disambiguated assignee becasue of no location    
@@ -39,12 +39,13 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
             disambiguated[assignee_id] = [row['name_first'], row['name_last'], row['organization']]
             type_lookup[assignee_id].append(row['type'])
         assignee_id_set.add(assignee_id)
-        output.writerow([row['uuid'], row['patent_id'], assignee_id, row['rawlocation_id'], row['type'], row['name_first'], row['name_last'], row['organization']])
+        output.writerow([row['uuid'], row['patent_id'], assignee_id, row['rawlocation_id'], row['type'], row['name_first'], row['name_last'], row['organization'], row['sequence']])
     return type_lookup, disambiguated, assignee_id_set
 
 
 def upload_rawassignee(db_con, disambiguated_folder):
     db_con.execute('alter table rawassignee rename temp_rawassignee_backup')
+    db_con.execute('create table rawassignee like temp_rawassignee_backup')
     raw_assignee = pd.read_csv('{}/rawassignee_updated.csv'.format(disambiguated_folder), encoding = 'utf-8', delimiter = '\t')
     raw_assignee.to_sql(con=db_con, name = 'rawassignee', index = False, if_exists='append') #append keeps the indexes 
 
