@@ -13,7 +13,6 @@ sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 
 def make_lookup(disambiguated_folder):
-    os.system('mv location_all.tsv {}/location_disambiguation.tsv'.format(disambiguated_folder))
     inp = csv.reader(open( "{}/location_disambiguation.tsv".format(disambiguated_folder),'r'),delimiter='\t')
     print('read in')
     lat_name_lookup = {} #place to lat/long/id lookup
