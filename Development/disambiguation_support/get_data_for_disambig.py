@@ -32,10 +32,12 @@ if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
     config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
-    db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['OLD_DB'])
+    db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'disambig_inputs')
+    
     if not os.path.exists(disambig_folder):
         os.makedirs(disambig_folder)
     get_tables(db_con, disambig_folder)
+  
     key_file = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
     os.system('scp -i "{}" {}/*.tsv centos@ec2-52-21-62-204.compute-1.amazonaws.com:/data/inventor-disambiguation-internal/data'.format(key_file, disambig_folder))
