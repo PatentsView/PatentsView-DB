@@ -24,20 +24,20 @@ create database if not exists `PatentsView_20171226_v2` default character set=ut
  
 #ALTER TABLE `patent_20171226`.`patent_assignee` ADD INDEX `assignee_id` (`assignee_id` );
  
-#ALTER TABLE `patent_20171226`.`cpc_current` ADD INDEX `section_id` (`section_id` );
+ALTER TABLE `patent_20171226`.`cpc_current` ADD INDEX `section_id` (`section_id` );
 
 
-#ALTER TABLE `patent_20171226`.`rawexaminer` ADD INDEX `patent_id` (`patent_id` );
+ALTER TABLE `patent_20171226`.`rawexaminer` ADD INDEX `patent_id` (`patent_id` );
 
 
 
-#ALTER TABLE `patent_20171226`.`usreldoc` ADD INDEX `patent_id` (`patent_id` );
+ALTER TABLE `patent_20171226`.`usreldoc` ADD INDEX `patent_id` (`patent_id` );
 
-#ALTER TABLE `patent_20171226`.`rel_app_text` ADD INDEX `patent_id` (`patent_id` );
+ALTER TABLE `patent_20171226`.`rel_app_text` ADD INDEX `patent_id` (`patent_id` );
 
-#ALTER TABLE `patent_20171226`.`wipo` ADD INDEX `patent_id` (`patent_id` );
+ALTER TABLE `patent_20171226`.`wipo` ADD INDEX `patent_id` (`patent_id` );
 
-#ALTER TABLE `patent_20171226`.`wipo` ADD INDEX `field_id` (`field_id` );
+ALTER TABLE `patent_20171226`.`wipo` ADD INDEX `field_id` (`field_id` );
 
 
 # BEGIN assignee id mapping 
