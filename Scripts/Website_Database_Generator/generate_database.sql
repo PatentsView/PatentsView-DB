@@ -10,7 +10,7 @@
 
 ### TODO: add indexes to all new fields created for new data
 
-drop database if exists `PatentsView_20171226_v2`;
+#drop database if exists `PatentsView_20171226_v2`;
 create database if not exists `PatentsView_20171226_v2` default character set=utf8 default collate=utf8_general_ci;
 
 #add indexes
