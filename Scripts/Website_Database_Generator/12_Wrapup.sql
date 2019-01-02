@@ -991,18 +991,6 @@ INSERT INTO `PatentsView_20181127`.`government_organization`
 INSERT INTO `PatentsView_20181127`.`patent_contractawardnumber`
    SELECT * FROM `patent_20181127`.`patent_contractawardnumber`;
 
-DROP TABLE IF EXISTS `patent_20181127`.`temp_patent_govintorg_backup`;
-
-ALTER TABLE `patent_20181127`.`patent_govintorg`
-   RENAME `patent_20181127`.`temp_patent_govintorg_backup`;
-
-CREATE TABLE `patent_20181127`.`patent_govintorg`
-AS
-     SELECT *
-       FROM `patent_20181127`.`temp_patent_govintorg_backup`
-   GROUP BY patent_id, organization_id;
-
-
 INSERT INTO `PatentsView_20181127`.`patent_govintorg`
    SELECT * FROM `patent_20181127`.`patent_govintorg`;
 
