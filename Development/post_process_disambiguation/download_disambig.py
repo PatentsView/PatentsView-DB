@@ -17,7 +17,7 @@ if not os.path.exists(disambig_folder):
 
 key_file = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
 
-#os.system('scp -i "{}" centos@ec2-52-21-62-204.compute-1.amazonaws.com:/data/inventor-disambiguation-internal/data/multi-canopy-output/clean_inventor_results.txt {}/inventor_disambiguation.tsv'.format(key_file, disambig_folder))
+os.system('scp -i "{}" centos@ec2-52-21-62-204.compute-1.amazonaws.com:/data/inventor-disambiguation-internal/data/multi-canopy-output/clean_inventor_results.txt {}/inventor_disambiguation.tsv'.format(key_file, disambig_folder))
 
 os.system('scp -i "{}" centos@ec2-52-21-62-204.compute-1.amazonaws.com:/data/inventor-disambiguation-internal/exp_out/assignee/disambiguation.post_processed.tsv {}/assignee_disambiguation.tsv'.format(key_file, disambig_folder))
 
