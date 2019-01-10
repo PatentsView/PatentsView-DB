@@ -44,10 +44,25 @@ def make_lookup(disambiguated_folder):
     print('second loop')
     return id_lat_long_lookup, lat_long_cannonical_name
 
-def upload_location(db_con, lat_long_cannonical_name, disambiguated_folder):
+def make_fips():
+    census_fips = pd.read_csv('{}/census_fips.csv'.format(config['FOLDERS']['PERSISTENT_FILES']))
+    state_lookup = {}
+    states = census_fips['STATE']
+    state_fips = census_fips['STATE_FIPS']
+    for i in range(len(census_fips)):
+        state_lookup[states[i]] = str(state_fips[i]).zfill(2)
+    return state_lookup
+
+for i in range(len(census_fips)):
+    state_lookup[states[i]] = str(state_fips[i]).zfill(2)
+
+def upload_location(db_con, lat_long_cannonical_name, disambiguated_folder, fips):
     location = []          
     for lat_long, v in lat_long_cannonical_name.items():
-        location.append([v['id'], v['place'][0],v['place'][1],v['place'][2],lat_long.split('|')[0], lat_long.split('|')[1], None, None, None])
+        state_fips = None
+        if v['place'][1] in fips.keys():
+            state_fips = fips[v['place'][1]]
+        location.append([v['id'], v['place'][0],v['place'][1],v['place'][2],lat_long.split('|')[0], lat_long.split('|')[1], None, state_fips, None])
     location_df = pd.DataFrame(location)
     location_df.columns = ['id', 'city', 'state', 'country', 'latitude', 'longitude', 'county', 'state_fips', 'county_fips']
     location_df.to_sql(con=db_con, name = 'location', if_exists = 'append', index = False)
