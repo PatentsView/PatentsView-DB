@@ -1,0 +1,14 @@
+Cython
+pytz
+pyOpenSSL
+ndg-httpsclient
+datetime
+pyasn1
+BeautifulSoup4
+lxml
+simplejson
+apache-airflow[celery,postgres,hive,jdbc,mysql]
+celery[redis]
+clint
+mysqlclient
+sqlalchemy

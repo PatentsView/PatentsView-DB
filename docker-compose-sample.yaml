@@ -1,0 +1,9 @@
+version: "3"
+services:
+  {service-name}:
+      volumes:
+       - '/Path/to/Project/Root/PatentsView-DB/:/project'
+       - '/Path/to/Project/Root/PatentsView-DB/airflow:/airflow'
+      image: {docker-image-name}
+      ports:
+        - 9090:8080
