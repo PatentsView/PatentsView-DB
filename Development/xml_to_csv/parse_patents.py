@@ -430,11 +430,7 @@ if __name__ == '__main__':
     fields = [field_dictionary for item in in_files]
     files = zip(in_files, out_files, fields)
 
-    for item in files:
-        print(item[0])
-        main_process(item[0], item[1], item[2])  
     
-    '''
     print("Starting")
     desired_processes = 7 # ussually num cpu - 1
     jobs = []
@@ -444,4 +440,4 @@ if __name__ == '__main__':
         print(segment)
         for job in segment:
             job.start()
-    '''
+            job.join()
