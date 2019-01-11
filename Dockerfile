@@ -64,8 +64,8 @@ WORKDIR /setup/
 COPY requirements.txt /setup
 RUN export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -r requirements.txt
 EXPOSE 8080 5555 8793
-RUN chown -R airflow:airflow /airflow
-USER airflow
+#RUN chown -R airflow:airflow /airflow
+#USER airflow
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/project/supervisord.conf"]
 # ENTRYPOINT ["/entrypoint.sh"]
 # CMD ["webserver"] # set default arg for entrypoint
