@@ -7,3 +7,4 @@ services:
       image: {docker-image-name}
       ports:
         - 9090:8080
+        - 8889:8888
