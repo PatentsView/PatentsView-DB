@@ -5,6 +5,26 @@ services:
        - '/Path/to/Project/Root/PatentsView-DB/:/project'
        - '/Path/to/Project/Root/PatentsView-DB/airflow:/airflow'
       image: {docker-image-name}
+      depends_on:
+      - "airflow-db"
       ports:
         - 9090:8080
         - 8889:8888
+      environment:
+        AIRFLOW__CORE__SQL_ALCHEMY_CONN: "mysql://airflow:airflow_db_password@airflow-metadata-db:3306/airflow"
+    container_name: airflow-notebook-server
+  airflow-db:
+    volumes:
+      - '/Path/to/Project/Root/PatentsView-DB/airflow-metadata-db-disk:/var/lib/mysql'
+    image: mysql:5.6
+    command: --default-authentication-plugin=mysql_native_password --explicit_defaults_for_timestamp=1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql_root_password
+    container_name: airflow-metadata-db
+    ports:
+      - 3308:3306
+networks:
+  default:
+    external:
+      name: patentsview-pipeline-network
