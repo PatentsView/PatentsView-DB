@@ -6,3 +6,11 @@ venv
 .idea
 docker-compose.yaml
 docker-compose-debug.yaml
+Development/config.ini
+airflow/airflow-webserver.pid
+airflow/airflow.db
+airflow/lawyer.pickle
+airflow/logs/scheduler/2019-01-15/update-db.py.log
+airflow/logs/scheduler/2019-01-16/update-db.py.log
+airflow/logs/scheduler/latest
+airflow/unittests.cfg
