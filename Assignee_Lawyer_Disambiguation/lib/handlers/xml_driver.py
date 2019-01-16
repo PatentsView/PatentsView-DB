@@ -37,7 +37,7 @@ provides useful helper methods to handle the parsed data.
 import functools
 from collections import deque
 from xml.sax import make_parser, handler
-import xml_util
+from . import xml_util
 
 class ChainList(list):
     """
@@ -87,7 +87,7 @@ class XMLElement(object):
     def __iter__(self):
         yield self
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self.is_root or self._name is not None
 
     def __getitem__(self, key):
@@ -120,14 +120,14 @@ class XMLElement(object):
                  and len(res) == 1\
                  and isinstance(res[0], list):
                 res = res[0]
-            return ' '.join(filter(lambda x: x, filter(lambda x: not isinstance(x, list), res)))
+            return ' '.join([x for x in [x for x in res if not isinstance(x, list)] if x])
         return res
 
     def get_content(self, upper=True):
         if len(self.content) == 1:
             return xml_util.clean(self.content[0], upper=upper)
         else:
-            return map(functools.partial(xml_util.clean, upper=upper), self.content)
+            return list(map(functools.partial(xml_util.clean, upper=upper), self.content))
 
     def put_content(self, content, lastlinenumber, linenumber):
         if not self.content or lastlinenumber != linenumber:
@@ -142,7 +142,7 @@ class XMLElement(object):
         return xml_util.clean(self._attributes.get(key, None), upper=upper)
 
     def get_xmlelements(self, name):
-        return filter(lambda x: x._name == name, self.children) \
+        return [x for x in self.children if x._name == name] \
                if name else \
                self.children
 
@@ -161,7 +161,7 @@ class XMLHandler(handler.ContentHandler):
 
     def startElement(self, name, attributes):
         name = name.replace('-','_').replace('.','_').replace(':','_')
-        xmlelem = XMLElement(name, dict(attributes.items()))
+        xmlelem = XMLElement(name, dict(list(attributes.items())))
         if self.elements:
             self.elements[-1].add_child(xmlelem)
         else:
@@ -178,7 +178,7 @@ class XMLHandler(handler.ContentHandler):
           if self.elements[-1]._name in ('b','i'):
             self.elements[-2].put_content(content, self.lastline, currentlinenumber)
           elif self.elements[-1]._name == 'sub':
-            newtxt = u"<sub>"+content+u"</sub>"
+            newtxt = "<sub>"+content+"</sub>"
             self.elements[-2].put_content(newtxt, self.lastline, currentlinenumber)
           else:
             self.elements[-1].put_content(content, self.lastline, currentlinenumber)

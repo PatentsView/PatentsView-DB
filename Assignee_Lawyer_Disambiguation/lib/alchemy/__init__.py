@@ -31,34 +31,34 @@ Helper functions for database-related functionality.
 """
 import os
 import re
-import ConfigParser
+import configparser
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.sql import exists
 from collections import defaultdict
-import schema
-from match import *
+from . import schema
+from .match import *
 import uuid
 
 from sqlalchemy import exc
 from sqlalchemy import event
 from sqlalchemy.pool import Pool
 
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 h = HTMLParser()
 def unescape_html(x):
     return h.unescape(x)
 
-import htmlentitydefs
+import html.entities
 
 _char = re.compile(r'&(\w+?);')
     
 # Generate some extra HTML entities
-defs=htmlentitydefs.entitydefs
+defs=html.entities.entitydefs
 defs['apos'] = "'"
 #need to fix this to pull the database location from the config file
-entities = open('D:/DataBaseUpdate/Code/PatentsView-DB/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
+entities = open('../project/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
 for e in entities:
     try:
         first = re.sub('\s+|\"|;|&','',e[3:15])
@@ -125,7 +125,7 @@ def get_config(localfile="config.ini", default_file=True):
         openfile = localfile
     config = defaultdict(dict)
     if os.path.isfile(openfile):
-        cfg = ConfigParser.ConfigParser()
+        cfg = configparser.ConfigParser()
         cfg.read(openfile)
         for s in cfg.sections():
             for k, v in cfg.items(s):
@@ -384,9 +384,9 @@ def add_claims(obj, pat):
 def commit():
     try:
         grantsession.commit()
-    except Exception, e:
+    except Exception as e:
         grantsession.rollback()
-        print str(e)
+        print(str(e))
 
 def add_application(obj, override=True, temp=False):
     """
@@ -501,9 +501,9 @@ def add_app_claims(obj, app):
 def commit_application():
     try:
         appsession.commit()
-    except Exception, e:
+    except Exception as e:
         appsession.rollback()
-        print str(e)
+        print(str(e))
 
 grantsession = fetch_session(dbtype='grant')
 appsession = fetch_session(dbtype='application')
