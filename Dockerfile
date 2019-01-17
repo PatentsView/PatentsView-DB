@@ -5,15 +5,15 @@
 
 FROM jupyter/datascience-notebook
 USER root
-LABEL maintainer="Puckel_"
 
+ARG GID=1000
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
 # Airflow
 ARG AIRFLOW_VERSION=1.10.1
-
+ARG GID=1000
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -59,10 +59,11 @@ RUN apt-get update --fix-missing \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
-
+RUN groupadd --gid=$GID docker-group || 1
+RUN usermod -a -G $GID $NB_USER
 RUN apt-get install -y net-tools iputils-ping
 RUN apt-get install -y libmysqlclient-dev
-USER jovyan
+USER $NB_USER
 RUN pip install https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tarball/master yapf
 RUN pip install autopep8 pymysql nltk pymongo google-cloud-pubsub python-dateutil pycryptodome
 RUN jupyter contrib nbextension install --user
@@ -87,7 +88,7 @@ COPY requirements.txt /setup
 RUN export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -r /setup/requirements.txt
 
 EXPOSE 8080 5555 8793
-#RUN chown -R airflow:airflow /airflow
+
 
 WORKDIR /project
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/project/supervisord.conf"]

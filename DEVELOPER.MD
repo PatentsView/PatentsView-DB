@@ -7,7 +7,7 @@
 ## Base & Airflow Setup
 
 1. Clone into this repository (cloned local folder referred to as **PROJECT_HOME** for the rest of this documentation)
-2. Build docker image from **PROJECT_HOME** using `docker build -t {image-name} .`
+2. Build docker image from **PROJECT_HOME** using `docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t {image-name} .`
 3. Using `docker-compose-sample.yaml` as reference, create a file called `docker-compose.yaml`  
 	a. Replace `/Path/to/Project/Root/PatentsView-DB/` with the **PROJECT_HOME** location in all `volumes` lines  (total of 3)
 	b. Replace **{docker-image-name}** with docker image name you used/intend to use. This is the value that you use in `docker build -t . {docker-image-name}`  
