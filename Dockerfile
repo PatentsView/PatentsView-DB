@@ -6,7 +6,6 @@
 FROM jupyter/datascience-notebook
 USER root
 
-
 ARG GID=1000
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -91,8 +90,10 @@ COPY requirements.txt /setup
 RUN export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -r /setup/requirements.txt
 
 EXPOSE 8080 5555 8793
+
 ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}/Development"
 #RUN chown -R airflow:airflow /airflow
+
 
 WORKDIR /project
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/project/supervisord.conf"]
