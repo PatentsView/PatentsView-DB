@@ -84,7 +84,7 @@ def bulk_download(start_date, end_date):
     start_year = int(start_date[0:4])
     end_year = int(end_date[0:4]) 
     #create a folder to save files
-    folder = '/usr/local/airflow/raw_data'
+    folder = '/project/data/raw_data'
     if not os.path.exists(folder):
         os.mkdir(folder)
     os.chdir(folder)

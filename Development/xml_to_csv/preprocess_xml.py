@@ -1,7 +1,7 @@
 import os
 import sys
 import re
-sys.path.append("/usr/local/airflow/PatentsView-DB/Development")
+sys.path.append("/project/Development")
 from helpers import general_helpers, xml_helpers
 import xml.etree.ElementTree as ET
 from lxml import etree
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     import configparser
     config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+    config.read('/project/Development/config.ini')
     infolder = config['FOLDERS']['RAW_DATA']
     outfolder = config['FOLDERS']['DATA_TO_PARSE']
     if not os.path.exists(outfolder):

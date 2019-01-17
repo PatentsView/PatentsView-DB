@@ -2,13 +2,13 @@ import MySQLdb
 import os
 import csv
 import sys
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+sys.path.append('/project/Development')
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 
 import configparser
 config = configparser.ConfigParser()
-config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+config.read('/project/Development/config.ini')
 disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'disambig_out')
 
 if not os.path.exists(disambig_folder):

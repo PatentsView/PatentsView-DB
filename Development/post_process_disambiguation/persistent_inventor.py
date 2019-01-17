@@ -3,13 +3,13 @@ import os
 import csv
 import sys
 import pandas as pd
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+sys.path.append('/project/Development')
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 
 import configparser
 config = configparser.ConfigParser()
-config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+config.read('/project/Development/config.ini')
 db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
 disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'disambig_out')
 old_db = config['DATABASE']['OLD_DB']

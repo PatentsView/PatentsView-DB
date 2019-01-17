@@ -3,11 +3,11 @@ import MySQLdb
 import sys
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 #this makes it run in airflow specifically, which is picky about paths
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+#sys.path.append('/project/Development')
 from helpers import general_helpers
 import configparser
 config = configparser.ConfigParser()
-config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+config.read('/project/Development/config.ini')
 host = config['DATABASE']['HOST']
 username = config['DATABASE']['USERNAME']
 password = config['DATABASE']['PASSWORD']
@@ -23,7 +23,7 @@ engine.execute("create schema {} CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unico
 
 engine2 = general_helpers.connect_to_db(host, username, password, new_database)
 engine2.execute("SET FOREIGN_KEY_CHECKS=0;")
-with open('/usr/local/airflow/PatentsView-DB/Development/patent_schema.sql'.format(os.getcwd()), 'r') as f:
+with open('/project/Development/patent_schema.sql'.format(os.getcwd()), 'r') as f:
     commands = f.read().replace('\n', '').split(';')[:-1]
     for command in commands:
         engine2.execute(command)

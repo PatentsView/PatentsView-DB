@@ -1,7 +1,7 @@
 import sys
 import os
 import MySQLdb
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+sys.path.append('/project/Development')
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 from warnings import filterwarnings
@@ -76,7 +76,7 @@ def upload_cpc_current(db_con, cpc_current_loc):
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+    config.read('/project/Development/config.ini')
 
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], 
                                             config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
