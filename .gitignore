@@ -14,3 +14,5 @@ airflow/logs/scheduler/2019-01-15/update-db.py.log
 airflow/logs/scheduler/2019-01-16/update-db.py.log
 airflow/logs/scheduler/latest
 airflow/unittests.cfg
+Development/dev_config.ini
+Assignee_Lawyer_Disambiguation/lib/alchemy/alchemy_config.ini

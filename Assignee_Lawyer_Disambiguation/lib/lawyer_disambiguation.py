@@ -51,7 +51,7 @@ from tasks import bulk_commit_inserts, bulk_commit_updates
 import sys
 config = get_config()
 
-THRESHOLD = config.get("lawyer").get("threshold")
+THRESHOLD = config.get("LAWYER").get("threshold")
 
 # bookkeeping for blocks
 blocks = defaultdict(list)
@@ -147,7 +147,7 @@ def create_lawyer_table(session):
               lawyer_match(rawlawyers, session, commit=True)
           else:
               lawyer_match(rawlawyers, session, commit=False)
-    t1 = bulk_commit_inserts(lawyer_insert_statements, Lawyer.__table__, alchemy.is_mysql(), 20000, 'grant')
+    t1 = bulk_commit_inserts(lawyer_insert_statements, Lawyer.__table__, alchemy.is_mysql(), 20000, 'new')
     t2 = bulk_commit_inserts(patentlawyer_insert_statements, patentlawyer, alchemy.is_mysql(), 20000)
     t3 = bulk_commit_updates('lawyer_id', update_statements, RawLawyer.__table__, alchemy.is_mysql(), 20000)
     # t1.get()
@@ -237,7 +237,7 @@ def printall():
             f.write('\n')
 
 
-def run_letter(letter, session, doctype='grant'):
+def run_letter(letter, session, doctype='new'):
     schema = RawLawyer
     if doctype == 'application':
         schema = App_RawLawyer
@@ -251,14 +251,14 @@ def run_letter(letter, session, doctype='grant'):
     create_lawyer_table(session)
 
 
-def run_disambiguation(doctype='grant'):
+def run_disambiguation(doctype='new'):
     # get all lawyers in database
     global blocks
     global lawyer_insert_statements
     global patentlawyer_insert_statements
     global update_statements
     session = alchemy.fetch_session(dbtype=doctype)
-    if doctype == 'grant':
+    if doctype == 'new':
         lawyers = deque(session.query(RawLawyer))
     if doctype == 'application':
         lawyers = deque(session.query(App_RawLawyer))

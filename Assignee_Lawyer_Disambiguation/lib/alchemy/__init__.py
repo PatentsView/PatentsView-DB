@@ -108,17 +108,18 @@ def is_mysql():
     like `set foreign_key_checks = 0` and `truncate <tablaneme>`.
     """
     config = get_config()
-    return config.get('global').get('database') == 'mysql'
+    return config.get('GLOBAL').get('database') == 'mysql'
 
 
-def get_config(localfile="config.ini", default_file=True):
+def get_config(localfile="../project/Development/config.ini", default_file=False):
     """
     This grabs a configuration file and converts it into
     a dictionary.
 
     The default filename is called config.ini
-    First we load the global file, then we load a local file
+    First we load the GLOBAL file, then we load a local file
     """
+    print("OPEN FILE AT : ", os.path.dirname(os.path.realpath(__file__)))
     if default_file:
         openfile = "{0}/config.ini".format(os.path.dirname(os.path.realpath(__file__)))
     else:
@@ -140,28 +141,33 @@ def get_config(localfile="config.ini", default_file=True):
         for section in newconfig:
             for item in newconfig[section]:
                 config[section][item] = newconfig[section][item]
-
+    print(config)
     return config
 
-def session_generator(db=None, dbtype='grant'):
+def session_generator(db=None, dbtype='new'):
     """
-    Read from config.ini file and load appropriate database
+    Read from ../project/Development/config.ini file and load appropriate database
 
     @db: string describing database, e.g. "sqlite" or "mysql"
     @dbtype: string indicating if we are fetching the session for
-             the grant database or the application database
+             the new database or the application database
     session_generator will return an object taht can be called
     to retrieve more sessions, e.g.
-    sg = session_generator(dbtype='grant')
+    sg = session_generator(dbtype='new')
     session1 = sg()
     session2 = sg()
     etc.
     These sessions will be protected with the ping refresher above
     """
     config = get_config()
-    echo = config.get('global').get('echo')
+    echo = config.get('GLOBAL').get('echo')
     if not db:
-        db = config.get('global').get('database')
+        db = config.get('GLOBAL').get('database')
+        print("USER : ", config.get(db).get('user'))
+        print("PASSWORD : ", config.get(db).get('password'))
+        print("HOST : ", config.get(db).get('host'))
+        print("DBTYPE : ", dbtype)
+        print("DB : ", config.get(db).get('{0}_db'.format(dbtype)))
     if db[:6] == "sqlite":
         sqlite_db_path = os.path.join(
             config.get(db).get('path'),
@@ -174,9 +180,9 @@ def session_generator(db=None, dbtype='grant'):
             config.get(db).get('user'),
             config.get(db).get('password'),
             config.get(db).get('host'),
-            config.get(db).get('{0}-database'.format(dbtype)), echo=echo), pool_size=3, pool_recycle=3600, echo_pool=True)
+            config.get(db).get('{0}_db'.format(dbtype)), echo=echo), pool_size=3, pool_recycle=3600, echo_pool=True)
 
-    if dbtype == 'grant':
+    if dbtype == 'new':
         schema.GrantBase.metadata.create_all(engine)
     else:
         schema.ApplicationBase.metadata.create_all(engine)
@@ -184,31 +190,36 @@ def session_generator(db=None, dbtype='grant'):
     Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
     return scoped_session(Session)
 
-def fetch_session(db=None, dbtype='grant'):
+def fetch_session(db=None, dbtype='new'):
     """
-    Read from config.ini file and load appropriate database
+    Read from ../project/Development/config.ini file and load appropriate database
 
     @db: string describing database, e.g. "sqlite" or "mysql"
     @dbtype: string indicating if we are fetching the session for
-             the grant database or the application database
+             the new database or the application database
     """
     config = get_config()
-    echo = config.get('global').get('echo')
+    echo = config.get('GLOBAL').get('echo')
     if not db:
-        db = config.get('global').get('database')
+        db = config.get('GLOBAL').get('database')
+        #print("USER : ", config.get(db).get('user'))
+        #print("PASSWORD : ", config.get(db).get('password'))
+        #print("HOST : ", config.get(db).get('host'))
+        #print("DBTYPE : ", dbtype)
+        #print("DB : ", config.get(db).get('{0}_db'.format(dbtype)))
     if db[:6] == "sqlite":
         sqlite_db_path = os.path.join(
             config.get(db).get('path'),
-            config.get(db).get('{0}-database'.format(dbtype)))
+            config.get(db).get('{0}_database'.format(dbtype)))
         engine = create_engine('sqlite:///{0}'.format(sqlite_db_path), echo=echo)
     else:
         engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
             config.get(db).get('user'),
             config.get(db).get('password'),
             config.get(db).get('host'),
-            config.get(db).get('{0}-database'.format(dbtype)), echo=echo))
+            config.get(db).get('{0}_db'.format(dbtype)), echo=echo))
 
-    if dbtype == 'grant':
+    if dbtype == 'new':
         schema.GrantBase.metadata.create_all(engine)
     else:
         schema.ApplicationBase.metadata.create_all(engine)
@@ -505,6 +516,6 @@ def commit_application():
         appsession.rollback()
         print(str(e))
 
-grantsession = fetch_session(dbtype='grant')
-appsession = fetch_session(dbtype='application')
+grantsession = fetch_session(dbtype='new')
+#appsession = fetch_session(dbtype='application')
 session = grantsession # default for clean and consolidate
