@@ -133,9 +133,8 @@ def create_lawyer_table(session):
     populates the lawyer table in the database
     """
     print('Disambiguating lawyers...')
-    if alchemy.is_mysql():
-        session.execute('set foreign_key_checks = 0;')
-        session.commit()
+    session.execute('set foreign_key_checks = 0;')
+    session.commit()
     i = 0
     for lawyer in blocks.keys():
         ra_ids = (id_map[ra] for ra in blocks[lawyer])
@@ -147,9 +146,9 @@ def create_lawyer_table(session):
               lawyer_match(rawlawyers, session, commit=True)
           else:
               lawyer_match(rawlawyers, session, commit=False)
-    t1 = bulk_commit_inserts(lawyer_insert_statements, Lawyer.__table__, alchemy.is_mysql(), 20000, 'new')
-    t2 = bulk_commit_inserts(patentlawyer_insert_statements, patentlawyer, alchemy.is_mysql(), 20000)
-    t3 = bulk_commit_updates('lawyer_id', update_statements, RawLawyer.__table__, alchemy.is_mysql(), 20000)
+    t1 = bulk_commit_inserts(lawyer_insert_statements, Lawyer.__table__, 20000, 'grant')
+    t2 = bulk_commit_inserts(patentlawyer_insert_statements, patentlawyer,  20000)
+    t3 = bulk_commit_updates('lawyer_id', update_statements, RawLawyer.__table__, 20000)
     # t1.get()
     # t2.get()
     # t3.get()
@@ -237,7 +236,7 @@ def printall():
             f.write('\n')
 
 
-def run_letter(letter, session, doctype='new'):
+def run_letter(letter, session, doctype='grant'):
     schema = RawLawyer
     if doctype == 'application':
         schema = App_RawLawyer
@@ -251,14 +250,14 @@ def run_letter(letter, session, doctype='new'):
     create_lawyer_table(session)
 
 
-def run_disambiguation(doctype='new'):
+def run_disambiguation(doctype='grant'):
     # get all lawyers in database
     global blocks
     global lawyer_insert_statements
     global patentlawyer_insert_statements
     global update_statements
     session = alchemy.fetch_session(dbtype=doctype)
-    if doctype == 'new':
+    if doctype == 'grant':
         lawyers = deque(session.query(RawLawyer))
     if doctype == 'application':
         lawyers = deque(session.query(App_RawLawyer))

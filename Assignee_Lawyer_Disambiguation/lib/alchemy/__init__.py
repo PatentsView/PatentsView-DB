@@ -93,22 +93,13 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     try:
         # reset the connection settings
         cursor.execute("SELECT 1;")
-        if is_mysql():
-            cursor.execute("set foreign_key_checks = 0; set unique_checks = 0;")
+
+        cursor.execute("set foreign_key_checks = 0; set unique_checks = 0;")
     except:
         # raise DisconnectionError - pool will try
         # connecting again up to three times before raising.
         raise exc.DisconnectionError()
     cursor.close()
-
-def is_mysql():
-    """
-    Returns True if currently connected to a MySQL database. Given that our only two options
-    are MySQL and SQLite, we use this function to determien when we can use certain functions
-    like `set foreign_key_checks = 0` and `truncate <tablaneme>`.
-    """
-    config = get_config()
-    return config.get('GLOBAL').get('database') == 'mysql'
 
 
 def get_config(localfile="../project/Development/config.ini", default_file=False):
@@ -119,7 +110,6 @@ def get_config(localfile="../project/Development/config.ini", default_file=False
     The default filename is called config.ini
     First we load the GLOBAL file, then we load a local file
     """
-    print("OPEN FILE AT : ", os.path.dirname(os.path.realpath(__file__)))
     if default_file:
         openfile = "{0}/config.ini".format(os.path.dirname(os.path.realpath(__file__)))
     else:
@@ -141,19 +131,17 @@ def get_config(localfile="../project/Development/config.ini", default_file=False
         for section in newconfig:
             for item in newconfig[section]:
                 config[section][item] = newconfig[section][item]
-    print(config)
     return config
 
-def session_generator(db=None, dbtype='new'):
+def session_generator(dbtype='grant'):
     """
     Read from ../project/Development/config.ini file and load appropriate database
 
-    @db: string describing database, e.g. "sqlite" or "mysql"
     @dbtype: string indicating if we are fetching the session for
-             the new database or the application database
-    session_generator will return an object taht can be called
+             the grant database or the application database
+    session_generator will return an object that can be called
     to retrieve more sessions, e.g.
-    sg = session_generator(dbtype='new')
+    sg = session_generator(dbtype='grant')
     session1 = sg()
     session2 = sg()
     etc.
@@ -161,68 +149,42 @@ def session_generator(db=None, dbtype='new'):
     """
     config = get_config()
     echo = config.get('GLOBAL').get('echo')
-    if not db:
-        db = config.get('GLOBAL').get('database')
-        print("USER : ", config.get(db).get('user'))
-        print("PASSWORD : ", config.get(db).get('password'))
-        print("HOST : ", config.get(db).get('host'))
-        print("DBTYPE : ", dbtype)
-        print("DB : ", config.get(db).get('{0}_db'.format(dbtype)))
-    if db[:6] == "sqlite":
-        sqlite_db_path = os.path.join(
-            config.get(db).get('path'),
-            config.get(db).get('{0}-database'.format(dbtype)))
-        if os.path.basename(os.getcwd()) == 'lib':
-            sqlite_db_path = '../' + sqlite_db_path
-        engine = create_engine('sqlite:///{0}'.format(sqlite_db_path), echo=echo, echo_pool=True)
-    else:
-        engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
-            config.get(db).get('user'),
-            config.get(db).get('password'),
-            config.get(db).get('host'),
-            config.get(db).get('{0}_db'.format(dbtype)), echo=echo), pool_size=3, pool_recycle=3600, echo_pool=True)
+    if dbtype == 'grant':
+        read_database = "new_db"
 
-    if dbtype == 'new':
-        schema.GrantBase.metadata.create_all(engine)
-    else:
-        schema.ApplicationBase.metadata.create_all(engine)
+    engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
+        config.get('DATABASE').get('user'),
+        config.get('DATABASE').get('password'),
+        config.get('DATABASE').get('host'),
+        config.get('DATABASE').get(read_database), echo=echo), pool_size=3, pool_recycle=3600, echo_pool=True)
+
+
+    schema.GrantBase.metadata.create_all(engine)
+
 
     Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
     return scoped_session(Session)
 
-def fetch_session(db=None, dbtype='new'):
+def fetch_session(dbtype='grant'):
     """
     Read from ../project/Development/config.ini file and load appropriate database
 
-    @db: string describing database, e.g. "sqlite" or "mysql"
     @dbtype: string indicating if we are fetching the session for
-             the new database or the application database
+             the grant database or the application database
     """
     config = get_config()
     echo = config.get('GLOBAL').get('echo')
-    if not db:
-        db = config.get('GLOBAL').get('database')
-        #print("USER : ", config.get(db).get('user'))
-        #print("PASSWORD : ", config.get(db).get('password'))
-        #print("HOST : ", config.get(db).get('host'))
-        #print("DBTYPE : ", dbtype)
-        #print("DB : ", config.get(db).get('{0}_db'.format(dbtype)))
-    if db[:6] == "sqlite":
-        sqlite_db_path = os.path.join(
-            config.get(db).get('path'),
-            config.get(db).get('{0}_database'.format(dbtype)))
-        engine = create_engine('sqlite:///{0}'.format(sqlite_db_path), echo=echo)
-    else:
-        engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
-            config.get(db).get('user'),
-            config.get(db).get('password'),
-            config.get(db).get('host'),
-            config.get(db).get('{0}_db'.format(dbtype)), echo=echo))
+    if dbtype == 'grant':
+        read_database = "new_db"
 
-    if dbtype == 'new':
-        schema.GrantBase.metadata.create_all(engine)
-    else:
-        schema.ApplicationBase.metadata.create_all(engine)
+    engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
+        config.get('DATABASE').get('user'),
+        config.get('DATABASE').get('password'),
+        config.get('DATABASE').get('host'),
+        config.get('DATABASE').get(read_database), echo=echo))
+
+
+    schema.GrantBase.metadata.create_all(engine)
 
     Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
     session = Session()
@@ -265,9 +227,9 @@ def add_grant(obj, override=True, temp=False):
     pat.application = schema.Application(**obj.app)
     # lots of abstracts seem to be missing. why?
     add_all_fields(obj, pat)
-    if is_mysql():
-        grantsession.execute('set foreign_key_checks = 0;')
-        grantsession.execute('set unique_checks = 0;')
+
+    grantsession.execute('set foreign_key_checks = 0;')
+    grantsession.execute('set unique_checks = 0;')
 
     #grantsession.commit()
 
@@ -382,6 +344,7 @@ def add_citations(obj, pat):
         ref = schema.OtherReference(**ref)
         pat.otherreferences.append(ref)
 
+
 def add_claims(obj, pat):
     claims = obj.claims
     for claim in claims:
@@ -399,123 +362,6 @@ def commit():
         grantsession.rollback()
         print(str(e))
 
-def add_application(obj, override=True, temp=False):
-    """
-    PatentApplication Object converting to tables via SQLAlchemy
-    Necessary to convert dates to datetime because of SQLite (OK on MySQL)
 
-    Case Sensitivity and Table Reflection
-    MySQL has inconsistent support for case-sensitive identifier names,
-    basing support on specific details of the underlying operating system.
-    However, it has been observed that no matter what case sensitivity
-    behavior is present, the names of tables in foreign key declarations
-    are always received from the database as all-lower case, making it
-    impossible to accurately reflect a schema where inter-related tables
-    use mixed-case identifier names.
-
-    Therefore it is strongly advised that table names be declared as all
-    lower case both within SQLAlchemy as well as on the MySQL database
-    itself, especially if database reflection features are to be used.
-    """
-
-    # if the application exists, remove it so we can replace it
-    (app_exists, ), = appsession.query(exists().where(schema.App_Application.number == obj.application))
-    if app_exists:
-        if override:
-            app_query = appsession.query(schema.App_Application).filter(schema.App_Application.number == obj.application)
-            appsession.delete(app_query.one())
-        else:
-            return
-    if len(obj.app["number"]) < 3:
-        return
-
-    app = schema.App_Application(**obj.app)
-    # lots of abstracts seem to be missing. why?
-    add_all_app_fields(obj, app)
-
-    appsession.merge(app)
-
-
-def add_all_app_fields(obj, app):
-    add_app_asg(obj, app)
-    add_app_inv(obj, app)
-    add_app_classes(obj, app)
-    add_app_claims(obj, app)
-    add_app_current_classes(obj, app)
-
-
-def add_app_asg(obj, app):
-    for asg, loc in obj.assignee_list:
-        loc = fixid(loc)
-        asg = fixid(asg)
-        asg['organization'] = unescape_html(asg['organization'])
-        asg = schema.App_RawAssignee(**asg)
-        loc = schema.App_RawLocation(**loc)
-        appsession.merge(loc)
-        asg.rawlocation = loc
-        app.rawassignees.append(asg)
-
-
-def add_app_inv(obj, app):
-    for inv, loc in obj.inventor_list:
-        loc = fixid(loc)
-        inv = fixid(inv)
-        inv = schema.App_RawInventor(**inv)
-        loc = schema.App_RawLocation(**loc)
-        appsession.merge(loc)
-        inv.rawlocation = loc
-        app.rawinventors.append(inv)
-
-
-def add_app_classes(obj, app):
-    for uspc, mc, sc in obj.us_classifications:
-        uspc = fixid(uspc)
-        uspc = schema.App_USPC(**uspc)
-        mc = schema.App_MainClass(**mc)
-        sc = schema.App_SubClass(**sc)
-        appsession.merge(mc)
-        appsession.merge(sc)
-        uspc.mainclass = mc
-        uspc.subclass = sc
-        app.classes.append(uspc)
-
-
-def add_app_current_classes(obj, app):
-    for uspc_current, mc, sc in obj.us_classifications:
-        uspc_current = fixid(uspc_current)
-        uspc_current = schema.App_USPC_current(**uspc_current)
-        mc = schema.App_MainClass_current(**mc)
-        sc = schema.App_SubClass_current(**sc)
-        appsession.merge(mc)
-        appsession.merge(sc)
-        uspc_current.mainclass_current = mc
-        uspc_current.subclass_current = sc
-        app.current_classes.append(uspc_current)
-
-
-def add_app_ipcr(obj, app):
-    for ipc in obj.ipcr_classifications:
-        ipc = schema.App_IPCR(**ipc)
-        app.ipcrs.append(ipc)
-
-
-def add_app_claims(obj, app):
-    claims = obj.claims
-    for claim in claims:
-        claim = fixid(claim)
-        claim['text'] = unescape_html(claim['text'])
-        claim['text'] = _char.sub(_char_unescape,claim['text'])
-        clm = schema.App_Claim(**claim)
-        app.claims.append(clm)
-
-
-def commit_application():
-    try:
-        appsession.commit()
-    except Exception as e:
-        appsession.rollback()
-        print(str(e))
-
-grantsession = fetch_session(dbtype='new')
-#appsession = fetch_session(dbtype='application')
+grantsession = fetch_session(dbtype='grant')
 session = grantsession # default for clean and consolidate
