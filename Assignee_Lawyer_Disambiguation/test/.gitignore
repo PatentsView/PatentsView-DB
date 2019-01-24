@@ -1,6 +1,0 @@
-results.csv
-*.db
-tmp
-err
-fibotest.py
-*.sqlite3
