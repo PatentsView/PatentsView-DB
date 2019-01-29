@@ -16,7 +16,7 @@ old_db = config['DATABASE']['OLD_DB']
 new_db = config['DATABASE']['NEW_DB']
 new_update_date = new_db[-8:]
 
-'''
+
 col_data = db_con.execute('show columns from {}.persistent_inventor_disambig'.format(old_db)) 
 cols = [c[0] for c in col_data]
 disambig_cols = [item for item in cols if item.startswith('disamb')]
@@ -42,8 +42,8 @@ for inv in new_data:
         outfile.writerow([inv['uuid'], inv['uuid'], inv['inventor_id']] + persistent_lookup[inv['uuid']])
     else:
         outfile.writerow([inv['uuid'], '', inv['inventor_id']] + blanks)
-'''
-#db_con.execute('alter table persistent_inventor_disambig add disamb_inventor_id_{} varchar(24)'.format(new_update_date))
+
+db_con.execute('alter table persistent_inventor_disambig add disamb_inventor_id_{} varchar(24)'.format(new_update_date))
 data = pd.read_csv('{}/inventor_persistent.tsv'.format(disambig_folder), encoding = 'utf-8', delimiter = '\t')
 data.to_sql(con=db_con, name = 'persistent_inventor_disambig', index = False, if_exists='append') #append keeps the indexes 
 
