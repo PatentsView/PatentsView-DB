@@ -1,6 +1,7 @@
 #import MySQLdb
 from sqlalchemy import create_engine
 import csv
+import string
 import re,os,random,string,codecs
 import requests
 from clint.textui import progress
@@ -50,3 +51,7 @@ def get_patent_ids(db_con, new_db):
     for patent in patent_data:
         patnums[patent['number']] = patent['id']
     return set(patnums.keys()), patnums
+
+def better_title(text):
+    title = " ".join([item if item not in ["Of", "The", "For", "And", "On"] else item.lower() for item in str(text).title().split( )])
+    return re.sub('['+string.punctuation+']', '', title)

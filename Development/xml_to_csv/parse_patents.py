@@ -5,7 +5,7 @@ import re
 import pandas as pd
 import simplejson as json
 
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+sys.path.append('/project/Development')
 from helpers import output, xml_helpers, general_helpers
 from lxml import etree
 from collections import defaultdict
@@ -416,26 +416,22 @@ def main_process(data_file, outloc, field_dictionary):
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+    config.read('/project/Development/config.ini')
     #TO run Everything:
     with open('{}/field_dict.json'.format(config['FOLDERS']['PERSISTENT_FILES'])) as myfile:
         field_dictionary = json.load(myfile)
-
+    
+    input_folder = '{}/clean_data'.format(config['FOLDERS']['WORKING_FOLDER'])
+    output_folder = '{}/parsed_data'.format(config['FOLDERS']['WORKING_FOLDER'])
     #this is the folder with the xml files that we want to reparse
-    in_files = ['{0}/{1}'.format(config['FOLDERS']['DATA_TO_PARSE'], item) for item in os.listdir(config['FOLDERS']['DATA_TO_PARSE'])]
-    if not os.path.exists(config['FOLDERS']['PARSED_DATA']):
-        os.mkdir(config['FOLDERS']['PARSED_DATA'])
-    out_files= ['{0}/{1}'.format(config['FOLDERS']['PARSED_DATA'], item[-16:-10]) 
+    in_files = ['{0}/{1}'.format(input_folder, item) for item in os.listdir(input_folder)]
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
+    out_files= ['{0}/{1}'.format(output_folder, item[-16:-10]) 
                    for item in in_files]
     fields = [field_dictionary for item in in_files]
     files = zip(in_files, out_files, fields)
-
-    for item in files:
-        print(item[0])
-        main_process(item[0], item[1], item[2])  
     
-    '''
-    print("Starting")
     desired_processes = 7 # ussually num cpu - 1
     jobs = []
     for f in files:
@@ -444,4 +440,4 @@ if __name__ == '__main__':
         print(segment)
         for job in segment:
             job.start()
-    '''
+

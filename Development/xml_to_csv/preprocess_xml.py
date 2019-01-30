@@ -1,7 +1,7 @@
 import os
 import sys
 import re
-sys.path.append("/usr/local/airflow/PatentsView-DB/Development")
+sys.path.append("/project/Development")
 from helpers import general_helpers, xml_helpers
 import xml.etree.ElementTree as ET
 from lxml import etree
@@ -72,15 +72,14 @@ if __name__ == '__main__':
 
     import configparser
     config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
-    infolder = config['FOLDERS']['RAW_DATA']
-    outfolder = config['FOLDERS']['DATA_TO_PARSE']
+    config.read('/project/Development/config.ini')
+    infolder = '{}/raw_data'.format(config['FOLDERS']['WORKING_FOLDER'])
+    outfolder = '{}/clean_data'.format(config['FOLDERS']['WORKING_FOLDER'])
     if not os.path.exists(outfolder):
         os.mkdir(outfolder)
 
     in_files = ['{0}/{1}'.format(infolder, f) for f in os.listdir(infolder) if os.path.isfile(os.path.join(infolder, f))]
     out_files = ['{}/{}_clean.xml'.format(outfolder, raw_file[-13:-4]) for raw_file in in_files]
-    #out_files = [outfolder + '/' + raw_file[-13:-4] +'_clean.xml' for raw_file in in_files]
     files = zip(in_files, out_files)
 
     desired_processes = 7 # ussually num cpu - 1
@@ -93,6 +92,7 @@ if __name__ == '__main__':
             job.start()
 
     #After cleaning the files check that there haven't been schema changes
+    #This is commented out because still needs work
     #check the schema has not changed
-    # clean_example =xml_helpers.get_xml(out_files[-1]) #get the most recent data an an example
-    # check_schema(clean_example, [expected_high_level, expected_main_fields])
+    #clean_example =xml_helpers.get_xml(out_files[-1]) #get the most recent data an an example
+    #check_schema(clean_example, [expected_high_level, expected_main_fields])
