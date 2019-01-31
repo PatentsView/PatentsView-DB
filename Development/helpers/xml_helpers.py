@@ -40,37 +40,79 @@ def get_entity(patent, entity_name, attribute_list=None):
 	return var_list
 
 def get_main_text_fields(patent):
-	'''
-	:params patent: take the xml object representing a patent
-	:returns a default dictionaries with all the data for the main text fields (relapp, brfsum, detdesc, drawdesc)
-	'''
-	data = defaultdict(list)
-	to_skip = ['BACKGROUND OF THE INVENTION', 'FIELD OF THE INVENTION', 'TECHNICAL FIELD',
-			   'SUMMARY', 'FIELD OF INVENTION', 'FIELD','DETAILED BOTANICAL DESCRIPTION',
-			  'DETAILED DESCRIPTION OF THE VARIETY', 'DETAILED DESCRIPTION', 'DETAILED DESCRIPTION OF THE INVENTION',
-			   'DESCRIPTION OF EMBODIMENTS', 'DETAILED DESCRIPTION OF THE PREFERRED EMBODIMENTS',
-			   'DESCRIPTION OF THE INVENTION', 'BRIEF DESCRIPTION OF DRAWINGS']
-	description = patent.find('description')
-	if description is not None:
-		for item in description: 
-			if getattr(item, 'tag', None) is etree.ProcessingInstruction:
-				field = item.attrib['description']
-			else:
-				if item.tag == 'description-of-drawings':
-					for sub_item in item:
-						data[field].append(" ".join(get_text(sub_item)))
-				else:
-					data[field].extend(get_text(item))
-					for sub_item in item:
-						if sub_item.tag == 'ul' or sub_item.tag == 'ol' : #get the list items using special list function
-							data[field].extend(recursive_list(sub_item))
-		for key in data.keys():
-			clean_list = filter(lambda x: x is not None and not x in to_skip and not re.sub(r'\s+', '', x) == "", data[key])
-			if key == 'Brief Description of Drawings':
-				data[key] = clean_list
-			else:
-				data[key]  = (" ".join( clean_list)).strip().replace("\r\n"," ").replace("\n", " ").replace("\t", " ").replace("  ", " ")
-	return data
+    #TODO: This could use improvements to be less convoluted
+    #this is very complicated becuase both headings and information processing tags are used to delimit fields
+    #and there are lots of heading varients
+    #test this on 050803 data specifically patent 6865523, 6863488 for GI
+    #specifically  6862844, 6862822 for other ref
+    data = defaultdict(list)
+    titles = ['BACKGROUND OF THE INVENTION', 'FIELD OF THE INVENTION', 'TECHNICAL FIELD',
+               'SUMMARY', 'SUMMARY OF THE INVENTION','FIELD OF INVENTION', 'FIELD','DETAILED BOTANICAL DESCRIPTION',
+              'DETAILED DESCRIPTION OF THE VARIETY', 'DETAILED DESCRIPTION', 'DETAILED DESCRIPTION OF THE INVENTION',
+               'DESCRIPTION OF EMBODIMENTS','DESCRIPTION OF THE PREFERRED EMBODIMENT', 'DETAILED DESCRIPTION OF THE PREFERRED EMBODIMENTS',
+               'DESCRIPTION OF THE INVENTION', 'BRIEF DESCRIPTION OF DRAWINGS']
+    government  = ['STATEMENT OF GOVERNMENT INTEREST','GOVERNMENT INTEREST', 'STATEMENT REGARDING FEDERALLY SPONSORED RESEARCH OR DEVELOPMENT', 'STATEMENT AS TO RIGHTS TO INVENTIONS MADE UNDER FEDERALLY SPONSORED RESEARCH AND DEVELOPMENT']
+    other_patent = ['RELATED APPLICATION','CROSS REFERENCES TO RELATED APPLICATIONS','CROSS-REFERENCE TO RELATED PATENT APPLICATIONS', 'OTHER PATENT RELATIONS', 'CROSS REFERENCE TO RELATED APPLICATIONS','CROSS-REFERENCE TO RELATED APPLICATIONS', 'CROSS-REFERENCES TO RELATED APPLICATIONS']
+    not_applicable = ['None','None.', 'none', 'none.' , '(Not applicable)','(Not Applicable)','“Not Applicable”','Not applicable','Not applicable.', 'Not Applicable', 'Not Applicable.','' 'NA', 'n/a', 'N/A', 'na']
+    to_skip = titles + government + other_patent + not_applicable
+    description = patent.find('description')
+    #temp things to help test
+    if description is not None:
+        switch_back = False
+        next_switch = False
+        for item in description: 
+            if getattr(item, 'tag', None) is etree.ProcessingInstruction:
+                field = item.attrib['description']
+            else:
+                if item.tag == 'heading':
+                    #special processing section to get the GI statement if it is delimited by a heading instead of a processing tag
+                    if get_text(item)[0] in government and field != 'Government Interest':
+                        if not switch_back: #don't make old field in GI if that came first
+                            old_field = field
+                        next_switch = False
+                        field = 'Government Interest'
+                        switch_back = True
+                    #specially processing to get other reference with wierd tag as well
+                    elif get_text(item)[0] in other_patent and field != 'Other Patent Relations':
+                        if not switch_back: #don't make old field in GI if that came first
+                            old_field = field
+                        field = 'Other Patent Relations'
+                        next_switch = False
+                        switch_back = True
+                    elif switch_back: #switch back to main tag after getting GI statement/other ref
+                        field = old_field
+                        switch_back = False
+                #sometimes there is no heading after the heading delimited GI or Other Ref
+                #so move on next time if its just NA
+                if next_switch:
+                    field = old_field
+
+                if item.text in not_applicable and switch_back:
+                    next_switch = True
+                if item.tag == 'description-of-drawings':
+                    for sub_item in item:
+                        data[field].append(" ".join(get_text(sub_item)))
+                else:
+                    data[field].extend(get_text(item))
+                    for sub_item in item:
+                        if sub_item.tag == 'ul' or sub_item.tag == 'ol' : #get the list items using special list function
+                            data[field].extend(recursive_list(sub_item))
+        to_remove = []
+        for key in data.keys():
+            clean_list = list(filter(lambda x: x is not None and not x in to_skip and not re.sub(r'\s+', '', x) == "", data[key]))
+            #skip ones that have no data, mostly cause they have 'not applicable'
+            if len(clean_list) > 0:
+                if key == 'Brief Description of Drawings':
+                    data[key] = clean_list
+                else:
+                    data[key]  = (" ".join( clean_list)).strip().replace("\r\n"," ").replace("\n", " ").replace("\t", " ").replace("  ", " ")
+            else: #remove empty items
+                to_remove.append(key) #can't do this in place because of the loop
+        for key in to_remove:
+            del data[key]
+
+    return data
+
 
 #####################################
 ### Get Data for Specific Fields

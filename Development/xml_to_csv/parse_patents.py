@@ -99,7 +99,7 @@ def get_results(patents, field_dictionary):
             if detail_desc_text_data !=[]:
                 results['detail_desc_text'].append([general_helpers.id_generator(), patent_id, detail_desc_text_data, len(detail_desc_text_data)])
             else:
-                if not patent_id[0] in ["R", 'P', 'H', 'D']: #these types are allowed to not have detailed descriptions
+                if not patent_id[0] in ['R', 'P', 'H', 'D']: #these types are allowed to not have detailed descriptions
                     error_log.append([patent_id, 'detail-description'])
 
             brf_sum_text_data = text_data['Brief Summary']
