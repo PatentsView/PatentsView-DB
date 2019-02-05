@@ -51,6 +51,10 @@ upload_new_operator = BashOperator(task_id='upload_new',
 merge_new_operator = BashOperator(task_id='merge_db',
                                   bash_command='python /project/Development/copy_databases/merge_in_new_data.py',
                                   dag=dag)
+#add withdrawn patent code
+withdrawn_operator = BashOperator(task_id ='note_withdrawn',
+                                  bash_command = 'python /project/Development/withdrawn_patents/update_withdrawn.py', dag = dag)
+
 # download cpcs
 cpc_download_operator = BashOperator(task_id='download_cpc',
                                      bash_command='python /project/Development/process_cpcs/download_cpc_ipc.py',
@@ -104,6 +108,12 @@ postprocess_assignee_operator = BashOperator(task_id='post_process_assignee',
 postprocess_location_operator = BashOperator(task_id='post_process_location',
                                              bash_command='python /project/Development/post_process_disambiguation/post_process_location.py',
                                              dag=dag)
+persistent_inventor_operator = BashOperator(task_id = 'persistent_inventor',
+                                            bash_command = 'python /project/Development/post_process_disambiguation/persistent_inventor.py')
+
+lookup_tables_operator = BashOperator(task_id = 'lookup_tables',
+                                            bash_command = 'python /project/Development/post_process_disambiguation/create_lookup_tables.py')
+
 
 process_xml_operator.set_upstream(download_xml_operator)
 parse_xml_operator.set_upstream(process_xml_operator)
@@ -111,6 +121,8 @@ parse_xml_operator.set_upstream(process_xml_operator)
 upload_new_operator.set_upstream(parse_xml_operator)
 merge_new_operator.set_upstream(upload_new_operator)
 merge_new_operator.set_upstream(copy_old_operator)
+
+withdrawn_operator.set_upstream(merge_new_operator)
 
 cpc_parser_operator.set_upstream(cpc_download_operator)
 cpc_parser_operator.set_upstream(cpc_class_parser_operator)
@@ -131,3 +143,8 @@ download_disambig_operator.set_upstream(run_disambiguation_operator)
 postprocess_inventor_operator.set_upstream(download_disambig_operator)
 postprocess_assignee_operator.set_upstream(download_disambig_operator)
 postprocess_location_operator.set_upstream(download_disambig_operator)
+
+persistent_inventor_operator.set_upstream(postprocess_inventor_operator)
+lookup_tables_operator.set_upstream(postprocess_inventor_operator)
+lookup_tables_operator.set_upstream(postprocess_assignee_operator)
+lookup_tables_operator.set_upstream(postprocess_location_operator)
