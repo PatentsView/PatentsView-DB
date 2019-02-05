@@ -76,7 +76,7 @@ def get_results(patents, field_dictionary):
             app_type = None
         #assigned after application to extract application data
         results['patent'].append([patent_id,app_type , patent_id, patent_data['document-id-country'],
-                           patent_date, abstract, title, patent_data['document-id-kind'], num_claims, filename])
+                           patent_date, abstract, title, patent_data['document-id-kind'], num_claims, filename, '0'])
         
         exemplary = xml_helpers.get_entity(patent, 'us-exemplary-claim')
         if exemplary[0] is not None:
