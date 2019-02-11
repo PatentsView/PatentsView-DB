@@ -16,3 +16,4 @@ airflow/logs/scheduler/latest
 airflow/unittests.cfg
 Development/dev_config.ini
 Assignee_Lawyer_Disambiguation/lib/alchemy/alchemy_config.ini
+airflow-metadata-db-disk/*
