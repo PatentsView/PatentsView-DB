@@ -51,6 +51,9 @@ db_con.execute('create index {0}_ix on persistent_inventor_disambig ({0});'.form
 
 new_id_col = 'disamb_inventor_id_{}'.format(new_db[-8:])
 
+query = 'create table inventor_gender (`disamb_inventor_id_{}` varchar(24) NULL, `disamb_inventor_id_20170808` varchar(24) NULL, `male` varchar(8))'.format(new_db[-8:])
+db_con.execute(query)
+
 #create inventor gender lookup
 new_id_col = 'disamb_inventor_id_{}'.format(new_db[-8:])
 new_to_old = con.execute('select disamb_inventor_id_20170808, {} from {}.persistent_inventor_disambig'.format(new_id_col, new_db))
@@ -68,11 +71,11 @@ for row in gender:
 results = []
 for new_id, old_id in ids_new_to_old.items(): 
     if old_id is not None:
-        results.append((new_id, id_to_gender[old_id]))
+        results.append((old_id, new_id, id_to_gender[old_id]))
     else:
-        results.append((new_id, None))
+        results.append((None,new_id, None))
 gender_df = pd.DataFrame(results)
-gender_df.columns = ['inventor_id', 'male']
+gender_df.columns = ['disamb_inventor_id_20170808',new_id_col, 'male']
 
 gender_df.to_sql(con=con, name = 'inventor_gender', index = False, if_exists='append')
 
