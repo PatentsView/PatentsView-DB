@@ -47,7 +47,7 @@ from sqlalchemy.pool import Pool
 
 from html.parser import HTMLParser
 import os
-project_home=os.environ['PROJECT_HOME']
+project_home=os.environ['PACKAGE_HOME']
 h = HTMLParser()
 def unescape_html(x):
     return h.unescape(x)
