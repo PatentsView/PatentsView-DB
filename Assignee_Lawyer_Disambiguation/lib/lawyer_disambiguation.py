@@ -51,7 +51,7 @@ from tasks import bulk_commit_inserts, bulk_commit_updates
 import sys
 import os
 config = get_config()
-project_home=os.environ["PROJECT_HOME"]
+project_home=os.environ["PACKAGE_HOME"]
 THRESHOLD = config.get("LAWYER").get("threshold")
 
 # bookkeeping for blocks
