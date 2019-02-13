@@ -54,19 +54,19 @@ def commit_inserts(session, insert_statements, table, is_mysql, commit_frequency
         session.commit()
     else:
         ignore_prefix = ("OR IGNORE",)
-    numgroups = len(insert_statements) / commit_frequency
+    numgroups = len(insert_statements) // commit_frequency
     for ng in range(numgroups):
         if numgroups == 0:
             break
         chunk = insert_statements[ng*commit_frequency:(ng+1)*commit_frequency]
         session.connection().execute(table.insert(prefixes=ignore_prefix), chunk)
-        print "committing chunk",ng+1,"of",numgroups,"with length",len(chunk),"at",datetime.now()
+        print("committing chunk",ng+1,"of",numgroups,"with length",len(chunk),"at",datetime.now())
         session.commit()
     last_chunk = insert_statements[numgroups*commit_frequency:]
     if last_chunk:
-        print "committing last",len(last_chunk),"records at",datetime.now()
+        print("committing last",len(last_chunk),"records at",datetime.now())
         session.connection().execute(table.insert(prefixes=ignore_prefix), last_chunk)
-        print "last chunk in, committing"
+        print("last chunk in, committing")
         session.commit()
 
 def commit_updates(session, update_key, update_statements, table, commit_frequency = 1000):
@@ -89,7 +89,7 @@ def commit_updates(session, update_key, update_statements, table, commit_frequen
     table -- SQLAlchemy table object. If you have a table reference, you can use TableName.__table
     commit_frequency -- tune this for speed. Runs "session.commit" every `commit_frequency` items
     """
-    primary_key = table.primary_key.columns.values()[0]
+    primary_key = list(table.primary_key.columns.values())[0]
     update_key = table.columns[update_key]
     u = table.update().where(primary_key==bindparam('pk')).values({update_key: bindparam('update')})
     numgroups = len(update_statements) / commit_frequency
@@ -98,11 +98,11 @@ def commit_updates(session, update_key, update_statements, table, commit_frequen
             break
         chunk = update_statements[ng*commit_frequency:(ng+1)*commit_frequency]
         session.connection().execute(u, *chunk)
-        print "committing chunk",ng+1,"of",numgroups,"with length",len(chunk),"at",datetime.now()
+        print("committing chunk",ng+1,"of",numgroups,"with length",len(chunk),"at",datetime.now())
         session.commit()
     last_chunk = update_statements[numgroups*commit_frequency:]
     if last_chunk:
-        print "committing last",len(last_chunk),"records at",datetime.now()
-        print " If it sticks here, use the assignee_patch.py file to fix it!"
+        print("committing last",len(last_chunk),"records at",datetime.now())
+        print(" If it sticks here, use the assignee_patch.py file to fix it!")
         session.connection().execute(u, *last_chunk)
         session.commit()
