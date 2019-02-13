@@ -46,6 +46,8 @@ from sqlalchemy import event
 from sqlalchemy.pool import Pool
 
 from html.parser import HTMLParser
+import os
+project_home=os.environ['PROJECT_HOME']
 h = HTMLParser()
 def unescape_html(x):
     return h.unescape(x)
@@ -58,7 +60,8 @@ _char = re.compile(r'&(\w+?);')
 defs=html.entities.entitydefs
 defs['apos'] = "'"
 #need to fix this to pull the database location from the config file
-entities = open('Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
+
+entities = open(project_home+'/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
 for e in entities:
     try:
         first = re.sub('\s+|\"|;|&','',e[3:15])
@@ -102,7 +105,7 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     cursor.close()
 
 
-def get_config(localfile="Development/config.ini", default_file=False):
+def get_config(localfile=project_home+"/Development/config.ini", default_file=False):
     """
     This grabs a configuration file and converts it into
     a dictionary.
