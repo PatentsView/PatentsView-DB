@@ -85,7 +85,7 @@ create_and_upload_disambig_operator = BashOperator(task_id='get_disambig_input',
                                                    bash_command='python /project/Development/disambiguation_support/get_data_for_disambig.py',
                                                    dag=dag)
 run_lawyer_disambiguation_operator=BashOperator(task_id='run_lawyer_disambiguation',
-                                           bash_command='python /project/Assignee_Lawyer_Disambiguation/libs/lawyer_disambiguation.py',
+                                           bash_command='python /project/Assignee_Lawyer_Disambiguation/lib/lawyer_disambiguation.py',
                                            dag=dag)
 run_disambiguation_operator = BashOperator(task_id='run_disambiguation',
                                            bash_command='bash /project/Development/disambiguation_support/run_disambiguation.sh',
