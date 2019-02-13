@@ -58,7 +58,7 @@ _char = re.compile(r'&(\w+?);')
 defs=html.entities.entitydefs
 defs['apos'] = "'"
 #need to fix this to pull the database location from the config file
-entities = open('../project/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
+entities = open('Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
 for e in entities:
     try:
         first = re.sub('\s+|\"|;|&','',e[3:15])
@@ -102,7 +102,7 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     cursor.close()
 
 
-def get_config(localfile="../project/Development/config.ini", default_file=False):
+def get_config(localfile="Development/config.ini", default_file=False):
     """
     This grabs a configuration file and converts it into
     a dictionary.
@@ -152,7 +152,7 @@ def session_generator(dbtype='grant'):
     if dbtype == 'grant':
         read_database = "new_db"
 
-    engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
+    engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8mb4'.format(
         config.get('DATABASE').get('user'),
         config.get('DATABASE').get('password'),
         config.get('DATABASE').get('host'),
