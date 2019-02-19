@@ -12,4 +12,5 @@ celery[redis]
 clint
 mysqlclient
 sqlalchemy
-jupyter
+regex
+SlackClient
