@@ -17,7 +17,7 @@ def connect_to_db(host, username, password, database):
     return engine
 
 def send_slack_notification(message, level="info"):
-    color_map={"info":"#6699cc", "success":"#aad922", "warning":"#d96c06","error":"#d62828" }
+    color_map={"info":"#6699cc", "success":"#aad922", "warning":"#FFFF00","error":"#d62828" }
     print(color_map[level])
     return slack_client.api_call(
         "chat.postMessage",
