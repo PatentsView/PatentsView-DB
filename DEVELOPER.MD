@@ -104,3 +104,9 @@ The notebook also comes with a list of useful extension:
 ![Extensions](extensions.png) Any extensions you enable would be temporary. To permanently enable an extension you have to update the Dockerfile 
  
 
+# Reporting Database Configuration
+Edit the config.ini file with following changes
+1. Add Slack API token
+2. Update the slack channel in which we want to recieve notifications
+3. Update the source `raw` database name
+4. Update destination `reporting` database name
