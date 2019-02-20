@@ -15,3 +15,6 @@ sqlalchemy
 regex
 SlackClient
 sqlparse
+jupyter
+fuzzywuzzy
+python-Levenshtein
