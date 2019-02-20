@@ -435,8 +435,6 @@ if __name__ == '__main__':
                    for item in in_files]
     fields = [field_dictionary for item in in_files]
     files = zip(in_files, out_files, fields)
-    
-
     desired_processes = 7 # ussually num cpu - 1
     jobs = []
     for f in files:
