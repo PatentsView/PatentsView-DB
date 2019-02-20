@@ -2,11 +2,11 @@ import os
 import configparser
 import sys
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+sys.path.append('/project/Development')
 from helpers import general_helpers
 import configparser
 config = configparser.ConfigParser()
-config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+config.read('/project/Development/config.ini')
 host = config['DATABASE']['HOST']
 username = config['DATABASE']['USERNAME']
 password = config['DATABASE']['PASSWORD']
