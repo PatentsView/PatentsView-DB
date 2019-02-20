@@ -116,6 +116,7 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read('/project/Development/config.ini')
 
+
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
     
     disambiguated_folder = "{}/disambig_out".format(config['FOLDERS']['WORKING_FOLDER'])
@@ -129,5 +130,6 @@ if __name__ == '__main__':
     process_rawlocation(db_con, lat_long_cannonical_name, d_lat_long_lookup, disambiguated_folder)
     print('done process')
     upload_rawloc(db_con, disambiguated_folder)
+
 
 

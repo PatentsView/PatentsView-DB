@@ -113,7 +113,6 @@ def get_main_text_fields(patent):
 
     return data
 
-
 #####################################
 ### Get Data for Specific Fields
 #####################################

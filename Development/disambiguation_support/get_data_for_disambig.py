@@ -11,7 +11,7 @@ def get_tables(db_con, output_folder):
     regex_keys = [r"\,\sdeceased",r"\,\sadministrator", r"\,\sexecutor", 
              r"\,\slegal.+",r"\,\spersonal.+" ]
     regex = re.compile("(%s)" % "|".join(regex_keys))
-    
+
     for t in tables:
         print("Exporting table {}".format(t))
         col_data = db_con.execute('show columns from {}'.format(t)) #eventually add funcitonality to check that the columns getting exported are exactly the same
@@ -54,4 +54,6 @@ if __name__ == '__main__':
     get_tables(db_con, disambig_folder)
   
     key_file = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
+    #TODO: update this to use subprocess
     os.system('scp -i "{}" {}/*.tsv disambiguser@ec2-52-21-62-204.compute-1.amazonaws.com:/data/inventor-disambiguation-internal/data'.format(key_file, disambig_folder))
+

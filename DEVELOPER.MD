@@ -19,9 +19,12 @@ Example:
  	e. Across the yaml file, replace **{db\_container\_name}** with a suitable name. This will be the `hostname` at which airflow will connect to MySQL (it doens't have to be in URL format)  
  d. Update port number in this line: `- 9090:8080` if you want to use a different port number than 8080 to access airflow UI. **Format: {desiredPortNumber}:8080**  
 4. Run this command from your host system. `docker network create patentsview-pipeline-network` . The name you use here must be used in `docker-compose.yaml` file.
+
 ## Credentials
 5. You must copy the 'Development/config_template.ini' to one called 'Development/config.ini' and enter your database password and the name of the upload, old and new databases. 
 6. You must also enter the key file for the disambiguation server into a file called 'disambig' in the 'credentials' folder. Ask Sarah to get a copy of the key, which you can just copy into the file. 
+=======
+
 ## MySQL Setup  
 
 5. Create a copy of `airflow-metadata-db-sql/init-sample.sql` with the name `airflow-metadata-db-sql/init.sql`  

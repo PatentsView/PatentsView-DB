@@ -89,6 +89,10 @@ create_and_upload_disambig_operator = BashOperator(task_id='get_disambig_input',
                                                    bash_command='python /project/Development/disambiguation_support/get_data_for_disambig.py',
                                                    dag=dag)
 
+run_lawyer_disambiguation_operator=BashOperator(task_id='run_lawyer_disambiguation',
+                                           bash_command='python /project/Assignee_Lawyer_Disambiguation/lib/lawyer_disambiguation.py',
+                                           dag=dag)
+
 run_disambiguation_operator = BashOperator(task_id='run_disambiguation',
                                            bash_command='bash /project/Development/disambiguation_support/run_disambiguation.sh',
                                            dag=dag)
@@ -108,12 +112,12 @@ postprocess_assignee_operator = BashOperator(task_id='post_process_assignee',
 postprocess_location_operator = BashOperator(task_id='post_process_location',
                                              bash_command='python /project/Development/post_process_disambiguation/post_process_location.py',
                                              dag=dag)
+
 persistent_inventor_operator = BashOperator(task_id = 'persistent_inventor',
                                             bash_command = 'python /project/Development/post_process_disambiguation/persistent_inventor.py')
 
 lookup_tables_operator = BashOperator(task_id = 'lookup_tables',
                                             bash_command = 'python /project/Development/post_process_disambiguation/create_lookup_tables.py')
-
 
 process_xml_operator.set_upstream(download_xml_operator)
 parse_xml_operator.set_upstream(process_xml_operator)
@@ -138,6 +142,10 @@ upload_uspc_operator.set_upstream(merge_new_operator)
 process_wipo_operator.set_upstream(cpc_current_operator)
 
 create_and_upload_disambig_operator.set_upstream(process_wipo_operator)
+
+run_lawyer_disambiguation_operator.set_upstream(create_and_upload_disambig_operator)
+download_disambig_operator.set_upstream(run_lawyer_disambiguation_operator)
+
 run_disambiguation_operator.set_upstream(create_and_upload_disambig_operator)
 download_disambig_operator.set_upstream(run_disambiguation_operator)
 postprocess_inventor_operator.set_upstream(download_disambig_operator)
@@ -148,3 +156,4 @@ persistent_inventor_operator.set_upstream(postprocess_inventor_operator)
 lookup_tables_operator.set_upstream(postprocess_inventor_operator)
 lookup_tables_operator.set_upstream(postprocess_assignee_operator)
 lookup_tables_operator.set_upstream(postprocess_location_operator)
+

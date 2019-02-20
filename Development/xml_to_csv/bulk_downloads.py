@@ -70,7 +70,6 @@ def extract_file(download_url):
     os.remove(name)
 
 
-# In[12]:
 
 def bulk_download(start_date, end_date, folder):
     

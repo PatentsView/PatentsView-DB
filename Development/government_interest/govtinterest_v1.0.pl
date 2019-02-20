@@ -18,6 +18,7 @@ use Cwd qw(getcwd);
 # Stanford NER = Named Entity Recognition 
 #  for Information extraction
 
+
 # This script takes a csv file in the format:
 # "patent number,TwinArch set,GI title,GI statement"
 # and parses out the funding agency via Stanford NER pre-existing output. It also identifies contract and award numbers
@@ -70,10 +71,39 @@ my $file = "ner.txt";
 
 my $data = (); # main data hash
 # declare empty hashes
+=======
+open( my $configFile, "/usr/local/airflow/config.txt") or die("Can't find config file!");
+my @config_info = <$configFile>;
+my $temp = "@config_info[0]";
+chomp $temp;
+
+
+#my $location = $temp . "/NER_output";
+
+my $nerDir = "/usr/local/airflow/PatentsView-DB/Development/government_interest/NER/stanford-ner-2017-06-09";
+#my $omitLocsFile = "/usr/local/airflow/PatentsView-DB/Development/persistent_files/omitLocs.csv";
+
+
+my $starting_dir = getcwd;
+my $omitLocsFile = $startingdir ."/Development/persistent_files/omitLocs.csv"
+
+
+
+#my $workDir = $temp . "/government_interest";
+#print($workDir);
+my $inFile = $temp . "merged_csvs.csv";
+my $outFile = "NER_output.txt";
+my $distinctOrgsFile = "distinctOrgs.txt";
+my $distinctLocsFile = "distinctLocs.txt";
+my $file = "ner.txt";
+
+my $data = (); # main data hash
+
 my %distinctOrgs;
 my %distinctLocs;
 
 # NER globally visibile vars
+
 # set params that apply for NER extraction (scalar, arrays)
 my $NERFC= 5000;		 # specifies number of lines to feed NER per Java call 
 # classifiers to view and create output directories for 3 classes
@@ -97,6 +127,20 @@ writeOutput();
 # Requires: data with parsed NER data added
 # Modifies: nothing
 # Effects: clean contracts from certain Bethesda, San Diego related contract #s
+=======
+my $NERFC= 5000;		 # specifies number of lines to feed NER per Java call 
+my @classifiers = ('classifiers/english.all.3class.distsim.crf.ser.gz', 'classifiers/english.conll.4class.distsim.crf.ser.gz', 'classifiers/english.muc.7class.distsim.crf.ser.gz');
+my @nerOutDirs = ('out-3class', 'out-4class', 'out-7class');
+my $simple = XML::Simple->new(ForceArray => 1);
+my %omitLocs;  # use to remove country variations from a list of locations
+
+init ();
+readData();
+doNer();
+process();
+writeOutput();
+
+
 sub cleanContracts () { 
   foreach my $pn (keys (%$data)) {
     next if ($data->{$pn}->{"hasLocation"} == 0);
@@ -110,6 +154,13 @@ sub cleanContracts () {
       $data->{$pn}->{"ids"} = \@results;
     }
     # match Bethesda 
+
+
+    if ($giStmt =~ m/San Diego(,)?/i) {
+      my @results = grep (!/((CA\s)?92152(-\d{4,4})?|72120|20012|53510|D0012|53560)/, @ids);
+      $data->{$pn}->{"ids"} = \@results;
+    }
+
     if ($giStmt =~ m/Bethesda(,)?/i) {
       my @results = grep (!/20014|20892/, @ids);
       $data->{$pn}->{"ids"} = \@results;
@@ -142,19 +193,36 @@ sub init () {
     (my $omit = $line->[2]) =~ s,\n|\r,,sg;
     # omitLocs hash key = loc , value = $omit
     # if it needs to be omitted
+
+sub init () {
+    my $csv = Text::CSV->new({  binary => 1, sep_char => ',' });
+  open (my $fh, "<", "$workDir/$omitLocsFile") or die "Cannot open $omitLocsFile: $!\n";
+  my $header = $csv->getline($fh); # skip header
+
+  while (my $line = $csv->getline($fh)) {
+    chomp $line; 
+
+    (my $loc = $line->[0]) =~ s,\n|\r,,sg;
+    (my $freq = $line->[1]) =~ s,\n|\r,,sg;
+    (my $omit = $line->[2]) =~ s,\n|\r,,sg;
+
     $omitLocs{$loc} = $omit if ($omit == 1); 
   }
 }
 
 
+
 # Requires: NER 
 # Modifies: Nothing
 # Effects: process NER recognition data
+
 sub doNer() {
   my $i = 0; my $fc = 0;
   my @nersIn = (); 
   #chdir ($nerDir) or die "Cannot change directories $!\n";
+
   # declare new patKeys array from data hash
+
   my @patKeys = sort (keys (%$data));
   print $#patKeys;
   print "Working on ", ($#patKeys + 1), " records.\n";
@@ -166,8 +234,10 @@ sub doNer() {
   #  `rm -f $nerDir/$d/*`;
   #}
 
+
   # loop through patents
   # specifically gi-Statement
+
   foreach my $pat (@patKeys) {
     my $giStmt = $data->{$pat}->{"giStmt"};
     # remove periods in certain acronyms that won't be captured by NER otherwise
@@ -175,6 +245,7 @@ sub doNer() {
     $giStmt =~ s/N\.S\.F\./NSF/sg;
     $giStmt =~ s/N\.A\.S\.A\./NASA/sg;
     $giStmt =~ s/C\.D\.C\./CDC/sg;
+
     # add value to end of array
     push (@nersIn, $giStmt);
     # if value >= 5000 or patKeys == i 
@@ -197,25 +268,43 @@ sub doNer() {
     # increment
     $i++;
     close FILE; 
+
+    
+    push (@nersIn, $giStmt);
+
+    if ($#nersIn >= $NERFC || $i == $#patKeys ) {
+      open FILE, ">", "$nerDir/in/$fc.txt" or die "Cannot open temporary  file $nerDir/in/$fc.txt $!\n";
+      #open FILE, ">", "in/$fc.txt" or die "Cannot open temporary -here-  file in/$fc.txt $!\n";
+      print FILE (join ("\n", @nersIn));
+      close FILE;
+      $fc++;
+      @nersIn= ();
+    }
+    $i++;
+
   }
 
   `rm -f error.log`; # remove the error log before staring a new NER run
   #my $starting_dir = getcwd;
+
   # now process NER
   chdir ($nerDir) or die "Cannot change directories $!\n";
   # o in classifiers array
+  chdir ($nerDir) or die "Cannot change directories $!\n";
+
   for (my $o = 0; $o <= $#classifiers; $o++) {
     print "Staring NER on: ", $classifiers[$o], "\n";
     my $dir = getcwd;
     print $dir;
+
     # c new var with fc as limit
+      # write output
     for (my $c = 0; $c < $fc; $c++) {
       print "\tRunning NER on in/$c.txt\n"; 
-      # java command run
       my $cmd = "java -mx500m -classpath \"stanford-ner.jar;lib/*\" edu.stanford.nlp.ie.crf.CRFClassifier -loadClassifier $classifiers[$o] -textFile in/$c.txt -outputFormat inlineXML 2>> error.log";
      
       my $output = `$cmd`;
-      # write output
+
       #open FILE, ">", "$nerDir/$nerOutDirs[$o]/$c.txt" or die "Cannot open temporary file $nerOutDirs[$o]/$file.txt: $!\n";
       open FILE, ">", "$nerOutDirs[$o]/$c.txt" or die "Cannot open temporary file $nerOutDirs[$o]/$file.txt: $!\n";
       print FILE $output;
@@ -223,6 +312,7 @@ sub doNer() {
     }
   }
 }
+
 
 # Requires: input file
 # Modifies: nothing 
@@ -242,11 +332,12 @@ sub readData() {
     chomp $line;
     # 4 fields here: patent #, twinArch, giTitle, giStatement
     # take out newline and return characters
+
     (my $patentNo = $line->[0]) =~ s,\n|\r,,sg;
     (my $twinArch = $line->[1]) =~ s,\n|\r,,sg;
     (my $giTitle = $line->[2]) =~ s,\n|\r,,sg;
     (my $giStmt = $line->[3]) =~ s,\n|\r,,sg;
-    # data hash 
+
     $data->{$patentNo}->{"twinArch"} = $twinArch;
     $data->{$patentNo}->{"giTitle"} = $giTitle;
     $data->{$patentNo}->{"giStmt"} = $giStmt;
@@ -257,9 +348,13 @@ sub readData() {
 
 
 # open NER results file
+
 # Requires: 
 # Modifies: 
 # Effects: 
+
+
+
 sub process() {
   chdir ($starting_dir) or die "Cannot change directories back $!\n";
   my $i = 0; my $c = 0;
@@ -271,6 +366,7 @@ sub process() {
     $data->{$patNum}->{"hasPhoneNumber"} = $hasPhoneNumber;
     $data->{$patNum}->{"ids"} = $ids;
     # loop through NER files
+
     if ($i == 0) {
       print "Opening NER files: $c\n";
       foreach (my $o = 0; $o <= $#nerOutDirs; $o++) {
@@ -292,6 +388,7 @@ sub process() {
       my @nerLines = @{$ners{$o}};
       my $line = $nerLines[$i];
       # parse XML file for orgs, locs, has location 
+
       my ($orgs, $locs, $hasLocation) = parseNer($line);
       $data->{$patNum}->{"hasLocation"}++ if ($hasLocation);
       push (@corgs, @$orgs);
@@ -300,6 +397,7 @@ sub process() {
       $data->{$patNum}->{$nerOutDirs[$o]} = $line;
     }
     
+
     # remove dups 
     my @ulocs = uniq(@clocs);
     my @uorgs = uniq(@corgs);
@@ -315,16 +413,19 @@ sub process() {
   cleanContracts();
   # print Dumper ($data), "\n";
 }
+
 # helper function used in parseNums()
 # Requires: 
 # Modifies: nothing
 # Effects: remove lead + trail punct.
+
 sub trimWord ($) {
   my $word = shift; 
   # remove leading and trailing punctuation only
   $word =~ s,(^[[:punct:]])+|([[:punct:]]+$),,sg;
   return $word;
 }
+
 
 # helper function used in process()
 # Requires: data, hasPhoneNumber, ids 
@@ -335,6 +436,7 @@ sub parseNums () {
   # split giStatement field into words
   my @in = split (" ", shift); 
   # map trimWord () to array
+
   my @words = map ( trimWord($_), @in); # trim all beginning and ending punctuation 
   my %candidates;  # all things that look like contract or award numbers
   my %ids;  # what we deem to be an actual contract or award number 
@@ -342,7 +444,7 @@ sub parseNums () {
 
   # find all base contract and award segments 
   for (my $i=0; $i <= $#words; $i++) {
-    # loop through, substitute punctuation "" to remove it
+
     (my $noPunctWord = $words[$i]) =~ s,[[:punct:]],,sg; 
     # grab all words with alphanumeric combinations or words with 5+ digits, signalling an award or contract number
     if ( ( $noPunctWord =~ m,\d+, && $noPunctWord =~ m,[[:alpha:]], && length($noPunctWord) > 3 ) || $noPunctWord =~ m/\d{5,}/ ) {
@@ -357,7 +459,7 @@ sub parseNums () {
     my $val = $candidates{$pos};
     # check to see if the previous words are between one and four characters and consists of cap letters and/or numbers,
     # in which case it should be part of the identifier.  Mind the punctuation in the original word
-    
+
     my $id = $val;
     for (my $pb = $pos - 1; $pb >= 0; $pb--) {
       if ( ($words[$pb] =~ m/^[A-Z0-9]{1,6}$/  && $words[$pb] !~ m,^A$, && $in[$pb] !~ m,[[:punct:]]$,) || 
@@ -392,8 +494,10 @@ sub parseNums () {
     $ids{$id} = 1;
   }
   
+
    print "\tAll ids for record: ", Dumper (\%ids);
    print "\tAll removes for record: ", Dumper (\%removes);
+
   
   # remove all items from the ids array
   my @diff = grep { not exists $removes{$_} } keys (%ids);
@@ -404,6 +508,7 @@ sub parseNums () {
   # whitespace or dash, then 3 digits, whitespace/dash, last 4
   # (\s|-)?[0-9]{3,3}(-|\s)+[0-9]{4,4}$
   # if length of phone # is less than length of @diff array, giStatement has phone number
+
   my @noPhone = grep (!/^(\+?1?(\s|-)?\(?[0-9]{3,3}\)?)(\s|-)?[0-9]{3,3}(-|\s)+[0-9]{4,4}$/, @diff );
     $hasPhoneNumber = 1 if ($#noPhone < $#diff );
   
@@ -417,7 +522,9 @@ sub parseNums () {
   return (\@noEmail, $hasPhoneNumber);
 }
 
+
 # helper function in process()
+
 sub parseNer () {
   my $output = shift;
   my @orgs = ();
@@ -468,7 +575,10 @@ sub parseNer () {
 }
 
 
+
 # Write output of data both commandline and file 
+=======
+
 sub writeOutput() {
   # print Dumper ($data), "\n";
   my $dir = getcwd;
@@ -476,7 +586,9 @@ sub writeOutput() {
 
   open (OUF, ">$workDir/$outFile") or die "Cannot open here! $outFile: $!\n";
   print OUF "Patent number\tTwinArch set\tGI title\tGI statement\tOrgs\tContract/award(s)\tHas address\tHas phone\n"; 
+
   # for each patent in data hash
+
   foreach my $patNum (sort(keys(%$data))) {
     my $orgs = $data->{$patNum}->{"orgs"};
     my $ids = $data->{$patNum}->{"ids"};
@@ -508,9 +620,11 @@ sub writeOutput() {
   close LOCSF;
 
 }
+
 # Requires: 
 # Modifies:
 # Effects: 
+
 sub uniq {
   my %seen;
   return grep { !$seen{$_}++ } @_;

@@ -77,6 +77,7 @@ def get_results(patents, field_dictionary):
         #assigned after application to extract application data
         results['patent'].append([patent_id,app_type , patent_id, patent_data['document-id-country'],
                            patent_date, abstract, title, patent_data['document-id-kind'], num_claims, filename, '0'])
+
         
         exemplary = xml_helpers.get_entity(patent, 'us-exemplary-claim')
         if exemplary[0] is not None:
@@ -435,6 +436,7 @@ if __name__ == '__main__':
     fields = [field_dictionary for item in in_files]
     files = zip(in_files, out_files, fields)
     
+
     desired_processes = 7 # ussually num cpu - 1
     jobs = []
     for f in files:
@@ -443,4 +445,4 @@ if __name__ == '__main__':
         print(segment)
         for job in segment:
             job.start()
-
+            job.join()

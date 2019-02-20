@@ -52,6 +52,7 @@ def get_patent_ids(db_con, new_db):
         patnums[patent['number']] = patent['id']
     return set(patnums.keys()), patnums
 
+
 def better_title(text):
     title = " ".join([item if item not in ["Of", "The", "For", "And", "On"] else item.lower() for item in str(text).title().split( )])
     return re.sub('['+string.punctuation+']', '', title)

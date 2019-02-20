@@ -3,7 +3,6 @@ import pandas as pd
 from collections import Counter
 import sys
 sys.path.append('/project/Development')
-sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 import multiprocessing
 from collections import defaultdict
