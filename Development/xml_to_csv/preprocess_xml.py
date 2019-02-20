@@ -74,8 +74,10 @@ if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
     config.read('/project/Development/config.ini')
+
     infolder = '{}/raw_data'.format(config['FOLDERS']['WORKING_FOLDER'])
     outfolder = '{}/clean_data'.format(config['FOLDERS']['WORKING_FOLDER'])
+
     if not os.path.exists(outfolder):
         os.mkdir(outfolder)
 

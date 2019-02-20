@@ -7,7 +7,7 @@ import csv
 import re,os,random,string,codecs
 import sys
 from collections import Counter, defaultdict
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+sys.path.append('/project/Development')
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 
@@ -68,7 +68,7 @@ def upload_assignee(db_con, disambiguated_to_write, type_lookup, assignee_id_set
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+    config.read('/project/Development/config.ini')
 
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
     disambiguated_folder = "{}/disambig_out".format(config['FOLDERS']['WORKING_FOLDER'])    

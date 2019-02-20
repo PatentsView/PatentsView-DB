@@ -9,6 +9,7 @@ import re,os,random,string,codecs
 import sys
 from collections import Counter, defaultdict
 sys.path.append('/project/Development')
+
 from helpers import general_helpers
 
 def make_lookup(disambiguated_folder):
@@ -115,7 +116,6 @@ if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
     config.read('/project/Development/config.ini')
-
 
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
     

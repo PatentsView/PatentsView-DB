@@ -80,8 +80,8 @@ chomp $temp;
 
 #my $location = $temp . "/NER_output";
 
-my $nerDir = "/usr/local/airflow/PatentsView-DB/Development/government_interest/NER/stanford-ner-2017-06-09";
-#my $omitLocsFile = "/usr/local/airflow/PatentsView-DB/Development/persistent_files/omitLocs.csv";
+my $nerDir = "/project/Development/government_interest/NER/stanford-ner-2017-06-09";
+#my $omitLocsFile = "/project/Development/persistent_files/omitLocs.csv";
 
 
 my $starting_dir = getcwd;

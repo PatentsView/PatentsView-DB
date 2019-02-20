@@ -22,7 +22,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: mysql_root_password
-
+      USER: "1000:1001"
     container_name: {db_container_name}
     ports:
       - 3308:3306

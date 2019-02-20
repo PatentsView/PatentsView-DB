@@ -11,6 +11,7 @@ import configparser
 config = configparser.ConfigParser()
 
 config.read('/project/Development/config.ini')
+
 disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'disambig_out')
 old_db = config['DATABASE']['OLD_DB']
 new_db = config['DATABASE']['NEW_DB']
