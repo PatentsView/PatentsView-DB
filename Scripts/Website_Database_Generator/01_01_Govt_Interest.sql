@@ -49,8 +49,6 @@ drop table if exists `{{params.reporting_database}}`.`patent_govintorg`;
 INSERT INTO `{{params.reporting_database}}`.`government_interest` SELECT * FROM `{{params.raw_database}}`.`government_interest`;
 INSERT INTO `{{params.reporting_database}}`.`government_organization` SELECT * FROM `{{params.raw_database}}`.`government_organization`;
 INSERT INTO `{{params.reporting_database}}`.`patent_contractawardnumber` SELECT * FROM `{{params.raw_database}}`.`patent_contractawardnumber`;
-drop table if exists `{{params.raw_database}}`.`temp_patent_govintorg_backup`;
-alter table `{{params.raw_database}}`.`patent_govintorg` rename `{{params.raw_database}}`.`temp_patent_govintorg_backup`;
 
 INSERT INTO `{{params.reporting_database}}`.`patent_govintorg` SELECT * FROM `{{params.raw_database}}`.`patent_govintorg`;
 
