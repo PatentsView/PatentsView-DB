@@ -25,7 +25,7 @@ def get_tables(db_con, output_folder):
         existing_data = db_con.execute("select {} from {};".format(col_string, t))
         outp = csv.writer(open('{}/{}.tsv'.format(output_folder, t),'w'),delimiter='\t')
         outp.writerow(cols)
-        if table = 'rawinventor':
+        if table == 'rawinventor':
             for_output = []
             for row in existing_data:
                 data = [item for item in row]
