@@ -12,9 +12,6 @@ celery[redis]
 clint
 mysqlclient
 sqlalchemy
-regex
-SlackClient
-sqlparse
 jupyter
 fuzzywuzzy
 python-Levenshtein
