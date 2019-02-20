@@ -5,7 +5,7 @@ import re
 import pandas as pd
 import simplejson as json
 
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+sys.path.append('/project/Development')
 from helpers import output, xml_helpers, general_helpers
 from lxml import etree
 from collections import defaultdict
@@ -76,7 +76,8 @@ def get_results(patents, field_dictionary):
             app_type = None
         #assigned after application to extract application data
         results['patent'].append([patent_id,app_type , patent_id, patent_data['document-id-country'],
-                           patent_date, abstract, title, patent_data['document-id-kind'], num_claims, filename])
+                           patent_date, abstract, title, patent_data['document-id-kind'], num_claims, filename, '0'])
+
         
         exemplary = xml_helpers.get_entity(patent, 'us-exemplary-claim')
         if exemplary[0] is not None:
@@ -99,7 +100,7 @@ def get_results(patents, field_dictionary):
             if detail_desc_text_data !=[]:
                 results['detail_desc_text'].append([general_helpers.id_generator(), patent_id, detail_desc_text_data, len(detail_desc_text_data)])
             else:
-                if not patent_id[0] in ["R", 'P', 'H', 'D']: #these types are allowed to not have detailed descriptions
+                if not patent_id[0] in ['R', 'P', 'H', 'D']: #these types are allowed to not have detailed descriptions
                     error_log.append([patent_id, 'detail-description'])
 
             brf_sum_text_data = text_data['Brief Summary']
@@ -136,7 +137,10 @@ def get_results(patents, field_dictionary):
             for inventor in inventor_data:
                 rawlocid = general_helpers.id_generator()
                 results['rawlocation'].append([rawlocid, None, inventor['address-city'], inventor['address-state'], inventor['address-country'], xml_helpers.clean_country(inventor['address-country'])])
-                results['rawinventor'].append([general_helpers.id_generator(), patent_id, None, rawlocid, output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']), int(inventor['sequence']) -1, rule_47_flag])
+                deceased = False
+                if 'deceased' in output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']):
+                    deceased = True
+                results['rawinventor'].append([general_helpers.id_generator(), patent_id, None, rawlocid, output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']), int(inventor['sequence']) -1, rule_47_flag, deceased])
                 output.mandatory_fields('inventor', patent_id, error_log, [output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
         else:
             error_log.append([patent_id, 'inventor'])
@@ -152,7 +156,7 @@ def get_results(patents, field_dictionary):
                 results['rawinventor'].append([general_helpers.id_generator(), patent_id, None, rawlocid, 
                                          output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), 
                                          output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']),
-                                         inventor['sequence'], rule_47_flag])
+                                         inventor['sequence'], rule_47_flag, True])
                 output.mandatory_fields('inventor', patent_id, error_log, [output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
         
         #applicant has inventor info for some earlier time periods
@@ -167,7 +171,7 @@ def get_results(patents, field_dictionary):
                 if applicant['app-type'] == "applicant-inventor":
                     #rule_47 flag always 0 for applicant-inventors (becauase they must be alive)
                     results['rawinventor'].append([general_helpers.id_generator(), patent_id,None, rawlocid, applicant['addressbook-first-name'],
-                                              applicant['addressbook-last-name'], str(inventor_app_seq), 0 ])
+                                              applicant['addressbook-last-name'], str(inventor_app_seq), 0 , False])
                     inventor_app_seq +=1
                     output.mandatory_fields('inventor_applicant', patent_id, error_log,[applicant['addressbook-first-name'],
                                          applicant['addressbook-last-name']])
@@ -416,22 +420,21 @@ def main_process(data_file, outloc, field_dictionary):
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+    config.read('/project/Development/config.ini')
     #TO run Everything:
     with open('{}/field_dict.json'.format(config['FOLDERS']['PERSISTENT_FILES'])) as myfile:
         field_dictionary = json.load(myfile)
-
+    
+    input_folder = '{}/clean_data'.format(config['FOLDERS']['WORKING_FOLDER'])
+    output_folder = '{}/parsed_data'.format(config['FOLDERS']['WORKING_FOLDER'])
     #this is the folder with the xml files that we want to reparse
-    in_files = ['{0}/{1}'.format(config['FOLDERS']['DATA_TO_PARSE'], item) for item in os.listdir(config['FOLDERS']['DATA_TO_PARSE'])]
-    if not os.path.exists(config['FOLDERS']['PARSED_DATA']):
-        os.mkdir(config['FOLDERS']['PARSED_DATA'])
-    out_files= ['{0}/{1}'.format(config['FOLDERS']['PARSED_DATA'], item[-16:-10]) 
+    in_files = ['{0}/{1}'.format(input_folder, item) for item in os.listdir(input_folder)]
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
+    out_files= ['{0}/{1}'.format(output_folder, item[-16:-10]) 
                    for item in in_files]
     fields = [field_dictionary for item in in_files]
     files = zip(in_files, out_files, fields)
-
-    
-    print("Starting")
     desired_processes = 7 # ussually num cpu - 1
     jobs = []
     for f in files:
