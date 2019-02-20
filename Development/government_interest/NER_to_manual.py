@@ -73,10 +73,11 @@ def get_data(persistent_files, pre_manual):
     govt_acc_dict = dict(zip([item.strip() for item in government_orgs["Acronym"]], [general_helpers.better_title(item.strip()) for item in government_orgs["Long_form"]]))
 
     # #Input from NER round
-    orgs = pd.read_csv("{}/distinctOrgs.txt".format(pre_manual), delimiter = "\t")
+    orgs = pd.read_csv("{}/distinct_orgs.txt".format(pre_manual), delimiter = "\t")
 
     gov_to_skip = ['Government', 'US Government', 'U.S. Government', 'United States Government']
-    organizations = [item for item in orgs['Organization'] if not item in gov_to_skip ]
+    #there is only one column in orgs file
+    organizations = [item for item in orgs.iloc[:,0] if not item in gov_to_skip ]
     
     return existing_lookup, govt_acc_dict, organizations
     
@@ -93,6 +94,11 @@ def perform_lookups(existing_lookup, govt_acc_dict, organizations, post_manual, 
     matched.to_csv('{}/automatically_matched.csv'.format(post_manual), index = False)
     to_check = results[~pd.isnull(results['possible'])][['organization', 'possible']]
     to_check.to_csv('{}/to_check.csv'.format(manual_inputs), index = False)
+    
+def get_orgs(db_con, manual_inputs):
+	raw = pd.read_sql("select * from government_organization", db_con)
+	raw.to_csv(manual_inputs + "/government_organization.csv", index = None)
+    
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
@@ -107,3 +113,5 @@ if __name__ == '__main__':
         os.mkdir(post_manual)
     existing_lookup, govt_acc_dict, organizations = get_data(persistent_files, pre_manual)
     perform_lookups(existing_lookup, govt_acc_dict, organizations, post_manual, manual_inputs)
+    db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
+    get_orgs(db_con, manual_inputs)

@@ -13,3 +13,5 @@ clint
 mysqlclient
 sqlalchemy
 jupyter
+fuzzywuzzy
+python-Levenshtein
