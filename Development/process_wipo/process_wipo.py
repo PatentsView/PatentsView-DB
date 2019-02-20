@@ -2,7 +2,7 @@ import re,csv,os,MySQLdb
 import pandas as pd
 from collections import Counter
 import sys
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+sys.path.append('/project/Development')
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 import multiprocessing
@@ -29,14 +29,11 @@ def dict_setup(working_directory, persistent_files):
 
     # create a dictionary mapping IPC code to field number
     # key: IPC_code
-    # value: Sector_en
-    ipc_to_field = {}
-    #have to read this as bytes because it won't read normally due to encoding issues
-    #TODO: explore if we can read this in with encoding specified
-    with open('{}/ipc_technology.csv'.format(persistent_files), 'rb') as myfile:
-        rows = csv.reader(codecs.iterdecode(myfile, 'utf-8', errors= 'ignore'))
-        for row in rows:
-            ipc_to_field[row[7].replace("%","").replace(' ','')] = row[0]
+    # value: Field_number
+    ipc_data = pd.read_csv('{}/ipc_technology.csv'.format(persistent_files))
+    ipc_data['clean_IPC'] = ipc_data['IPC_code'].str.replace("%","").replace(' ','')
+    ipc_to_field = dict(zip(ipc_data['clean_IPC'], ipc_data['Field_number']))
+
     ###### CPC to IPC mapping ######
 
     # input ipc_concordance data from local

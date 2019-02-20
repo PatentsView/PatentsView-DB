@@ -136,7 +136,10 @@ def get_results(patents, field_dictionary):
             for inventor in inventor_data:
                 rawlocid = general_helpers.id_generator()
                 results['rawlocation'].append([rawlocid, None, inventor['address-city'], inventor['address-state'], inventor['address-country'], xml_helpers.clean_country(inventor['address-country'])])
-                results['rawinventor'].append([general_helpers.id_generator(), patent_id, None, rawlocid, output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']), int(inventor['sequence']) -1, rule_47_flag])
+                deceased = False
+                if 'deceased' in output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']):
+                    deceased = True
+                results['rawinventor'].append([general_helpers.id_generator(), patent_id, None, rawlocid, output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']), int(inventor['sequence']) -1, rule_47_flag, deceased])
                 output.mandatory_fields('inventor', patent_id, error_log, [output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
         else:
             error_log.append([patent_id, 'inventor'])
@@ -152,7 +155,7 @@ def get_results(patents, field_dictionary):
                 results['rawinventor'].append([general_helpers.id_generator(), patent_id, None, rawlocid, 
                                          output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), 
                                          output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']),
-                                         inventor['sequence'], rule_47_flag])
+                                         inventor['sequence'], rule_47_flag, True])
                 output.mandatory_fields('inventor', patent_id, error_log, [output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
         
         #applicant has inventor info for some earlier time periods
@@ -167,7 +170,7 @@ def get_results(patents, field_dictionary):
                 if applicant['app-type'] == "applicant-inventor":
                     #rule_47 flag always 0 for applicant-inventors (becauase they must be alive)
                     results['rawinventor'].append([general_helpers.id_generator(), patent_id,None, rawlocid, applicant['addressbook-first-name'],
-                                              applicant['addressbook-last-name'], str(inventor_app_seq), 0 ])
+                                              applicant['addressbook-last-name'], str(inventor_app_seq), 0 , False])
                     inventor_app_seq +=1
                     output.mandatory_fields('inventor_applicant', patent_id, error_log,[applicant['addressbook-first-name'],
                                          applicant['addressbook-last-name']])

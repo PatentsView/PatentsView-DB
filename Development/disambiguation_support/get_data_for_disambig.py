@@ -7,6 +7,11 @@ from helpers import general_helpers
 
 def get_tables(db_con, output_folder):
     tables = ['patent', 'cpc_current','ipcr','nber','rawassignee','rawinventor','uspc_current','rawlawyer']
+    #regex for removing inventor name details
+    regex_keys = [r"\,\sdeceased",r"\,\sadministrator", r"\,\sexecutor", 
+             r"\,\slegal.+",r"\,\spersonal.+" ]
+    regex = re.compile("(%s)" % "|".join(regex_keys))
+    
     for t in tables:
         print("Exporting table {}".format(t))
         col_data = db_con.execute('show columns from {}'.format(t)) #eventually add funcitonality to check that the columns getting exported are exactly the same
@@ -20,7 +25,17 @@ def get_tables(db_con, output_folder):
         existing_data = db_con.execute("select {} from {};".format(col_string, t))
         outp = csv.writer(open('{}/{}.tsv'.format(output_folder, t),'w'),delimiter='\t')
         outp.writerow(cols)
-        outp.writerows(existing_data)
+        if table = 'rawinventor':
+            for_output = []
+            for row in existing_data:
+                data = [item for item in row]
+                data[5] = re.sub(regex, '', row[5])
+                for_output.append(data)
+
+            outp.writerows(for_output)
+        else:
+            outp.writerows(existing_data)
+        
      #rawlocation done separately because it is a specially query
     outp = csv.writer(open('{}/rawlocation.tsv'.format(output_folder),'w'),delimiter='\t')
     existing_data = db_con.execute('select id,location_id_transformed as location_id,city,state,country_transformed as country from rawlocation')
