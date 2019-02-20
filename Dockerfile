@@ -91,9 +91,9 @@ RUN export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -r /setup/requirements
 
 EXPOSE 8080 5555 8793
 
+
 ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}/Development"
 #RUN chown -R airflow:airflow /airflow
-
 
 WORKDIR /project
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/project/supervisord.conf"]

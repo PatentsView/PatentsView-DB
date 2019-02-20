@@ -2,6 +2,7 @@
 # Requirements
 * Docker
 * docker-compose  
+
 #### Change History
 1. Updated SQL sample file location
 2. Moved Port Number details to separate sectiomn
@@ -16,10 +17,12 @@
 	a. Replace `/Path/to/Project/Root/PatentsView-DB/` with the **PROJECT_HOME** location in all `volumes` lines  (total of 3)  
 	b. Replace **{docker-image-name}** with docker image name you used/intend to use. This is the value that you use in `docker build -t . {docker-image-name}`  
 	c. Replace **{service-name}** with a suitable name. In the absence of a container name in the `yaml` file, this name will be used as a basis for any docker container that is spawned based on the above image  
+
 Example:  
  **image-name**: patent-data-processing  
  **service-name**: patent-data-processor  
  	d. Across the yaml file, replace **{airflow\_container\_name}** with a suitable container name. This is the name you will be using in `docker exec` command  
+<<<<<<< HEAD
  	e. Across the yaml file, replace **{db\_container\_name}** with a suitable name. This will be the `hostname` at which airflow will connect to MySQL (it doesn't have to be in URL format)    
 4. Run this command from your host system. `docker network create patentsview-pipeline-network` . The name you use here must be used in `docker-compose.yaml` file.
 ## MySQL Setup  
@@ -64,6 +67,7 @@ In effect, if there is a MySQL server running at 3308 in `gp-linux-server`, afte
 	
 	* If your local machine is a Windows Machine, and you use tools like **Putty** to connect to SSH server, the same can be achieved using Settings UI. Eg for Putty: [Guide](https://www.linode.com/docs/networking/ssh/ssh-connections-using-putty-on-windows/#port-forwarding-ssh-tunnels-with-putty)
 * Update port number in the `docker-compose.yaml` based on your chosen port numbers
+
 ## Running the created image
 10. Use the command `docker-compose up` to run the airflow & database server. This will print logs to the console. Use `-d` flag to avoid this: `docker-compose up -d`  
 	a. 	If you choose to use daemon `-d` flag, you can still see logs using `docker logs -f {container_id/container_name}` command. 
@@ -82,10 +86,12 @@ If your container stops for some reason (either the airflow or database containe
 ## Cleanup & Shared Systems
 * If you already completed all the steps in previous version of this instruction, make sure to clean up all docker networks, containers and images when building new version of docker images    
 * If you are using a shared system (i.e not a laptop), you might want to suffix your container and network names with your username
+
 ## Passwords
 1. Jupyter notebook password is prited to console (or to `docker logs` when -d switch is used)
 2. Use the password in `init.sql` file along with port number as configured to connect to the MySQL airflow database
 3. If you want MySQL `root`  privilege, use the same connection parameters as above but with password  `MYSQL_ROOT_PASSWORD` from `docker-compose.yaml`  
+
 #### Jupyter Notebook Packages   
 1. beautifulsoup4==4.6.3  
 2. celery==4.2.1  
