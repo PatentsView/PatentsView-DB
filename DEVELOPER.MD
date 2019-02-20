@@ -22,7 +22,6 @@ Example:
  **image-name**: patent-data-processing  
  **service-name**: patent-data-processor  
  	d. Across the yaml file, replace **{airflow\_container\_name}** with a suitable container name. This is the name you will be using in `docker exec` command  
-<<<<<<< HEAD
  	e. Across the yaml file, replace **{db\_container\_name}** with a suitable name. This will be the `hostname` at which airflow will connect to MySQL (it doesn't have to be in URL format)    
 4. Run this command from your host system. `docker network create patentsview-pipeline-network` . The name you use here must be used in `docker-compose.yaml` file.
 ## MySQL Setup  
