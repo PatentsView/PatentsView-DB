@@ -9,7 +9,7 @@ import re,os,random,string,codecs
 import sys
 from collections import Counter, defaultdict
 sys.path.append('/project/Development')
-sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
+
 from helpers import general_helpers
 
 def make_lookup(disambiguated_folder):
@@ -44,10 +44,40 @@ def make_lookup(disambiguated_folder):
     print('second loop')
     return id_lat_long_lookup, lat_long_cannonical_name
 
-def upload_location(db_con, lat_long_cannonical_name, disambiguated_folder):
+def create_fips_lookups(persistent_files):
+    #TODO: maybe just store this as a json file that directly becomes a dict?
+    county_lookup = pd.read_csv('{}/county_lookup.csv'.format(persistent_files))
+    city = county_lookup['city']
+    state = county_lookup['state']
+    county = county_lookup['county']
+    county_fips = county_lookup['county_fips']
+    county_fips_dict = {}
+    county_dict = {}
+    for i in range(len(county)):
+        county_dict[(state[i], city[i])] = county[i]
+        county_fips_dict[(state[i], city[i])] = county_fips[i]
+    state_df = pd.read_csv('{}/state_fips.csv'.format(persistent_files), dtype=object)
+    state_dict = dict(zip(list(state_df['State']), list(state_df['State_FIPS'])))
+
+    return [county_dict, county_fips_dict, state_dict]
+
+def lookup_fips(city, state, country, lookup_dict, lookup_type = 'city'):
+    result = None
+    if lookup_type == 'city':
+        if country == 'US' and (state, city) in lookup_dict:
+            result = lookup_dict[(state, city)]
+    elif country == 'US' and state in lookup_dict:
+        result = lookup_dict[state]
+    return result
+
+def upload_location(db_con, lat_long_cannonical_name, disambiguated_folder, fips_lookups):
+    county_dict, county_fips_dict, state_dict = fips_lookups
+    county = lookup_fips(v['place'][0],v['place'][1],v['place'][2], county_dict, 'city')
+    county_fips = lookup_fips(v['place'][0],v['place'][1],v['place'][2], county_fips_dict, 'city')
+    state_fips = lookup_fips(v['place'][0],v['place'][1],v['place'][2], state_dict, 'state')
     location = []          
     for lat_long, v in lat_long_cannonical_name.items():
-        location.append([v['id'], v['place'][0],v['place'][1],v['place'][2],lat_long.split('|')[0], lat_long.split('|')[1], None, None, None])
+        location.append([v['id'], v['place'][0],v['place'][1],v['place'][2],lat_long.split('|')[0], lat_long.split('|')[1], county, state_fips, county_fips])
     location_df = pd.DataFrame(location)
     location_df.columns = ['id', 'city', 'state', 'country', 'latitude', 'longitude', 'county', 'state_fips', 'county_fips']
     location_df.to_sql(con=db_con, name = 'location', if_exists = 'append', index = False)
@@ -94,10 +124,12 @@ if __name__ == '__main__':
     print('data inserted')
     id_lat_long_lookup, lat_long_cannonical_name = make_lookup(disambiguated_folder)
     print('made lookup')
-    upload_location(db_con, lat_long_cannonical_name, disambiguated_folder)
+    fips_lookups = create_fips_lookups(config['FOLDERS']['PERSISTENT_FILES'])
+    upload_location(db_con, lat_long_cannonical_name, disambiguated_folder, fips_lookups)
     print('done locupload ')
     process_rawlocation(db_con, lat_long_cannonical_name, d_lat_long_lookup, disambiguated_folder)
     print('done process')
-    #upload_rawloc(db_con, disambiguated_folder)
+    upload_rawloc(db_con, disambiguated_folder)
+
 
 

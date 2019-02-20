@@ -1,0 +1,8 @@
+pv3-ingestmysql.cckzcdkkfzqo.us-east-1.rds.amazonaws.com
+skelley
+bys2.R-AV9y=kdTe
+jan_upload
+patent_20171003
+patent_20171226
+2018_Jan
+0

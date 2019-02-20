@@ -1,10 +1,11 @@
 #import MySQLdb
 from sqlalchemy import create_engine
 import csv
+import string
 import re,os,random,string,codecs
 import requests
 from clint.textui import progress
-
+from . import slack_client, slack_channel
 def chunks(l,n):
     '''Yield successive n-sized chunks from l. Useful for multi-processing'''
     chunk_list =[]
@@ -16,8 +17,20 @@ def connect_to_db(host, username, password, database):
     engine = create_engine('mysql+mysqldb://{}:{}@{}/{}?charset=utf8'.format(username, password, host, database ), encoding='utf-8')
     return engine
 
+def send_slack_notification(message, level="info"):
+    color_map={"info":"#6699cc", "success":"#aad922", "warning":"#FFFF00","error":"#d62828" }
+    print(color_map[level])
+    return slack_client.api_call(
+        "chat.postMessage",
+        channel=slack_channel,
+        attachments=[
+            {
+                "color":color_map[level],
+                "text":message,
 
-
+            }
+        ]
+    )
 def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
@@ -50,3 +63,8 @@ def get_patent_ids(db_con, new_db):
     for patent in patent_data:
         patnums[patent['number']] = patent['id']
     return set(patnums.keys()), patnums
+
+
+def better_title(text):
+    title = " ".join([item if item not in ["Of", "The", "For", "And", "On"] else item.lower() for item in str(text).title().split( )])
+    return re.sub('['+string.punctuation+']', '', title)

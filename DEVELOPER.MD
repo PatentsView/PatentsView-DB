@@ -24,6 +24,12 @@ Example:
  	d. Across the yaml file, replace **{airflow\_container\_name}** with a suitable container name. This is the name you will be using in `docker exec` command  
  	e. Across the yaml file, replace **{db\_container\_name}** with a suitable name. This will be the `hostname` at which airflow will connect to MySQL (it doesn't have to be in URL format)    
 4. Run this command from your host system. `docker network create patentsview-pipeline-network` . The name you use here must be used in `docker-compose.yaml` file.
+
+## Credentials
+5. You must copy the 'Development/config_template.ini' to one called 'Development/config.ini' and enter your database password and the name of the upload, old and new databases. 
+6. You must also enter the key file for the disambiguation server into a file called 'disambig' in the 'credentials' folder. Ask Sarah to get a copy of the key, which you can just copy into the file. 
+=======
+
 ## MySQL Setup  
 
 5. Create a copy of `init-sample.sql` with the name `airflow-metadata-db-sql/init.sql`  
@@ -125,3 +131,9 @@ The notebook also comes with a list of useful extension:
 ![Extensions](extensions.png) Any extensions you enable would be temporary. To permanently enable an extension you have to update the Dockerfile 
  
 
+# Reporting Database Configuration
+Edit the config.ini file with following changes
+1. Add Slack API token
+2. Update the slack channel in which we want to recieve notifications
+3. Update the source `raw` database name
+4. Update destination `reporting` database name
