@@ -156,7 +156,7 @@ cpc_class_parser_operator.set_upstream(cpc_download_operator)
 cpc_current_operator.set_upstream(cpc_parser_operator)
 cpc_current_operator.set_upstream(merge_new_operator)
 cpc_class_operator.set_upstream(cpc_class_parser_operator)
-cpc_class_operator.set_upstream(copy_old_operator)
+cpc_class_operator.set_upstream(rename_old_operator)
 
 upload_uspc_operator.set_upstream(download_uspc_operator)
 upload_uspc_operator.set_upstream(merge_new_operator)
