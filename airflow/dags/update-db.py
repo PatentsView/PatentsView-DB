@@ -40,17 +40,26 @@ process_xml_operator = BashOperator(task_id='process_xml',
 parse_xml_operator = BashOperator(task_id='parse_xml',
                                   bash_command='python /project/Development/xml_to_csv/parse_patents.py',
                                   dag=dag)
-# copy old database
-copy_old_operator = BashOperator(task_id='copy_db',
-                                 bash_command='python /project/Development/copy_databases/copy_db.py', dag=dag)
+
+#rename old database for inplace modification
+rename_old_operator = BashOperator(task_id='rename_db',
+                                 bash_command='python /project/Development/create_databases/rename_db.py', dag=dag)
 # upload newly parsed data
 upload_new_operator = BashOperator(task_id='upload_new',
-                                   bash_command='python /project/Development/copy_databases/upload_new_data.py',
+                                   bash_command='python /project/Development/create_databases/upload_new_data.py',
                                    dag=dag)
+qa_new = BashOperator(task_id='qa_new',
+                      bash_command = 'python /project/Development/QA/03_temp_upload.py', dag=dag)
+
 # merge in newly parsed data
 merge_new_operator = BashOperator(task_id='merge_db',
-                                  bash_command='python /project/Development/copy_databases/merge_in_new_data.py',
+                                  bash_command='python /project/Development/create_databases/merge_in_new_data.py',
                                   dag=dag)
+
+#check that latest date is in merged file
+qa_date = BashOperator(task_id='qa_date',
+                      bash_command = 'python /project/Development/QA/02_date.py', dag=dag)
+
 #add withdrawn patent code
 withdrawn_operator = BashOperator(task_id ='note_withdrawn',
                                   bash_command = 'python /project/Development/withdrawn_patents/update_withdrawn.py', dag = dag)
@@ -114,17 +123,29 @@ postprocess_location_operator = BashOperator(task_id='post_process_location',
                                              dag=dag)
 
 persistent_inventor_operator = BashOperator(task_id = 'persistent_inventor',
-                                            bash_command = 'python /project/Development/post_process_disambiguation/persistent_inventor.py')
+                                            bash_command = 'python /project/Development/post_process_disambiguation/persistent_inventor.py', dag = dag)
 
 lookup_tables_operator = BashOperator(task_id = 'lookup_tables',
-                                            bash_command = 'python /project/Development/post_process_disambiguation/create_lookup_tables.py')
+                                            bash_command = 'python /project/Development/post_process_disambiguation/create_lookup_tables.py', dag = dag)
+
+#check counts, has to happen after processing
+count_operator = BashOperator(task_id = 'count_qa', bash_command = 'python /project/Development/QA/01_count.py', dag = dag)
+
+null_operator = BashOperator(task_id = 'null_qa', bash_command = 'python /project/Development/QA/04_null_blanks.py', dag = dag)
+
+ratios_operator = BashOperator(task_id = 'ratio_qa', bash_command = 'python /project/Development/QA/05_ratios.py', dag = dag)
+
 
 process_xml_operator.set_upstream(download_xml_operator)
 parse_xml_operator.set_upstream(process_xml_operator)
 
 upload_new_operator.set_upstream(parse_xml_operator)
 merge_new_operator.set_upstream(upload_new_operator)
-merge_new_operator.set_upstream(copy_old_operator)
+merge_new_operator.set_upstream(rename_old_operator)
+
+qa_new.set_upstream(upload_new_operator)
+qa_date.set_upstream(merge_new_operator)
+
 
 withdrawn_operator.set_upstream(merge_new_operator)
 
@@ -157,3 +178,6 @@ lookup_tables_operator.set_upstream(postprocess_inventor_operator)
 lookup_tables_operator.set_upstream(postprocess_assignee_operator)
 lookup_tables_operator.set_upstream(postprocess_location_operator)
 
+null_operator.set_upstream(lookup_tables_operator)
+ratios_operator.set_upstream(lookup_tables_operator)
+count_operator.set_upstream(lookup_tables_operator)
