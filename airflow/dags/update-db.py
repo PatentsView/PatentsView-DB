@@ -9,11 +9,12 @@ default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
     'start_date': datetime.now(),
-    'email': ['airflow@example.com'],
-    'email_on_failure': False,
+    'email': ['skelley@air.org'],
+    'email_on_failure': True,
     'email_on_retry': False,
-    'retries': 1,
+    'retries': 10,
     'retry_delay': timedelta(minutes=5),
+    'concurrency': 4
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
@@ -46,7 +47,7 @@ rename_old_operator = BashOperator(task_id='rename_db',
                                  bash_command='python /project/Development/create_databases/rename_db.py', dag=dag)
 # upload newly parsed data
 upload_new_operator = BashOperator(task_id='upload_new',
-                                   bash_command='python /project/Development/create_databases/upload_new_data.py',
+                                   bash_command='python /project/Development/create_databases/upload_new.py',
                                    dag=dag)
 qa_new = BashOperator(task_id='qa_new',
                       bash_command = 'python /project/Development/QA/03_temp_upload.py', dag=dag)

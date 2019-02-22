@@ -1,12 +1,12 @@
 import os
 import configparser
 import sys
-sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
-sys.path.append('/project/Development')
-from helpers import general_helpers
+project_home = os.environ['PACKAGE_HOME']
+from Development.helpers import general_helpers
 import configparser
 config = configparser.ConfigParser()
-config.read('/project/Development/config.ini')
+config.read(project_home + '/Development/config.ini')
+
 host = config['DATABASE']['HOST']
 username = config['DATABASE']['USERNAME']
 password = config['DATABASE']['PASSWORD']
