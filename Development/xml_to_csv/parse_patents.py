@@ -4,16 +4,18 @@ import csv
 import re
 import pandas as pd
 import simplejson as json
+project_home = os.environ['PACKAGE_HOME']
+from Development.helpers import output, xml_helpers, general_helpers
 
-sys.path.append('/project/Development')
-from helpers import output, xml_helpers, general_helpers
+
 from lxml import etree
 from collections import defaultdict
 import string
 import random
 import multiprocessing
-import configparser
 import copy
+import configparser
+
 
 def get_results(patents, field_dictionary): 
     results = {}
@@ -418,9 +420,8 @@ def main_process(data_file, outloc, field_dictionary):
 
 
 if __name__ == '__main__':
-    import configparser
     config = configparser.ConfigParser()
-    config.read('/project/Development/config.ini')
+    config.read(project_home + '/Development/config.ini')
     #TO run Everything:
     with open('{}/field_dict.json'.format(config['FOLDERS']['PERSISTENT_FILES'])) as myfile:
         field_dictionary = json.load(myfile)
