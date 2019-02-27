@@ -7,8 +7,8 @@ import re
 import os
 import csv
 import sys
-sys.path.append('/project/Development')
-from helpers import general_helpers
+project_home = os.environ['PACKAGE_HOME']
+from Development.helpers import general_helpers
 
 def clean_matchlist(match_list):
     if len(match_list) == 0:
@@ -25,17 +25,22 @@ def fuzzy_match(org, govt_acc_dict, existing_lookup):
     for result in results:
         score = result[1]
         matched_org = result[0]
-        if score > 90 and len(matched_org) >=6: #small acronyms match too many things
-            if  matched_org in ["Army", "Air Force", "Navy"]: #special procesing to avoid losing information on longer military division
-                if len(matched_org) <= len(org) + 4:
-                    solid_matches.append(matched_org)
+        len_dif = abs( len(org) -len(matched_org))/len(org)
+        if len_dif < 2:
+            if score > 90: #small acronyms match too many things
+                if  matched_org in ["Army", "Air Force", "Navy"]: #special procesing to avoid losing information on longer military division
+                    if len(matched_org) <= len(org) + 4:
+                        solid_matches.append(matched_org)
+                    else:
+                        possible_matches.append(matched_org)
                 else:
-                    possible_matches.append(matched_org)
-            else:
-                solid_matches.append(matched_org)
-        elif score > 50:
+                    solid_matches.append(matched_org)
+            elif score > 60:
+                possible_matches.append(matched_org)
+        elif len_dif >2 and score > 90 and len(org) > 4:
             possible_matches.append(matched_org)
     return solid_matches,  possible_matches
+
 
 def match(org, govt_acc_dict, existing_lookup):
     solid_matches = []
@@ -47,7 +52,7 @@ def match(org, govt_acc_dict, existing_lookup):
         if name in org:
             solid_matches.append(name)
     for existing, clean in existing_lookup.items():
-        if existing in org or clean in org:
+        if existing.lower() in org.lower() or clean.lower() in org.lower():
             solid_matches.append(clean)
     solid_fuzzy, possible_fuzzy = fuzzy_match(org, govt_acc_dict, existing_lookup)
     solid_matches.extend(solid_fuzzy)
@@ -93,6 +98,9 @@ def perform_lookups(existing_lookup, govt_acc_dict, organizations, post_manual, 
     matched = results[~pd.isnull(results['solid'])][['organization', 'solid']]
     matched.to_csv('{}/automatically_matched.csv'.format(post_manual), index = False)
     to_check = results[~pd.isnull(results['possible'])][['organization', 'possible']]
+    to_check['match'] = ''
+    to_check['new'] = ''
+    to_check['non_government']=''
     to_check.to_csv('{}/to_check.csv'.format(manual_inputs), index = False)
     
 def get_orgs(db_con, manual_inputs):
@@ -102,15 +110,16 @@ def get_orgs(db_con, manual_inputs):
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('/project/Development/config.ini')
+    config.read(project_home + '/Development/config.ini')
+    
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     manual_inputs = '{}/government_interest/manual_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
-    if not os.path.exists(manual_inputs):
-        os.mkdir(manual_inputs)
-    if not os.path.exists(post_manual):
-        os.mkdir(post_manual)
+    for path in [pre_manual, manual_inputs, post_manual]:
+        if not os.path.exists(path):
+            os.makedirs(path)
+
     existing_lookup, govt_acc_dict, organizations = get_data(persistent_files, pre_manual)
     perform_lookups(existing_lookup, govt_acc_dict, organizations, post_manual, manual_inputs)
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])

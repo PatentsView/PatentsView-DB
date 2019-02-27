@@ -65,6 +65,17 @@ qa_date = BashOperator(task_id='qa_date',
 withdrawn_operator = BashOperator(task_id ='note_withdrawn',
                                   bash_command = 'python /project/Development/withdrawn_patents/update_withdrawn.py', dag = dag)
 
+#do government interest processing
+gi_NER = BashOperator(task_id = 'gi_NER', 
+                              bash_command = 'python /project/Development/government_interest/NER.py', dag = dag)
+
+gi_postprocess_NER = BashOperator(task_id = 'postprocess_NER', 
+                              bash_command = 'python /project/Development/government_interest/NER_to_manual.py', dag = dag)
+
+gi_post_manual = BashOperator(task_id = 'gi_post_manual', 
+                              bash_command = 'python /project/Development/government_interest/post_manual.py', dag = dag)
+
+
 # download cpcs
 cpc_download_operator = BashOperator(task_id='download_cpc',
                                      bash_command='python /project/Development/process_cpcs/download_cpc_ipc.py',
@@ -146,6 +157,10 @@ merge_new_operator.set_upstream(rename_old_operator)
 
 qa_new.set_upstream(upload_new_operator)
 qa_date.set_upstream(merge_new_operator)
+
+gi_NER.set_upstream(merge_new_operator)
+gi_postprocess_NER .set_upstream(gi_NER )
+gi_post_manual.set_upstream(gi_postprocess_NER )
 
 
 withdrawn_operator.set_upstream(merge_new_operator)
