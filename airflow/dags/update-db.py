@@ -3,6 +3,19 @@ from airflow.operators.bash_operator import BashOperator
 # from airflow.operators import PythonOperator
 from datetime import datetime, timedelta
 import sys
+import os
+project_home = os.environ['PACKAGE_HOME']
+import configparser
+config = configparser.ConfigParser()
+config.read(project_home + '/Development/config.ini')
+
+#set up a few folders that are passed as arguments
+disambig_input = '{}/disambig_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])
+keyfile = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
+host = config['DATABASE']['HOST']
+username = config['DATABASE']['USERNAME']
+password = config['DATABASE']['PASSWORD']
+new_database = config['DATABASE']['NEW_DB']
 
 
 default_args = {
@@ -106,9 +119,15 @@ upload_uspc_operator = BashOperator(task_id='upload_uspc',
 process_wipo_operator = BashOperator(task_id='process_wipo',
                                      bash_command='python /project/Development/process_wipo/process_wipo.py', dag=dag)
 
-create_and_upload_disambig_operator = BashOperator(task_id='get_disambig_input',
-                                                   bash_command='python /project/Development/disambiguation_support/get_data_for_disambig.py',
+get_disambig_data = BashOperator(task_id='get_disambig_input',
+                                                   bash_command='bash /project/Development/disambiguation_support/get_data_for_disambig.sh {} {} {} {}'.format(host, username, new_database, disambig_input),
                                                    dag=dag)
+
+clean_inventor = BashOperator(task_id='clean_inventor',
+                                     bash_command='python /project/Development/disambiguation_support/clean_inventor.py', dag=dag)
+
+upload_disambig = BashOperator(task_id='upload_disambig_files',
+                                     bash_command='bash /project/Development/disambiguation_support/upload_disambig.sh {} {}'.format(keyfile, disambig_input), dag=dag)
 
 run_lawyer_disambiguation_operator=BashOperator(task_id='run_lawyer_disambiguation',
                                            bash_command='python /project/Assignee_Lawyer_Disambiguation/lib/lawyer_disambiguation.py',
@@ -117,6 +136,8 @@ run_lawyer_disambiguation_operator=BashOperator(task_id='run_lawyer_disambiguati
 run_disambiguation_operator = BashOperator(task_id='run_disambiguation',
                                            bash_command='bash /project/Development/disambiguation_support/run_disambiguation.sh',
                                            dag=dag)
+
+
 
 download_disambig_operator = BashOperator(task_id='download_disambiguation',
                                           bash_command='bash /project/Development/post_process_disambiguation/download_disambiguation.sh',
@@ -178,12 +199,13 @@ upload_uspc_operator.set_upstream(download_uspc_operator)
 upload_uspc_operator.set_upstream(merge_new_operator)
 process_wipo_operator.set_upstream(cpc_current_operator)
 
-create_and_upload_disambig_operator.set_upstream(process_wipo_operator)
+get_disambig_data.set_upstream(process_wipo_operator)
 
-run_lawyer_disambiguation_operator.set_upstream(create_and_upload_disambig_operator)
-download_disambig_operator.set_upstream(run_lawyer_disambiguation_operator)
+run_lawyer_disambiguation_operator.set_upstream(process_wipo_operator)
+clean_inventor.set_upstream(get_disambig_data)
+upload_disambig.set_upstream(clean_inventor)
 
-run_disambiguation_operator.set_upstream(create_and_upload_disambig_operator)
+run_disambiguation_operator.set_upstream(upload_disambig)
 download_disambig_operator.set_upstream(run_disambiguation_operator)
 postprocess_inventor_operator.set_upstream(download_disambig_operator)
 postprocess_assignee_operator.set_upstream(download_disambig_operator)
