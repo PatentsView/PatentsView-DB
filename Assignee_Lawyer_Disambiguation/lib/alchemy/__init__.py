@@ -48,6 +48,10 @@ from sqlalchemy.pool import Pool
 from html.parser import HTMLParser
 import os
 project_home=os.environ['PACKAGE_HOME']
+from Development.helpers import general_helpers
+config = configparser.ConfigParser()
+config.read(project_home + '/Development/config.ini')
+
 h = HTMLParser()
 def unescape_html(x):
     return h.unescape(x)
@@ -105,36 +109,36 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     cursor.close()
 
 
-def get_config(localfile=project_home+"/Development/config.ini", default_file=False):
-    """
-    This grabs a configuration file and converts it into
-    a dictionary.
+# def get_config(localfile=project_home+"/Development/config.ini", default_file=False):
+#     """
+#     This grabs a configuration file and converts it into
+#     a dictionary.
 
-    The default filename is called config.ini
-    First we load the GLOBAL file, then we load a local file
-    """
-    if default_file:
-        openfile = "{0}/config.ini".format(os.path.dirname(os.path.realpath(__file__)))
-    else:
-        openfile = localfile
-    config = defaultdict(dict)
-    if os.path.isfile(openfile):
-        cfg = configparser.ConfigParser()
-        cfg.read(openfile)
-        for s in cfg.sections():
-            for k, v in cfg.items(s):
-                dec = re.compile(r'^\d+(\.\d+)?$')
-                if v in ("True", "False") or v.isdigit() or dec.match(v):
-                    v = eval(v)
-                config[s][k] = v
+#     The default filename is called config.ini
+#     First we load the GLOBAL file, then we load a local file
+#     """
+#     if default_file:
+#         openfile = "{0}/config.ini".format(os.path.dirname(os.path.realpath(__file__)))
+#     else:
+#         openfile = localfile
+#     config = defaultdict(dict)
+#     if os.path.isfile(openfile):
+#         cfg = configparser.ConfigParser()
+#         cfg.read(openfile)
+#         for s in cfg.sections():
+#             for k, v in cfg.items(s):
+#                 dec = re.compile(r'^\d+(\.\d+)?$')
+#                 if v in ("True", "False") or v.isdigit() or dec.match(v):
+#                     v = eval(v)
+#                 config[s][k] = v
 
-    # this enables us to load a local file
-    if default_file:
-        newconfig = get_config(localfile, default_file=False)
-        for section in newconfig:
-            for item in newconfig[section]:
-                config[section][item] = newconfig[section][item]
-    return config
+#     # this enables us to load a local file
+#     if default_file:
+#         newconfig = get_config(localfile, default_file=False)
+#         for section in newconfig:
+#             for item in newconfig[section]:
+#                 config[section][item] = newconfig[section][item]
+#     return config
 
 def session_generator(dbtype='grant'):
     """
@@ -150,16 +154,18 @@ def session_generator(dbtype='grant'):
     etc.
     These sessions will be protected with the ping refresher above
     """
-    config = get_config()
-    echo = config.get('GLOBAL').get('echo')
+    #config = get_config()
+    #echo = config.get('GLOBAL').get('echo')
+    echo = True
     if dbtype == 'grant':
-        read_database = "new_db"
+        read_database = "NEW_DB"
+    engine = general_helpers.connect_to_db(config['DATABASE']['HOST'],config['DATABASE']['USERNAME'],config['DATABASE']['PASSWORD'], config['DATABASE'][read_database])
 
-    engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8mb4'.format(
-        config.get('DATABASE').get('user'),
-        config.get('DATABASE').get('password'),
-        config.get('DATABASE').get('host'),
-        config.get('DATABASE').get(read_database), echo=echo), pool_size=3, pool_recycle=3600, echo_pool=True)
+#     engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8mb4'.format(
+#         config.get('DATABASE').get('user'),
+#         config.get('DATABASE').get('password'),
+#         config.get('DATABASE').get('host'),
+#         config.get('DATABASE').get(read_database), echo=echo), pool_size=3, pool_recycle=3600, echo_pool=True)
 
 
     schema.GrantBase.metadata.create_all(engine)
@@ -175,16 +181,17 @@ def fetch_session(dbtype='grant'):
     @dbtype: string indicating if we are fetching the session for
              the grant database or the application database
     """
-    config = get_config()
-    echo = config.get('GLOBAL').get('echo')
-    if dbtype == 'grant':
-        read_database = "new_db"
+    #config = get_config()
+    echo = True
+    if dbtype == 'grant': #this is here so we can port to work for applicaitons also
+        read_database = "NEW_DB"
+        engine = general_helpers.connect_to_db(config['DATABASE']['HOST'],config['DATABASE']['USERNAME'],config['DATABASE']['PASSWORD'], config['DATABASE'][read_database])
 
-    engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
-        config.get('DATABASE').get('user'),
-        config.get('DATABASE').get('password'),
-        config.get('DATABASE').get('host'),
-        config.get('DATABASE').get(read_database), echo=echo))
+#     engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
+#         config['DATABASE']['USERNAME'],
+#         config['DATABASE']['PASSWORD'],
+#         config['DATABASE']['HOST'],
+#         config['DATABASE'][read_database], echo=echo))
 
 
     schema.GrantBase.metadata.create_all(engine)
