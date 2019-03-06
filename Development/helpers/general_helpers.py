@@ -6,6 +6,7 @@ import re,os,random,string,codecs
 import requests
 from clint.textui import progress
 from . import slack_client, slack_channel
+
 def chunks(l,n):
     '''Yield successive n-sized chunks from l. Useful for multi-processing'''
     chunk_list =[]
@@ -17,20 +18,21 @@ def connect_to_db(host, username, password, database):
     engine = create_engine('mysql+mysqldb://{}:{}@{}/{}?charset=utf8mb4'.format(username, password, host, database ), encoding='utf-8', pool_size=30, max_overflow=0)
     return engine
 
-def send_slack_notification(message, level="info"):
-    color_map={"info":"#6699cc", "success":"#aad922", "warning":"#FFFF00","error":"#d62828" }
+def send_slack_notification(message, slack_client, slack_channel, section="DB Update", level="info"):
+    color_map = {"info": "#6699cc", "success": "#aad922", "warning": "#FFFF00", "error": "#d62828"}
     print(color_map[level])
     return slack_client.api_call(
         "chat.postMessage",
         channel=slack_channel,
+        text=section,
         attachments=[
             {
-                "color":color_map[level],
-                "text":message,
-
+                "color": color_map[level],
+                "text": message
             }
         ]
     )
+
 def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
