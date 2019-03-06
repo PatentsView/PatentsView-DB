@@ -4,11 +4,12 @@ import os
 import configparser
 import sys
 from sqlalchemy import create_engine
-sys.path.append('/project/Development')
-from helpers import general_helpers
+project_home = os.environ['PACKAGE_HOME']
 import configparser
 config = configparser.ConfigParser()
-config.read('/project/Development/config.ini')
+config.read(project_home + '/Development/config.ini')
+from Development.helpers import general_helpers
+
 host = config['DATABASE']['HOST']
 username = config['DATABASE']['USERNAME']
 password = config['DATABASE']['PASSWORD']
@@ -17,7 +18,7 @@ old_database = config['DATABASE']['OLD_DB']
 temporary_upload = config['DATABASE']['TEMP_UPLOAD_DB']
 previous_qa_loc = config['FOLDERS']['OLD_QA_LOC']
 new_qa_loc = config['FOLDERS']['NEW_QA_LOC']
-latest_expected_date = config['CONSTANTS']['LATEST_DATE']
+latest_expected_date = config['DATES']['END_DATE']
 
 
 def temp_upload_count (temporary_upload, tables):
@@ -41,9 +42,8 @@ def temp_upload_count (temporary_upload, tables):
     return df_temp_upload
 
 def write_temp(df, new_qa_loc):
-    writer = pd.ExcelWriter('{0}/1_table_counts_temp_upload.xlsx'.format(new_qa_loc), engine='xlsxwriter')
-    df.to_excel(writer, index = False)
-    writer.save()
+    df.to_csv('{0}/01_table_counts_temp_upload.csv'.format(new_qa_loc), index = False)
+
 
 if __name__ == '__main__':
     if not os.path.exists(new_qa_loc):
