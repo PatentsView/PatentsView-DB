@@ -6,6 +6,8 @@ import requests
 from zipfile import ZipFile
 import os
 
+
+
 def get_zip_url_year(page_url):
 
     ### a helper function
@@ -111,9 +113,11 @@ def bulk_download(start_date, end_date, folder):
     print("Download Finished")
 
 if __name__== '__main__':
+    import os
+    project_home = os.environ['PACKAGE_HOME']
     import configparser
     config = configparser.ConfigParser()
-    config.read('/project/Development/config.ini')
+    config.read(project_home + '/Development/config.ini')
     start_date = config['DATES']['START_DATE']
     end_date = config['DATES']['END_DATE']
     output_folder = '{}/raw_data'.format(config['FOLDERS']['WORKING_FOLDER'])

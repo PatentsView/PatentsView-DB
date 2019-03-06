@@ -115,7 +115,7 @@ def get_results(patents, field_dictionary):
 
             rel_app_text_data = text_data['Other Patent Relations']
             if rel_app_text_data !=[]:
-                results['rel_app_text'].append([general_helpers.id_generator(), patent_id, rel_app_text_data])
+                results['rel_app_text'].append([general_helpers.id_generator(), patent_id, rel_app_text_data, 0])
                 
             government_interest_data = text_data['Government Interest']
             if government_interest_data !=[]:
