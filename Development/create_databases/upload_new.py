@@ -34,7 +34,7 @@ con = engine.connect()
 for folder in os.listdir(processed_data):
 	fields = [item for item in os.listdir('{}/{}'.format(processed_data, folder)) if not item in ['error_counts.csv', 'error_data.csv']]
 	for f in fields:
-		data = pd.read_csv('{}/{}/{}'.format(processed_data, folder, f), delimiter ='\t')
+		data = pd.read_csv('{}/{}/{}'.format(processed_data, folder, f), delimiter ='\t',index_col = False)
 		data.to_sql(f.replace('.csv', ''), con, if_exists = 'append', index = False)
 
 	
