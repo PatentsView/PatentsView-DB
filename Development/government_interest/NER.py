@@ -306,7 +306,7 @@ if __name__ == '__main__':
     ner_txt_indir = "/project/Development/government_interest/stanford-ner-2017-06-09/in/"
     ner_txt_outdir = '{}/NER_out/'.format(pre_manual)
     if not os.path.exists(ner_txt_outdir):
-        os.mkdir(ner_txt_outdir)
+        os.makedirs(ner_txt_outdir)
     classifiers = ['classifiers/english.all.3class.distsim.crf.ser.gz', 'classifiers/english.conll.4class.distsim.crf.ser.gz', 'classifiers/english.muc.7class.distsim.crf.ser.gz']
     ner_classif_dirs = ['out-3class', 'out-4class', 'out-7class']
 

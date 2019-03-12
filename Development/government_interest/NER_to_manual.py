@@ -20,7 +20,11 @@ def fuzzy_match(org, govt_acc_dict, existing_lookup):
     all_possible_long = [item.strip() for item in govt_acc_dict.values()] + [item.strip() for item in existing_lookup.values()]
     solid_matches = []
     possible_matches = []
-    results = process.extract(org, all_possible_long, scorer=fuzz.partial_ratio)
+    if len(org.split(' '))>= 3:
+        results = process.extract(org, all_possible_long, scorer=fuzz.partial_ratio)
+    else:
+        results = process.extract(org, all_possible_long, scorer=fuzz.ratio)
+
     first_result = True
     for result in results:
         score = result[1]
