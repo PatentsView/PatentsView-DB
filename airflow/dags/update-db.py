@@ -23,7 +23,7 @@ new_database = config['DATABASE']['NEW_DB']
 slack_token = config["SLACK"]["API_TOKEN"]
 slack_client = SlackClient(slack_token)
 slack_channel = config["SLACK"]["CHANNEL"]
-
+mysql_config = config['DATABASE']['CONFIG_FILE']
 
 
 
@@ -57,7 +57,7 @@ def slack_failure(context):
     on_failure_callback  =send_slack_notification('%s failed'%(context['task'].task_id) ,slack_client, slack_channel,section="Data Prep", level='error')
 
 download_xml_operator = BashOperator(task_id='download_xml',
-                                     bash_command='python /project/Development/xml_to_csv/bulk_downloads.py 20180920',
+                                     bash_command='python /project/Development/xml_to_csv/bulk_downloads.py',
                                      dag=dag,
                                      on_success_callback = slack_success,
                                      on_failure_callback = slack_failure
@@ -195,7 +195,7 @@ process_wipo_operator = BashOperator(task_id='process_wipo',
 
 
 get_disambig_data = BashOperator(task_id='get_disambig_input',
-                                                   bash_command='bash /project/Development/disambiguation_support/get_data_for_disambig.sh {} {} {} {}'.format(host, username, new_database, disambig_input),
+                                                   bash_command='bash /project/Development/disambiguation_support/get_data_for_disambig.sh %s %s'%(mysql_config, disambig_input),
                                                    dag=dag,
                                      on_success_callback = slack_success,
                                      on_failure_callback = slack_failure
