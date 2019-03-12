@@ -1,5 +1,6 @@
 import sys
 import os
+project_home = os.environ['PACKAGE_HOME']
 import pandas as pd
 from sqlalchemy import create_engine
 from warnings import filterwarnings
@@ -7,9 +8,7 @@ import csv
 import re,os,random,string,codecs
 import sys
 from collections import Counter, defaultdict
-sys.path.append('/project/Development')
-sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
-from helpers import general_helpers
+from Development.helpers import general_helpers
 
 
 def create_assignee_lookup(disambiguated_folder):  
@@ -62,16 +61,15 @@ def upload_assignee(db_con, disambiguated_to_write, type_lookup, assignee_id_set
             disambig_list.append([assignee_id, type, assignee_info[0], assignee_info[1], assignee_info[2]])
     disambig_data = pd.DataFrame(disambig_list)
     disambig_data.columns = ['id', 'type', 'name_first', 'name_last', 'organization']
-    #load it into a temp table and then get rid of the extr assignees
     disambig_data.to_sql(con = db_con, name = 'assignee', index = False, if_exists = 'append')#append keeps the index
     
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('/project/Development/config.ini')
+    config.read(project_home + '/Development/config.ini')
 
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
-    disambiguated_folder = "{}/disambig_out".format(config['FOLDERS']['WORKING_FOLDER'])    
+    disambiguated_folder = "{}/disambig_output".format(config['FOLDERS']['WORKING_FOLDER'])    
 
     raw_to_disambiguated, disambiguated_to_write = create_assignee_lookup(disambiguated_folder)
     print(len(raw_to_disambiguated))

@@ -8,9 +8,8 @@ import csv
 import re,os,random,string,codecs
 import sys
 from collections import Counter, defaultdict
-sys.path.append('/project/Development')
-
-from helpers import general_helpers
+project_home = os.environ['PACKAGE_HOME']
+from Development.helpers import general_helpers
 
 def make_lookup(disambiguated_folder):
     inp = csv.reader(open( "{}/location_disambiguation.tsv".format(disambiguated_folder),'r'),delimiter='\t')
@@ -31,15 +30,18 @@ def make_lookup(disambiguated_folder):
         if row[3] != 'NULL':#if there is a lat-long pair
             lat_long = "{0}|{1}".format(np.round(float(row[3]),4), np.round(float(row[4]),4))
         else:
-            lat_long = '|' #this handles the ~13,000 undisambiguated
+            lat_long = 'undisambiguated' #this handles the ~13,000 undisambiguated
         lat_long_name_count[lat_long][clean_loc] +=1  
-        id_name_lookup[row[0]] = lat_long
+        id_lat_long_lookup[row[0]] = lat_long
     print('first loop')
 
     lat_long_cannonical_name = {}
     for lat_long, name_list in lat_long_name_count.items():
-        name = sorted([(name, count) for name, count in name_list.items()], key = lambda x: x[1])[-1]
-        lat_long_cannonical_name[lat_long] = {'place': name, 'id': general_helpers.id_generator(12)}
+        if not lat_long == 'undisambiguated':#don't clump the undisambiguated ones together
+            name = sorted([(name, count) for name, count in name_list.items()], key = lambda x: x[1])[-1][0]
+            lat_long_cannonical_name[lat_long] = {'place': name, 'id': general_helpers.id_generator(12)}
+        else:
+            lat_long_cannonical_name[lat_long] = {'place': ('', '', ''), 'id': general_helpers.id_generator(12)}
 
     print('second loop')
     return id_lat_long_lookup, lat_long_cannonical_name
@@ -72,16 +74,18 @@ def lookup_fips(city, state, country, lookup_dict, lookup_type = 'city'):
 
 def upload_location(db_con, lat_long_cannonical_name, disambiguated_folder, fips_lookups):
     county_dict, county_fips_dict, state_dict = fips_lookups
-    county = lookup_fips(v['place'][0],v['place'][1],v['place'][2], county_dict, 'city')
-    county_fips = lookup_fips(v['place'][0],v['place'][1],v['place'][2], county_fips_dict, 'city')
-    state_fips = lookup_fips(v['place'][0],v['place'][1],v['place'][2], state_dict, 'state')
+
     location = []          
     for lat_long, v in lat_long_cannonical_name.items():
-        location.append([v['id'], v['place'][0],v['place'][1],v['place'][2],lat_long.split('|')[0], lat_long.split('|')[1], county, state_fips, county_fips])
+        if not lat_long == 'undisambiguated':
+            county = lookup_fips(v['place'][0],v['place'][1],v['place'][2], county_dict, 'city')
+            county_fips = lookup_fips(v['place'][0],v['place'][1],v['place'][2], county_fips_dict, 'city')
+            state_fips = lookup_fips(v['place'][0],v['place'][1],v['place'][2], state_dict, 'state')
+            location.append([v['id'], v['place'][0],v['place'][1],v['place'][2],lat_long.split('|')[0], lat_long.split('|')[1], county, state_fips, county_fips])
     location_df = pd.DataFrame(location)
     location_df.columns = ['id', 'city', 'state', 'country', 'latitude', 'longitude', 'county', 'state_fips', 'county_fips']
-    location_df.to_sql(con=db_con, name = 'location', if_exists = 'append', index = False)
     location_df.to_csv('{}/location.csv'.format(disambiguated_folder))
+    location_df.to_sql(con=db_con, name = 'location', if_exists = 'append', index = False)
     
 
 def process_rawlocation(db_con, lat_long_cannonical_name, id_lat_long_lookup, disambiguated_folder):
@@ -115,19 +119,18 @@ def upload_rawloc(db_con, disambiguated_folder):
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('/project/Development/config.ini')
+    config.read(project_home + '/Development/config.ini')
 
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
     
-    disambiguated_folder = "{}/disambig_out".format(config['FOLDERS']['WORKING_FOLDER'])
+    disambiguated_folder = "{}/disambig_output".format(config['FOLDERS']['WORKING_FOLDER'])
     print('here!')
-    print('data inserted')
     id_lat_long_lookup, lat_long_cannonical_name = make_lookup(disambiguated_folder)
     print('made lookup')
     fips_lookups = create_fips_lookups(config['FOLDERS']['PERSISTENT_FILES'])
     upload_location(db_con, lat_long_cannonical_name, disambiguated_folder, fips_lookups)
     print('done locupload ')
-    process_rawlocation(db_con, lat_long_cannonical_name, d_lat_long_lookup, disambiguated_folder)
+    process_rawlocation(db_con, lat_long_cannonical_name, id_lat_long_lookup, disambiguated_folder)
     print('done process')
     upload_rawloc(db_con, disambiguated_folder)
 

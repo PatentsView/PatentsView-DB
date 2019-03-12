@@ -7,9 +7,8 @@ import csv
 import re,os,random,string,codecs
 import sys
 from collections import Counter, defaultdict
-sys.path.append('/project/Development')
-sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
-from helpers import general_helpers
+project_home = os.environ['PACKAGE_HOME']
+from Development.helpers import general_helpers
 
 
 def make_lookup(disambiguated_folder):
@@ -37,7 +36,7 @@ def write_inventor(inventors_to_write, disambiguated_folder):
     for inv_id, inventor in inventors_to_write.items():
         inventor_list.append([inv_id] + inventor)
     inventor_data = pd.DataFrame(inventor_list)
-    inventor_data.columns = ['inventor_id', 'name_first', 'name_last']
+    inventor_data.columns = ['id', 'name_first', 'name_last']
     inventor_data.to_sql(con=db_con, name = 'inventor', if_exists = 'append', index = False)
     inventor_data.to_csv("{}/inventor.csv".format(disambiguated_folder), index = False)
 
@@ -56,20 +55,17 @@ def update_raw(db_con, disambiguated_folder, lookup):
     raw_data.to_sql(con=db_con, name = 'rawinventor', if_exists = 'append', index = False)
  
 
-
 if __name__ == '__main__':
+
     import configparser
     config = configparser.ConfigParser()
-    config.read('/project/Development/config.ini')
+    config.read(project_home + '/Development/config.ini')
 
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
-    disambiguated_folder = "{}/disambig_out".format(config['FOLDERS']['WORKING_FOLDER'])    
-    if not os.path.exists(disambiguated_folder):
-       os.mkdir(disambiguated_folder)
+    disambiguated_folder = "{}/disambig_output".format(config['FOLDERS']['WORKING_FOLDER'])    
+
     lookup, inventors = make_lookup(disambiguated_folder)
     print('done lookup ')
-    print(len(lookup))
-    print(len(inventors))
     write_inventor(inventors, disambiguated_folder)
     print('written inventor')
     update_raw(db_con, disambiguated_folder, lookup)
