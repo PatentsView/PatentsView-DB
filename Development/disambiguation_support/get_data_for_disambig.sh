@@ -20,7 +20,7 @@ do
         (*) selectStatement="SELECT * FROM $table"
     esac
 
-    echo "$selectStatement limit 10" | mysql --defaults-file="$CONF_FILE" --quick >"$OUTPUT_LOCATION/$table.tsv"
+    echo "$selectStatement" | mysql --defaults-file="$CONF_FILE" --quick >"$OUTPUT_LOCATION/$table.tsv"
 
 done
 
