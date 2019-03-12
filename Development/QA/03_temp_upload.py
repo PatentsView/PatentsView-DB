@@ -30,7 +30,8 @@ def temp_upload_count (temporary_upload, tables):
         conn = engine.connect()
         count = conn.execute('select count(*) from {}'.format(table))
         conn.close()
-        new_counts.append(count)
+        for item in count:
+            new_counts.append(item[0])
     for count in new_counts:
         if count == 0:
             description.append("Problem: Empty Table")

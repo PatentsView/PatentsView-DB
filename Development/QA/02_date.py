@@ -34,7 +34,7 @@ def check_latest_date(newdb, last_date):
 		date_match = "date matches"
 		date_dict.update({new_database:date_match})
 	return date_dict
-def date_check_to_excel(previous_qa_loc, date_dict, new_qa_loc):
+def date_check_to_file(previous_qa_loc, date_dict, new_qa_loc):
 	df = pd.read_csv('{}/01_latest_date_check.csv'.format(previous_qa_loc))
 	df_2 = pd.DataFrame.from_dict(date_dict, orient = 'index')
 	df_2.reset_index(inplace=True)
