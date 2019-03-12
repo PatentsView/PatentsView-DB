@@ -261,6 +261,12 @@ persistent_inventor_operator = BashOperator(task_id = 'persistent_inventor',
                                      on_failure_callback = slack_failure
                                      )
 
+inventor_gender_operator = BashOperator(task_id = 'inventor_gender',
+                                            bash_command = 'python /project/Development/post_process_disambiguation/inventor_gender.py', dag=dag,
+                                     on_success_callback = slack_success,
+                                     on_failure_callback = slack_failure
+                                     )
+
 lookup_tables_operator = BashOperator(task_id = 'lookup_tables',
                                             bash_command = 'python /project/Development/post_process_disambiguation/create_lookup_tables.py', dag=dag,
                                      on_success_callback = slack_success,
@@ -294,8 +300,9 @@ merge_new_operator.set_upstream(rename_old_operator)
 qa_new.set_upstream(upload_new_operator)
 qa_date.set_upstream(merge_new_operator)
 
-gi_NER.set_upstream(merge_new_operator)
+gi_NER.set_upstream(parse_xml_operator)
 gi_postprocess_NER .set_upstream(gi_NER )
+gi_postprocess_NER .set_upstream(rename_old_operator)
 gi_post_manual.set_upstream(gi_postprocess_NER )
 
 
@@ -326,10 +333,12 @@ postprocess_inventor_operator.set_upstream(download_disambig_operator)
 postprocess_assignee_operator.set_upstream(download_disambig_operator)
 postprocess_location_operator.set_upstream(download_disambig_operator)
 
-persistent_inventor_operator.set_upstream(postprocess_inventor_operator)
+
 lookup_tables_operator.set_upstream(postprocess_inventor_operator)
 lookup_tables_operator.set_upstream(postprocess_assignee_operator)
 lookup_tables_operator.set_upstream(postprocess_location_operator)
+persistent_inventor_operator.set_upstream(postprocess_inventor_operator)
+inventor_gender_operator.set_upstream(persistent_inventor_operator)
 
 null_operator.set_upstream(lookup_tables_operator)
 ratios_operator.set_upstream(lookup_tables_operator)
