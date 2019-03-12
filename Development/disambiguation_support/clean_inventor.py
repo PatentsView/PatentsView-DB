@@ -22,3 +22,5 @@ for e, row in enumerate(inp):
         print(e)
     row[5] = re.sub(regex, '', row[5])
     outp.writerow(row)
+
+os.system('mv {0}/rawinventor_clean.tsv {0}/rawinventor.tsv'.format(disambig_folder))
