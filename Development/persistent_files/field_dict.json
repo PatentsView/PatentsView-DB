@@ -5,7 +5,7 @@
                    "detail_desc_text": ["uuid", "patent_id", "text", "length"],
                    "draw_desc_text":["uuid", "patent_id", "text", "sequence"],
                     "patent" : ["id","type","number","country","date","abstract","title","kind","num_claims", "filename", "withdrawn"],
-                   "rel_app_text":["uuid", "patent_id", "text"],
+                   "rel_app_text":["uuid", "patent_id", "text", "sequence"],
                    "rawinventor": ["uuid","patent_id", "inventor_id","rawlocation_id","name_first","name_last", "sequence", "rule_47", "deceased"],
                    "rawassignee": ["uuid","patent_id","assignee_id","rawlocation_id","type","name_first","name_last","organization","sequence"],
                     "rawlawyer" :["uuid", "lawyer_id","patent_id","name_first","name_last","organization","country","sequence"],
