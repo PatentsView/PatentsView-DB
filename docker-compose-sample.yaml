@@ -12,7 +12,7 @@ services:
         - 8889:8888
       environment:
         AIRFLOW__CORE__SQL_ALCHEMY_CONN: "mysql://airflow:airflow_db_password@{db_container_name}:3306/airflow"
-    container_name: {airflow_container_name}
+      container_name: {airflow_container_name}
   airflow-db-{suffix}:
     volumes:
       - '/Path/to/Project/Root/PatentsView-DB/airflow-metadata-db-disk:/var/lib/mysql'
@@ -20,9 +20,9 @@ services:
     image: mysql:5.6
     command: --default-authentication-plugin=mysql_native_password --explicit_defaults_for_timestamp=1
     restart: always
+    user: "1000:1001"
     environment:
       MYSQL_ROOT_PASSWORD: mysql_root_password
-      USER: "1000:1001"
     container_name: {db_container_name}
     ports:
       - 3308:3306
