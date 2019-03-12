@@ -16,15 +16,16 @@ temporary_upload = config['DATABASE']['TEMP_UPLOAD_DB']
 
 engine = general_helpers.connect_to_db(host, username, password, new_database)
 
-# #get a list of table names in the database we want to copy in
-# command = "select table_name from information_schema.tables where table_type = 'base table' and table_schema ='{}'".format(new_database)
-# tables_data = engine.execute(command)
-# tables = [table['table_name'] for table in tables_data]
+#get a list of table names in the database we want to copy in
+command = "select table_name from information_schema.tables where table_type = 'base table' and table_schema ='{}'".format(temporary_upload)
+tables_data = engine.execute(command)
+tables = [table['table_name'] for table in tables_data]
 
-# # query to insert db
-# for table in tables:
-#     print(table)
-#     insert_table_command = "INSERT INTO {0}.{2} SELECT * FROM {1}.{2}".format(new_database, temporary_upload, table)
-#     engine.execute(insert_table_command)
+engine.execute("SET FOREIGN_KEY_CHECKS=0;")
+# query to insert db
+for table in tables:
+    print(table)
+    insert_table_command = "INSERT INTO {0}.{2} SELECT * FROM {1}.{2}".format(new_database, temporary_upload, table)
+    engine.execute(insert_table_command)
 
-# engine.execute("SET FOREIGN_KEY_CHECKS=1;")
+engine.execute("SET FOREIGN_KEY_CHECKS=1;")
