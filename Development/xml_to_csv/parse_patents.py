@@ -250,7 +250,7 @@ def get_results(patents, field_dictionary):
                 is_app = True #indicator for whether something being cited is a patent application
 
                 if cited_doc_num:
-                    if re.match(r'^[A-Z]*\d+$', cited_doc_num): #basically if there is anything other than number and digits its an application
+                    if re.match(r'^[A-Z]*\.?\s?\d+$', cited_doc_num): #basically if there is anything other than number and digits its an application
                         num = re.findall('\d+', cited_doc_num)
                         num = num[0] #turns it from list to string
                         if num[0] == '0': #drop leading zeros
