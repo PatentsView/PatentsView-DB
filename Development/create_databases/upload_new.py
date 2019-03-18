@@ -23,11 +23,11 @@ command = "select table_name from information_schema.tables where table_type = '
 tables_data = con.execute(command)
 tables = [table['table_name'] for table in tables_data]
 
-# con.execute("create schema {}".format(temporary_upload))
-# for table in tables:
-#     con = engine.connect()
-#     con.execute("create table {0}.{2} like {1}.{2}".format(temporary_upload, new_database, table))
-#     con.close()
+con.execute("create schema {}".format(temporary_upload))
+for table in tables:
+    con = engine.connect()
+    con.execute("create table {0}.{2} like {1}.{2}".format(temporary_upload, new_database, table))
+    con.close()
 
 engine = general_helpers.connect_to_db(host, username, password, temporary_upload)
 con = engine.connect()
