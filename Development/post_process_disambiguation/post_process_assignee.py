@@ -20,7 +20,11 @@ def create_assignee_lookup(disambiguated_folder):
         raw_to_disambiguated[row[0]] = disambiguated_id
         disambiguated[disambiguated_id] =[" ".join(row[4].split(" ")[:-1]),row[4].split(" ")[-1],row[3]]
     return raw_to_disambiguated, disambiguated
-
+# String helper function
+def xstr(s):
+    if s is None:
+        return ''
+    return str(s)
 def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
     raw_assignee_data = db_con.execute("select * from rawassignee")
     output = csv.writer(open(disambiguated_folder + "/rawassignee_updated.csv",'w', encoding = 'utf-8'),delimiter='\t')
@@ -38,7 +42,10 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
             assignee_id = general_helpers.id_generator()
             disambiguated[assignee_id] = [row['name_first'], row['name_last'], row['organization']]
             type_lookup[assignee_id].append(row['type'])
-        canonical_name_count[assignee_id][row['name_first'] + "|" + row['name_last']] += 1
+        name=xstr(row['name_first']) + "|" + xstr(row['name_last'])
+        if row['name_first'] is None and row['name_last'] is None:
+            name= None
+        canonical_name_count[assignee_id][name] += 1
         canonical_org_count[assignee_id][row['organization']] += 1
         assignee_id_set.add(assignee_id)
         output.writerow([row['uuid'], row['patent_id'], assignee_id, row['rawlocation_id'], row['type'], row['name_first'], row['name_last'], row['organization'], row['sequence']])
@@ -50,8 +57,13 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
         frequent_name = disambiguated[1]
         if disambiguated_id in canonical_name_count:
             frequent_name = max(canonical_name_count[disambiguated_id].items(), key=operator.itemgetter(1))[0]
-        disambiguated[disambiguated_id] = [
-            " ".join(frequent_name.split("|")[:-1]), frequent_name.split(" ")[-1], frequent_org]
+        if frequent_name is not None:
+            disambiguated[disambiguated_id] = [
+                " ".join(frequent_name.split("|")[:-1]), frequent_name.split(" ")[-1], frequent_org]
+        else:
+            disambiguated[disambiguated_id] = [
+                None, None, frequent_org]
+
 
     return type_lookup, disambiguated, assignee_id_set
 
