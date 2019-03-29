@@ -51,10 +51,10 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
         output.writerow([row['uuid'], row['patent_id'], assignee_id, row['rawlocation_id'], row['type'], row['name_first'], row['name_last'], row['organization'], row['sequence']])
 
     for disambiguated_id in disambiguated.keys():
-        frequent_org=disambiguated[2]
+        frequent_org=disambiguated[disambiguated_id][2]
         if disambiguated_id in canonical_org_count:
             frequent_org = max(canonical_org_count[disambiguated_id].items(), key=operator.itemgetter(1))[0]
-        frequent_name = disambiguated[1]
+        frequent_name = disambiguated[disambiguated_id][1]
         if disambiguated_id in canonical_name_count:
             frequent_name = max(canonical_name_count[disambiguated_id].items(), key=operator.itemgetter(1))[0]
         if frequent_name is not None:
