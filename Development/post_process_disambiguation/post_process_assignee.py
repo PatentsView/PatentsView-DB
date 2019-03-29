@@ -9,7 +9,7 @@ import re,os,random,string,codecs
 import sys
 from collections import Counter, defaultdict
 from Development.helpers import general_helpers
-
+import operator
 
 def create_assignee_lookup(disambiguated_folder):  
     assignee_data = csv.reader(open('{}/assignee_disambiguation.tsv'.format(disambiguated_folder), 'r'), delimiter = '\t')
@@ -28,6 +28,8 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
     type_lookup = defaultdict(lambda : [])
     assignee_id_set = set() #need this to get rid of assignees that don't appear in the raw assignee table
     counter = 0
+    canonical_name_count = defaultdict(lambda: defaultdict(lambda: 0))
+    canonical_org_count = defaultdict(lambda: defaultdict(lambda: 0))
     for row in raw_assignee_data:
         if row['uuid'] in lookup.keys(): #some rawassignees don't have a disambiguated assignee becasue of no location    
             assignee_id = lookup[row['uuid']]
@@ -36,8 +38,21 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
             assignee_id = general_helpers.id_generator()
             disambiguated[assignee_id] = [row['name_first'], row['name_last'], row['organization']]
             type_lookup[assignee_id].append(row['type'])
+        canonical_name_count[assignee_id][row['name_first'] + "|" + row['name_last']] += 1
+        canonical_org_count[assignee_id][row['organization']] += 1
         assignee_id_set.add(assignee_id)
         output.writerow([row['uuid'], row['patent_id'], assignee_id, row['rawlocation_id'], row['type'], row['name_first'], row['name_last'], row['organization'], row['sequence']])
+
+    for disambiguated_id in disambiguated.keys():
+        frequent_org=disambiguated[2]
+        if disambiguated_id in canonical_org_count:
+            frequent_org = max(canonical_org_count[disambiguated_id].items(), key=operator.itemgetter(1))[0]
+        frequent_name = disambiguated[1]
+        if disambiguated_id in canonical_name_count:
+            frequent_name = max(canonical_name_count[disambiguated_id].items(), key=operator.itemgetter(1))[0]
+        disambiguated[disambiguated_id] = [
+            " ".join(frequent_name.split("|")[:-1]), frequent_name.split(" ")[-1], frequent_org]
+
     return type_lookup, disambiguated, assignee_id_set
 
 
