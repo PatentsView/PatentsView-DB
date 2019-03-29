@@ -9,34 +9,17 @@ import re,os,random,string,codecs
 import sys
 from collections import Counter, defaultdict
 from Development.helpers import general_helpers
-import operator
 
 
-def create_assignee_lookup(disambiguated_folder):
-    assignee_data = csv.reader(
-        open('{}/assignee_disambiguation.tsv'.format(disambiguated_folder),
-             'r'),
-        delimiter='\t')
+def create_assignee_lookup(disambiguated_folder):  
+    assignee_data = csv.reader(open('{}/assignee_disambiguation.tsv'.format(disambiguated_folder), 'r'), delimiter = '\t')
     raw_to_disambiguated = {}
     disambiguated = {}
-    canonical_name_count = defaultdict(lambda: defaultdict(lambda: 0))
-    canonical_org_count = defaultdict(lambda: defaultdict(lambda: 0))
-    # For each disambiguated id count the name and organization occurrence
     for row in assignee_data:
-        disambiguated_id = row[1] if row[1] != '' else row[2]
+        disambiguated_id = row[1] if row[1]!= '' else row[2]
         raw_to_disambiguated[row[0]] = disambiguated_id
-        canonical_name_count[disambiguated_id][row[4]] += 1
-        canonical_org_count[disambiguated_id][row[3]] += 1
-        
-    # For each disambiguated id, identify most frquent name/org
-    for disambiguated_id in canonical_org_count.keys():
-        frequent_org = max(canonical_org_count[disambiguated_id].items(), key=operator.itemgetter(1))[0]
-        frequent_name = max(canonical_name_count[disambiguated_id].items(), key=operator.itemgetter(1))[0]
-        disambiguated[disambiguated_id] = [
-            " ".join(frequent_name.split(" ")[:-1]), frequent_name.split(" ")[-1], frequent_org]
-
+        disambiguated[disambiguated_id] =[" ".join(row[4].split(" ")[:-1]),row[4].split(" ")[-1],row[3]]
     return raw_to_disambiguated, disambiguated
-
 
 def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
     raw_assignee_data = db_con.execute("select * from rawassignee")
