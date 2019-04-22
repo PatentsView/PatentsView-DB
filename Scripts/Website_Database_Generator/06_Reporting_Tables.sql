@@ -2,9 +2,9 @@
 # BEGIN new class table creation
 #####################################################################################################################################
 
-create table if not exists `{{params.reporting_database}}`.`cpc_subsection` (id varchar(20) primary key,title varchar(256), num_patents int(10) unsigned, num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
-create table if not exists `{{params.reporting_database}}`.`cpc_subgroup` (id varchar(20) primary key,title varchar(512));
-create table if not exists `{{params.reporting_database}}`.`cpc_group` (id varchar(20) primary key,title varchar(256), num_patents int(10) unsigned, num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
+create table if not exists `{{params.reporting_database}}`.`cpc_subsection` (id varchar(20) primary key,title varchar(512), num_patents int(10) unsigned, num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
+create table if not exists `{{params.reporting_database}}`.`cpc_subgroup` (id varchar(20) primary key,title varchar(2048));
+create table if not exists `{{params.reporting_database}}`.`cpc_group` (id varchar(20) primary key,title varchar(512), num_patents int(10) unsigned, num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
 create table if not exists `{{params.reporting_database}}`.`nber_category` (id varchar(20) primary key,title varchar(512));
 create table if not exists `{{params.reporting_database}}`.`nber_subcategory` (id varchar(20) primary key,title varchar(512), num_patents int(10) unsigned, 
   num_inventors int(10) unsigned, num_assignees int(10) unsigned,first_seen_date date,last_seen_date date,years_active smallint(5) unsigned);
