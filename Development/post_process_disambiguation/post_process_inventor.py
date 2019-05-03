@@ -49,7 +49,6 @@ def write_inventor(inventors_to_write, disambiguated_folder):
 
 
 def update_raw(db_con, disambiguated_folder, lookup):
-    db_con.execute('create table rawinventor_inprogress like rawinventor')
     raw_inventor = db_con.execute("select * from rawinventor")
     print('got raw inventor')
     output = csv.writer(open(disambiguated_folder + "/rawinventor_updated.csv", 'w'), delimiter='\t')
@@ -60,18 +59,24 @@ def update_raw(db_con, disambiguated_folder, lookup):
         output.writerow(
             [row['uuid'], row['patent_id'], inventor_id, row['rawlocation_id'], row['name_first'], row['name_last'],
              row['sequence'], row['rule_47']])
-    raw_data = pd.read_csv(disambiguated_folder + "/rawinventor_updated.csv", delimiter='\t')
+
+## Keeping this method separate to avoid memory issues
+def upload_raw(db_con,disambiguated_folder) :
+    db_con.execute('create table rawinventor_inprogress like rawinventor')
+    chunksize = 10 ** 6
     start = time.time()
-    raw_data.to_sql(con=db_con, name='rawinventor_inprogress', if_exists='append', index=False, chunksize=500,
-                    method="multi")
+    for raw_data_chunk in pd.read_csv(disambiguated_folder + "/rawinventor_updated.csv", chunksize=chunksize, delimiter = '\t'):
+        raw_data_chunk.to_sql(con=db_con, name='rawinventor_inprogress', if_exists='append', index=False, chunksize=500,
+                        method="multi")
+
     print("TO SQL: Time")
     end = time.time()
     print(end - start)
+
     timestamp = round(end)
     backup_name = "temp_rawinventor_backup_" + str(timestamp)
-    db_con.execute('alter table rawinventor rename '+backup_name)
+    db_con.execute('alter table rawinventor rename ' + backup_name)
     db_con.execute('alter table rawinventor_inprogress rename rawinventor')
-
 
 if __name__ == '__main__':
     import configparser
