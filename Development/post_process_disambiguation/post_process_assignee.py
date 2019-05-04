@@ -7,6 +7,7 @@ from warnings import filterwarnings
 import csv
 import re,os,random,string,codecs
 import sys
+import time
 from collections import Counter, defaultdict
 from Development.helpers import general_helpers
 import operator
@@ -88,7 +89,16 @@ def upload_assignee(db_con, disambiguated_to_write, type_lookup, assignee_id_set
             disambig_list.append([assignee_id, type, assignee_info[0], assignee_info[1], assignee_info[2]])
     disambig_data = pd.DataFrame(disambig_list)
     disambig_data.columns = ['id', 'type', 'name_first', 'name_last', 'organization']
-    disambig_data.to_sql(con = db_con, name = 'assignee', index = False, if_exists = 'append')#append keeps the index
+    del disambig_list
+    start=time.time()
+    n = 100  # chunk row size
+    for i in range(0, disambig_data.shape[0], n):
+        current_chunk = disambig_data[i:i + n]
+        with db_con.begin() as conn:
+            current_chunk.to_sql(con = conn, name = 'assignee', index = False, if_exists = 'append', chunksize=500,
+                        method="multi")#append keeps the index
+    end= time.time()
+    print("Load Time:" + str(round(end-start)))
     
 if __name__ == '__main__':
     import configparser
@@ -96,14 +106,25 @@ if __name__ == '__main__':
     config.read(project_home + '/Development/config.ini')
 
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
-    disambiguated_folder = "{}/disambig_output".format(config['FOLDERS']['WORKING_FOLDER'])    
-
+    disambiguated_folder = "{}/disambig_output".format(config['FOLDERS']['WORKING_FOLDER'])
+    start = time.time()
     raw_to_disambiguated, disambiguated_to_write = create_assignee_lookup(disambiguated_folder)
     print(len(raw_to_disambiguated))
     print(len(disambiguated_to_write))
     print('done lookup')
+    end = time.time()
+    print("Lookup Time:" + str(round(end - start)))
+    start = time.time()
     type_lookup, disambiguated_to_write, assignee_ids_to_use = update_raw_assignee(db_con, disambiguated_folder, raw_to_disambiguated, disambiguated_to_write)
     print('done raw update')
+    end = time.time()
+    print("Raw update Time:" + str(round(end - start)))
+    start = time.time()
     upload_assignee(db_con, disambiguated_to_write, type_lookup, assignee_ids_to_use)
     print('Uploaded assignee')
+    end = time.time()
+    print("Assignee Upload Time:" + str(round(end - start)))
+    start = time.time()
     upload_rawassignee(db_con, disambiguated_folder)
+    end = time.time()
+    print("Raw Assignee Upload Time:" + str(round(end - start)))
