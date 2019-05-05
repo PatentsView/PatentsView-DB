@@ -10,6 +10,8 @@ import sys
 from collections import Counter, defaultdict
 project_home = os.environ['PACKAGE_HOME']
 from Development.helpers import general_helpers
+import tqdm
+import time
 
 def make_lookup(disambiguated_folder):
     inp = csv.reader(open( "{}/location_disambiguation.tsv".format(disambiguated_folder),'r'),delimiter='\t')
@@ -21,7 +23,7 @@ def make_lookup(disambiguated_folder):
     #create the latitude/longitude to id mappings
     id_lat_long_lookup = {}
     lat_long_name_count = defaultdict(lambda : defaultdict(lambda: 0))
-    for row in inp:
+    for row in tqdm.tqdm(inp):
         clean_loc = tuple([None if i =='NULL' else i for i in row[1].split('|')])
         if len(row) < 5: #some of the lat long pairs are ented as a pipe separated pair in the 4th column
             lat_long = row[3].split('|')
@@ -84,22 +86,28 @@ def upload_location(db_con, lat_long_cannonical_name, disambiguated_folder, fips
             location.append([v['id'], v['place'][0],v['place'][1],v['place'][2],lat_long.split('|')[0], lat_long.split('|')[1], county, state_fips, county_fips])
     location_df = pd.DataFrame(location)
     location_df.columns = ['id', 'city', 'state', 'country', 'latitude', 'longitude', 'county', 'state_fips', 'county_fips']
+
     location_df.to_csv('{}/location.csv'.format(disambiguated_folder))
-    location_df.to_sql(con=db_con, name = 'location', if_exists = 'append', index = False)
+    start=time.time()
+    n = 100  # chunk row size
+    for i in tqdm.tqdm(range(0, location_df.shape[0], n)):
+        current_chunk = location_df[i:i + n]
+        with db_con.begin() as conn:
+            current_chunk.to_sql(con=conn, name='location', index=False, if_exists='append',
+                                 method="multi")  # append keeps the index
+    end = time.time()
+    print("Load Time:" + str(round(end - start)))
     
 
 def process_rawlocation(db_con, lat_long_cannonical_name, id_lat_long_lookup, disambiguated_folder):
-   
-    db_con.execute('alter table rawlocation rename temp_rawlocation_backup')
-    print('getting data for rawloc')
-    db_con.execute('create table rawlocation like temp_rawlocation_backup')
-    raw_loc_data = db_con.execute("select * from temp_rawlocation_backup")
+
+    raw_loc_data = db_con.execute("select * from rawlocation")
     print('got data')
     updated = csv.writer(open(disambiguated_folder + "/rawlocation_updated.csv",'w'),delimiter='\t')
     counter = 0
     total_undisambiguated = 0
     total_missed = []
-    for i in raw_loc_data:
+    for i in tqdm.tqdm(raw_loc_data):
         counter +=1
         if counter%500000==0:
             print(str(counter))
@@ -110,11 +118,37 @@ def process_rawlocation(db_con, lat_long_cannonical_name, id_lat_long_lookup, di
         else:
             updated.writerow([i['id'],'', i['city'], i['state'], i['country'], i['country_transformed'],''])
 
-def upload_rawloc(db_con, disambiguated_folder):
-    raw_data = pd.read_csv(disambiguated_folder + "/rawlocation_updated.csv", delimiter = '\t')
-    print('uploading')
-    raw_data.to_sql(con=db_con, name = 'rawlocation', if_exists = 'append', index = False)
+def upload_rawloc(db_con, disambiguated_folder,db):
+    db_con.execute('create table rawlocation_inprogress like rawlocation')
+    add_indexes_fetcher = db_con.execute(
+        "SELECT CONCAT('ALTER TABLE `',TABLE_NAME,'` ','ADD ', IF(NON_UNIQUE = 1, CASE UPPER(INDEX_TYPE) WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE ) END, IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE ), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE ) ) ), '(', GROUP_CONCAT( DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', ' ), ');' ) AS 'Show_Add_Indexes' FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '" + db + "' AND TABLE_NAME='rawlocation_inprogress' and UPPER(INDEX_NAME) <> 'PRIMARY' GROUP BY TABLE_NAME, INDEX_NAME ORDER BY TABLE_NAME ASC, INDEX_NAME ASC; ")
+    add_indexes = add_indexes_fetcher.fetchall()
 
+    drop_indexes_fetcher = db_con.execute(
+        "SELECT CONCAT( 'ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT( DISTINCT CONCAT( 'DROP ', IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`') ) ) SEPARATOR ', ' ), ';' ) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '" + db + "' AND TABLE_NAME='rawlocation_inprogress' and UPPER(INDEX_NAME) <> 'PRIMARY' GROUP BY TABLE_NAME ORDER BY TABLE_NAME ASC")
+    drop_indexes = drop_indexes_fetcher.fetchall()
+
+    for drop_sql in drop_indexes:
+        db_con.execute(drop_sql)
+
+    raw_data = pd.read_csv(disambiguated_folder + "/rawlocation_updated.csv", delimiter = '\t')
+    raw_data.sort_values(by="id", inplace=True)
+    raw_data.reset_index(inplace=True, drop=True)
+    print('uploading')
+    start = time.time()
+    n = 100  # chunk row size
+    for i in tqdm.tqdm(range(0, raw_data.shape[0], n)):
+        current_chunk = raw_data[i:i + n]
+        with db_con.begin() as conn:
+            current_chunk.to_sql(con=conn, name='rawlocation', index=False, if_exists='append',
+                                 method="multi")  # append keeps the index
+    end = time.time()
+    print("Load Time:" + str(round(end - start)))
+    for add_sql in add_indexes:
+        db_con.execute(add_sql)
+    stamp=str(round(time.time()))
+    db_con.execute('alter table rawlocation rename temp_rawlocation_backup_'+stamp)
+    db_con.execute('alter table rawlocation_inprogress rename rawlocation')
 
 if __name__ == '__main__':
     import configparser
