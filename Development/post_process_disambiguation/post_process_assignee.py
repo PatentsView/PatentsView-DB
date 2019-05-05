@@ -17,7 +17,7 @@ def create_assignee_lookup(disambiguated_folder):
     assignee_data = csv.reader(open('{}/assignee_disambiguation.tsv'.format(disambiguated_folder), 'r'), delimiter = '\t')
     raw_to_disambiguated = {}
     disambiguated = {}
-    for row in tqdm.tqdm(assignee_data, 6163970):
+    for row in tqdm.tqdm(assignee_data, total=6163970):
         disambiguated_id = row[1] if row[1]!= '' else row[2]
         raw_to_disambiguated[row[0]] = disambiguated_id
         disambiguated[disambiguated_id] =[" ".join(row[4].split(" ")[:-1]),row[4].split(" ")[-1],row[3]]
