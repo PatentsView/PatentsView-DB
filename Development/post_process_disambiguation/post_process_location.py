@@ -23,7 +23,7 @@ def make_lookup(disambiguated_folder):
     #create the latitude/longitude to id mappings
     id_lat_long_lookup = {}
     lat_long_name_count = defaultdict(lambda : defaultdict(lambda: 0))
-    for row in tqdm.tqdm(inp):
+    for row in tqdm.tqdm(inp, desc="Lookup Progress"):
         clean_loc = tuple([None if i =='NULL' else i for i in row[1].split('|')])
         if len(row) < 5: #some of the lat long pairs are ented as a pipe separated pair in the 4th column
             lat_long = row[3].split('|')
@@ -90,7 +90,7 @@ def upload_location(db_con, lat_long_cannonical_name, disambiguated_folder, fips
     location_df.to_csv('{}/location.csv'.format(disambiguated_folder))
     start=time.time()
     n = 100  # chunk row size
-    for i in tqdm.tqdm(range(0, location_df.shape[0], n)):
+    for i in tqdm.tqdm(range(0, location_df.shape[0], n), desc="Location Load"):
         current_chunk = location_df[i:i + n]
         with db_con.begin() as conn:
             current_chunk.to_sql(con=conn, name='location', index=False, if_exists='append',
@@ -107,7 +107,7 @@ def process_rawlocation(db_con, lat_long_cannonical_name, id_lat_long_lookup, di
     counter = 0
     total_undisambiguated = 0
     total_missed = []
-    for i in tqdm.tqdm(raw_loc_data):
+    for i in tqdm.tqdm(raw_loc_data, desc="Raw location Processing"):
         counter +=1
         if counter%500000==0:
             print(str(counter))
@@ -137,7 +137,7 @@ def upload_rawloc(db_con, disambiguated_folder,db):
     print('uploading')
     start = time.time()
     n = 100  # chunk row size
-    for i in tqdm.tqdm(range(0, raw_data.shape[0], n)):
+    for i in tqdm.tqdm(range(0, raw_data.shape[0], n), desc="Raw Location Upload"):
         current_chunk = raw_data[i:i + n]
         with db_con.begin() as conn:
             current_chunk.to_sql(con=conn, name='rawlocation', index=False, if_exists='append',
