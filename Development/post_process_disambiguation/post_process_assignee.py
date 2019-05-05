@@ -11,12 +11,13 @@ import time
 from collections import Counter, defaultdict
 from Development.helpers import general_helpers
 import operator
+import tqdm
 
 def create_assignee_lookup(disambiguated_folder):  
     assignee_data = csv.reader(open('{}/assignee_disambiguation.tsv'.format(disambiguated_folder), 'r'), delimiter = '\t')
     raw_to_disambiguated = {}
     disambiguated = {}
-    for row in assignee_data:
+    for row in tqdm.tqdm(assignee_data, 6163970):
         disambiguated_id = row[1] if row[1]!= '' else row[2]
         raw_to_disambiguated[row[0]] = disambiguated_id
         disambiguated[disambiguated_id] =[" ".join(row[4].split(" ")[:-1]),row[4].split(" ")[-1],row[3]]
@@ -35,7 +36,7 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
     counter = 0
     canonical_name_count = defaultdict(lambda: defaultdict(lambda: 0))
     canonical_org_count = defaultdict(lambda: defaultdict(lambda: 0))
-    for row in raw_assignee_data:
+    for row in tqdm.tqdm(raw_assignee_data):
         if row['uuid'] in lookup.keys(): #some rawassignees don't have a disambiguated assignee becasue of no location    
             assignee_id = lookup[row['uuid']]
             type_lookup[assignee_id].append(row['type'])
@@ -51,7 +52,7 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
         assignee_id_set.add(assignee_id)
         output.writerow([row['uuid'], row['patent_id'], assignee_id, row['rawlocation_id'], row['type'], row['name_first'], row['name_last'], row['organization'], row['sequence']])
 
-    for disambiguated_id in disambiguated.keys():
+    for disambiguated_id in tqdm.tqdm(disambiguated.keys(), total=len(disambiguated.keys())):
         frequent_org=disambiguated[disambiguated_id][2]
         if disambiguated_id in canonical_org_count:
             frequent_org = max(canonical_org_count[disambiguated_id].items(), key=operator.itemgetter(1))[0]
@@ -69,11 +70,36 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
     return type_lookup, disambiguated, assignee_id_set
 
 
-def upload_rawassignee(db_con, disambiguated_folder):
-    db_con.execute('alter table rawassignee rename temp_rawassignee_backup')
-    db_con.execute('create table rawassignee like temp_rawassignee_backup')
-    raw_assignee = pd.read_csv('{}/rawassignee_updated.csv'.format(disambiguated_folder), encoding = 'utf-8', delimiter = '\t')
-    raw_assignee.to_sql(con=db_con, name = 'rawassignee', index = False, if_exists='append') #append keeps the indexes 
+def upload_rawassignee(db_con, disambiguated_folder, db):
+
+    db_con.execute('create table rawassignee_inprogress like rawassignee_backup')
+    add_indexes_fetcher=db_con.execute("SELECT CONCAT('ALTER TABLE `',TABLE_NAME,'` ','ADD ', IF(NON_UNIQUE = 1, CASE UPPER(INDEX_TYPE) WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE ) END, IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE ), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE ) ) ), '(', GROUP_CONCAT( DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', ' ), ');' ) AS 'Show_Add_Indexes' FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '"+db+"' AND TABLE_NAME='rawassignee_inprogress' and UPPER(INDEX_NAME) <> 'PRIMARY' GROUP BY TABLE_NAME, INDEX_NAME ORDER BY TABLE_NAME ASC, INDEX_NAME ASC; ")
+    add_indexes=add_indexes_fetcher.fetchall()
+
+    drop_indexes_fetcher=db_con.execute("SELECT CONCAT( 'ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT( DISTINCT CONCAT( 'DROP ', IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`') ) ) SEPARATOR ', ' ), ';' ) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '"+db+"' AND TABLE_NAME='rawassignee_inprogress' and UPPER(INDEX_NAME) <> 'PRIMARY' GROUP BY TABLE_NAME ORDER BY TABLE_NAME ASC")
+    drop_indexes=drop_indexes_fetcher.fetchall()
+
+    for drop_sql in drop_indexes:
+        db_con.execute(drop_sql)
+    start = time.time()
+    n = 100  # chunk row size
+    raw_assignees= pd.read_csv('{}/rawassignee_updated.csv'.format(disambiguated_folder), encoding = 'utf-8', delimiter = '\t')
+    raw_assignees.sort_values(by="uuid", inplace=True, axis=1)
+    raw_assignees.reset_index(inplace=True)
+    n = 100  # chunk row size
+    for i in range(0, raw_assignees.shape[0], n):
+        current_chunk = raw_assignees[i:i + n]
+        with db_con.begin() as conn:
+            current_chunk.to_sql(con=conn, name='rawassignee_inprogress', index=False, if_exists='append',
+                                 method="multi")  # append keeps the index
+    end = time.time()
+    print("Load Time:" + str(round(end - start)))
+
+    for add_sql in add_indexes:
+        db_con.execute(add_sql)
+    stamp=str(round(time.time()))
+    db_con.execute('alter table rawassignee rename temp_rawassignee_backup_'+stamp)
+    db_con.execute('alter table rawassignee_inprogress rename rawassignee' + stamp)
 
 
 
@@ -95,7 +121,7 @@ def upload_assignee(db_con, disambiguated_to_write, type_lookup, assignee_id_set
     for i in range(0, disambig_data.shape[0], n):
         current_chunk = disambig_data[i:i + n]
         with db_con.begin() as conn:
-            current_chunk.to_sql(con = conn, name = 'assignee', index = False, if_exists = 'append', chunksize=500,
+            current_chunk.to_sql(con = conn, name = 'assignee', index = False, if_exists = 'append',
                         method="multi")#append keeps the index
     end= time.time()
     print("Load Time:" + str(round(end-start)))
@@ -125,6 +151,6 @@ if __name__ == '__main__':
     end = time.time()
     print("Assignee Upload Time:" + str(round(end - start)))
     start = time.time()
-    upload_rawassignee(db_con, disambiguated_folder)
+    upload_rawassignee(db_con, disambiguated_folder,config['DATABASE']['NEW_DB'])
     end = time.time()
     print("Raw Assignee Upload Time:" + str(round(end - start)))
