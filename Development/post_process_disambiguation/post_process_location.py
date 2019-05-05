@@ -107,17 +107,20 @@ def process_rawlocation(db_con, lat_long_cannonical_name, id_lat_long_lookup, di
     counter = 0
     total_undisambiguated = 0
     total_missed = []
-    rawl_loc_fetch_chunk=raw_loc_data.fetchmany(10000)
-    for i in tqdm.tqdm(rawl_loc_fetch_chunks, desc="Raw location Part Processing"):
-        counter +=1
-        if counter%500000==0:
-            print(str(counter))
-        if i['id'] in id_lat_long_lookup.keys():
-            lat_long = id_lat_long_lookup[i['id']]
-            loc_id = lat_long_cannonical_name[lat_long]['id']
-            updated.writerow([i['id'],loc_id, i['city'], i['state'], i['country'], i['country_transformed'], lat_long])
-        else:
-            updated.writerow([i['id'],'', i['city'], i['state'], i['country'], i['country_transformed'],''])
+    while True:
+        rawl_loc_fetch_chunk=raw_loc_data.fetchmany(10000)
+        if not rawl_loc_fetch_chunk:
+            break
+        for i in tqdm.tqdm(rawl_loc_fetch_chunk, desc="Raw location Part Processing"):
+            counter +=1
+            if counter%500000==0:
+                print(str(counter))
+            if i['id'] in id_lat_long_lookup.keys():
+                lat_long = id_lat_long_lookup[i['id']]
+                loc_id = lat_long_cannonical_name[lat_long]['id']
+                updated.writerow([i['id'],loc_id, i['city'], i['state'], i['country'], i['country_transformed'], lat_long])
+            else:
+                updated.writerow([i['id'],'', i['city'], i['state'], i['country'], i['country_transformed'],''])
 
 def upload_rawloc(db_con, disambiguated_folder,db):
     db_con.execute('create table rawlocation_inprogress like rawlocation')
