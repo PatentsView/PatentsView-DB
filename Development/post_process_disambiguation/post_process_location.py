@@ -107,7 +107,8 @@ def process_rawlocation(db_con, lat_long_cannonical_name, id_lat_long_lookup, di
     counter = 0
     total_undisambiguated = 0
     total_missed = []
-    for i in tqdm.tqdm(raw_loc_data, desc="Raw location Processing"):
+    rawl_loc_fetch_chunk=raw_loc_data.fetchmany(10000)
+    for i in tqdm.tqdm(rawl_loc_fetch_chunks, desc="Raw location Part Processing"):
         counter +=1
         if counter%500000==0:
             print(str(counter))
