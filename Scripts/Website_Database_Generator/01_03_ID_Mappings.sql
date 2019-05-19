@@ -172,7 +172,7 @@ select distinct
 from
   `{{params.raw_database}}`.`rawlocation`
 where
-  `location_id_transformed` is not null and `location_id_transformed` != '';
+  `location_id_transformed` is not null and `location_id_transformed` != '' and `location_id_transformed`!='undisambiguated';
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_location`;
@@ -194,7 +194,7 @@ select distinct
   rl.`location_id`,
   t.`new_location_id`
 from
-  (select distinct location_id, location_id_transformed from `{{params.raw_database}}`.`rawlocation` where location_id != '' and location_id is not null) rl
+  (select distinct location_id, location_id_transformed from `{{params.raw_database}}`.`rawlocation` where location_id != '' and location_id is not null and `location_id_transformed`!='undisambiguated') rl
   inner join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` t on
     t.`old_location_id_transformed` = rl.`location_id_transformed`;
 
