@@ -1,63 +1,63 @@
 
--- # BEGIN assignee id mapping 
+# BEGIN assignee id mapping
 
--- ###################################################################################################################################
-
-
--- # We need this early for firstnamed stuff.
--- drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_assignee`;
--- create table `{{params.reporting_database}}`.`temp_id_mapping_assignee`
--- (
---   `old_assignee_id` varchar(72) not null,
---   `new_assignee_id` int unsigned not null auto_increment,
---   primary key (`old_assignee_id`),
---   unique index `ak_temp_id_mapping_assignee` (`new_assignee_id`)
--- )
--- engine=InnoDB;
+###################################################################################################################################
 
 
--- # There are assignees in the raw data that are not linked to anything so we will take our
--- # assignee ids from the patent_assignee table to ensure we don't copy any unused assignees over.
--- # 345,185 @ 0:23
--- insert into
---   `{{params.reporting_database}}`.`temp_id_mapping_assignee` (`old_assignee_id`)
--- select distinct
---   pa.`assignee_id`
--- from
---   `{{params.raw_database}}`.`patent_assignee` pa;
+# We need this early for firstnamed stuff.
+drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_assignee`;
+create table `{{params.reporting_database}}`.`temp_id_mapping_assignee`
+(
+  `old_assignee_id` varchar(72) not null,
+  `new_assignee_id` int unsigned not null auto_increment,
+  primary key (`old_assignee_id`),
+  unique index `ak_temp_id_mapping_assignee` (`new_assignee_id`)
+)
+engine=InnoDB;
 
 
--- # END assignee id mapping 
-
--- #####################################################################################################################################
-
-
--- # BEGIN inventor id mapping 
-
--- ###################################################################################################################################
-
-
--- # We need this early for firstnamed stuff.
--- drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_inventor`;
--- create table `{{params.reporting_database}}`.`temp_id_mapping_inventor`
--- (
---   `old_inventor_id` varchar(36) not null,
---   `new_inventor_id` int unsigned not null auto_increment,
---   primary key (`old_inventor_id`),
---   unique index `ak_temp_id_mapping_inventor` (`new_inventor_id`)
--- )
--- engine=InnoDB;
+# There are assignees in the raw data that are not linked to anything so we will take our
+# assignee ids from the patent_assignee table to ensure we don't copy any unused assignees over.
+# 345,185 @ 0:23
+insert into
+  `{{params.reporting_database}}`.`temp_id_mapping_assignee` (`old_assignee_id`)
+select distinct
+  pa.`assignee_id`
+from
+  `{{params.raw_database}}`.`patent_assignee` pa;
 
 
--- # There are inventors in the raw data that are not linked to anything so we will take our
--- # inventor ids from the patent_inventor table to ensure we don't copy any unused inventors over.
--- # 3,572,763 @ 1:08
--- insert into
---   `{{params.reporting_database}}`.`temp_id_mapping_inventor` (`old_inventor_id`)
--- select distinct
---   `inventor_id`
--- from
---   `{{params.raw_database}}`.`patent_inventor`;
+# END assignee id mapping
+
+#####################################################################################################################################
+
+
+# BEGIN inventor id mapping
+
+###################################################################################################################################
+
+
+# We need this early for firstnamed stuff.
+drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_inventor`;
+create table `{{params.reporting_database}}`.`temp_id_mapping_inventor`
+(
+  `old_inventor_id` varchar(36) not null,
+  `new_inventor_id` int unsigned not null auto_increment,
+  primary key (`old_inventor_id`),
+  unique index `ak_temp_id_mapping_inventor` (`new_inventor_id`)
+)
+engine=InnoDB;
+
+
+# There are inventors in the raw data that are not linked to anything so we will take our
+# inventor ids from the patent_inventor table to ensure we don't copy any unused inventors over.
+# 3,572,763 @ 1:08
+insert into
+  `{{params.reporting_database}}`.`temp_id_mapping_inventor` (`old_inventor_id`)
+select distinct
+  `inventor_id`
+from
+  `{{params.raw_database}}`.`patent_inventor`;
 
 
 # END inventor id mapping 
