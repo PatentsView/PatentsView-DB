@@ -14,7 +14,7 @@ regex_keys = [r"\,\sdeceased",r"\,\sadministrator", r"\,\sexecutor",
          r"\,\slegal.+",r"\,\spersonal.+" ]
 regex = re.compile("(%s)" % "|".join(regex_keys))
 
-inp = csv.reader(open('{}/rawinventor.tsv'.format(disambig_folder),'r'),delimiter='\t')
+inp = csv.reader(open('{}/rawinventor.tsv'.format(disambig_folder),'r'),delimiter='\t', quoting=csv.QUOTE_NONE)
 outp = csv.writer(open('{}/rawinventor_clean.tsv'.format(disambig_folder),'w'),delimiter='\t')
 
 for e, row in enumerate(inp):
