@@ -89,7 +89,7 @@ def upload_location(db_con, lat_long_cannonical_name, disambiguated_folder, fips
 
     location_df.to_csv('{}/location.csv'.format(disambiguated_folder))
     start=time.time()
-    n = 100  # chunk row size
+    n = 10000  # chunk row size
     for i in tqdm.tqdm(range(0, location_df.shape[0], n), desc="Location Load"):
         current_chunk = location_df[i:i + n]
         with db_con.begin() as conn:
@@ -101,26 +101,30 @@ def upload_location(db_con, lat_long_cannonical_name, disambiguated_folder, fips
 
 def process_rawlocation(db_con, lat_long_cannonical_name, id_lat_long_lookup, disambiguated_folder):
 
-    raw_loc_data = db_con.execute("select * from rawlocation")
-    print('got data')
+    raw_loc_count_cursor= db_con.execute("select count(*) from rawlocation")
+    raw_loc_count=raw_loc_count_cursor.fetchall()[0][0]
     updated = csv.writer(open(disambiguated_folder + "/rawlocation_updated.csv",'w'),delimiter='\t')
-    counter = 0
+    limit=300000
+    offset=0
     total_undisambiguated = 0
     total_missed = []
+    batch_counter=0
     while True:
-        rawl_loc_fetch_chunk=raw_loc_data.fetchmany(10000)
-        if not rawl_loc_fetch_chunk:
-            break
-        for i in tqdm.tqdm(rawl_loc_fetch_chunk, desc="Raw location Part Processing"):
-            counter +=1
-            if counter%500000==0:
-                print(str(counter))
+        batch_counter+=1
+        print("Next Iteration")
+        rawl_loc_fetch_chunk= db_con.execute("select * from rawlocation order by uuid limit {} offset {}".format(limit, offset))
+        counter = 0
+        for idx, i in tqdm.tqdm(rawl_loc_fetch_chunk,total=limit,  desc="Raw location Part Processing"+ str(batch_counter) + "/"+str(total_rows/limit)):
             if i['id'] in id_lat_long_lookup.keys():
                 lat_long = id_lat_long_lookup[i['id']]
                 loc_id = lat_long_cannonical_name[lat_long]['id']
                 updated.writerow([i['id'],loc_id, i['city'], i['state'], i['country'], i['country_transformed'], lat_long])
             else:
                 updated.writerow([i['id'],'', i['city'], i['state'], i['country'], i['country_transformed'],''])
+            counter+=1
+        if counter==0:
+            break
+        offset=offset+limit
 
 def upload_rawloc(db_con, disambiguated_folder,db):
     db_con.execute('create table rawlocation_inprogress like rawlocation')

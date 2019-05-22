@@ -6,6 +6,7 @@ import re,os,random,string,codecs
 import requests
 from clint.textui import progress
 from . import slack_client, slack_channel
+from itertools import (takewhile,repeat)
 
 def chunks(l,n):
     '''Yield successive n-sized chunks from l. Useful for multi-processing'''
@@ -70,3 +71,8 @@ def get_patent_ids(db_con, new_db):
 def better_title(text):
     title = " ".join([item if item not in ["Of", "The", "For", "And", "On"] else item.lower() for item in str(text).title().split( )])
     return re.sub('['+string.punctuation+']', '', title)
+
+def rawbigcount(filename):
+    f = open(filename, 'rb')
+    bufgen = takewhile(lambda x: x, (f.raw.read(1024*1024) for _ in repeat(None)))
+    return sum( buf.count(b'\n') for buf in bufgen if buf )
