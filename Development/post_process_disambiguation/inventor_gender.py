@@ -33,7 +33,7 @@ for row in gender:
 
 results = []
 for new_id, old_id in ids_new_to_old.items(): 
-    if old_id is not None:
+    if old_id is not None and old_id in id_to_gender:
         results.append((old_id, new_id, id_to_gender[old_id]))
     else:
         results.append((None,new_id, None))

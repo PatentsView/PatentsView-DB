@@ -46,10 +46,10 @@ for inv in new_data:
         outfile.writerow([inv['uuid'], inv['uuid'], inv['inventor_id']] + persistent_lookup[inv['uuid']])
     else:
         outfile.writerow([inv['uuid'], '', inv['inventor_id']] + blanks)
-data = pd.read_csv('{}/inventor_persistent.tsv'.format(disambig_folder), encoding = 'utf-8', delimiter = '\t')
 
 db_con.execute('alter table persistent_inventor_disambig rename temp_persistent_inventor_disambig_backup')
 db_con.execute('create table persistent_inventor_disambig like temp_persistent_inventor_disambig_backup')
-
-data.to_sql(con=db_con, name = 'persistent_inventor_disambig', index = False, if_exists='append') #append keeps the indexes
+chunksize = 10 ** 4
+for data_chunk in pd.read_csv('{}/inventor_persistent.tsv'.format(disambig_folder), encoding = 'utf-8', delimiter = '\t', chunksize=chunksize):
+    data_chunk.to_sql(con=db_con, name = 'persistent_inventor_disambig', index = False, if_exists='append') #append keeps the indexes
 db_con.execute('create index {0}_ix on persistent_inventor_disambig ({0});'.format(new_id_col))
