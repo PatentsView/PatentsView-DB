@@ -44,6 +44,7 @@ def update_raw_assignee(db_con, disambiguated_folder, lookup, disambiguated):
     canonical_org_count = defaultdict(lambda: defaultdict(lambda: 0))
     batch_counter=0
     while True:
+        batch_counter+=1
         raw_assignee_data = db_con.execute("select * from rawassignee order by uuid limit {} offset {}".format(limit, offset))
         counter=0
         for row in tqdm.tqdm(raw_assignee_data, total=limit, desc="Update Raw Assignee "+ str(batch_counter) + "/"+str(total_rows/limit)):
