@@ -39,7 +39,8 @@ import pickle as pickle
 import alchemy
 from textdistance import jaro_winkler
 from collections import Counter
-from alchemy import get_config, match
+#from alchemy import get_config, match
+from alchemy import match
 from alchemy.schema import *
 from alchemy.match import commit_inserts, commit_updates
 from handlers.xml_util import normalize_utf8
@@ -50,9 +51,12 @@ from unidecode import unidecode
 from tasks import bulk_commit_inserts, bulk_commit_updates
 import sys
 import os
-config = get_config()
+import configparser
 project_home=os.environ["PACKAGE_HOME"]
-THRESHOLD = config.get("LAWYER").get("threshold")
+project_home = os.environ['PACKAGE_HOME']
+config = configparser.ConfigParser()
+config.read(project_home + '/Development/config.ini')
+THRESHOLD = config["LAWYER"]["THRESHOLD"]
 
 # bookkeeping for blocks
 blocks = defaultdict(list)
@@ -118,7 +122,7 @@ def create_jw_blocks(list_of_lawyers):
             if primary == secondary:
                 blocks[primary].append(secondary)
                 continue
-            if jaro_winkler(primary, secondary, 0.0) >= THRESHOLD:
+            if jaro_winkler(primary, secondary, 0.0) >= float(THRESHOLD):
                 consumed[secondary] = 1
                 blocks[primary].append(secondary)
     pickle.dump(blocks, open('lawyer.pickle', 'wb'))

@@ -44,7 +44,7 @@ drop table if exists `{{params.reporting_database}}`.`temp_cpc_subsection_title`
 create table `{{params.reporting_database}}`.`temp_cpc_subsection_title`
 (
   `id` varchar(20) not null,
-  `title` varchar(256) null,
+  `title` varchar(512) null,
   primary key (`id`)
 )
 engine=InnoDB;
@@ -108,7 +108,7 @@ drop table if exists `{{params.reporting_database}}`.`temp_cpc_group_title`;
 create table `{{params.reporting_database}}`.`temp_cpc_group_title`
 (
   `id` varchar(20) not null,
-  `title` varchar(256) null,
+  `title` varchar(512) null,
   primary key (`id`)
 )
 engine=InnoDB;
@@ -131,7 +131,7 @@ drop table if exists `{{params.reporting_database}}`.`temp_cpc_subgroup_title`;
 create table `{{params.reporting_database}}`.`temp_cpc_subgroup_title`
 (
   `id` varchar(20) not null,
-  `title` varchar(512) null,
+  `title` varchar(2048) null,
   primary key (`id`)
 )
 engine=InnoDB;
@@ -159,9 +159,9 @@ create table `{{params.reporting_database}}`.`cpc_current`
   `subsection_id` varchar(20) null,
   `subsection_title` varchar(512) null,
   `group_id` varchar(20) null,
-  `group_title` varchar(256) null,
+  `group_title` varchar(512) null,
   `subgroup_id` varchar(20) null,
-  `subgroup_title` varchar(512) null,
+  `subgroup_title` varchar(2048) null,
   `category` varchar(36) null,
   `num_assignees` int unsigned null,
   `num_inventors` int unsigned null,

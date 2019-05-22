@@ -10,7 +10,7 @@ create table `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
 (
   `patent_id` varchar(20) not null,
   `assignee_id` int unsigned null,
-  `persistent_assignee_id` varchar(36) null,
+  `persistent_assignee_id` varchar(64) null,
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
   `city` varchar(128) null,
@@ -276,6 +276,7 @@ where
 
 
 drop table if exists `{{params.reporting_database}}`.`patent`;
+
 create table `{{params.reporting_database}}`.`patent`
 (
   `patent_id` varchar(20) not null,
@@ -289,7 +290,7 @@ create table `{{params.reporting_database}}`.`patent`
   `kind` varchar(10) null,
   `num_claims` smallint unsigned null,
   `firstnamed_assignee_id` int unsigned null,
-  `firstnamed_assignee_persistent_id` varchar(36) null,
+  `firstnamed_assignee_persistent_id` varchar(64) null,
   `firstnamed_assignee_location_id` int unsigned null,
   `firstnamed_assignee_persistent_location_id` varchar(128) null,
   `firstnamed_assignee_city` varchar(128) null,

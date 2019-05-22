@@ -1,13 +1,16 @@
 
-# BEGIN assignee 
+# BEGIN assignee
 
 ##############################################################################################################################################
 
+#this is necessary because otherwise the subqueries wierdly have a different collation
+SET collation_connection = 'utf8mb4_unicode_ci';
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_lastknown_location`;
+
 create table `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
 (
-  `assignee_id` varchar(36) not null,
+  `assignee_id` varchar(64) not null,
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
   `city` varchar(128) null,
@@ -24,10 +27,6 @@ engine=InnoDB;
 # with the most recent patent associated with the assignee.  It is possible for a patent/assignee
 # combination not to have a location, so we will grab the most recent KNOWN location.
 # 320,156 @ 3:51
-insert into `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
-(
-  `assignee_id`, `location_id`, `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`
-)
 select
   t.`assignee_id`,
   tl.`new_location_id`,
@@ -44,18 +43,18 @@ from
       t.`location_id`,
       t.`location_id_transformed`
     from
-      (
-        select
-          @rownum := case when @assignee_id = t.`assignee_id` then @rownum + 1 else 1 end `rownum`,
-          @assignee_id := t.`assignee_id` `assignee_id`,
-	  t.`location_id`,
+      (select ROW_NUMBER() OVER (PARTITION BY t.assignee_id ORDER BY t.`date` desc) AS rownum,
+          t. `assignee_id`,
+    t.`location_id`,
           t.`location_id_transformed`
         from
           (
             select
               ra.`assignee_id`,
               rl.`location_id`,
-	      rl.`location_id_transformed`
+        	rl.`location_id_transformed`,
+               p.`date`,
+       			 p.`id`
             from
               `{{params.raw_database}}`.`rawassignee` ra
               inner join `{{params.raw_database}}`.`patent` p on p.`id` = ra.`patent_id`
@@ -67,22 +66,14 @@ from
               ra.`assignee_id`,
               p.`date` desc,
               p.`id` desc
-          ) t,
-          (select @rownum := 0, @assignee_id := '') r
-      ) t
-    where
-      t.`rownum` < 2
-  ) t
-  left outer join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = 
-
-t.`location_id_transformed`;
-
+          ) t) t where rownum = 1 ) t
+  left join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
+  left join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = t.`location_id_transformed`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_num_patents`;
 create table `{{params.reporting_database}}`.`temp_assignee_num_patents`
 (
-  `assignee_id` varchar(36) not null,
+  `assignee_id` varchar(64) not null,
   `num_patents` int unsigned not null,
   primary key (`assignee_id`)
 )
@@ -102,7 +93,7 @@ group by
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_num_inventors`;
 create table `{{params.reporting_database}}`.`temp_assignee_num_inventors`
 (
-  `assignee_id` varchar(36) not null,
+  `assignee_id` varchar(64) not null,
   `num_inventors` int unsigned not null,
   primary key (`assignee_id`)
 )
@@ -123,7 +114,7 @@ group by
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_years_active`;
 create table `{{params.reporting_database}}`.`temp_assignee_years_active`
 (
-  `assignee_id` varchar(36) not null,
+  `assignee_id` varchar(64) not null,
   `first_seen_date` date null,
   `last_seen_date` date null,
   `actual_years_active` smallint unsigned not null,
@@ -170,10 +161,10 @@ select distinct
 from
   `{{params.raw_database}}`.`patent_assignee` pa
   inner join `{{params.reporting_database}}`.`temp_id_mapping_assignee` t on t.`old_assignee_id` = pa.`assignee_id`
-  left join (select patent_id, assignee_id, min(sequence) sequence from `{{params.raw_database}}`.`rawassignee` group by patent_id, assignee_id) t 
+  left join (select patent_id, assignee_id, min(sequence) sequence from `{{params.raw_database}}`.`rawassignee` group by patent_id, assignee_id) t
 
 on t.`patent_id` = pa.`patent_id` and t.`assignee_id` = pa.`assignee_id`
-  left join `{{params.raw_database}}`.`rawassignee` ra on ra.`patent_id` = t.`patent_id` and ra.`assignee_id` = t.`assignee_id` and ra.`sequence` 
+  left join `{{params.raw_database}}`.`rawassignee` ra on ra.`patent_id` = t.`patent_id` and ra.`assignee_id` = t.`assignee_id` and ra.`sequence`
 
 = t.`sequence`
   left join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
@@ -225,7 +216,7 @@ create table `{{params.reporting_database}}`.`assignee`
   `first_seen_date` date null,
   `last_seen_date` date null,
   `years_active` smallint unsigned not null,
-  `persistent_assignee_id` varchar(36) not null,
+  `persistent_assignee_id` varchar(64) not null,
   primary key (`assignee_id`)
 )
 engine=InnoDB;

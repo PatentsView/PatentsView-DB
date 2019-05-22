@@ -21,6 +21,7 @@ select
   `lawyer_id`, count(distinct `patent_id`)
 from
   `{{params.raw_database}}`.`patent_lawyer`
+  where `lawyer_id` is not null
 group by
   `lawyer_id`;
 
@@ -43,6 +44,7 @@ from
   `{{params.raw_database}}`.`patent_lawyer` ii
   join `{{params.raw_database}}`.`patent_assignee` aa
   on aa.`patent_id` = ii.`patent_id`
+  where `lawyer_id` is not null
 group by
   ii.`lawyer_id`;
 
@@ -65,6 +67,7 @@ select
 from
   `{{params.raw_database}}`.`patent_lawyer` aa
   join `{{params.raw_database}}`.`patent_inventor` ii on ii.patent_id = aa.patent_id
+   where `lawyer_id` is not null
 group by
   aa.`lawyer_id`;
 
@@ -93,6 +96,7 @@ from
   inner join `{{params.reporting_database}}`.`patent` p on p.`patent_id`= pa.`patent_id`
 where
   p.`date` is not null
+and `lawyer_id` is not null
 group by
   pa.`lawyer_id`;
 

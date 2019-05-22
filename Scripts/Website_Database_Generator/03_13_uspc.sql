@@ -115,7 +115,7 @@ engine=InnoDB;
 # 21,191,230 @ 16:54
 # 21,175,812 @ 1:02:06
 # 21,175,812 @ 11:36
-insert into `{{params.reporting_database}}`.`uspc_current`
+insert ignore into `{{params.reporting_database}}`.`uspc_current`
 (
   `patent_id`, `sequence`, `mainclass_id`,
   `mainclass_title`, `subclass_id`, `subclass_title`,
@@ -172,8 +172,8 @@ select
   ifnull(case when tmcac.`actual_years_active` < 1 then 1 else tmcac.`actual_years_active` end, 0)
 from
   (select distinct `patent_id`, `mainclass_id` from `{{params.reporting_database}}`.`uspc_current`) u
-  left outer join `{{params.reporting_database}}`.`temp_mainclass_current_title` m on m.`id` = u.`mainclass_id`
-  left outer join `{{params.reporting_database}}`.`temp_mainclass_current_aggregate_counts` tmcac on tmcac.`mainclass_id` = u.`mainclass_id`;
+  left join `{{params.reporting_database}}`.`temp_mainclass_current_title` m on m.`id` = u.`mainclass_id`
+  left join `{{params.reporting_database}}`.`temp_mainclass_current_aggregate_counts` tmcac on tmcac.`mainclass_id` = u.`mainclass_id`;
 
 
 # END uspc_current 

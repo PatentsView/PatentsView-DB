@@ -96,8 +96,8 @@ def validate_and_execute(filename, **context):
                                                             "warning")
                     raise Exception(message)
 
-                # Uncomment this below section to run data less table creation process as test run
-                continue
+                # # Uncomment this below section to run data less table creation process as test run
+                # continue
 
         # If empty line move on to next sql
         if not single_line_query.strip():

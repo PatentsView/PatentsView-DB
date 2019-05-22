@@ -9,10 +9,10 @@ create table `{{params.reporting_database}}`.`foreignpriority`
 (
   `patent_id` varchar(20) not null,
   `sequence` int not null,
-  `foreign_doc_number` varchar(20) null,
+  `foreign_doc_number` varchar(64) null,
   `date` date null,
   `country` varchar(64) null,
-  `kind` varchar(10) null,
+  `kind` varchar(24) null,
   primary key (`patent_id`, `sequence`)
 )
 engine=InnoDB;

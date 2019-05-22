@@ -9,7 +9,7 @@ create table `{{params.reporting_database}}`.`usapplicationcitation`
 (
   `citing_patent_id` varchar(20) not null,
   `sequence` int not null,
-  `cited_application_id` varchar(20) null,
+  `cited_application_id` varchar(36) null,
   `date` date null,
   `name` varchar(64) null,
   `kind` varchar(10) null,

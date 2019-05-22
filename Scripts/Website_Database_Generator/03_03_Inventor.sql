@@ -4,6 +4,8 @@
 ##############################################################################################################################################
 
 
+SET collation_connection = 'utf8mb4_unicode_ci';
+
 drop table if exists `{{params.reporting_database}}`.`temp_inventor_lastknown_location`;
 create table `{{params.reporting_database}}`.`temp_inventor_lastknown_location`
 (
@@ -24,10 +26,9 @@ engine=InnoDB;
 # with the most recent patent associated with the inventor.  It is possible for a patent/inventor
 # combination not to have a location, so we will grab the most recent KNOWN location.
 # 3,437,668 @ 22:05
+
+
 insert into `{{params.reporting_database}}`.`temp_inventor_lastknown_location`
-(
-  `inventor_id`, `location_id`, `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`
-)
 select
   t.`inventor_id`,
   tl.`new_location_id`,
@@ -37,17 +38,12 @@ select
   nullif(trim(l.`country`), ''),
   l.`latitude`,
   l.`longitude`
-from
-  (
-    select
-      t.`inventor_id`,
-      t.`location_id`,
-      t.`location_id_transformed`
-    from
-      (
-        select
-          @rownum := case when @inventor_id = t.`inventor_id` then @rownum + 1 else 1 end `rownum`,
-          @inventor_id := t.`inventor_id` `inventor_id`,
+  
+  from (select * from 
+
+	(select
+          ROW_NUMBER() OVER (PARTITION BY t.inventor_id ORDER BY t.`date` desc) AS rownum,
+          t.`inventor_id`,
           t.`location_id`,
 	  t.`location_id_transformed`
         from
@@ -55,7 +51,9 @@ from
             select
               ri.`inventor_id`,
               rl.`location_id`,
-	      rl.`location_id_transformed`
+	      rl.`location_id_transformed`,
+	      p.`date`,
+	      p.`id`
             from
               `{{params.raw_database}}`.`rawinventor` ri
               inner join `{{params.raw_database}}`.`patent` p on p.`id` = ri.`patent_id`
@@ -66,17 +64,11 @@ from
             order by
               ri.`inventor_id`,
               p.`date` desc,
-              p.`id` desc
-          ) t,
-          (select @rownum := 0, @inventor_id := '') r
-      ) t
-    where
-      t.`rownum` < 2
-  ) t
-  left outer join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = 
+              p.`id` desc 
+          ) t) t where t.rownum = 1 ) t          
+       left join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
+       left join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = t.`location_id_transformed` ;
 
-t.`location_id_transformed`;
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_inventor_num_patents`;

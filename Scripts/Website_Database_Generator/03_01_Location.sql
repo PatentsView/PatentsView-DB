@@ -132,7 +132,7 @@ create table `{{params.reporting_database}}`.`location`
   `country` varchar(10) null,
   `county` varchar(60) null,
   `state_fips` varchar(2) null,
-  `county_fips` varchar(3) null,
+  `county_fips` varchar(6) null,
   `latitude` float null,
   `longitude` float null,
   `num_assignees` int unsigned not null,

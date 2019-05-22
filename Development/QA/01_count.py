@@ -2,12 +2,11 @@
 import pandas as pd
 import os
 import configparser
-import sys
-sys.path.append('/project/Development')
-from helpers import general_helpers
+project_home = os.environ['PACKAGE_HOME']
 import configparser
 config = configparser.ConfigParser()
-config.read('/project/Development/config.ini')
+config.read(project_home + '/Development/config.ini')
+from Development.helpers import general_helpers
 host = config['DATABASE']['HOST']
 username = config['DATABASE']['USERNAME']
 password = config['DATABASE']['PASSWORD']
@@ -16,7 +15,7 @@ old_database = config['DATABASE']['OLD_DB']
 temporary_upload = config['DATABASE']['TEMP_UPLOAD_DB']
 previous_qa_loc = config['FOLDERS']['OLD_QA_LOC']
 new_qa_loc = config['FOLDERS']['NEW_QA_LOC']
-latest_expected_date = config['CONSTANTS']['LATEST_DATE']
+
 
 #Counts- creating count description
 def create_count_description(old_db_count, new_db_count, table, min_inc = 1.01, max_inc = 1.1):
@@ -48,7 +47,7 @@ def create_count_description(old_db_count, new_db_count, table, min_inc = 1.01, 
         
 #Counts- Get counts
 def get_counts(previous_qa_loc, new_qa_loc, new_database):
-    counts = pd.read_excel('{}/1_table_counts.xlsx'.format(previous_qa_loc))
+    counts = pd.read_csv('{}/01_counts.csv'.format(previous_qa_loc))
     conn = engine.connect()
     conn.execute('use {}'.format(new_database))
     new_counts = []
@@ -61,10 +60,15 @@ def get_counts(previous_qa_loc, new_qa_loc, new_database):
     return new_counts
 #Counts- write to file
 def make_file(new_counts, previous_qa_loc, new_qa_loc, new_database):
-    counts = pd.read_excel('{}/1_table_counts.xlsx'.format(previous_qa_loc))
+    counts = pd.read_csv('{}/01_counts.csv'.format(previous_qa_loc))
     counts[new_database] = new_counts
     del counts['Description']
-    #the last row of the table is now the most recent previous database!    counts['Description'] = counts.apply(lambda row: create_count_description(row[counts.columns[-3]], row[new_database],row['Table']), axis=1)
+    #the last row of the table is now the most recent previous database!
+    counts['Description'] = counts.apply(lambda row: create_count_description(row[counts.columns[-3]], row[new_database],row['Table']), axis=1)
+    cols = list(counts.columns)
+    cols.pop(cols.index('Comments'))
+    cols += ['Comments']
+    data = counts[cols]
     counts.to_csv('{}/01_counts.csv'.format(new_qa_loc), index = False)
     
 
@@ -73,6 +77,6 @@ if __name__ == '__main__':
     if not os.path.exists(new_qa_loc):
         os.mkdir(new_qa_loc)
     engine = general_helpers.connect_to_db(host, username, password, temporary_upload)
-    data = pd.read_excel("{}/1_table_counts.xlsx".format(previous_qa_loc))
+    data = pd.read_csv("{}/01_counts.csv".format(previous_qa_loc))
     new_counts = get_counts(previous_qa_loc, new_qa_loc, new_database)
     make_file(new_counts,previous_qa_loc, new_qa_loc, new_database)

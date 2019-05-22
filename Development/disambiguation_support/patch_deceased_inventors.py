@@ -1,12 +1,16 @@
 import csv
-output_folder = '/project/August_2018/disambig_out'
+import os
+project_home = os.environ['PACKAGE_HOME']
+from Development.helpers import general_helpers
 import configparser
 config = configparser.ConfigParser()
-config.read('/project/Development/config.ini')
+config.read(project_home + '/Development/config.ini')
 import sys
-sys.path.append('/project/Development')
-from helpers import general_helpers
+from Development.helpers import general_helpers
 db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
+
+output_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_out')
+
 
 cursor = db_con.connect()
 col_data = cursor.execute('show columns from rawinventor')

@@ -18,3 +18,4 @@ sqlparse
 jupyter
 fuzzywuzzy
 python-Levenshtein
+textdistance

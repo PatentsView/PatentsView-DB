@@ -1,5 +1,5 @@
 
-# BEGIN assignee id mapping 
+# BEGIN assignee id mapping
 
 ###################################################################################################################################
 
@@ -8,7 +8,7 @@
 drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_assignee`;
 create table `{{params.reporting_database}}`.`temp_id_mapping_assignee`
 (
-  `old_assignee_id` varchar(36) not null,
+  `old_assignee_id` varchar(72) not null,
   `new_assignee_id` int unsigned not null auto_increment,
   primary key (`old_assignee_id`),
   unique index `ak_temp_id_mapping_assignee` (`new_assignee_id`)
@@ -27,12 +27,12 @@ from
   `{{params.raw_database}}`.`patent_assignee` pa;
 
 
-# END assignee id mapping 
+# END assignee id mapping
 
 #####################################################################################################################################
 
 
-# BEGIN inventor id mapping 
+# BEGIN inventor id mapping
 
 ###################################################################################################################################
 
@@ -90,7 +90,8 @@ insert into
 select distinct
   `lawyer_id`
 from
-  `{{params.raw_database}}`.`patent_lawyer`;
+  `{{params.raw_database}}`.`patent_lawyer` 
+  where lawyer_id is not null and lawyer_id !=  '';
 
 
 # END lawyer id mapping 
@@ -171,7 +172,7 @@ select distinct
 from
   `{{params.raw_database}}`.`rawlocation`
 where
-  `location_id_transformed` is not null and `location_id_transformed` != '';
+  `location_id_transformed` is not null and `location_id_transformed` != '' and `location_id_transformed`!='undisambiguated';
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_location`;
@@ -193,7 +194,7 @@ select distinct
   rl.`location_id`,
   t.`new_location_id`
 from
-  (select distinct location_id, location_id_transformed from `{{params.raw_database}}`.`rawlocation` where location_id != '' and location_id is not null) rl
+  (select distinct location_id, location_id_transformed from `{{params.raw_database}}`.`rawlocation` where location_id != '' and location_id is not null and `location_id_transformed`!='undisambiguated') rl
   inner join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` t on
     t.`old_location_id_transformed` = rl.`location_id_transformed`;
 

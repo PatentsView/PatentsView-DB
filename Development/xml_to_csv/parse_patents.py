@@ -4,16 +4,18 @@ import csv
 import re
 import pandas as pd
 import simplejson as json
+project_home = os.environ['PACKAGE_HOME']
+from Development.helpers import output, xml_helpers, general_helpers
 
-sys.path.append('/project/Development')
-from helpers import output, xml_helpers, general_helpers
+
 from lxml import etree
 from collections import defaultdict
 import string
 import random
 import multiprocessing
-import configparser
 import copy
+import configparser
+
 
 def get_results(patents, field_dictionary): 
     results = {}
@@ -113,7 +115,7 @@ def get_results(patents, field_dictionary):
 
             rel_app_text_data = text_data['Other Patent Relations']
             if rel_app_text_data !=[]:
-                results['rel_app_text'].append([general_helpers.id_generator(), patent_id, rel_app_text_data])
+                results['rel_app_text'].append([general_helpers.id_generator(), patent_id, rel_app_text_data, 0])
                 
             government_interest_data = text_data['Government Interest']
             if government_interest_data !=[]:
@@ -248,7 +250,7 @@ def get_results(patents, field_dictionary):
                 is_app = True #indicator for whether something being cited is a patent application
 
                 if cited_doc_num:
-                    if re.match(r'^[A-Z]*\d+$', cited_doc_num): #basically if there is anything other than number and digits its an application
+                    if re.match(r'^[A-Z]*\.?\s?\d+$', cited_doc_num): #basically if there is anything other than number and digits its an application
                         num = re.findall('\d+', cited_doc_num)
                         num = num[0] #turns it from list to string
                         if num[0] == '0': #drop leading zeros
@@ -418,9 +420,8 @@ def main_process(data_file, outloc, field_dictionary):
 
 
 if __name__ == '__main__':
-    import configparser
     config = configparser.ConfigParser()
-    config.read('/project/Development/config.ini')
+    config.read(project_home + '/Development/config.ini')
     #TO run Everything:
     with open('{}/field_dict.json'.format(config['FOLDERS']['PERSISTENT_FILES'])) as myfile:
         field_dictionary = json.load(myfile)

@@ -28,7 +28,7 @@ group by
 # END assignee_inventor ######################################################################################################################
 
 
-# BEGIN inventor_coinventor 
+# BEGIN inventor_coinventor
 
 ######################################################################################################################
 
@@ -57,7 +57,7 @@ group by
 # END inventor_coinventor ######################################################################################################################
 
 
-# BEGIN inventor_cpc_subsection 
+# BEGIN inventor_cpc_subsection
 
 ######################################################################################################################
 
@@ -86,7 +86,7 @@ group by
   pi.inventor_id, c.subsection_id;
 
 
-# END inventor_cpc_subsection 
+# END inventor_cpc_subsection
 
 ######################################################################################################################
 
@@ -120,12 +120,12 @@ group by
   pi.inventor_id, c.group_id;
 
 
-# END inventor_cpc_group 
+# END inventor_cpc_group
 
 ######################################################################################################################
 
 
-# BEGIN inventor_nber_subcategory 
+# BEGIN inventor_nber_subcategory
 
 ######################################################################################################################
 
@@ -153,12 +153,12 @@ group by
   pi.inventor_id, n.subcategory_id;
 
 
-# END inventor_nber_subcategory 
+# END inventor_nber_subcategory
 
 ######################################################################################################################
 
 
-# BEGIN inventor_uspc_mainclass 
+# BEGIN inventor_uspc_mainclass
 
 ######################################################################################################################
 
@@ -184,7 +184,7 @@ group by
   pi.inventor_id, u.mainclass_id;
 
 
-# END inventor_uspc_mainclass 
+# END inventor_uspc_mainclass
 
 ######################################################################################################################
 
@@ -215,7 +215,7 @@ group by
 # END inventor_year ######################################################################################################################
 
 
-# BEGIN assignee_cpc_subsection 
+# BEGIN assignee_cpc_subsection
 
 ######################################################################################################################
 
@@ -244,7 +244,7 @@ group by
   pa.assignee_id, c.subsection_id;
 
 
-# END assignee_cpc_subsection 
+# END assignee_cpc_subsection
 
 ######################################################################################################################
 
@@ -278,11 +278,11 @@ group by
   pa.assignee_id, c.group_id;
 
 
-# END assignee_cpc_group 
+# END assignee_cpc_group
 
 ######################################################################################################################
 
-# BEGIN assignee_nber_subcategory 
+# BEGIN assignee_nber_subcategory
 
 ######################################################################################################################
 
@@ -310,12 +310,12 @@ group by
   pa.assignee_id, n.subcategory_id;
 
 
-# END assignee_nber_subcategory 
+# END assignee_nber_subcategory
 
 ######################################################################################################################
 
 
-# BEGIN assignee_uspc_mainclass 
+# BEGIN assignee_uspc_mainclass
 
 ######################################################################################################################
 
@@ -341,7 +341,7 @@ group by
   pa.assignee_id, u.mainclass_id;
 
 
-# END assignee_uspc_mainclass 
+# END assignee_uspc_mainclass
 
 ######################################################################################################################
 
@@ -373,7 +373,7 @@ group by
 # END assignee_year ######################################################################################################################
 
 
-# BEGIN location_assignee update num_patents 
+# BEGIN location_assignee update num_patents
 
 ###################################################################################################################################
 
@@ -394,12 +394,12 @@ set
   la.`num_patents` = pa.`num_patents`;
 
 
-# END location_assignee update num_patents 
+# END location_assignee update num_patents
 
 ###################################################################################################################################
 
 
-# BEGIN location_inventor update num_patents 
+# BEGIN location_inventor update num_patents
 
 ###################################################################################################################################
 
@@ -420,12 +420,12 @@ set
   li.`num_patents` = pii.`num_patents`;
 
 
-# END location_assignee update num_patents 
+# END location_assignee update num_patents
 
 ###################################################################################################################################
 
 
-# BEGIN location_cpc_subsection 
+# BEGIN location_cpc_subsection
 
 ######################################################################################################################
 
@@ -452,11 +452,11 @@ group by
   tlp.`location_id`, cpc.`subsection_id`;
 
 
-# END location_cpc_subsection 
+# END location_cpc_subsection
 
 ######################################################################################################################
 
-# BEGIN location_cpc_group 
+# BEGIN location_cpc_group
 
 ######################################################################################################################
 
@@ -488,7 +488,7 @@ group by
 ######################################################################################################################
 
 
-# BEGIN location_uspc_mainclass 
+# BEGIN location_uspc_mainclass
 
 ######################################################################################################################
 
@@ -515,12 +515,12 @@ group by
   tlp.`location_id`, uspc.`mainclass_id`;
 
 
-# END location_uspc_mainclass 
+# END location_uspc_mainclass
 
 ######################################################################################################################
 
 
-# BEGIN location_nber_subcategory 
+# BEGIN location_nber_subcategory
 
 ######################################################################################################################
 
@@ -535,7 +535,7 @@ create table `{{params.reporting_database}}`.`location_nber_subcategory`
 engine=InnoDB;
 
 
-# 
+#
 insert into `{{params.reporting_database}}`.`location_nber_subcategory`
   (`location_id`, `subcategory_id`, `num_patents`)
 select
@@ -547,7 +547,7 @@ group by
   tlp.`location_id`, nber.`subcategory_id`;
 
 
-# END location_nber_subcategory 
+# END location_nber_subcategory
 
 ######################################################################################################################
 
