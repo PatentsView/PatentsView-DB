@@ -34,14 +34,14 @@ db_con = engine.connect()
 # print("getting data from temp_rawinv_persistinvdisambig....")
 # print('making lookup.....with new logic')
 # print('...............................')
-#########################################################################################
+# ########################################################################################
 # limit = 300000
 # offset = 0
 # batch_counter = 0
 # blanks = ['','','','','']
 
 
-# # 16,788,011 rows so 55.96 --> ~ 56 batches 
+# # 16,788,011 rows so 55.04 --> ~ 56 batches 
 # while True:
 # 	batch_counter+=1
 # 	print('Next iteration...')
@@ -73,16 +73,24 @@ db_con = engine.connect()
 # 	offset = offset + limit
 
 
-print('passes making persistent_data.tsv')
-print('...............................')
+# print('passes making inventor_persistent.tsv')
+# print('...............................')
 
 
 #########################################################################################
+print('reading in inventor_persistent.tsv')
+print('...............................')
 
-data = pd.read_csv('{}/inventor_persistent.tsv'.format(disambig_folder), encoding = 'utf-8', delimiter = '\t')
 
 #db_con.execute('alter table persistent_inventor_disambig rename temp_persistent_inventor_disambig_backup')
+db_con.execute('drop table if exists persistent_inventor_disambig')
 db_con.execute('create table persistent_inventor_disambig like temp_persistent_inventor_disambig_backup')
 
-data.to_sql(con=db_con, name = 'persistent_inventor_disambig', index = False, if_exists='append') #append keeps the indexes
+chunk_size = 300000
+data_chunk = pd.read_csv('{}/inventor_persistent.tsv'.format(disambig_folder), encoding = 'utf-8', delimiter = '\t', chunksize=chunk_size)
+print("now processing")
+
+for chunk in tqdm.tqdm(data_chunk, desc="persistent_inventor_disambig - batch inserts:"):
+    chunk.to_sql(con=db_con, name = 'persistent_inventor_disambig', index = False, if_exists='append') #append keeps the indexes
+
 db_con.execute('create index {0}_ix on persistent_inventor_disambig ({0});'.format(new_id_col))
