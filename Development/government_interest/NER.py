@@ -27,6 +27,8 @@ def prepare_input_files(working_folder, merged_csv_output):
     all_gi_data = pd.DataFrame()
     for folder in os.listdir(input_data):
         all_gi_data = all_gi_data.append(pd.read_csv('{}/{}/government_interest.csv'.format(input_data, folder), delimiter = '\t'))
+    # reset index after appending all data together
+    all_gi_data.reset_index(inplace=True)
     all_gi_data['heading'] = all_gi_data['gi_statement'].apply(get_heading)
     all_gi_data['gi_statement'] = all_gi_data.apply(lambda row : row['gi_statement'][len(row['heading']):], axis = 1)
     all_gi_data = all_gi_data[['patent_id', 'heading', 'gi_statement']]
