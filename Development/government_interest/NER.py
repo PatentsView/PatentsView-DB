@@ -32,6 +32,22 @@ def prepare_input_files(working_folder, merged_csv_output):
     all_gi_data['heading'] = all_gi_data['gi_statement'].apply(get_heading)
     all_gi_data['gi_statement'] = all_gi_data.apply(lambda row : row['gi_statement'][len(row['heading']):], axis = 1)
     all_gi_data = all_gi_data[['patent_id', 'heading', 'gi_statement']]
+    
+    # eliminate rows that have not applicable in the gi statement
+    idx_rm_na = all_gi_data[all_gi_data['gi_statement'].str.contains('Not applicable', flags=re.IGNORECASE, regex=True) == True].index.tolist()
+
+    # eliminate rows that have blanks in the gi statement
+    idx_rm_empty = all_gi_data[all_gi_data['gi_statement'] == ''].index.tolist()
+    
+    # eliminate rows that have statements ~ to "No federal government funds were used in researching or developing this invention."
+    idx_rm_nofunds = all_gi_data[all_gi_data['gi_statement'].str.contains('No federal government funds', flags=re.IGNORECASE, regex=True) == True].index.tolist()
+
+    all_to_rm = idx_rm_na + idx_rm_empty + idx_rm_nofunds
+    
+    all_gi_data.drop(all_to_rm, inplace=True)
+
+    all_gi_data.reset_index(inplace=True)
+    
     all_gi_data.to_csv(merged_csv_output, index = False)
     return all_gi_data
 
