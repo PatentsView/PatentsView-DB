@@ -303,6 +303,18 @@ rep_tbl_2 = SQLTemplatedPythonOperator(
     params=database_name_config
 )
 
+half_join_table = SQLTemplatedPythonOperator(
+    task_id='half_join_table',
+    provide_context=True,
+    python_callable=validate_query.validate_and_execute,
+    dag=reporting_db_dag,
+    op_kwargs={'filename': '07_half_join', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
+    templates_dict={'source_sql': '07_half_join.sql'},
+    templates_exts=template_extension_config,
+    params=database_name_config
+)
+
 govt_interest.set_upstream(db_creation)
 claims.set_upstream(db_creation)
 id_mappings.set_upstream(db_creation)
@@ -344,3 +356,5 @@ rep_tbl_1.set_upstream(uspc)
 
 idx.set_upstream(rep_tbl_1)
 rep_tbl_2.set_upstream(idx)
+
+half_join_table.set_upstream(rep_tbl_2)
