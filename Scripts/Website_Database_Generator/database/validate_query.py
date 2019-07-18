@@ -89,13 +89,11 @@ def validate_and_execute(filename=None, slack_channel=None, slack_client=None, s
             if parsed_statement.get_type().lower() == 'insert':
                 # Check if query plan includes full table scan, if it does send an alert
                 query_plan_check=database_helpers.check_query_plan(db_con, single_line_query)
-                if query_plan_check["full_table"]:
+                if not query_plan_check:
                     message = "Query execution plan involves full table scan: ```" + single_line_query + "```"
                     general_helpers.send_slack_notification(message, slack_client, slack_channel,
                                                             "*Reporting DB (" + filename + ")* ",
                                                             "warning")
-                    print(type(query_plan_check["plan_data"]))
-                    print(type(query_plan_check["plan_data"][0]))
                     print(message)
                     # raise Exception(message)
                 #
