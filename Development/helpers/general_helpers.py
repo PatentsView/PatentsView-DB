@@ -6,6 +6,7 @@ import re,os,random,string,codecs
 import requests
 from clint.textui import progress
 #from . import slack_client, slack_channel
+from itertools import (takewhile,repeat)
 
 def chunks(l,n):
     '''Yield successive n-sized chunks from l. Useful for multi-processing'''
