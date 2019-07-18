@@ -66,7 +66,7 @@ govt_interest = SQLTemplatedPythonOperator(
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={'filename': '01_01_Govt_Interest', 'slack_client': slack_client, 'slack_channel': slack_channel,
-               "schema_only": schema_only},
+               "schema_only": schema_only, "fk_check": False},
     templates_dict={'source_sql': '01_01_Govt_Interest.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -336,7 +336,6 @@ cpc.set_upstream(patent)
 ipcr.set_upstream(patent)
 nber.set_upstream(patent)
 
-
 uspc.set_upstream(location)
 uspc.set_upstream(assignee)
 uspc.set_upstream(inventor)
@@ -350,9 +349,7 @@ uspc.set_upstream(cpc)
 uspc.set_upstream(ipcr)
 uspc.set_upstream(nber)
 
-
 rep_tbl_1.set_upstream(uspc)
-
 
 idx.set_upstream(rep_tbl_1)
 rep_tbl_2.set_upstream(idx)

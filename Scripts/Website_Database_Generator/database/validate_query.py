@@ -36,7 +36,7 @@ def db_and_table_as_array(single_line_query):
     return collation_check_parameters
 
 
-def validate_and_execute(filename=None, slack_channel=None, slack_client=None, schema_only=False, drop_existing=True, **context):
+def validate_and_execute(filename=None, slack_channel=None, slack_client=None, schema_only=False, drop_existing=True, fk_check=True, **context):
     print(filename)
     print(slack_channel)
     print(slack_client)
@@ -57,6 +57,8 @@ def validate_and_execute(filename=None, slack_channel=None, slack_client=None, s
     # Set up database connection
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'],
                                            config['DATABASE']['PASSWORD'], "information_schema").connect()
+    if not fk_check:
+        db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
     general_helpers.send_slack_notification(
        "Executing Query File: `" + filename + "`", slack_client, slack_channel, "*Reporting DB (" + filename + ") *",
@@ -86,11 +88,14 @@ def validate_and_execute(filename=None, slack_channel=None, slack_client=None, s
             # We perform sanity checks on those queries
             if parsed_statement.get_type().lower() == 'insert':
                 # Check if query plan includes full table scan, if it does send an alert
-                if not database_helpers.check_query_plan(db_con, single_line_query):
+                query_plan_check=database_helpers.check_query_plan(db_con, single_line_query)
+                if query_plan_check["full_table"]:
                     message = "Query execution plan involves full table scan: ```" + single_line_query + "```"
                     general_helpers.send_slack_notification(message, slack_client, slack_channel,
                                                             "*Reporting DB (" + filename + ")* ",
                                                             "warning")
+                    print(type(query_plan_check["plan_data"]))
+                    print(type(query_plan_check["plan_data"][0]))
                     print(message)
                     # raise Exception(message)
                 #
@@ -120,6 +125,8 @@ def validate_and_execute(filename=None, slack_channel=None, slack_client=None, s
                 "*Reporting DB (" + filename + ")* ",
                 "error")
             raise e
+    if not fk_check:
+        db_con.execute("SET FOREIGN_KEY_CHECKS=1")
     db_con.close()
     general_helpers.send_slack_notification(
         "Execution for Query File: `" + filename + "` is complete", slack_client, slack_channel,
