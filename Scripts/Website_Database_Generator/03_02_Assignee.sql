@@ -27,6 +27,10 @@ engine=InnoDB;
 # with the most recent patent associated with the assignee.  It is possible for a patent/assignee
 # combination not to have a location, so we will grab the most recent KNOWN location.
 # 320,156 @ 3:51
+insert into `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
+(
+  `assignee_id`, `location_id`, `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`
+)
 select
   t.`assignee_id`,
   tl.`new_location_id`,
