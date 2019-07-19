@@ -9,6 +9,10 @@ mkdir -p $OUTPUT_LOCATION
 
 for table in rawinventor patent cpc_current ipcr nber rawassignee uspc_current rawlawyer rawlocation 
 do
+    if [ -e "$OUTPUT_LOCATION/$table.tsv" ]
+    then
+	continue
+    fi
     echo "$table"
     # Set the SELECT statement that will create the table
     case "$table" in 
@@ -20,7 +24,7 @@ do
         (*) selectStatement="SELECT * FROM $table"
     esac
 
-    echo "$selectStatement" | mysql --defaults-file="$CONF_FILE" --quick >"$OUTPUT_LOCATION/$table.tsv"
+    echo "$selectStatement" | mysql --defaults-file="$CONF_FILE" >"$OUTPUT_LOCATION/$table.tsv"
 
 done
 
