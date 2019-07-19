@@ -53,7 +53,7 @@ def create_dict(pre_manual, post_manual, persistent_files):
     existing_plus_manual = pd.concat([lookup_data, existing_lookup])
     existing_plus_manual = existing_plus_manual.drop_duplicates()
     #TODO: uncomment this
-    #existing_plus_manual.to_csv(persistent_files + '/existing_orgs_lookup.csv', index = False)
+    existing_plus_manual.to_csv(persistent_files + '/existing_orgs_lookup.csv', index = False)
 
     #automatically matched ones are not added to the persistent lookup
     #this is to prevent errors propagating and being hard to fix
@@ -146,6 +146,7 @@ if __name__ == '__main__':
     username = config['DATABASE']['USERNAME']
     password = config['DATABASE']['PASSWORD']
     new_database = config['DATABASE']['NEW_DB']
+
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
