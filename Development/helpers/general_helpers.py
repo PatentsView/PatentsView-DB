@@ -5,7 +5,6 @@ import string
 import re,os,random,string,codecs
 import requests
 from clint.textui import progress
-from . import slack_client, slack_channel
 from itertools import (takewhile,repeat)
 
 def chunks(l,n):

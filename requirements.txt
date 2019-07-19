@@ -13,9 +13,10 @@ clint
 mysqlclient
 sqlalchemy
 regex
-SlackClient
+slackclient==1.3.1
 sqlparse
 jupyter
 fuzzywuzzy
 python-Levenshtein
 textdistance
+Flask==1.0.4

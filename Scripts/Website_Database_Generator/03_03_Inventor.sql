@@ -167,8 +167,7 @@ from
   left outer join (select patent_id, inventor_id, min(sequence) sequence from `{{params.raw_database}}`.`rawinventor` group by patent_id, inventor_id) t 
 
 on t.`patent_id` = pii.`patent_id` and t.`inventor_id` = pii.`inventor_id`
-  left outer join `{{params.raw_database}}`.`rawinventor` ri on ri.`patent_id` = t.`patent_id` and ri.`inventor_id` = t.`inventor_id` and ri.`sequence` 
-
+  left outer join `{{params.raw_database}}`.`rawinventor` ri on ri.`patent_id` = t.`patent_id` and ri.`inventor_id` = t.`inventor_id` and ri.`sequence`
 = t.`sequence`
   left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`location_id`;
@@ -202,8 +201,8 @@ drop table if exists `{{params.reporting_database}}`.`inventor`;
 create table `{{params.reporting_database}}`.`inventor`
 (
   `inventor_id` int unsigned not null,
-  `name_first` varchar(64) null,
-  `name_last` varchar(64) null,
+  `name_first` varchar(128) null,
+  `name_last` varchar(128) null,
   `num_patents` int unsigned not null,
   `num_assignees` int unsigned not null,
   `lastknown_location_id` int unsigned null,
