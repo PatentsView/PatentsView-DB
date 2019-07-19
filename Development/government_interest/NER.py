@@ -39,8 +39,8 @@ def prepare_input_files(working_folder, merged_csv_output):
     # eliminate rows that have blanks in the gi statement
     idx_rm_empty = all_gi_data[all_gi_data['gi_statement'] == ''].index.tolist()
     
-    # eliminate rows that have statements ~ to "No federal government funds were used in researching or developing this invention."
-    idx_rm_nofunds = all_gi_data[all_gi_data['gi_statement'].str.contains('No federal government funds', flags=re.IGNORECASE, regex=True) == True].index.tolist()
+    # eliminate rows that have statements ~ to "No federal government funds were used in researching or developing this invention..."
+    idx_rm_nofunds = all_gi_data[all_gi_data['gi_statement'].str.contains('No federal government funds|No federal funds|without the sponsorship or funding', flags=re.IGNORECASE, regex=True) == True].index.tolist()
 
     all_to_rm = idx_rm_na + idx_rm_empty + idx_rm_nofunds
     
