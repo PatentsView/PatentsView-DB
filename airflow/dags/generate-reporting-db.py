@@ -71,17 +71,17 @@ govt_interest = SQLTemplatedPythonOperator(
     templates_exts=template_extension_config,
     params=database_name_config
 )
-claims = SQLTemplatedPythonOperator(
-    task_id='Claims_Table',
-    provide_context=True,
-    python_callable=validate_query.validate_and_execute,
-    dag=reporting_db_dag,
-    op_kwargs={'filename': '01_02_Claims', 'slack_client': slack_client, 'slack_channel': slack_channel,
-               "schema_only": schema_only},
-    templates_dict={'source_sql': '01_02_Claims.sql'},
-    templates_exts=template_extension_config,
-    params=database_name_config
-)
+# claims = SQLTemplatedPythonOperator(
+#     task_id='Claims_Table',
+#     provide_context=True,
+#     python_callable=validate_query.validate_and_execute,
+#     dag=reporting_db_dag,
+#     op_kwargs={'filename': '01_02_Claims', 'slack_client': slack_client, 'slack_channel': slack_channel,
+#                "schema_only": schema_only},
+#     templates_dict={'source_sql': '01_02_Claims.sql'},
+#     templates_exts=template_extension_config,
+#     params=database_name_config
+# )
 id_mappings = SQLTemplatedPythonOperator(
     task_id='ID_Mappings',
     provide_context=True,
@@ -316,7 +316,7 @@ half_join_table = SQLTemplatedPythonOperator(
 )
 
 govt_interest.set_upstream(db_creation)
-claims.set_upstream(db_creation)
+# claims.set_upstream(db_creation)
 id_mappings.set_upstream(db_creation)
 application.set_upstream(db_creation)
 wipo.set_upstream(db_creation)
