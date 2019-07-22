@@ -10,6 +10,22 @@ import sys
 project_home = os.environ['PACKAGE_HOME']
 from Development.helpers import general_helpers
 
+# Requires: solid matched organizations dataframe
+# Modifies: list of solid matches
+# Effects: if solid match has non_government as extra tag, removes non_government tag
+def non_gov_check(matched_df):
+    # loop through matched_df rows
+    for index, row in matched_df.iterrows():
+        solid_values = row['solid'].split('|')
+        # check list of solid matches
+        if len(solid_values) > 1 and 'non_government' in solid_values:
+            # if solid match found and non_government, remove non_government
+            solid_values.remove('non_government')
+            matched_df.at[index,'solid'] = '|'.join(solid_values)
+
+    return matched_df
+
+
 def clean_matchlist(match_list):
     if len(match_list) == 0:
         match_list = np.nan
@@ -90,7 +106,7 @@ def get_data(persistent_files, pre_manual):
     
     return existing_lookup, govt_acc_dict, organizations
     
-def perform_lookups(existing_lookup, govt_acc_dict, organizations, post_manual, manual_inputs):
+def perform_lookups(existing_lookup, govt_acc_dict, organizations, manual_inputs):
     all_solid = []
     all_possible = []
     for org in organizations:#kinda slow, ~7 minutes for 6 months of data
@@ -100,7 +116,11 @@ def perform_lookups(existing_lookup, govt_acc_dict, organizations, post_manual, 
     results = pd.DataFrame([organizations, all_solid, all_possible]).T
     results.columns = ['organization', 'solid', 'possible']
     matched = results[~pd.isnull(results['solid'])][['organization', 'solid']]
-    matched.to_csv('{}/automatically_matched.csv'.format(post_manual), index = False)
+    
+    # Need to remove non_government from solid matched orgs (avoid post_manual.py issues)
+    matched = non_gov_check(matched)
+    matched.to_csv('{}/automatically_matched.csv'.format(manual_inputs), index = False)
+    
     to_check = results[~pd.isnull(results['possible'])][['organization', 'possible']]
     to_check['match'] = ''
     to_check['new'] = ''
@@ -125,6 +145,6 @@ if __name__ == '__main__':
             os.makedirs(path)
 
     existing_lookup, govt_acc_dict, organizations = get_data(persistent_files, pre_manual)
-    perform_lookups(existing_lookup, govt_acc_dict, organizations, post_manual, manual_inputs)
+    perform_lookups(existing_lookup, govt_acc_dict, organizations, manual_inputs)
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
     get_orgs(db_con, manual_inputs)
