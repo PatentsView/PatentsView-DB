@@ -20,3 +20,4 @@ fuzzywuzzy
 python-Levenshtein
 textdistance
 Flask==1.0.4
+unidecode
