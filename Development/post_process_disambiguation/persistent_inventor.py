@@ -4,7 +4,8 @@ import csv
 import sys
 import pandas as pd
 import tqdm 
-import time 
+import time
+import sqlalchemy
 
 project_home = os.environ['PACKAGE_HOME']
 from Development.helpers import general_helpers
@@ -14,6 +15,7 @@ config = configparser.ConfigParser()
 config.read(project_home + '/Development/config.ini')
 
 disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'disambig_output')
+old_db = config['DATABASE']['OLD_DB']
 new_db = config['DATABASE']['NEW_DB']
 
 new_id_col = 'disamb_inventor_id_{}'.format(new_db[-8:])
@@ -21,76 +23,111 @@ new_id_col = 'disamb_inventor_id_{}'.format(new_db[-8:])
 engine = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
 db_con = engine.connect() 
 
-#db_con.execute('alter table persistent_inventor_disambig ADD COLUMN ({} varchar(36))'.format(new_id_col))
 
-# print("getting columns......")
-# print('...............................')
-# cols = [item[0] for item in db_con.execute('show columns from persistent_inventor_disambig')]
+########################################################################################
+# STEP 1: CREATE temp_rawinv_persistinvdisambig
+# Note: will need to update this to add prev db column 
+print("First creating temp_rawinv_persistentinvdisambig table..............")
 
-# outfile = csv.writer(open(disambig_folder+'/inventor_persistent.tsv','w'),delimiter='\t')
-# outfile.writerow(cols)
+# ADD INDEXES to rawinventor
+db_con.execute('create index {0}_rawinv_pid_ix on rawinventor (uuid, inventor_id);'.format(new_db))
 
-# print('...............................')
-# print("getting data from temp_rawinv_persistinvdisambig....")
-# print('making lookup.....with new logic')
-# print('...............................')
-# ########################################################################################
-# limit = 300000
-# offset = 0
-# batch_counter = 0
-# blanks = ['','','','','']
+# to test: need to add index to all columns in a table? 
+db_con.execute('create table temp_rawinv_persistinvdisambig( uuid varchar(36), inventor_id varchar(36), current_rawinventor_id varchar(36), old_rawinventor_id varchar(40), disamb_inventor_id_20171226 varchar(20), disamb_inventor_id_20171003 varchar(20), disamb_inventor_id_20170808 varchar(20), disamb_inventor_id_20180528 varchar(36), disamb_inventor_id_20181127 varchar(24))')
+
+     
+db_con.execute('insert into temp_rawinv_persistinvdisambig(uuid, inventor_id, current_rawinventor_id, old_rawinventor_id, disamb_inventor_id_20171226,  disamb_inventor_id_20171003, disamb_inventor_id_20170808, disamb_inventor_id_20180528, disamb_inventor_id_20181127) select ri.uuid, ri.inventor_id, pid.current_rawinventor_id, pid.old_rawinventor_id, pid.disamb_inventor_id_20171226, pid.disamb_inventor_id_20171003, pid.disamb_inventor_id_20170808,pid.disamb_inventor_id_20180528, pid.disamb_inventor_id_20181127 from rawinventor ri left join persistent_inventor_disambig pid on ri.uuid = pid.current_rawinventor_id;')
+
+# ADD INDEXES to uuid for temp_rawinv_persistinvdisambig
+db_con.execute('create index {0}_rawinv_pid_ix on temp_rawinv_persistinvdisambig (uuid);'.format(new_db))
+
+########################################################################################
+# STEP 2: Get new data from temp_rawinv_persistinvdisambig and perform lookup with persistent_inventor_disambig
+print("Now getting previous data from the persistent_inventor_disambig table..............")
+
+print("getting columns......")
+cols = [item[0] for item in db_con.execute('show columns from persistent_inventor_disambig')]
+
+print("Now creating inventor_persistent.tsv")
+
+outfile = csv.writer(open(disambig_folder +'/inventor_persistent.tsv','w'),delimiter='\t')
+outfile.writerow(cols)
 
 
-# # 16,788,011 rows so 55.04 --> ~ 56 batches 
-# while True:
-# 	batch_counter+=1
-# 	print('Next iteration...')
-# 	# order by with primary key column - no nulls
-# 	ri_pid_chunk = db_con.execute("select * from {0}.temp_rawinv_persistinvdisambig order by uuid limit {1} offset {2}".format(new_db, limit, offset))
-# 	counter = 0
-# 	for row in tqdm.tqdm(ri_pid_chunk, total=limit, desc="temp_rawinv_persistinvdisambig - batch:" + str(batch_counter)):
-# 		# row[0] = uuid, row[1] = inventor_id, row[2] = current_rawinventor_id, row[3] = old_rawinventor_id
-# 		# row[4:8] = disambig cols 20171226,1003,0808,0528,1127
-# 		# row[9] = disambig col 0312 (null) ... 4,5,6,7,8
+limit = 300000
+offset = 0
+batch_counter = 0
+blanks = [''for _ in cols]
+
+while True:
+	batch_counter+=1
+	print('Next iteration...')
+    
+	# order by with primary key column - this has no nulls
+	ri_pid_chunk = db_con.execute("select * from {0}.temp_rawinv_persistinvdisambig order by uuid limit {1} offset {2}".format(new_db, limit, offset))
+    
+	counter = 0
+	for row in tqdm.tqdm(ri_pid_chunk, total=limit, desc="temp_rawinv_persistinvdisambig - batch:" + str(batch_counter)):
+		# row[0:2] always fixed = uuid, inventor_id, current_rawinventor_id, old_rawinventor_id (not needed)
+		# row[4:] always fixed = disambig cols 20171226,1003,0808,0528,1127...
+
+		# OUTFILE ROW COLUMNS: current_rawinv_id, old_rawinv_id, disambig cols (previous), new_disambig col
 		
-# 		# OUTFILE ROW: current_rawinv_id, old_rawinv_id, disambig cols (previous), new_disambig col
-# 		# if uuid matches current_rawinventor_id -> previously existing
-# 		if row[0] == row[2]:
-# 			outfile.writerow([row[0], row[0]] + [row[4],row[5],row[6],row[7], row[8]] + [row[1]])
-# 		# uuid is new! no old_rawinventor id or old disambig cols
-# 		else:
-# 			outfile.writerow([row[0],''] + blanks + [row[1]])
+        # if uuid matches current_rawinventor_id -> then it is previously existing
+		if row[0] == row[2]:
+			outfile.writerow([row[0], row[0]] + row[4:] + [row[1]])
+		
+        # uuid is new! no old_rawinventor id or old disambig cols
+		else:
+			outfile.writerow([row[0],''] + blanks + [row[1]])
 
-# 		# keep going because we have chunks to process
-# 		counter +=1
-# 	# means we have no more batches to process
-# 	if counter == 0:
-# 		break
-# 	# FOR TESTING
-# 	#if batch_counter == 3:
-# 	#	break
+		# keep going because we have chunks to process
+		counter +=1
 
-# 	offset = offset + limit
+    # means we have no more batches to process
+	if counter == 0:
+		break
 
 
-# print('passes making inventor_persistent.tsv')
-# print('...............................')
+	offset = offset + limit
+
+
+print('passes making inventor_persistent.tsv')
+
+#########################################################################################
+# STEP 3: Move prior data to renamed table with old_db as suffix, create empty table with new_db as suffix, add new_db column 
+try:
+    db_con.execute('alter table persistent_inventor_disambig rename temp_persistent_inventor_disambig_{}').format(old_db)
+
+# Situation where this doesn't run: 1) persistent_inventor_disambig does not exist and was manually renamed to 
+#  a different name or 2) dropped. In these cases, keep moving on to recreate table as planned
+except sqlalchemy.exc.ProgrammingError as e:
+    print("Alter table command did not work - see full error message below")
+    print(e)
+    
+
+db_con.execute('create table persistent_inventor_disambig_{0} like temp_persistent_inventor_disambig_{1}').format(new_db, old_db)
+
+
+db_con.execute('alter table persistent_inventor_disambig_{0} ADD COLUMN ({} varchar(36))'.format(new_db, new_id_col))
 
 
 #########################################################################################
-print('reading in inventor_persistent.tsv')
-print('...............................')
+# STEP 4: Insert data into table 
 
-
-#db_con.execute('alter table persistent_inventor_disambig rename temp_persistent_inventor_disambig_backup')
-db_con.execute('drop table if exists persistent_inventor_disambig')
-db_con.execute('create table persistent_inventor_disambig like temp_persistent_inventor_disambig_backup')
-
+print('Reading in inventor_persistent.tsv.............')
 chunk_size = 300000
+
 data_chunk = pd.read_csv('{}/inventor_persistent.tsv'.format(disambig_folder), encoding = 'utf-8', delimiter = '\t', chunksize=chunk_size)
-print("now processing")
+
+print("Now inserting data into table")
 
 for chunk in tqdm.tqdm(data_chunk, desc="persistent_inventor_disambig - batch inserts:"):
-    chunk.to_sql(con=db_con, name = 'persistent_inventor_disambig', index = False, if_exists='append') #append keeps the indexes
+    chunk.to_sql(con=db_con, name = 'persistent_inventor_disambig_{0}'.format(new_db), index = False, if_exists='append') 
+#append keeps the indexes
+
+# rename table to generic persistent_inventor_disambig
+db_con.execute('alter table persistent_inventor_disambig_{0} rename persistent_inventor_disambig').format(new_db)
+
 
 db_con.execute('create index {0}_ix on persistent_inventor_disambig ({0});'.format(new_id_col))
