@@ -294,6 +294,8 @@ process_xml_operator.set_upstream(download_xml_operator)
 parse_xml_operator.set_upstream(process_xml_operator)
 
 upload_new_operator.set_upstream(parse_xml_operator)
+upload_new_operator.set_upstream(rename_old_operator)
+
 merge_new_operator.set_upstream(upload_new_operator)
 merge_new_operator.set_upstream(rename_old_operator)
 
