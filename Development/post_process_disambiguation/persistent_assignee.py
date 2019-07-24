@@ -17,69 +17,34 @@ disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'disambig_o
 new_db = config['DATABASE']['NEW_DB']
 old_db = config['DATABASE']['OLD_DB']
 
-new_id_col = 'disamb_inventor_id_{}'.format(new_db[-8:])
+new_id_col = 'disamb_inventor_id_v2{}'.format(new_db[-8:])
 
 engine = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
 db_con = engine.connect()
 
 ########################################################################################
-##### Helper Functions
-# # REQUIRES: a table's column info from information schema and table prefix for join statement
-# # MODIFIES: nothing
-# # EFFECTS: returns string statements for create, insert, and select components 
-# #      in order to build query for a table 
-# def get_column_info(table_col_info, table_prefix):
-   
-#     column_data =[item for item in table_col_info]
-    
-#     # create cols string for create, insert, and select statements for 1) rawinventor 
-#     table_cols_create_stmt = [item[0] + ' ' + item[1] for item in column_data]
-#     table_cols_create_str = ', '.join(table_cols_create_stmt)
-    
-#     table_cols_insert_stmt = [item[0] for item in column_data]
-#     table_cols_insert_str = ', '.join(table_cols_insert_stmt)
-   
-#     table_cols_select_stmt = [table_prefix + item for item in table_cols_insert_stmt]
-#     table_cols_select_str = ', '.join(table_cols_select_stmt)
-    
-#     return table_cols_create_str, table_cols_insert_str, table_cols_select_str
-    
-# # REQUIRES: two table component strings
-# # MODIFIES: nothing
-# # EFFECTS: returns full string column component    
-# def get_full_column_strings(table1_str, table2_str):
-    
-#     full_cols_str = table1_str  + ',' + table2_str
-    
-#     return full_cols_str
-
-
-########################################################################################
 # STEP 1: CREATE temp_rawassignee_persistassignee_disambig
-# Note: will need to update this to add prev db column 
 
-# ADD INDEXES to rawassignee
-#db_con.execute('create index {0}_rawassignee_pad_ix on rawassignee (uuid, assignee_id);'.format(new_db))
-# to test: need to add index to all columns in a table? 
-
+# ADD INDEXES to rawassignee - test if this helps 
+# db_con.execute('create index {0}_rawassignee_pad_ix on rawassignee (uuid, assignee_id);'.format(new_db))
+# to test: need to add index to all columns in a table? like persistent_assignee_disambig 
 
 # get column information from information schema, format as strings
-rawassignee_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawassignee' and column_name = 'uuid' or column_name = 'assignee_id';".format(new_db))
+rawassignee_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawassignee' and column_name in ('uuid', 'assignee_id');".format(new_db))
     
 pad_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'persistent_assignee_disambig';".format(new_db))
 
-rawassignee_create_str, rawassignee_insert_str, rawassignee_select_str = get_column_info(rawassignee_col_info, "ra")
-pid_create_str, pid_insert_str, pid_select_str = get_column_info(pid_col_info, "pad")
+rawassignee_create_str, rawassignee_insert_str, rawassignee_select_str = general_helpers.get_column_info(rawassignee_col_info, "ra.")
+pad_create_str, pad_insert_str, pad_select_str = general_helpers.get_column_info(pad_col_info, "pad.")
 
 
-cols_create_str = get_full_column_strings(rawassignee_create_str, pid_create_str)
-cols_insert_str = get_full_column_strings(rawassignee_insert_str, pid_insert_str)
-cols_select_str = get_full_column_strings(rawassignee_select_str, pid_select_str)
+cols_create_str = general_helpers.get_full_column_strings(rawassignee_create_str, pad_create_str)
+cols_insert_str = general_helpers.get_full_column_strings(rawassignee_insert_str, pad_insert_str)
+cols_select_str = general_helpers.get_full_column_strings(rawassignee_select_str, pad_select_str)
 
-db_con.execute('create table temp_rawassignee_persistassignee_disambig({0});'.format(cols_create_str))
+db_con.execute('create table if not exists temp_rawassignee_persistassignee_disambig({0});'.format(cols_create_str))
 
 db_con.execute('insert into temp_rawassignee_persistassignee_disambig({0}) select {1} from rawassignee ra left join persistent_assignee_disambig pad on ra.uuid = pad.current_rawassignee_id;'.format(cols_insert_str, cols_select_str))
-
 
 # ADD INDEXES to uuid for temp_rawassignee_persistassignee_disambig
 db_con.execute('create index {0}_rawassignee_pad_ix on temp_rawassignee_persistassignee_disambig (uuid);'.format(new_db))
@@ -148,7 +113,7 @@ except sqlalchemy.exc.ProgrammingError as e:
     print(e)
     
 
-db_con.execute('create table persistent_assignee_disambig_{0} like temp_persistent_assignee_disambig_{1}'.format(new_db, old_db))
+db_con.execute('create table if not exists persistent_assignee_disambig_{0} like temp_persistent_assignee_disambig_{1}'.format(new_db, old_db))
 
 
 db_con.execute('alter table persistent_assignee_disambig_{0} ADD COLUMN ({} varchar(128))'.format(new_db, new_id_col))
@@ -156,7 +121,6 @@ db_con.execute('alter table persistent_assignee_disambig_{0} ADD COLUMN ({} varc
 
 #########################################################################################
 # STEP 4: Insert data into table 
-
 
 print('Reading in assignee_persistent.tsv.............')
 chunk_size = 300000

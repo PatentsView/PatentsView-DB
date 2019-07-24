@@ -33,18 +33,18 @@ print("First creating temp_rawinv_persistentinvdisambig table..............")
 # to test: need to add index to all columns in a table? 
 
 # 1. get column information from information schema
-rawinv_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawinventor' and column_name = 'uuid' or column_name = 'inventor_id';".format(new_db))
+rawinv_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawinventor' and column_name in ('uuid', 'inventor_id');".format(new_db))
     
 pid_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'persistent_inventor_disambig';".format(new_db))
 
-rawinv_create_str, rawinv_insert_str, rawinv_select_str = get_column_info(rawinv_col_info, "ri")
-pid_create_str, pid_insert_str, pid_select_str = get_column_info(pid_col_info, "pid")
+rawinv_create_str, rawinv_insert_str, rawinv_select_str = general_helpers.get_column_info(rawinv_col_info, "ri.")
+pid_create_str, pid_insert_str, pid_select_str = general_helpers.get_column_info(pid_col_info, "pid.")
 
-cols_create_str = get_full_column_strings(rawinv_create_str, pid_create_str)
-cols_insert_str = get_full_column_strings(rawinv_insert_str, pid_insert_str)
-cols_select_str = get_full_column_strings(rawinv_select_str, pid_select_str)
+cols_create_str = general_helpers.get_full_column_strings(rawinv_create_str, pid_create_str)
+cols_insert_str = general_helpers.get_full_column_strings(rawinv_insert_str, pid_insert_str)
+cols_select_str = general_helpers.get_full_column_strings(rawinv_select_str, pid_select_str)
 
-db_con.execute('create table temp_rawinv_persistinvdisambig({0});'.format(cols_create_str))
+db_con.execute('create table if not exists temp_rawinv_persistinvdisambig({0});'.format(cols_create_str))
      
 db_con.execute('insert into temp_rawinv_persistinvdisambig({0}) select {1} from rawinventor ri left join persistent_inventor_disambig pid on ri.uuid = pid.current_rawinventor_id;'.format(cols_insert_str, cols_select_str)
 
@@ -116,7 +116,7 @@ except sqlalchemy.exc.ProgrammingError as e:
     print(e)
     
 
-db_con.execute('create table persistent_inventor_disambig_{0} like temp_persistent_inventor_disambig_{1}').format(new_db, old_db)
+db_con.execute('create table if not exists persistent_inventor_disambig_{0} like temp_persistent_inventor_disambig_{1}').format(new_db, old_db)
 
 
 db_con.execute('alter table persistent_inventor_disambig_{0} ADD COLUMN ({} varchar(128))'.format(new_db, new_id_col))
