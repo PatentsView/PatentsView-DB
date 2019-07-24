@@ -10,7 +10,7 @@ create table `{{params.reporting_database}}`.`uspatentcitation`
   `citing_patent_id` varchar(20) not null,
   `sequence` int not null,
   `cited_patent_id` varchar(20) null,
-  `category` varchar(20) null,
+  `category` varchar(64) null,
   primary key (`citing_patent_id`, `sequence`)
 )
 engine=InnoDB;
