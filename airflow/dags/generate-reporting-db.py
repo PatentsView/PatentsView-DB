@@ -344,7 +344,7 @@ uspc.set_upstream(forprior)
 uspc.set_upstream(pct)
 uspc.set_upstream(us_appcit)
 uspc.set_upstream(us_patcit)
-uspc.set_upstream(cpc)
+
 uspc.set_upstream(ipcr)
 uspc.set_upstream(nber)
 
@@ -357,7 +357,7 @@ cpc.set_upstream(forprior)
 cpc.set_upstream(pct)
 cpc.set_upstream(us_appcit)
 cpc.set_upstream(us_patcit)
-cpc.set_upstream(cpc)
+
 cpc.set_upstream(ipcr)
 cpc.set_upstream(nber)
 
