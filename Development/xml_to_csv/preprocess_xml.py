@@ -93,7 +93,7 @@ if __name__ == '__main__':
         for job in segment:
             job.start()
     #delete the raw files so we don't run out of space
-    os.system('rm infolder/*')
+    os.system('rm '+infolder+'/*')
 
     #After cleaning the files check that there haven't been schema changes
     #This is commented out because still needs work

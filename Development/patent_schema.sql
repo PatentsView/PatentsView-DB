@@ -518,7 +518,7 @@ CREATE TABLE `uspatentcitation` (
   `name` varchar(64) DEFAULT NULL,
   `kind` varchar(10) DEFAULT NULL,
   `country` varchar(10) DEFAULT NULL,
-  `category` varchar(20) DEFAULT NULL,
+  `category` varchar(64) DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`),
