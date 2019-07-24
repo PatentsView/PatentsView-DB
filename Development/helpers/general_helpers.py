@@ -5,7 +5,7 @@ import string
 import re,os,random,string,codecs
 import requests
 from clint.textui import progress
-from . import slack_client, slack_channel
+#from . import slack_client, slack_channel
 
 def chunks(l,n):
     '''Yield successive n-sized chunks from l. Useful for multi-processing'''
@@ -70,3 +70,38 @@ def get_patent_ids(db_con, new_db):
 def better_title(text):
     title = " ".join([item if item not in ["Of", "The", "For", "And", "On"] else item.lower() for item in str(text).title().split( )])
     return re.sub('['+string.punctuation+']', '', title)
+
+
+# REQUIRES: a table's column info from information schema and table prefix for join statement
+# MODIFIES: nothing
+# EFFECTS: returns string statements for create, insert, and select components 
+#      in order to build query for a table 
+def get_column_info(table_col_info, table_prefix):
+   
+    column_data =[item for item in table_col_info]
+    
+    # create cols string for create, insert, and select statements for 1) rawinventor 
+    table_cols_create_stmt = [item[0] + ' ' + item[1] for item in column_data]
+    table_cols_create_str = ', '.join(table_cols_create_stmt)
+    
+    table_cols_insert_stmt = [item[0] for item in column_data]
+    table_cols_insert_str = ', '.join(table_cols_insert_stmt)
+   
+    table_cols_select_stmt = [table_prefix + item for item in table_cols_insert_stmt]
+    table_cols_select_str = ', '.join(table_cols_select_stmt)
+    
+    return table_cols_create_str, table_cols_insert_str, table_cols_select_str
+    
+# REQUIRES: two table component strings
+# MODIFIES: nothing
+# EFFECTS: returns full string column component    
+def get_full_column_strings(table1_str, table2_str):
+    
+    full_cols_str = table1_str  + ',' + table2_str
+    
+    return full_cols_str
+
+
+
+
+

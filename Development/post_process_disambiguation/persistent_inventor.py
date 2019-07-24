@@ -23,20 +23,30 @@ new_id_col = 'disamb_inventor_id_{}'.format(new_db[-8:])
 engine = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
 db_con = engine.connect() 
 
-
 ########################################################################################
 # STEP 1: CREATE temp_rawinv_persistinvdisambig
 # Note: will need to update this to add prev db column 
 print("First creating temp_rawinv_persistentinvdisambig table..............")
 
 # ADD INDEXES to rawinventor
-db_con.execute('create index {0}_rawinv_pid_ix on rawinventor (uuid, inventor_id);'.format(new_db))
-
+#db_con.execute('create index {0}_rawinv_pid_ix on rawinventor (uuid, inventor_id);'.format(new_db))
 # to test: need to add index to all columns in a table? 
-db_con.execute('create table temp_rawinv_persistinvdisambig( uuid varchar(36), inventor_id varchar(36), current_rawinventor_id varchar(36), old_rawinventor_id varchar(40), disamb_inventor_id_20171226 varchar(20), disamb_inventor_id_20171003 varchar(20), disamb_inventor_id_20170808 varchar(20), disamb_inventor_id_20180528 varchar(36), disamb_inventor_id_20181127 varchar(24))')
 
+# 1. get column information from information schema
+rawinv_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawinventor' and column_name = 'uuid' or column_name = 'inventor_id';".format(new_db))
+    
+pid_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'persistent_inventor_disambig';".format(new_db))
+
+rawinv_create_str, rawinv_insert_str, rawinv_select_str = get_column_info(rawinv_col_info, "ri")
+pid_create_str, pid_insert_str, pid_select_str = get_column_info(pid_col_info, "pid")
+
+cols_create_str = get_full_column_strings(rawinv_create_str, pid_create_str)
+cols_insert_str = get_full_column_strings(rawinv_insert_str, pid_insert_str)
+cols_select_str = get_full_column_strings(rawinv_select_str, pid_select_str)
+
+db_con.execute('create table temp_rawinv_persistinvdisambig({0});'.format(cols_create_str))
      
-db_con.execute('insert into temp_rawinv_persistinvdisambig(uuid, inventor_id, current_rawinventor_id, old_rawinventor_id, disamb_inventor_id_20171226,  disamb_inventor_id_20171003, disamb_inventor_id_20170808, disamb_inventor_id_20180528, disamb_inventor_id_20181127) select ri.uuid, ri.inventor_id, pid.current_rawinventor_id, pid.old_rawinventor_id, pid.disamb_inventor_id_20171226, pid.disamb_inventor_id_20171003, pid.disamb_inventor_id_20170808,pid.disamb_inventor_id_20180528, pid.disamb_inventor_id_20181127 from rawinventor ri left join persistent_inventor_disambig pid on ri.uuid = pid.current_rawinventor_id;')
+db_con.execute('insert into temp_rawinv_persistinvdisambig({0}) select {1} from rawinventor ri left join persistent_inventor_disambig pid on ri.uuid = pid.current_rawinventor_id;'.format(cols_insert_str, cols_select_str)
 
 # ADD INDEXES to uuid for temp_rawinv_persistinvdisambig
 db_con.execute('create index {0}_rawinv_pid_ix on temp_rawinv_persistinvdisambig (uuid);'.format(new_db))
@@ -109,7 +119,7 @@ except sqlalchemy.exc.ProgrammingError as e:
 db_con.execute('create table persistent_inventor_disambig_{0} like temp_persistent_inventor_disambig_{1}').format(new_db, old_db)
 
 
-db_con.execute('alter table persistent_inventor_disambig_{0} ADD COLUMN ({} varchar(36))'.format(new_db, new_id_col))
+db_con.execute('alter table persistent_inventor_disambig_{0} ADD COLUMN ({} varchar(128))'.format(new_db, new_id_col))
 
 
 #########################################################################################
