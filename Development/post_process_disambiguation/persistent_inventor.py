@@ -48,9 +48,8 @@ db_con.execute('create table if not exists temp_rawinv_persistinvdisambig({0});'
      
 db_con.execute('insert into temp_rawinv_persistinvdisambig({0}) select {1} from rawinventor ri left join persistent_inventor_disambig pid on ri.uuid = pid.current_rawinventor_id;'.format(cols_insert_str, cols_select_str)
 
-# ADD INDEXES to uuid for temp_rawinv_persistinvdisambig
-db_con.execute('create index {0}_rawinv_pid_ix on temp_rawinv_persistinvdisambig (uuid);'.format(new_db))
-
+# Make uuid primary key of temp_rawinv_persistinv_disambig
+db_con.execute('alter table {0}.temp_rawinv_persistinvdisambig add primary key (uuid);'.format(new_db))
 ########################################################################################
 # STEP 2: Get new data from temp_rawinv_persistinvdisambig and perform lookup with persistent_inventor_disambig
 print("Now getting previous data from the persistent_inventor_disambig table..............")

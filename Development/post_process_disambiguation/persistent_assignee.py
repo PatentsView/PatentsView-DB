@@ -30,24 +30,24 @@ db_con = engine.connect()
 # to test: need to add index to all columns in a table? like persistent_assignee_disambig 
 
 # get column information from information schema, format as strings
-rawassignee_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawassignee' and column_name in ('uuid', 'assignee_id');".format(new_db))
+# rawassignee_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawassignee' and column_name in ('uuid', 'assignee_id');".format(new_db))
     
-pad_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'persistent_assignee_disambig';".format(new_db))
+# pad_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'persistent_assignee_disambig';".format(new_db))
 
-rawassignee_create_str, rawassignee_insert_str, rawassignee_select_str = general_helpers.get_column_info(rawassignee_col_info, "ra.")
-pad_create_str, pad_insert_str, pad_select_str = general_helpers.get_column_info(pad_col_info, "pad.")
+# rawassignee_create_str, rawassignee_insert_str, rawassignee_select_str = general_helpers.get_column_info(rawassignee_col_info, "ra.")
+# pad_create_str, pad_insert_str, pad_select_str = general_helpers.get_column_info(pad_col_info, "pad.")
 
 
-cols_create_str = general_helpers.get_full_column_strings(rawassignee_create_str, pad_create_str)
-cols_insert_str = general_helpers.get_full_column_strings(rawassignee_insert_str, pad_insert_str)
-cols_select_str = general_helpers.get_full_column_strings(rawassignee_select_str, pad_select_str)
+# cols_create_str = general_helpers.get_full_column_strings(rawassignee_create_str, pad_create_str)
+# cols_insert_str = general_helpers.get_full_column_strings(rawassignee_insert_str, pad_insert_str)
+# cols_select_str = general_helpers.get_full_column_strings(rawassignee_select_str, pad_select_str)
 
-db_con.execute('create table if not exists temp_rawassignee_persistassignee_disambig({0});'.format(cols_create_str))
+# db_con.execute('create table if not exists temp_rawassignee_persistassignee_disambig({0});'.format(cols_create_str))
 
-db_con.execute('insert into temp_rawassignee_persistassignee_disambig({0}) select {1} from rawassignee ra left join persistent_assignee_disambig pad on ra.uuid = pad.current_rawassignee_id;'.format(cols_insert_str, cols_select_str))
+# db_con.execute('insert into temp_rawassignee_persistassignee_disambig({0}) select {1} from rawassignee ra left join persistent_assignee_disambig pad on ra.uuid = pad.current_rawassignee_id;'.format(cols_insert_str, cols_select_str))
 
-# ADD INDEXES to uuid for temp_rawassignee_persistassignee_disambig
-db_con.execute('create index {0}_rawassignee_pad_ix on temp_rawassignee_persistassignee_disambig (uuid);'.format(new_db))
+# Make uuid primary key of temp_rawassignee_persistassignee_disambig
+db_con.execute('alter table {0}.temp_rawassignee_persistassignee_disambig add primary key (uuid);'.format(new_db))
 
 ########################################################################################
 # STEP 2: Get new data from temp_rawassignee_persistassignee_disambig and perform lookup with persistent_assignee_disambig
@@ -83,7 +83,7 @@ while True:
         
         # if uuid matches current_rawinventor_id -> then it is previously existing
 		if row[0] == row[2]:
-			outfile.writerow([row[0], row[0]] + row[4:] + [row[1]])
+			outfile.writerow([row[0], row[0]] + [row[4:]] + [row[1]])
             
 		# uuid is new! no old_rawassignee id or old disambig cols
 		else:
