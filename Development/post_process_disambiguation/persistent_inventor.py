@@ -118,7 +118,7 @@ except sqlalchemy.exc.ProgrammingError as e:
 db_con.execute('create table if not exists persistent_inventor_disambig_{0} like temp_persistent_inventor_disambig_{1}').format(new_db, old_db)
 
 
-db_con.execute('alter table persistent_inventor_disambig_{0} ADD COLUMN ({} varchar(128))'.format(new_db, new_id_col))
+db_con.execute('alter table persistent_inventor_disambig_{0} ADD COLUMN ({1} varchar(128))'.format(new_db, new_id_col))
 
 
 #########################################################################################

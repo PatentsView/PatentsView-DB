@@ -47,7 +47,7 @@ db_con = engine.connect()
 # db_con.execute('insert into temp_rawassignee_persistassignee_disambig({0}) select {1} from rawassignee ra left join persistent_assignee_disambig pad on ra.uuid = pad.current_rawassignee_id;'.format(cols_insert_str, cols_select_str))
 
 # Make uuid primary key of temp_rawassignee_persistassignee_disambig
-db_con.execute('alter table {0}.temp_rawassignee_persistassignee_disambig add primary key (uuid);'.format(new_db))
+#db_con.execute('alter table {0}.temp_rawassignee_persistassignee_disambig add primary key (uuid);'.format(new_db))
 
 ########################################################################################
 # STEP 2: Get new data from temp_rawassignee_persistassignee_disambig and perform lookup with persistent_assignee_disambig
@@ -116,7 +116,7 @@ except sqlalchemy.exc.ProgrammingError as e:
 db_con.execute('create table if not exists persistent_assignee_disambig_{0} like temp_persistent_assignee_disambig_{1}'.format(new_db, old_db))
 
 
-db_con.execute('alter table persistent_assignee_disambig_{0} ADD COLUMN ({} varchar(128))'.format(new_db, new_id_col))
+db_con.execute('alter table persistent_assignee_disambig_{0} ADD COLUMN ({1} varchar(128))'.format(new_db, new_id_col))
 
 
 #########################################################################################
