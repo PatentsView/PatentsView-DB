@@ -19,3 +19,4 @@ jupyter
 fuzzywuzzy
 python-Levenshtein
 textdistance
+tqdm
