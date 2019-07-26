@@ -26,11 +26,19 @@ db_con = engine.connect()
 ########################################################################################
 # STEP 1: CREATE temp_rawinv_persistinvdisambig
 # Note: will need to update this to add prev db column 
+# rename to track with timestamps
 print("First creating temp_rawinv_persistentinvdisambig table..............")
+try:
+    db_con.execute('alter table persistent_inventor_disambig rename temp_persistent_inventor_disambig_{0}').format(old_db)
 
+# Situation where this doesn't run: 1) persistent_inventor_disambig does not exist and was manually renamed to 
+#  a different name or 2) dropped. In these cases, keep moving on to recreate table as planned
+except sqlalchemy.exc.ProgrammingError as e:
+    print("Alter table command did not work - see full error message below")
+    print(e)
+    
 # ADD INDEXES to rawinventor
-#db_con.execute('create index {0}_rawinv_pid_ix on rawinventor (uuid, inventor_id);'.format(new_db))
-# to test: need to add index to all columns in a table? 
+db_con.execute('create index {0}_rawinv_pid_ix on rawinventor (uuid, inventor_id);'.format(new_db))
 
 # 1. get column information from information schema
 rawinv_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawinventor' and column_name in ('uuid', 'inventor_id');".format(new_db))
@@ -60,7 +68,7 @@ cols = [item[0] for item in db_con.execute('show columns from persistent_invento
 print("Now creating inventor_persistent.tsv")
 
 outfile = csv.writer(open(disambig_folder +'/inventor_persistent.tsv','w'),delimiter='\t')
-outfile.writerow(cols)
+outfile.writerow(cols + [new_id_col])
 
 
 limit = 300000
@@ -84,7 +92,7 @@ while True:
 		
         # if uuid matches current_rawinventor_id -> then it is previously existing
 		if row[0] == row[2]:
-			outfile.writerow([row[0], row[0]] + row[4:] + [row[1]])
+			outfile.writerow([row[0], row[0]] + [item for item in row[4:]] + [row[1]])
 		
         # uuid is new! no old_rawinventor id or old disambig cols
 		else:
@@ -104,17 +112,7 @@ while True:
 print('passes making inventor_persistent.tsv')
 
 #########################################################################################
-# STEP 3: Move prior data to renamed table with old_db as suffix, create empty table with new_db as suffix, add new_db column 
-try:
-    db_con.execute('alter table persistent_inventor_disambig rename temp_persistent_inventor_disambig_{}').format(old_db)
-
-# Situation where this doesn't run: 1) persistent_inventor_disambig does not exist and was manually renamed to 
-#  a different name or 2) dropped. In these cases, keep moving on to recreate table as planned
-except sqlalchemy.exc.ProgrammingError as e:
-    print("Alter table command did not work - see full error message below")
-    print(e)
-    
-
+# STEP 3: Create empty table with new_db as suffix, add new_db column 
 db_con.execute('create table if not exists persistent_inventor_disambig_{0} like temp_persistent_inventor_disambig_{1}').format(new_db, old_db)
 
 
@@ -123,16 +121,16 @@ db_con.execute('alter table persistent_inventor_disambig_{0} ADD COLUMN ({1} var
 
 #########################################################################################
 # STEP 4: Insert data into table 
-
 print('Reading in inventor_persistent.tsv.............')
 chunk_size = 300000
 
 data_chunk = pd.read_csv('{}/inventor_persistent.tsv'.format(disambig_folder), encoding = 'utf-8', delimiter = '\t', chunksize=chunk_size)
 
 print("Now inserting data into table")
-
+batch_counter = 0
 for chunk in tqdm.tqdm(data_chunk, desc="persistent_inventor_disambig - batch inserts:"):
     chunk.to_sql(con=db_con, name = 'persistent_inventor_disambig_{0}'.format(new_db), index = False, if_exists='append') 
+    batch_counter += 1
 #append keeps the indexes
 
 # rename table to generic persistent_inventor_disambig
