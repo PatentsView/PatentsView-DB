@@ -352,7 +352,7 @@ cpc.set_upstream(ipcr)
 cpc.set_upstream(nber)
 
 rep_tbl_1.set_upstream(uspc)
-rep_tbl_1.set_upstream(cpc)
+
 
 idx.set_upstream(rep_tbl_1)
 rep_tbl_2.set_upstream(idx)
