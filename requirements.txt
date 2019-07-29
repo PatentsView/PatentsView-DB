@@ -1,6 +1,6 @@
 Cython
 pytz
-pandas=0.24.0
+pandas==0.24.0
 pyOpenSSL
 ndg-httpsclient
 datetime
