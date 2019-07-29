@@ -17,7 +17,7 @@ disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'disambig_o
 new_db = config['DATABASE']['NEW_DB']
 old_db = config['DATABASE']['OLD_DB']
 
-old_db_col = 'disamb_inventor_id_{}'.format(old_db[-8:])
+old_id_col = 'disamb_inventor_id_{}'.format(old_db[-8:])
 new_id_col = 'disamb_inventor_id_{}'.format(new_db[-8:])
 
 engine = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
@@ -42,7 +42,7 @@ db_con.execute('create index ix_inv_gender on temp_inventor_gender_{0} (disamb_i
 # for order by 
 db_con.execute('create index ix_disamb_inv_id_20170808 on temp_inventor_gender_{0}(disamb_inventor_id_20170808);'.format(old_db)) 
 
-# db_con.execute('create index ix_disamb_invgender on persistent_inventor_disambig (disamb_inventor_id_20170808, disamb_inventor_id_20181127, {0});'.format(new_id_col))
+db_con.execute('create index ix_disamb_invgender on persistent_inventor_disambig (disamb_inventor_id_20170808, {0}, {1});'.format(old_id_col,new_id_col))
 
 # for order by 
 db_con.execute('create index ix_disamb_20170808_invgender on persistent_inventor_disambig(disamb_inventor_id_20170808);')
@@ -131,15 +131,18 @@ db_con.execute('create table inventor_gender_{0} like temp_inventor_gender_{1}'.
 
 db_con.execute('alter table inventor_gender_{0} add column ({1} varchar(128))'.format(new_db, new_id_col))
 # need to move column to be before male column to match inventor_gender.tsv
-db_con.execute('alter table inventor_gender_{0} modify column male after {1}'.format(new_db,new_id_col))
+male_col_type_ig = db_con.execute("select column_type from information_schema.columns where table_schema = '{0}' and table_name = 'inventor_gender_{0}' and column_name = 'male';".format(new_db))
+
+#only have one item, col type of male
+male_col_type = [item[0] for item in male_col_type_ig]
+
+db_con.execute('alter table inventor_gender_{0} modify column male {1} after {2}'.format(new_db, male_col_type[0], new_id_col))
 
 print("print now inserting into table.....")
 chunk_size_sql = 300000
-gender_df.to_sql(con=db_con, name = 'inventor_gender', index = False, if_exists='append', chunksize =chunk_size_sql)
+gender_df.to_sql(con=db_con, name = 'inventor_gender_{0}'.format(new_db), index = False, if_exists='append', chunksize =chunk_size_sql)
 
 
 # rename table to generic persistent_inventor_disambig
 db_con.execute('alter table inventor_gender_{0} rename inventor_gender'.format(new_db))
-
-
 

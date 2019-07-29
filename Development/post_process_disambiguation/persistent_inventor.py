@@ -29,7 +29,7 @@ db_con = engine.connect()
 # rename to track with timestamps
 print("First creating temp_rawinv_persistentinvdisambig table..............")
 try:
-    db_con.execute('alter table persistent_inventor_disambig rename temp_persistent_inventor_disambig_{0}').format(old_db)
+    db_con.execute('alter table persistent_inventor_disambig rename temp_persistent_inventor_disambig_{0}'.format(old_db))
 
 # Situation where this doesn't run: 1) persistent_inventor_disambig does not exist and was manually renamed to 
 #  a different name or 2) dropped. In these cases, keep moving on to recreate table as planned
@@ -38,12 +38,12 @@ except sqlalchemy.exc.ProgrammingError as e:
     print(e)
     
 # ADD INDEXES to rawinventor
-db_con.execute('create index {0}_rawinv_pid_ix on rawinventor (uuid, inventor_id);'.format(new_db))
+db_con.execute('create index rawinv_pid_ix on rawinventor (uuid, inventor_id);')
 
 # 1. get column information from information schema
 rawinv_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawinventor' and column_name in ('uuid', 'inventor_id');".format(new_db))
     
-pid_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'persistent_inventor_disambig';".format(new_db))
+pid_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'temp_persistent_inventor_disambig_{1}';".format(new_db, old_db))
 
 rawinv_create_str, rawinv_insert_str, rawinv_select_str = general_helpers.get_column_info(rawinv_col_info, "ri.")
 pid_create_str, pid_insert_str, pid_select_str = general_helpers.get_column_info(pid_col_info, "pid.")
@@ -53,17 +53,19 @@ cols_insert_str = general_helpers.get_full_column_strings(rawinv_insert_str, pid
 cols_select_str = general_helpers.get_full_column_strings(rawinv_select_str, pid_select_str)
 
 db_con.execute('create table if not exists temp_rawinv_persistinvdisambig({0});'.format(cols_create_str))
-     
-db_con.execute('insert into temp_rawinv_persistinvdisambig({0}) select {1} from rawinventor ri left join persistent_inventor_disambig pid on ri.uuid = pid.current_rawinventor_id;'.format(cols_insert_str, cols_select_str)
+        
+db_con.execute('insert into temp_rawinv_persistinvdisambig({0}) select {1} from rawinventor ri left join temp_persistent_inventor_disambig_{2} pid on ri.uuid = pid.current_rawinventor_id;'.format(cols_insert_str, cols_select_str, old_db))
+
 
 # Make uuid primary key of temp_rawinv_persistinv_disambig
 db_con.execute('alter table {0}.temp_rawinv_persistinvdisambig add primary key (uuid);'.format(new_db))
+
 ########################################################################################
 # STEP 2: Get new data from temp_rawinv_persistinvdisambig and perform lookup with persistent_inventor_disambig
 print("Now getting previous data from the persistent_inventor_disambig table..............")
 
 print("getting columns......")
-cols = [item[0] for item in db_con.execute('show columns from persistent_inventor_disambig')]
+cols = [item[0] for item in db_con.execute('show columns from temp_persistent_inventor_disambig_{0}'.format(old_db))]
 
 print("Now creating inventor_persistent.tsv")
 
@@ -113,7 +115,7 @@ print('passes making inventor_persistent.tsv')
 
 #########################################################################################
 # STEP 3: Create empty table with new_db as suffix, add new_db column 
-db_con.execute('create table if not exists persistent_inventor_disambig_{0} like temp_persistent_inventor_disambig_{1}').format(new_db, old_db)
+db_con.execute('create table if not exists persistent_inventor_disambig_{0} like temp_persistent_inventor_disambig_{1}'.format(new_db, old_db))
 
 
 db_con.execute('alter table persistent_inventor_disambig_{0} ADD COLUMN ({1} varchar(128))'.format(new_db, new_id_col))
@@ -134,7 +136,7 @@ for chunk in tqdm.tqdm(data_chunk, desc="persistent_inventor_disambig - batch in
 #append keeps the indexes
 
 # rename table to generic persistent_inventor_disambig
-db_con.execute('alter table persistent_inventor_disambig_{0} rename persistent_inventor_disambig').format(new_db)
+db_con.execute('alter table persistent_inventor_disambig_{0} rename persistent_inventor_disambig'.format(new_db))
 
 
 db_con.execute('create index {0}_ix on persistent_inventor_disambig ({0});'.format(new_id_col))

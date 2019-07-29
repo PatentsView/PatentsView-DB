@@ -37,8 +37,7 @@ except sqlalchemy.exc.ProgrammingError as e:
     print(e)
     
 # ADD INDEXES to rawassignee - test if this helps 
-db_con.execute('create index {0}_rawassignee_pad_ix on rawassignee (uuid, assignee_id);'.format(new_db))
-to test: need to add index to all columns in a table? like persistent_assignee_disambig 
+db_con.execute('create index rawassignee_pad_ix on rawassignee (uuid, assignee_id);')
 
 # get column information from information schema, format as strings
 rawassignee_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawassignee' and column_name in ('uuid', 'assignee_id');".format(new_db))
@@ -55,7 +54,7 @@ cols_select_str = general_helpers.get_full_column_strings(rawassignee_select_str
 
 db_con.execute('create table if not exists temp_rawassignee_persistassignee_disambig({0});'.format(cols_create_str))
 
-db_con.execute('insert into temp_rawassignee_persistassignee_disambig({0}) select {1} from rawassignee ra left join persistent_assignee_disambig pad on ra.uuid = pad.current_rawassignee_id;'.format(cols_insert_str, cols_select_str))
+db_con.execute('insert into temp_rawassignee_persistassignee_disambig({0}) select {1} from rawassignee ra left join temp_persistent_assignee_disambig_{2} pad on ra.uuid = pad.current_rawassignee_id;'.format(cols_insert_str, cols_select_str, old_db))
 
 # Make uuid primary key of temp_rawassignee_persistassignee_disambig
 db_con.execute('alter table {0}.temp_rawassignee_persistassignee_disambig add primary key (uuid);'.format(new_db))
