@@ -21,6 +21,12 @@ else:
     schema_only = False
 
 from Scripts.Website_Database_Generator.database import validate_query
+import pprint
+
+template_extension_config = [".sql"]
+database_name_config = {'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
+                        'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']}
+
 
 
 class SQLTemplatedPythonOperator(PythonOperator):
@@ -52,9 +58,8 @@ db_creation = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '00_Creation', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '00_Creation.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 
 govt_interest = SQLTemplatedPythonOperator(
@@ -65,9 +70,8 @@ govt_interest = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '01_01_Govt_Interest', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '01_01_Govt_Interest.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 claims = SQLTemplatedPythonOperator(
     task_id='Claims_Table',
@@ -77,9 +81,8 @@ claims = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '01_02_Claims', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '01_02_Claims.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 id_mappings = SQLTemplatedPythonOperator(
     task_id='ID_Mappings',
@@ -89,9 +92,8 @@ id_mappings = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '01_03_ID_Mappings', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '01_03_ID_Mappings.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 application = SQLTemplatedPythonOperator(
     task_id='Application',
@@ -101,9 +103,8 @@ application = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '01_04_Application', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '01_04_Application.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 wipo = SQLTemplatedPythonOperator(
     task_id='WIPO',
@@ -113,9 +114,8 @@ wipo = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '01_05_Wipo', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '01_05_Wipo.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 patent = SQLTemplatedPythonOperator(
     task_id='Patent',
@@ -125,9 +125,8 @@ patent = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '02_Patent', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '02_Patent.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 location = SQLTemplatedPythonOperator(
     task_id='Location',
@@ -137,9 +136,8 @@ location = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_01_Location', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_01_Location.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 assignee = SQLTemplatedPythonOperator(
     task_id='Assignee',
@@ -149,9 +147,8 @@ assignee = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_02_Assignee', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_02_Assignee.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 inventor = SQLTemplatedPythonOperator(
     task_id='Inventor',
@@ -161,9 +158,8 @@ inventor = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_03_Inventor', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_03_Inventor.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 lawyer = SQLTemplatedPythonOperator(
     task_id='Lawyer',
@@ -173,9 +169,8 @@ lawyer = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_04_Lawyer', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_04_Lawyer.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 examiner = SQLTemplatedPythonOperator(
     task_id='Examiner',
@@ -185,9 +180,8 @@ examiner = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_05_Examiner', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_05_Examiner.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 forprior = SQLTemplatedPythonOperator(
     task_id='Foreign_Priority',
@@ -197,9 +191,8 @@ forprior = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_06_Foreign_Priority', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_06_Foreign_Priority.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 pct = SQLTemplatedPythonOperator(
     task_id='PCT',
@@ -209,9 +202,8 @@ pct = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_07_PCT', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_07_PCT.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 us_appcit = SQLTemplatedPythonOperator(
     task_id='US_Application_Citation',
@@ -221,9 +213,8 @@ us_appcit = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_08_US_App_Citation', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_08_US_App_Citation.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 us_patcit = SQLTemplatedPythonOperator(
     task_id='US_Patent_Citation',
@@ -233,9 +224,8 @@ us_patcit = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_09_US_Patent_Citation', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_09_US_Patent_Citation.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 cpc = SQLTemplatedPythonOperator(
     task_id='CPC',
@@ -245,9 +235,8 @@ cpc = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_10_CPC', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_10_CPC.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 ipcr = SQLTemplatedPythonOperator(
     task_id='ipcr',
@@ -257,9 +246,8 @@ ipcr = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_11_IPCR', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_11_IPCR.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 nber = SQLTemplatedPythonOperator(
     task_id='NBER',
@@ -269,9 +257,8 @@ nber = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_12_Nber', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_12_Nber.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 uspc = SQLTemplatedPythonOperator(
     task_id='USPC',
@@ -281,9 +268,8 @@ uspc = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '03_13_uspc', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '03_13_uspc.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 rep_tbl_1 = SQLTemplatedPythonOperator(
     task_id='Reporting_Tables_1',
@@ -293,9 +279,8 @@ rep_tbl_1 = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '04_Support', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '04_Support.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 idx = SQLTemplatedPythonOperator(
     task_id='Indexes',
@@ -305,9 +290,8 @@ idx = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '05_Indexes', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '05_Indexes.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 rep_tbl_2 = SQLTemplatedPythonOperator(
     task_id='Reporting_Tables_2',
@@ -317,9 +301,8 @@ rep_tbl_2 = SQLTemplatedPythonOperator(
     op_kwargs={'filename': '06_Reporting_Tables', 'slack_client': slack_client, 'slack_channel': slack_channel,
                "schema_only": schema_only},
     templates_dict={'source_sql': '06_Reporting_Tables.sql'},
-    templates_exts=[".sql"],
-    params={'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-            'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']},
+    templates_exts=template_extension_config,
+    params=database_name_config
 )
 
 govt_interest.set_upstream(db_creation)

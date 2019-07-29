@@ -165,14 +165,20 @@ def write_wipo_assigned(working_directory, output, pats):
             outp.writerow([k,cpc,e])
 
 def upload_wipo(wipo_output, db_con):
+    config = configparser.ConfigParser()
+    config.read('/project/Development/config.ini')
+    db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['TEMP_UPLOAD_DB'])
     print('here')
     outfiles = [f for f in os.listdir(wipo_output) if f.startswith('patent_cpc')]
     for f in outfiles:
         f = '{}/{}'.format(wipo_output,f)
         data = pd.read_csv(f, delimiter = '\t')
         print(f)
-        print(len(data))
+        print(data.shape)
+        print(data.head(1))
         data.to_sql('wipo', db_con, if_exists = 'append', index = False)
+    insert_sql = 'INSERT IGNORE INTO {}.wipo(SELECT * FROM {}.wipo)'.format(config['DATABASE']['NEW_DB'], config['DATABASE']['TEMP_UPLOAD_DB'])
+    db_con.execute(insert_sql)
 
 
 def dict_chunks(data, size):

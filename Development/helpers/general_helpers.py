@@ -5,7 +5,7 @@ import string
 import re,os,random,string,codecs
 import requests
 from clint.textui import progress
-#from . import slack_client, slack_channel
+from . import slack_client, slack_channel
 from itertools import (takewhile,repeat)
 
 def chunks(l,n):
@@ -15,8 +15,8 @@ def chunks(l,n):
         chunk_list.append(l[i:i + n])
     return chunk_list
 
-def connect_to_db(host, username, password, database):
-    engine = create_engine('mysql+mysqldb://{}:{}@{}/{}?charset=utf8mb4'.format(username, password, host, database ), encoding='utf-8', pool_size=30, max_overflow=0)
+def connect_to_db(host, username, password, database,server_side_cursors=False):
+    engine = create_engine('mysql+mysqldb://{}:{}@{}/{}?charset=utf8mb4'.format(username, password, host, database ), encoding='utf-8', pool_size=30, max_overflow=0, server_side_cursors=server_side_cursors )
     return engine
 
 def send_slack_notification(message, slack_client, slack_channel, section="DB Update", level="info"):
@@ -106,3 +106,7 @@ def get_full_column_strings(table1_str, table2_str):
 
 
 
+def rawbigcount(filename):
+    f = open(filename, 'rb')
+    bufgen = takewhile(lambda x: x, (f.raw.read(1024*1024) for _ in repeat(None)))
+    return sum( buf.count(b'\n') for buf in bufgen if buf )
