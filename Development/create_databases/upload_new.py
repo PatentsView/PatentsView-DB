@@ -35,6 +35,18 @@ con = engine.connect()
 mainclass = []
 subclass = []
 
+##########################################################################################
+# Added code 7.30.19 for the detail_desc_length.csv creation from detail_desc_text.csv
+for folder in os.listdir(processed_data):
+    # load detail_desc_text, subset cols for detail_desc_length, output to .csv
+    detail_desc_text_data = pd.read_csv('{}/{}/{}'.format(processed_data, folder, 'detail_desc_text.csv'), delimiter ='\t',index_col = False)
+    detail_desc_length_data = detail_desc_text_data[['patent_id','length']]
+
+    detail_desc_length_data.to_csv('{}/{}/{}'.format(processed_data, folder, 'detail_desc_length.csv'), sep ='\t',index=False)
+
+##########################################################################################
+
+
 for folder in os.listdir(processed_data):
     fields = [item for item in os.listdir('{}/{}'.format(processed_data, folder)) if not item in ['error_counts.csv', 'error_data.csv']]
     for f in fields:
