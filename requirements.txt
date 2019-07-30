@@ -20,5 +20,6 @@ jupyter
 fuzzywuzzy
 python-Levenshtein
 textdistance
+tqdm
 Flask==1.0.4
 unidecode
