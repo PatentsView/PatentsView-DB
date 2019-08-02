@@ -194,12 +194,17 @@ process_wipo_operator = BashOperator(task_id='process_wipo',
                                      )
 
 
+# get_disambig_data = BashOperator(task_id='get_disambig_input',
+#                                                    bash_command='bash /project/Development/disambiguation_support/get_data_for_disambig.sh %s %s'%(mysql_config, disambig_input),
+#                                                    dag=dag,
+#                                      on_success_callback = slack_success,
+#                                      on_failure_callback = slack_failure
+#                                      )
+
 get_disambig_data = BashOperator(task_id='get_disambig_input',
-                                                   bash_command='bash /project/Development/disambiguation_support/get_data_for_disambig.sh %s %s'%(mysql_config, disambig_input),
-                                                   dag=dag,
-                                     on_success_callback = slack_success,
-                                     on_failure_callback = slack_failure
-                                     )
+                                 bash_command='python /project/Development/disambiguation_support/get_data_for_disambig.py',
+                                 dag=dag, on_success_callback=slack_success,
+                                 on_failure_callback=slack_failure)
 
 clean_inventor = BashOperator(task_id='clean_inventor',
                                      bash_command='python /project/Development/disambiguation_support/clean_inventor.py', dag=dag,
