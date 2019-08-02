@@ -206,11 +206,11 @@ get_disambig_data = BashOperator(task_id='get_disambig_input',
                                  dag=dag, on_success_callback=slack_success,
                                  on_failure_callback=slack_failure)
 
-clean_inventor = BashOperator(task_id='clean_inventor',
-                                     bash_command='python /project/Development/disambiguation_support/clean_inventor.py', dag=dag,
-                                     on_success_callback = slack_success,
-                                     on_failure_callback = slack_failure
-                                     )
+# clean_inventor = BashOperator(task_id='clean_inventor',
+#                                      bash_command='python /project/Development/disambiguation_support/clean_inventor.py', dag=dag,
+#                                      on_success_callback = slack_success,
+#                                      on_failure_callback = slack_failure
+#                                      )
 
 upload_disambig = BashOperator(task_id='upload_disambig_files',
                                      bash_command='/project/Development/disambiguation_support/upload_disambig.sh %s %s'%(keyfile, disambig_input), dag=dag,
@@ -331,8 +331,8 @@ process_wipo_operator.set_upstream(cpc_current_operator)
 get_disambig_data.set_upstream(process_wipo_operator)
 
 run_lawyer_disambiguation_operator.set_upstream(process_wipo_operator)
-clean_inventor.set_upstream(get_disambig_data)
-upload_disambig.set_upstream(clean_inventor)
+# clean_inventor.set_upstream(get_disambig_data)
+upload_disambig.set_upstream(get_disambig_data)
 
 run_disambiguation_operator.set_upstream(upload_disambig)
 download_disambig_operator.set_upstream(run_disambiguation_operator)
