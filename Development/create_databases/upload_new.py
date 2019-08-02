@@ -42,7 +42,7 @@ for folder in os.listdir(processed_data):
         print(f)
         data = pd.read_csv('{}/{}/{}'.format(processed_data, folder, f), delimiter ='\t',index_col = False)
         if not f in ['mainclass.csv', 'subclass.csv']:
-            data.to_sql(f.replace('.csv', ''), con, if_exists = 'append', index = False)
+            data.to_sql(f.replace('.csv', ''), con, if_exists = 'replace', index = False)
         if f == 'mainclass.csv':
              mainclass.extend(list(data['id']))
         if f == 'subclass.csv':

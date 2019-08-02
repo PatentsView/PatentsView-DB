@@ -173,19 +173,19 @@ cpc_class_operator = BashOperator(task_id='upload_cpc_class',
                                      on_success_callback = slack_success,
                                      on_failure_callback = slack_failure
                                      )
-
-download_uspc_operator = BashOperator(task_id='download_uspc',
-                                      bash_command='python /project/Development/process_uspc/download_and_parse_uspc.py',
-                                      dag=dag,
-                                     on_success_callback = slack_success,
-                                     on_failure_callback = slack_failure
-                                     )
-
-upload_uspc_operator = BashOperator(task_id='upload_uspc',
-                                    bash_command='python /project/Development/process_uspc/upload_uspc.py', dag=dag,
-                                     on_success_callback = slack_success,
-                                     on_failure_callback = slack_failure
-                                     )
+#
+# download_uspc_operator = BashOperator(task_id='download_uspc',
+#                                       bash_command='python /project/Development/process_uspc/download_and_parse_uspc.py',
+#                                       dag=dag,
+#                                      on_success_callback = slack_success,
+#                                      on_failure_callback = slack_failure
+#                                      )
+#
+# upload_uspc_operator = BashOperator(task_id='upload_uspc',
+#                                     bash_command='python /project/Development/process_uspc/upload_uspc.py', dag=dag,
+#                                      on_success_callback = slack_success,
+#                                      on_failure_callback = slack_failure
+#                                      )
 
 process_wipo_operator = BashOperator(task_id='process_wipo',
                                      bash_command='python /project/Development/process_wipo/process_wipo.py', dag=dag,
@@ -319,8 +319,8 @@ cpc_current_operator.set_upstream(merge_new_operator)
 cpc_class_operator.set_upstream(cpc_class_parser_operator)
 cpc_class_operator.set_upstream(rename_old_operator)
 
-upload_uspc_operator.set_upstream(download_uspc_operator)
-upload_uspc_operator.set_upstream(merge_new_operator)
+# upload_uspc_operator.set_upstream(download_uspc_operator)
+# upload_uspc_operator.set_upstream(merge_new_operator)
 process_wipo_operator.set_upstream(cpc_current_operator)
 
 get_disambig_data.set_upstream(process_wipo_operator)

@@ -1,9 +1,9 @@
-import re,csv,os,MySQLdb
+import re,csv,os,pymysql
 import pandas as pd
 from collections import Counter
-import sys
+import sys, time
 sys.path.append('/project/Development')
-
+import sqlalchemy
 from helpers import general_helpers
 import multiprocessing
 from collections import defaultdict
@@ -63,10 +63,20 @@ def get_data(db_con):
         pat_to_subgroup(list): a list of tuples with [(patent_id, subgroup_id)]
     
     """
-    
 
+    db_con.dispose()
+    db_con.connect()
     #get a list of patent ids and cpc subgroup ids from the database
-    data  = db_con.execute('select distinct patent_id,subgroup_id from cpc_current where category="inventional" order by patent_id asc,sequence asc')
+    start=time.time()
+    try:
+        data  = db_con.execute("select distinct patent_id,subgroup_id from cpc_current where category='inventional'")
+        end=time.time()
+        print("SELEcT time: "+ str(end-start), flush=True)
+    except sqlalchemy.exc.OperationalError as e:
+        end=time.time()
+        print("Error Time:"+str(end-start), flush=True )
+        raise e
+
     pat_to_subgroup = [item for item in data]
     return pat_to_subgroup
 
@@ -140,7 +150,7 @@ def write_wipo_assigned(working_directory, output, pats):
     
     """
     #have this go over the full output file from before and grab the patent_id and cpc list
-    print(len(pats))
+    print(len(pats), flush=True)
     outp= csv.writer(open('{0}/{1}'.format(working_directory,output),'w'),delimiter = '\t')
     outp.writerow(['patent_id', 'field_id', 'sequence'])
     for k,v in pats.items():
@@ -168,14 +178,14 @@ def upload_wipo(wipo_output, db_con):
     config = configparser.ConfigParser()
     config.read('/project/Development/config.ini')
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['TEMP_UPLOAD_DB'])
-    print('here')
+    print('here', flush=True)
     outfiles = [f for f in os.listdir(wipo_output) if f.startswith('patent_cpc')]
     for f in outfiles:
         f = '{}/{}'.format(wipo_output,f)
         data = pd.read_csv(f, delimiter = '\t')
-        print(f)
-        print(data.shape)
-        print(data.head(1))
+        print(f, flush=True)
+        print(data.shape, flush=True)
+        print(data.head(1), flush=True)
         data.to_sql('wipo', db_con, if_exists = 'append', index = False)
     insert_sql = 'INSERT IGNORE INTO {}.wipo(SELECT * FROM {}.wipo)'.format(config['DATABASE']['NEW_DB'], config['DATABASE']['TEMP_UPLOAD_DB'])
     db_con.execute(insert_sql)
@@ -212,7 +222,8 @@ if __name__ == '__main__':
    
     input_data = zip(working_directories, chunks_of_patent, cpc_to_ipcs, ipc_to_fields, outfiles)
 
-    desired_processes = 7 # ussually num cpu - 1
+    total_cpus = multiprocessing.cpu_count()
+    desired_processes = (total_cpus / 2) + 1  # ussually num cpu - 1
     jobs = []
     for f in input_data:
         jobs.append(multiprocessing.Process(target = write_cpc2ipc, args=(f)))
@@ -223,12 +234,13 @@ if __name__ == '__main__':
     pats = defaultdict(lambda: [])
     for f in [f for f in os.listdir(wipo_output) if f.startswith('wipo')]:
        patent_input = csv.reader(open('{}/{}'.format(wipo_output, f),'r'), delimiter = '\t')
+       next(patent_input)
        for row in patent_input:
            pats[row[0]].append(row[2])
     
     data_chunks = list(dict_chunks(pats, (len(pats)//7) + 1))
-    print(len(pats))
-    print([len(i) for i in data_chunks])
+    print(len(pats), flush=True)
+    print([len(i) for i in data_chunks], flush=True)
     working_directories = [wipo_output for _ in data_chunks]
     outfiles = ['patent_cpc_{}'.format(item) for item in ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
     input_data = zip(working_directories, outfiles, data_chunks)
@@ -237,7 +249,7 @@ if __name__ == '__main__':
     for f in input_data:
         jobs.append(multiprocessing.Process(target = write_wipo_assigned, args=(f)))
     for segment in general_helpers.chunks(jobs, desired_processes):
-        print(segment)
+        print(segment, flush=True)
         for job in segment:
             job.start()
     upload_wipo(wipo_output, db_con)
