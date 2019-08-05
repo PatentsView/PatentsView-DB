@@ -29,7 +29,7 @@ engine.execute("SET FOREIGN_KEY_CHECKS=0;")
 engine.dispose()
 
 
-status_file=project_home + '/Development/create_databases/status.json'
+status_file=project_home + '/Development/create_databases/merge_status.json'
 try:
     current_status=json.load(open(status_file))
 except OSError as e:
