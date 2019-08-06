@@ -71,7 +71,8 @@ def upload_cpc_current(db_con, cpc_current_loc):
             #any combinaiton of delim_whitespace=True, delimiter = '\t', encoding = 'utf-8' vs no encodign doesnt help
             #so for now read as csv then to data frame, which I hate
             #data=pd.read_csv(f, sep="\t",chunksize=1000, header=None)
-            load_data_command = "LOAD DATA LOCAL INFILE '{0}' INTO TABLE cpc_current COLUMNS TERMINATED BY '\t' lines terminated BY '\n'; ".format(f)
+            load_data_command = "LOAD DATA LOCAL INFILE '{0}' INTO TABLE cpc_current COLUMNS TERMINATED BY '\\t' lines terminated BY '\\n'; ".format(f)
+            print(load_data_command)
             start = time.time()
             with db_con.begin() as conn:
                 conn.execute(load_data_command)
