@@ -223,7 +223,7 @@ if __name__ == '__main__':
     input_data = zip(working_directories, chunks_of_patent, cpc_to_ipcs, ipc_to_fields, outfiles)
 
     total_cpus = multiprocessing.cpu_count()
-    desired_processes = (total_cpus / 2) + 1  # ussually num cpu - 1
+    desired_processes = (total_cpus // 2) + 1  # ussually num cpu - 1
     jobs = []
     for f in input_data:
         jobs.append(multiprocessing.Process(target = write_cpc2ipc, args=(f)))
