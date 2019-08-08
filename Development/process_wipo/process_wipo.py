@@ -231,6 +231,11 @@ if __name__ == '__main__':
     for segment in general_helpers.chunks(jobs, desired_processes):
         for job in segment:
             job.start()
+
+    # wait until all jobs finish processing to move on to the next step
+    for job in jobs:
+        job.join()
+
     pats = defaultdict(lambda: [])
     for f in [f for f in os.listdir(wipo_output) if f.startswith('wipo')]:
        patent_input = csv.reader(open('{}/{}'.format(wipo_output, f),'r'), delimiter = '\t')
@@ -252,4 +257,10 @@ if __name__ == '__main__':
         print(segment, flush=True)
         for job in segment:
             job.start()
+
+
+    # wait until all jobs finish processing to move on to uploading wipo
+    for job in jobs:
+        job.join()
+
     upload_wipo(wipo_output, db_con)
