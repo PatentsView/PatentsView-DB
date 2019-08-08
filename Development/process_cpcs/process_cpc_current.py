@@ -124,6 +124,12 @@ if __name__ == '__main__':
         print(segment)
         for job in segment:
             job.start()
+
+    # wait until all jobs finish processing to move on to uploading cpc current data
+    for job in jobs:
+        job.join()
+
+
     print("Uploading", flush=True)
     upload_cpc_current(db_con, cpc_folder)
  
