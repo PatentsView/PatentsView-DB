@@ -8,7 +8,7 @@ import re, os, random, string, codecs
 import sys
 from collections import Counter, defaultdict
 import time
-
+import tqdm
 project_home = os.environ['PACKAGE_HOME']
 from Development.helpers import general_helpers
 
