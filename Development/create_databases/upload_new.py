@@ -41,6 +41,8 @@ for folder in os.listdir(processed_data):
     # load detail_desc_text, subset cols for detail_desc_length, output to .csv
     detail_desc_text_data = pd.read_csv('{}/{}/{}'.format(processed_data, folder, 'detail_desc_text.csv'), delimiter ='\t',index_col = False)
     detail_desc_length_data = detail_desc_text_data[['patent_id','length']]
+    # rename to match colnames in sql table
+    detail_desc_length_data.columns = ['patent_id', 'detail_desc_length']
 
     detail_desc_length_data.to_csv('{}/{}/{}'.format(processed_data, folder, 'detail_desc_length.csv'), sep ='\t',index=False)
 
