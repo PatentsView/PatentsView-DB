@@ -46,7 +46,7 @@ default_args = {
 dag = DAG(
     'update_db',
     description='Download and process main data and classifications data',
-    start_date=datetime.now(),
+    start_date=datetime(2019, 8, 13, 0, 0, 0),
     catchup=True,
     schedule_interval=None)
 
