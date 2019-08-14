@@ -335,18 +335,8 @@ us_patcit.set_upstream(patent)
 ipcr.set_upstream(patent)
 nber.set_upstream(patent)
 
-uspc.set_upstream(location)
-uspc.set_upstream(assignee)
-uspc.set_upstream(inventor)
-uspc.set_upstream(lawyer)
-uspc.set_upstream(examiner)
-uspc.set_upstream(forprior)
-uspc.set_upstream(pct)
-uspc.set_upstream(us_appcit)
-uspc.set_upstream(us_patcit)
 
-uspc.set_upstream(ipcr)
-uspc.set_upstream(nber)
+uspc.set_upstream(cpc)
 
 cpc.set_upstream(location)
 cpc.set_upstream(assignee)
@@ -362,7 +352,7 @@ cpc.set_upstream(ipcr)
 cpc.set_upstream(nber)
 
 rep_tbl_1.set_upstream(uspc)
-rep_tbl_1.set_upstream(cpc)
+
 
 idx.set_upstream(rep_tbl_1)
 rep_tbl_2.set_upstream(idx)
