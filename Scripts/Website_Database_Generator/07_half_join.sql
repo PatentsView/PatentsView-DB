@@ -28,8 +28,8 @@ CREATE TABLE `{{params.reporting_database}}`.inventor_entity as
     FROM `{{params.reporting_database}}`.patent_inventor left outer join `{{params.reporting_database}}`.inventor ON patent_inventor.inventor_id=inventor.inventor_id 
     left outer join `{{params.reporting_database}}`.location as locationI on patent_inventor.location_id=locationI.location_id;
 
-ALTER TABLE `{{params.reporting_database}}`.`PatentsView_20190312`.`inventor_entity` ADD INDEX `patent_id` (`patent_id` ASC);
-ALTER TABLE `{{params.reporting_database}}`.`PatentsView_20190312`.`inventor_entity` ADD INDEX `inventor_key_id` (`inventor_key_id` ASC);
+ALTER TABLE `{{params.reporting_database}}`.`inventor_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `{{params.reporting_database}}`.`inventor_entity` ADD INDEX `inventor_key_id` (`inventor_key_id` ASC);
 
 -- Index on patent_id and assignee_key_id
 CREATE TABLE `{{params.reporting_database}}`.assignee_entity as 
@@ -64,8 +64,8 @@ CREATE TABLE `{{params.reporting_database}}`.assignee_entity as
     FROM `{{params.reporting_database}}`.patent_assignee left outer join `{{params.reporting_database}}`.assignee ON patent_assignee.assignee_id=assignee.assignee_id 
     left outer join `{{params.reporting_database}}`.location as locationA on patent_assignee.location_id=locationA.location_id;
 
-ALTER TABLE `{{params.reporting_database}}`.`PatentsView_20190312`.`assignee_entity` ADD INDEX `patent_id` (`patent_id` ASC);
-ALTER TABLE `{{params.reporting_database}}`.`PatentsView_20190312`.`assignee_entity` ADD INDEX `assignee_key_id` (`assignee_key_id` ASC);
+ALTER TABLE `{{params.reporting_database}}`.`assignee_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `{{params.reporting_database}}`.`assignee_entity` ADD INDEX `assignee_key_id` (`assignee_key_id` ASC);
 
 -- Index on patent_id
 CREATE TABLE `{{params.reporting_database}}`.uspc_entity as 
@@ -86,7 +86,7 @@ CREATE TABLE `{{params.reporting_database}}`.uspc_entity as
 	left outer join `{{params.reporting_database}}`.uspc_mainclass on uspc_current_mainclass_copy.mainclass_id=uspc_mainclass.id 
     left outer join `{{params.reporting_database}}`.uspc_subclass on uspc_current_copy.subclass_id=uspc_subclass.id;
 
-ALTER TABLE `{{params.reporting_database}}`.`PatentsView_20190312`.`uspc_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `{{params.reporting_database}}`.`uspc_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
 -- Index on patent_id
 CREATE TABLE `{{params.reporting_database}}`.cpc_entity as 
@@ -112,7 +112,7 @@ CREATE TABLE `{{params.reporting_database}}`.cpc_entity as
 	left outer join `{{params.reporting_database}}`.cpc_group on cpc_current_copy.group_id=cpc_group.id 
     left outer join `{{params.reporting_database}}`.cpc_subgroup on cpc_current_copy.subgroup_id=cpc_subgroup.id;
     
-ALTER TABLE `{{params.reporting_database}}`.`PatentsView_20190312`.`cpc_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `{{params.reporting_database}}`.`cpc_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
 -- Index on patent_id
 CREATE TABLE `{{params.reporting_database}}`.nber_entity as 
@@ -130,7 +130,7 @@ CREATE TABLE `{{params.reporting_database}}`.nber_entity as
     FROM `{{params.reporting_database}}`.nber_copy left outer join `{{params.reporting_database}}`.nber_category on nber_copy.category_id=nber_category.id 
     left outer join `{{params.reporting_database}}`.nber_subcategory on nber_copy.subcategory_id=nber_subcategory.id;
     
-ALTER TABLE `{{params.reporting_database}}`.`PatentsView_20190312`.`nber_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `{{params.reporting_database}}`.`nber_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
 -- Index on patent_id
 CREATE TABLE `{{params.reporting_database}}`.wipo_entity as 
@@ -142,7 +142,7 @@ CREATE TABLE `{{params.reporting_database}}`.wipo_entity as
     
     FROM `{{params.reporting_database}}`.wipo left outer join `{{params.reporting_database}}`.wipo_field on wipo.field_id=wipo_field.id;
     
-ALTER TABLE `{{params.reporting_database}}`.`PatentsView_20190312`.`wipo_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `{{params.reporting_database}}`.`wipo_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
 -- Index on patent_id
 CREATE TABLE `{{params.reporting_database}}`.examiner_entity as 
@@ -156,7 +156,7 @@ CREATE TABLE `{{params.reporting_database}}`.examiner_entity as
     
     FROM `{{params.reporting_database}}`.patent_examiner left outer join `{{params.reporting_database}}`.examiner on examiner.examiner_id=patent_examiner.examiner_id;
     
-ALTER TABLE `{{params.reporting_database}}`.`PatentsView_20190312`.`examiner_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `{{params.reporting_database}}`.`examiner_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
 -- Index on patent_id
 CREATE TABLE `{{params.reporting_database}}`.lawyer_entity as 
@@ -175,4 +175,4 @@ CREATE TABLE `{{params.reporting_database}}`.lawyer_entity as
     
     FROM `{{params.reporting_database}}`.patent_lawyer left outer join `{{params.reporting_database}}`.lawyer on lawyer.lawyer_id=patent_lawyer.lawyer_id;
     
-ALTER TABLE `{{params.reporting_database}}`.`PatentsView_20190312`.`lawyer_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `{{params.reporting_database}}`.`lawyer_entity` ADD INDEX `patent_id` (`patent_id` ASC);
