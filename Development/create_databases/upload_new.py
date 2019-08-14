@@ -24,7 +24,7 @@ command = "select table_name from information_schema.tables where table_type = '
 tables_data = con.execute(command)
 tables = [table['table_name'] for table in tables_data]
 
-con.execute("create database {} default character set=utf8mb4 default collate=utf8mb4_unicode_ci".format(temporary_upload))
+con.execute("create database if not exists {} default character set=utf8mb4 default collate=utf8mb4_unicode_ci".format(temporary_upload))
 for table in tables:
     con = engine.connect()
     con.execute("create table {0}.{2} like {1}.{2}".format(temporary_upload, new_database, table))
