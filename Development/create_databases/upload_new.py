@@ -47,18 +47,43 @@ for folder in os.listdir(processed_data):
 ##########################################################################################
 
 
+# check to see if folder and table have previously been loaded
+status_file=project_home + '/Development/create_databases/upload_status.json'
+try:
+    current_status=json.load(open(status_file))
+except OSError as e:
+    print(e)
+    current_status={}
+
+
 for folder in os.listdir(processed_data):
-    fields = [item for item in os.listdir('{}/{}'.format(processed_data, folder)) if not item in ['error_counts.csv', 'error_data.csv']]
-    for f in fields:
+    table_files = [item for item in os.listdir('{}/{}'.format(processed_data, folder)) if not item in ['error_counts.csv', 'error_data.csv']]
+
+    for f in table_files:
         print(folder)
         print(f)
         data = pd.read_csv('{}/{}/{}'.format(processed_data, folder, f), delimiter ='\t',index_col = False)
+
+        # need to track for folder and field combinations
+        folder_table = folder + "_" + f
+
+        # if folder_table combination is in current_status with 1 - break out and move on
+        if folder_table in current_status and current_status[folder_table] == 1:
+            continue
+
         if not f in ['mainclass.csv', 'subclass.csv']:
-            data.to_sql(f.replace('.csv', ''), con, if_exists = 'replace', index = False)
+            data.to_sql(f.replace('.csv', ''), con, if_exists = 'append', index = False)
+
         if f == 'mainclass.csv':
              mainclass.extend(list(data['id']))
         if f == 'subclass.csv':
              subclass.extend(list(data['id']))
+
+
+        current_status[folder_table] = 1
+        json.dump(current_status, open(status_file, "w"))
+        engine.dispose()
+
 #mainclass and subclass get added on once because they need to be unique
 mainclass = pd.DataFrame(list(set(mainclass)), columns = ['id'])
 mainclass.to_sql('mainclass', engine, if_exists = 'replace', index = False)
