@@ -46,7 +46,7 @@ default_args = {
 dag = DAG(
     'update_db',
     description='Download and process main data and classifications data',
-    start_date=datetime.now(),
+    start_date=datetime(2019, 8, 13, 0, 0, 0),
     catchup=True,
     schedule_interval=None)
 
@@ -173,19 +173,19 @@ cpc_class_operator = BashOperator(task_id='upload_cpc_class',
                                      on_success_callback = slack_success,
                                      on_failure_callback = slack_failure
                                      )
-
-download_uspc_operator = BashOperator(task_id='download_uspc',
-                                      bash_command='python /project/Development/process_uspc/download_and_parse_uspc.py',
-                                      dag=dag,
-                                     on_success_callback = slack_success,
-                                     on_failure_callback = slack_failure
-                                     )
-
-upload_uspc_operator = BashOperator(task_id='upload_uspc',
-                                    bash_command='python /project/Development/process_uspc/upload_uspc.py', dag=dag,
-                                     on_success_callback = slack_success,
-                                     on_failure_callback = slack_failure
-                                     )
+#
+# download_uspc_operator = BashOperator(task_id='download_uspc',
+#                                       bash_command='python /project/Development/process_uspc/download_and_parse_uspc.py',
+#                                       dag=dag,
+#                                      on_success_callback = slack_success,
+#                                      on_failure_callback = slack_failure
+#                                      )
+#
+# upload_uspc_operator = BashOperator(task_id='upload_uspc',
+#                                     bash_command='python /project/Development/process_uspc/upload_uspc.py', dag=dag,
+#                                      on_success_callback = slack_success,
+#                                      on_failure_callback = slack_failure
+#                                      )
 
 process_wipo_operator = BashOperator(task_id='process_wipo',
                                      bash_command='python /project/Development/process_wipo/process_wipo.py', dag=dag,
@@ -194,18 +194,23 @@ process_wipo_operator = BashOperator(task_id='process_wipo',
                                      )
 
 
-get_disambig_data = BashOperator(task_id='get_disambig_input',
-                                                   bash_command='bash /project/Development/disambiguation_support/get_data_for_disambig.sh %s %s'%(mysql_config, disambig_input),
-                                                   dag=dag,
-                                     on_success_callback = slack_success,
-                                     on_failure_callback = slack_failure
-                                     )
+# get_disambig_data = BashOperator(task_id='get_disambig_input',
+#                                                    bash_command='bash /project/Development/disambiguation_support/get_data_for_disambig.sh %s %s'%(mysql_config, disambig_input),
+#                                                    dag=dag,
+#                                      on_success_callback = slack_success,
+#                                      on_failure_callback = slack_failure
+#                                      )
 
-clean_inventor = BashOperator(task_id='clean_inventor',
-                                     bash_command='python /project/Development/disambiguation_support/clean_inventor.py', dag=dag,
-                                     on_success_callback = slack_success,
-                                     on_failure_callback = slack_failure
-                                     )
+get_disambig_data = BashOperator(task_id='get_disambig_input',
+                                 bash_command='python /project/Development/disambiguation_support/get_data_for_disambig.py',
+                                 dag=dag, on_success_callback=slack_success,
+                                 on_failure_callback=slack_failure)
+
+# clean_inventor = BashOperator(task_id='clean_inventor',
+#                                      bash_command='python /project/Development/disambiguation_support/clean_inventor.py', dag=dag,
+#                                      on_success_callback = slack_success,
+#                                      on_failure_callback = slack_failure
+#                                      )
 
 upload_disambig = BashOperator(task_id='upload_disambig_files',
                                      bash_command='/project/Development/disambiguation_support/upload_disambig.sh %s %s'%(keyfile, disambig_input), dag=dag,
@@ -294,6 +299,8 @@ process_xml_operator.set_upstream(download_xml_operator)
 parse_xml_operator.set_upstream(process_xml_operator)
 
 upload_new_operator.set_upstream(parse_xml_operator)
+upload_new_operator.set_upstream(rename_old_operator)
+
 merge_new_operator.set_upstream(upload_new_operator)
 merge_new_operator.set_upstream(rename_old_operator)
 
@@ -317,15 +324,15 @@ cpc_current_operator.set_upstream(merge_new_operator)
 cpc_class_operator.set_upstream(cpc_class_parser_operator)
 cpc_class_operator.set_upstream(rename_old_operator)
 
-upload_uspc_operator.set_upstream(download_uspc_operator)
-upload_uspc_operator.set_upstream(merge_new_operator)
+# upload_uspc_operator.set_upstream(download_uspc_operator)
+# upload_uspc_operator.set_upstream(merge_new_operator)
 process_wipo_operator.set_upstream(cpc_current_operator)
 
 get_disambig_data.set_upstream(process_wipo_operator)
 
 run_lawyer_disambiguation_operator.set_upstream(process_wipo_operator)
-clean_inventor.set_upstream(get_disambig_data)
-upload_disambig.set_upstream(clean_inventor)
+# clean_inventor.set_upstream(get_disambig_data)
+upload_disambig.set_upstream(get_disambig_data)
 
 run_disambiguation_operator.set_upstream(upload_disambig)
 download_disambig_operator.set_upstream(run_disambiguation_operator)

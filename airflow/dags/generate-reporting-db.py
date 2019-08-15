@@ -14,14 +14,17 @@ config.read(project_home + '/Development/config.ini')
 slack_token = config["SLACK"]["API_TOKEN"]
 slack_client = SlackClient(slack_token)
 slack_channel = config["SLACK"]["CHANNEL"]
+schema_only = config["REPORTING_DATABASE_OPTIONS"]["SCHEMA_ONLY"]
+if schema_only == "TRUE":
+    schema_only = True
+else:
+    schema_only = False
 
 from Scripts.Website_Database_Generator.database import validate_query
-import pprint
 
 template_extension_config = [".sql"]
 database_name_config = {'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
                         'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME']}
-
 
 
 class SQLTemplatedPythonOperator(PythonOperator):
@@ -43,14 +46,15 @@ default_args = {
     # 'end_date': datetime(2016, 1, 1),
 }
 
-reporting_db_dag = DAG("reporting_database_generation", default_args=default_args, start_date=datetime(2018, 12, 1), 
+reporting_db_dag = DAG("reporting_database_generation", default_args=default_args, start_date=datetime(2018, 12, 1),
                        schedule_interval=None, template_searchpath="/project/Scripts/Website_Database_Generator/")
 db_creation = SQLTemplatedPythonOperator(
     task_id='Database_Creation',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '00_Creation.sql', 'slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '00_Creation', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '00_Creation.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -61,27 +65,30 @@ govt_interest = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '01_01_Govt_Interest.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '01_01_Govt_Interest', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only, "fk_check": False},
     templates_dict={'source_sql': '01_01_Govt_Interest.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
 )
-claims = SQLTemplatedPythonOperator(
-    task_id='Claims_Table',
-    provide_context=True,
-    python_callable=validate_query.validate_and_execute,
-    dag=reporting_db_dag,
-    op_kwargs={'filename': '01_02_Claims.sql','slack_client': slack_client, 'slack_channel':slack_channel},
-    templates_dict={'source_sql': '01_02_Claims.sql'},
-    templates_exts=template_extension_config,
-    params=database_name_config
-)
+# claims = SQLTemplatedPythonOperator(
+#     task_id='Claims_Table',
+#     provide_context=True,
+#     python_callable=validate_query.validate_and_execute,
+#     dag=reporting_db_dag,
+#     op_kwargs={'filename': '01_02_Claims', 'slack_client': slack_client, 'slack_channel': slack_channel,
+#                "schema_only": schema_only},
+#     templates_dict={'source_sql': '01_02_Claims.sql'},
+#     templates_exts=template_extension_config,
+#     params=database_name_config
+# )
 id_mappings = SQLTemplatedPythonOperator(
     task_id='ID_Mappings',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '01_03_ID_Mappings.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '01_03_ID_Mappings', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '01_03_ID_Mappings.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -91,7 +98,8 @@ application = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '01_04_Application.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '01_04_Application', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '01_04_Application.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -101,7 +109,8 @@ wipo = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '01_05_Wipo.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '01_05_Wipo', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '01_05_Wipo.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -111,7 +120,8 @@ patent = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '02_Patent.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '02_Patent', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '02_Patent.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -121,7 +131,8 @@ location = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_01_Location.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_01_Location', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_01_Location.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -131,7 +142,8 @@ assignee = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_02_Assignee.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_02_Assignee', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_02_Assignee.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -141,7 +153,8 @@ inventor = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_03_Inventor.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_03_Inventor', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_03_Inventor.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -151,7 +164,8 @@ lawyer = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_04_Lawyer.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_04_Lawyer', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_04_Lawyer.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -161,7 +175,8 @@ examiner = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_05_Examiner.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_05_Examiner', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_05_Examiner.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -171,7 +186,8 @@ forprior = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_06_Foreign_Priority.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_06_Foreign_Priority', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_06_Foreign_Priority.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -181,7 +197,8 @@ pct = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_07_PCT.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_07_PCT', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_07_PCT.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -191,7 +208,8 @@ us_appcit = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_08_US_App_Citation.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_08_US_App_Citation', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_08_US_App_Citation.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -201,7 +219,8 @@ us_patcit = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_09_US_Patent_Citation.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_09_US_Patent_Citation', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_09_US_Patent_Citation.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -211,7 +230,8 @@ cpc = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_10_CPC.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_10_CPC', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_10_CPC.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -221,7 +241,8 @@ ipcr = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_11_IPCR.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_11_IPCR', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_11_IPCR.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -231,7 +252,8 @@ nber = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_12_Nber.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_12_Nber', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_12_Nber.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -241,7 +263,8 @@ uspc = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '03_13_uspc.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '03_13_uspc', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '03_13_uspc.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -251,7 +274,8 @@ rep_tbl_1 = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '04_Support.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '04_Support', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '04_Support.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -261,7 +285,8 @@ idx = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '05_Indexes.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '05_Indexes', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '05_Indexes.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
@@ -271,14 +296,27 @@ rep_tbl_2 = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
-    op_kwargs={'filename': '06_Reporting_Tables.sql','slack_client': slack_client, 'slack_channel':slack_channel},
+    op_kwargs={'filename': '06_Reporting_Tables', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
     templates_dict={'source_sql': '06_Reporting_Tables.sql'},
     templates_exts=template_extension_config,
     params=database_name_config
 )
 
+half_join_table = SQLTemplatedPythonOperator(
+    task_id='half_join_table',
+    provide_context=True,
+    python_callable=validate_query.validate_and_execute,
+    dag=reporting_db_dag,
+    op_kwargs={'filename': '07_half_join', 'slack_client': slack_client, 'slack_channel': slack_channel,
+               "schema_only": schema_only},
+    templates_dict={'source_sql': '07_half_join.sql'},
+    templates_exts=template_extension_config,
+    params=database_name_config
+)
+
 govt_interest.set_upstream(db_creation)
-claims.set_upstream(db_creation)
+# claims.set_upstream(db_creation)
 id_mappings.set_upstream(db_creation)
 application.set_upstream(db_creation)
 wipo.set_upstream(db_creation)
@@ -294,24 +332,29 @@ forprior.set_upstream(patent)
 pct.set_upstream(patent)
 us_appcit.set_upstream(patent)
 us_patcit.set_upstream(patent)
-cpc.set_upstream(patent)
 ipcr.set_upstream(patent)
 nber.set_upstream(patent)
-uspc.set_upstream(patent)
 
-rep_tbl_1.set_upstream(location)
-rep_tbl_1.set_upstream(assignee)
-rep_tbl_1.set_upstream(inventor)
-rep_tbl_1.set_upstream(lawyer)
-rep_tbl_1.set_upstream(examiner)
-rep_tbl_1.set_upstream(forprior)
-rep_tbl_1.set_upstream(pct)
-rep_tbl_1.set_upstream(us_appcit)
-rep_tbl_1.set_upstream(us_patcit)
-rep_tbl_1.set_upstream(cpc)
-rep_tbl_1.set_upstream(ipcr)
-rep_tbl_1.set_upstream(nber)
+
+uspc.set_upstream(cpc)
+
+cpc.set_upstream(location)
+cpc.set_upstream(assignee)
+cpc.set_upstream(inventor)
+cpc.set_upstream(lawyer)
+cpc.set_upstream(examiner)
+cpc.set_upstream(forprior)
+cpc.set_upstream(pct)
+cpc.set_upstream(us_appcit)
+cpc.set_upstream(us_patcit)
+
+cpc.set_upstream(ipcr)
+cpc.set_upstream(nber)
+
 rep_tbl_1.set_upstream(uspc)
+
 
 idx.set_upstream(rep_tbl_1)
 rep_tbl_2.set_upstream(idx)
+
+half_join_table.set_upstream(rep_tbl_2)

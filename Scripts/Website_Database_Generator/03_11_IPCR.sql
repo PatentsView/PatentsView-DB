@@ -14,7 +14,7 @@ create table `{{params.reporting_database}}`.`temp_ipcr_aggregations`
   `subclass` varchar(20) null,
   `num_assignees` int unsigned not null,
   `num_inventors` int unsigned not null,
-  primary key (`section`, `ipc_class`, `subclass`)
+  unique key (`section`, `ipc_class`, `subclass`)
 )
 engine=InnoDB;
 
@@ -43,7 +43,7 @@ create table `{{params.reporting_database}}`.`temp_ipcr_years_active`
   `first_seen_date` date null,
   `last_seen_date` date null,
   `actual_years_active` smallint unsigned not null,
-  primary key (`section`, `ipc_class`, `subclass`)
+  unique key (`section`, `ipc_class`, `subclass`)
 )
 engine=InnoDB;
 

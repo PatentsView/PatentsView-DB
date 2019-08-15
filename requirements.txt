@@ -1,5 +1,6 @@
 Cython
 pytz
+pandas==0.24.0
 pyOpenSSL
 ndg-httpsclient
 datetime
@@ -13,11 +14,12 @@ clint
 mysqlclient
 sqlalchemy
 regex
-SlackClient
+slackclient==1.3.1
 sqlparse
 jupyter
 fuzzywuzzy
 python-Levenshtein
 textdistance
 tqdm
-pandas
+Flask==1.0.4
+unidecode

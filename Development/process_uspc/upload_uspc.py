@@ -62,8 +62,9 @@ def upload_uspc_current(db_con, uspc_current_loc):
     for outfile in uspc_current_files:
         print(outfile)
         if os.path.getsize('{}/{}'.format(uspc_current_loc,outfile)):
-            data = pd.read_csv('{}/{}'.format(uspc_current_loc,outfile),delimiter = '\t', encoding ='utf-8')
-            data.to_sql('uspc_current', db_con, if_exists = 'append', index=False)
+            uspc_data = pd.read_csv('{}/{}'.format(uspc_current_loc,outfile),delimiter = '\t', encoding ='utf-8', chunksize=10000)
+            for uspc_data_chunk in uspc_data:
+                uspc_data_chunk.to_sql('uspc_current', db_con, if_exists = 'append', index=False, method="multi")
 
 
 

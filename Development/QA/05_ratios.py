@@ -44,6 +44,7 @@ def write_distinct_excel(new_ratios, previous_qa_loc, new_qa_loc, new_database):
     ratios = pd.read_excel('{}/1_distinct_to_total.xlsx'.format(previous_qa_loc))
     ratios[new_database] = new_ratios
     del ratios['Description']
+    del ratios['Notes']
     #the last row of the table is now the most recent previous database!
     ratios['Description'] = ratios.apply(lambda row: create_ratio_description(row[ratios.columns[-2]], row[new_database]), axis=1)
     ratios.to_csv('{}/05_ratios.csv'.format(new_qa_loc), index = False)
