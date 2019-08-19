@@ -92,6 +92,10 @@ if __name__ == '__main__':
     for segment in general_helpers.chunks(jobs, desired_processes):
         for job in segment:
             job.start()
+
+    # wait until all jobs finish processing to move on
+    for job in jobs:
+        job.join()
     #delete the raw files so we don't run out of space
     os.system('rm '+infolder+'/*')
 
