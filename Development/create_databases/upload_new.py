@@ -27,7 +27,7 @@ tables = [table['table_name'] for table in tables_data]
 con.execute("create database if not exists {} default character set=utf8mb4 default collate=utf8mb4_unicode_ci".format(temporary_upload))
 for table in tables:
     con = engine.connect()
-    con.execute("create table {0}.{2} like {1}.{2}".format(temporary_upload, new_database, table))
+    con.execute("create table if not exists {0}.{2} like {1}.{2}".format(temporary_upload, new_database, table))
     con.close()
 
 engine = general_helpers.connect_to_db(host, username, password, temporary_upload)
