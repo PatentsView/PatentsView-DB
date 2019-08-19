@@ -62,7 +62,7 @@ RUN apt-get update --fix-missing \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
-RUN groupadd --gid=$GID docker-group || 1
+RUN groupadd --gid=$GID docker-group || :
 RUN usermod -a -G $GID $NB_USER
 RUN apt-get install -y net-tools iputils-ping
 RUN apt-get install -y libmysqlclient-dev
