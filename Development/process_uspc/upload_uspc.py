@@ -88,8 +88,8 @@ if __name__ == '__main__':
     pat_sets = [patent_set for item in in_files]
     files = zip(in_files, out_files, error_log, pat_dicts, pat_sets)
 
-
-    desired_processes = 7# ussually num cpu - 1
+    total_cpus = multiprocessing.cpu_count()
+    desired_processes = (total_cpus // 2) + 1  # usually num cpu - 1
     jobs = []
     for f in files:
         jobs.append(multiprocessing.Process(target = write_uspc_current, args=(f)))
