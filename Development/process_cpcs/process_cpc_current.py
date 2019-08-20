@@ -67,7 +67,7 @@ def upload_cpc_current(db_con, cpc_current_loc):
         f = '{}/{}'.format(cpc_current_loc,outfile)
         print(f)
         if os.path.getsize(f) > 0: #some files empyt because of patents pre-1976
-            #TODO: very strangely pd.read_csv works on this file in the interperter and not in the script
+            #TODO: very strangely pd.read_csv works on this file in the interpreter and not in the script
             #any combinaiton of delim_whitespace=True, delimiter = '\t', encoding = 'utf-8' vs no encodign doesnt help
             #so for now read as csv then to data frame, which I hate
             #data=pd.read_csv(f, sep="\t",chunksize=1000, header=None)
@@ -115,7 +115,8 @@ if __name__ == '__main__':
 
 
     print("Processing Files", flush=True)
-    desired_processes = 1 # ussually num cpu - 1
+    total_cpus = multiprocessing.cpu_count()
+    desired_processes = (total_cpus // 2) + 1
     jobs = []
     for f in files:
         jobs.append(multiprocessing.Process(target = write_cpc_current, args=(f)))

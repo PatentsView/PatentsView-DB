@@ -249,7 +249,7 @@ if __name__ == '__main__':
     working_directories = [wipo_output for _ in data_chunks]
     outfiles = ['patent_cpc_{}'.format(item) for item in ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
     input_data = zip(working_directories, outfiles, data_chunks)
-    desired_processes = 7 # ussually num cpu - 1
+
     jobs = []
     for f in input_data:
         jobs.append(multiprocessing.Process(target = write_wipo_assigned, args=(f)))

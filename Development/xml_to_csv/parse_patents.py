@@ -64,13 +64,13 @@ def get_results(patents, field_dictionary):
             series_code = patent.find('.//us-application-series-code').text
             #logic for creating transformed columns
             if patent_id.startswith('D'):
-    	        id_transformed = application_num
-    	        number_transformed = application_num
-    	        series_code_transformed_from_type = 'D'
+                id_transformed = application_num
+                number_transformed = application_num
+                series_code_transformed_from_type = 'D'
             else:
-    	        id_transformed = '{}/{}'.format(application_num[:2], application_num[2:])
-    	        number_transformed = application_num
-    	        series_code_transformed_from_type = series_code
+                id_transformed = '{}/{}'.format(application_num[:2], application_num[2:])
+                number_transformed = application_num
+                series_code_transformed_from_type = series_code
 
             results['application'].append([applicationid, patent_id, series_code, app_data['document-id-doc-number'], app_data['document-id-country'], date, id_transformed, number_transformed, series_code_transformed_from_type])
         else:
@@ -436,12 +436,16 @@ if __name__ == '__main__':
                    for item in in_files]
     fields = [field_dictionary for item in in_files]
     files = zip(in_files, out_files, fields)
-    desired_processes = 7 # ussually num cpu - 1
+
+    total_cpus = multiprocessing.cpu_count()
+    desired_processes = (total_cpus // 2) + 1 # usually num cpu - 1
     jobs = []
     for f in files:
         jobs.append(multiprocessing.Process(target = main_process, args=(f)))
     for segment in general_helpers.chunks(jobs, desired_processes):
-        print(segment)
+        print(segment, flush=True)
         for job in segment:
             job.start()
             job.join()
+
+    print("finished processing", flush=True)
