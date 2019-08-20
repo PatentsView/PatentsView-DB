@@ -108,7 +108,7 @@ if __name__ == '__main__':
     # wait until all jobs finish processing to move on
 
     #delete the raw files so we don't run out of space
-    os.system('rm '+infolder+'/*')
+    #os.system('rm '+infolder+'/*')
 
     #After cleaning the files check that there haven't been schema changes
     #This is commented out because still needs work
