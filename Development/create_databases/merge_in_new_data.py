@@ -51,28 +51,36 @@ for table in tables:
     limit = 10000
     offset = 0
     batch_counter = 0
-    while True:
-        batch_counter += 1
-        print('Next iteration...')
+    try:
+        while True:
+            batch_counter += 1
+            print('Next iteration...')
 
-        # order by with primary key column - this has no nulls
-        insert_table_command_template = "INSERT INTO {0}.{2} SELECT * FROM {1}.{2} ORDER BY " + order_by_clause + " limit {3} offset {4}"
-        if table == "mainclass" or table == "subclass":
-            insert_table_command_template = "INSERT IGNORE INTO {0}.{2} SELECT * FROM {1}.{2} ORDER BY " + order_by_clause + " limit {3} offset {4}"
+            # order by with primary key column - this has no nulls
+            insert_table_command_template = "INSERT INTO {0}.{2} SELECT * FROM {1}.{2} ORDER BY " + order_by_clause + " limit {3} offset {4}"
+            if table == "mainclass" or table == "subclass":
+                insert_table_command_template = "INSERT IGNORE INTO {0}.{2} SELECT * FROM {1}.{2} ORDER BY " + order_by_clause + " limit {3} offset {4}"
 
-        insert_table_command = insert_table_command_template.format(
-            new_database, temporary_upload, table, limit,
-            offset)
-        print(insert_table_command, flush=True)
-        start = time.time()
-        engine.execute(insert_table_command)
-        print(time.time() - start, flush=True)
-        # means we have no more batches to process
-        if offset > table_data_count:
-            break
+            insert_table_command = insert_table_command_template.format(
+                new_database, temporary_upload, table, limit,
+                offset)
+            print(insert_table_command, flush=True)
+            start = time.time()
 
-        offset = offset + limit
-        break
-    current_status[table] = 1
+            engine.execute(insert_table_command)
+
+            print(time.time() - start, flush=True)
+            # means we have no more batches to process
+            if offset > table_data_count:
+                break
+
+            offset = offset + limit
+        current_status[table] = 1
+    except Exception as e:
+        current_status[table] = 0
+        json.dump(current_status, open(status_file, "w"))
+        engine.dispose()
+        raise e
+
     json.dump(current_status, open(status_file, "w"))
     engine.dispose()
