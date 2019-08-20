@@ -266,6 +266,7 @@ def recursive_children(xml_element, parent_field=""):
 
 def get_text(element):
 	entries = []
+	return_list = []
 	if element is not None: #some patents lack an abstract
 		if element.text:
 			entries.extend(get_text_and_tail(element))
@@ -277,9 +278,13 @@ def get_text(element):
 				entries.extend(get_text_and_tail(sub_element))
 				for sub_sub_element in sub_element:
 					entries.extend(get_text_and_tail(sub_sub_element))           
-		return list(filter(lambda x: x is not None and not x == "\n", entries))
+		return_list = list(filter(lambda x: x is not None and not x == "\n", entries))
+		if len(return_list) < 1:
+			return_list = [None]
 	else:
-		return [None]
+		return_list = [None]
+
+	return return_list
 
 def get_text_and_tail(element):
 	'''
