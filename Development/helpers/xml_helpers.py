@@ -65,15 +65,16 @@ def get_main_text_fields(patent):
                 field = item.attrib['description']
             else:
                 if item.tag == 'heading':
+					item_text=get_text(item)
                     #special processing section to get the GI statement if it is delimited by a heading instead of a processing tag
-                    if get_text(item)[0] in government and field != 'Government Interest':
+                    if item_text and len(item_text)>0 and item_text[0] in government and field != 'Government Interest':
                         if not switch_back: #don't make old field in GI if that came first
                             old_field = field
                         next_switch = False
                         field = 'Government Interest'
                         switch_back = True
                     #specially processing to get other reference with wierd tag as well
-                    elif get_text(item)[0] in other_patent and field != 'Other Patent Relations':
+                    elif item_text[0] in other_patent and field != 'Other Patent Relations':
                         if not switch_back: #don't make old field in GI if that came first
                             old_field = field
                         field = 'Other Patent Relations'
