@@ -74,7 +74,7 @@ def get_main_text_fields(patent):
                         field = 'Government Interest'
                         switch_back = True
                     #specially processing to get other reference with wierd tag as well
-                    elif item_text[0] in other_patent and field != 'Other Patent Relations':
+                    elif item_text and len(item_text)>0 and  item_text[0] in other_patent and field != 'Other Patent Relations':
                         if not switch_back: #don't make old field in GI if that came first
                             old_field = field
                         field = 'Other Patent Relations'
