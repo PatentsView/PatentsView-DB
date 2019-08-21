@@ -6,38 +6,38 @@ import re
 ### Main Data Processing Functions
 #####################################
 def get_xml(valid_xml_file):
-	'''
-	Return a xml object with patent data
-	:param valid_xml_file: a valid xml object
-	:return the root object of the xml file, ready to parse
-	'''
-	tree = etree.parse(valid_xml_file)
-	root = tree.getroot()
-	return root
+    '''
+    Return a xml object with patent data
+    :param valid_xml_file: a valid xml object
+    :return the root object of the xml file, ready to parse
+    '''
+    tree = etree.parse(valid_xml_file)
+    root = tree.getroot()
+    return root
 
 def get_entity(patent, entity_name, attribute_list=None):
-	'''
-	:params patent: take the xml object representing a patent
-	:params entity_name: a string with the xml tag for an entity with single or multiple entities
-	:returns a list of default dictionaries with all the data for the entity and processes dates
-	'''
-	var_list=[]
-	xml = patent.findall('.//'+entity_name)
-	for field in xml:
-		data=defaultdict(lambda : None)
-		if attribute_list:
-			for attribute in attribute_list:
-				data[attribute]=field.attrib[attribute]
-		#recursive function modifies data dictionary defined above
-		results_list = recursive_children(field)
-		data.update(dict(results_list))
-		for key in data.keys():
-			if 'date' in key:
-				data[key] = process_date(data[key])
-		var_list.append(data)
-	if var_list ==[]:
-		return [None]
-	return var_list
+    '''
+    :params patent: take the xml object representing a patent
+    :params entity_name: a string with the xml tag for an entity with single or multiple entities
+    :returns a list of default dictionaries with all the data for the entity and processes dates
+    '''
+    var_list=[]
+    xml = patent.findall('.//'+entity_name)
+    for field in xml:
+        data=defaultdict(lambda : None)
+        if attribute_list:
+            for attribute in attribute_list:
+                data[attribute]=field.attrib[attribute]
+        #recursive function modifies data dictionary defined above
+        results_list = recursive_children(field)
+        data.update(dict(results_list))
+        for key in data.keys():
+            if 'date' in key:
+                data[key] = process_date(data[key])
+        var_list.append(data)
+    if var_list ==[]:
+        return [None]
+    return var_list
 
 def get_main_text_fields(patent):
     #TODO: This could use improvements to be less convoluted
@@ -65,7 +65,7 @@ def get_main_text_fields(patent):
                 field = item.attrib['description']
             else:
                 if item.tag == 'heading':
-					item_text=get_text(item)
+                    item_text=get_text(item)
                     #special processing section to get the GI statement if it is delimited by a heading instead of a processing tag
                     if item_text and len(item_text)>0 and item_text[0] in government and field != 'Government Interest':
                         if not switch_back: #don't make old field in GI if that came first
@@ -118,13 +118,13 @@ def get_main_text_fields(patent):
 ### Get Data for Specific Fields
 #####################################
 def get_uspc(patent):
-	uspc_list = []
-	for uspc in patent.findall('.//us-bibliographic-data-grant/classification-national'):
-		uspc_data = defaultdict(list)
-		for element in uspc:
-			uspc_data[element.tag].append(element.text)
-		uspc_list.append(uspc_data)
-	return uspc_list
+    uspc_list = []
+    for uspc in patent.findall('.//us-bibliographic-data-grant/classification-national'):
+        uspc_data = defaultdict(list)
+        for element in uspc:
+            uspc_data[element.tag].append(element.text)
+        uspc_list.append(uspc_data)
+    return uspc_list
 
 def get_claims_data(patent):
     '''
@@ -154,93 +154,93 @@ def get_claims_data(patent):
     return claims_list
 
 def get_usreldocs(patent):
-	usreldoc_list = []
-	sequence = 0
-	usreldocs = patent.find('.//'+'us-related-documents')
-	if usreldocs is not None:
-		for item in usreldocs:
-			doc_type = item.tag
-			for sub_item in item:  
-				if sub_item.tag == 'document-id': 
-					data = defaultdict(lambda: None)
-					data['doc-type'] = doc_type
-					for sub_sub_item in sub_item:
-						data[sub_sub_item.tag] = sub_sub_item.text
-					data['sequence'] = sequence
-					sequence +=1
-					usreldoc_list.append(data)
-				else:
-					for partial_doc in sub_item:
-						data = defaultdict(lambda: None)
-						data['doc-type'] = doc_type
-						data['relation'] = partial_doc.tag
-						for field in partial_doc.find('document-id'):
-							data[field.tag] = field.text
-						data['sequence'] = sequence
-						sequence +=1
-						status = partial_doc.find('parent-status')
-						if status is not None:
-							data['status'] = status.text
-						usreldoc_list.append(data)
-						for field in partial_doc:
-							if field.tag in ['parent-grant-document', 
-											  'parent-pct-document']:
-								data = defaultdict(lambda: None)
-								data['doc-type'] = doc_type
-								data['relation'] = field.tag
-								for sub_field in field.find('document-id'):
-									data[sub_field.tag] = sub_field.text
-								data['sequence'] = sequence
-								sequence +=1
-								usreldoc_list.append(data)
-		for data_dict in usreldoc_list:   
-			for key in data_dict.keys():
-				if 'date' in key:
-					data_dict[key] = process_date(data_dict[key])
-	return usreldoc_list
+    usreldoc_list = []
+    sequence = 0
+    usreldocs = patent.find('.//'+'us-related-documents')
+    if usreldocs is not None:
+        for item in usreldocs:
+            doc_type = item.tag
+            for sub_item in item:  
+                if sub_item.tag == 'document-id': 
+                    data = defaultdict(lambda: None)
+                    data['doc-type'] = doc_type
+                    for sub_sub_item in sub_item:
+                        data[sub_sub_item.tag] = sub_sub_item.text
+                    data['sequence'] = sequence
+                    sequence +=1
+                    usreldoc_list.append(data)
+                else:
+                    for partial_doc in sub_item:
+                        data = defaultdict(lambda: None)
+                        data['doc-type'] = doc_type
+                        data['relation'] = partial_doc.tag
+                        for field in partial_doc.find('document-id'):
+                            data[field.tag] = field.text
+                        data['sequence'] = sequence
+                        sequence +=1
+                        status = partial_doc.find('parent-status')
+                        if status is not None:
+                            data['status'] = status.text
+                        usreldoc_list.append(data)
+                        for field in partial_doc:
+                            if field.tag in ['parent-grant-document', 
+                                              'parent-pct-document']:
+                                data = defaultdict(lambda: None)
+                                data['doc-type'] = doc_type
+                                data['relation'] = field.tag
+                                for sub_field in field.find('document-id'):
+                                    data[sub_field.tag] = sub_field.text
+                                data['sequence'] = sequence
+                                sequence +=1
+                                usreldoc_list.append(data)
+        for data_dict in usreldoc_list:   
+            for key in data_dict.keys():
+                if 'date' in key:
+                    data_dict[key] = process_date(data_dict[key])
+    return usreldoc_list
 
 def get_citations(patent):
-	'''
-	:params patent: the xml object representing a patent
-	:returns a list of default dictionary with code for each citation
-	'''
-	patent_cite_list = []
-	non_patent_cite_list= []
-	citations = patent.findall(".//us-citation")
-	if citations ==[]:
-		citations = patent.findall(".//citation")
-	if citations != []:
-		for citation in citations:
-			cite_data = defaultdict(lambda : None)
-			for element in citation:
-				if element.tag == 'category':
-					cite_data['category'] = element.text
-				elif element.tag =='classification-cpc-text':
-					pass
-				else:
-					if element.tag in ['nplcit', 'patcit']:
-						cite_data['type'] == element.tag
-					if element.tag=='nplcit':
-						cite_data['text']= []
-						for sub_element in element:
-							cite_data['text'].append(sub_element.text)
-							for sub_sub_element in sub_element:
-								cite_data['text'].extend([sub_sub_element.text, sub_sub_element.tail])
-						cite_data['text'] = " ".join([item for item in cite_data['text'] if item is not None])
-						non_patent_cite_list.append(cite_data)
-					elif element.tag in ['classification-national', 'classification-ipc', 'classification-ipcr']:
-						pass
-					else:
-						doc_info = element.find('document-id')
-						for sub_element in doc_info:
-							cite_data[sub_element.tag] = sub_element.text
-						for key in cite_data.keys():
-							if 'date' in key:
-								cite_data[key] = process_date(cite_data[key])
-						patent_cite_list.append(cite_data)
-		return patent_cite_list, non_patent_cite_list
-	else:
-		return [None, None]
+    '''
+    :params patent: the xml object representing a patent
+    :returns a list of default dictionary with code for each citation
+    '''
+    patent_cite_list = []
+    non_patent_cite_list= []
+    citations = patent.findall(".//us-citation")
+    if citations ==[]:
+        citations = patent.findall(".//citation")
+    if citations != []:
+        for citation in citations:
+            cite_data = defaultdict(lambda : None)
+            for element in citation:
+                if element.tag == 'category':
+                    cite_data['category'] = element.text
+                elif element.tag =='classification-cpc-text':
+                    pass
+                else:
+                    if element.tag in ['nplcit', 'patcit']:
+                        cite_data['type'] == element.tag
+                    if element.tag=='nplcit':
+                        cite_data['text']= []
+                        for sub_element in element:
+                            cite_data['text'].append(sub_element.text)
+                            for sub_sub_element in sub_element:
+                                cite_data['text'].extend([sub_sub_element.text, sub_sub_element.tail])
+                        cite_data['text'] = " ".join([item for item in cite_data['text'] if item is not None])
+                        non_patent_cite_list.append(cite_data)
+                    elif element.tag in ['classification-national', 'classification-ipc', 'classification-ipcr']:
+                        pass
+                    else:
+                        doc_info = element.find('document-id')
+                        for sub_element in doc_info:
+                            cite_data[sub_element.tag] = sub_element.text
+                        for key in cite_data.keys():
+                            if 'date' in key:
+                                cite_data[key] = process_date(cite_data[key])
+                        patent_cite_list.append(cite_data)
+        return patent_cite_list, non_patent_cite_list
+    else:
+        return [None, None]
 
 #####################################
 ### Data Processing Helper Functions
@@ -266,100 +266,100 @@ def recursive_children(xml_element, parent_field=""):
     return test_list
 
 def get_text(element):
-	entries = []
-	if element is not None: #some patents lack an abstract
-		if element.text:
-			entries.extend(get_text_and_tail(element))
-		for sub_element in element:
-			if sub_element.tag == 'ul':
-				pass
-				#entries.extend(recursive_list(sub_item))
-			else:
-				entries.extend(get_text_and_tail(sub_element))
-				for sub_sub_element in sub_element:
-					entries.extend(get_text_and_tail(sub_sub_element))           
-		return list(filter(lambda x: x is not None and not x == "\n", entries))
-	else:
-		return [None]
+    entries = []
+    if element is not None: #some patents lack an abstract
+        if element.text:
+            entries.extend(get_text_and_tail(element))
+        for sub_element in element:
+            if sub_element.tag == 'ul':
+                pass
+                #entries.extend(recursive_list(sub_item))
+            else:
+                entries.extend(get_text_and_tail(sub_element))
+                for sub_sub_element in sub_element:
+                    entries.extend(get_text_and_tail(sub_sub_element))           
+        return list(filter(lambda x: x is not None and not x == "\n", entries))
+    else:
+        return [None]
 
 def get_text_and_tail(element):
-	'''
-	Filters out the information processing tag information that is oddly appearing
-	the extra text that appears after a child tag is, confusingly, the tail of the child tag rather than of the parent tag it seems to belong to
-	:params element: xml element, or sub element, that has both text and a tail (the extra text that appears after a tag)
-	'''
-	results_list = []
-	if not etree.tostring(element, encoding = 'unicode').startswith("<?"):
-		results_list.extend([element.text, element.tail])
-	if etree.tostring(element, encoding = 'unicode').startswith("<?"):
-		results_list.extend([element.tail])
-	return results_list
+    '''
+    Filters out the information processing tag information that is oddly appearing
+    the extra text that appears after a child tag is, confusingly, the tail of the child tag rather than of the parent tag it seems to belong to
+    :params element: xml element, or sub element, that has both text and a tail (the extra text that appears after a tag)
+    '''
+    results_list = []
+    if not etree.tostring(element, encoding = 'unicode').startswith("<?"):
+        results_list.extend([element.text, element.tail])
+    if etree.tostring(element, encoding = 'unicode').startswith("<?"):
+        results_list.extend([element.tail])
+    return results_list
 def recursive_list(field):
-	'''
-	Flattens out an xml list and returns the flattend version
-	:params field that is an xml list
-	'''
-	list_of_lists = []
-	if len(field)>0:
-		list_of_lists.append(field.text)
-		for sub_field in field:
-			list_of_lists += recursive_list(sub_field)
-	else:
-		list_of_lists += get_text(field)
-	return list_of_lists
+    '''
+    Flattens out an xml list and returns the flattend version
+    :params field that is an xml list
+    '''
+    list_of_lists = []
+    if len(field)>0:
+        list_of_lists.append(field.text)
+        for sub_field in field:
+            list_of_lists += recursive_list(sub_field)
+    else:
+        list_of_lists += get_text(field)
+    return list_of_lists
 
 
 #####################################
 ### Post-Processing Functions
 #####################################
 def process_patent_numbers(raw_patent_num):
-	'''
-	Helper function ot transform patent ids into thier final format
-	:param raw_patent_num: patent number extracted from the raw XML
-	:return cleaned patent id.
-	'''
-	num = re.findall('\d+', raw_patent_num)[0] #get the just numbers in string form
-	if num[0].startswith("0"):
-		num = num[1:]
-	#Sept 5, 2016 - must triple check that moving the let definition out side of the if statement above does not mess up the patent numbers
-	let = re.findall('[a-zA-Z]+', raw_patent_num) #get the letter prefixes
-	if let:
-		let = let[0]#list to string
-		clean_patent_num = let + num
-	else:
-		clean_patent_num = num
-	return clean_patent_num
+    '''
+    Helper function ot transform patent ids into thier final format
+    :param raw_patent_num: patent number extracted from the raw XML
+    :return cleaned patent id.
+    '''
+    num = re.findall('\d+', raw_patent_num)[0] #get the just numbers in string form
+    if num[0].startswith("0"):
+        num = num[1:]
+    #Sept 5, 2016 - must triple check that moving the let definition out side of the if statement above does not mess up the patent numbers
+    let = re.findall('[a-zA-Z]+', raw_patent_num) #get the letter prefixes
+    if let:
+        let = let[0]#list to string
+        clean_patent_num = let + num
+    else:
+        clean_patent_num = num
+    return clean_patent_num
 
 def process_date(date): 
-	'''
-	Takes a date formated as 6 numbers and returns it with dashes and days that are 00 replaced with 01
-	:params date: a date object formatted as 6 numbers
-	:returns cleaned up date
-	'''
-	if date is not None:
-		if date[6:] != "00":
-			date = date[:4]+'-'+date[4:6]+'-'+date[6:]
-		else:
-			date = date[:4]+'-'+date[4:6]+'-'+'01'
-	return date
+    '''
+    Takes a date formated as 6 numbers and returns it with dashes and days that are 00 replaced with 01
+    :params date: a date object formatted as 6 numbers
+    :returns cleaned up date
+    '''
+    if date is not None:
+        if date[6:] != "00":
+            date = date[:4]+'-'+date[4:6]+'-'+date[6:]
+        else:
+            date = date[:4]+'-'+date[4:6]+'-'+'01'
+    return date
 
 def process_uspc_class_sub(classification):
-	'''
-	:params classification:  a uspc classification entry
-	:returns cleaned up version of the classification entry
-	'''
-	crossrefsub = classification[3:].replace(" ","") 
-	if len(crossrefsub) > 3 and re.search('^[A-Z]',crossrefsub[3:]) is None: 
-		crossrefsub = crossrefsub[:3]+'.'+crossrefsub[3:] 
-	crossrefsub = re.sub('^0+','',crossrefsub) 
-	if re.search('[A-Z]{3}',crossrefsub[:3]): 
-		crossrefsub = crossrefsub.replace(".","")
-	return crossrefsub
-	
+    '''
+    :params classification:  a uspc classification entry
+    :returns cleaned up version of the classification entry
+    '''
+    crossrefsub = classification[3:].replace(" ","") 
+    if len(crossrefsub) > 3 and re.search('^[A-Z]',crossrefsub[3:]) is None: 
+        crossrefsub = crossrefsub[:3]+'.'+crossrefsub[3:] 
+    crossrefsub = re.sub('^0+','',crossrefsub) 
+    if re.search('[A-Z]{3}',crossrefsub[:3]): 
+        crossrefsub = crossrefsub.replace(".","")
+    return crossrefsub
+    
 def clean_country(country):
-	if country is None or country == 'unknown':
-		return None
-	elif len(country) >=3:
-		return country[:2]
-	else:
-		return country
+    if country is None or country == 'unknown':
+        return None
+    elif len(country) >=3:
+        return country[:2]
+    else:
+        return country
