@@ -266,6 +266,11 @@ persistent_inventor_operator = BashOperator(task_id = 'persistent_inventor',
                                      on_failure_callback = slack_failure
                                      )
 
+persistent_assignee_operator = BashOperator(task_id = 'persistent_assignee',
+                                            bash_command = 'python /project/Development/post_process_disambiguation/persistent_assignee.py', dag=dag,
+                                     on_success_callback = slack_success,
+                                     on_failure_callback = slack_failure
+                                     )
 inventor_gender_operator = BashOperator(task_id = 'inventor_gender',
                                             bash_command = 'python /project/Development/post_process_disambiguation/inventor_gender.py', dag=dag,
                                      on_success_callback = slack_success,
@@ -344,6 +349,7 @@ postprocess_location_operator.set_upstream(download_disambig_operator)
 lookup_tables_operator.set_upstream(postprocess_inventor_operator)
 lookup_tables_operator.set_upstream(postprocess_assignee_operator)
 lookup_tables_operator.set_upstream(postprocess_location_operator)
+persistent_assignee_operator.set_upstream(postprocess_assignee_operator)
 persistent_inventor_operator.set_upstream(postprocess_inventor_operator)
 inventor_gender_operator.set_upstream(persistent_inventor_operator)
 
