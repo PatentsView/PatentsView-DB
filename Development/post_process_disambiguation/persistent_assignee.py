@@ -97,7 +97,7 @@ while True:
             
 		# uuid is new! no old_rawassignee id or old disambig cols
 		else:
-			outfile.writerow([row[0], ''] + blanks + [row[1]])
+			outfile.writerow([row[0], ''] + blanks[2:] + [row[1]])
 
 		# keep going because we have chunks to process
 		counter +=1
