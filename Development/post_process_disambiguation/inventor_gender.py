@@ -37,15 +37,15 @@ except sqlalchemy.exc.ProgrammingError as e:
     print("Alter table command did not work - see full error message below")
     print(e)
     
-db_con.execute('create index ix_inv_gender on temp_inventor_gender_{0} (disamb_inventor_id_20170808, male);'.format(old_db))
-
-# for order by 
-db_con.execute('create index ix_disamb_inv_id_20170808 on temp_inventor_gender_{0}(disamb_inventor_id_20170808);'.format(old_db)) 
-
-db_con.execute('create index ix_disamb_invgender on persistent_inventor_disambig (disamb_inventor_id_20170808, {0}, {1});'.format(old_id_col,new_id_col))
-
-# for order by 
-db_con.execute('create index ix_disamb_20170808_invgender on persistent_inventor_disambig(disamb_inventor_id_20170808);')
+# db_con.execute('create index ix_inv_gender on temp_inventor_gender_{0} (disamb_inventor_id_20170808, male);'.format(old_db))
+#
+# # for order by
+# db_con.execute('create index ix_disamb_inv_id_20170808 on temp_inventor_gender_{0}(disamb_inventor_id_20170808);'.format(old_db))
+#
+# db_con.execute('create index ix_disamb_invgender on persistent_inventor_disambig (disamb_inventor_id_20170808, {0}, {1});'.format(old_id_col,new_id_col))
+#
+# # for order by
+# db_con.execute('create index ix_disamb_20170808_invgender on persistent_inventor_disambig(disamb_inventor_id_20170808);')
 
 
 ########################################################################################
