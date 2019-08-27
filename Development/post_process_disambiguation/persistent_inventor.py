@@ -38,7 +38,7 @@ except sqlalchemy.exc.ProgrammingError as e:
     print(e)
     
 # ADD INDEXES to rawinventor
-db_con.execute('create index rawinv_pid_ix on rawinventor (uuid, inventor_id);')
+#db_con.execute('create index rawinv_pid_ix on rawinventor (uuid, inventor_id);')
 
 # 1. get column information from information schema
 rawinv_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawinventor' and column_name in ('uuid', 'inventor_id');".format(new_db))
