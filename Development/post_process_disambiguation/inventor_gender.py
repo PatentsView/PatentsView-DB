@@ -83,7 +83,7 @@ batch_counter = 0
 limit = 300000
 offset = 0
 
-processed_ids = []
+processed_ids = set()
 
 while True:
 	batch_counter+=1
@@ -96,7 +96,7 @@ while True:
         # row[len(row) - 1] = most recent db col
         # if 20170808 id has not been seen previously already, add to processed ids list
 		if row[0] not in processed_ids:
-			processed_ids.append(row[0])
+			processed_ids.add(row[0])
             
             # if 20170808 id exists and it is in the inventor_gender table, we have gender info!
 			if row[0] is not None and row[0] in id_to_gender.keys():
