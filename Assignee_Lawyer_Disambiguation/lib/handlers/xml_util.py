@@ -33,7 +33,7 @@ Collection of useful functions and tools for working with XML documents
 """
 
 import re
-from itertools import izip
+
 from unicodedata import normalize
 from cgi import escape
 
@@ -44,7 +44,7 @@ def flatten(ls_of_ls):
     where list `i` contains the `i`th element from the original
     set of lists.
     """
-    return map(list, list(izip(*ls_of_ls)))
+    return list(map(list, list(zip(*ls_of_ls))))
 
 def extend_padding(ls_of_ls, padding=''):
     """
@@ -52,7 +52,7 @@ def extend_padding(ls_of_ls, padding=''):
     where each list is padded up to the length of the longest
     list by [padding] (defaults to the empty string)
     """
-    maxlen = max(map(len, ls_of_ls))
+    maxlen = max(list(map(len, ls_of_ls)))
     newls = []
     for ls in ls_of_ls:
         if len(ls) != maxlen:
@@ -77,14 +77,14 @@ def has_content(l):
     """
     Returns true if list [l] contains any non-null objects
     """
-    return any(filter(lambda x: x, l))
+    return any([x for x in l if x])
 
 def normalize_utf8(string):
     """
     Normalizes [string] to be UTF-8 encoded. Accepts both unicode and normal
     Python strings.
     """
-    if isinstance(string, unicode):
+    if isinstance(string, str):
         return normalize('NFC', string)
     else:
         return normalize('NFC', string.decode('utf-8'))
@@ -104,7 +104,7 @@ def translate_underscore(string, lower=False):
     """
     if lower:
         string = string.lower()
-    return string.replace('<sub>&#x2014;</sub>','_').replace('<sub>-</sub>','_').replace(u'<sub>\u2014</sub>','_')
+    return string.replace('<sub>&#x2014;</sub>','_').replace('<sub>-</sub>','_').replace('<sub>\u2014</sub>','_')
 
 
 def escape_html(string):

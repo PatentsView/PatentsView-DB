@@ -88,7 +88,7 @@ DROP TABLE IF EXISTS `cpc_group`;
 
 CREATE TABLE `cpc_group` (
   `id` varchar(20) NOT NULL,
-  `title` varchar(256) DEFAULT NULL,
+  `title` mediumtext  DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -107,7 +107,7 @@ DROP TABLE IF EXISTS `cpc_subsection`;
 
 CREATE TABLE `cpc_subsection` (
   `id` varchar(20) NOT NULL,
-  `title` varchar(256) DEFAULT NULL,
+  `title` mediumtext DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -422,6 +422,7 @@ CREATE TABLE `rawinventor` (
   `name_last` varchar(64) DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `rule_47` varchar(20) DEFAULT NULL,
+  `deceased` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`),
   KEY `inventor_id` (`inventor_id`),
@@ -517,7 +518,7 @@ CREATE TABLE `uspatentcitation` (
   `name` varchar(64) DEFAULT NULL,
   `kind` varchar(10) DEFAULT NULL,
   `country` varchar(10) DEFAULT NULL,
-  `category` varchar(20) DEFAULT NULL,
+  `category` varchar(64) DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   KEY `patent_id` (`patent_id`),

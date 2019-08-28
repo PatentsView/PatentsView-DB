@@ -4,7 +4,7 @@ import os
 from lxml import html
 import lxml.html
 import sys
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+sys.path.append('/project/Development')
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 
@@ -186,7 +186,7 @@ if __name__ == '__main__':
     import datetime
     import configparser
     config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+    config.read('/project/Development/config.ini')
     # Find URLs correctly
     #TODO: update these to reflect most recent dates
     print(find_cpc_schema_url())

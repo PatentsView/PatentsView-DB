@@ -4,16 +4,18 @@ import csv
 import re
 import pandas as pd
 import simplejson as json
+project_home = os.environ['PACKAGE_HOME']
+from Development.helpers import output, xml_helpers, general_helpers
 
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
-from helpers import output, xml_helpers, general_helpers
+
 from lxml import etree
 from collections import defaultdict
 import string
 import random
 import multiprocessing
-import configparser
 import copy
+import configparser
+
 
 def get_results(patents, field_dictionary): 
     results = {}
@@ -62,13 +64,13 @@ def get_results(patents, field_dictionary):
             series_code = patent.find('.//us-application-series-code').text
             #logic for creating transformed columns
             if patent_id.startswith('D'):
-    	        id_transformed = application_num
-    	        number_transformed = application_num
-    	        series_code_transformed_from_type = 'D'
+                id_transformed = application_num
+                number_transformed = application_num
+                series_code_transformed_from_type = 'D'
             else:
-    	        id_transformed = '{}/{}'.format(application_num[:2], application_num[2:])
-    	        number_transformed = application_num
-    	        series_code_transformed_from_type = series_code
+                id_transformed = '{}/{}'.format(application_num[:2], application_num[2:])
+                number_transformed = application_num
+                series_code_transformed_from_type = series_code
 
             results['application'].append([applicationid, patent_id, series_code, app_data['document-id-doc-number'], app_data['document-id-country'], date, id_transformed, number_transformed, series_code_transformed_from_type])
         else:
@@ -76,7 +78,8 @@ def get_results(patents, field_dictionary):
             app_type = None
         #assigned after application to extract application data
         results['patent'].append([patent_id,app_type , patent_id, patent_data['document-id-country'],
-                           patent_date, abstract, title, patent_data['document-id-kind'], num_claims, filename])
+                           patent_date, abstract, title, patent_data['document-id-kind'], num_claims, filename, '0'])
+
         
         exemplary = xml_helpers.get_entity(patent, 'us-exemplary-claim')
         if exemplary[0] is not None:
@@ -99,7 +102,7 @@ def get_results(patents, field_dictionary):
             if detail_desc_text_data !=[]:
                 results['detail_desc_text'].append([general_helpers.id_generator(), patent_id, detail_desc_text_data, len(detail_desc_text_data)])
             else:
-                if not patent_id[0] in ["R", 'P', 'H', 'D']: #these types are allowed to not have detailed descriptions
+                if not patent_id[0] in ['R', 'P', 'H', 'D']: #these types are allowed to not have detailed descriptions
                     error_log.append([patent_id, 'detail-description'])
 
             brf_sum_text_data = text_data['Brief Summary']
@@ -112,7 +115,7 @@ def get_results(patents, field_dictionary):
 
             rel_app_text_data = text_data['Other Patent Relations']
             if rel_app_text_data !=[]:
-                results['rel_app_text'].append([general_helpers.id_generator(), patent_id, rel_app_text_data])
+                results['rel_app_text'].append([general_helpers.id_generator(), patent_id, rel_app_text_data, 0])
                 
             government_interest_data = text_data['Government Interest']
             if government_interest_data !=[]:
@@ -136,7 +139,10 @@ def get_results(patents, field_dictionary):
             for inventor in inventor_data:
                 rawlocid = general_helpers.id_generator()
                 results['rawlocation'].append([rawlocid, None, inventor['address-city'], inventor['address-state'], inventor['address-country'], xml_helpers.clean_country(inventor['address-country'])])
-                results['rawinventor'].append([general_helpers.id_generator(), patent_id, None, rawlocid, output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']), int(inventor['sequence']) -1, rule_47_flag])
+                deceased = False
+                if 'deceased' in output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']):
+                    deceased = True
+                results['rawinventor'].append([general_helpers.id_generator(), patent_id, None, rawlocid, output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']), int(inventor['sequence']) -1, rule_47_flag, deceased])
                 output.mandatory_fields('inventor', patent_id, error_log, [output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
         else:
             error_log.append([patent_id, 'inventor'])
@@ -152,7 +158,7 @@ def get_results(patents, field_dictionary):
                 results['rawinventor'].append([general_helpers.id_generator(), patent_id, None, rawlocid, 
                                          output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), 
                                          output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name']),
-                                         inventor['sequence'], rule_47_flag])
+                                         inventor['sequence'], rule_47_flag, True])
                 output.mandatory_fields('inventor', patent_id, error_log, [output.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']), output.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
         
         #applicant has inventor info for some earlier time periods
@@ -167,7 +173,7 @@ def get_results(patents, field_dictionary):
                 if applicant['app-type'] == "applicant-inventor":
                     #rule_47 flag always 0 for applicant-inventors (becauase they must be alive)
                     results['rawinventor'].append([general_helpers.id_generator(), patent_id,None, rawlocid, applicant['addressbook-first-name'],
-                                              applicant['addressbook-last-name'], str(inventor_app_seq), 0 ])
+                                              applicant['addressbook-last-name'], str(inventor_app_seq), 0 , False])
                     inventor_app_seq +=1
                     output.mandatory_fields('inventor_applicant', patent_id, error_log,[applicant['addressbook-first-name'],
                                          applicant['addressbook-last-name']])
@@ -244,7 +250,7 @@ def get_results(patents, field_dictionary):
                 is_app = True #indicator for whether something being cited is a patent application
 
                 if cited_doc_num:
-                    if re.match(r'^[A-Z]*\d+$', cited_doc_num): #basically if there is anything other than number and digits its an application
+                    if re.match(r'^[A-Z]*\.?\s?\d+$', cited_doc_num): #basically if there is anything other than number and digits its an application
                         num = re.findall('\d+', cited_doc_num)
                         num = num[0] #turns it from list to string
                         if num[0] == '0': #drop leading zeros
@@ -414,34 +420,32 @@ def main_process(data_file, outloc, field_dictionary):
 
 
 if __name__ == '__main__':
-    import configparser
     config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+    config.read(project_home + '/Development/config.ini')
     #TO run Everything:
     with open('{}/field_dict.json'.format(config['FOLDERS']['PERSISTENT_FILES'])) as myfile:
         field_dictionary = json.load(myfile)
-
+    
+    input_folder = '{}/clean_data'.format(config['FOLDERS']['WORKING_FOLDER'])
+    output_folder = '{}/parsed_data'.format(config['FOLDERS']['WORKING_FOLDER'])
     #this is the folder with the xml files that we want to reparse
-    in_files = ['{0}/{1}'.format(config['FOLDERS']['DATA_TO_PARSE'], item) for item in os.listdir(config['FOLDERS']['DATA_TO_PARSE'])]
-    if not os.path.exists(config['FOLDERS']['PARSED_DATA']):
-        os.mkdir(config['FOLDERS']['PARSED_DATA'])
-    out_files= ['{0}/{1}'.format(config['FOLDERS']['PARSED_DATA'], item[-16:-10]) 
+    in_files = ['{0}/{1}'.format(input_folder, item) for item in os.listdir(input_folder)]
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
+    out_files= ['{0}/{1}'.format(output_folder, item[-16:-10]) 
                    for item in in_files]
     fields = [field_dictionary for item in in_files]
     files = zip(in_files, out_files, fields)
 
-    for item in files:
-        print(item[0])
-        main_process(item[0], item[1], item[2])  
-    
-    '''
-    print("Starting")
-    desired_processes = 7 # ussually num cpu - 1
+    total_cpus = multiprocessing.cpu_count()
+    desired_processes = (total_cpus // 2) + 1 # usually num cpu - 1
     jobs = []
     for f in files:
         jobs.append(multiprocessing.Process(target = main_process, args=(f)))
     for segment in general_helpers.chunks(jobs, desired_processes):
-        print(segment)
+        print(segment, flush=True)
         for job in segment:
             job.start()
-    '''
+            job.join()
+
+    print("finished processing", flush=True)

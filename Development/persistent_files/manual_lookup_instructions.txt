@@ -1,0 +1,23 @@
+
+The csv file "to_check.csv" has a list of potential government organizations (in the "organization" column) which we need to match to our list of existing government organization. 
+We've already matched what we can do automatically (this matching is definitely not perfect, and updating it is on the to-do list, but it is what we have for now). 
+The 'possible' column has some automatic suggestions for organizations that might match, so if one of them does you can just copy that over to the 'match' column. 
+
+What we need to do is fill out the 'match' (and sometimes 'new' and 'non_government') column in the "to_check.csv" file, depending on what the organization looks like.
+ 
+There are several possible scenarios:
+1.      The organization matches an organization in the "possible" column. In this situation, copy the name from 'possible' to the 'match' column.
+2.	If the organization matches multiple organizations (e.g. NIH NSF should match ‘National Institutes of Health’ and also ‘National Science Foundation’) then put both organizations separated by a pipe in the match column (e.g. ‘National Institutes of Health’| ‘National Science Foundation’).
+3.      The organization DOES NOT MATCH THE SUGGESTED ORGANZIATION BUT DOES MATCH A DIFFERENT ORGANIZATION in the government_organization spreadsheet. Figure this out by searching for the organization (or something similar) in the government_organization spreadsheet in the "name" column. In this case, put the name of the actual organization (directly copy/pasted) in the 'match' column.
+4.      The organization IS NOT A US FEDERAL GOVERNMENT ENTITY. This includes companies, foreign/state/local governments or universities.Figure this out by googling the name. This also includes things that aren't organizations like "Contract 1234", "department".  In this case, put a 1 in the “non_government” column.
+5.      The organization DOES NOT MATCH ANY GOVERNMENT ORGANIZATION IN THE SPREADSHEET BUT IS A GOVERNMENT ORGANIZATION. Figure this out by searching for the organization in the government organization spreadsheet and then googling it. Put the name of the organization in the 'match' column AND ALSO in the 'new' column.
+6.      You cannot figure out what the organization is or it is ambiguous. Add a 'confused' column if it does not exist already and put a 1 in it.
+a.      If you are not clear, just flag it as confused and move on.
+b.      Do not spend more than 2 or 3 minutes on one entity, if it takes longer than that to figure out just flag it and move on. 
+
+Once you have matched all the organizations, you need to create a 'new_organizations.csv' file with the same colums as the government_organization.csv file:
+1.	For each unique entity that you added to the new column above, double check that it really isn't in the government organziation file (eg with different spelling). 
+2.	If it is really new, enter the name of the organization in the 'name' column and then find the level_one (highest level), level_two and level_three organizations(lowest level) within which the organization is nested. 
+3. 	If there are less than 3 layers (or the organization is a top level organization -- eg 'Department of Energy') ,  the name can go into the level_one/two/three column as appropriate (in addition to being in the name column). 
+4.	If you are confused about the organizational structures, ask! 
+5.	See the 'government-organization.csv' spreadsheet for examples!

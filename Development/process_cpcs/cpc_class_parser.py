@@ -3,7 +3,7 @@ import os
 import csv
 from bs4 import BeautifulSoup as bs
 import sys
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
+sys.path.append('/project/Development')
 sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
 from helpers import general_helpers
 
@@ -219,7 +219,7 @@ def parse_cpc_subgroups(soup):
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+    config.read('/project/Development/config.ini')
 
     location_of_cpc_files = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     output_directory = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')

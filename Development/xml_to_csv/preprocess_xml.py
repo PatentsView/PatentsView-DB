@@ -1,8 +1,12 @@
 import os
 import sys
 import re
-sys.path.append("/usr/local/airflow/PatentsView-DB/Development")
-from helpers import general_helpers, xml_helpers
+
+project_home = os.environ['PACKAGE_HOME']
+from Development.helpers import general_helpers, xml_helpers
+import configparser
+config = configparser.ConfigParser()
+config.read(project_home + '/Development/config.ini')
 import xml.etree.ElementTree as ET
 from lxml import etree
 import csv
@@ -15,6 +19,7 @@ def clean_single_file(raw_xml_file, new_xml_file):
     This is a little hacky but solves the files-are-not-provided-as-valid-xml problem
     '''
     with open(raw_xml_file, 'r+') as f:
+
         with open(new_xml_file, 'w', encoding = 'utf8') as new_f:
             new_f.write('<?xml version="1.0" encoding="UTF-8"?>' + "\n")
             new_f.write('<root>' + '\n')
@@ -23,6 +28,7 @@ def clean_single_file(raw_xml_file, new_xml_file):
                     new_f.write(line)
             new_f.write('</root>')
 
+    print("cleaning is done for current raw xml file: ", new_xml_file, flush=True)
 
 
 def check_schema(patent_xml):
@@ -39,7 +45,7 @@ def check_schema(patent_xml):
                           'us-bibliographic-data-grant', 'us-chemistry', 'us-claim-statement',
                           'us-math', 'us-sequence-list-doc']
     expected_main_fields = ['application-reference', 'assignees', 'classification-locarno', 'classification-national',
-                            'classifications-cpc', 'classifications-ipcr', 'examiners', 'figures', 
+                            'classifications-cpc', 'classifications-ipcr', 'examiners', 'figures',
                             'hague-agreement-data', 'invention-title', 'number-of-claims',
                             'pct-or-regional-filing-data', 'pct-or-regional-publishing-data',
                             'priority-claims', 'publication-reference', 'rule-47-flag',
@@ -57,7 +63,7 @@ def check_schema(patent_xml):
             without_us_bibliographic +=1
     high_level = sorted(list(set(high_level)))
     main_fields = sorted(list(set(main_fields)))
-    
+
     if not high_level == expected_high_level:
         print(high_level)
         raise Exception("The high level fields have changed ...check that it is not the ones we use.")
@@ -70,29 +76,42 @@ def check_schema(patent_xml):
 
 if __name__ == '__main__':
 
-    import configparser
-    config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
-    infolder = config['FOLDERS']['RAW_DATA']
-    outfolder = config['FOLDERS']['DATA_TO_PARSE']
+    infolder = '{}/raw_data'.format(config['FOLDERS']['WORKING_FOLDER'])
+    outfolder = '{}/clean_data'.format(config['FOLDERS']['WORKING_FOLDER'])
+
     if not os.path.exists(outfolder):
         os.mkdir(outfolder)
 
     in_files = ['{0}/{1}'.format(infolder, f) for f in os.listdir(infolder) if os.path.isfile(os.path.join(infolder, f))]
     out_files = ['{}/{}_clean.xml'.format(outfolder, raw_file[-13:-4]) for raw_file in in_files]
-    #out_files = [outfolder + '/' + raw_file[-13:-4] +'_clean.xml' for raw_file in in_files]
     files = zip(in_files, out_files)
 
-    desired_processes = 7 # ussually num cpu - 1
+    total_cpus = multiprocessing.cpu_count()
+    desired_processes = (total_cpus // 2) + 1 # usually num cpu - 1
     jobs = []
 
     for f in files:
         jobs.append(multiprocessing.Process(target = clean_single_file, args=([f[0], f[1]])))
     for segment in general_helpers.chunks(jobs, desired_processes):
+        print(len(segment), flush=True)
         for job in segment:
             job.start()
 
+        print("Start jobs has finished, now joining", flush=True)
+
+        for job in segment:
+            job.join()
+
+        print("Now moving to next chunk!", flush = True)
+
+    print("finished", flush = True)
+    # wait until all jobs finish processing to move on
+
+    #delete the raw files so we don't run out of space
+    #os.system('rm '+infolder+'/*')
+
     #After cleaning the files check that there haven't been schema changes
+    #This is commented out because still needs work
     #check the schema has not changed
-    # clean_example =xml_helpers.get_xml(out_files[-1]) #get the most recent data an an example
-    # check_schema(clean_example, [expected_high_level, expected_main_fields])
+    #clean_example =xml_helpers.get_xml(out_files[-1]) #get the most recent data an an example
+    #check_schema(clean_example, [expected_high_level, expected_main_fields])
