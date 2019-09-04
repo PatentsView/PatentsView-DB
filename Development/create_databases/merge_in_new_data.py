@@ -51,7 +51,7 @@ for table in tables:
         "SELECT GROUP_CONCAT(s.COLUMN_NAME SEPARATOR ', ' ) from information_schema.tables t left join information_schema.statistics s on t.TABLE_NAME=s.TABLE_NAME where INDEX_NAME='PRIMARY' and t.TABLE_SCHEMA=s.TABLE_SCHEMA and t.TABLE_SCHEMA ='" + temporary_upload + "' and s.TABLE_NAME ='" + table + "' GROUP BY t.TABLE_NAME;")
     order_by_clause = order_by_cursor.fetchall()[0][0]
     table_data_count = engine.execute("SELEcT count(1) from " + temporary_upload + "." + table).fetchall()[0][0]
-    limit = 10000
+    limit = 50000
     offset = 0
     batch_counter = 0
     try:
