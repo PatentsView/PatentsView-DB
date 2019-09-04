@@ -18,7 +18,7 @@ disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'disambig_o
 new_db = config['DATABASE']['NEW_DB']
 old_db = config['DATABASE']['OLD_DB']
 
-new_id_col = 'disamb_inventor_id_v2{}'.format(new_db[-8:])
+new_id_col = 'disamb_assignee_id_{}'.format(new_db[-8:])
 
 engine = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
 db_con = engine.connect()
@@ -26,7 +26,7 @@ db_con = engine.connect()
 ########################################################################################
 # STEP 1: CREATE temp_rawassignee_persistassignee_disambig
 # rename to track with timestamps
-print("First creating temp_rawassignee_persistentinvdisambig table..............")
+print("First creating temp_rawassignee_persistassignee_disambig table..............")
 try:
     db_con.execute('alter table persistent_assignee_disambig rename temp_persistent_assignee_disambig_{0}'.format(old_db))
 
@@ -97,7 +97,7 @@ while True:
             
 		# uuid is new! no old_rawassignee id or old disambig cols
 		else:
-			outfile.writerow([row[0], ''] + blanks + [row[1]])
+			outfile.writerow([row[0], ''] + blanks[2:] + [row[1]])
 
 		# keep going because we have chunks to process
 		counter +=1

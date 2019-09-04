@@ -38,7 +38,7 @@ except sqlalchemy.exc.ProgrammingError as e:
     print(e)
     
 # ADD INDEXES to rawinventor
-db_con.execute('create index rawinv_pid_ix on rawinventor (uuid, inventor_id);')
+#db_con.execute('create index rawinv_pid_ix on rawinventor (uuid, inventor_id);')
 
 # 1. get column information from information schema
 rawinv_col_info = db_con.execute("select column_name, column_type from information_schema.columns where table_schema = '{0}' and table_name = 'rawinventor' and column_name in ('uuid', 'inventor_id');".format(new_db))
@@ -98,7 +98,7 @@ while True:
 		
         # uuid is new! no old_rawinventor id or old disambig cols
 		else:
-			outfile.writerow([row[0],''] + blanks + [row[1]])
+			outfile.writerow([row[0],''] + blanks[2:] + [row[1]])
 
 		# keep going because we have chunks to process
 		counter +=1
