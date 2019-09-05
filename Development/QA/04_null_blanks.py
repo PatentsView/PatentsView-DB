@@ -20,7 +20,7 @@ new_qa_loc = config['FOLDERS']['NEW_QA_LOC']
 
 
 def count_null_and_blank(new_database, previous_qa_loc):
-    tc = pd.read_excel('{}/1_null_and_blank_count.xlsx'.format(previous_qa_loc))
+    tc = pd.read_csv('{}/04_null_blanks.csv'.format(previous_qa_loc))
     table_col_dict = zip(tc['Table'], tc['Column'])
     results = []
     for table, col in table_col_dict:
@@ -50,7 +50,7 @@ def increase_10_percent_desc(newdb_count, olddb_count, accept_inc):
     except:
         return "Problem : {}" .format(newdb_count)
 def null_to_file(newdb_results,previous_qa_loc, new_qa_loc, new_database):
-    df = pd.read_excel('{}/1_null_and_blank_count.xlsx'.format(previous_qa_loc))
+    df = pd.read_csv('{}/04_null_blanks.csv'.format(previous_qa_loc))
     df_2 = pd.DataFrame(newdb_results)
     df_2.rename(columns={0:new_database}, inplace = True)
     df_3 = pd.concat([df, df_2], axis = 1)
@@ -63,6 +63,6 @@ if __name__ == '__main__':
     if not os.path.exists(new_qa_loc):
         os.mkdir(new_qa_loc)
     engine = general_helpers.connect_to_db(host, username, password, temporary_upload)
-    data = pd.read_excel("{}/1_null_and_blank_count.xlsx".format(previous_qa_loc))
+    data = pd.read_csv("{}/04_null_blanks.csv".format(previous_qa_loc))
     null_results = count_null_and_blank(new_database, previous_qa_loc)
     null_to_file(null_results, previous_qa_loc, new_qa_loc, new_database)
