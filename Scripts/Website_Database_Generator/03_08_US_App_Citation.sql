@@ -11,9 +11,9 @@ create table `{{params.reporting_database}}`.`usapplicationcitation`
   `sequence` int not null,
   `cited_application_id` varchar(36) null,
   `date` date null,
-  `name` varchar(64) null,
+  `name` varchar(128) null,
   `kind` varchar(10) null,
-  `category` varchar(20) null,
+  `category` varchar(64) null,
   primary key (`citing_patent_id`, `sequence`)
 )
 engine=InnoDB;
