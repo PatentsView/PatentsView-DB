@@ -2,8 +2,7 @@
 
 drop table if exists `{{params.reporting_database}}`.`inventor_entity`;
 create table `{{params.reporting_database}}`.`inventor_entity`
-(
-c`patent_id` varchar(20) not null, 
+(`patent_id` varchar(20) not null,
    	`inventor_city` varchar(256) null, 
     `inventor_country` varchar(10) null, 
     `inventor_county` varchar(60) null, 
