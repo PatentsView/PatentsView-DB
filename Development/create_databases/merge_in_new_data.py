@@ -25,10 +25,10 @@ command = "select table_name from information_schema.tables where table_type = '
     temporary_upload)
 tables_data = engine.execute(command)
 tables = [table['table_name'] for table in tables_data]
-tables = ['application', 'botanic', 'brf_sum_text', 'claim', 'detail_desc_length', 'draw_desc_text', 'figures',
-          'foreign_priority', 'ipcr', 'mainclass', 'otherreference', 'patent', 'rawassignee', 'rawexaminer',
-          'rawinventor', 'rawlawyer', 'rawlocation', 'rel_app_text', 'subclass', 'us_term_of_grant',
-          'usapplicationcitation', 'uspatentcitation', 'usreldoc']
+tables = ['application', 'botanic', 'brf_sum_text', 'claim', 'detail_desc_length', 'draw_desc_text', 'figures', 'foreigncitation',
+          'foreign_priority', 'government_interest', 'ipcr', 'mainclass', 'non_inventor_applicant' ,'otherreference', 'patent', 'rawassignee', 'rawexaminer',
+          'pct_data','rawinventor', 'rawlawyer', 'rawlocation', 'rel_app_text', 'subclass', 'us_term_of_grant',
+          'usapplicationcitation', 'uspatentcitation', 'usreldoc','uspc']
 engine.execute("SET FOREIGN_KEY_CHECKS=0;")
 
 engine.dispose()

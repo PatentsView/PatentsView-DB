@@ -26,7 +26,11 @@ def create_ratio_description(old_db_ratio, new_db_ratio, max_dif = .05 ):
         return "No Problem"
     
 def get_ratios(previous_qa_loc, new_qa_loc, new_database):
+<<<<<<< HEAD
     ratios = pd.read_excel('{}/05_ratios.csv'.format(previous_qa_loc))
+=======
+    ratios = pd.read_csv('{}/05_ratios.csv'.format(previous_qa_loc))
+>>>>>>> a15de5925a8abdbe15bc5f7d56eebaf406d17ab7
     new_ratios = []
     table_col = zip(ratios['Table'], ratios['Column'])
     for table, col in table_col:
@@ -41,10 +45,13 @@ def get_ratios(previous_qa_loc, new_qa_loc, new_database):
     return new_ratios   
 
 def write_distinct_excel(new_ratios, previous_qa_loc, new_qa_loc, new_database):
+<<<<<<< HEAD
     ratios = pd.read_excel('{}/05_ratios.csv'.format(previous_qa_loc))
+=======
+    ratios = pd.read_csv('{}/05_ratios.csv'.format(previous_qa_loc))
+>>>>>>> a15de5925a8abdbe15bc5f7d56eebaf406d17ab7
     ratios[new_database] = new_ratios
     del ratios['Description']
-    del ratios['Notes']
     #the last row of the table is now the most recent previous database!
     ratios['Description'] = ratios.apply(lambda row: create_ratio_description(row[ratios.columns[-2]], row[new_database]), axis=1)
     ratios.to_csv('{}/05_ratios.csv'.format(new_qa_loc), index = False)
@@ -54,6 +61,10 @@ if __name__ == '__main__':
     if not os.path.exists(new_qa_loc):
         os.mkdir(new_qa_loc)
     engine = general_helpers.connect_to_db(host, username, password, new_database)
+<<<<<<< HEAD
     data = pd.read_excel('{}/05_ratios.csv'.format(previous_qa_loc))
+=======
+    data = pd.read_csv('{}/05_ratios.csv'.format(previous_qa_loc))
+>>>>>>> a15de5925a8abdbe15bc5f7d56eebaf406d17ab7
     ratios = get_ratios(previous_qa_loc, new_qa_loc, new_database)
     write_distinct_excel(ratios, previous_qa_loc, new_qa_loc, new_database)
