@@ -34,7 +34,7 @@ insert into `{{params.reporting_database}}`.`inventor_entity`
   	`patent_id`, `inventor_city`, `inventor_country`, 
     `inventor_county`, `inventor_county_fips`, `inventor_first_name`, 
     `inventor_first_seen_date`, `inventor_id`, `inventor_key_id`, 
-    `inventor_last_name`, `inventor_last_seen_date`, `inventor_lastknown_city` 
+    `inventor_last_name`, `inventor_last_seen_date`, `inventor_lastknown_city`,
     `inventor_lastknown_country`, `inventor_lastknown_latitude`, `inventor_lastknown_location_id`, 
 	`inventor_lastknown_longitude`, `inventor_lastknown_state`, `inventor_latitude`, 
  	`inventor_location_id`, `inventor_longitude`,  `inventor_state`, 
