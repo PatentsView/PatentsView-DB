@@ -16,7 +16,7 @@ create table `{{params.reporting_database}}`.`inventor_entity`
     `inventor_lastknown_city` varchar(256) null, 
     `inventor_lastknown_country` varchar(10) null, 
     `inventor_lastknown_latitude` float null, 
-	`inventor_lastknown_location_id` int(10) unsigned null, 
+	`inventor_lastknown_location_id` varchar 128,
 	`inventor_lastknown_longitude` float null, 
 	`inventor_lastknown_state` varchar(20) null, 
 	`inventor_latitude` float null, 
