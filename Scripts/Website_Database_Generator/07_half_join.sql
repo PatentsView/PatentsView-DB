@@ -67,7 +67,7 @@ select
     i.`num_assignees`, 
     i.`num_patents`
 from
- 	`{{params.reporting_database}}`.`patent_inventor`p 
+ 	`{{params.reporting_database}}`.`patent_inventor` p
  	left outer join `{{params.reporting_database}}`.`inventor` i ON p.`inventor_id`=i.`inventor_id`
     left outer join `{{params.reporting_database}}`.`location` as `locationI` on p.`location_id`= locationI.`location_id`;
 
@@ -108,6 +108,18 @@ create table `{{params.reporting_database}}`.`assignee_entity`
     `assignee_type` varchar(10) null
 )
 engine=InnoDB;
+
+insert into `{{params.reporting_database}}`.`assignee_entity`
+(
+      `patent_id`,`assignee_county`,`assignee_county_fips`,`assignee_state_fips`,`assignee_city`,
+    `assignee_country`,`assignee_first_name`,`assignee_first_seen_date`,`assignee_id`,
+    `assignee_key_id`,`assignee_lastknown_city`,`assignee_lastknown_country`,`assignee_lastknown_latitude`,
+    `assignee_lastknown_location_id`,`assignee_lastknown_longitude`,`assignee_lastknown_state`,
+    `assignee_last_name`,`assignee_last_seen_`assignee_latitude`, `assignee_location_id`,
+    `assignee_longitude`,`assignee_organization`,`assignee_sequence`,`assignee_state`,`assignee_total_num_patents`,
+    `assignee_total_num_inventors`,`assignee_type`
+)
+
 
 select
 	p.`patent_id`,
@@ -163,6 +175,17 @@ create table `{{params.reporting_database}}`.`uspc_entity`
     `uspc_total_num_inventors` int(10) unsigned null, 
   	`uspc_total_num_patents` int(10) unsigned null 
 )
+
+insert into `{{params.reporting_database}}`.`uspc_entity`
+(
+
+	`patent_id`, `uspc_first_seen_date` , `uspc_last_seen_date` ,`uspc_mainclass_id` ,
+    `uspc_mainclass_title`,`uspc_sequence`,`uspc_subclass_id`,`uspc_subclass_title` ,
+    `uspc_total_num_assignees` ,`uspc_total_num_inventors` ,`uspc_total_num_patents`
+)
+
+
+
 select
 	ucm.`patent_id`,
     um.`first_seen_date`, 
@@ -205,6 +228,19 @@ create table `{{params.reporting_database}}`.`cpc_entity`
     `cpc_total_num_patents` int(10) unsigned null, 
     `cpc_total_num_assignees` int(10) unsigned null 
 )
+
+insert into `{{params.reporting_database}}`.`cpc_entity`
+(
+  `patent_id` ,`cpc_category` ,`cpc_first_seen_date` ,
+    `cpc_group_id` ,`cpc_group_title` ,`cpc_last_seen_date` ,
+    `cpc_section_id` ,`cpc_sequence` ,`cpc_subgroup_id` ,
+    `cpc_subgroup_title` ,`cpc_subsection_id` ,`cpc_subsection_title` ,
+    `cpc_total_num_inventors` ,`cpc_total_num_patents` ,
+    `cpc_total_num_assignees`
+
+
+)
+
 select
 	cpc_current_subsection_copy.`patent_id`, 
     cpc_current_copy.`category`, 
@@ -245,6 +281,16 @@ create table `{{params.reporting_database}}`.`nber_entity`
     `nber_total_num_inventors` int(10) unsigned null, 
     `nber_total_num_patents` int(10) unsigned null 
 )
+
+
+insert into `{{params.reporting_database}}`.`nber_entity`
+(
+   `patent_id`, `nber_category_id` ,`nber_category_title`, `nber_first_seen_date`,
+    `nber_last_seen_date` ,	`nber_subcategory_id`,`nber_subcategory_title` ,
+    `nber_total_num_assignees` , `nber_total_num_inventors` , `nber_total_num_patents`
+
+)
+
 select
  	nber_copy.`patent_id`, 
     nber_copy.`category_id`, 
@@ -274,6 +320,16 @@ create table `{{params.reporting_database}}`.`wipo_entity`
     `wipo_sector_title` varchar(60) null, 
     `wipo_sequence` int(10) unsigned
 )
+
+
+insert into `{{params.reporting_database}}`.`wipo_entity`
+(
+  `patent_id`,	`wipo_field_id` , `wipo_field_title` ,`wipo_sector_title` ,
+    `wipo_sequence`
+
+)
+
+
 select
 	wipo.`patent_id`, 
     wipo.`field_id`, 
@@ -296,7 +352,16 @@ create table `{{params.reporting_database}}`.`examiner_entity`
 	`examiner_last_name` varchar(64) null, 
 	`examiner_role` varchar(20), 
 	`examiner_group` varchar(20) null
-)    
+)
+
+
+insert into `{{params.reporting_database}}`.`examiner_entity`
+(
+ `patent_id`,`examiner_first_name` ,`examiner_id` , `examiner_key_id`,
+	`examiner_last_name` , `examiner_role` , `examiner_group`
+
+)
+
 select
 	patent_examiner.`patent_id`, 
     examiner.`name_first`, 
@@ -327,6 +392,17 @@ create table `{{params.reporting_database}}`.`lawyer_entity`
 	`lawyer_total_num_assignees` int(10) unsigned, 
 	`lawyer_total_num_inventors` int(10) unsigned
 )
+
+
+insert into `{{params.reporting_database}}`.`lawyer_entity`
+(
+ `patent_id` , `lawyer_first_name`, `lawyer_first_seen_date`, `lawyer_id`  ,
+	`lawyer_key_id` ,	`lawyer_last_name` ,`lawyer_last_seen_date` , `lawyer_organization`,
+	`lawyer_sequence` ,`lawyer_total_num_patents`, `lawyer_total_num_assignees`, `lawyer_total_num_inventors`
+
+)
+
+
 select
    	patent_lawyer.`patent_id`,
    	lawyer.`name_first`,
