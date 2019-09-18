@@ -115,7 +115,7 @@ insert into `{{params.reporting_database}}`.`assignee_entity`
     `assignee_country`,`assignee_first_name`,`assignee_first_seen_date`,`assignee_id`,
     `assignee_key_id`,`assignee_lastknown_city`,`assignee_lastknown_country`,`assignee_lastknown_latitude`,
     `assignee_lastknown_location_id`,`assignee_lastknown_longitude`,`assignee_lastknown_state`,
-    `assignee_last_name`,`assignee_last_seen_`assignee_latitude`, `assignee_location_id`,
+    `assignee_last_name`,`assignee_last_seen_date`, `assignee_latitude`, `assignee_location_id`,
     `assignee_longitude`,`assignee_organization`,`assignee_sequence`,`assignee_state`,`assignee_total_num_patents`,
     `assignee_total_num_inventors`,`assignee_type`
 )
