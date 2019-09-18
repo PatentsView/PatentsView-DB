@@ -92,7 +92,7 @@ create table `{{params.reporting_database}}`.`assignee_entity`
     `assignee_lastknown_city` varchar(128), 
     `assignee_lastknown_country` varchar(10), 
     `assignee_lastknown_latitude` float null, 
-    `assignee_lastknown_location_id` int(10) unsigned null, 
+    `assignee_lastknown_location_id` varchar(128),
     `assignee_lastknown_longitude` float null, 
     `assignee_lastknown_state` varchar(20) null, 
     `assignee_last_name` varchar(64) null, 
