@@ -1,78 +1,78 @@
 -- Index on patent_id and inventor_key_id
 
-drop table if exists `{{params.reporting_database}}`.`inventor_entity`;
-create table `{{params.reporting_database}}`.`inventor_entity`
-(`patent_id` varchar(20) not null,
-   	`inventor_city` varchar(256) null, 
-    `inventor_country` varchar(10) null, 
-    `inventor_county` varchar(60) null, 
-    `inventor_county_fips` varchar(6) null, 
-    `inventor_first_name` varchar(128) null, 
-    `inventor_first_seen_date` date null, 
-    `inventor_id` varchar(36) null, 
-    `inventor_key_id` int(10) unsigned, 
-    `inventor_last_name` varchar(128) null, 
-   	`inventor_last_seen_date` date null, 
-    `inventor_lastknown_city` varchar(256) null, 
-    `inventor_lastknown_country` varchar(10) null, 
-    `inventor_lastknown_latitude` float null, 
-	`inventor_lastknown_location_id` varchar(128) null,
-	`inventor_lastknown_longitude` float null,
-	`inventor_lastknown_state` varchar(20) null, 
-	`inventor_latitude` float null, 
- 	`inventor_location_id` varchar(128), 
-   	`inventor_longitude` float null,  
-    `inventor_state` varchar(20) null, 
-    `inventor_state_fips` varchar(2) null, 
-    `inventor_total_num_assignees` int(10) unsigned, 
-    `inventor_total_num_patents` int(10) unsigned
-)
-engine=InnoDB;
-
-insert into `{{params.reporting_database}}`.`inventor_entity`
-(
-  	`patent_id`, `inventor_city`, `inventor_country`, 
-    `inventor_county`, `inventor_county_fips`, `inventor_first_name`, 
-    `inventor_first_seen_date`, `inventor_id`, `inventor_key_id`, 
-    `inventor_last_name`, `inventor_last_seen_date`, `inventor_lastknown_city`,
-    `inventor_lastknown_country`, `inventor_lastknown_latitude`, `inventor_lastknown_location_id`, 
-	`inventor_lastknown_longitude`, `inventor_lastknown_state`, `inventor_latitude`, 
- 	`inventor_location_id`, `inventor_longitude`,  `inventor_state`, 
-    `inventor_state_fips`, `inventor_total_num_assignees`, `inventor_total_num_patents`
-)
-
-select
-  	p.`patent_id`, 
-  	locationI.`city`, 
-  	locationI.`country`, 
-    locationI.`county`, 
-    locationI.`county_fips`, 
-    i.`name_first`,
-    i.`first_seen_date`, 
-    i.`persistent_inventor_id`, 
-    i.`inventor_id`, 
-    i.`name_last`, 
-    i.`last_seen_date`, 
-    i.`lastknown_city`,
-    i.`lastknown_country`, 
-    i.`lastknown_latitude`, 
-    i.`lastknown_persistent_location_id`, 
-	i.`lastknown_longitude`, 
-	i.`lastknown_state`,
-	locationI.`latitude`, 
- 	locationI.`persistent_location_id`, 
- 	locationI.`longitude`,
- 	locationI.`state`, 
-    locationI.`state_fips`,
-    i.`num_assignees`, 
-    i.`num_patents`
-from
- 	`{{params.reporting_database}}`.`patent_inventor` p
- 	left outer join `{{params.reporting_database}}`.`inventor` i ON p.`inventor_id`=i.`inventor_id`
-    left outer join `{{params.reporting_database}}`.`location` as `locationI` on p.`location_id`= locationI.`location_id`;
-
-ALTER TABLE `{{params.reporting_database}}`.`inventor_entity` ADD INDEX `patent_id` (`patent_id` ASC);
-ALTER TABLE `{{params.reporting_database}}`.`inventor_entity` ADD INDEX `inventor_key_id` (`inventor_key_id` ASC);
+--drop table if exists `{{params.reporting_database}}`.`inventor_entity`;
+--create table `{{params.reporting_database}}`.`inventor_entity`
+--(`patent_id` varchar(20) not null,
+--   	`inventor_city` varchar(256) null,
+--    `inventor_country` varchar(10) null,
+--    `inventor_county` varchar(60) null,
+--    `inventor_county_fips` varchar(6) null,
+--    `inventor_first_name` varchar(128) null,
+--    `inventor_first_seen_date` date null,
+--    `inventor_id` varchar(36) null,
+--    `inventor_key_id` int(10) unsigned,
+--    `inventor_last_name` varchar(128) null,
+--   	`inventor_last_seen_date` date null,
+--    `inventor_lastknown_city` varchar(256) null,
+--    `inventor_lastknown_country` varchar(10) null,
+--    `inventor_lastknown_latitude` float null,
+--	`inventor_lastknown_location_id` varchar(128) null,
+--	`inventor_lastknown_longitude` float null,
+--	`inventor_lastknown_state` varchar(20) null,
+--	`inventor_latitude` float null,
+-- 	`inventor_location_id` varchar(128),
+--   	`inventor_longitude` float null,
+--    `inventor_state` varchar(20) null,
+--    `inventor_state_fips` varchar(2) null,
+--    `inventor_total_num_assignees` int(10) unsigned,
+--    `inventor_total_num_patents` int(10) unsigned
+--)
+--engine=InnoDB;
+--
+--insert into `{{params.reporting_database}}`.`inventor_entity`
+--(
+--  	`patent_id`, `inventor_city`, `inventor_country`,
+--    `inventor_county`, `inventor_county_fips`, `inventor_first_name`,
+--    `inventor_first_seen_date`, `inventor_id`, `inventor_key_id`,
+--    `inventor_last_name`, `inventor_last_seen_date`, `inventor_lastknown_city`,
+--    `inventor_lastknown_country`, `inventor_lastknown_latitude`, `inventor_lastknown_location_id`,
+--	`inventor_lastknown_longitude`, `inventor_lastknown_state`, `inventor_latitude`,
+-- 	`inventor_location_id`, `inventor_longitude`,  `inventor_state`,
+--    `inventor_state_fips`, `inventor_total_num_assignees`, `inventor_total_num_patents`
+--)
+--
+--select
+--  	p.`patent_id`,
+--  	locationI.`city`,
+--  	locationI.`country`,
+--    locationI.`county`,
+--    locationI.`county_fips`,
+--    i.`name_first`,
+--    i.`first_seen_date`,
+--    i.`persistent_inventor_id`,
+--    i.`inventor_id`,
+--    i.`name_last`,
+--    i.`last_seen_date`,
+--    i.`lastknown_city`,
+--    i.`lastknown_country`,
+--    i.`lastknown_latitude`,
+--    i.`lastknown_persistent_location_id`,
+--	i.`lastknown_longitude`,
+--	i.`lastknown_state`,
+--	locationI.`latitude`,
+-- 	locationI.`persistent_location_id`,
+-- 	locationI.`longitude`,
+-- 	locationI.`state`,
+--    locationI.`state_fips`,
+--    i.`num_assignees`,
+--    i.`num_patents`
+--from
+-- 	`{{params.reporting_database}}`.`patent_inventor` p
+-- 	left outer join `{{params.reporting_database}}`.`inventor` i ON p.`inventor_id`=i.`inventor_id`
+--    left outer join `{{params.reporting_database}}`.`location` as `locationI` on p.`location_id`= locationI.`location_id`;
+--
+--ALTER TABLE `{{params.reporting_database}}`.`inventor_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+--ALTER TABLE `{{params.reporting_database}}`.`inventor_entity` ADD INDEX `inventor_key_id` (`inventor_key_id` ASC);
 
 -- Index on patent_id and assignee_key_id
 
@@ -122,7 +122,7 @@ insert into `{{params.reporting_database}}`.`assignee_entity`
 
 
 select
-	p.`patent_id`,
+	pa.`patent_id`,
 	locationA.`county`, 
     locationA.`county_fips`, 
     locationA.`state_fips`, 
@@ -200,7 +200,7 @@ select
   	um.`num_patents`
 from
 	`{{params.reporting_database}}`.`uspc_current_mainclass_copy` ucm
-	left outer join `{{params.reporting_database}}`.`uspc_current_copy` uc on ucm.`patent_id=uc.patent_id` 
+	left outer join `{{params.reporting_database}}`.`uspc_current_copy` uc on ucm.`patent_id`=uc.`patent_id`
 		and ucm.`mainclass_id`=uc.`mainclass_id` 
 	left outer join `{{params.reporting_database}}`.`uspc_mainclass` um on ucm.`mainclass_id`=um.`id` 
     left outer join `{{params.reporting_database}}`.`uspc_subclass` us on uc.`subclass_id`=us.`id`;
@@ -258,7 +258,7 @@ select
     cpc_subsection.`num_patents`, 
     cpc_subsection.`num_assignees`
 FROM 
-	`{{params.reporting_database}}`.cpc_current_subsection_copy left outer join `{{params.reporting_database}}`.cpc_subsection on cpc_current_subsection_copy.`subsection_id=cpc_subsection.id` 
+	`{{params.reporting_database}}`.cpc_current_subsection_copy left outer join `{{params.reporting_database}}`.cpc_subsection on cpc_current_subsection_copy.`subsection_id`=cpc_subsection.`id`
     left outer join `{{params.reporting_database}}`.cpc_current_copy on cpc_current_subsection_copy.`patent_id`=cpc_current_copy.`patent_id`
 		and cpc_subsection.`id`=cpc_current_copy.`subsection_id`
 	left outer join `{{params.reporting_database}}`.cpc_group on cpc_current_copy.`group_id`=cpc_group.`id` 
