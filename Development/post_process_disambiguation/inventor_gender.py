@@ -100,7 +100,7 @@ while True:
             
             # if 20170808 id exists and it is in the inventor_gender table, we have gender info!
 			if row[0] is not None and row[0] in id_to_gender.keys():
-				results.append((row[0], row[1:len(row)-1], row[len(row) - 1], id_to_gender[row[0]]))
+				results.append([row[0]] + [row[1:len(row)-1]] + [row[len(row) - 1]] + [id_to_gender[row[0]]])
 			
 
 
@@ -126,7 +126,6 @@ gender_df.columns = ['disamb_inventor_id_20170808',old_id_col, new_id_col, 'male
 gender_df.to_csv('{}/inventor_gender.tsv'.format(disambig_folder),encoding='utf-8', header=True,index=False, sep='\t')
 gender_df = pd.read_csv('{}/inventor_gender.tsv'.format(disambig_folder),encoding='utf-8',delimiter='\t')
 
-
 db_con.execute('create table inventor_gender_{0} like temp_inventor_gender_{1}'.format(new_db, old_db))
 
 db_con.execute('alter table inventor_gender_{0} add column ({1} varchar(128))'.format(new_db, new_id_col))
@@ -143,6 +142,7 @@ chunk_size_sql = 300000
 gender_df.to_sql(con=db_con, name = 'inventor_gender_{0}'.format(new_db), index = False, if_exists='append', chunksize =chunk_size_sql)
 
 
-# rename table to generic persistent_inventor_disambig
+# rename table to generic inventor gender
+db_con.execute('drop table if exists inventor_gender')
 db_con.execute('alter table inventor_gender_{0} rename inventor_gender'.format(new_db))
 
