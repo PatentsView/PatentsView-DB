@@ -100,7 +100,7 @@ while True:
             
             # if 20170808 id exists and it is in the inventor_gender table, we have gender info!
 			if row[0] is not None and row[0] in id_to_gender.keys():
-				results.append([row[0]] + [row[1:len(row)-1]] + [row[len(row) - 1]] + [id_to_gender[row[0]]])
+				results.append([row[0]] + list(row[1:len(row)-1]) + [row[len(row) - 1], id_to_gender[row[0]]])
 			
 
 
