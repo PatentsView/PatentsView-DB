@@ -28,15 +28,6 @@ CREATE TABLE `{{params.reporting_database}}`.`patent_contractawardnumber` (
 
 
 
--- CREATE TABLE IF NOT EXISTS `{{params.reporting_database}}`.`patent_govintorg` (
---    `patent_id` varchar(255) NOT NULL,
---    `organization_id` int(11) NOT NULL,
---    PRIMARY KEY (`patent_id`,`organization_id`),
---    KEY `organization_id` (`organization_id`),
---    CONSTRAINT `patent_govintorg_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `{{params.reporting_database}}`.`government_interest` (`patent_id`) ON DELETE CASCADE,
---    CONSTRAINT `patent_govintorg_ibfk_2` FOREIGN KEY (`organization_id`) REFERENCES `{{params.reporting_database}}`.`government_organization` (`organization_id`) ON DELETE CASCADE
---  ) ENGINE=InnoDB;
-
 drop table if exists `{{params.reporting_database}}`.`patent_govintorg`;
  
 CREATE TABLE `{{params.reporting_database}}`.`patent_govintorg` (

@@ -127,7 +127,7 @@ drop table if exists `{{params.reporting_database}}`.`location`;
 create table `{{params.reporting_database}}`.`location`
 (
   `location_id` int unsigned not null,
-  `city` varchar(128) null,
+  `city` varchar(256) null,
   `state` varchar(20) null,
   `country` varchar(10) null,
   `county` varchar(60) null,

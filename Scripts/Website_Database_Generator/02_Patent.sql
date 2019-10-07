@@ -13,7 +13,7 @@ create table `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
   `persistent_assignee_id` varchar(64) null,
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
-  `city` varchar(128) null,
+  `city` varchar(256) null,
   `state` varchar(20) null,
   `country` varchar(10) null,
   `latitude` float null,
@@ -62,7 +62,7 @@ create table `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
   `persistent_inventor_id` varchar(36) null,
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
-  `city` varchar(128) null,
+  `city` varchar(256) null,
   `state` varchar(20) null,
   `country` varchar(10) null,
   `latitude` float null,
@@ -293,7 +293,7 @@ create table `{{params.reporting_database}}`.`patent`
   `firstnamed_assignee_persistent_id` varchar(64) null,
   `firstnamed_assignee_location_id` int unsigned null,
   `firstnamed_assignee_persistent_location_id` varchar(128) null,
-  `firstnamed_assignee_city` varchar(128) null,
+  `firstnamed_assignee_city` varchar(256) null,
   `firstnamed_assignee_state` varchar(20) null,
   `firstnamed_assignee_country` varchar(10) null,
   `firstnamed_assignee_latitude` float null,
@@ -302,7 +302,7 @@ create table `{{params.reporting_database}}`.`patent`
   `firstnamed_inventor_persistent_id` varchar(36) null,
   `firstnamed_inventor_location_id` int unsigned null,
   `firstnamed_inventor_persistent_location_id` varchar(128) null,
-  `firstnamed_inventor_city` varchar(128) null,
+  `firstnamed_inventor_city` varchar(256) null,
   `firstnamed_inventor_state` varchar(20) null,
   `firstnamed_inventor_country` varchar(10) null,
   `firstnamed_inventor_latitude` float null,
@@ -341,7 +341,7 @@ insert into `{{params.reporting_database}}`.`patent`
   `num_us_patents_cited`, `num_total_documents_cited`,
   `num_times_cited_by_us_patents`,
   `earliest_application_date`, `patent_processing_days`,
-  `term_extension`
+  `term_extension`, `detail_desc_length`
 )
 select
   p.`id`, case when ifnull(p.`type`, '') = 'sir' then 'statutory invention registration' else nullif(trim(p.`type`), '') end,
@@ -358,7 +358,7 @@ select
   tpa.`num_times_cited_by_us_patents`,
   tpead.`earliest_application_date`,
   case when tpead.`earliest_application_date` <= p.`date` then timestampdiff(day, tpead.`earliest_application_date`, tpd.`date`) else null end,
-  ustog.`term_extension`
+  ustog.`term_extension`, `detail_desc_length`
 from
   `{{params.raw_database}}`.`patent` p
   left outer join `{{params.reporting_database}}`.`temp_patent_date` tpd on tpd.`patent_id` = p.`id`
@@ -366,7 +366,8 @@ from
   left outer join `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor` tpfni on tpfni.`patent_id` = p.`id`
   left outer join `{{params.reporting_database}}`.`temp_patent_aggregations` tpa on tpa.`patent_id` = p.`id`
   left outer join `{{params.reporting_database}}`.`temp_patent_earliest_application_date` tpead on tpead.`patent_id` = p.`id`
-  left outer join `{{params.raw_database}}`.`us_term_of_grant` ustog on ustog.`patent_id`=p.`id`;
+  left outer join `{{params.raw_database}}`.`us_term_of_grant` ustog on ustog.`patent_id`=p.`id`
+  left outer join `{{params.raw_database}}`.`detail_desc_length` ddl on ddl.`patent_id` = p.`id`;
 
 # END patent 
 

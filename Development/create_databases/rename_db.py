@@ -17,7 +17,7 @@ old_database = config['DATABASE']['OLD_DB']
 engine = general_helpers.connect_to_db(host, username, password, old_database)
 
 con = engine.connect()
-con.execute('create schema {}'.format(new_database))
+con.execute('create schema {}  default character set=utf8mb4 default collate=utf8mb4_unicode_ci'.format(new_database))
 tables = [t[0] for t in con.execute('show tables from {}'.format(old_database)) if not t[0].startswith('temp')]
 con.close()
 

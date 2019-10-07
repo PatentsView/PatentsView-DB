@@ -36,39 +36,50 @@ def db_and_table_as_array(single_line_query):
     return collation_check_parameters
 
 
-def validate_and_execute(filename, **context):
+def validate_and_execute(filename=None, slack_channel=None, slack_client=None, schema_only=False, drop_existing=True, fk_check=True, **context):
+    print(filename)
+    print(slack_channel)
+    print(slack_client)
+    print(schema_only)
+    print(context)
+    ## Schema only run setting
+    # schema_only=context["schema_only"]
     ## Initialization from config files
     project_home = os.environ['PACKAGE_HOME']
     config = configparser.ConfigParser()
     config.read(project_home + '/Development/config.ini')
     # Create slack client
     slack_token = config["SLACK"]["API_TOKEN"]
-    slack_client = SlackClient(slack_token)
-    slack_channel = config["SLACK"]["CHANNEL"]
+    if slack_client is None:
+        slack_client = SlackClient(slack_token)
+    if slack_channel is None:
+        slack_channel = config["SLACK"]["CHANNEL"]
     # Set up database connection
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'],
                                            config['DATABASE']['PASSWORD'], "information_schema").connect()
+    if not fk_check:
+        db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
     general_helpers.send_slack_notification(
-        "Executing Query File: `" + filename + "`", slack_client, slack_channel, "*Reporting DB (" + filename + ") *",
-        "info")
+       "Executing Query File: `" + filename + "`", slack_client, slack_channel, "*Reporting DB (" + filename + ") *",
+       "info")
     # Get processed template file content
     sql_content = context['templates_dict']['source_sql']
     # Extract individual statements from sql file
     sql_statements = sqlparse.split(sql_content)
     for sql_statement in sql_statements:
         # Certain type of sql are not parsed properly by sqlparse,
-        # this is the implict else to forthcoming if
+        # this is the implicit else to forthcoming if
         single_line_query = sql_statement
         # if the parse is successful we do some sanity checks
         if len(sqlparse.parse(sql_statement)) > 0:
             # Parse SQL
             parsed_statement = sqlparse.parse(sql_statement)[0]
             single_line_query = parse_and_format_sql(parsed_statement)
-            ## Uncomment this section to ignore DROP table commands
-            # if parsed_statement.get_type().lower() == 'unknown':
-            #     if single_line_query.lower().lstrip().startswith("drop"):
-            #         continue
+            ## Based on parameter ignore DROP table commands
+            if not drop_existing and parsed_statement.get_type().lower() == 'unknown':
+                if single_line_query.lower().lstrip().startswith("drop"):
+                    continue
 
             # Log file output
             print(single_line_query)
@@ -77,7 +88,8 @@ def validate_and_execute(filename, **context):
             # We perform sanity checks on those queries
             if parsed_statement.get_type().lower() == 'insert':
                 # Check if query plan includes full table scan, if it does send an alert
-                if not database_helpers.check_query_plan(db_con, single_line_query):
+                query_plan_check=database_helpers.check_query_plan(db_con, single_line_query)
+                if not query_plan_check:
                     message = "Query execution plan involves full table scan: ```" + single_line_query + "```"
                     general_helpers.send_slack_notification(message, slack_client, slack_channel,
                                                             "*Reporting DB (" + filename + ")* ",
@@ -96,8 +108,9 @@ def validate_and_execute(filename, **context):
                                                             "warning")
                     raise Exception(message)
 
-                # # Uncomment this below section to run data less table creation process as test run
-                # continue
+                # # Do not run insert statements if it is schema only run
+                if schema_only:
+                    continue
 
         # If empty line move on to next sql
         if not single_line_query.strip():
@@ -110,6 +123,8 @@ def validate_and_execute(filename, **context):
                 "*Reporting DB (" + filename + ")* ",
                 "error")
             raise e
+    if not fk_check:
+        db_con.execute("SET FOREIGN_KEY_CHECKS=1")
     db_con.close()
     general_helpers.send_slack_notification(
         "Execution for Query File: `" + filename + "` is complete", slack_client, slack_channel,

@@ -59,12 +59,12 @@ def get_counts(previous_qa_loc, new_qa_loc, new_database):
     conn.close()
     return new_counts
 #Counts- write to file
-def make_file(new_counts, previous_qa_loc, new_qa_loc, new_database):
+def make_file(new_counts, previous_qa_loc, new_qa_loc, new_database, old_database):
     counts = pd.read_csv('{}/01_counts.csv'.format(previous_qa_loc))
     counts[new_database] = new_counts
     del counts['Description']
     #the last row of the table is now the most recent previous database!
-    counts['Description'] = counts.apply(lambda row: create_count_description(row[counts.columns[-3]], row[new_database],row['Table']), axis=1)
+    counts['Description'] = counts.apply(lambda row: create_count_description(row[old_database], row[new_database],row['Table']), axis=1)
     cols = list(counts.columns)
     cols.pop(cols.index('Comments'))
     cols += ['Comments']
@@ -79,4 +79,4 @@ if __name__ == '__main__':
     engine = general_helpers.connect_to_db(host, username, password, temporary_upload)
     data = pd.read_csv("{}/01_counts.csv".format(previous_qa_loc))
     new_counts = get_counts(previous_qa_loc, new_qa_loc, new_database)
-    make_file(new_counts,previous_qa_loc, new_qa_loc, new_database)
+    make_file(new_counts,previous_qa_loc, new_qa_loc, new_database, old_database)

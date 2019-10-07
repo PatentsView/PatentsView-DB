@@ -88,7 +88,7 @@ def clean_lawyers(list_of_lawyers):
     stoplist = ['the', 'of', 'and', 'a', 'an', 'at']
     #alpha_blocks = defaultdict(list)
     block = []
-    print('Removing stop words, blocking by first letter...')
+    print('Removing stop words, blocking by first letter...', flush=True)
     for lawyer in list_of_lawyers:
         lawyer_dict[lawyer.uuid] = lawyer
         a_id = get_lawyer_id(lawyer)
@@ -97,7 +97,7 @@ def clean_lawyers(list_of_lawyers):
         a_id = ''.join(nodigits.findall(a_id)).strip()
         id_map[a_id].append(lawyer.uuid)
         block.append(a_id)
-    print('lawyers cleaned!')
+    print('lawyers cleaned!', flush=True)
     return block
 
 
@@ -112,7 +112,7 @@ def create_jw_blocks(list_of_lawyers):
     """
     global blocks
     consumed = defaultdict(int)
-    print('Doing pairwise Jaro-Winkler...', len(list_of_lawyers))
+    print('Doing pairwise Jaro-Winkler...', len(list_of_lawyers), flush=True)
     for i, primary in enumerate(list_of_lawyers):
         if consumed[primary]: continue
         consumed[primary] = 1
@@ -126,7 +126,7 @@ def create_jw_blocks(list_of_lawyers):
                 consumed[secondary] = 1
                 blocks[primary].append(secondary)
     pickle.dump(blocks, open('lawyer.pickle', 'wb'))
-    print('lawyer blocks created!')
+    print('lawyer blocks created!', flush=True)
 
 
 lawyer_insert_statements = []
@@ -137,7 +137,7 @@ def create_lawyer_table(session):
     Given a list of lawyers and the redis key-value disambiguation,
     populates the lawyer table in the database
     """
-    print('Disambiguating lawyers...')
+    print('Disambiguating lawyers...', flush=True)
     session.execute('set foreign_key_checks = 0;')
     session.commit()
     i = 0
@@ -147,7 +147,7 @@ def create_lawyer_table(session):
           i += 1
           rawlawyers = [lawyer_dict[ra_id] for ra_id in block]
           if i % 20000 == 0:
-              print(i, datetime.now())
+              print(i, datetime.now(), flush=True)
               lawyer_match(rawlawyers, session, commit=True)
           else:
               lawyer_match(rawlawyers, session, commit=False)
@@ -158,7 +158,7 @@ def create_lawyer_table(session):
     # t2.get()
     # t3.get()
     # session.commit()
-    print(i, datetime.now())
+    print(i, datetime.now(), flush=True)
 
 def lawyer_match(objects, session, commit=False):
     freq = defaultdict(Counter)
@@ -220,12 +220,12 @@ def lawyer_match(objects, session, commit=False):
 def examine():
     lawyers = s.query(lawyer).all()
     for a in lawyers:
-        print(get_lawyer_id(a), len(a.rawlawyers))
+        print(get_lawyer_id(a), len(a.rawlawyers), flush=True)
         for ra in a.rawlawyers:
             if get_lawyer_id(ra) != get_lawyer_id(a):
-                print(get_lawyer_id(ra))
-            print('-'*10)
-    print(len(lawyers))
+                print(get_lawyer_id(ra), flush=True)
+            print('-'*10, flush=True)
+    print(len(lawyers), flush=True)
 
 
 def printall():
@@ -268,7 +268,7 @@ def run_disambiguation(doctype='grant'):
         lawyers = deque(session.query(App_RawLawyer))
     lawyer_alpha_blocks = clean_lawyers(lawyers)
     for letter in alphabet:
-        print(letter, datetime.now())
+        print(letter, datetime.now(), flush=True)
         blocks = defaultdict(list)
         lawyer_insert_statements = []
         patentlawyer_insert_statements = []
@@ -283,11 +283,11 @@ if __name__ == '__main__':
         run_disambiguation()
     elif len(sys.argv) < 3:
         doctype = sys.argv[1]
-        print('Running ' + doctype)
+        print('Running ' + doctype, flush=True)
         run_disambiguation(doctype)
     else:
         doctype = sys.argv[1]
         letter = sys.argv[2]
         session = alchemy.fetch_session(dbtype=doctype)
-        print('Running ' + letter + ' ' + doctype)
+        print('Running ' + letter + ' ' + doctype, flush=True)
         run_letter(letter, session, doctype)
