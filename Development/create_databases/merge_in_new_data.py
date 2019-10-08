@@ -49,7 +49,13 @@ for table in tables:
         continue
     order_by_cursor = engine.execute(
         "SELECT GROUP_CONCAT(s.COLUMN_NAME SEPARATOR ', ' ) from information_schema.tables t left join information_schema.statistics s on t.TABLE_NAME=s.TABLE_NAME where INDEX_NAME='PRIMARY' and t.TABLE_SCHEMA=s.TABLE_SCHEMA and t.TABLE_SCHEMA ='" + temporary_upload + "' and s.TABLE_NAME ='" + table + "' GROUP BY t.TABLE_NAME;")
-    order_by_clause = order_by_cursor.fetchall()[0][0]
+
+    # added fix for mainclass, subclass tables - has no order by field picked up from information schema
+    if table == 'mainclass' or table == 'subclass':
+        order_by_clause = ''
+    else:
+        order_by_clause = order_by_cursor.fetchall()[0][0]
+
     table_data_count = engine.execute("SELEcT count(1) from " + temporary_upload + "." + table).fetchall()[0][0]
     limit = 50000
     offset = 0
@@ -62,7 +68,7 @@ for table in tables:
             # order by with primary key column - this has no nulls
             insert_table_command_template = "INSERT INTO {0}.{2} SELECT * FROM {1}.{2} ORDER BY " + order_by_clause + " limit {3} offset {4}"
             if table == "mainclass" or table == "subclass":
-                insert_table_command_template = "INSERT IGNORE INTO {0}.{2} SELECT * FROM {1}.{2} ORDER BY " + order_by_clause + " limit {3} offset {4}"
+                    insert_table_command_template = "INSERT IGNORE INTO {0}.{2} SELECT * FROM {1}.{2}  limit {3} offset {4}"
 
             insert_table_command = insert_table_command_template.format(
                 new_database, temporary_upload, table, limit,
