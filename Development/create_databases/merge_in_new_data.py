@@ -68,7 +68,7 @@ for table in tables:
             # order by with primary key column - this has no nulls
             insert_table_command_template = "INSERT INTO {0}.{2} SELECT * FROM {1}.{2} ORDER BY " + order_by_clause + " limit {3} offset {4}"
             if table == "mainclass" or table == "subclass":
-                    insert_table_command_template = "INSERT IGNORE INTO {0}.{2} SELECT * FROM {1}.{2}  limit {3} offset {4}"
+                insert_table_command_template = "INSERT IGNORE INTO {0}.{2} SELECT * FROM {1}.{2}  limit {3} offset {4}"
 
             insert_table_command = insert_table_command_template.format(
                 new_database, temporary_upload, table, limit,
