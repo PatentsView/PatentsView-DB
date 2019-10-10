@@ -52,7 +52,8 @@ def get_tables(db_con, output_folder, status_file):
                 cols = [c[0] for c in col_data]
 
                 if t == 'rawinventor':
-                    cols.remove('rule_47', 'deceased')
+                    cols.remove('rule_47')
+                    cols.remove('deceased')
 
                 elif t == 'patent':
                     cols.remove('withdrawn')
