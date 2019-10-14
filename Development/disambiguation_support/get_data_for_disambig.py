@@ -41,7 +41,7 @@ def get_tables(db_con, output_folder, status_file):
             outp.writerows(existing_data)
             current_status[t] = 1
             json.dump(current_status, open(status_file, 'w'))
-            engine.dispose()
+            db_con.dispose()
 
         else:
 
@@ -55,6 +55,12 @@ def get_tables(db_con, output_folder, status_file):
                     cols.remove('rule_47')
                     cols.remove('deceased')
 
+                    # replace nulls with empty strings in mysql
+                    idx_firstname = cols.index('name_first')
+                    idx_lastname = cols.index('name_last')
+                    cols[idx_firstname] = "coalesce(name_first, '') as name_first"
+                    cols[idx_lastname] = "coalesce(name_last, '') as name_last"
+
                 elif t == 'patent':
                     cols.remove('withdrawn')
 
@@ -62,6 +68,7 @@ def get_tables(db_con, output_folder, status_file):
                 existing_data = db_con.execute("select {} from {};".format(col_string, t))
                 outp = csv.writer(open('{}/{}.tsv'.format(output_folder, t),'w'),delimiter='\t')
                 outp.writerow(cols)
+
                 if t == 'rawinventor':
                     for_output = []
                     for row in existing_data:
@@ -76,13 +83,13 @@ def get_tables(db_con, output_folder, status_file):
                 # update status file to reflect tables already exported
                 current_status[t] = 1
                 json.dump(current_status, open(status_file, 'w'))
-                engine.dispose()
+                db_con.dispose()
 
             # makes entry, but puts value as 0
             except Exception as e:
                 current_status[t] = 0
                 json.dump(current_status, open(status_file, 'w'))
-                engine.dispose()
+                db_con.dispose()
                 raise e
 
 
