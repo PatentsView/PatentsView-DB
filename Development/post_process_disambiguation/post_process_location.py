@@ -157,18 +157,16 @@ def upload_rawloc(db_con, disambiguated_folder, db):
     for drop_sql in drop_indexes:
         db_con.execute(drop_sql[0])
 
-    raw_data = pd.read_csv(disambiguated_folder + "/rawlocation_updated.csv", delimiter='\t')
-    raw_data.columns = ["id", "location_id", "city", "state", "country", "country_transformed",
-                        "location_id_transformed"]
-    raw_data.sort_values(by="id", inplace=True)
-    raw_data.reset_index(inplace=True, drop=True)
+    raw_data_chunks = pd.read_csv(disambiguated_folder + "/rawlocation_updated.csv", delimiter='\t', chunksize=10000)
     print('uploading', flush=True)
     start = time.time()
-    n = 1000  # chunk row size
-    for i in tqdm.tqdm(range(0, raw_data.shape[0], n), desc="Raw Location Upload"):
-        current_chunk = raw_data[i:i + n]
+    for raw_data in tqdm.tqdm(raw_data_chunks, desc="Raw Location Upload"):
+        raw_data.columns = ["id", "location_id", "city", "state", "country", "country_transformed",
+                            "location_id_transformed"]
+        raw_data.sort_values(by="id", inplace=True)
+        raw_data.reset_index(inplace=True, drop=True)
         with db_con.begin() as conn:
-            current_chunk.to_sql(con=conn, name='rawlocation_inprogress', index=False, if_exists='append',
+            raw_data.to_sql(con=conn, name='rawlocation_inprogress', index=False, if_exists='append',
                                  method="multi")  # append keeps the index
     end = time.time()
     print("Load Time:" + str(round(end - start)), flush=True)
