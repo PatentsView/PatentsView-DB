@@ -111,8 +111,9 @@ def push_orgs(looked_up_data, org_id_mapping):
         gi_statement = row['gi_statement']
         if row['looked_up'] is not np.nan: 
             orgs  = row['looked_up'].split('|')
+            # initialize set to track all orgs for each gi patent
+            all_orgs = set()
             for org in orgs:
-                all_orgs = set()
                 if org.upper() in org_id_mapping.keys():
                     org_id = org_id_mapping[org.upper()]
                     all_orgs.add(org_id)
