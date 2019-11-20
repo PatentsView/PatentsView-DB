@@ -31,34 +31,41 @@ Helper functions for database-related functionality.
 """
 import os
 import re
-import ConfigParser
+import configparser
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.sql import exists
 from collections import defaultdict
-import schema
-from match import *
+from . import schema
+from .match import *
 import uuid
 
 from sqlalchemy import exc
 from sqlalchemy import event
 from sqlalchemy.pool import Pool
 
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
+import os
+project_home=os.environ['PACKAGE_HOME']
+from Development.helpers import general_helpers
+config = configparser.ConfigParser()
+config.read(project_home + '/Development/config.ini')
+
 h = HTMLParser()
 def unescape_html(x):
     return h.unescape(x)
 
-import htmlentitydefs
+import html.entities
 
 _char = re.compile(r'&(\w+?);')
     
 # Generate some extra HTML entities
-defs=htmlentitydefs.entitydefs
+defs=html.entities.entitydefs
 defs['apos'] = "'"
 #need to fix this to pull the database location from the config file
-entities = open('D:/DataBaseUpdate/Code/PatentsView-DB/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
+
+entities = open(project_home+'/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
 for e in entities:
     try:
         first = re.sub('\s+|\"|;|&','',e[3:15])
@@ -93,64 +100,53 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     try:
         # reset the connection settings
         cursor.execute("SELECT 1;")
-        if is_mysql():
-            cursor.execute("set foreign_key_checks = 0; set unique_checks = 0;")
+
+        cursor.execute("set foreign_key_checks = 0; set unique_checks = 0;")
     except:
         # raise DisconnectionError - pool will try
         # connecting again up to three times before raising.
         raise exc.DisconnectionError()
     cursor.close()
 
-def is_mysql():
+
+# def get_config(localfile=project_home+"/Development/config.ini", default_file=False):
+#     """
+#     This grabs a configuration file and converts it into
+#     a dictionary.
+
+#     The default filename is called config.ini
+#     First we load the GLOBAL file, then we load a local file
+#     """
+#     if default_file:
+#         openfile = "{0}/config.ini".format(os.path.dirname(os.path.realpath(__file__)))
+#     else:
+#         openfile = localfile
+#     config = defaultdict(dict)
+#     if os.path.isfile(openfile):
+#         cfg = configparser.ConfigParser()
+#         cfg.read(openfile)
+#         for s in cfg.sections():
+#             for k, v in cfg.items(s):
+#                 dec = re.compile(r'^\d+(\.\d+)?$')
+#                 if v in ("True", "False") or v.isdigit() or dec.match(v):
+#                     v = eval(v)
+#                 config[s][k] = v
+
+#     # this enables us to load a local file
+#     if default_file:
+#         newconfig = get_config(localfile, default_file=False)
+#         for section in newconfig:
+#             for item in newconfig[section]:
+#                 config[section][item] = newconfig[section][item]
+#     return config
+
+def session_generator(dbtype='grant'):
     """
-    Returns True if currently connected to a MySQL database. Given that our only two options
-    are MySQL and SQLite, we use this function to determien when we can use certain functions
-    like `set foreign_key_checks = 0` and `truncate <tablaneme>`.
-    """
-    config = get_config()
-    return config.get('global').get('database') == 'mysql'
+    Read from ../project/Development/config.ini file and load appropriate database
 
-
-def get_config(localfile="config.ini", default_file=True):
-    """
-    This grabs a configuration file and converts it into
-    a dictionary.
-
-    The default filename is called config.ini
-    First we load the global file, then we load a local file
-    """
-    if default_file:
-        openfile = "{0}/config.ini".format(os.path.dirname(os.path.realpath(__file__)))
-    else:
-        openfile = localfile
-    config = defaultdict(dict)
-    if os.path.isfile(openfile):
-        cfg = ConfigParser.ConfigParser()
-        cfg.read(openfile)
-        for s in cfg.sections():
-            for k, v in cfg.items(s):
-                dec = re.compile(r'^\d+(\.\d+)?$')
-                if v in ("True", "False") or v.isdigit() or dec.match(v):
-                    v = eval(v)
-                config[s][k] = v
-
-    # this enables us to load a local file
-    if default_file:
-        newconfig = get_config(localfile, default_file=False)
-        for section in newconfig:
-            for item in newconfig[section]:
-                config[section][item] = newconfig[section][item]
-
-    return config
-
-def session_generator(db=None, dbtype='grant'):
-    """
-    Read from config.ini file and load appropriate database
-
-    @db: string describing database, e.g. "sqlite" or "mysql"
     @dbtype: string indicating if we are fetching the session for
              the grant database or the application database
-    session_generator will return an object taht can be called
+    session_generator will return an object that can be called
     to retrieve more sessions, e.g.
     sg = session_generator(dbtype='grant')
     session1 = sg()
@@ -158,60 +154,47 @@ def session_generator(db=None, dbtype='grant'):
     etc.
     These sessions will be protected with the ping refresher above
     """
-    config = get_config()
-    echo = config.get('global').get('echo')
-    if not db:
-        db = config.get('global').get('database')
-    if db[:6] == "sqlite":
-        sqlite_db_path = os.path.join(
-            config.get(db).get('path'),
-            config.get(db).get('{0}-database'.format(dbtype)))
-        if os.path.basename(os.getcwd()) == 'lib':
-            sqlite_db_path = '../' + sqlite_db_path
-        engine = create_engine('sqlite:///{0}'.format(sqlite_db_path), echo=echo, echo_pool=True)
-    else:
-        engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
-            config.get(db).get('user'),
-            config.get(db).get('password'),
-            config.get(db).get('host'),
-            config.get(db).get('{0}-database'.format(dbtype)), echo=echo), pool_size=3, pool_recycle=3600, echo_pool=True)
-
+    #config = get_config()
+    #echo = config.get('GLOBAL').get('echo')
+    echo = True
     if dbtype == 'grant':
-        schema.GrantBase.metadata.create_all(engine)
-    else:
-        schema.ApplicationBase.metadata.create_all(engine)
+        read_database = "NEW_DB"
+    engine = general_helpers.connect_to_db(config['DATABASE']['HOST'],config['DATABASE']['USERNAME'],config['DATABASE']['PASSWORD'], config['DATABASE'][read_database])
+
+#     engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8mb4'.format(
+#         config.get('DATABASE').get('user'),
+#         config.get('DATABASE').get('password'),
+#         config.get('DATABASE').get('host'),
+#         config.get('DATABASE').get(read_database), echo=echo), pool_size=3, pool_recycle=3600, echo_pool=True)
+
+
+    schema.GrantBase.metadata.create_all(engine)
+
 
     Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
     return scoped_session(Session)
 
-def fetch_session(db=None, dbtype='grant'):
+def fetch_session(dbtype='grant'):
     """
-    Read from config.ini file and load appropriate database
+    Read from ../project/Development/config.ini file and load appropriate database
 
-    @db: string describing database, e.g. "sqlite" or "mysql"
     @dbtype: string indicating if we are fetching the session for
              the grant database or the application database
     """
-    config = get_config()
-    echo = config.get('global').get('echo')
-    if not db:
-        db = config.get('global').get('database')
-    if db[:6] == "sqlite":
-        sqlite_db_path = os.path.join(
-            config.get(db).get('path'),
-            config.get(db).get('{0}-database'.format(dbtype)))
-        engine = create_engine('sqlite:///{0}'.format(sqlite_db_path), echo=echo)
-    else:
-        engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
-            config.get(db).get('user'),
-            config.get(db).get('password'),
-            config.get(db).get('host'),
-            config.get(db).get('{0}-database'.format(dbtype)), echo=echo))
+    #config = get_config()
+    echo = True
+    if dbtype == 'grant': #this is here so we can port to work for applicaitons also
+        read_database = "NEW_DB"
+        engine = general_helpers.connect_to_db(config['DATABASE']['HOST'],config['DATABASE']['USERNAME'],config['DATABASE']['PASSWORD'], config['DATABASE'][read_database])
 
-    if dbtype == 'grant':
-        schema.GrantBase.metadata.create_all(engine)
-    else:
-        schema.ApplicationBase.metadata.create_all(engine)
+#     engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
+#         config['DATABASE']['USERNAME'],
+#         config['DATABASE']['PASSWORD'],
+#         config['DATABASE']['HOST'],
+#         config['DATABASE'][read_database], echo=echo))
+
+
+    schema.GrantBase.metadata.create_all(engine)
 
     Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
     session = Session()
@@ -254,9 +237,9 @@ def add_grant(obj, override=True, temp=False):
     pat.application = schema.Application(**obj.app)
     # lots of abstracts seem to be missing. why?
     add_all_fields(obj, pat)
-    if is_mysql():
-        grantsession.execute('set foreign_key_checks = 0;')
-        grantsession.execute('set unique_checks = 0;')
+
+    grantsession.execute('set foreign_key_checks = 0;')
+    grantsession.execute('set unique_checks = 0;')
 
     #grantsession.commit()
 
@@ -371,6 +354,7 @@ def add_citations(obj, pat):
         ref = schema.OtherReference(**ref)
         pat.otherreferences.append(ref)
 
+
 def add_claims(obj, pat):
     claims = obj.claims
     for claim in claims:
@@ -384,127 +368,10 @@ def add_claims(obj, pat):
 def commit():
     try:
         grantsession.commit()
-    except Exception, e:
+    except Exception as e:
         grantsession.rollback()
-        print str(e)
+        print(str(e))
 
-def add_application(obj, override=True, temp=False):
-    """
-    PatentApplication Object converting to tables via SQLAlchemy
-    Necessary to convert dates to datetime because of SQLite (OK on MySQL)
-
-    Case Sensitivity and Table Reflection
-    MySQL has inconsistent support for case-sensitive identifier names,
-    basing support on specific details of the underlying operating system.
-    However, it has been observed that no matter what case sensitivity
-    behavior is present, the names of tables in foreign key declarations
-    are always received from the database as all-lower case, making it
-    impossible to accurately reflect a schema where inter-related tables
-    use mixed-case identifier names.
-
-    Therefore it is strongly advised that table names be declared as all
-    lower case both within SQLAlchemy as well as on the MySQL database
-    itself, especially if database reflection features are to be used.
-    """
-
-    # if the application exists, remove it so we can replace it
-    (app_exists, ), = appsession.query(exists().where(schema.App_Application.number == obj.application))
-    if app_exists:
-        if override:
-            app_query = appsession.query(schema.App_Application).filter(schema.App_Application.number == obj.application)
-            appsession.delete(app_query.one())
-        else:
-            return
-    if len(obj.app["number"]) < 3:
-        return
-
-    app = schema.App_Application(**obj.app)
-    # lots of abstracts seem to be missing. why?
-    add_all_app_fields(obj, app)
-
-    appsession.merge(app)
-
-
-def add_all_app_fields(obj, app):
-    add_app_asg(obj, app)
-    add_app_inv(obj, app)
-    add_app_classes(obj, app)
-    add_app_claims(obj, app)
-    add_app_current_classes(obj, app)
-
-
-def add_app_asg(obj, app):
-    for asg, loc in obj.assignee_list:
-        loc = fixid(loc)
-        asg = fixid(asg)
-        asg['organization'] = unescape_html(asg['organization'])
-        asg = schema.App_RawAssignee(**asg)
-        loc = schema.App_RawLocation(**loc)
-        appsession.merge(loc)
-        asg.rawlocation = loc
-        app.rawassignees.append(asg)
-
-
-def add_app_inv(obj, app):
-    for inv, loc in obj.inventor_list:
-        loc = fixid(loc)
-        inv = fixid(inv)
-        inv = schema.App_RawInventor(**inv)
-        loc = schema.App_RawLocation(**loc)
-        appsession.merge(loc)
-        inv.rawlocation = loc
-        app.rawinventors.append(inv)
-
-
-def add_app_classes(obj, app):
-    for uspc, mc, sc in obj.us_classifications:
-        uspc = fixid(uspc)
-        uspc = schema.App_USPC(**uspc)
-        mc = schema.App_MainClass(**mc)
-        sc = schema.App_SubClass(**sc)
-        appsession.merge(mc)
-        appsession.merge(sc)
-        uspc.mainclass = mc
-        uspc.subclass = sc
-        app.classes.append(uspc)
-
-
-def add_app_current_classes(obj, app):
-    for uspc_current, mc, sc in obj.us_classifications:
-        uspc_current = fixid(uspc_current)
-        uspc_current = schema.App_USPC_current(**uspc_current)
-        mc = schema.App_MainClass_current(**mc)
-        sc = schema.App_SubClass_current(**sc)
-        appsession.merge(mc)
-        appsession.merge(sc)
-        uspc_current.mainclass_current = mc
-        uspc_current.subclass_current = sc
-        app.current_classes.append(uspc_current)
-
-
-def add_app_ipcr(obj, app):
-    for ipc in obj.ipcr_classifications:
-        ipc = schema.App_IPCR(**ipc)
-        app.ipcrs.append(ipc)
-
-
-def add_app_claims(obj, app):
-    claims = obj.claims
-    for claim in claims:
-        claim = fixid(claim)
-        claim['text'] = unescape_html(claim['text'])
-        claim['text'] = _char.sub(_char_unescape,claim['text'])
-        clm = schema.App_Claim(**claim)
-        app.claims.append(clm)
-
-
-def commit_application():
-    try:
-        appsession.commit()
-    except Exception, e:
-        appsession.rollback()
-        print str(e)
 
 grantsession = fetch_session(dbtype='grant')
-appsession = fetch_session(dbtype='application')
 session = grantsession # default for clean and consolidate

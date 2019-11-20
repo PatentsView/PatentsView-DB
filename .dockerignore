@@ -1,0 +1,10 @@
+Development
+Location_Disambiguation
+QA_Development/
+Scripts/
+Temporary_update_database/*
+vendor/
+Assignee_Lawyer_Disambiguation/
+QA_Development/*
+airflow-*/
+data/

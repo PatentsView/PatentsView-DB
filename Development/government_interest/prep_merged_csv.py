@@ -9,7 +9,7 @@ config.read('Development/config.ini')
 
 
 
-parsed_folders = '/usr/local/airflow/parsed'
+parsed_folders = '/project/data/parsed'
 #parsed_folders = '{}/parsed'.format(config['FOLDERS']['WORKING_FOLDER'])
 
 

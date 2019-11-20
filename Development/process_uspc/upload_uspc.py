@@ -2,9 +2,9 @@ import sys
 import os
 import re
 import csv
-sys.path.append('/usr/local/airflow/PatentsView-DB/Development')
-sys.path.append('{}/{}'.format(os.getcwd(), 'Development'))
-from helpers import general_helpers
+project_home = os.environ['PACKAGE_HOME']
+from Development.helpers import general_helpers
+from Development.helpers import general_helpers
 import pandas as pd
 import multiprocessing
 
@@ -62,56 +62,16 @@ def upload_uspc_current(db_con, uspc_current_loc):
     for outfile in uspc_current_files:
         print(outfile)
         if os.path.getsize('{}/{}'.format(uspc_current_loc,outfile)):
-            data = pd.read_csv('{}/{}'.format(uspc_current_loc,outfile),delimiter = '\t', encoding ='utf-8')
-            data.to_sql('uspc_current', db_con, if_exists = 'append', index=False)
+            uspc_data = pd.read_csv('{}/{}'.format(uspc_current_loc,outfile),delimiter = '\t', encoding ='utf-8', chunksize=10000)
+            for uspc_data_chunk in uspc_data:
+                uspc_data_chunk.to_sql('uspc_current', db_con, if_exists = 'append', index=False, method="multi")
 
-
-def find_missed_patents(db_con, patent_set, uspc_output):
-    patents_in_uspc = db_con.execute('select patent_id from uspc_current')
-    current_exists = set()
-    for patent in patents_in_uspc:
-        current_exists.add(patent['patent_id'])
-
-    missed_patents = list(patent_set - current_exists)
-
-    if len(missed_patents) > 0:
-        main = db_con.execute('select id from mainclass_current')
-        mainclass = set([item['id'] for item in main])
-        sub = db_con.execute('select id from subclass_current')
-        subclass = set([item['id'] for item in sub])
-
-        to_add_main = []
-        to_add_sub = []
-        to_add_uspc_current = []
-
-        count =0
-        print(len(missed_patents))
-        for patent in missed_patents:
-            uspc_data = db_con.execute('select * from uspc where patent_id ="{}"'.format(patent))
-            uspc_data_clean = [item for item in uspc_data]
-            count +=1
-            if count%1000 ==0:
-                print(str(count))
-            for d in uspc_data_clean:
-                if not d['mainclass_id'] in mainclass:
-                    to_add_main.append(d['mainclass_id'])
-                if not d['subclass_id'] in subclass:
-                    to_add_sub.append(d['subclass_id'])
-                sequence = int(d['sequence'])
-                to_add_uspc_current.append([d['uuid'], d['patent_id'], d['mainclass_id'], d['subclass_id'], sequence]) 
-        print("got final data for update")
-        data = pd.DataFrame(to_add_uspc_current)
-        data.columns = ['uuid', 'patent_id', 'mainclass_id', 'subclass_id', 'sequence']
-        data.to_sql(con=db_con, name='temp_uspc_current_to_insert', index = False, if_exists='replace')
-        print('uploaded data, inserting')
-        db_con.execute('insert into uspc_current select * from temp_uspc_current_to_insert;')
-        print("done")
 
 
 if __name__ == '__main__':
     import configparser
     config = configparser.ConfigParser()
-    config.read('/usr/local/airflow/PatentsView-DB/Development/config.ini')
+    config.read(project_home + '/Development/config.ini')
 
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], 
                                             config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
@@ -128,8 +88,8 @@ if __name__ == '__main__':
     pat_sets = [patent_set for item in in_files]
     files = zip(in_files, out_files, error_log, pat_dicts, pat_sets)
 
-
-    desired_processes = 7# ussually num cpu - 1
+    total_cpus = multiprocessing.cpu_count()
+    desired_processes = (total_cpus // 2) + 1  # usually num cpu - 1
     jobs = []
     for f in files:
         jobs.append(multiprocessing.Process(target = write_uspc_current, args=(f)))
@@ -140,4 +100,4 @@ if __name__ == '__main__':
             job.start()
  
     upload_uspc_current(db_con, uspc_folder)
-    find_missed_patents(db_con, patent_set, '{}/uspc_current.csv'.format(uspc_folder))
+
