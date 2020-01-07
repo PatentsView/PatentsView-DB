@@ -145,7 +145,7 @@ def find_ipc_url():
     potential_links = []
     for link in tree.xpath('//a/@href'):
         print(link)
-        if (link.lstrip('.').lstrip("/").startswith("cpcConcordances/CPCtoIPCtxt")
+        if (link.lstrip('.').lstrip("/").startswith("cpc/concordances/cpc-ipc-concordance")
                 and link.endswith(".txt")):
             potential_links.append(link)
 
