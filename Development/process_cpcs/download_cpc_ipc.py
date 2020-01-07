@@ -45,7 +45,7 @@ def find_cpc_schema_url():
     tree = html.fromstring(page.read())
     potential_links = []
     for link in tree.xpath('//a/@href'):
-        if (link.lstrip(".").startswith("/cpc/interleaved/CPCSchemeXML")
+        if (link.lstrip(".").startswith("/cpc/bulk/CPCSchemeXML")
                 and link.endswith(".zip")):
             potential_links.append(link.replace('..',''))
 
