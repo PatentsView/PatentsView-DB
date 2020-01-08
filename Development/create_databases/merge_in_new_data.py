@@ -14,7 +14,7 @@ config.read(project_home + '/Development/config.ini')
 host = config['DATABASE']['HOST']
 username = config['DATABASE']['USERNAME']
 password = config['DATABASE']['PASSWORD']
-working = congig['FOLDERS']['WORKING_FOLDER']
+working = config['FOLDERS']['WORKING_FOLDER']
 new_database = config['DATABASE']['NEW_DB']
 old_database = config['DATABASE']['OLD_DB']
 
