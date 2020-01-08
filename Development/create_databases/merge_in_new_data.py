@@ -14,8 +14,10 @@ config.read(project_home + '/Development/config.ini')
 host = config['DATABASE']['HOST']
 username = config['DATABASE']['USERNAME']
 password = config['DATABASE']['PASSWORD']
+working = config['FOLDERS']['WORKING_FOLDER']
 new_database = config['DATABASE']['NEW_DB']
 old_database = config['DATABASE']['OLD_DB']
+
 temporary_upload = config['DATABASE']['TEMP_UPLOAD_DB']
 
 engine = general_helpers.connect_to_db(host, username, password, new_database)
@@ -32,8 +34,11 @@ tables = ['application', 'botanic', 'brf_sum_text', 'claim', 'detail_desc_length
 engine.execute("SET FOREIGN_KEY_CHECKS=0;")
 
 engine.dispose()
+status_folder = '{}/{}'.format(working, 'create_databases')
+if not os.path.exists(status_folder):
+    os.makedirs(status_folder)
 
-status_file = project_home + '/Development/create_databases/merge_status.json'
+status_file = '{}/{}'.format(status_folder, 'merge_status.json')
 try:
     current_status = json.load(open(status_file))
 except OSError as e:
