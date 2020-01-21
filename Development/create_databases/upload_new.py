@@ -13,6 +13,7 @@ host = config['DATABASE']['HOST']
 username = config['DATABASE']['USERNAME']
 password = config['DATABASE']['PASSWORD']
 new_database = config['DATABASE']['NEW_DB']
+working = config['FOLDERS']['WORKING_FOLDER']
 temporary_upload = config['DATABASE']['TEMP_UPLOAD_DB']
 processed_data = '{}/parsed_data'.format(config['FOLDERS']['WORKING_FOLDER'])
 
@@ -51,7 +52,11 @@ for folder in os.listdir(processed_data):
 
 
 # check to see if folder and table have previously been loaded
-status_file=project_home + '/Development/create_databases/upload_status.json'
+status folder = '{}/{}'.format(working, 'create_databases')
+if not os.path.exists(status_folder):
+    os.makedirs(status_folder)
+
+status_file = '{}/{}'.format(status_folder, 'upload_status.json')
 try:
     current_status=json.load(open(status_file))
 except OSError as e:
