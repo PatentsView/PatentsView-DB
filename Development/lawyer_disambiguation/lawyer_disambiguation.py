@@ -6,6 +6,7 @@ import pandas as pd
 import tqdm
 import sqlalchemy
 import re
+import time
 from collections import defaultdict, deque
 import uuid
 from string import ascii_lowercase as alphabet
@@ -38,24 +39,27 @@ THRESHOLD = config["LAWYER"]["THRESHOLD"]
 engine = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
 db_con = engine.connect() 
 
+timestamp = str(int(time.time()))
+
 ### Make a copy of rawlawyer table ###
 engine.execute("CREATE TABLE rawlawyer_copy LIKE rawlawyer;")
-engine.execute("ALTER TABLE rawlawyer_copy ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;")
-engine.execute("UPDATE rawlawyer_copy rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;")
-engine.execute("UPDATE rawlawyer_copy rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;")
-engine.execute("UPDATE rawlawyer_copy rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_lawyer_id IS NULL;")
-engine.execute("ALTER TABLE temp_rawlawyer_cleaned character SET 'utf8mb4'  collate utf8mb4_unicode_ci;")
+engine.execute("ALTER TABLE rawlawyer_backup_{} ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;").format(timestamp)
+engine.execute("UPDATE rawlawyer_backup_{} rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;").format(timestamp)
+engine.execute("UPDATE rawlawyer_backup_{} rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;").format(timestamp)
+engine.execute("UPDATE rawlawyer_backup_{} rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_lawyer_id IS NULL;").format(timestamp)
+engine.execute("ALTER TABLE rawlawyer ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;")
+
 
 nodigits = re.compile(r'[^\d]+')
 
 
-disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],'update_20191008')
+disambig_folder = '{}/{}/'.format(config['FOLDERS']['WORKING_FOLDER'], config['DATABASE']['TEMP_UPLOAD_DB'], 'disambig_output')
 
 
 ######## Formerly clean_alpha_lawyer_ids.ipynb ########
 # create outfile
 outfile = csv.writer(open(disambig_folder +'/rawlawyer_cleanalphaids.tsv','w'),delimiter='\t')
-outfile.writerow(['uuid', 'cleaned_alpha_lawyer_id'])
+outfile.writerow(['uuid', 'lawyer_id', 'patent_id', 'name_first', 'name_last', 'organization', 'cleaned_alpha_lawyer_id', 'country', 'sequence'])
 
 stoplist = ['the', 'of', 'and', 'a', 'an', 'at']
     
@@ -68,19 +72,26 @@ while True:
     batch_counter += 1
     counter=0
 
-    rawlaw_chunk = db_con.execute('SELECT uuid, alpha_lawyer_id from rawlawyer_copy order by uuid limit {} offset {}'.format(limit, offset))
+    rawlaw_chunk = db_con.execute('SELECT * from rawlawyer_backup_{} order by uuid limit {} offset {}'.format(timestamp, limit, offset))
 
     for lawyer in tqdm.tqdm(rawlaw_chunk, total=limit, desc="rawlawyer processing - batch:" + str(batch_counter)):
 
         uuid_match = lawyer[0]
-        a_id = lawyer[1]
+        law_id = lawyer[1]
+        pat_id = lawyer[2]
+        name_f = lawyer[3]
+        name_l = lawyer[4]
+        org = lawyer[5]
+        a_id = lawyer[6]
+        ctry = lawyer[7]
+        seq = lawyer[8]
         
         # removes stop words, then rejoins the string
         a_id = ' '.join([x for x in a_id.split(' ') if x.lower() not in stoplist])
         cleaned_a_id = ''.join(nodigits.findall(a_id)).strip()
 
         # update cleaned_alpha_lawyer_id
-        outfile.writerow([uuid_match, cleaned_a_id])
+        outfile.writerow([uuid_match, law_id, pat_id, name_f, name_l, org, cleaned_a_id, ctry, seq])
         counter += 1
 
     print('lawyers cleaned!', flush=True)
@@ -93,9 +104,14 @@ while True:
     offset = offset + limit
     print("processed batch: ", str(batch_counter))
 
+###
+engine.execute("ALTER TABLE rawlawyer RENAME TO rawlawyer_predisambig;")
+engine.execute("CREATE TABLE rawlawyer LIKE rawlawyer_predisambig;")
+engine.execute("LOAD DATA INFILE {} INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES;")
+
+
+
 ######## Formerly debug_rawlawyer.ipynb ########
-def without_digits(word):
-    return ''.join([x for x in word if not x.isdigit()])
 
 def create_jw_blocks(list_of_lawyers):
     """
@@ -210,81 +226,8 @@ def lawyer_match(objects, session, commit=False):
     patentlawyer_insert_statements.extend([{'patent_id': x, 'lawyer_id': param['id']} for x in patents])
     update_statements.extend([{'pk':x,'update':param['id']} for x in tmpids])
 
-def examine():
-    lawyers = s.query(lawyer).all()
-    for a in lawyers:
-        print(get_lawyer_id(a), len(a.rawlawyers), flush=True)
-        for ra in a.rawlawyers:
-            if get_lawyer_id(ra) != get_lawyer_id(a):
-                print(get_lawyer_id(ra), flush=True)
-            print('-'*10, flush=True)
-    print(len(lawyers), flush=True)
-
-
-def printall():
-    lawyers = s.query(lawyer).all()
-    with open('out.txt', 'wb') as f:
-        for a in lawyers:
-            f.write(normalize_utf8(get_lawyer_id(a)).encode('utf-8'))
-            f.write('\n')
-            for ra in a.rawlawyers:
-                f.write(normalize_utf8(get_lawyer_id(ra)).encode('utf-8'))
-                f.write('\n')
-            f.write('-'*20)
-            f.write('\n')
-
-
-def run_letter(letter, session, doctype='grant'):
-    schema = RawLawyer
-    if doctype == 'application':
-        schema = App_RawLawyer
-    letter = letter.upper()
-    clause1 = schema.organization.startswith(bindparam('letter',letter))
-    clause2 = schema.name_first.startswith(bindparam('letter',letter))
-    clauses = or_(clause1, clause2)
-    lawyers = (lawyer for lawyer in session.query(schema).filter(clauses))
-    block = clean_lawyers(lawyers)
-    create_jw_blocks(block)
-    create_lawyer_table(session)
-
-def run_disambiguation(doctype='grant'):
+def run_disambiguation():
     # get all lawyers in database
-    global blocks
-    global lawyer_insert_statements
-    global patentlawyer_insert_statements
-    global update_statements
-    session = alchemy.fetch_session(dbtype=doctype)
-    
-    # bookkeeping for blocks
-    blocks = defaultdict(list)
-    id_map = defaultdict(list)
-    lawyer_dict = {}
-    
-    print("going through alphabet")
-    for letter in alphabet:
-       
-        print("letter is: ", letter, datetime.now(), flush=True)
-
-        blocks = defaultdict(list)
-        lawyer_insert_statements = []
-        patentlawyer_insert_statements = []
-        update_statements = []
-
-        # query by letter 
-        lawyers_object = session.query(RawLawyer).add_columns(RawLawyer.uuid, RawLawyer.lawyer_id, RawLawyer.cleaned_alpha_lawyer_id)#.filter(RawLawyer.cleaned_alpha_lawyer_id like (letter + '%'))
-
-        letterblock = []
-        # update lawyer_dict, id_map, and letterblock
-        for lawyer in lawyers_object:
-            lawyer_dict[lawyer.uuid] = lawyer
-            id_map[lawyer.cleaned_alpha_lawyer_id].append(lawyer.uuid)
-            letterblock.append(lawyer.cleaned_alpha_lawyer_id)
-
-        create_jw_blocks(letterblock)
-        create_lawyer_table(session)
-
-if __name__ == '__main__':
-
     print("running")
     doctype='grant' 
     global blocks
@@ -347,3 +290,8 @@ if __name__ == '__main__':
             f.flush()
             
     f.close()
+
+if __name__ == '__main__':
+    run_disambiguation()
+    engine.execute("ALTER TABLE rawlawyer DROP alpha_lawyer_id")
+    engine.dispose()
