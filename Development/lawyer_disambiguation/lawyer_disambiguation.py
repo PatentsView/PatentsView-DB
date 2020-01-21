@@ -42,12 +42,12 @@ db_con = engine.connect()
 timestamp = str(int(time.time()))
 
 ### Make a copy of rawlawyer table ###
-engine.execute("CREATE TABLE rawlawyer_copy LIKE rawlawyer;")
-engine.execute("ALTER TABLE rawlawyer_backup_{} ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;").format(timestamp)
-engine.execute("UPDATE rawlawyer_backup_{} rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;").format(timestamp)
-engine.execute("UPDATE rawlawyer_backup_{} rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;").format(timestamp)
-engine.execute("UPDATE rawlawyer_backup_{} rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_lawyer_id IS NULL;").format(timestamp)
+engine.execute("CREATE TABLE rawlawyer_copy_backup_{} LIKE rawlawyer;".format(timestamp))
+engine.execute("INSERT INTO rawlawyer_copy_backup_{} SELECT * FROM rawlawyer".format(timestamp))
 engine.execute("ALTER TABLE rawlawyer ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;")
+engine.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;")
+engine.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;")
+engine.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_lawyer_id IS NULL;")
 
 
 nodigits = re.compile(r'[^\d]+')
@@ -72,7 +72,7 @@ while True:
     batch_counter += 1
     counter=0
 
-    rawlaw_chunk = db_con.execute('SELECT * from rawlawyer_backup_{} order by uuid limit {} offset {}'.format(timestamp, limit, offset))
+    rawlaw_chunk = db_con.execute('SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset))
 
     for lawyer in tqdm.tqdm(rawlaw_chunk, total=limit, desc="rawlawyer processing - batch:" + str(batch_counter)):
 
@@ -107,7 +107,7 @@ while True:
 ###
 engine.execute("ALTER TABLE rawlawyer RENAME TO rawlawyer_predisambig;")
 engine.execute("CREATE TABLE rawlawyer LIKE rawlawyer_predisambig;")
-engine.execute("LOAD DATA INFILE {} INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES;")
+engine.execute("LOAD DATA LOCAL INFILE {} INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES;".format(outfile))
 
 
 
