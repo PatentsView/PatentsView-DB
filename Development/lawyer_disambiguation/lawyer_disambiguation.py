@@ -53,7 +53,7 @@ engine.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_
 nodigits = re.compile(r'[^\d]+')
 
 
-disambig_folder = '{}/{}/'.format(config['FOLDERS']['WORKING_FOLDER'], config['DATABASE']['TEMP_UPLOAD_DB'], 'disambig_output')
+disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
 
 
 ######## Formerly clean_alpha_lawyer_ids.ipynb ########
