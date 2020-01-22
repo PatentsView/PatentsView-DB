@@ -107,7 +107,7 @@ while True:
 ###
 engine.execute("ALTER TABLE rawlawyer RENAME TO rawlawyer_predisambig;")
 engine.execute("CREATE TABLE rawlawyer LIKE rawlawyer_predisambig;")
-engine.execute("LOAD DATA LOCAL INFILE {} INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES;".format(disambig_folder +'/rawlawyer_cleanalphaids.tsv'))
+engine.execute("LOAD DATA LOCAL INFILE '{}' INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES;".format(disambig_folder +'/rawlawyer_cleanalphaids.tsv'))
 
 
 
