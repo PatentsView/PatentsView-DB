@@ -134,14 +134,14 @@ def create_jw_blocks(list_of_lawyers):
             if jaro_winkler(primary, secondary, 0.0) >= float(THRESHOLD):
                 consumed[secondary] = 1
                 blocks[primary].append(secondary)
-    pickle.dump(blocks, open('lawyer.pickle', 'wb'))
+    pickle.dump(blocks, open(disambig_folder + '/' + 'lawyer.pickle', 'wb'))
     print('lawyer blocks created!', flush=True)
 
 
 lawyer_insert_statements = []
 patentlawyer_insert_statements = []
 update_statements = []
-def create_lawyer_table(session):
+def create_lawyer_table(session, id_map, lawyer_dict):
     """
     Given a list of lawyers and the redis key-value disambiguation,
     populates the lawyer table in the database
@@ -226,7 +226,7 @@ def lawyer_match(objects, session, commit=False):
     patentlawyer_insert_statements.extend([{'patent_id': x, 'lawyer_id': param['id']} for x in patents])
     update_statements.extend([{'pk':x,'update':param['id']} for x in tmpids])
 
-def run_disambiguation():
+def run_disambiguation(doctype='grant'):
     # get all lawyers in database
     print("running")
     doctype='grant' 
@@ -259,7 +259,7 @@ def run_disambiguation():
             update_statements = []
 
             # query by letter        
-            lawyers_object = session.query(RawLawyer).filter(RawLawyer.cleaned_alpha_lawyer_id.like(letter + '%'))
+            lawyers_object = session.query(RawLawyer).filter(RawLawyer.alpha_lawyer_id.like(letter + '%'))
 
             print("query returned")
             
@@ -267,8 +267,8 @@ def run_disambiguation():
 
             for lawyer in lawyers_object:
                 lawyer_dict[lawyer.uuid] = lawyer
-                id_map[lawyer.cleaned_alpha_lawyer_id].append(lawyer.uuid)
-                letterblock.append(lawyer.cleaned_alpha_lawyer_id)
+                id_map[lawyer.alpha_lawyer_id].append(lawyer.uuid)
+                letterblock.append(lawyer.alpha_lawyer_id)
 
                 
                 
@@ -280,7 +280,7 @@ def run_disambiguation():
             create_jw_blocks(letterblock)
             
             f.write('size of blocks for letter is ' + str(sys.getsizeof(blocks)) + '\n')
-            create_lawyer_table(session)
+            create_lawyer_table(session, id_map, lawyer_dict)
             
             f.write('size of lawyer_insert_statements for letter is ' + str(sys.getsizeof(lawyer_insert_statements)) + '\n')
             f.write('size of patentlawyer_insert_statements for letter is ' + str(sys.getsizeof(patentlawyer_insert_statements)) + '\n')
@@ -292,6 +292,6 @@ def run_disambiguation():
     f.close()
 
 if __name__ == '__main__':
-    run_disambiguation()
+    run_disambiguation(doctype='grant')
     engine.execute("ALTER TABLE rawlawyer DROP alpha_lawyer_id")
     engine.dispose()
