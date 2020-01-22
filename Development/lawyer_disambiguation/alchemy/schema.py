@@ -504,6 +504,7 @@ class RawLawyer(GrantBase):
     name_first = Column(Unicode(64))
     name_last = Column(Unicode(64))
     organization = Column(Unicode(64))
+    alpha_lawyer_id = Column(Unicode(128))
     country = Column(Unicode(10))
     sequence = Column(Integer, index=True)
 
