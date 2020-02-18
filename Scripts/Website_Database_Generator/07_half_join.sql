@@ -270,6 +270,73 @@ FROM
     
 ALTER TABLE `{{params.reporting_database}}`.`cpc_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
+
+-- Index on patent_id
+drop table if exists `{{params.reporting_database}}`.`cpc_entity_type_2`;
+create table `{{params.reporting_database}}`.`cpc_entity_type_2`
+(
+	`patent_id` varchar(20) not null,
+    `cpc_category` varchar(36) null,
+    `cpc_first_seen_date` date null,
+    `cpc_group_id` varchar(20) null,
+    `cpc_group_title` varchar(512) null,
+    `cpc_last_seen_date` date null,
+    `cpc_section_id` varchar(10) null,
+    `cpc_sequence` int(10) unsigned null,
+    `cpc_subgroup_id` varchar(20) null,
+    `cpc_subgroup_title` varchar(2048) null,
+    `cpc_subsection_id` varchar(20) not null,
+    `cpc_subsection_title` varchar(512) null,
+    `cpc_total_num_inventors` int(10) unsigned null,
+    `cpc_total_num_patents` int(10) unsigned null,
+    `cpc_total_num_assignees` int(10) unsigned null
+)
+
+engine=InnoDB;
+
+
+insert into `{{params.reporting_database}}`.`cpc_entity_type_2`
+(
+  `patent_id` ,`cpc_category` ,`cpc_first_seen_date` ,
+    `cpc_group_id` ,`cpc_group_title` ,`cpc_last_seen_date` ,
+    `cpc_section_id` ,`cpc_sequence` ,`cpc_subgroup_id` ,
+    `cpc_subgroup_title` ,`cpc_subsection_id` ,`cpc_subsection_title` ,
+    `cpc_total_num_inventors` ,`cpc_total_num_patents` ,
+    `cpc_total_num_assignees`
+
+
+)
+
+select
+        cpc_current_group_copy.`patent_id`,
+        cpc_current_copy.`category`,
+        cpc_group.`first_seen_date`,
+        cpc_group.`id`,
+        cpc_group.`title`,
+        cpc_group.`last_seen_date`,
+        cpc_current_group_copy.`section_id`,
+        cpc_current_copy.`sequence`,
+        cpc_current_copy.`subgroup_id`,
+        cpc_subgroup.`title`,
+        cpc_current_copy.`subsection_id`,
+        cpc_subsection.`title`,
+        cpc_group.`num_inventors`,
+        cpc_group.`num_patents`,
+			 cpc_group.`num_assignees`
+FROM
+        `{{params.reporting_database}}`.cpc_current_group_copy
+            LEFT OUTER JOIN
+        `{{params.reporting_database}}`.cpc_group ON cpc_current_group_copy.group_id = cpc_group.id
+            LEFT OUTER JOIN
+        `{{params.reporting_database}}`.cpc_current_copy ON cpc_current_group_copy.patent_id = cpc_current_copy.patent_id
+            AND cpc_group.id = cpc_current_copy.group_id
+            LEFT OUTER JOIN
+        `{{params.reporting_database}}`.cpc_subsection ON cpc_current_copy.subsection_id = cpc_subsection.id
+            LEFT OUTER JOIN
+        `{{params.reporting_database}}`.cpc_subgroup ON cpc_current_copy.subgroup_id = cpc_subgroup.id;
+
+ALTER TABLE `{{params.reporting_database}}`.`cpc_entity_type_2` ADD INDEX `patent_id` (`patent_id` ASC);
+
 -- Index on patent_id
 drop table if exists `{{params.reporting_database}}`.`nber_entity`;
 create table `{{params.reporting_database}}`.`nber_entity`
