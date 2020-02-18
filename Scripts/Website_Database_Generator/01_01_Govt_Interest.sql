@@ -4,7 +4,7 @@
 ###############################################################################################################################
 drop table if exists `{{params.reporting_database}}`.`government_interest`;
 CREATE TABLE `{{params.reporting_database}}`.`government_interest` (
-   `patent_id` varchar(255) NOT NULL,
+   `patent_id` varchar(24) NOT NULL,
    `gi_statement` text,
    PRIMARY KEY (`patent_id`)
  ) ENGINE=InnoDB;
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `{{params.reporting_database}}`.`government_organizat
 drop table if exists `{{params.reporting_database}}`.`patent_contractawardnumber`;
 CREATE TABLE `{{params.reporting_database}}`.`patent_contractawardnumber` (
    `patent_id` varchar(24) NOT NULL,
-   `contract_award_number` varchar(255) Null,
+   `contract_award_number` varchar(64) Null,
    PRIMARY KEY (`patent_id`,`contract_award_number`),
    CONSTRAINT `patent_contractawardnumber_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `{{params.reporting_database}}`.`government_interest` (`patent_id`) ON DELETE CASCADE
  ) ENGINE=InnoDB;
@@ -31,7 +31,7 @@ CREATE TABLE `{{params.reporting_database}}`.`patent_contractawardnumber` (
 drop table if exists `{{params.reporting_database}}`.`patent_govintorg`;
  
 CREATE TABLE `{{params.reporting_database}}`.`patent_govintorg` (
-   `patent_id` varchar(255) NOT NULL,
+   `patent_id` varchar(24) NOT NULL,
    `organization_id` int(11) NOT NULL,
    PRIMARY KEY (`patent_id`,`organization_id`),
    KEY `organization_id` (`organization_id`),

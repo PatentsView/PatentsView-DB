@@ -214,6 +214,7 @@ if __name__ == '__main__':
     db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'], config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
     pat_to_subgroup = get_data(db_con)
     chunks_of_patent = general_helpers.chunks(pat_to_subgroup, (len(pat_to_subgroup)//7)+1)
+    del pat_to_subgroup
 
     outfiles = ['{}/wipo_cats_assigned_cpc2ipc_{}'.format(wipo_output, item) for item in ['a', 'b', 'c', 'd', 'e', 'f', 'g']]
     working_directories = [wipo_output for _ in outfiles]
@@ -223,7 +224,8 @@ if __name__ == '__main__':
     input_data = zip(working_directories, chunks_of_patent, cpc_to_ipcs, ipc_to_fields, outfiles)
 
     total_cpus = multiprocessing.cpu_count()
-    desired_processes = (total_cpus // 2) + 1  # usually num cpu - 1
+#    desired_processes = (total_cpus // 2) + 1  # usually num cpu - 1
+    desired_processes = 1
     jobs = []
     for f in input_data:
         jobs.append(multiprocessing.Process(target = write_cpc2ipc, args=(f)))
@@ -235,6 +237,9 @@ if __name__ == '__main__':
     # wait until all jobs finish processing to move on to the next step
     for job in jobs:
         job.join()
+
+    del cpc_to_ipc
+    del ipc_to_fields
 
     pats = defaultdict(lambda: [])
     for f in [f for f in os.listdir(wipo_output) if f.startswith('wipo')]:
@@ -252,15 +257,6 @@ if __name__ == '__main__':
 
     jobs = []
     for f in input_data:
-        jobs.append(multiprocessing.Process(target = write_wipo_assigned, args=(f)))
-    for segment in general_helpers.chunks(jobs, desired_processes):
-        print(segment, flush=True)
-        for job in segment:
-            job.start()
-
-
-    # wait until all jobs finish processing to move on to uploading wipo
-    for job in jobs:
-        job.join()
+        write_wipo_assigned(f[0], f[1], f[2])
 
     upload_wipo(wipo_output, db_con)
