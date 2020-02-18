@@ -5,5 +5,5 @@ chardet==3.0.4
 clint==0.5.1
 idna==2.7
 lxml==4.2.1
-requests==2.19.1
+requests==2.20.0
 urllib3==1.23
