@@ -8,6 +8,7 @@ from updater.callbacks import airflow_task_success, airflow_task_failure
 
 # Parser Imports
 from updater.xml_to_csv.bulk_downloads import bulk_download
+from updater.xml_to_csv.preprocess_xml import preprocess_xml
 
 default_args = {
     'owner': 'airflow',
@@ -38,8 +39,10 @@ download_xml_operator = PythonOperator(dag=dag, task_id='download_xml', python_c
                                        op_kwargs={'config': config},
                                        on_success_callback=airflow_task_success,
                                        on_failure_callback=airflow_task_failure)
-# process_xml_operator = PythonOperator(task_id='process_xml',
-#                                       python_callable=bulk_download,
-#                                       dag=dag, op_kwargs={'config': config, 'project_home': project_home},
-#                                       on_success_callback=airflow_task_success,
-#                                       on_failure_callback=airflow_task_failure)
+process_xml_operator = PythonOperator(task_id='process_xml',
+                                      python_callable=preprocess_xml,
+                                      dag=dag, op_kwargs={'config': config},
+                                      on_success_callback=airflow_task_success,
+                                      on_failure_callback=airflow_task_failure)
+
+process_xml_operator.set_upstream(download_xml_operator)

@@ -1,5 +1,3 @@
-import unittest
-
 from bs4 import BeautifulSoup
 from urllib.request import urlretrieve
 import requests
@@ -7,7 +5,7 @@ from zipfile import ZipFile
 import os
 import logging
 
-from QA.tests import XMLTest
+from QA.xml_to_csv.DownloadTest import DownloadTest
 
 logger = logging.getLogger("Bulk Downloads")
 
@@ -138,7 +136,7 @@ def bulk_download(**kwargs):
 
 
 def post_download(update_config):
-    qc_step = XMLTest(update_config)
+    qc_step = DownloadTest(update_config)
     qc_step.runTest(update_config)
 
 

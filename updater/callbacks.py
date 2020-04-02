@@ -1,14 +1,12 @@
-from QA.report import get_report_message
+from QA.reports import get_report_message
 from lib.configuration import get_section
 from lib.notifications import send_slack_notification
-import os
 
 
 def airflow_task_success(context):
     section = get_section(context['task'].task_id)
     from lib.configuration import get_config
     config = get_config()
-    project_home = os.environ['PACKAGE_HOME']
     message = 'AIRFLOW TASK Success:\n' \
               'DAG:    {}\n' \
               'TASKS:  {}\n' \

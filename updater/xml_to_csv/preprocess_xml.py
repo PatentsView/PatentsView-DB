@@ -1,10 +1,14 @@
 import logging
 import multiprocessing
 import os
+import time
 
-from lib.utilities import
-logger = logging.getLogger("XML Cleaner")
+from QA.xml_to_csv.XMLTest import XMLTest
+from lib.configuration import get_config
+
+
 def clean_single_file(raw_xml_file, new_xml_file):
+    logger = logging.getLogger("airflow.task")
     '''
     This is a little hacky but solves the files-are-not-provided-as-valid-xml problem
     '''
@@ -18,7 +22,7 @@ def clean_single_file(raw_xml_file, new_xml_file):
                     new_f.write(line)
             new_f.write('</root>')
 
-    print("cleaning is done for current raw xml file: ", new_xml_file, flush=True)
+    logger.info("cleaning is done for current raw xml file: {fname}".format(fname=new_xml_file))
 
 
 def check_schema(patent_xml):
@@ -30,6 +34,7 @@ def check_schema(patent_xml):
     :param expected_schema: the list of fields previously at those levels for comparison
     :returns null: Raises errors if the schema is unexpected
     '''
+    logger = logging.getLogger("airflow.task")
     expected_high_level = ['abstract', 'claims', 'description', 'drawings', 'number',
                            'publication-reference', 'sequence-list-new-rules', 'table',
                            'us-bibliographic-data-grant', 'us-chemistry', 'us-claim-statement',
@@ -55,16 +60,19 @@ def check_schema(patent_xml):
     main_fields = sorted(list(set(main_fields)))
 
     if not high_level == expected_high_level:
-        print(high_level)
+        logger.error(high_level)
         raise Exception("The high level fields have changed ...check that it is not the ones we use.")
     if not main_fields == expected_main_fields:
-        print(main_fields)
+        logger.error(main_fields)
         raise Exception(
             "The main fields in the us-bibliographic-grant-data have changed ...check that it is not the ones we use.")
     if without_us_bibliographic > 200:
         raise Exception("There are more patents missing the us-bibliographic-grant-data field than ussual ")
 
-def begin_xml_cleaning(config, project_home):
+
+def begin_xml_cleaning(config):
+    logger = logging.getLogger("airflow.task")
+    logger.info("airflow.task >>> 2 - INFO logger test")
     infolder = '{}/raw_data'.format(config['FOLDERS']['WORKING_FOLDER'])
     outfolder = '{}/clean_data'.format(config['FOLDERS']['WORKING_FOLDER'])
 
@@ -79,22 +87,20 @@ def begin_xml_cleaning(config, project_home):
     total_cpus = multiprocessing.cpu_count()
     desired_processes = (total_cpus // 2) + 1  # usually num cpu - 1
     jobs = []
-
+    pool = multiprocessing.Pool(desired_processes)
     for f in files:
-        jobs.append(multiprocessing.Process(target=clean_single_file, args=([f[0], f[1]])))
-    for segment in general_helpers.chunks(jobs, desired_processes):
-        print(len(segment), flush=True)
-        for job in segment:
-            job.start()
+        p = pool.apply_async(clean_single_file, args=([f[0], f[1]]))
+        jobs.append(p)
 
-        print("Start jobs has finished, now joining", flush=True)
+    logger.info("{n} jobs have started, now waiting for them to complete".format(n=len(jobs)))
 
-        for job in segment:
-            job.join()
+    for job in jobs:
+        job.get()
 
-        print("Now moving to next chunk!", flush=True)
+    pool.close()
+    pool.join()
 
-    print("finished", flush=True)
+    logger.info("finished")
     # wait until all jobs finish processing to move on
 
     # delete the raw files so we don't run out of space
@@ -107,4 +113,19 @@ def begin_xml_cleaning(config, project_home):
     # check_schema(clean_example, [expected_high_level, expected_main_fields])
 
 
+def post_xml(update_config):
+    qc_step = XMLTest(update_config)
+    qc_step.runTest(update_config)
+
+
+def preprocess_xml(config):
+    begin_xml_cleaning(config)
+    try:
+        post_xml(config)
+    except AssertionError as e:
+        raise AssertionError("Error when cleaning XML files")
+
+
 if __name__ == '__main__':
+    config = get_config()
+    preprocess_xml(config)
