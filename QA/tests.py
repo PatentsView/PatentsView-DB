@@ -1,7 +1,6 @@
 class XMLTest:
-    def __init__(self, update_config, project_home):
-        output_folder = '{project_home}{timestamp}/raw_data'.format(project_home=project_home,
-                                                                    timestamp=update_config['FOLDERS'][
+    def __init__(self, update_config):
+        output_folder = '{working_folder}/raw_data'.format(working_folder=update_config['FOLDERS'][
                                                                         'WORKING_FOLDER'])
         import glob
         xml_glob = "{folder}/*.xml".format(folder=output_folder)

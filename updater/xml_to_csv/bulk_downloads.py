@@ -85,11 +85,10 @@ def extract_file(download_url):
     os.remove(name)
 
 
-def begin_download(update_config, project_home):
+def begin_download(update_config):
     start_date = update_config['DATES']['START_DATE']
     end_date = update_config['DATES']['END_DATE']
-    folder = '{project_home}{timestamp}/raw_data'.format(project_home=project_home,
-                                                         timestamp=update_config['FOLDERS']['WORKING_FOLDER'])
+    folder = '{working_folder}/raw_data'.format(working_folder=update_config['FOLDERS']['WORKING_FOLDER'])
     if not os.path.exists(folder):
         os.makedirs(folder)
     for date in [start_date, end_date]:
@@ -130,17 +129,16 @@ def begin_download(update_config, project_home):
 
 def bulk_download(**kwargs):
     update_config = kwargs['config']
-    project_home = kwargs['project_home']
 
-    begin_download(update_config, project_home)
+    #begin_download(update_config)
     try:
-        post_download(update_config, project_home)
+        post_download(update_config)
     except AssertionError as e:
         raise AssertionError("Error when validating downloaded XMLs")
 
 
-def post_download(update_config, project_home):
-    qc_step = XMLTest(update_config, project_home)
+def post_download(update_config):
+    qc_step = XMLTest(update_config)
     qc_step.runTest(update_config)
 
 
@@ -150,4 +148,4 @@ if __name__ == '__main__':
     project_home = os.environ['PACKAGE_HOME']
     config = configparser.ConfigParser()
     config.read(project_home + '/config.ini')
-    bulk_download(**{'config': config, 'project_home': project_home})
+    bulk_download(**{'config': config})

@@ -35,7 +35,7 @@ project_home = os.environ['PACKAGE_HOME']
 config = get_config()
 
 download_xml_operator = PythonOperator(dag=dag, task_id='download_xml', python_callable=bulk_download,
-                                       op_kwargs={'config': config, 'project_home': project_home},
+                                       op_kwargs={'config': config},
                                        on_success_callback=airflow_task_success,
                                        on_failure_callback=airflow_task_failure)
 # process_xml_operator = PythonOperator(task_id='process_xml',

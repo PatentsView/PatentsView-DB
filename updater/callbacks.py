@@ -14,7 +14,7 @@ def airflow_task_success(context):
               'TASKS:  {}\n' \
         .format(context['task_instance'].dag_id,
                 context['task_instance'].task_id)
-    report_message = get_report_message(context['task'].task_id, config, project_home)
+    report_message = get_report_message(context['task'].task_id, config)
     send_slack_notification(message, config, section=section, level='success')
     send_slack_notification(report_message, config, section=section, level='success')
 
