@@ -130,7 +130,7 @@ def begin_download(update_config):
 def bulk_download(**kwargs):
     update_config = kwargs['config']
 
-    #begin_download(update_config)
+    begin_download(update_config)
     try:
         post_download(update_config)
     except AssertionError as e:
