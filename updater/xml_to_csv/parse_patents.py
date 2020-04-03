@@ -484,6 +484,7 @@ def get_results(patents, field_dictionary):
 
 def main_process(data_file, outloc, field_dictionary):
     logger = logging.getLogger("airflow.task")
+    logger.info("Starting {file}, sending output to {outloc}".format(file=data_file, outloc=outloc))
     try:
         patent_xml = xml_helpers.get_xml(data_file)
         results, error_log = get_results(patent_xml, field_dictionary)
@@ -491,7 +492,7 @@ def main_process(data_file, outloc, field_dictionary):
         error_data.columns = ['patent_id', 'field']
         error_counts = error_data.groupby("field").count()
         try:
-            os.mkdir(outloc, )
+            os.mkdir(outloc)
         except FileExistsError as e:
             pass
         error_data.to_csv('{0}/error_data.csv'.format(outloc))
@@ -499,7 +500,6 @@ def main_process(data_file, outloc, field_dictionary):
         output_helper.write_partial(results, outloc, field_dictionary)
     except Exception as e:
         logger.error("Exception {msg} for {file}".format(file=data_file, msg=str(e)))
-
         return False
 
 
