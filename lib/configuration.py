@@ -9,5 +9,5 @@ def get_config():
 
 
 def get_section(task_id):
-    section_lookup = {'download_xml': "XML Processing"}
+    section_lookup = {'download_xml': "XML Processing", 'process_xml': "XML Processing"}
     return section_lookup[task_id]
