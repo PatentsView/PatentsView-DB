@@ -520,14 +520,15 @@ def begin_parsing(update_config):
     files = zip(in_files, out_files, fields)
 
     total_cpus = multiprocessing.cpu_count()
-    desired_processes = (total_cpus // 2) + 1  # usually num cpu - 1
+    desired_processes = (total_cpus // 2)   # usually num cpu - 1
     jobs = []
     pool = multiprocessing.Pool(desired_processes)
     for f in files:
         p = pool.apply_async(main_process, args=f)
         jobs.append(p)
 
-    logger.info("{n} jobs have started, now waiting for them to complete".format(n=len(jobs)))
+    logger.info("{n} jobs have started, running {x} at a time now waiting for them to complete".format(n=len(jobs),
+                                                                                                       x=desired_processes))
     counter = 0
     for job in jobs:
         counter += 1
