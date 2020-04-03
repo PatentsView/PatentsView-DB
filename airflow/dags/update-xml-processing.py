@@ -7,6 +7,7 @@ from lib.configuration import get_config
 from updater.callbacks import airflow_task_success, airflow_task_failure
 
 # Parser Imports
+from updater.xml_to_csv.parse_patents import patent_parser
 from updater.xml_to_csv.bulk_downloads import bulk_download
 from updater.xml_to_csv.preprocess_xml import preprocess_xml
 
@@ -26,23 +27,29 @@ default_args = {
     # 'end_date': datetime(2016, 1, 1),
 }
 
-dag = DAG(
-    'update_raw_database',
+xml_dag = DAG(
+    'parse_xml',
     description='Download and process main granted patent data and corresponding classifications data',
-    start_date=datetime(2019, 8, 13, 0, 0, 0),
+    start_date=datetime(2020, 1, 1, 0, 0, 0),
     catchup=True,
     schedule_interval=None)
 project_home = os.environ['PACKAGE_HOME']
 config = get_config()
 
-download_xml_operator = PythonOperator(dag=dag, task_id='download_xml', python_callable=bulk_download,
+download_xml_operator = PythonOperator(dag=xml_dag, task_id='download_xml', python_callable=bulk_download,
                                        op_kwargs={'config': config},
                                        on_success_callback=airflow_task_success,
                                        on_failure_callback=airflow_task_failure)
 process_xml_operator = PythonOperator(task_id='process_xml',
                                       python_callable=preprocess_xml,
-                                      dag=dag, op_kwargs={'config': config},
+                                      dag=xml_dag, op_kwargs={'config': config},
                                       on_success_callback=airflow_task_success,
                                       on_failure_callback=airflow_task_failure)
+parse_xml_operator = PythonOperator(task_id='parse_xml',
+                                    python_callable=patent_parser,
+                                    dag=xml_dag, op_kwargs={'config': config},
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure)
 
 process_xml_operator.set_upstream(download_xml_operator)
+parse_xml_operator.set_upstream(process_xml_operator)

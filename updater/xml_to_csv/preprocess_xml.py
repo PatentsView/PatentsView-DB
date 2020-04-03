@@ -72,7 +72,6 @@ def check_schema(patent_xml):
 
 def begin_xml_cleaning(config):
     logger = logging.getLogger("airflow.task")
-    logger.info("airflow.task >>> 2 - INFO logger test")
     infolder = '{}/raw_data'.format(config['FOLDERS']['WORKING_FOLDER'])
     outfolder = '{}/clean_data'.format(config['FOLDERS']['WORKING_FOLDER'])
 
