@@ -483,18 +483,24 @@ def get_results(patents, field_dictionary):
 
 
 def main_process(data_file, outloc, field_dictionary):
-    patent_xml = xml_helpers.get_xml(data_file)
-    results, error_log = get_results(patent_xml, field_dictionary)
-    error_data = pd.DataFrame(error_log)
-    error_data.columns = ['patent_id', 'field']
-    error_counts = error_data.groupby("field").count()
+    logger = logging.getLogger("airflow.task")
     try:
-        os.mkdir(outloc, )
-    except FileExistsError as e:
-        pass
-    error_data.to_csv('{0}/error_data.csv'.format(outloc))
-    error_counts.to_csv('{0}/error_counts.csv'.format(outloc))
-    output_helper.write_partial(results, outloc, field_dictionary)
+        patent_xml = xml_helpers.get_xml(data_file)
+        results, error_log = get_results(patent_xml, field_dictionary)
+        error_data = pd.DataFrame(error_log)
+        error_data.columns = ['patent_id', 'field']
+        error_counts = error_data.groupby("field").count()
+        try:
+            os.mkdir(outloc, )
+        except FileExistsError as e:
+            pass
+        error_data.to_csv('{0}/error_data.csv'.format(outloc))
+        error_counts.to_csv('{0}/error_counts.csv'.format(outloc))
+        output_helper.write_partial(results, outloc, field_dictionary)
+    except Exception as e:
+        logger.error("Exception {msg} for {file}".format(file=data_file, msg=str(e)))
+
+        return False
 
 
 def begin_parsing(update_config):
