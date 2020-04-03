@@ -538,7 +538,7 @@ def post_parsing(update_config):
 
 
 def patent_parser(config):
-    #begin_parsing(config)
+    begin_parsing(config)
     try:
         post_parsing(config)
     except AssertionError as e:

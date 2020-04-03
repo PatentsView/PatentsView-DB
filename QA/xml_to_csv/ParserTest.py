@@ -2,7 +2,9 @@ import os
 import pandas as pd
 import re
 import logging
+
 logger = logging.getLogger("airflow.task")
+
 
 class ParserTest:
     def __init__(self, update_config):
@@ -54,7 +56,7 @@ class ParserTest:
         assert df.shape[0] > 0
 
     def get_file_shapes(self, update_config):
-        shapes = []
+        shapes = {'timestamp': [], 'entity': [], 'count': []}
         output_folder = '{working_folder}/parsed_data'.format(working_folder=update_config['FOLDERS']['WORKING_FOLDER'])
         logger.info(self.ip_filenames)
         for fname in self.ip_filenames:
@@ -64,11 +66,13 @@ class ParserTest:
             if tstamp_match is None:
                 raise AssertionError("Non patent file found in input folder")
             folder_name = tstamp_match.group(1)
-            counts = {}
+
             for entity in self.expected_entities:
-                entity_file = "{top_folder}/{tfolder}/{entity}.tsv".format(top_folder=output_folder,
+                entity_file = "{top_folder}/{tfolder}/{entity}.csv".format(top_folder=output_folder,
                                                                            tfolder=folder_name, entity=entity)
                 df = pd.read_csv(entity_file, sep='\t')
-                counts[entity] = df.shape[0]
-            shapes.append(counts)
+                shapes['timestamp'].append(folder_name)
+                shapes['entity'].append(entity)
+                shapes['count'].append(df.shape[0])
+
         return pd.DataFrame(shapes)
