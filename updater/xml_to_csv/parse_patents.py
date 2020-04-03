@@ -528,9 +528,12 @@ def begin_parsing(update_config):
         jobs.append(p)
 
     logger.info("{n} jobs have started, now waiting for them to complete".format(n=len(jobs)))
-
+    counter = 0
     for job in jobs:
+        counter += 1
+        logger.info("Waiting for job {counter} ".format(counter=counter))
         job.get()
+        logger.info("Job {counter}  has finished".format(counter=counter))
 
     pool.close()
     pool.join()
