@@ -21,6 +21,11 @@ def parser_report(update_config):
     return tabulate(shape_frame)
 
 
+def rename_report(update_config):
+    message = "New database created:{db_name}".format(db_name=update_config["DATABASE"]["NEW_DB"])
+    return message
+
+
 def backup_report(update_config):
     from pathlib import Path
     directory_parameter = "{datahome}/{database}_backup".format(datahome=update_config["FOLDERS"]["WORKING_FOLDER"],
@@ -33,5 +38,5 @@ def backup_report(update_config):
 
 def get_report_message(task, update_config):
     report_lookup = {'download_xml': xml_download_report, 'process_xml': xml_process_report, 'parse_xml': parser_report,
-                     'backup_olddb': backup_report}
+                     'backup_olddb': backup_report, 'rename_db': rename_report}
     return report_lookup[task](update_config)

@@ -10,12 +10,12 @@ def get_config():
 
 def get_section(task_id):
     section_lookup = {'download_xml': "XML Processing", 'process_xml': "XML Processing", 'parse_xml': "XML Processing",
-                      "backup_olddb": "Database Backup"}
+                      "backup_olddb": "Database Setup", "rename_db": "Database Setup"}
     return section_lookup[task_id]
 
 
-def get_connection_string(config):
-    database = '{}'.format(config['DATABASE']['DATABASE'])
+def get_connection_string(config, database='TEMP_UPLOAD_DB'):
+    database = '{}'.format(config['DATABASE'][database])
     host = '{}'.format(config['DATABASE']['HOST'])
     user = '{}'.format(config['DATABASE']['USERNAME'])
     password = '{}'.format(config['DATABASE']['PASSWORD'])
