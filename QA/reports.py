@@ -21,6 +21,17 @@ def parser_report(update_config):
     return tabulate(shape_frame)
 
 
+def backup_report(update_config):
+    from pathlib import Path
+    directory_parameter = "{datahome}/{database}_backup".format(datahome=update_config["FOLDERS"]["WORKING_FOLDER"],
+                                                                database=update_config["DATABASE"]["TEMP_UPLOAD_DB"])
+    root_directory = Path(directory_parameter)
+    message = "The backup occupies {size}".format(
+        size=sum(f.stat().st_size for f in root_directory.glob('**/*') if f.is_file()))
+    return message
+
+
 def get_report_message(task, update_config):
-    report_lookup = {'download_xml': xml_download_report, 'process_xml': xml_process_report, 'parse_xml': parser_report}
+    report_lookup = {'download_xml': xml_download_report, 'process_xml': xml_process_report, 'parse_xml': parser_report,
+                     'backup_olddb': backup_report}
     return report_lookup[task](update_config)

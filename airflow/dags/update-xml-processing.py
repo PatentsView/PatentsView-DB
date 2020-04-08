@@ -29,7 +29,7 @@ default_args = {
 
 xml_dag = DAG(
     'parse_xml',
-    description='Download and process main granted patent data and corresponding classifications data',
+    description='Parse XML data into CSV files',
     start_date=datetime(2020, 1, 1, 0, 0, 0),
     catchup=True,
     schedule_interval=None)

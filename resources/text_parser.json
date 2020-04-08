@@ -1,0 +1,63 @@
+{
+  "foreign_key_config": {
+    "field_name": "patent_number",
+    "friendly_name": "Patent Number",
+    "xml_path": "us-bibliographic-data-grant/publication-reference/document-id/doc-number",
+    "data-type": "string"
+  },
+  "table_xml_map": [
+    {
+      "table_name": "claim",
+      "friendly_name": "Claim",
+      "multi_valued": true,
+      "entity_root_path": "claims/",
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "claim-text",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "num",
+          "friendly_name": "num",
+          "xml_path": ".",
+          "attribute": "num",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "dependent",
+          "friendly_name": "Dependent",
+          "xml_path": "./claim-text/claim-ref",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "claim.tsv"
+    }
+  ]
+}

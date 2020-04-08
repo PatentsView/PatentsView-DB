@@ -66,6 +66,8 @@ RUN groupadd --gid=$GID docker-group || :
 RUN usermod -a -G $GID $NB_USER
 RUN apt-get install -y net-tools iputils-ping
 RUN apt-get install -y libmysqlclient-dev
+RUN wget https://github.com/maxbube/mydumper/releases/download/v0.9.3/mydumper_0.9.3-41.stretch_amd64.deb
+RUN dpkg -i mydumper_0.9.3-41.stretch_amd64.deb
 USER $NB_USER
 
 RUN pip install https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tarball/master yapf

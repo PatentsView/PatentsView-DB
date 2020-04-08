@@ -1,3 +1,6 @@
 [submodule "updater/text_parser"]
 	path = updater/text_parser
 	url = git@github.com:American-Institutes-for-Research/PV_Application_DB_Reparse.git
+[submodule "lib/loader"]
+	path = lib/loader
+	url = git@github.com:American-Institutes-for-Research/mysql-dumper-loader.git
