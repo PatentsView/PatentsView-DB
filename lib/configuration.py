@@ -11,3 +11,12 @@ def get_config():
 def get_section(task_id):
     section_lookup = {'download_xml': "XML Processing", 'process_xml': "XML Processing", 'parse_xml': "XML Processing"}
     return section_lookup[task_id]
+
+
+def get_connection_string(config):
+    database = '{}'.format(config['DATABASE']['DATABASE'])
+    host = '{}'.format(config['DATABASE']['HOST'])
+    user = '{}'.format(config['DATABASE']['USERNAME'])
+    password = '{}'.format(config['DATABASE']['PASSWORD'])
+    port = '{}'.format(config['DATABASE']['PORT'])
+    return 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database)

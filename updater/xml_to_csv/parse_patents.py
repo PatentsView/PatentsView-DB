@@ -483,8 +483,8 @@ def get_results(patents, field_dictionary):
 
 
 def main_process(data_file, outloc, field_dictionary):
-    logger = logging.getLogger("airflow.task")
-    logger.info("Starting {file}, sending output to {outloc}".format(file=data_file, outloc=outloc))
+    local_logger = logging.getLogger("airflow.task")
+    local_logger.info("Starting {file}, sending output to {outloc}".format(file=data_file, outloc=outloc))
     try:
         patent_xml = xml_helpers.get_xml(data_file)
         results, error_log = get_results(patent_xml, field_dictionary)
@@ -499,8 +499,9 @@ def main_process(data_file, outloc, field_dictionary):
         error_counts.to_csv('{0}/error_counts.csv'.format(outloc))
         output_helper.write_partial(results, outloc, field_dictionary)
     except Exception as e:
-        logger.error("Exception {msg} for {file}".format(file=data_file, msg=str(e)))
+        local_logger.error("Exception {msg} for {file}".format(file=data_file, msg=str(e)))
         return False
+    local_logger.info("Completed {file}, output sent to {outloc}".format(file=data_file, outloc=outloc))
 
 
 def begin_parsing(update_config):
