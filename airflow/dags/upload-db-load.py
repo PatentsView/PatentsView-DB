@@ -8,6 +8,7 @@ from airflow.operators.python_operator import PythonOperator
 from lib.configuration import get_config, get_backup_command, get_loader_command
 from updater.callbacks import airflow_task_success, airflow_task_failure
 from updater.create_databases.rename_db import begin_rename
+from updater.create_databases.upload_new import upload_new_data
 
 default_args = {
     'owner': 'airflow',
@@ -44,6 +45,11 @@ rename_old_operator = PythonOperator(task_id='rename_db', python_callable=begin_
                                      on_failure_callback=airflow_task_failure
                                      )
 
+upload_new_operator = PythonOperator(task_id='upload_new', python_callable=upload_new_data,
+                                     op_kwargs={'config': config},
+                                     dag=upload_dag, on_success_callback=airflow_task_success,
+                                     on_failure_callback=airflow_task_failure
+                                     )
 restore_old_db = BashOperator(dag=upload_dag, task_id='restore_olddb',
                               bash_command=get_loader_command(config, project_home),
                               on_success_callback=airflow_task_success,

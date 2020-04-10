@@ -14,3 +14,5 @@ def weekday_count(start_date, end_date):
 
 def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
+
