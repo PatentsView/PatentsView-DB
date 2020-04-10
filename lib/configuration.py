@@ -4,6 +4,7 @@ def get_config(type='granted_patent'):
     import configparser
 
     config = configparser.ConfigParser()
+    filename = 'config.ini'
     if type == 'granted_patent':
         filename = 'config.ini'
     elif type == 'application':
@@ -16,6 +17,7 @@ def get_config(type='granted_patent'):
 def set_config(config, type='granted_patent'):
     import os
     project_home = os.environ['PACKAGE_HOME']
+    filename = 'config.ini'
     if type == 'granted_patent':
         filename = 'config.ini'
     elif type == 'application':
