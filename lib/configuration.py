@@ -1,11 +1,28 @@
-def get_config():
+def get_config(type='granted_patent'):
     import os
     project_home = os.environ['PACKAGE_HOME']
     import configparser
 
     config = configparser.ConfigParser()
-    config.read(project_home + '/config.ini')
+    if type == 'granted_patent':
+        filename = 'config.ini'
+    elif type == 'application':
+        filename = 'app_config.ini'
+    config_file = "{home}/{filename}".format(home=project_home, filename=filename)
+    config.read(config_file)
     return config
+
+
+def set_config(config, type='granted_patent'):
+    import os
+    project_home = os.environ['PACKAGE_HOME']
+    if type == 'granted_patent':
+        filename = 'config.ini'
+    elif type == 'application':
+        filename = 'app_config.ini'
+    config_file = "{home}/{filename}".format(home=project_home, filename=filename)
+    with open(config_file, "w") as f:
+        config.write(f)
 
 
 def get_section(task_id):
