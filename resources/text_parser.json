@@ -7,7 +7,7 @@
   },
   "table_xml_map": [
     {
-      "table_name": "claim",
+      "table_name": "temp_claim",
       "friendly_name": "Claim",
       "multi_valued": true,
       "entity_root_path": "claims/",
@@ -58,6 +58,82 @@
         }
       ],
       "filename": "claim.tsv"
+    },
+    {
+      "table_name": "temp_brf_sum_text",
+      "friendly_name": "Brief Summary Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "description",
+          "description": "Brief Summary",
+          "attribute": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "brf_sum_text.tsv"
+    },
+    {
+      "table_name": "temp_claim_exemplary",
+      "friendly_name": "Claim Exemplary",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "exemplary",
+          "friendly_name": "Exemplary Claim",
+          "xml_path": "us-bibliographic-data-grant/us-exemplary-claim",
+          "description": null,
+          "attribute": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "exemplary_claim.tsv"
+    },
+    {
+      "table_name": "temp_draw_desc_text",
+      "friendly_name": "Drawing Description Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "description",
+          "description": "Brief Description of Drawings",
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "draw_desc_text.tsv"
+    },
+    {
+      "table_name": "temp_detail_desc_text",
+      "friendly_name": "Detailed Description Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "description",
+          "description": "Detailed Description",
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "detail_desc_text.tsv"
     }
   ]
 }

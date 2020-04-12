@@ -7,6 +7,7 @@ from airflow.operators.python_operator import PythonOperator
 # Helper Imports
 from lib.configuration import get_config, get_backup_command, get_loader_command
 from updater.callbacks import airflow_task_success, airflow_task_failure
+from updater.create_databases.merge_in_new_data import begin_merging
 from updater.create_databases.rename_db import begin_rename
 from updater.create_databases.upload_new import upload_new_data
 
@@ -54,5 +55,13 @@ restore_old_db = BashOperator(dag=upload_dag, task_id='restore_olddb',
                               bash_command=get_loader_command(config, project_home),
                               on_success_callback=airflow_task_success,
                               on_failure_callback=airflow_task_failure)
+# merge in newly parsed data
+merge_new_operator = PythonOperator(task_id='merge_db',
+                                    python_callable=begin_merging,
+                                    op_kwargs={'config': config},
+                                    dag=upload_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure
+                                    )
 rename_old_operator.set_upstream(backup_old_db)
 restore_old_db.set_upstream(rename_old_operator)

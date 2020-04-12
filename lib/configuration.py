@@ -73,3 +73,15 @@ def get_loader_command(config, project_home):
         database_parameter=database_parameter, verbosity=verbosity, thread=thread)
 
     return loader_command
+
+
+def get_text_table_load_command(config, project_home):
+    command = 'mysql'
+    defaults_parameter = config['DATABASE']['CONFIG_FILE']
+    script_to_load = "{home}/resources/text_tables.sql".format(home=project_home)
+    database = config["DATABASE"]['TEMP_UPLOAD_DB']
+    create_command = "{command} --defaults-file={default_param} {database} < {script_to_load}".format(command=command,
+                                                                                                      default_param=defaults_parameter,
+                                                                                                      database=database,
+                                                                                                      script_to_load=script_to_load)
+    return create_command
