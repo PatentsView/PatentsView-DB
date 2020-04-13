@@ -26,17 +26,50 @@ def rename_report(update_config):
     return message
 
 
+def merge_report(update_config):
+    qa_database = update_config["DATABASE"]['QA_DATABASE']
+    message = "Merge Report available for :{db_name} in {qa_db}".format(db_name=update_config["DATABASE"]["NEW_DB"],
+                                                                        qa_db=qa_database)
+    return message
+
+
 def backup_report(update_config):
     from pathlib import Path
     directory_parameter = "{datahome}/{database}_backup".format(datahome=update_config["FOLDERS"]["WORKING_FOLDER"],
                                                                 database=update_config["DATABASE"]["TEMP_UPLOAD_DB"])
     root_directory = Path(directory_parameter)
-    message = "The backup occupies {size}".format(
+    message = "The backup occupies {size} bytes".format(
         size=sum(f.stat().st_size for f in root_directory.glob('**/*') if f.is_file()))
+    return message
+
+
+def restore_report(update_config):
+    from pathlib import Path
+    directory_parameter = "{datahome}/{database}_backup".format(datahome=update_config["FOLDERS"]["WORKING_FOLDER"],
+                                                                database=update_config["DATABASE"]["TEMP_UPLOAD_DB"])
+    database_parameter = "{database}".format(database=update_config["DATABASE"]["OLD_DB"])
+    message = "Database restored from {dir_param} to {db}".format(dir_param=directory_parameter, db=database_parameter)
+    return message
+
+
+def text_table_create_report(update_config):
+    message = "Tables created in the temp database: {temp_db}".format(
+        temp_db=update_config['DATABASE']["TEMP_UPLOAD_DB"])
+    return message
+
+
+def text_parser_report(update_config):
+    qa_database = update_config["DATABASE"]['QA_DATABASE']
+    message = "Merge Report available for :{db_name} in {qa_db}".format(
+        db_name=update_config["DATABASE"]["TEXT_DATABASE"],
+        qa_db=qa_database)
     return message
 
 
 def get_report_message(task, update_config):
     report_lookup = {'download_xml': xml_download_report, 'process_xml': xml_process_report, 'parse_xml': parser_report,
-                     'backup_olddb': backup_report, 'rename_db': rename_report}
+                     'backup_olddb': backup_report, 'rename_db': rename_report, 'merge_db': merge_report,
+                     'create_text_tables': text_table_create_report, 'parse_text_data': text_parser_report,
+                     'restore_olddb': restore_report}
+
     return report_lookup[task](update_config)

@@ -29,7 +29,10 @@ def set_config(config, type='granted_patent'):
 
 def get_section(task_id):
     section_lookup = {'download_xml': "XML Processing", 'process_xml': "XML Processing", 'parse_xml': "XML Processing",
-                      "backup_olddb": "Database Setup", "rename_db": "Database Setup"}
+                      "backup_olddb": "Database Setup", "rename_db": "Database Setup",
+                      "restore_olddb": "Database Setup", "merge_db": "Database Setup",
+                      "create_text_tables": "Description Parsing", "parse_text_data": "Description Parsing"}
+
     return section_lookup[task_id]
 
 
@@ -46,12 +49,12 @@ def get_backup_command(config, project_home):
     command = "mydumper"
     conf_parameter = "{home}/resources/sql.conf".format(home=project_home)
     directory_parameter = "{datahome}/{database}_backup".format(datahome=config["FOLDERS"]["WORKING_FOLDER"],
-                                                                database=config["DATABASE"]["TEMP_UPLOAD_DB"])
+                                                                database=config["DATABASE"]["OLD_DB"])
     database_parameter = "{database}".format(database=config["DATABASE"]["OLD_DB"])
     verbosity = 3
     thread = 6
 
-    backup_command = "{command} --defaults-file={conf_parameter} -F 50 -s 5000000 -l 1999999999 -v {verbosity} -t {thread} -B {database} -o {directory_parameter}".format(
+    backup_command = "{command} --defaults-file={conf_parameter} -F 50 -s 5000000 -l 1999999999 -v {verbosity} -t {thread} -B {database} -o {directory_parameter} --lock-all-tables".format(
         command=command, conf_parameter=conf_parameter, verbosity=verbosity, thread=thread,
         directory_parameter=directory_parameter, database=database_parameter)
 
@@ -63,7 +66,7 @@ def get_loader_command(config, project_home):
     script = "{home}/lib/loader/index_optimized_loader".format(home=project_home)
     conf_parameter = "{home}/resources/sql.conf".format(home=project_home)
     directory_parameter = "{datahome}/{database}_backup".format(datahome=config["FOLDERS"]["WORKING_FOLDER"],
-                                                                database=config["DATABASE"]["TEMP_UPLOAD_DB"])
+                                                                database=config["DATABASE"]["OLD_DB"])
     database_parameter = "{database}".format(database=config["DATABASE"]["OLD_DB"])
     verbosity = 3
     thread = 6
