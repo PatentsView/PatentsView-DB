@@ -25,7 +25,7 @@ class RenameTest:
             new_db=new_database)
         table_cursor = engine.execute(table_query)
         for table_name in table_cursor:
-            count_query = "SELECT count(*) from {tbl}".format(tbl=table_name)
+            count_query = "SELECT count(*) from {tbl}".format(tbl=table_name[0])
             count_cursor = engine.execute(count_query)
             count_value = count_cursor.fetchall()[0][0]
             if table_name in self.empty_tables:
