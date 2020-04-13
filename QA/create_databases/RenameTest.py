@@ -29,9 +29,11 @@ class RenameTest:
             count_cursor = engine.execute(count_query)
             count_value = count_cursor.fetchall()[0][0]
             if table_name in self.empty_tables:
-                assert count_value == 0
+                if count_value != 0:
+                    raise AssertionError("Table {table_name} should be empty".format(table_name=table_name))
             else:
-                assert count_value > 0
+                if not count_value > 0:
+                    raise AssertionError("Table {table_name} should not be empty".format(table_name=table_name))
 
     def test_database_encoding(self):
         new_database = self.config['DATABASE']["NEW_DB"]
@@ -42,25 +44,31 @@ class RenameTest:
             new_db=new_database)
         collation_cursor = engine.execute(collation_query)
         cset, collation = collation_cursor.fetchall()[0]
-        assert cset == 'utf8mb4'
-        assert collation == 'utf8mb4_unicode_ci'
+        if cset != 'utf8mb4':
+            raise AssertionError("Database character set should be utf8mb4 instead found {cset}".format(cset=cset))
+        if collation != 'utf8mb4_unicode_ci':
+            raise AssertionError(
+                "Database collationshould be utf8mb4_unicode_ci instead found {collation}".format(cset=collation))
 
     def test_table_encoding(self):
         new_database = self.config['DATABASE']["NEW_DB"]
         connection_string = get_connection_string(self.config, database='NEW_DB')
         engine = create_engine(connection_string)
-        collation_query = "SELECT  TABLE_COLLATION from information_schema.tables where TABLE_SCHEMA='{new_db}'".format(
+        collation_query = "SELECT  TABLE_NAME, TABLE_COLLATION from information_schema.tables where TABLE_SCHEMA='{new_db}'".format(
             new_db=new_database)
         collation_cursor = engine.execute(collation_query)
         for table_collation_row in collation_cursor:
-            assert table_collation_row[0] == 'utf8mb4_unicode_ci'
+            if table_collation_row[1] != 'utf8mb4_unicode_ci':
+                raise AssertionError(
+                    "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
+                        cset=table_collation_row[1], tbl=table_collation_row[0]))
 
     def test_column_encoding(self):
         new_database = self.config['DATABASE']["NEW_DB"]
         connection_string = get_connection_string(self.config, database='NEW_DB')
         engine = create_engine(connection_string)
         collation_query = '''
-                        SELECT character_set_name,
+                        SELECT TABLE_NAME, COLUMN_NAME, character_set_name,
                             collation_name
                         FROM   information_schema.columns
                         WHERE  table_schema='{new_db}'
@@ -75,5 +83,11 @@ class RenameTest:
             new_db=new_database)
         collation_cursor = engine.execute(collation_query)
         for column_collation_name in collation_cursor:
-            assert column_collation_name[0] == 'utf8mb4'
-            assert column_collation_name[1] == 'utf8mb4_unicode_ci'
+            if column_collation_name[2] != 'utf8mb4':
+                raise AssertionError(
+                    "Table character set should be utf8mb4 instead found {cset} for table {tbl}. column name {col}".format(
+                        cset=column_collation_name[2], tbl=column_collation_name[0], col=column_collation_name[1]))
+            if column_collation_name[3] != 'utf8mb4_unicode_ci':
+                raise AssertionError(
+                    "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
+                        collation=column_collation_name[3], tbl=column_collation_name[0], col=column_collation_name[1]))

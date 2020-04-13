@@ -84,7 +84,3 @@ merge_new_operator.set_upstream(parse_text_data_operator)
 table_creation_operator.set_upstream(upload_new_operator)
 parse_text_data_operator.set_upstream(table_creation_operator)
 
-rename_old_operator.set_upstream(backup_old_db)
-restore_old_db.set_upstream(rename_old_operator)
-rename_old_operator.set_upstream(backup_old_db)
-restore_old_db.set_upstream(rename_old_operator)
