@@ -28,7 +28,7 @@ class RenameTest:
             count_query = "SELECT count(*) from {tbl}".format(tbl=table_name[0])
             count_cursor = engine.execute(count_query)
             count_value = count_cursor.fetchall()[0][0]
-            if table_name in self.empty_tables:
+            if table_name[0] in self.empty_tables:
                 if count_value != 0:
                     raise AssertionError("Table {table_name} should be empty".format(table_name=table_name))
             else:
