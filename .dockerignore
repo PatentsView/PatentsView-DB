@@ -8,3 +8,5 @@ Assignee_Lawyer_Disambiguation/
 QA_Development/*
 airflow-*/
 data/
+app-db-exploration/
+upload-*/
