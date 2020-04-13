@@ -6,7 +6,7 @@ from lib.configuration import get_connection_string
 class RenameTest:
     def __init__(self, config):
         self.empty_tables = ['assignee', 'cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_subsection', 'claim',
-                             'brf_sum_text', 'detail_desc_text', 'draw_desc_text''inventor', 'location',
+                             'brf_sum_text', 'detail_desc_text', 'draw_desc_text','inventor', 'location',
                              'location_assignee', 'location_inventor', 'patent_assignee', 'patent_inventor',
                              'patent_lawyer']
         self.config = config
