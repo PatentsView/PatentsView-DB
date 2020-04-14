@@ -4,6 +4,7 @@ import os
 from sqlalchemy import create_engine
 
 from QA.PatentDatabaseTester import PatentDatabaseTester
+from lib.configuration import get_config
 
 
 class MergeTest(PatentDatabaseTester):
@@ -206,5 +207,14 @@ class MergeTest(PatentDatabaseTester):
         if count_value != 0:
             raise Exception(
                 "NULLs (Non-design patents) encountered in table found:{database}.{table} column abstract. Count: {count}".format(
-                    database=self.database_connection_string, table=table,
+                    database=self.database_section , table=table,
                     count=count_value))
+
+
+if __name__ == '__main__':
+    config = get_config()
+    mc = MergeTest(config)
+    for table in mc.table_config:
+        for field in mc.table_config[table]:
+            if "date_field" in mc.table_config[table][field] and mc.table_config[table][field]["date_field"]:
+                mc.assert_zero_dates(table, field)

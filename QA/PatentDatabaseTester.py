@@ -13,7 +13,7 @@ class PatentDatabaseTester(ABC):
         self.database_connection_string = get_connection_string(config, database_section)
         self.config = config
         self.table_config = {}
-        self.qa_data = {"counts": [], 'null_counts': []}
+        self.qa_data = {"counts": [], 'null_counts': [], 'patent_count_by_year': []}
         self.floating_entities = []
         self.floating_patent = []
 
@@ -39,7 +39,7 @@ class PatentDatabaseTester(ABC):
                 if count_value != 0:
                     raise Exception(
                         "Blanks encountered in  table found:{database}.{table} column {col}. Count: {count}".format(
-                            database=self.database_connection_string, table=table,
+                            database=self.database_section , table=table,
                             col=field,
                             count=count_value))
         engine.dispose()
@@ -54,7 +54,7 @@ class PatentDatabaseTester(ABC):
                 if count_value != 0:
                     raise Exception(
                         "NULLs encountered in table found:{database}.{table} column {col}. Count: {count}".format(
-                            database=self.database_connection_string, table=table,
+                            database=self.database_section , table=table,
                             col=field,
                             count=count_value))
             database_type, version = self.config["DATABASE"][self.database_section].split("_")
@@ -71,8 +71,13 @@ class PatentDatabaseTester(ABC):
         if count_value != 0:
             raise Exception(
                 "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {count}".format(
-                    database=self.database_connection_string, table=table, col=field,
+                    database=self.database_section , table=table, col=field,
                     count=count_value))
+
+    def test_yearly_count(self):
+        engine = create_engine(self.database_connection_string)
+        count_query = "SELECT count(1) from patent group by year(patent_date)"
+        year_count_data = pd.read_sql_query(count_query, con=engine)
 
     def save_qa_data(self):
         qa_engine = create_engine(self.qa_connection_string)
@@ -80,8 +85,6 @@ class PatentDatabaseTester(ABC):
             qa_table_data = self.qa_data[qa_table]
             table_frame = pd.DataFrame(qa_table_data)
             table_frame.to_sql(name=qa_table, if_exists='append', con=qa_engine, index=False)
-
-
 
     def runTests(self):
         for table in self.table_config:
