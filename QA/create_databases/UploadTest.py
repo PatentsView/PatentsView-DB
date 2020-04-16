@@ -1,12 +1,15 @@
+import datetime
+
 from sqlalchemy import create_engine
 
 from QA.PatentDatabaseTester import PatentDatabaseTester
 
 
 class UploadTest(PatentDatabaseTester):
-
     def __init__(self, config):
-        super().__init__(config, 'TEMP_UPLOAD_DB')
+        start_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+        end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+        super().__init__(config, 'TEMP_UPLOAD_DB', start_date, end_date)
         self.table_config = {'application': {'patent_id': {'data_type': 'varchar', 'null_allowed': False},
                                              'id_transformed': {'data_type': 'varchar', 'null_allowed': True},
                                              'type': {'data_type': 'varchar', 'null_allowed': True},
@@ -186,16 +189,18 @@ class UploadTest(PatentDatabaseTester):
         self.floating_patent = []
 
     def test_patent_abstract_null(self, table):
-        engine = create_engine(self.database_connection_string)
-        count_query = "SELECT count(*) from {tbl} where abstract is null and type!='design' and type!='reissue'".format(
+        if not self.connection.open:
+            self.connection.connect()
+        count_query = "SELECT count(*) as null_abstract_count from {tbl} where abstract is null and type!='design' and type!='reissue'".format(
             tbl=table)
-        count_cursor = engine.execute(count_query)
-        count_value = count_cursor.fetchall()[0][0]
-        if count_value != 0:
-            raise Exception(
-                "NULLs (Non-design patents) encountered in table found:{database}.{table} column abstract. Count: {count}".format(
-                    database=self.database_connection_string, table=table,
-                    count=count_value))
+        with self.connection.cursor() as count_cursor:
+            count_cursor.execute(count_query)
+            count_value = count_cursor.fetchall()[0][0]
+            if count_value != 0:
+                raise Exception(
+                    "NULLs (Non-design patents) encountered in table found:{database}.{table} column abstract. Count: {count}".format(
+                        database=self.config['DATABASE'][self.database_section], table=table,
+                        count=count_value))
 
     def runTests(self):
         self.test_patent_abstract_null(table='patent')

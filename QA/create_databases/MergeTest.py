@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 
@@ -8,12 +9,14 @@ from lib.configuration import get_config
 
 
 class MergeTest(PatentDatabaseTester):
+
     def runTests(self):
         self.test_merge_status()
         super(MergeTest, self).runTests()
 
     def __init__(self, config):
-        super().__init__(config, 'NEW_DB')
+        end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+        super().__init__(config, 'NEW_DB', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {'application': {'patent_id': {'data_type': 'varchar', 'null_allowed': False},
                                              'id_transformed': {'data_type': 'varchar', 'null_allowed': True},
                                              'type': {'data_type': 'varchar', 'null_allowed': True},
@@ -71,7 +74,7 @@ class MergeTest(PatentDatabaseTester):
                                                         'patent_id': {'data_type': 'varchar', 'null_allowed': False},
                                                         'sequence': {'data_type': 'int', 'null_allowed': False},
                                                         'rawlocation_id': {'data_type': 'varchar',
-                                                                           'null_allowed': False},
+                                                                           'null_allowed': True},
                                                         'designation': {'data_type': 'varchar', 'null_allowed': True},
                                                         'lname': {'data_type': 'varchar', 'null_allowed': True},
                                                         'applicant_type': {'data_type': 'varchar',
@@ -104,7 +107,7 @@ class MergeTest(PatentDatabaseTester):
                                              'name_last': {'data_type': 'varchar', 'null_allowed': True},
                                              'assignee_id': {'data_type': 'varchar', 'null_allowed': True},
                                              'organization': {'data_type': 'varchar', 'null_allowed': True},
-                                             'rawlocation_id': {'data_type': 'varchar', 'null_allowed': False},
+                                             'rawlocation_id': {'data_type': 'varchar', 'null_allowed': True},
                                              'sequence': {'data_type': 'int', 'null_allowed': False},
                                              'type': {'data_type': 'varchar', 'null_allowed': True},
                                              'uuid': {'data_type': 'varchar', 'null_allowed': False},
@@ -115,7 +118,7 @@ class MergeTest(PatentDatabaseTester):
                                              'sequence': {'data_type': 'int', 'null_allowed': False},
                                              'inventor_id': {'data_type': 'varchar', 'null_allowed': True},
                                              'rule_47': {'data_type': 'varchar', 'null_allowed': True},
-                                             'rawlocation_id': {'data_type': 'varchar', 'null_allowed': False},
+                                             'rawlocation_id': {'data_type': 'varchar', 'null_allowed': True},
                                              'deceased': {'data_type': 'varchar', 'null_allowed': True},
                                              'name_first': {'data_type': 'varchar', 'null_allowed': True}},
                              'rawlawyer': {'name_last': {'data_type': 'varchar', 'null_allowed': True},
@@ -207,14 +210,11 @@ class MergeTest(PatentDatabaseTester):
         if count_value != 0:
             raise Exception(
                 "NULLs (Non-design patents) encountered in table found:{database}.{table} column abstract. Count: {count}".format(
-                    database=self.database_section , table=table,
+                    database=self.database_section, table=table,
                     count=count_value))
 
 
 if __name__ == '__main__':
     config = get_config()
     mc = MergeTest(config)
-    for table in mc.table_config:
-        for field in mc.table_config[table]:
-            if "date_field" in mc.table_config[table][field] and mc.table_config[table][field]["date_field"]:
-                mc.assert_zero_dates(table, field)
+    mc.test_yearly_count()

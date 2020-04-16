@@ -66,10 +66,18 @@ def text_parser_report(update_config):
     return message
 
 
+def upload_report(update_config):
+    qa_database = update_config["DATABASE"]['QA_DATABASE']
+    message = "Upload Report available for :{db_name} in {qa_db}".format(
+        db_name=update_config["DATABASE"]["TEMP_UPLOAD_DB"],
+        qa_db=qa_database)
+    return message
+
+
 def get_report_message(task, update_config):
     report_lookup = {'download_xml': xml_download_report, 'process_xml': xml_process_report, 'parse_xml': parser_report,
                      'backup_olddb': backup_report, 'rename_db': rename_report, 'merge_db': merge_report,
                      'create_text_tables': text_table_create_report, 'parse_text_data': text_parser_report,
-                     'restore_olddb': restore_report}
+                     'restore_olddb': restore_report, 'upload_new': upload_report}
 
     return report_lookup[task](update_config)

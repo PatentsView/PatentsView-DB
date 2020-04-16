@@ -26,5 +26,6 @@ node_modules/
 app-db-exploration
 QA_*
 airflow-meta*
-upload_*
+upload_*/*
 *_qa_loc*
+**/*.log

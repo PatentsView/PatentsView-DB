@@ -1,9 +1,12 @@
+import datetime
+
 from QA.PatentDatabaseTester import PatentDatabaseTester
 
 
 class TextMergeTest(PatentDatabaseTester):
     def __init__(self, config):
-        super().__init__(config, 'TEXT_DATABASE')
+        end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+        super().__init__(config, 'TEXT_DATABASE', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {"brf_sum_text": {"uuid": {"null_allowed": False, "data_type": "varchar"},
                                               "patent_id": {"null_allowed": False, "data_type": "varchar"},
                                               "text": {"null_allowed": False, "data_type": "mediumtext"},
@@ -20,10 +23,15 @@ class TextMergeTest(PatentDatabaseTester):
         self.floating_entities = []
         self.floating_patent = []
 
+    def test_yearly_count(self):
+        pass
+
 
 class TextUploadTest(PatentDatabaseTester):
     def __init__(self, config):
-        super().__init__(config, 'TEMP_UPLOAD_DB')
+        start_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+        end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+        super().__init__(config, 'TEMP_UPLOAD_DB', start_date, end_date)
         self.table_config = {"temp_brf_sum_text": {"filename": {"null_allowed": False, "data_type": "varchar"},
                                                    "id": {"null_allowed": False, "data_type": "varchar"},
                                                    "patent_number": {"null_allowed": False, "data_type": "varchar"},
@@ -44,3 +52,6 @@ class TextUploadTest(PatentDatabaseTester):
         self.count_data = []
         self.floating_entities = []
         self.floating_patent = []
+
+    def test_yearly_count(self):
+        pass
