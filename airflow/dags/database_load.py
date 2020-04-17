@@ -10,7 +10,7 @@ from updater.callbacks import airflow_task_success, airflow_task_failure
 from updater.create_databases.merge_in_new_data import begin_merging, begin_text_merging, post_merge, post_text_merge
 from updater.create_databases.rename_db import begin_rename, post_rename
 from updater.create_databases.upload_new import upload_new_data, post_upload
-from updater.text_data_processor.text_table_parsing import begin_text_parsing
+from updater.text_data_processor.text_table_parsing import begin_text_parsing, post_text_parsing
 
 default_args = {
     'owner': 'airflow',
@@ -75,7 +75,11 @@ parse_text_data_operator = PythonOperator(task_id='parse_text_data',
                                           dag=upload_dag, op_kwargs={'config': config},
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure)
-
+qc_parse_text_operator = PythonOperator(task_id='qc_parse_text_data',
+                                        python_callable=post_text_parsing,
+                                        dag=upload_dag, op_kwargs={'config': config},
+                                        on_success_callback=airflow_task_success,
+                                        on_failure_callback=airflow_task_failure)
 # merge in newly parsed data
 merge_new_operator = PythonOperator(task_id='merge_db',
                                     python_callable=begin_merging,
@@ -115,5 +119,6 @@ merge_new_operator.set_upstream(qc_upload_operator)
 qc_merge_operator.set_upstream(merge_new_operator)
 table_creation_operator.set_upstream(qc_upload_operator)
 parse_text_data_operator.set_upstream(table_creation_operator)
-merge_text_operator.set_upstream(parse_text_data_operator)
+qc_parse_text_operator.set_upstream(parse_text_data_operator)
+merge_text_operator.set_upstream(qc_parse_text_operator)
 qc_text_merge_operator.set_upstream(merge_text_operator)

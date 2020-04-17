@@ -11,6 +11,9 @@ def begin_text_parsing(config):
     from updater.text_parser.app_parser import queue_parsers
 
     queue_parsers(config)
+
+
+def post_text_parsing(config):
     tpt = TextUploadTest(config)
     tpt.runTests()
 
