@@ -74,6 +74,9 @@ def begin_upload(update_config):
 
 def upload_new_data(config):
     begin_upload(update_config=config)
+
+
+def post_upload(config):
     qc = UploadTest(config)
     qc.runTests()
 

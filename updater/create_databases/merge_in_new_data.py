@@ -105,11 +105,11 @@ def begin_merging(config):
               'rawlocation', 'rel_app_text', 'subclass', 'us_term_of_grant', 'usapplicationcitation',
               'uspatentcitation', 'usreldoc', 'uspc']
     project_home = os.environ['PACKAGE_HOME']
-    version = config['DATABASE']['TEMP_UPLOAD_DB'].split("_")[1]
     merge_new_data(tables, project_home, config)
 
-    qc = MergeTest(config)
-    qc.runTests()
+
+def begin_text_merging(config):
+    version = config['DATABASE']['TEMP_UPLOAD_DB'].split("_")[1]
     text_table_config = {'brf_sum_text': {
         "insert": "INSERT INTO {text_db}.brf_sum_text(uuid, patent_id, text, version_indicator) SELECT id, patent_number, text, '{database_version}' from {temp_db}.temp_brf_sum_text".format(
             text_db=config['DATABASE']['TEXT_DATABASE'], temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
@@ -119,6 +119,13 @@ def begin_merging(config):
             database_version=version)}}
     merge_text_data(text_table_config, config)
 
+
+def post_merge(config):
+    qc = MergeTest(config)
+    qc.runTests()
+
+
+def post_text_merge(config):
     qc = TextMergeTest(config)
     qc.runTests()
 

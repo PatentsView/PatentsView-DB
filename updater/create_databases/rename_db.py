@@ -35,5 +35,8 @@ def rename_old_db(update_config):
 def begin_rename(config):
     create_new_database(config)
     rename_old_db(config)
+
+
+def post_rename(config):
     qc = RenameTest(config)
     qc.runTests()
