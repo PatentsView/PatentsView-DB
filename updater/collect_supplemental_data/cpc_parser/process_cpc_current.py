@@ -82,7 +82,7 @@ def process_and_upload_cpc_current(config):
                                                            'cpc_primary': str,
                                                            'cpc_additional': str
                                                        },
-                                                       chunk_size=100000)
+                                                       chunksize=100000)
     for granted_patent_class_chunk in granted_patent_classification_chunks:
         cpc_chunk_processor(granted_patent_class_chunk, config)
     consolidate_cpc_data(config)
