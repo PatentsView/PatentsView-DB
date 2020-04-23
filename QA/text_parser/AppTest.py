@@ -174,7 +174,7 @@ class AppMergeTest(AppDatabaseTester):
                                           "us_371c124_date": {"null_allowed": True, "data_type": "date"},
                                           "us_371c12_date": {"null_allowed": True, "data_type": "date"},
                                           "kind": {"null_allowed": True, "data_type": "varchar"},
-                                          "doc_type": {"null_allowed": True, "data_type": "varchar"}
+                                          "doc_type": {"null_allowed": True, "data_type": "varchar"},
                                           "filename": {"null_allowed": True, "data_type": "varchar"},
                                           "created_date": {"null_allowed": True, "data_type": "timestamp"},
                                           "updated_date": {"null_allowed": True, "data_type": "timestamp"}},
@@ -458,7 +458,7 @@ class AppUploadTest(AppDatabaseTester):
                                           "us_371c124_date": {"null_allowed": True, "data_type": "date"},
                                           "us_371c12_date": {"null_allowed": True, "data_type": "date"},
                                           "kind": {"null_allowed": True, "data_type": "varchar"},
-                                          "doc_type": {"null_allowed": True, "data_type": "varchar"}
+                                          "doc_type": {"null_allowed": True, "data_type": "varchar"},
                                           "filename": {"null_allowed": True, "data_type": "varchar"},
                                           "created_date": {"null_allowed": True, "data_type": "timestamp"},
                                           "updated_date": {"null_allowed": True, "data_type": "timestamp"}},
