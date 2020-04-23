@@ -49,7 +49,7 @@ def extract_cpc_current(chunk_frame):
         subsection_id=cpc_data.subgroup_id.str.slice(0, 3))
     cpc_data = cpc_data.assign(group_id=cpc_data.subgroup_id.str.slice(0, 4))
     # Assign UUID
-    cpc_data = cpc_data.assign(uuid=cpc_data.apply(lambda _: uuid.uuid4(), axis=1))
+    cpc_data = cpc_data.assign(uuid=cpc_data.apply(lambda _: str(uuid.uuid4()), axis=1))
     return cpc_data
 
 
