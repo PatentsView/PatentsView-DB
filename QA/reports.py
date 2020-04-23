@@ -186,6 +186,6 @@ def get_report_message(task, update_config):
                      'qc_upload_new': qc_upload_new_report,
                      'qc_withdrawn_processor': qc_withdrawn_processor_report,
                      'wipo_processor': wipo_processor_report,
-                     'withdrawn_processor': withdrawn_processor_report(config)}
+                     'withdrawn_processor': withdrawn_processor_report}
 
     return report_lookup[task](update_config)

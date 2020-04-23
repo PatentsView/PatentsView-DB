@@ -7,7 +7,7 @@ from airflow.operators.python_operator import PythonOperator
 from QA.collect_supplemental_data.cpc_parser.CPCCurrentTest import CPCTest
 from lib.configuration import get_config
 from updater.callbacks import airflow_task_success, airflow_task_failure
-from updater.collect_supplemental_data.cpc_parser.download_cpc import d, collect_cpc_data, post_download
+from updater.collect_supplemental_data.cpc_parser.download_cpc import collect_cpc_data, post_download
 from updater.collect_supplemental_data.cpc_parser.cpc_class_parser import process_cpc_class_parser, post_class_parser
 from updater.collect_supplemental_data.cpc_parser.cpc_parser import start_cpc_parser, post_cpc_parser
 from updater.collect_supplemental_data.cpc_parser.process_cpc_current import process_and_upload_cpc_current
