@@ -3,7 +3,7 @@ import datetime
 from QA.AppDatabaseTester import AppDatabaseTester
 
 
-class Text  AppMergeTest(AppDatabaseTester):
+class AppMergeTest(AppDatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, 'DATABASE', datetime.date(year=1976, month=1, day=1), end_date)
