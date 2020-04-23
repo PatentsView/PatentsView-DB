@@ -16,7 +16,7 @@ class AppMergeTest(AppDatabaseTester):
                                              "kind": {"null_allowed": True, "data_type": "varchar"},
                                              "series_code": {"null_allowed": True, "data_type": "int"},
                                              "invention_title": {"null_allowed": True, "data_type": "mediumtext"},
-                                             "invention_abstract": {"null_allowed": True, "data_type": "mediumtext"}
+                                             "invention_abstract": {"null_allowed": True, "data_type": "mediumtext"},
                                              "rule_47_flag": {"null_allowed": True, "data_type": "varchar"},
                                              "filename": {"null_allowed": True, "data_type": "varchar"},
                                              "created_date": {"null_allowed": True, "data_type": "timestamp"},
@@ -300,7 +300,7 @@ class AppUploadTest(AppDatabaseTester):
                                              "kind": {"null_allowed": True, "data_type": "varchar"},
                                              "series_code": {"null_allowed": True, "data_type": "int"},
                                              "invention_title": {"null_allowed": True, "data_type": "mediumtext"},
-                                             "invention_abstract": {"null_allowed": True, "data_type": "mediumtext"}
+                                             "invention_abstract": {"null_allowed": True, "data_type": "mediumtext"},
                                              "rule_47_flag": {"null_allowed": True, "data_type": "varchar"},
                                              "filename": {"null_allowed": True, "data_type": "varchar"},
                                              "created_date": {"null_allowed": True, "data_type": "timestamp"},
