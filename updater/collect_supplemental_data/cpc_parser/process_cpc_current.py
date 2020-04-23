@@ -50,6 +50,8 @@ def extract_cpc_current(chunk_frame):
     cpc_data = cpc_data.assign(group_id=cpc_data.subgroup_id.str.slice(0, 4))
     # Assign UUID
     cpc_data = cpc_data.assign(uuid=cpc_data.apply(lambda _: str(uuid.uuid4()), axis=1))
+    # Rename patent number to patent_id
+    cpc_data = cpc_data.rename({'patent_number': 'patent_id'}, axis=1)
     return cpc_data
 
 
