@@ -288,7 +288,7 @@ class AppMergeTest(AppDatabaseTester):
 
 class AppUploadTest(AppDatabaseTester):
     def __init__(self, config):
-        start_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')s
+        start_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, 'TEMP_UPLOAD_DB', start_date, end_date)
         self.table_config = {"application": {"id": {"null_allowed": False, "data_type": "varchar"},
