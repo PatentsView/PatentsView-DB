@@ -22,7 +22,7 @@ def rename_old_db(update_config):
     tables = [t[0] for t in engine.execute('show tables from {}'.format(old_database)) if not t[0].startswith('temp')]
     tables_to_truncate = ['assignee', 'cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_subsection', 'inventor',
                           'location', 'location_assignee', 'location_inventor',
-                          'patent_assignee', 'patent_inventor', 'patent_lawyer']
+                          'patent_assignee', 'patent_inventor', 'patent_lawyer', 'wipo']
 
     for table in tables:
         con = engine.connect()

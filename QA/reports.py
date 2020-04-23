@@ -74,10 +74,118 @@ def upload_report(update_config):
     return message
 
 
+def cpc_class_uploader_report(update_config):
+    message = "CPC Class data uploaded"
+    return message
+
+
+def withdrawn_processor_report(config):
+    message = "Withdrawn data updated"
+    return message
+
+
+def wipo_processor_report(config):
+    message = "Wipo Processing complete"
+    return message
+
+
+def qc_withdrawn_processor_report(config):
+    message = "Withdrawn QC Complete"
+    return message
+
+
+def qc_upload_new_report(config):
+    message = "New Data QC Complete"
+    return message
+
+
+def qc_rename_db_report(config):
+    message = "Database Rename QC Complete"
+    return message
+
+
+def qc_parse_text_data_report(config):
+    message = "Text Data Parsing QC Complete"
+    return message
+
+
+def cpc_current_processor_report(config):
+    message = "CPC Current Processed"
+    return message
+
+
+def cpc_parser_report(config):
+    message = "CPC Data Parsing completed"
+    return message
+
+
+def merge_text_db_report(config):
+    message = "New Text Data Merged with Complete Data"
+    return message
+
+
+def qc_download_cpc_report(config):
+    message = "CPC data Download QC Complete"
+    return message
+
+
+def qc_cpc_parser_report(config):
+    message = "CPC data Parsed from download"
+    return message
+
+
+def qc_merge_db_report(config):
+    message = "Merged Patent Database QC Complete"
+    return message
+
+
+def cpc_class_parser_report(config):
+    message = "CPC Classes Parsed"
+    return message
+
+
+def download_cpc_report(config):
+    message = "CPC Download Complete"
+    return message
+
+
+def qc_cpc_class_parser_report(config):
+    message = "CPC Class Parser QC Complete"
+    return message
+
+
+def qc_cpc_current_wipo_report(config):
+    message = "Uploaded WIPO & CPC Current QC Complete"
+    return message
+
+
+def qc_merge_text_db_report(config):
+    message = "Merged Text Database QC Complete"
+    return message
+
+
 def get_report_message(task, update_config):
     report_lookup = {'download_xml': xml_download_report, 'process_xml': xml_process_report, 'parse_xml': parser_report,
                      'backup_olddb': backup_report, 'rename_db': rename_report, 'merge_db': merge_report,
                      'create_text_tables': text_table_create_report, 'parse_text_data': text_parser_report,
-                     'restore_olddb': restore_report, 'upload_new': upload_report}
+                     'restore_olddb': restore_report, 'upload_new': upload_report,
+                     'cpc_class_parser': cpc_class_parser_report,
+                     'cpc_class_uploader': cpc_class_uploader_report,
+                     'cpc_current_processor': cpc_current_processor_report,
+                     'cpc_parser': cpc_parser_report,
+                     'download_cpc': download_cpc_report,
+                     'merge_text_db': merge_text_db_report,
+                     'qc_cpc_class_parser': qc_cpc_class_parser_report,
+                     'qc_cpc_current_wipo': qc_cpc_current_wipo_report,
+                     'qc_cpc_parser': qc_cpc_parser_report,
+                     'qc_download_cpc': qc_download_cpc_report,
+                     'qc_merge_db': qc_merge_db_report,
+                     'qc_merge_text_db': qc_merge_text_db_report,
+                     'qc_parse_text_data': qc_parse_text_data_report,
+                     'qc_rename_db': qc_rename_db_report,
+                     'qc_upload_new': qc_upload_new_report,
+                     'qc_withdrawn_processor': qc_withdrawn_processor_report,
+                     'wipo_processor': wipo_processor_report,
+                     'withdrawn_processor': withdrawn_processor_report(config)}
 
     return report_lookup[task](update_config)
