@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import pymysql.cursors
 
-from lib.configuration import get_connection_string, get_query_results
+from lib.configuration import get_connection_string
 
 
 class AppDatabaseTester(ABC):
