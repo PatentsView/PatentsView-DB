@@ -11,7 +11,7 @@ def export_table(config, table, table_config):
     fields = table_config['fields']
     order_fields = table_config['order_fields']
     separator = "\t"
-    export(engine, database, table + " limit 10", fields, output_file, separator, quote_option=csv.QUOTE_NONE,
+    export(engine, database, table , fields, output_file, separator, quote_option=csv.QUOTE_NONE,
            chunk_options={'chunk_size': 1000000, 'order_fields': order_fields})
 
 
