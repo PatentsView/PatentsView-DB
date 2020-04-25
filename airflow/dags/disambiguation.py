@@ -25,7 +25,7 @@ default_args = {
 }
 
 disambiguation_dag = DAG(
-    'supplemental_data_load',
+    'disambiguation',
     description='Upload CPC files to database',
     start_date=datetime(2020, 1, 1, 0, 0, 0),
     catchup=True,
