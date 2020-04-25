@@ -38,7 +38,7 @@ def get_ipc_cpc_ipc_concordance_map(concordance_file):
     return cpc_ipc_known_data
 
 
-@profile()
+# @profile()
 def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
     # Obtain IPC Concordance for each patent based on cpc subgrou ID
     cpc_current_with_concordance = cpc_chunk.merge(right=cpc_ipc_concordance,
@@ -100,7 +100,7 @@ def upload_wipo(db_con, wipo_chunk):
     with db_con.begin() as conn:
         wipo_chunk.to_sql('wipo', conn, if_exists='append', index=False, method="multi")
     end = time.time()
-    print("Chunk Load Time:" + str(round(end - start)))
+#    print("Chunk Load Time:" + str(round(end - start)))
 
 
 def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config):
@@ -135,6 +135,7 @@ def process_and_upload_wipo(config):
     offset = 0
     batch_counter = 0
     while True:
+        start = time.time()
         batch_counter += 1
         cpc_current_data = pd.read_sql_query(con=myengine,
                                              sql="select * from cpc_current order by uuid limit {} offset {}".format(
@@ -143,6 +144,8 @@ def process_and_upload_wipo(config):
             break
         wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
         offset = offset + limit
+        end = time.time()
+        print("Chunk Time:" + str(round(end - start)))
     consolidate_wipo(config)
 
 
