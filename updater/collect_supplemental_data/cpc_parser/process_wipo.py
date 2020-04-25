@@ -128,7 +128,7 @@ def process_and_upload_wipo(config):
     offset = 0
     batch_counter = 0
     base_query_template = "SELECT * from patent order by id limit {limit} offset {offset}"
-    cpc_query_template = "SELECT * from cpc_current c join ({base_query}) p on p.id = c.id)"
+    cpc_query_template = "SELECT c.* from cpc_current c join ({base_query}) p on p.id = c.id"
     while True:
         start = time.time()
         batch_counter += 1
