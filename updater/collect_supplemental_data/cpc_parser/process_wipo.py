@@ -143,8 +143,7 @@ def process_and_upload_wipo(config):
             break
         wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
         offset = offset + limit
-        break
-    # consolidate_wipo(config)
+    consolidate_wipo(config)
 
 
 if __name__ == '__main__':
