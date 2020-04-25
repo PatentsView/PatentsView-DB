@@ -138,7 +138,7 @@ def process_and_upload_wipo(config):
         start = time.time()
         batch_counter += 1
         cpc_current_data = pd.read_sql_query(con=myengine,
-                                             sql="select * from cpc_current order by uuid limit {} offset {}".format(
+                                             sql="select * from cpc_current order by patent_id, sequence limit {} offset {}".format(
                                                  limit, offset))
         if cpc_current_data.shape[0] < 1:
             break
