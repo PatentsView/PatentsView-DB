@@ -122,3 +122,22 @@ def get_text_table_load_command(config, project_home):
                                                                                                       database=database,
                                                                                                       script_to_load=script_to_load)
     return create_command
+
+
+def get_scp_copy_command(config):
+    # scp -i "$KEYFILE" "$FOLDER"/*.tsv disambiguser@ec2-52-21-62-204.compute-1.amazonaws.com:/data/disambiguation/data
+    command = 'scp'
+    keyfile_parameter = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
+    disambig_input_folder = '{}/disambig_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])
+    source_blob = "{folder}/*.tsv".format(folder=disambig_input_folder)
+    disambig_user = 'disambiguser'
+    disambig_host = "ec2-52-21-62-204.compute-1.amazonaws.com"
+    destination = "/data/disambiguation/data"
+
+    command = "{command} -i {keyfile} {source_blob} {user}@{host}:{destination}".format(command=command,
+                                                                                        keyfile=keyfile_parameter,
+                                                                                        source_blob=source_blob,
+                                                                                        user=disambig_user,
+                                                                                        host=disambig_host,
+                                                                                        destination=destination)
+    return command

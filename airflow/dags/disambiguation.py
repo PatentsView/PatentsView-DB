@@ -2,9 +2,10 @@ import os
 from datetime import datetime, timedelta
 
 from airflow import DAG
+from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-from lib.configuration import get_config
+from lib.configuration import get_config, get_scp_copy_command
 from updater.callbacks import airflow_task_success, airflow_task_failure
 from updater.disambiguation_support.export_disambiguation_data import export_disambig_data
 
@@ -32,7 +33,11 @@ disambiguation_dag = DAG(
     schedule_interval=None)
 project_home = os.environ['PACKAGE_HOME']
 config = get_config()
-withdrawn_operator = PythonOperator(task_id='export_disambig_data', python_callable=export_disambig_data,
-                                    op_kwargs={'config': config}, dag=disambiguation_dag,
-                                    on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure)
+
+export_disambig_operator = PythonOperator(task_id='export_disambig_data', python_callable=export_disambig_data,
+                                          op_kwargs={'config': config}, dag=disambiguation_dag,
+                                          on_success_callback=airflow_task_success,
+                                          on_failure_callback=airflow_task_failure)
+upload_disambig = BashOperator(task_id='upload_disambig_files', bash_command=get_scp_copy_command(config),
+                               dag=disambiguation_dag, on_success_callback=airflow_task_success,
+                               on_failure_callback=airflow_task_failure)
