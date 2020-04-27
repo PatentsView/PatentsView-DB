@@ -42,7 +42,7 @@ def upload_disambig_results(update_config):
 
 def update_rawassignee(update_config):
     engine = create_engine(get_connection_string(update_config, "NEW_DB"))
-    update_statement = "UPDATE rawassignee ra left join assignee_disambiguation_mapping adm on adm.uuid = ra.uuid set  ri.inventor_id = adm.assignee_id"
+    update_statement = "UPDATE rawassignee ra left join assignee_disambiguation_mapping adm on adm.uuid = ra.uuid set  ra.assignee_id = adm.assignee_id"
     engine.execute(update_statement)
 
 
