@@ -153,7 +153,7 @@ def get_scp_download_command(config):
         'inventor_disambiguation.tsv': '/data/disambiguation/exp_out/inventor/disambiguation.postprocessed.tsv',
         'assignee_disambiguation.tsv': '/data/disambiguation/exp_out/assignee/assignee_disambiguation.tsv',
         'location_disambiguation.tsv': '/data/disambiguation/exp_out/location/location_post_processed.tsv'}
-    command_strings = ["mkdir -[ {disambig_output_folder}".format(disambig_output_folder=disambig_output_folder)]
+    command_strings = ["mkdir -p {disambig_output_folder}".format(disambig_output_folder=disambig_output_folder)]
     for dest_file in source_files:
         command = "{command} -i {keyfile} {user}@{host}:{source_file} {disambig_output_folder}/{dest_file} ".format(
             command=command, keyfile=keyfile_parameter, dest_file=dest_file, source_file=source_files[dest_file],
