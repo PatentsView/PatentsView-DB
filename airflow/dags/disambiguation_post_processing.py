@@ -7,6 +7,7 @@ from airflow.operators.python_operator import PythonOperator
 
 from lib.configuration import get_config, get_scp_copy_command, get_scp_download_command
 from updater.callbacks import airflow_task_success, airflow_task_failure
+from updater.post_processing.create_lookup import create_lookup_tables
 from updater.post_processing.post_process_assignee import post_process_assignee
 from updater.post_processing.post_process_inventor import post_process_inventor
 from updater.post_processing.post_process_location import post_process_location
@@ -57,6 +58,16 @@ post_process_location_operator = PythonOperator(task_id='post_process_location',
                                                 on_success_callback=airflow_task_success,
                                                 on_failure_callback=airflow_task_failure)
 
+lookup_tables_operator = PythonOperator(task_id='lookup_tables',
+                                        python_callable=create_lookup_tables, dag=dag,
+                                        on_success_callback=airflow_task_success,
+                                        on_failure_callback=airflow_task_failure
+                                        )
+
 post_process_inventor_operator.set_upstream(download_disambig_operator)
 post_process_assignee_operator.set_upstream(download_disambig_operator)
 post_process_location_operator.set_upstream(download_disambig_operator)
+
+lookup_tables_operator.set_upstream(post_process_inventor_operator)
+lookup_tables_operator.set_upstream(post_process_assignee_operator)
+lookup_tables_operator.set_upstream(post_process_location_operator)
