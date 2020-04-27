@@ -19,7 +19,7 @@ def create_inventor(update_config):
         con=engine)
     inventors_data = inventors_name_with_count.sort_values("name_count", ascending=False).groupby("inventor_id").head(
         1).reset_index(drop=True)
-    inventors_data.to_sql(name='inventor', con=engine, if_exists='append')
+    inventors_data.to_sql(name='inventor', con=engine, if_exists='append', index=False)
 
 
 def upload_disambig_results(update_config):
