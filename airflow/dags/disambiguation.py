@@ -44,7 +44,7 @@ upload_disambig = BashOperator(task_id='upload_disambig_files', bash_command=get
 
 run_lawyer_disambiguation_operator = BashOperator(task_id='run_lawyer_disambiguation',
                                                   bash_command='python /project/Development/lawyer_disambiguation/lawyer_disambiguation.py',
-                                                  dag=dag,
+                                                  dag=disambiguation_dag,
                                                   on_success_callback=airflow_task_success,
                                                   on_failure_callback=airflow_task_failure
                                                   )
