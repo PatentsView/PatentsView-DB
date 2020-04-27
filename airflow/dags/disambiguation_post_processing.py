@@ -7,6 +7,7 @@ from airflow.operators.python_operator import PythonOperator
 
 from lib.configuration import get_config, get_scp_copy_command, get_scp_download_command
 from updater.callbacks import airflow_task_success, airflow_task_failure
+from updater.post_processing.post_process_assignee import post_process_assignee
 from updater.post_processing.post_process_inventor import post_process_inventor
 
 default_args = {
