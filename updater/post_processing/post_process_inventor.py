@@ -25,7 +25,7 @@ def create_inventor(update_config):
 def upload_disambig_results(update_config):
     engine = create_engine(get_connection_string(update_config, "NEW_DB"))
     disambig_output_file = "{wkfolder}/disambig_output/{disamb_file}".format(
-        wkfolder=update_config['FOLDERS']['WORKING_FOLDER'], disamb_file="disambiguation.postprocessed.tsv")
+        wkfolder=update_config['FOLDERS']['WORKING_FOLDER'], disamb_file="inventor_disambiguation.tsv")
     disambig_output = pd.read_csv(disambig_output_file, sep="\t", chunksize=300000, header=None, quoting=csv.QUOTE_NONE,
                                   names=['unknown_1', 'uuid', 'inventor_id', 'name_first', 'name_middle', 'name_last',
                                          'name_suffix'])

@@ -11,7 +11,7 @@ def upload_disambig_results(update_config):
     engine = create_engine(get_connection_string(update_config, "NEW_DB"))
     disambig_output_file = "{wkfolder}/disambig_outputs/{disamb_file}".format(
         wkfolder=update_config['FOLDERS']['WORKING_FOLDER'],
-        disamb_file="disambiguation.tsv")
+        disamb_file="assignee_disambiguation.tsv")
     disambig_output = pd.read_csv(
         disambig_output_file,
         sep="\t",
