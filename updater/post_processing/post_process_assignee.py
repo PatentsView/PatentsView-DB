@@ -49,22 +49,24 @@ def update_rawassignee(update_config):
 def create_assignee(update_config):
     engine = create_engine(get_connection_string(update_config, "NEW_DB"))
     assignee_name_with_count = pd.read_sql_query(
-        "SELECT assignee_id, name_first, name_last, count(1) name_count from rawassignee where assignee is not null and organization is null group by assignee_id, name_first, name_last;",
+        "SELECT assignee_id, name_first, name_last, type, count(1) name_count from rawassignee where assignee is not null and organization is null group by assignee_id, name_first, name_last, type;",
         con=engine)
     assignee_name_data = assignee_name_with_count.sort_values("name_count", ascending=False).groupby(
         "assignee_id").head(
         1).reset_index(drop=True)
     assignee_name_data = assignee_name_data.drop("name_count").assign(organization=None)
-    assignee_name_data.to_sql(name='assignee', con=engine, if_exists='append', index=False)
+    assignee_name_data.rename({"assignee_id": "id"}, axis=1).to_sql(name='assignee', con=engine, if_exists='append',
+                                                                    index=False)
 
     assignee_organization_with_count = pd.read_sql_query(
-        "SELECT assignee_id, organization, count(1) org_count from rawassignee where assignee is not null and organization is not null group by assignee_id, organization;",
+        "SELECT assignee_id, organization, type, count(1) org_count from rawassignee where assignee is not null and organization is not null group by assignee_id, organization, type;",
         con=engine)
     assignee_org_data = assignee_organization_with_count.sort_values("name_count", ascending=False).groupby(
         "assignee_id").head(
         1).reset_index(drop=True)
-    assignee_name_data = assignee_org_data.drop("name_count").assign(name_first=None, name_last=None)
-    assignee_name_data.to_sql(name='assignee', con=engine, if_exists='append', index=False)
+    assignee_org_data = assignee_org_data.drop("name_count").assign(name_first=None, name_last=None)
+    assignee_org_data.rename({"assignee_id": "id"}, axis=1).to_sql(name='assignee', con=engine, if_exists='append',
+                                                                   index=False)
 
 
 def post_process_assignee(config):
