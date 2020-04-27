@@ -155,8 +155,8 @@ def get_scp_download_command(config):
         'location_disambiguation.tsv': '/data/disambiguation/exp_out/location/location_post_processed.tsv'}
     command_strings = ["mkdir -p {disambig_output_folder}".format(disambig_output_folder=disambig_output_folder)]
     for dest_file in source_files:
-        command = "{command} -i {keyfile} {user}@{host}:{source_file} {disambig_output_folder}/{dest_file} ".format(
+        command_string = "{command} -i {keyfile} {user}@{host}:{source_file} {disambig_output_folder}/{dest_file} ".format(
             command=command, keyfile=keyfile_parameter, dest_file=dest_file, source_file=source_files[dest_file],
             user=disambig_user, host=disambig_host, disambig_output_folder=disambig_output_folder)
-        command_strings.append(command)
+        command_strings.append(command_string)
     return " && ".join(command_strings)
