@@ -9,6 +9,7 @@ from lib.configuration import get_config, get_scp_copy_command, get_scp_download
 from updater.callbacks import airflow_task_success, airflow_task_failure
 from updater.post_processing.post_process_assignee import post_process_assignee
 from updater.post_processing.post_process_inventor import post_process_inventor
+from updater.post_processing.post_process_location import post_process_location
 
 default_args = {
     'owner': 'airflow',
@@ -50,5 +51,12 @@ post_process_assignee_operator = PythonOperator(task_id='post_process_assignee',
                                                 op_kwargs={'config': config}, dag=disambiguation_post_processing,
                                                 on_success_callback=airflow_task_success,
                                                 on_failure_callback=airflow_task_failure)
+
+post_process_location_operator = PythonOperator(task_id='post_process_location', python_callable=post_process_location,
+                                                op_kwargs={'config': config}, dag=disambiguation_post_processing,
+                                                on_success_callback=airflow_task_success,
+                                                on_failure_callback=airflow_task_failure)
+
 post_process_inventor_operator.set_upstream(download_disambig_operator)
 post_process_assignee_operator.set_upstream(download_disambig_operator)
+post_process_location_operator.set_upstream(download_disambig_operator)
