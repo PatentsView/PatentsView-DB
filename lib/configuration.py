@@ -141,3 +141,25 @@ def get_scp_copy_command(config):
                                                                                         host=disambig_host,
                                                                                         destination=destination)
     return command
+
+
+def get_scp_download_command(config):
+    command = 'scp'
+    keyfile_parameter = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
+    disambig_output_folder = '{}/disambig_output/'.format(config['FOLDERS']['WORKING_FOLDER'])
+    disambig_user = 'disambiguser'
+    disambig_host = "ec2-52-21-62-204.compute-1.amazonaws.com"
+    source_files = {
+        'inventor_disambiguation.tsv': '/data/disambiguation/exp_out/inventor/disambiguation.postprocessed.tsv',
+        'assignee_disambiguation.tsv': '/data/disambiguation/exp_out/assignee/assignee_disambiguation.tsv',
+        'location_disambiguation.tsv': '/data/disambiguation/exp_out/location/location_post_processed.tsv'}
+    command_strings = []
+    for source_file in source_files:
+        command = "{command} -i {keyfile} {user}@{host}:{source_file} {disambig_output_folder} ".format(command=command,
+                                                                                                        keyfile=keyfile_parameter,
+                                                                                                        source_file=source_file,
+                                                                                                        user=disambig_user,
+                                                                                                        host=disambig_host,
+                                                                                                        disambig_output_folder=disambig_output_folder)
+        command_strings.append(command)
+    return " && ".join(command_strings)
