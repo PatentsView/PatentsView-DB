@@ -36,7 +36,7 @@ config = get_config()
 
 download_disambig_operator = BashOperator(task_id='download_disambiguation',
                                           bash_command=get_scp_download_command(config),
-                                          dag=dag,
+                                          dag=disambiguation_post_processing,
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure
                                           )
