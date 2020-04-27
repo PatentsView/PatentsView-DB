@@ -23,7 +23,11 @@ def make_lookup(disambiguated_folder):
     # create the latitude/longitude to id mappings
     id_lat_long_lookup = {}
     lat_long_name_count = defaultdict(lambda: defaultdict(lambda: 0))
+    counter = 0
     for row in inp:
+        counter += 1
+        if counter % 1000 == 0:
+            print(counter)
         clean_loc = tuple([None if i == 'NULL' else i for i in row[1].split('|')])
         try:
             if len(row) < 5:  # some of that long pairs are ented as a pipe separated pair in the 4th column
