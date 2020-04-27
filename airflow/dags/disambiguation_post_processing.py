@@ -60,6 +60,7 @@ post_process_location_operator = PythonOperator(task_id='post_process_location',
 
 lookup_tables_operator = PythonOperator(task_id='lookup_tables',
                                         python_callable=create_lookup_tables, dag=disambiguation_post_processing,
+                                        op_kwargs={'config': config},
                                         on_success_callback=airflow_task_success,
                                         on_failure_callback=airflow_task_failure
                                         )
