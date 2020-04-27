@@ -49,7 +49,7 @@ def update_rawassignee(update_config):
 def create_assignee(update_config):
     engine = create_engine(get_connection_string(update_config, "NEW_DB"))
     assignee_name_with_count = pd.read_sql_query(
-        "SELECT assignee_id, name_first, name_last, type, count(1) name_count from rawassignee where assignee is not null and organization is null group by assignee_id, name_first, name_last, type;",
+        "SELECT assignee_id, name_first, name_last, type, count(1) name_count from rawassignee where assignee_id is not null and organization is null group by assignee_id, name_first, name_last, type;",
         con=engine)
     assignee_name_data = assignee_name_with_count.sort_values("name_count", ascending=False).groupby(
         "assignee_id").head(
@@ -59,7 +59,7 @@ def create_assignee(update_config):
                                                                     index=False)
 
     assignee_organization_with_count = pd.read_sql_query(
-        "SELECT assignee_id, organization, type, count(1) org_count from rawassignee where assignee is not null and organization is not null group by assignee_id, organization, type;",
+        "SELECT assignee_id, organization, type, count(1) org_count from rawassignee where assignee_id is not null and organization is not null group by assignee_id, organization, type;",
         con=engine)
     assignee_org_data = assignee_organization_with_count.sort_values("org_count", ascending=False).groupby(
         "assignee_id").head(
