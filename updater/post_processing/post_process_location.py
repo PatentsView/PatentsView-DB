@@ -1,18 +1,14 @@
-import sys
+import uuid
+
 import numpy as np
-import os
 import pandas as pd
 from sqlalchemy import create_engine
-from warnings import filterwarnings
 import csv
-import re, os, random, string, codecs
-import sys
+import os
 from collections import Counter, defaultdict
 
-from lib.configuration import get_config
+from lib.configuration import get_config, get_connection_string
 
-project_home = os.environ['PACKAGE_HOME']
-from Development.helpers import general_helpers
 import tqdm
 import time
 
@@ -51,9 +47,9 @@ def make_lookup(disambiguated_folder):
     for lat_long, name_list in lat_long_name_count.items():
         if not lat_long == 'undisambiguated':  # don't clump the undisambiguated ones together
             name = sorted([(name, count) for name, count in name_list.items()], key=lambda x: x[1])[-1][0]
-            lat_long_cannonical_name[lat_long] = {'place': name, 'id': general_helpers.id_generator(12)}
+            lat_long_cannonical_name[lat_long] = {'place': name, 'id': str(uuid.uuid4())}
         else:
-            lat_long_cannonical_name[lat_long] = {'place': (None, None, None), 'id': general_helpers.id_generator(12)}
+            lat_long_cannonical_name[lat_long] = {'place': (None, None, None), 'id': str(uuid.uuid4())}
 
     print('second loop', flush=True)
     return id_lat_long_lookup, lat_long_cannonical_name
@@ -180,19 +176,17 @@ def upload_rawloc(db_con, disambiguated_folder, db):
 
 
 def post_process_location(config):
-    db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'],
-                                           config['DATABASE']['PASSWORD'], config['DATABASE']['NEW_DB'])
-
+    engine = create_engine(get_connection_string(config, "NEW_DB"))
     disambiguated_folder = "{}/disambig_output".format(config['FOLDERS']['WORKING_FOLDER'])
     print('here!', flush=True)
     id_lat_long_lookup, lat_long_cannonical_name = make_lookup(disambiguated_folder)
     print('made lookup', flush=True)
     fips_lookups = create_fips_lookups(config['FOLDERS']['PERSISTENT_FILES'])
-    upload_location(db_con, lat_long_cannonical_name, disambiguated_folder, fips_lookups)
+    upload_location(engine, lat_long_cannonical_name, disambiguated_folder, fips_lookups)
     print('done locupload ', flush=True)
-    process_rawlocation(db_con, lat_long_cannonical_name, id_lat_long_lookup, disambiguated_folder)
+    process_rawlocation(engine, lat_long_cannonical_name, id_lat_long_lookup, disambiguated_folder)
     print('done process', flush=True)
-    upload_rawloc(db_con, disambiguated_folder, config['DATABASE']['NEW_DB'])
+    upload_rawloc(engine, disambiguated_folder, config['DATABASE']['NEW_DB'])
 
 
 if __name__ == '__main__':
