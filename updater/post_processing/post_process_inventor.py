@@ -19,7 +19,7 @@ def create_inventor(update_config):
         con=engine)
     inventors_data = inventors_name_with_count.sort_values("name_count", ascending=False).groupby("inventor_id").head(
         1).reset_index(drop=True)
-    inventors_data.rename({"inventor_id": "id"}, axis=1).to_sql(name='inventor', con=engine, if_exists='append',
+    inventors_data.drop("name_count", axis =1).rename({"inventor_id": "id"}, axis=1).to_sql(name='inventor', con=engine, if_exists='append',
                                                                 index=False)
 
 
