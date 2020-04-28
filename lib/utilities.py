@@ -1,6 +1,7 @@
 import datetime
 import calendar
 import random
+import re
 import string
 import requests
 from clint.textui import progress
@@ -37,6 +38,12 @@ def download(url, filepath):
             if chunk:
                 f.write(chunk)
                 f.flush()
+
+
+def better_title(text):
+    title = " ".join(
+        [item if item not in ["Of", "The", "For", "And", "On"] else item.lower() for item in str(text).title().split()])
+    return re.sub('[' + string.punctuation + ']', '', title)
 
 
 def write_csv(rows, outputdir, filename):
