@@ -125,6 +125,48 @@ def process_NER(txt_fp_out, data):
     return orgs_final
 
 
+def extract_contract_award(gi_row):
+    statement = gi_row.gi_statement
+    statement = re.sub('FAR[^a-zA-Z]+', "", statement)
+    statement = re.sub('pursuant\s*to\s*.*U(\.)?S\.?C\.?\s*\.?sctn\.?[^s]+', "", statement, flags=re.IGNORECASE)
+    statement = re.sub('USC[^a-zA-Z]+', "", statement)
+    statement = re.sub("p.l.[^a-zA-Z]+", "", statement, flags=re.IGNORECASE)
+    statement = re.sub('cfr\s*[^a-zA-Z]+', "", statement, flags=re.IGNORECASE)
+    statement = re.sub('executive\s*order\s*[^a-zA-Z]+', "", statement, flags=re.IGNORECASE)
+    statement = re.sub('public\.?\s*(law)?\s*[^a-zA-Z]+', "", statement, flags=re.IGNORECASE)
+    statement = re.sub('(at)?\s*\(?[0-9]{3}\)?-?\s*[0-9]{3}\s*-?\s*[0-9]{4}', "", statement, flags=re.IGNORECASE)
+    #     for fmt in formats:
+    #         expression = fmt["prefix"]+"(.*)"+fmt["prefix"]
+    #         print(expression)
+    #         exp_match = re.match(expression, statement, re.IGNORECASE)
+    #         if exp_match is not None:
+    #             award = exp_match.group(1)
+    #             print(award)
+    start_list = ["NIH R\d\d", "\d R\d\d"]
+    match_string = ""
+    for start in start_list:
+        match_string += start + " [A-Za-z\d][A-Za-z\d-]+[^\s][\d][A-Za-z\d-]+|" + start + " [A-Z\d]{1,5}\s[A-Z\d-]+\d|"
+    match_string += "[A-Za-z\d][A-Za-z\d-]+[^\s][\d][A-Za-z\d-]+|[A-Z\d]{1,5}\s[A-Z\d-]+\d"
+    contract_nums = re.findall(
+        match_string,
+        statement)
+
+    if "public law" in gi_row.gi_statement.lower() or "p.l." in statement.lower():
+        contract_nums = [
+            re.sub("((96|85)-\d{3}|USC\s\d{3}|20\d{3}|111-\d{3})\|?", "", x)
+            for x in contract_nums
+        ]
+    if "Calif." in gi_row.gi_statement or "Bethesda" in statement:
+        contract_nums = [
+            x if x not in [
+                "619)553-5118", "619)553-5120", "553-5118", "(619-)?553-2778",
+                "92152", "72120", "20012", "53510", "D0012", "53560", "20014",
+                "20892"
+            ] else None for x in contract_nums
+        ]
+    return contract_nums
+
+
 # Requires: filepath, merged_df frame
 # Modifies: nothing
 # Effects: Process NER on merged_csvs, returns orgs list, locs list
@@ -151,7 +193,8 @@ def add_cols(data, orgs):
     data['orgs'] = pd.Series(gi_all_orgs)
 
     # Extract and clean Contract Numbers
-    contracts = clean_contracts(data, gi_statements)
+    #contracts = clean_contracts(data, gi_statements)
+    contracts = extract_contract_award(data)
 
     # Add contracts column for contracts
     data['contracts'] = pd.Series(contracts)
