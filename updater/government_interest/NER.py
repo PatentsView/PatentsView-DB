@@ -10,6 +10,8 @@ import os
 from os import listdir
 import re
 
+from lib.utilities import chunks
+
 
 def get_heading(gi_statement):
     # get the all caps headings from the start of the GI statement
@@ -75,7 +77,7 @@ def run_NER(fp, txt_fp_in, txt_fp_out, data, classif, classif_dirs):
     input_files = []
 
     # Chunk GI statements by nerfc limit
-    gi_chunked = general_helpers.chunks(gi_stmt_full, nerfc)
+    gi_chunked = chunks(gi_stmt_full, nerfc)
 
     for item in range(0, len(gi_chunked)):
         with open(txt_fp_in + str(item) + '_file.txt', 'w', encoding='utf-8') as f:
