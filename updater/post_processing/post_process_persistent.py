@@ -78,7 +78,7 @@ def write_long_outfile_newrows(db_con, new_db, raw_table, id_col, total_rows, ne
 # MODIFIES: nothing
 # EFFECTS: updates persistent long entity table with new rows from db update
 def update_persistent_long_entity(entity, config):
-    db_con = create_engine(get_connection_string('NEW_DB') + '&local_infile=1')
+    db_con = create_engine(get_connection_string(config, 'NEW_DB') + '&local_infile=1')
     new_db = config['DATABASE']['NEW_DB']
     new_db_timestamp = new_db.replace('patent_', '')
     disambig_folder = "{}/disambig_output/".format(config['FOLDERS']['WORKING_FOLDER'])

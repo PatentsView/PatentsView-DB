@@ -124,7 +124,7 @@ def create_wide_table_database(db_con, entity, persistent_disambig_table, outfil
 
 
 def create_persistent_wide_entity(config, entity):
-    db_con = create_engine(get_connection_string('NEW_DB'))
+    db_con = create_engine(get_connection_string(config, 'NEW_DB')+'&local_infile=1')
     disambig_folder = "{}/disambig_output/".format(config['FOLDERS']['WORKING_FOLDER'])
 
     old_db = config['DATABASE']['OLD_DB']
