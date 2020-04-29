@@ -94,6 +94,7 @@ create_persistent_wide_assignee = PythonOperator(
     op_kwargs={'entity': 'assignee', 'config': config},
     dag=disambiguation_post_processing
 )
+
 post_process_inventor_operator.set_upstream(download_disambig_operator)
 post_process_assignee_operator.set_upstream(download_disambig_operator)
 post_process_location_operator.set_upstream(download_disambig_operator)
