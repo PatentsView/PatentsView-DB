@@ -74,35 +74,37 @@ def create_dict(pre_manual, post_manual, persistent_files):
     return dict_clean_org
 
 
-def lookup_raw_org(raw_org_list, dict_clean_org):
-    if not raw_org_list is np.nan:
-        orgs = raw_org_list.upper().split('|')
-        looked_up = set()
-        global missed_orgs
-        for org in orgs:
-            if org in dict_clean_org.keys():
-                looked_up_org = dict_clean_org[org]
-                if not 'non_government' in looked_up_org:  # this is because of issues iwth spaces
-                    for sub_org in looked_up_org.split('|'):
-                        looked_up.add(sub_org.strip(' '))
-            else:
-                missed_orgs.append(org)
-        # we ONLY want 'United States Government' if there are no other orgs
-        if len(looked_up) > 1 and "United States Government" in looked_up:
-            looked_up.remove("United States Government")
-        elif len(looked_up) == 0:
-            looked_up = {"United States Government"}
+def lookup_raw_org(row, dict_clean_org, missed_orgs):
+    if row['gi_statement'] is np.nan:
+        return np.nan
     else:
-        looked_up = {"United States Government"}
-    set_org = ("|".join(looked_up).strip(' \t\n\r'))
-    return set_org
+        raw_org_list = row['orgs']
+        if not raw_org_list is np.nan:
+            orgs = raw_org_list.upper().split('|')
+            looked_up = set()
+            for org in orgs:
+                if org in dict_clean_org.keys():
+                    looked_up_org = dict_clean_org[org]
+                    if not 'non_government' in looked_up_org:  # this is because of issues iwth spaces
+                        for sub_org in looked_up_org.split('|'):
+                            looked_up.add(sub_org.strip(' '))
+                else:
+                    missed_orgs.append(org)
+            # we ONLY want 'United States Government' if there are no other orgs
+            if len(looked_up) > 1 and "United States Government" in looked_up:
+                looked_up.remove("United States Government")
+            elif len(looked_up) == 0:
+                looked_up = {"United States Government"}
+        else:
+            looked_up = {"United States Government"}
+        set_org = ("|".join(looked_up).strip(' \t\n\r'))
+        return set_org
 
 
 def process_NER(pre_manual, post_manual, dict_clean_org):
     NER_results = pd.read_csv('{}/NER_output.csv'.format(pre_manual))
-    NER_results['looked_up'] = NER_results.apply(
-        lambda row: lookup_raw_org(row['orgs'], dict_clean_org) if not row['gi_statement'] is np.nan else np.nan,
-        axis=1)
+    missed_orgs = []
+    NER_results['looked_up'] = NER_results.apply(lookup_raw_org, axis=1, args=(dict_clean_org, missed_orgs), )
     pd.DataFrame(missed_orgs).to_csv('{}/missed_orgs.csv'.format(post_manual))
     NER_results.to_csv('{}/lookedup_NER_output.csv'.format(post_manual))
     return NER_results
