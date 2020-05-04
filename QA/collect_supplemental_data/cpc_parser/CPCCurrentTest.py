@@ -19,9 +19,9 @@ class CPCTest(PatentDatabaseTester):
                                       'sequence': {'data_type': 'int', 'null_allowed': False},
                                       'field_id': {'data_type': 'varchar', 'null_allowed': False}},
                              'mainclass_current': {'id': {'data_type': 'varchar', 'null_allowed': False},
-                                                   'title': {'data_type': 'int', 'null_allowed': False}},
+                                                   'title': {'data_type': 'varchar', 'null_allowed': True}},
                              'subclass_current': {'id': {'data_type': 'varchar', 'null_allowed': False},
-                                                  'title': {'data_type': 'int', 'null_allowed': False}},
+                                                  'title': {'data_type': 'varchar', 'null_allowed': True}},
                              'mainclass': {'id': {'data_type': 'varchar', 'null_allowed': False}},
                              'subclass': {'id': {'data_type': 'varchar', 'null_allowed': False}}}
 
