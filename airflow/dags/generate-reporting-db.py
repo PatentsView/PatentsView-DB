@@ -9,7 +9,7 @@ import os
 
 project_home = os.environ['PACKAGE_HOME']
 config = configparser.ConfigParser()
-config.read(project_home + '/Development/config.ini')
+config.read(project_home + '/config.ini')
 
 slack_token = config["SLACK"]["API_TOKEN"]
 slack_client = SlackClient(slack_token)
