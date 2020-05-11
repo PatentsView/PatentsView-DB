@@ -22,10 +22,10 @@ class AppDatabaseTester(ABC):
         # self.database_connection_string = get_connection_string(config, database_section)
         self.config = config
         self.table_config = {}
-        self.qa_data = {"DataMonitor_count": [], 'DataMonitor_nullcount': [], 'DataMonitor_applicationyearlycount': []}
+        self.qa_data = {"DataMonitor_count": [], 'DataMonitor_nullcount': [], 'DataMonitor_patentyearlycount': []}
         self.floating_entities = []
         self.floating_application = []
-
+application
     def test_table_row_count(self, table_name):
         try:
             if not self.connection.open:
@@ -118,12 +118,12 @@ class AppDatabaseTester(ABC):
                 count_cursor.execute(count_query)
                 database_type, version = self.config["DATABASE"][self.database_section].split("_")
                 for count_row in count_cursor.fetchall():
-                    self.qa_data['DataMonitor_applicationyearlycount'].append(
+                    self.qa_data['DataMonitor_patentyearlycount'].append(
                         {"database_type": database_type,
                          'update_version': version, 'year': count_row[0],
                          'application_count': count_row[1]})
         finally:
-            print(self.qa_data['DataMonitor_applicationyearlycount'])
+            print(self.qa_data['DataMonitor_patentyearlycount'])
             if self.connection.open:
                 self.connection.close()
 
@@ -132,7 +132,7 @@ class AppDatabaseTester(ABC):
     def assert_yearly_counts(self):
         for year in range(self.start_date.year, self.end_date.year + 1):
             found = False
-            for row in self.qa_data['DataMonitor_applicationyearlycount']:
+            for row in self.qa_data['DataMonitor_patentyearlycount']:
                 if row['year'] == year:
                     found = True
                     if row['application_count'] < 1:
