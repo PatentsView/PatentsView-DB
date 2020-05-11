@@ -25,7 +25,7 @@ class AppDatabaseTester(ABC):
         self.qa_data = {"DataMonitor_count": [], 'DataMonitor_nullcount': [], 'DataMonitor_patentyearlycount': []}
         self.floating_entities = []
         self.floating_application = []
-application
+
     def test_table_row_count(self, table_name):
         try:
             if not self.connection.open:
