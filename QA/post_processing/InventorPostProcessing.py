@@ -24,6 +24,6 @@ class InventorPostProcessingQC(DisambiguationTester):
                                              'name_first': {'data_type': 'varchar', 'null_allowed': True,
                                                             'category': False}}}
         self.entity_table = 'rawinventor'
+        self.entity_id = 'uuid'
         self.disambiguated_id = 'inventor_id'
-        self.disambiguation_table = 'inventor'
-
+        self.disambiguated_table = 'inventor'

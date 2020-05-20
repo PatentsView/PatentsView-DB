@@ -18,5 +18,6 @@ class AssigneePostProcessingQC(DisambiguationTester):
                             'uuid': {'data_type': 'varchar', 'null_allowed': False, 'category': False},
                             'name_first': {'data_type': 'varchar', 'null_allowed': True, 'category': False}}}
         self.entity_table = 'rawassignee'
+        self.entity_id = 'uuid'
         self.disambiguated_id = 'assignee_id'
-        self.disambiguation_table = 'assignee'
+        self.disambiguated_table = 'assignee'

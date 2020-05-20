@@ -17,7 +17,9 @@ class LocationPostProcessingQC(DisambiguationTester):
                             'state': {'data_type': 'varchar', 'null_allowed': True, 'category': False},
                             'country': {'data_type': 'varchar', 'null_allowed': True, 'category': False}}}
         self.entity_table = 'rawlocation'
+        self.entity_id = 'id'
         self.disambiguated_id = 'location_id'
         self.disambiguation_table = 'location'
-        self.waypoint_nodes = [{'table': 'rawassignee', 'id': 'rawlocation_id'},
-                               {'table': 'rawinventor', 'id': 'rawlocation_id'}]
+
+    def test_floating_entities(self):
+        pass

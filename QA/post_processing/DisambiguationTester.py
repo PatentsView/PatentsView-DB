@@ -11,42 +11,30 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
         self.extended_qa_data = {"DataMonitor_distinctidcount": []}
         self.qa_data.update(self.extended_qa_data)
         self.entity_table = None
-        self.disambiguated_id = None
         self.entity_id = None
+
+        self.disambiguated_id = None
         self.disambiguated_table = None
-        self.waypoint_nodes = None
 
     def test_floating_entities(self):
         if not self.connection.open:
             self.connection.connect()
-        float_base_query_template = "SELECT count(distinct {entity_id}) from {entity_table} {waypoint_query} LEFT JOIN patent p on p.id = et.patent_id where p.id is null"
-        float_query_list = []
-        if self.waypoint_nodes is None:
-            float_query_list.append(
-                float_base_query_template.format(entity_id=self.disambiguated_id, entity_table=self.entity_table,
-                                                 waypoint_query="et"))
-        else:
-            for waypoint_node in self.waypoint_nodes:
-                waypoint_query = "wt LEFT JOIN {waypoint_table} et on wt.id = et.{join_id} ".format(
-                    waypoint_table=waypoint_node['table'], join_id=waypoint_node['id'])
-                float_query_list.append(float_base_query_template.format(entity_id=self.disambiguated_id,
-                                                                         entity_table=self.entity_table,
-                                                                         waypoint_query=waypoint_query))
+        float_query = "SELECT count(distinct {disambiguated_id}) from {entity_table} et LEFT JOIN patent p on p.id = et.patent_id where p.id is null".format(
+            disambiguated_id=self.disambiguated_id, entity_table=self.entity_table)
         import pprint
-        pprint.pprint(float_query_list)
+        pprint.pprint(float_query)
         total_float_count = 0
-        for float_query in float_query_list:
-            with self.connection.cursor() as count_cursor:
-                count_cursor.execute(float_query)
-                total_float_count += count_cursor.fetchall()[0][0]
+        with self.connection.cursor() as count_cursor:
+            count_cursor.execute(float_query)
+            total_float_count = count_cursor.fetchall()[0][0]
         if total_float_count > 0:
             raise Exception(
                 "Entity Table : {table} has patent IDs that are not in patent table. Count: {count}".format(
                     table=self.entity_table, count=total_float_count))
 
         patent_count_query = "SELECT count(id) from patent"
-        entity_count_query = "SELECT count(distinct {entity_id}) from {entity_table} et".format(
-            entity_id=self.disambiguated_id, entity_table=self.entity_table)
+        entity_count_query = "SELECT count(distinct {disambiguated_id}) from {entity_table} et".format(
+            disambiguated_id=self.disambiguated_id, entity_table=self.entity_table)
         entity_row_query = "SELECT count(*) from {entity_table} et".format(
             entity_id=self.disambiguated_id, entity_table=self.entity_table)
 
@@ -68,7 +56,7 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
                  'ratio_to_patent_id': ratio_to_patent, 'ratio_to_self': ratio_to_self})
 
     def test_invalid_id(self):
-        invalid_query = "SELECT count(1) from {disambiguated_table} dt left join {entity_table} et on et.{id_field}=dt.{id_field} where et.{id_field} is null".format(
+        invalid_query = "SELECT count(1) from {disambiguated_table} dt left join {entity_table} et on et.{id_field}=dt.id where et.{id_field} is null".format(
             disambiguated_table=self.disambiguated_table, entity_table=self.entity_table,
             id_field=self.disambiguated_id)
         if not self.connection.open:
@@ -83,5 +71,6 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
                         id_field=self.disambiguated_id))
 
     def runTests(self):
-        self.test_floating_entities()
-        # super(DisambiguationTester, self).runTests()
+        #self.test_floating_entities()
+        self.test_invalid_id()
+        super(DisambiguationTester, self).runTests()

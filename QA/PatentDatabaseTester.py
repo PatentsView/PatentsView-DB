@@ -208,15 +208,15 @@ class PatentDatabaseTester(ABC):
 
     def runTests(self):
         for table in self.table_config:
-            # self.test_yearly_count(table)
-            # self.test_table_row_count(table)
-            # self.test_blank_count(table, self.table_config[table])
-            # self.test_nulls(table, self.table_config[table])
+            self.test_yearly_count(table)
+            self.test_table_row_count(table)
+            self.test_blank_count(table, self.table_config[table])
+            self.test_nulls(table, self.table_config[table])
             self.load_floating_patent_count(table)
-        # for field in self.table_config[table]:
-        #     #    if "date_field" in self.table_config[table][field] and self.table_config[table][field]["date_field"]:
-        #     #        self.assert_zero_dates(table, field)
-        #     if self.table_config[table][field]['category']:
-        #         self.load_category_counts(table, field)
+            for field in self.table_config[table]:
+                if "date_field" in self.table_config[table][field] and self.table_config[table][field]["date_field"]:
+                    self.assert_zero_dates(table, field)
+                if self.table_config[table][field]['category']:
+                    self.load_category_counts(table, field)
 
         self.save_qa_data()
