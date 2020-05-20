@@ -3,6 +3,7 @@ from sqlalchemy import create_engine
 import csv
 import time
 
+from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
 from lib.configuration import get_connection_string, get_config
 
 
@@ -19,8 +20,9 @@ def create_inventor(update_config):
         con=engine)
     inventors_data = inventors_name_with_count.sort_values("name_count", ascending=False).groupby("inventor_id").head(
         1).reset_index(drop=True)
-    inventors_data.drop("name_count", axis =1).rename({"inventor_id": "id"}, axis=1).to_sql(name='inventor', con=engine, if_exists='append',
-                                                                index=False)
+    inventors_data.drop("name_count", axis=1).rename({"inventor_id": "id"}, axis=1).to_sql(name='inventor', con=engine,
+                                                                                           if_exists='append',
+                                                                                           index=False)
 
 
 def upload_disambig_results(update_config):
@@ -54,6 +56,12 @@ def post_process_inventor(config):
     create_inventor(config)
 
 
+def post_process_qc(config):
+    qc = InventorPostProcessingQC(config)
+    qc.runTests()
+
+
 if __name__ == '__main__':
     config = get_config()
-    post_process_inventor(config)
+    #post_process_inventor(config)
+    post_process_qc(config)

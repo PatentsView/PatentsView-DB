@@ -4,6 +4,7 @@ import time
 from sqlalchemy import create_engine
 import pandas as pd
 
+from QA.post_processing.AssigneePostProcessing import AssigneePostProcessingQC
 from lib.configuration import get_config, get_connection_string
 
 
@@ -75,6 +76,12 @@ def post_process_assignee(config):
     create_assignee(config)
 
 
+def post_process_qc(config):
+    qc = AssigneePostProcessingQC(config)
+    qc.runTests()
+
+
 if __name__ == '__main__':
     config = get_config()
-    post_process_assignee(config)
+    # post_process_assignee(config)
+    post_process_qc(config)

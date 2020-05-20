@@ -7,6 +7,7 @@ import csv
 import os
 from collections import Counter, defaultdict
 
+from QA.post_processing.LocationPostProcessing import LocationPostProcessingQC
 from lib.configuration import get_config, get_connection_string
 
 import tqdm
@@ -193,6 +194,12 @@ def post_process_location(config):
     upload_rawloc(engine, disambiguated_folder, config['DATABASE']['NEW_DB'])
 
 
+def post_process_qc(config):
+    qc = LocationPostProcessingQC(config)
+    qc.runTests()
+
+
 if __name__ == '__main__':
     config = get_config()
-    post_process_location(config)
+    # post_process_location(config)
+    post_process_qc(config)
