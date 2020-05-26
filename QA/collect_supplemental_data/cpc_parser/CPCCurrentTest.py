@@ -1,36 +1,47 @@
 import datetime
 
 from QA.PatentDatabaseTester import PatentDatabaseTester
+from lib.configuration import get_config
 
 
 class CPCTest(PatentDatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, 'NEW_DB', datetime.date(year=1976, month=1, day=1), end_date)
-        self.table_config = {'cpc_current': {'uuid': {'data_type': 'varchar', 'null_allowed': False},
-                                             'patent_id': {'data_type': 'varchar', 'null_allowed': False},
-                                             'sequence': {'data_type': 'int', 'null_allowed': False},
-                                             'section_id': {'data_type': 'varchar', 'null_allowed': False},
-                                             'subsection_id': {'data_type': 'varchar', 'null_allowed': False},
-                                             'group_id': {'data_type': 'varchar', 'null_allowed': False},
-                                             'subgroup_id': {'data_type': 'varchar', 'null_allowed': False},
-                                             'category': {'data_type': 'varchar', 'null_allowed': False}},
-                             'wipo': {'patent_id': {'data_type': 'varchar', 'null_allowed': False},
-                                      'sequence': {'data_type': 'int', 'null_allowed': False},
-                                      'field_id': {'data_type': 'varchar', 'null_allowed': False}},
-                             'mainclass_current': {'id': {'data_type': 'varchar', 'null_allowed': False},
-                                                   'title': {'data_type': 'varchar', 'null_allowed': True}},
-                             'subclass_current': {'id': {'data_type': 'varchar', 'null_allowed': False},
-                                                  'title': {'data_type': 'varchar', 'null_allowed': True}},
-                             'mainclass': {'id': {'data_type': 'varchar', 'null_allowed': False}},
-                             'subclass': {'id': {'data_type': 'varchar', 'null_allowed': False}}}
+        self.table_config = {
+            'cpc_current': {
+                'fields': {'uuid': {'data_type': 'varchar', 'null_allowed': False, 'category': False},
+                           'patent_id': {'data_type': 'varchar', 'null_allowed': False, 'category': False},
+                           'sequence': {'data_type': 'int', 'null_allowed': False, 'category': False},
+                           'section_id': {'data_type': 'varchar', 'null_allowed': False, 'category': True},
+                           'subsection_id': {'data_type': 'varchar', 'null_allowed': False,
+                                             'category': True},
+                           'group_id': {'data_type': 'varchar', 'null_allowed': False, 'category': True},
+                           'subgroup_id': {'data_type': 'varchar', 'null_allowed': False, 'category': True},
+                           'category': {'data_type': 'varchar', 'null_allowed': False, 'category': True}}},
+            'wipo': {'fields': {'patent_id': {'data_type': 'varchar', 'null_allowed': False, 'category': False}},
+                     'sequence': {'data_type': 'int', 'null_allowed': False, 'category': False},
+                     'field_id': {'data_type': 'varchar', 'null_allowed': False, 'category': True}},
+            'cpc_group': {'fields': {"id": {"data_type": "varchar", "null_allowed": False, "category": False},
+                                     "title": {"data_type": "varchar", "null_allowed": False, "category": False}},
+                          'related_entities': [
+                              {'table': 'cpc_current', 'source_id': 'id', 'destination_id': 'group_id'}]},
+            'cpc_subgroup': {'fields': {"id": {"data_type": "varchar", "null_allowed": False, "category": False},
+                                        "title": {"data_type": "mediumtext", "null_allowed": False, "category": False}},
+                             'related_entities': [
+                                 {'table': 'cpc_current', 'source_id': 'id', 'destination_id': 'subgroup_id'}]},
+            'cpc_subsection': {'fields': {"id": {"data_type": "varchar", "null_allowed": False, "category": False},
+                                          "title": {"data_type": "varchar", "null_allowed": False, "category": False}},
+                               'related_entities': [
+                                   {'table': 'cpc_current', 'source_id': 'id', 'destination_id': 'subsection_id'}]}}
+        self.patent_exclusion_list.extend(['cpc_group', 'cpc_subgroup', 'cpc_subsection'])
 
-    def test_yearly_count(self):
+    def test_yearly_count(self, table):
         start_date = datetime.datetime.strptime(self.config['DATES']['START_DATE'], '%Y%m%d')
         end_date = datetime.datetime.strptime(self.config['DATES']['END_DATE'], '%Y%m%d')
         start_date_string = start_date.strftime('%Y-%m-%d')
         end_date_string = end_date.strftime('%Y-%m-%d')
-        for table in ['cpc_current', 'wipo']:
+        if table in ['cpc_current', 'wipo']:
             if not self.connection.open:
                 self.connection.connect()
 
@@ -41,5 +52,11 @@ class CPCTest(PatentDatabaseTester):
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value < 1:
                     raise AssertionError(
-                        "Table doesn not have new data : {table}, date range '{start_dt}' to '{end_dt}' ".format(
+                        "Table doesn't not have new data : {table}, date range '{start_dt}' to '{end_dt}' ".format(
                             table=table, start_dt=start_date_string, end_dt=end_date_string))
+            super().test_yearly_count(table)
+
+
+if __name__ == '__main__':
+    qc = CPCTest(get_config())
+    qc.runTests()

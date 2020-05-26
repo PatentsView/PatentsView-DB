@@ -2,7 +2,7 @@
 CREATE TABLE `temp_brf_sum_text` (
   `id`            varchar(512) CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-  `patent_number` varchar(32)    DEFAULT NULL,
+  `patent_id` varchar(32)    DEFAULT NULL,
   `text`          mediumtext CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
   `filename`      varchar(32) CHARACTER SET utf8mb4
@@ -10,7 +10,7 @@ CREATE TABLE `temp_brf_sum_text` (
   `created_date`  timestamp NULL DEFAULT current_timestamp(),
   `updated_date`  timestamp NULL DEFAULT NULL
   ON UPDATE current_timestamp(),
-  UNIQUE KEY `patent_number` (`patent_number`)
+  UNIQUE KEY `patent_id` (`patent_id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -23,7 +23,7 @@ CREATE TRIGGER before_insert_brf
 CREATE TABLE `temp_claim` (
   `id`            varchar(512) CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-  `patent_number` varchar(32)    CHARACTER SET utf8mb4
+  `patent_id` varchar(32)    CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
   `num`           varchar(16) CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE `temp_claim` (
   `created_date`  timestamp NULL DEFAULT current_timestamp(),
   `updated_date`  timestamp NULL DEFAULT NULL
   ON UPDATE current_timestamp(),
-  UNIQUE KEY `patent_number` (`patent_number`, `num`)
+  UNIQUE KEY `patent_id` (`patent_id`, `num`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -50,7 +50,7 @@ CREATE TRIGGER before_insert_claim
 CREATE TABLE `temp_detail_desc_text` (
   `id`            varchar(512) CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-  `patent_number` varchar(32)    DEFAULT NULL,
+  `patent_id` varchar(32)    DEFAULT NULL,
   `text`          mediumtext CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
   `length`        bigint(16)     DEFAULT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE `temp_detail_desc_text` (
   `created_date`  timestamp NULL DEFAULT current_timestamp(),
   `updated_date`  timestamp NULL DEFAULT NULL
   ON UPDATE current_timestamp(),
-  UNIQUE KEY `patent_number` (`patent_number`)
+  UNIQUE KEY `patent_id` (`patent_id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -72,7 +72,7 @@ CREATE TRIGGER before_insert_ddt
 CREATE TABLE `temp_draw_desc_text` (
   `id`            varchar(512) CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-  `patent_number` varchar(32)    DEFAULT NULL,
+  `patent_id` varchar(32)    DEFAULT NULL,
   `text`          mediumtext CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
   `filename`      varchar(32) CHARACTER SET utf8mb4
@@ -80,7 +80,7 @@ CREATE TABLE `temp_draw_desc_text` (
   `created_date`  timestamp NULL DEFAULT current_timestamp(),
   `updated_date`  timestamp NULL DEFAULT NULL
   ON UPDATE current_timestamp(),
-  KEY `patent_number` (`patent_number`)
+  KEY `patent_id` (`patent_id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -94,7 +94,7 @@ CREATE TRIGGER before_insert_drawdt
 
 CREATE TABLE `temp_claim_exemplary` (
   `exemplary`     text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `patent_number` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `patent_id` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename`      text COLLATE utf8mb4_unicode_ci DEFAULT NULL
 )
   ENGINE = InnoDB

@@ -1,6 +1,6 @@
 {
   "foreign_key_config": {
-    "field_name": "patent_number",
+    "field_name": "patent_id",
     "friendly_name": "Patent Number",
     "xml_path": "us-bibliographic-data-grant/publication-reference/document-id/doc-number",
     "data-type": "string"
