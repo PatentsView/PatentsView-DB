@@ -20,7 +20,7 @@ if schema_only == "TRUE":
 else:
     schema_only = False
 
-from Scripts.Website_Database_Generator.database import validate_query
+from reporting_database_generator.database import validate_query
 
 template_extension_config = [".sql"]
 database_name_config = {'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
