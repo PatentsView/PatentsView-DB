@@ -78,5 +78,5 @@ LIMIT  100;
                      'related_entity_count': top_n_data_row[-1]})
 
     def runTests(self):
-        # self.load_top_n_patents()
+        self.load_top_n_patents()
         super(LocationPostProcessingQC, self).runTests()

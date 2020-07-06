@@ -362,29 +362,28 @@ class PatentDatabaseTester(ABC):
                                                               'max_text_length': text_length})
 
     def runTests(self):
-        skiplist = ['application', 'botanic', 'figures', 'foreigncitation', 'foreign_priority', 'government_interest',
-                    'ipcr', 'mainclass', 'non_inventor_applicant']
+        skiplist = []
         for table in self.table_config:
             if table in skiplist:
                 continue
             print("Beginning Test for {table_name} in {db}".format(table_name=table,
                                                                    db=self.config["DATABASE"][self.database_section]))
-            # self.test_floating_entities(table)
-            # self.test_yearly_count(table)
-            # self.test_table_row_count(table)
-            # self.test_blank_count(table, self.table_config[table])
-            # self.test_nulls(table, self.table_config[table])
-            # self.load_floating_patent_count(table, self.table_config[table])
-            # self.load_prefix_counts(table)
+            self.test_floating_entities(table)
+            self.test_yearly_count(table)
+            self.test_table_row_count(table)
+            self.test_blank_count(table, self.table_config[table])
+            self.test_nulls(table, self.table_config[table])
+            self.load_floating_patent_count(table, self.table_config[table])
+            self.load_prefix_counts(table)
             for field in self.table_config[table]["fields"]:
                 print("\tBeginning tests for {field} in {table_name}".format(field=field, table_name=table))
-                # if "date_field" in self.table_config[table]["fields"][field] and \
-                #         self.table_config[table]["fields"][field]["date_field"]:
-                #     self.assert_zero_dates(table, field)
-                # if self.table_config[table]["fields"][field]['category']:
-                #     self.load_category_counts(table, field)
-                # if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-                #     self.test_text_length(table, field)
+                if "date_field" in self.table_config[table]["fields"][field] and \
+                        self.table_config[table]["fields"][field]["date_field"]:
+                    self.assert_zero_dates(table, field)
+                if self.table_config[table]["fields"][field]['category']:
+                    self.load_category_counts(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
+                    self.test_text_length(table, field)
                 self.test_null_byte(table, field)
 
-        # self.save_qa_data()
+        self.save_qa_data()
