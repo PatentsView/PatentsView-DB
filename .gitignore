@@ -29,3 +29,5 @@ airflow-meta*
 upload_*/*
 *_qa_loc*
 **/*.log
+archive/*
+**/.ipynb_checkpoints

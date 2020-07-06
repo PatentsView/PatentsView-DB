@@ -1,4 +1,5 @@
 import time
+import datetime
 
 import pymysql
 
@@ -160,3 +161,30 @@ def get_scp_download_command(config):
             user=disambig_user, host=disambig_host, disambig_output_folder=disambig_output_folder)
         command_strings.append(command_string)
     return " && ".join(command_strings)
+
+
+def update_config_date(**kwargs):
+    """
+    Update config file start and end date to first and last day of the supplied week
+    :type cfg: object
+    :type yr: int
+    :type mth: int
+    :type day: int
+    :param yr: Year for start and end date
+    :param mth: Month for start and end date
+    :param day: Day for start and end date
+    :param cfg: config to update
+    :return: updated config
+    """
+    execution_date = kwargs['execution_date']
+
+    config = get_config(type='application')
+
+    prev_week = datetime.timedelta(weeks=1)
+    end_date = execution_date.strftime('%y%m%d')
+    start_date = (execution_date - prev_week).strftime('%y%m%d')
+    temp_date = execution_date.strftime('%Y%m%d')
+    config['DATES'] = {"START_DATE": start_date, "END_DATE": end_date}
+    config['DATABASE']["TEMP_DATABASE"] = "pgpubs_" + temp_date
+
+    return config
