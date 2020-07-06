@@ -26,7 +26,7 @@ class PatentDatabaseTester(ABC):
         self.table_config = {}
         self.qa_data = {"DataMonitor_count": [], 'DataMonitor_nullcount': [], 'DataMonitor_patentyearlycount': [],
                         'DataMonitor_categorycount': [], 'DataMonitor_floatingpatentcount': [],
-                        'DataMonitor_maxtextlength': [],'DataMonitor_prefixedentitycount':[]}
+                        'DataMonitor_maxtextlength': [], 'DataMonitor_prefixedentitycount': []}
         self.patent_db_prefix = None
 
     def test_table_row_count(self, table_name):
@@ -76,6 +76,27 @@ class PatentDatabaseTester(ABC):
 
                     if self.connection.open:
                         self.connection.close()
+
+    def test_null_byte(self, table, field):
+        print("\t\tTesting for NUL bytes for {field} in {table_name}".format(field=field, table_name=table))
+        try:
+            if not self.connection.open:
+                self.connection.connect()
+            nul_byte_query = "SELECT  count(*) as count from {tbl} where INSTR({field}, CHAR(0x00))>0".format(
+                tbl=table,
+                field=field)
+            with self.connection.cursor() as count_cursor:
+                count_cursor.execute(nul_byte_query)
+                nul_byte_count = count_cursor.fetchall()[0][0]
+                if nul_byte_count > 1:
+                    raise Exception(
+                        "{count} rows with NUL Byte found in {field} of {table_name} for {db}".format(
+                            count=nul_byte_count, field=field, table_name=table,
+                            db=self.config["DATABASE"][
+                                self.database_section]))
+        finally:
+            if self.connection.open:
+                self.connection.close()
 
     def load_category_counts(self, table, field):
         print("\t\tLoading category counts for {field} in {table_name}".format(field=field, table_name=table))
@@ -308,7 +329,6 @@ class PatentDatabaseTester(ABC):
                 if self.connection.open:
                     self.connection.close()
 
-
     def save_qa_data(self):
         qa_engine = create_engine(self.qa_connection_string)
         for qa_table in self.qa_data:
@@ -319,7 +339,6 @@ class PatentDatabaseTester(ABC):
             except SQLAlchemyError as e:
                 table_frame.to_csv("errored_qa_data" + qa_table, index=False)
                 raise e
-
 
     def test_text_length(self, table_name, field_name):
         print(
@@ -342,26 +361,30 @@ class PatentDatabaseTester(ABC):
                                                               'column_name': field_name,
                                                               'max_text_length': text_length})
 
-
     def runTests(self):
+        skiplist = ['application', 'botanic', 'figures', 'foreigncitation', 'foreign_priority', 'government_interest',
+                    'ipcr', 'mainclass', 'non_inventor_applicant']
         for table in self.table_config:
+            if table in skiplist:
+                continue
             print("Beginning Test for {table_name} in {db}".format(table_name=table,
                                                                    db=self.config["DATABASE"][self.database_section]))
-            self.test_floating_entities(table)
-            self.test_yearly_count(table)
-            self.test_table_row_count(table)
-            self.test_blank_count(table, self.table_config[table])
-            self.test_nulls(table, self.table_config[table])
-            self.load_floating_patent_count(table, self.table_config[table])
-            self.load_prefix_counts(table)
+            # self.test_floating_entities(table)
+            # self.test_yearly_count(table)
+            # self.test_table_row_count(table)
+            # self.test_blank_count(table, self.table_config[table])
+            # self.test_nulls(table, self.table_config[table])
+            # self.load_floating_patent_count(table, self.table_config[table])
+            # self.load_prefix_counts(table)
             for field in self.table_config[table]["fields"]:
                 print("\tBeginning tests for {field} in {table_name}".format(field=field, table_name=table))
-                if "date_field" in self.table_config[table]["fields"][field] and \
-                        self.table_config[table]["fields"][field]["date_field"]:
-                    self.assert_zero_dates(table, field)
-                if self.table_config[table]["fields"][field]['category']:
-                    self.load_category_counts(table, field)
-                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-                    self.test_text_length(table, field)
+                # if "date_field" in self.table_config[table]["fields"][field] and \
+                #         self.table_config[table]["fields"][field]["date_field"]:
+                #     self.assert_zero_dates(table, field)
+                # if self.table_config[table]["fields"][field]['category']:
+                #     self.load_category_counts(table, field)
+                # if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
+                #     self.test_text_length(table, field)
+                self.test_null_byte(table, field)
 
-        self.save_qa_data()
+        # self.save_qa_data()

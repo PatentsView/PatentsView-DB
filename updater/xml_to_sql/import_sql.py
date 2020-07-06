@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 
 from QA.text_parser.ImportTest import RenameTest
 from lib.configuration import get_config
-from update_config import update_config_date
+from lib.configuration import update_config_date
 from QA.text_parser.AppTest import AppMergeTest
 
 

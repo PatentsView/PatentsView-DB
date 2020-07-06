@@ -42,6 +42,7 @@ class InventorGenderGenerator:
                 self.id_to_gender[row[0]] = row[1]
                 counter += 1
             connection.close()
+            offset += limit
             # means we have no more batches to process
             if counter == 0:
                 break
@@ -79,6 +80,7 @@ class InventorGenderGenerator:
 
                 counter += 1
             # means we have no more batches to process
+            offset += limit
             connection.close()
             if counter == 0:
                 break
@@ -99,9 +101,9 @@ class InventorGenderGenerator:
         engine.execute('alter table inventor_gender_{0} rename inventor_gender'.format(self.new_db))
 
     def generate_inventor_gender(self):
-        self.backup_old_inventor_gender()
-        # self.generate_id_to_gender_mapping()
-        # self.map_new_inventor_gender()
+        # self.backup_old_inventor_gender()
+        self.generate_id_to_gender_mapping()
+        self.map_new_inventor_gender()
 
 
 if __name__ == '__main__':

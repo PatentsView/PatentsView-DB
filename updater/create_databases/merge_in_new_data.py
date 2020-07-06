@@ -132,4 +132,5 @@ def post_text_merge(config):
 
 if __name__ == '__main__':
     config = get_config()
-    begin_merging(config)
+    # begin_merging(config)
+    post_merge(config)

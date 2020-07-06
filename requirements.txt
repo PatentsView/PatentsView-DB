@@ -22,7 +22,6 @@ textdistance
 tqdm
 unidecode
 SQLAlchemy == 1.3.10
-pandas
 boto3
 bs4
 pymysql
