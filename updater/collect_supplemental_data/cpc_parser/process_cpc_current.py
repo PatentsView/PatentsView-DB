@@ -5,14 +5,13 @@ import re, os
 import multiprocessing
 import time
 import uuid
-from memory_profiler import profile
 from sqlalchemy import create_engine
 
 from lib.configuration import get_connection_string, get_config
 from lib.utilities import generate_index_statements
 
 
-@profile()
+# @profile()
 def extract_cpc_current(chunk_frame, config):
     # Melt Primary and Additional columns into rows
     first_level_melt = chunk_frame.melt(id_vars=['patent_number'],

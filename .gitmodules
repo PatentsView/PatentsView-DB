@@ -1,3 +1,6 @@
 [submodule "lib/loader"]
 	path = lib/loader
 	url = git@github.com:American-Institutes-for-Research/mysql-dumper-loader.git
+[submodule "lib/utils"]
+	path = lib/utils
+	url = git@github.com:American-Institutes-for-Research/pv-utilities

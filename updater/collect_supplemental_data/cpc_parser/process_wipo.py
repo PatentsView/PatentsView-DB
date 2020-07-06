@@ -2,7 +2,6 @@ import os
 import time
 import pandas as pd
 from sqlalchemy import create_engine
-from memory_profiler import profile
 
 from lib.configuration import get_connection_string, get_config
 

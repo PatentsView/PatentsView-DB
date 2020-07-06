@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 import csv
 from lib.configuration import get_connection_string, get_config
-from updater.text_parser.exporter import export
+from lib.utils.table_exporter import export
 
 
 def export_table(config, table, table_config):
@@ -11,7 +11,7 @@ def export_table(config, table, table_config):
     fields = table_config['fields']
     order_fields = table_config['order_fields']
     separator = "\t"
-    export(engine, database, table , fields, output_file, separator, quote_option=csv.QUOTE_NONE,
+    export(engine, database, table, fields, output_file, separator, quote_option=csv.QUOTE_NONE,
            chunk_options={'chunk_size': 1000000, 'order_fields': order_fields})
 
 
