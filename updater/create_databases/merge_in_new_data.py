@@ -69,7 +69,7 @@ def update_table_data(table_name, config):
 
 
 def merge_new_data(tables, project_home, update_config):
-    status_folder = '{}/{}'.format(project_home, 'create_databases')
+    status_folder = '{}/{}'.format(project_home, 'updater/create_databases')
 
     upload_status = get_merge_status(status_folder)
     try:
