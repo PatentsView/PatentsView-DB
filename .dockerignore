@@ -10,3 +10,4 @@ airflow-*/
 data/
 app-db-exploration/
 upload-*/
+archive.*

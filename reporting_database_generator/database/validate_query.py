@@ -2,10 +2,10 @@ import sqlparse
 import re
 import os
 import configparser
-from Development.helpers import database_helpers
-from Development.helpers import general_helpers
-import pprint
-from slackclient import SlackClient
+
+from sqlalchemy import create_engine
+from lib.notifications import send_slack_notification
+from lib import database_helpers
 
 
 def parse_and_format_sql(parsed_statement):
@@ -36,7 +36,8 @@ def db_and_table_as_array(single_line_query):
     return collation_check_parameters
 
 
-def validate_and_execute(filename=None, slack_channel=None, slack_client=None, schema_only=False, drop_existing=True, fk_check=True, **context):
+def validate_and_execute(filename=None, slack_channel=None, slack_client=None, schema_only=False, drop_existing=True,
+                         fk_check=True, **context):
     print(filename)
     print(slack_channel)
     print(slack_client)
@@ -47,22 +48,21 @@ def validate_and_execute(filename=None, slack_channel=None, slack_client=None, s
     ## Initialization from config files
     project_home = os.environ['PACKAGE_HOME']
     config = configparser.ConfigParser()
-    config.read(project_home + '/Development/config.ini')
-    # Create slack client
-    slack_token = config["SLACK"]["API_TOKEN"]
-    if slack_client is None:
-        slack_client = SlackClient(slack_token)
-    if slack_channel is None:
-        slack_channel = config["SLACK"]["CHANNEL"]
+    config.read(project_home + '/config.ini')
+
     # Set up database connection
-    db_con = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'],
-                                           config['DATABASE']['PASSWORD'], "information_schema").connect()
+    cstr = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(config['DATABASE']['USERNAME'],
+                                                                        config['DATABASE']['PASSWORD'],
+                                                                        config['DATABASE']['HOST'],
+                                                                        config['DATABASE']['PORT'],
+                                                                        "information_schema")
+    db_con = create_engine(cstr)
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
-    general_helpers.send_slack_notification(
-       "Executing Query File: `" + filename + "`", slack_client, slack_channel, "*Reporting DB (" + filename + ") *",
-       "info")
+    send_slack_notification(
+        "Executing Query File: `" + filename + "`", config, "*Reporting DB (" + filename + ") *",
+        "info")
     # Get processed template file content
     sql_content = context['templates_dict']['source_sql']
     # Extract individual statements from sql file
@@ -88,12 +88,12 @@ def validate_and_execute(filename=None, slack_channel=None, slack_client=None, s
             # We perform sanity checks on those queries
             if parsed_statement.get_type().lower() == 'insert':
                 # Check if query plan includes full table scan, if it does send an alert
-                query_plan_check=database_helpers.check_query_plan(db_con, single_line_query)
+                query_plan_check = database_helpers.check_query_plan(db_con, single_line_query)
                 if not query_plan_check:
                     message = "Query execution plan involves full table scan: ```" + single_line_query + "```"
-                    general_helpers.send_slack_notification(message, slack_client, slack_channel,
-                                                            "*Reporting DB (" + filename + ")* ",
-                                                            "warning")
+                    send_slack_notification(message, config,
+                                            "*Reporting DB (" + filename + ")* ",
+                                            "warning")
                     print(message)
                     # raise Exception(message)
                 #
@@ -103,9 +103,9 @@ def validate_and_execute(filename=None, slack_channel=None, slack_client=None, s
                 # This is because joins involving tables with inconsistent collation run forever
                 if not database_helpers.check_encoding_and_collation(db_con, collation_check_parameters):
                     message = "Character set and/or collation mismatch between tables involved in query :```" + single_line_query + "```"
-                    general_helpers.send_slack_notification(message, slack_client, slack_channel,
-                                                            "*Reporting DB (" + filename + ") *",
-                                                            "warning")
+                    send_slack_notification(message, config,
+                                            "*Reporting DB (" + filename + ") *",
+                                            "warning")
                     raise Exception(message)
 
                 # # Do not run insert statements if it is schema only run
@@ -118,15 +118,12 @@ def validate_and_execute(filename=None, slack_channel=None, slack_client=None, s
         try:
             db_con.execute(single_line_query)
         except Exception as e:
-            general_helpers.send_slack_notification(
-                "Execution of Query failed: ```" + single_line_query + "```", slack_client, slack_channel,
-                "*Reporting DB (" + filename + ")* ",
-                "error")
+            send_slack_notification("Execution of Query failed: ```" + single_line_query + "```", config,
+                                    "*Reporting DB (" + filename + ")* ", "error")
             raise e
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=1")
-    db_con.close()
-    general_helpers.send_slack_notification(
-        "Execution for Query File: `" + filename + "` is complete", slack_client, slack_channel,
-        "*Reporting DB (" + filename + ")*",
+    db_con.dispose()
+    send_slack_notification(
+        "Execution for Query File: `" + filename + "` is complete", config, "*Reporting DB (" + filename + ")*",
         "success")

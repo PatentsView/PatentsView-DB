@@ -1,4 +1,5 @@
 import time
+import datetime
 
 import pymysql
 
@@ -52,7 +53,23 @@ def get_section(task_id):
                       "qc_parse_text_data": "Supplemental Data Collection",
                       "merge_text_db": "Database Setup",
                       "qc_merge_db": "QC - Database Setup", "qc_merge_text_db": "QC - Text Parsing",
-                      "withdrawn_processor": "Supplemental Data", "qc_withdrawn_processor": "QC - Supplemental Data"}
+                      "withdrawn_processor": "Supplemental Data", "qc_withdrawn_processor": "QC - Supplemental Data",
+                      'export_disambig_data': 'Disambiguation Support - Export Disambig Inputs',
+                      'gi_NER': 'Government Interest - NER',
+                      'postprocess_NER': 'Government Interest - Post Process NER',
+                      'qc_cpc_current_wipo': 'QC - Supplemental Data - CPC/Wipo',
+                      'run_lawyer_disambiguation': 'Disambiguation - Lawyer Disambiguation',
+                      'upload_disambig_files': 'Disambiguation Support - Upload Disambig Inputs',
+                      'gi_post_manual': 'Government Interest - Post Manual Step',
+                      'create_persistent_wide_assignee': 'Post Processing - Assignee Persistent Processing',
+                      'create_persistent_wide_inventor': 'Post Processing - Inventor Persistent Processing',
+                      'download_disambiguation': 'Post Processing - Download Results',
+                      'lookup_tables': 'Post Processing - Relationship Tables Generation',
+                      'post_process_assignee': 'Post Processing - Assignee Post Processing',
+                      'post_process_inventor': 'Post Processing - Inventor Post Processing',
+                      'post_process_location': 'Post Processing - Location Post Processing',
+                      'update_persistent_long_assignee': 'Post Processing - Assignee Persistent Processing',
+                      'update_persistent_long_inventor': 'Post Processing - Inventor Persistent Processing'}
 
     return section_lookup[task_id]
 
@@ -160,3 +177,30 @@ def get_scp_download_command(config):
             user=disambig_user, host=disambig_host, disambig_output_folder=disambig_output_folder)
         command_strings.append(command_string)
     return " && ".join(command_strings)
+
+
+def update_config_date(**kwargs):
+    """
+    Update config file start and end date to first and last day of the supplied week
+    :type cfg: object
+    :type yr: int
+    :type mth: int
+    :type day: int
+    :param yr: Year for start and end date
+    :param mth: Month for start and end date
+    :param day: Day for start and end date
+    :param cfg: config to update
+    :return: updated config
+    """
+    execution_date = kwargs['execution_date']
+
+    config = get_config(type='application')
+
+    prev_week = datetime.timedelta(weeks=1)
+    end_date = execution_date.strftime('%y%m%d')
+    start_date = (execution_date - prev_week).strftime('%y%m%d')
+    temp_date = execution_date.strftime('%Y%m%d')
+    config['DATES'] = {"START_DATE": start_date, "END_DATE": end_date}
+    config['DATABASE']["TEMP_DATABASE"] = "pgpubs_" + temp_date
+
+    return config

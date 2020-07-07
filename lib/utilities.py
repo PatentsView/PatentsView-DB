@@ -1,12 +1,17 @@
 import datetime
 import calendar
+import logging
 import random
 import re
 import string
+import zipfile
+
 import requests
 from clint.textui import progress
 import os
 import csv
+import multiprocessing as mp
+from bs4 import BeautifulSoup
 
 from sqlalchemy import create_engine
 
@@ -77,3 +82,92 @@ def generate_index_statements(config, database_section, table):
     print(drop_indexes)
 
     return add_indexes, drop_indexes
+
+
+def log_writer(log_queue):
+    '''listens for messages on the q, writes to file. '''
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+
+    EXPANED_LOGFILE = datetime.datetime.now().strftime('logs/expanded_log_%Y%m%d_%H%M%S.log')
+    expanded_filehandler = logging.FileHandler(EXPANED_LOGFILE)
+    expanded_filehandler.setLevel(logging.DEBUG)
+
+    BASIC_LOGFILE = datetime.datetime.now().strftime('logs/log_%Y%m%d_%H%M%S.log')
+    filehandler = logging.FileHandler(BASIC_LOGFILE)
+    filehandler.setLevel(logging.INFO)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+
+    logger.addHandler(expanded_filehandler)
+    logger.addHandler(filehandler)
+    logger.addHandler(ch)
+    while 1:
+        message_data = log_queue.get()
+        if message_data["message"] == 'kill':
+            logger.info("Kill Signal received. Exiting")
+            break
+        logger.log(message_data["level"], message_data["message"])
+
+
+
+def save_zip_file(url, name, path, counter=0, log_queue=None):
+    with requests.get(url, stream=True) as downloader:
+        downloader.raise_for_status()
+        with open(path + name, 'wb') as f:
+            for chunk in downloader.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+
+    with zipfile.ZipFile(path + name, 'r') as zip_ref:
+        zip_ref.extractall(path)
+
+    os.remove(path + name)
+
+
+def download_xml_files(config):
+    xml_path_template = config["USPTO_LINKS"]['bulk_xml_template']
+    start_date = config['DATES']['START_DATE']
+    end_date = config['DATES']['END_DATE']
+    start_year = int(datetime.datetime.strptime(start_date, '%y%m%d').strftime('%Y'))
+    end_year = int(datetime.datetime.strptime(end_date, '%y%m%d').strftime('%Y'))
+    parallelism = int(config["PARALLELISM"]["parallelism"])
+    manager = mp.Manager()
+    log_queue = manager.Queue()
+    files_to_download = []
+
+    for year in range(start_year, end_year + 1):
+        year_xml_page = xml_path_template.format(year=year)
+        r = requests.get(year_xml_page)
+        soup = BeautifulSoup(r.content, "html.parser")
+        links = soup.find_all("a", href=re.compile("[0-9]{6}\.zip"))
+        idx_counter = 0
+        for link in links:
+            href = link.attrs['href']
+            href_match = re.match(r".*([0-9]{6})", href)
+            if href_match is not None and href_match.group(1) <= end_date and href_match.group(1) >= start_date:
+                files_to_download.append(
+                    (xml_path_template.format(year=year) + href, href, config["FOLDERS"]["BULK_XML_LOCATION"],
+                     idx_counter, log_queue))
+                idx_counter += 1
+
+    pool = mp.Pool(parallelism)
+    watcher = pool.apply_async(log_writer, (log_queue,))
+
+    p_list = []
+    idx_counter = 0
+    for file_to_download in files_to_download:
+        p = pool.apply_async(save_zip_file, file_to_download)
+        p_list.append(p)
+        idx_counter += 1
+
+    idx_counter = 0
+    for t in p_list:
+        t.get()
+
+    idx_counter += 1
+    log_queue.put({"level": None, "message": "kill"})
+    watcher.get()
+    pool.close()
+    pool.join()

@@ -71,6 +71,8 @@ def update_long_entity(connection, entity, update_version):
 def generate_wide_header(connection, entity, update_version, config):
     ############ 1. Create output file for wide format and needed wide/long column lists
     # get disambig cols from old db's persistent_inventor_disambig
+    current_rawentity = 'current_raw{0}_id'.format(entity)
+    old_rawentity = 'old_raw{0}_id'.format(entity)
     persistent_table = 'persistent_{entity}_disambig'.format(entity=entity)
     if not connection.open:
         connection.connect()
@@ -83,7 +85,7 @@ def generate_wide_header(connection, entity, update_version, config):
     disambig_cols.sort()
 
     # Add new column for this data update:
-    header = ['current_rawinventor_id', 'old_rawinventor_id'] + disambig_cols + [
+    header = [current_rawentity, old_rawentity] + disambig_cols + [
         'disamb_inventor_id_' + update_version]
     header_df = pd.DataFrame(columns=header)
     return header_df
@@ -93,6 +95,7 @@ def prepare_wide_table(connection, entity, update_version, config):
     wide_table_name = "persistent_{entity}_disambig".format(entity=entity)
     old_db = config['DATABASE']['OLD_DB']
     new_db = config['DATABASE']['NEW_DB']
+    current_rawentity = 'current_raw{0}_id'.format(entity)
     if not connection.open:
         connection.connect()
     with connection.cursor() as wide_table_prep_cursor:
@@ -103,7 +106,7 @@ def prepare_wide_table(connection, entity, update_version, config):
 
         create_stmt = 'create table {0}.{1} ( '.format(new_db, 'persistent_inventor_disambig')
         create_with_columns = get_create_syntax(entity, pid_cols, create_stmt)
-        primary_key_stmt = 'PRIMARY KEY (`current_rawinventor_id`));'
+        primary_key_stmt = 'PRIMARY KEY (`{current_rawentity}`));'.format(current_rawentity=current_rawentity)
 
         complete_create_statement = create_with_columns + primary_key_stmt
         wide_table_prep_cursor.execute(complete_create_statement)
@@ -187,7 +190,7 @@ def write_wide_table(connection, entity, update_version, config):
         pd.options.display.max_columns = 100
 
         # 2. Merge back old rawinventor id column
-        merged_df = pd.merge(pivoted_chunk_df, uuid_lookup, on='current_rawinventor_id')
+        merged_df = pd.merge(pivoted_chunk_df, uuid_lookup, on=current_rawentity)
 
         # 3. Concat with sort = False (preserves desired col order from header_df)
         formatted_chunk_df = pd.concat([header_df, merged_df], sort=False)
@@ -220,8 +223,8 @@ def begin_entity_persistent_update(config):
                                  cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
     update_version = config['DATES']['END_DATE']
     # update_long_entity(connection, 'inventor', update_version)
-    print(generate_wide_header(connection, 'inventor', update_version, config))
-    write_wide_table(connection, 'inventor', update_version, config)
+    # print(generate_wide_header(connection, 'assignee', update_version, config))
+    write_wide_table(connection, 'assignee', update_version, config)
 
 
 if __name__ == '__main__':

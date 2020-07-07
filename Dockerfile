@@ -24,6 +24,7 @@ ENV LC_MESSAGES en_US.UTF-8
 ENV AIRFLOW_HOME /airflow
 ENV PACKAGE_HOME /project
 ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}"
+ENV PYTHONPATH "${PYTHONPATH}:${AIRFLOW_HOME}"
 
 RUN set -ex \
     && buildDeps=' \
@@ -96,7 +97,7 @@ RUN export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -r /setup/requirements
 EXPOSE 8080 5555 8793
 
 
-ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}/Development"
+ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}/airflow/"
 #RUN chown -R airflow:airflow /airflow
 
 WORKDIR /project
