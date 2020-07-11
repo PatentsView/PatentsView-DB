@@ -111,7 +111,7 @@ def begin_merging(config):
 
 def begin_text_merging(config):
     version = config['DATABASE']['TEMP_UPLOAD_DB'].split("_")[1]
-    start_year = int(datetime.datetime.strptime(config['DATES']['START_DATE'], '%y%m%d').strftime('%Y'))
+    start_year = int(datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d').strftime('%Y'))
     text_table_config = {'brf_sum_text': {
         "insert": "INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, text, version_indicator) SELECT id, patent_number, text, '{database_version}' from {temp_db}.temp_brf_sum_text".format(
             text_db=config['DATABASE']['TEXT_DATABASE'], temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
