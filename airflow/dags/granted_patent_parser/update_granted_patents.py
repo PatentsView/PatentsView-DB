@@ -33,6 +33,7 @@ granted_patent_updater = DAG(
     description='Update Granted Patent Database',
     start_date=datetime(2020, 1, 1, 0, 0, 0),
     catchup=True,
+    template_searchpath="/project/resources/",
     schedule_interval=None)
 project_home = os.environ['PACKAGE_HOME']
 config = get_config()

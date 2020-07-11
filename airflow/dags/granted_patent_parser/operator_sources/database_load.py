@@ -36,7 +36,6 @@ from reporting_database_generator.database.validate_query import validate_and_ex
 
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
-    template_searchpath = "/project/resources/"
 
 
 def add_database_load_operators(upload_dag, config, project_home, airflow_task_success, airflow_task_failure, prefixes):
