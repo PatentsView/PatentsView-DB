@@ -50,8 +50,8 @@ def get_section(task_id):
                       "qc_cpc_current_wipot": "QC - Supplemental Data Collection",
                       "qc_rename_db": "QC - Database Setup",
                       "qc_upload_new": "QC - Database Setup",
-                      "qc_parse_text_data": "Supplemental Data Collection",
-                      "merge_text_db": "Database Setup",
+                      "qc_parse_text_data": "Long Text Processing",
+                      "merge_text_db": "Long Text Processing",
                       "qc_merge_db": "QC - Database Setup", "qc_merge_text_db": "QC - Text Parsing",
                       "withdrawn_processor": "Supplemental Data", "qc_withdrawn_processor": "QC - Supplemental Data",
                       'export_disambig_data': 'Disambiguation Support - Export Disambig Inputs',
@@ -69,7 +69,9 @@ def get_section(task_id):
                       'post_process_inventor': 'Post Processing - Inventor Post Processing',
                       'post_process_location': 'Post Processing - Location Post Processing',
                       'update_persistent_long_assignee': 'Post Processing - Assignee Persistent Processing',
-                      'update_persistent_long_inventor': 'Post Processing - Inventor Persistent Processing'}
+                      'update_persistent_long_inventor': 'Post Processing - Inventor Persistent Processing',
+                      'create_text_triggers': 'Long Text Processing',
+                      'create_text_yearly_tables': 'Long Text Processing'}
 
     return section_lookup[task_id]
 

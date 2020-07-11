@@ -119,6 +119,16 @@ def cpc_parser_report(config):
     return message
 
 
+def create_text_trigger_report(config):
+    message = "Triggers added to Upload Text Tables"
+    return message
+
+
+def create_text_yearly_tables_report(config):
+    message = "Yearly table added/verified in new database : {newdb}".format(newdb=config['DATABASES']['NEW_DB'])
+    return message
+
+
 def merge_text_db_report(config):
     message = "New Text Data Merged with Complete Data"
     return message
@@ -276,6 +286,8 @@ def get_report_message(task, update_config):
                      'run_lawyer_disambiguation': lawyer_dismabig_report,
                      'update_persistent_long_assignee': persistent_long_assignee_report,
                      'update_persistent_long_inventor': persistent_long_inventor_report,
-                     'upload_disambig_files': disambiguation_upload_report}
+                     'upload_disambig_files': disambiguation_upload_report,
+                     'create_text_triggers': create_text_trigger_report,
+                     'create_text_yearly_tables': create_text_yearly_tables_report}
 
     return report_lookup[task](update_config)
