@@ -1,5 +1,3 @@
--- Create syntax for TABLE 'brf_sum_text'
-
 CREATE TABLE IF NOT EXISTS `{{params.database}}`.`brf_sum_text_{{params.year}}`
 (
     `id`           varchar(512) CHARACTER SET utf8mb4
@@ -21,7 +19,7 @@ CREATE TRIGGER `{{params.database}}`.before_insert_brf
     ON `{{params.database}}`.`brf_sum_text_{{params.year}}`
     FOR EACH row
     SET new.id = uuid();
--- Create syntax for TABLE 'claim'
+
 CREATE TABLE IF NOT EXISTS `{{params.database}}`.`claim_{{params.year}}`
 (
     `id`           varchar(512) CHARACTER SET utf8mb4
@@ -49,7 +47,7 @@ CREATE TRIGGER `{{params.database}}`.before_insert_claim
     ON `{{params.database}}`.`claim_{{params.year}}`
     FOR EACH row
     SET new.id = uuid();
--- Create syntax for TABLE 'detail_desc_text'
+
 CREATE TABLE IF NOT EXISTS `{{params.database}}`.`detail_desc_text_{{params.year}}`
 (
     `id`           varchar(512) CHARACTER SET utf8mb4
@@ -72,7 +70,7 @@ CREATE TRIGGER `{{params.database}}`.before_insert_ddt
     ON `{{params.database}}`.`detail_desc_text_{{params.year}}`
     FOR EACH row
     SET new.id = uuid();
--- Create syntax for TABLE 'draw_desc_text'
+
 CREATE TABLE IF NOT EXISTS `{{params.database}}`.`draw_desc_text_{{params.year}}`
 (
     `id`           varchar(512) CHARACTER SET utf8mb4
