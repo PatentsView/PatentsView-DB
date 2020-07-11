@@ -465,9 +465,9 @@ def get_filenames_to_parse(config):
 
     xml_files = []
     start_date_string = '{}'.format(config['DATES']['START_DATE'])
-    start_date = datetime.strptime(start_date_string, '%y%m%d')
+    start_date = datetime.strptime(start_date_string, '%Y%m%d')
     end_date_string = '{}'.format(config['DATES']['END_DATE'])
-    end_date = datetime.strptime(end_date_string, '%y%m%d')
+    end_date = datetime.strptime(end_date_string, '%Y%m%d')
     for file_name in os.listdir(xml_directory):
         print(file_name)
         if file_name.endswith(".xml"):
