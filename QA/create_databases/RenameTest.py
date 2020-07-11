@@ -62,7 +62,7 @@ class RenameTest:
             if table_collation_row[1] != 'utf8mb4_unicode_ci':
                 raise AssertionError(
                     "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
-                        cset=table_collation_row[1], tbl=table_collation_row[0]))
+                        collation=table_collation_row[1], tbl=table_collation_row[0]))
 
     def test_column_encoding(self):
         new_database = self.config['DATABASE']["NEW_DB"]
