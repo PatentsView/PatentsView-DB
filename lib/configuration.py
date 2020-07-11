@@ -122,7 +122,7 @@ def get_loader_command(config, project_home):
     verbosity = 3
     thread = 6
 
-    loader_command = "{command} {script} {conf_parameter} -d {directory_parameter} -s {database_parameter} -v {verbosity} -t {thread}".format(
+    loader_command = "{command} {script} {conf_parameter} -d {directory_parameter} -s {database_parameter} -v {verbosity} -t {thread} -o".format(
         command=command, script=script, conf_parameter=conf_parameter, directory_parameter=directory_parameter,
         database_parameter=database_parameter, verbosity=verbosity, thread=thread)
 
