@@ -142,7 +142,7 @@ def begin_text_merging(config):
                                                                        temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
                                                                        database_version=version, year=start_year)},
         'draw_desc_text': {
-            "insert": "INSERT INTO {text_db}.draw_desc_text_{year}(uuid, patent_id, text, sequence, version_indicator) SELECT uuid, patent_id, text, sequence, '{database_version}' from {temp_db}.draw_desc_text".format(
+            "insert": "INSERT INTO {text_db}.draw_desc_text_{year}(id, patent_id, text, sequence, version_indicator) SELECT uuid, patent_id, text, sequence, '{database_version}' from {temp_db}.draw_desc_text".format(
                 text_db=config['DATABASE']['TEXT_DATABASE'], temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
                 database_version=version, year=start_year)}, 'detail_desc_text': {
             "insert": "INSERT INTO {text_db}.detail_desc_text_{year}(id, patent_id, text,length, filename, version_indicator) SELECT id, patent_id, text,char_length(text), filename, '{database_version}' from {temp_db}.temp_detail_desc_text".format(
