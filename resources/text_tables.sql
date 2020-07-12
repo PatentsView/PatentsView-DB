@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS `{{params.database}}`.`draw_desc_text_{{params.year}}
     `patent_id`    varchar(32)     DEFAULT NULL,
     `text`         mediumtext CHARACTER SET utf8mb4
         COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `sequence`     int(11)         DEFAULT NULL,
     `filename`     varchar(32) CHARACTER SET utf8mb4
         COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `created_date` timestamp NULL  DEFAULT current_timestamp(),

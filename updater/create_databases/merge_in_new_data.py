@@ -132,18 +132,18 @@ def begin_text_merging(config):
     version = config['DATABASE']['TEMP_UPLOAD_DB'].split("_")[1]
     start_year = int(datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d').strftime('%Y'))
     text_table_config = {'brf_sum_text': {
-        "insert": "INSERT INTO {text_db}.brf_sum_text_{year}(id, patent_id, text, version_indicator) SELECT id, patent_id, text, '{database_version}' from {temp_db}.temp_brf_sum_text".format(
+        "insert": "INSERT INTO {text_db}.brf_sum_text_{year}(id, patent_id, text,filename, version_indicator) SELECT id, patent_id, text, filename,'{database_version}' from {temp_db}.temp_brf_sum_text".format(
             text_db=config['DATABASE']['TEXT_DATABASE'], temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
             database_version=version, year=start_year)}, 'claim': {'preprocess': normalize_exemplary,
-                                                                   "insert": "INSERT INTO {text_db}.claim_{year}(id, patent_id, num, text, sequence, dependent, exemplary,filename, version_indicator, patent_date) SELECT  c.id, c.patent_id,c.num, c.text, c.sequence,  c.dependent, case when tce.exemplary is null then 0 else 1 end ,c.filename,'{database_version}', p.date from {temp_db}.temp_claim c left join {temp_db}.temp_normalized_claim_exemplary tce on tce.patent_id=c.patent_id and tce.exemplary = c.sequence -1 left join {temp_db}.patent p on p.id = c.patent_id".format(
+                                                                   "insert": "INSERT INTO {text_db}.claim_{year}(id, patent_id, num, text, sequence, dependent, exemplary,filename, version_indicator, patent_date) SELECT  c.id, c.patent_id,c.num, c.text, c.sequence-1,  c.dependent, case when tce.exemplary is null then 0 else 1 end ,c.filename,'{database_version}', p.date from {temp_db}.temp_claim c left join {temp_db}.temp_normalized_claim_exemplary tce on tce.patent_id=c.patent_id and tce.exemplary = c.sequence  left join {temp_db}.patent p on p.id = c.patent_id".format(
                                                                        text_db=config['DATABASE']['TEXT_DATABASE'],
                                                                        temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
                                                                        database_version=version, year=start_year)},
         'draw_desc_text': {
-            "insert": "INSERT INTO {text_db}.draw_desc_text_{year}(id, patent_id, text, sequence, version_indicator) SELECT id, patent_id, text, sequence, '{database_version}' from {temp_db}.temp_draw_desc_text".format(
+            "insert": "INSERT INTO {text_db}.draw_desc_text_{year}(id, patent_id, text, sequence, version_indicator) SELECT id, patent_id, text, sequence, '{database_version}' from {temp_db}.draw_desc_text".format(
                 text_db=config['DATABASE']['TEXT_DATABASE'], temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
                 database_version=version, year=start_year)}, 'detail_desc_text': {
-            "insert": "INSERT INTO {text_db}.detail_desc_text_{year}(id, patent_id, text, sequence, version_indicator) SELECT id, patent_id, text, sequence, '{database_version}' from {temp_db}.temp_detail_desc_text".format(
+            "insert": "INSERT INTO {text_db}.detail_desc_text_{year}(id, patent_id, text,length, filename, version_indicator) SELECT id, patent_id, text,char_length(text), filename, '{database_version}' from {temp_db}.temp_detail_desc_text".format(
                 text_db=config['DATABASE']['TEXT_DATABASE'], temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
                 database_version=version, year=start_year)}, 'detail_desc_length': {
             "insert": "INSERT INTO {new_db}.detail_desc_length( patent_id, detail_desc_length) SELECT  patent_id, CHAR_LENGTH(text) from {temp_db}.temp_detail_desc_text".format(
