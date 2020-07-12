@@ -94,12 +94,14 @@ def normalize_exemplary(config):
     exemplary_data = pd.read_sql_table(table_name="temp_claim_exemplary", con=engine)
 
     exemplary_data = exemplary_data.join(
-        exemplary_data.exemplary.str.strip().str.split(", ", expand=True)).drop(
+        exemplary_data.exemplary.str.strip().str.split(",", expand=True)).drop(
         "exemplary", axis=1)
 
     melted_exemplary = exemplary_data.melt(id_vars=['patent_id', 'filename'], value_name='exemplary')
-
-    normalized_exemplary = melted_exemplary[~melted_exemplary.exemplary.isnull()]
+    melted_exemplary.exemplary = melted_exemplary.exemplary.str.strip()
+    normalized_exemplary = melted_exemplary[
+        (~melted_exemplary.exemplary.isnull())
+        & (melted_exemplary.exemplary.str.len() > 0)]
 
     normalized_exemplary.to_sql(name='temp_normalized_claim_exemplary', index=False, con=engine, if_exists='append')
 
