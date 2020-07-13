@@ -8,8 +8,8 @@ class TextMergeTest(PatentDatabaseTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         brf_key = "brf_sum_text_{year}".format(year=end_date.year)
         clm_key = "claim_{year}".format(year=end_date.year)
-        ddr_key = "detail_desc_text_{year}".format(year=end_date.year)
-        ddt_key = "draw_desc_text_{year}".format(year=end_date.year)
+        ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
+        ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
 
         super().__init__(config, 'TEXT_DATABASE', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
