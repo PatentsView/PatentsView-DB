@@ -38,10 +38,10 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
             patent_count_value = count_cursor.fetchall()[0][0]
             ratio_to_patent = round((patent_count_value * 1.0) / entity_count_value, 3)
             ratio_to_self = round((entity_rows_value * 1.0) / entity_count_value, 3)
-            database_type, version = self.config["DATABASE"][self.database_section].split("_")
             self.qa_data['DataMonitor_distinctidcount'].append(
-                {"database_type": database_type, 'table_name': self.entity_table, "column_name": self.disambiguated_id,
-                 'update_version': version, 'distinct_id_count': entity_count_value,
+                {"database_type": self.database_type, 'table_name': self.entity_table,
+                 "column_name": self.disambiguated_id,
+                 'update_version': self.version, 'distinct_id_count': entity_count_value,
                  'ratio_to_patent_id': ratio_to_patent, 'ratio_to_self': ratio_to_self})
 
     def top_n_generator(self, table_name=None):
@@ -76,15 +76,14 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
             self.connection.connect()
         with self.connection.cursor() as top_cursor:
             top_cursor.execute(top_n_data_query)
-            database_type, version = self.config["DATABASE"][self.database_section].split("_")
             rank = 1
             for top_n_data_row in top_cursor:
                 data_value = ", ".join([x if x is not None else '' for x in top_n_data_row[1:-1]])
 
                 self.qa_data['DataMonitor_topnentities'].append(
-                    {"database_type": database_type, 'entity_name': top_entities_for,
+                    {"database_type": self.database_type, 'entity_name': top_entities_for,
                      "related_entity": top_entities_by["table"], 'entity_rank': rank,
-                     'update_version': version, 'entity_value': data_value,
+                     'update_version': self.version, 'entity_value': data_value,
                      'related_entity_count': top_n_data_row[-1]})
                 rank += 1
 

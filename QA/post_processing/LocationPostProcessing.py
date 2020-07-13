@@ -67,14 +67,13 @@ LIMIT  100;
             self.connection.connect()
         with self.connection.cursor() as top_cursor:
             top_cursor.execute(top_n_data)
-            database_type, version = self.config["DATABASE"][self.database_section].split("_")
             for top_n_data_row in top_cursor:
                 data_value = ", ".join([x if x is not None else '' for x in top_n_data_row[1:-1]])
 
                 self.qa_data['DataMonitor_topnentities'].append(
-                    {"database_type": database_type, 'entity_name': 'location',
+                    {"database_type": self.database_type, 'entity_name': 'location',
                      "related_entity": 'patent',
-                     'update_version': version, 'entity_value': data_value,
+                     'update_version': self.version, 'entity_value': data_value,
                      'related_entity_count': top_n_data_row[-1]})
 
     def runTests(self):

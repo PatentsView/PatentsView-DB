@@ -10,6 +10,8 @@ class TextMergeTest(PatentDatabaseTester):
         clm_key = "claim_{year}".format(year=end_date.year)
         ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
+        self.database_type = 'patent'
+        self.version = self.config['DATABASES']['NEW_DB'].split("_")[1]
 
         super().__init__(config, 'TEXT_DATABASE', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
@@ -49,6 +51,9 @@ class TextUploadTest(PatentDatabaseTester):
     def __init__(self, config):
         start_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+        self.database_type = 'upload'
+        self.version = self.config['DATABASES']['NEW_DB'].split("_")[1]
+
         super().__init__(config, 'TEMP_UPLOAD_DB', start_date, end_date)
         self.table_config = {
             "temp_brf_sum_text": {

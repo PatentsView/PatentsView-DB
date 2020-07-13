@@ -36,7 +36,7 @@ class CPCTest(PatentDatabaseTester):
                                    {'table': 'cpc_current', 'source_id': 'id', 'destination_id': 'subsection_id'}]}}
         self.patent_exclusion_list.extend(['cpc_group', 'cpc_subgroup', 'cpc_subsection'])
 
-    def test_yearly_count(self, table):
+    def test_yearly_count(self, table, strict=True):
         start_date = datetime.datetime.strptime(self.config['DATES']['START_DATE'], '%Y%m%d')
         end_date = datetime.datetime.strptime(self.config['DATES']['END_DATE'], '%Y%m%d')
         start_date_string = start_date.strftime('%Y-%m-%d')

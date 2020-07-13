@@ -14,6 +14,7 @@ class PatentDatabaseTester(ABC):
         self.start_date = start_date
         self.end_date = end_date
         self.database_section = database_section
+
         self.qa_connection_string = get_connection_string(config, 'QA_DATABASE')
         self.connection = pymysql.connect(host=config['DATABASE']['HOST'],
                                           user=config['DATABASE']['USERNAME'],
@@ -28,6 +29,9 @@ class PatentDatabaseTester(ABC):
                         'DataMonitor_categorycount': [], 'DataMonitor_floatingpatentcount': [],
                         'DataMonitor_maxtextlength': [], 'DataMonitor_prefixedentitycount': []}
         self.patent_db_prefix = None
+        database_type, version = self.config["DATABASE"][self.database_section].split("_")
+        self.version = version
+        self.database_type = database_type
 
     def test_table_row_count(self, table_name):
         print("\tTesting Table counts for {table_name} in {db}".format(table_name=table_name,
@@ -42,13 +46,14 @@ class PatentDatabaseTester(ABC):
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value < 1:
                     raise Exception("Empty table found:{table}".format(table=table_name))
-                database_type, version = self.config["DATABASE"][self.database_section].split("_")
+
                 write_table_name = table_name
                 prefix = "temp_"
                 if table_name.startswith(prefix):
                     write_table_name = table_name[len(prefix):]
                 self.qa_data['DataMonitor_count'].append(
-                    {"database_type": database_type, 'table_name': write_table_name, 'update_version': version,
+                    {"database_type": self.database_type, 'table_name': write_table_name,
+                     'update_version': self.version,
                      'table_row_count': count_value})
         finally:
             if self.connection.open:
@@ -109,7 +114,6 @@ class PatentDatabaseTester(ABC):
             print(category_count_query)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(category_count_query)
-                database_type, version = self.config["DATABASE"][self.database_section].split("_")
                 for count_row in count_cursor:
                     value = count_row[0]
                     if value is None:
@@ -119,8 +123,8 @@ class PatentDatabaseTester(ABC):
                     if table.startswith(prefix):
                         write_table_name = table[len(prefix):]
                     self.qa_data['DataMonitor_categorycount'].append(
-                        {"database_type": database_type, 'table_name': write_table_name, "column_name": field,
-                         'update_version': version, 'value': value, 'count': count_row[1]})
+                        {"database_type": self.database_type, 'table_name': write_table_name, "column_name": field,
+                         'update_version': self.version, 'value': value, 'count': count_row[1]})
         finally:
             if self.connection.open:
                 self.connection.close()
@@ -143,14 +147,13 @@ class PatentDatabaseTester(ABC):
                                     database=self.database_section, table=table,
                                     col=field,
                                     count=count_value))
-                    database_type, version = self.config["DATABASE"][self.database_section].split("_")
                     write_table_name = table
                     prefix = "temp_"
                     if table.startswith(prefix):
                         write_table_name = table[len(prefix):]
                     self.qa_data['DataMonitor_nullcount'].append(
-                        {"database_type": database_type, 'table_name': write_table_name, "column_name": field,
-                         'update_version': version, 'null_count': count_value})
+                        {"database_type": self.database_type, 'table_name': write_table_name, "column_name": field,
+                         'update_version': self.version, 'null_count': count_value})
             finally:
                 if self.connection.open:
                     self.connection.close()
@@ -188,14 +191,13 @@ class PatentDatabaseTester(ABC):
                     entity=table_name)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(count_query)
-                database_type, version = self.config["DATABASE"][self.database_section].split("_")
                 for count_row in count_cursor.fetchall():
                     write_table_name = table_name
                     prefix = "temp_"
                     if table_name.startswith(prefix):
                         write_table_name = table_name[len(prefix):]
                     self.qa_data['DataMonitor_patentyearlycount'].append(
-                        {"database_type": database_type, 'update_version': version, 'year': count_row[0],
+                        {"database_type": self.database_type, 'update_version': self.version, 'year': count_row[0],
                          'table_name': write_table_name, 'patent_count': count_row[1]})
         except pymysql.err.InternalError as e:
             return
@@ -283,13 +285,12 @@ class PatentDatabaseTester(ABC):
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(float_count_query)
                 float_count = count_cursor.fetchall()[0][0]
-                database_type, version = self.config["DATABASE"][self.database_section].split("_")
                 write_table_name = table
                 prefix = "temp_"
                 if table.startswith(prefix):
                     write_table_name = table[len(prefix):]
-                self.qa_data['DataMonitor_floatingpatentcount'].append({"database_type": database_type,
-                                                                        'update_version': version,
+                self.qa_data['DataMonitor_floatingpatentcount'].append({"database_type": self.database_type,
+                                                                        'update_version': self.version,
                                                                         'table_name': write_table_name,
                                                                         'floating_patent_count': float_count})
         except pymysql.Error as e:
@@ -312,14 +313,13 @@ class PatentDatabaseTester(ABC):
                     entity=table_name)
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
-                    database_type, version = self.config["DATABASE"][self.database_section].split("_")
                     for count_row in count_cursor.fetchall():
                         write_table_name = table_name
                         prefix = "temp_"
                         if table_name.startswith(prefix):
                             write_table_name = table_name[len(prefix):]
                         self.qa_data['DataMonitor_prefixedentitycount'].append(
-                            {"database_type": database_type, 'update_version': version, 'patent_type': count_row[0],
+                            {"database_type": self.database_type, 'update_version': self.version, 'patent_type': count_row[0],
                              'table_name': write_table_name, 'patent_count': count_row[1]})
             except pymysql.err.InternalError as e:
                 if table_name not in self.patent_exclusion_list:
@@ -350,13 +350,12 @@ class PatentDatabaseTester(ABC):
         with self.connection.cursor() as text_cursor:
             text_cursor.execute(text_length_query)
             text_length = text_cursor.fetchall()[0][0]
-            database_type, version = self.config["DATABASE"][self.database_section].split("_")
             write_table_name = table_name
             prefix = "temp_"
             if table_name.startswith(prefix):
                 write_table_name = table_name[len(prefix):]
-            self.qa_data['DataMonitor_maxtextlength'].append({"database_type": database_type,
-                                                              'update_version': version,
+            self.qa_data['DataMonitor_maxtextlength'].append({"database_type": self.database_type,
+                                                              'update_version': self.version,
                                                               'table_name': write_table_name,
                                                               'column_name': field_name,
                                                               'max_text_length': text_length})
