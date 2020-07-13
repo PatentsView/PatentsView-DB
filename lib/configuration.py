@@ -31,6 +31,7 @@ def set_config(config, type='granted_patent'):
     config_file = "{home}/{filename}".format(home=project_home, filename=filename)
     with open(config_file, "w") as f:
         config.write(f)
+    return config
 
 
 def get_section(task_id):
@@ -199,8 +200,8 @@ def update_config_date(**kwargs):
     config = get_config(type='application')
 
     prev_week = datetime.timedelta(weeks=1)
-    end_date = execution_date.strftime('%y%m%d')
-    start_date = (execution_date - prev_week).strftime('%y%m%d')
+    end_date = execution_date.strftime('%Y%m%d')
+    start_date = (execution_date - prev_week).strftime('%Y%m%d')
     temp_date = execution_date.strftime('%Y%m%d')
     config['DATES'] = {"START_DATE": start_date, "END_DATE": end_date}
     config['DATABASE']["TEMP_DATABASE"] = "pgpubs_" + temp_date
