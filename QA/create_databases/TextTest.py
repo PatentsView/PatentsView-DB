@@ -41,7 +41,7 @@ class TextMergeTest(PatentDatabaseTester):
 
         self.patent_db_prefix = "`{db}`".format(db=self.config['DATABASE']['NEW_DB'])
         self.database_type = 'patent'
-        self.version = self.config['DATABASES']['NEW_DB'].split("_")[1]
+        self.version = self.config['DATABASE']['NEW_DB'].split("_")[1]
 
     def test_yearly_count(self, table_name, strict=False):
         super().test_yearly_count(table_name, strict)
