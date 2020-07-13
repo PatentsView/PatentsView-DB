@@ -10,8 +10,6 @@ class TextMergeTest(PatentDatabaseTester):
         clm_key = "claim_{year}".format(year=end_date.year)
         ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
-        self.database_type = 'patent'
-        self.version = self.config['DATABASES']['NEW_DB'].split("_")[1]
 
         super().__init__(config, 'TEXT_DATABASE', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
@@ -42,6 +40,8 @@ class TextMergeTest(PatentDatabaseTester):
                                                        "category": True}}}}
 
         self.patent_db_prefix = "`{db}`".format(db=self.config['DATABASE']['NEW_DB'])
+        self.database_type = 'patent'
+        self.version = self.config['DATABASES']['NEW_DB'].split("_")[1]
 
     def test_yearly_count(self, table_name, strict=False):
         super().test_yearly_count(table_name, strict)
