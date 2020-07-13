@@ -19,7 +19,7 @@ class TextMergeTest(PatentDatabaseTester):
                                  "version_indicator": {"null_allowed": False,
                                                        "data_type": "varchar", "category": False}}},
             clm_key: {'fields': {"uuid": {"null_allowed": False, "data_type": "varchar", "category": False},
-                                 "exemplary": {"null_allowed": True, "data_type": "varchar", "category": False},
+                                 "exemplary": {"null_allowed": False, "data_type": "int", "category": False},
                                  "patent_id": {"null_allowed": False, "data_type": "varchar", "category": False},
                                  "version_indicator": {"null_allowed": False, "data_type": "varchar",
                                                        "category": False},
