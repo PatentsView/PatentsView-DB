@@ -174,7 +174,7 @@ class PatentDatabaseTester(ABC):
             if self.connection.open:
                 self.connection.close()
 
-    def test_yearly_count(self, table_name):
+    def test_yearly_count(self, table_name, strict=True):
         print("\tTesting yearly entities counts for {table_name}".format(table_name=table_name))
         try:
             if not self.connection.open:
@@ -202,8 +202,8 @@ class PatentDatabaseTester(ABC):
         finally:
             if self.connection.open:
                 self.connection.close()
-
-        self.assert_yearly_counts()
+        if strict:
+            self.assert_yearly_counts()
 
     def assert_yearly_counts(self):
         for year in range(self.start_date.year, self.end_date.year + 1):

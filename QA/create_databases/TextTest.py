@@ -41,6 +41,9 @@ class TextMergeTest(PatentDatabaseTester):
 
         self.patent_db_prefix = "`{db}`".format(db=self.config['DATABASE']['NEW_DB'])
 
+    def test_yearly_count(self, table_name, strict=False):
+        super().test_yearly_count(table_name, strict)
+
 
 class TextUploadTest(PatentDatabaseTester):
     def __init__(self, config):
