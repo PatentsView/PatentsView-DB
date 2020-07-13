@@ -27,7 +27,7 @@ class TextMergeTest(PatentDatabaseTester):
                                  "dependent": {"null_allowed": True, "data_type": "varchar", "category": False},
                                  "sequence": {"null_allowed": True, "data_type": "int", "category": False}}},
             ddr_key: {
-                'fields': {"uuid": {"null_allowed": detail_desc_text_2020False, "data_type": "varchar", "category": False},
+                'fields': {"uuid": {"null_allowed": False, "data_type": "varchar", "category": False},
                            "patent_id": {"null_allowed": False, "data_type": "varchar", "category": False},
                            "text": {"null_allowed": False, "data_type": "mediumtext", "category": False},
                            "sequence": {"null_allowed": False, "data_type": "int", "category": False},
