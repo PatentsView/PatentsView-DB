@@ -130,8 +130,8 @@ def download_xml_files(config):
     xml_path_template = config["USPTO_LINKS"]['bulk_xml_template']
     start_date = config['DATES']['START_DATE']
     end_date = config['DATES']['END_DATE']
-    start_year = int(datetime.datetime.strptime(start_date, '%y%m%d').strftime('%Y'))
-    end_year = int(datetime.datetime.strptime(end_date, '%y%m%d').strftime('%Y'))
+    start_year = int(datetime.datetime.strptime(start_date, '%Y%m%d').strftime('%Y'))
+    end_year = int(datetime.datetime.strptime(end_date, '%Y%m%d').strftime('%Y'))
     parallelism = int(config["PARALLELISM"]["parallelism"])
     manager = mp.Manager()
     log_queue = manager.Queue()

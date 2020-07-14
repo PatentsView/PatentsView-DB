@@ -27,76 +27,76 @@ from updater.disambiguation.lawyer_disambiguation.tasks import bulk_commit_inser
 
 config = get_config()
 cstr = get_connection_string(config, 'NEW_DB')
-engine = create_engine(cstr)
+engine = create_engine(cstr+"&local_infile=1")
 THRESHOLD = config["LAWYER"]["THRESHOLD"]
 db_con = engine.connect()
 
 timestamp = str(int(time.time()))
 
 ### Make a copy of rawlawyer table ###
-engine.execute("CREATE TABLE rawlawyer_copy_backup_{} LIKE rawlawyer;".format(timestamp))
-engine.execute("INSERT INTO rawlawyer_copy_backup_{} SELECT * FROM rawlawyer".format(timestamp))
-engine.execute("ALTER TABLE rawlawyer ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;")
-engine.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;")
-engine.execute(
-    "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;")
-engine.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_lawyer_id IS NULL;")
-
-nodigits = re.compile(r'[^\d]+')
+#engine.execute("CREATE TABLE rawlawyer_copy_backup_{} LIKE rawlawyer;".format(timestamp))
+#engine.execute("INSERT INTO rawlawyer_copy_backup_{} SELECT * FROM rawlawyer".format(timestamp))
+#engine.execute("ALTER TABLE rawlawyer ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;")
+#engine.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;")
+#engine.execute(
+#    "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;")
+#engine.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_lawyer_id IS NULL;")
+#
+#nodigits = re.compile(r'[^\d]+')
 
 disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
 
 ######## Formerly clean_alpha_lawyer_ids.ipynb ########
 # create outfile
-outfile = csv.writer(open(disambig_folder + '/rawlawyer_cleanalphaids.tsv', 'w'), delimiter='\t')
-outfile.writerow(
-    ['uuid', 'lawyer_id', 'patent_id', 'name_first', 'name_last', 'organization', 'cleaned_alpha_lawyer_id', 'country',
-     'sequence'])
+#outfile = csv.writer(open(disambig_folder + '/rawlawyer_cleanalphaids.tsv', 'w'), delimiter='\t')
+#outfile.writerow(
+#    ['uuid', 'lawyer_id', 'patent_id', 'name_first', 'name_last', 'organization', 'cleaned_alpha_lawyer_id', 'country',
+#     'sequence'])
 
-stoplist = ['the', 'of', 'and', 'a', 'an', 'at']
+#stoplist = ['the', 'of', 'and', 'a', 'an', 'at']
 
-batch_counter = 0
-limit = 300000
-offset = 0
+#batch_counter = 0
+#limit = 300000
+#offset = 0
 
 # process rawlawyer table in chunks
-while True:
-    batch_counter += 1
-    counter = 0
+#while True:
+#    batch_counter += 1
+#    counter = 0
 
-    rawlaw_chunk = db_con.execute('SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset))
+#    rawlaw_chunk = db_con.execute('SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset))
 
-    for lawyer in tqdm.tqdm(rawlaw_chunk, total=limit, desc="rawlawyer processing - batch:" + str(batch_counter)):
-        uuid_match = lawyer[0]
-        law_id = lawyer[1]
-        pat_id = lawyer[2]
-        name_f = lawyer[3]
-        name_l = lawyer[4]
-        org = lawyer[5]
-        a_id = lawyer[6]
-        ctry = lawyer[7]
-        seq = lawyer[8]
+#    for lawyer in tqdm.tqdm(rawlaw_chunk, total=limit, desc="rawlawyer processing - batch:" + str(batch_counter)):
+#        uuid_match = lawyer[0]
+#        law_id = lawyer[1]
+#        pat_id = lawyer[2]
+#        name_f = lawyer[3]
+#        name_l = lawyer[4]
+#        org = lawyer[5]
+#        a_id = lawyer[6]
+#        ctry = lawyer[7]
+#        seq = lawyer[8]
 
         # removes stop words, then rejoins the string
-        a_id = ' '.join([x for x in a_id.split(' ') if x.lower() not in stoplist])
-        cleaned_a_id = ''.join(nodigits.findall(a_id)).strip()
+#        a_id = ' '.join([x for x in a_id.split(' ') if x.lower() not in stoplist])
+#        cleaned_a_id = ''.join(nodigits.findall(a_id)).strip()
 
         # update cleaned_alpha_lawyer_id
-        outfile.writerow([uuid_match, law_id, pat_id, name_f, name_l, org, cleaned_a_id, ctry, seq])
-        counter += 1
+#        outfile.writerow([uuid_match, law_id, pat_id, name_f, name_l, org, cleaned_a_id, ctry, seq])
+#        counter += 1
 
-    print('lawyers cleaned!', flush=True)
+#    print('lawyers cleaned!', flush=True)
 
     # means we have no more batches to process
-    if counter == 0:
-        break
+#    if counter == 0:
+#        break
 
-    offset = offset + limit
-    print("processed batch: ", str(batch_counter))
+#    offset = offset + limit
+#    print("processed batch: ", str(batch_counter))
 
 ###
-engine.execute("ALTER TABLE rawlawyer RENAME TO rawlawyer_predisambig;")
-engine.execute("CREATE TABLE rawlawyer LIKE rawlawyer_predisambig;")
+#engine.execute("ALTER TABLE rawlawyer RENAME TO rawlawyer_predisambig;")
+#engine.execute("CREATE TABLE rawlawyer LIKE rawlawyer_predisambig;")
 engine.execute(
     "LOAD DATA LOCAL INFILE '{}' INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES;".format(
         disambig_folder + '/rawlawyer_cleanalphaids.tsv'))
