@@ -276,8 +276,6 @@ def clean_orgs(orgs):
                  "s", "Department"]
     orgs = [x for x in orgs if x not in to_remove]
 
-    final_output_dir = "G:/PatentsView/cssip/PatentsView-DB/Development/government_interest/test_output/"
-
     return orgs
 
 
@@ -370,8 +368,8 @@ def begin_NER_processing(config):
 
     # Set up vars + directories
     merged_csv = '{}/merged_csvs.csv'.format(pre_manual)
-    ner_dir = "/project/Development/government_interest/stanford-ner-2017-06-09/"
-    ner_txt_indir = "/project/Development/government_interest/stanford-ner-2017-06-09/in/"
+    ner_dir = "/project/persistent_files/stanford-ner-2017-06-09/"
+    ner_txt_indir = "/project/persistent_files/stanford-ner-2017-06-09/in/"
     ner_txt_outdir = '{}/NER_out/'.format(pre_manual)
     if not os.path.exists(ner_txt_outdir):
         os.makedirs(ner_txt_outdir)

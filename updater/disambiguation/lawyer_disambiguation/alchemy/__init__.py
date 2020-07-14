@@ -23,6 +23,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
+from lib.configuration import get_connection_string
+
 """
 @author Gabe Fierro gt.fierro@berkeley.edu github.com/gtfierro
 """
@@ -47,40 +49,46 @@ from sqlalchemy.pool import Pool
 
 from html.parser import HTMLParser
 import os
-project_home=os.environ['PACKAGE_HOME']
-from Development.helpers import general_helpers
+
+project_home = os.environ['PACKAGE_HOME']
+
 config = configparser.ConfigParser()
-config.read(project_home + '/Development/config.ini')
+config.read(project_home + '/config.ini')
 
 h = HTMLParser()
+
+
 def unescape_html(x):
     return h.unescape(x)
+
 
 import html.entities
 
 _char = re.compile(r'&(\w+?);')
-    
-# Generate some extra HTML entities
-defs=html.entities.entitydefs
-defs['apos'] = "'"
-#need to fix this to pull the database location from the config file
 
-entities = open(project_home+'/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
+# Generate some extra HTML entities
+defs = html.entities.entitydefs
+defs['apos'] = "'"
+# need to fix this to pull the database location from the config file
+
+entities = open(project_home + '/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
 for e in entities:
     try:
-        first = re.sub('\s+|\"|;|&','',e[3:15])
-        second = re.sub('\s+|\"|;|&','',e[15:24])
-        define = re.search("(?<=\s\s\').*?$",e).group()
+        first = re.sub('\s+|\"|;|&', '', e[3:15])
+        second = re.sub('\s+|\"|;|&', '', e[15:24])
+        define = re.search("(?<=\s\s\').*?$", e).group()
         defs[first] = define[:-1].encode('utf-8')
         defs[second] = define[:-1].encode('utf-8')
     except:
         pass
 
+
 def _char_unescape(m, defs=defs):
     try:
-        return defs[m.group(1)].encode('utf-8','ignore')
+        return defs[m.group(1)].encode('utf-8', 'ignore')
     except:
         return m.group()
+
 
 def fixid(x):
     if 'id' in x:
@@ -89,6 +97,7 @@ def fixid(x):
         x['uuid'] = str(uuid.uuid4())
     return x
 
+
 @event.listens_for(Pool, "checkout")
 def ping_connection(dbapi_connection, connection_record, connection_proxy):
     """
@@ -96,7 +105,7 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     """
     cursor = dbapi_connection.cursor()
     if not hasattr(cursor, 'MySQLError'):
-              return
+        return
     try:
         # reset the connection settings
         cursor.execute("SELECT 1;")
@@ -154,25 +163,24 @@ def session_generator(dbtype='grant'):
     etc.
     These sessions will be protected with the ping refresher above
     """
-    #config = get_config()
-    #echo = config.get('GLOBAL').get('echo')
+    # config = get_config()
+    # echo = config.get('GLOBAL').get('echo')
     echo = True
-    if dbtype == 'grant':
-        read_database = "NEW_DB"
-    engine = general_helpers.connect_to_db(config['DATABASE']['HOST'],config['DATABASE']['USERNAME'],config['DATABASE']['PASSWORD'], config['DATABASE'][read_database])
+    read_database = "NEW_DB"
+    cstr = get_connection_string(config, read_database)
+    engine = create_engine(cstr)
 
-#     engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8mb4'.format(
-#         config.get('DATABASE').get('user'),
-#         config.get('DATABASE').get('password'),
-#         config.get('DATABASE').get('host'),
-#         config.get('DATABASE').get(read_database), echo=echo), pool_size=3, pool_recycle=3600, echo_pool=True)
-
+    #     engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8mb4'.format(
+    #         config.get('DATABASE').get('user'),
+    #         config.get('DATABASE').get('password'),
+    #         config.get('DATABASE').get('host'),
+    #         config.get('DATABASE').get(read_database), echo=echo), pool_size=3, pool_recycle=3600, echo_pool=True)
 
     schema.GrantBase.metadata.create_all(engine)
 
-
     Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
     return scoped_session(Session)
+
 
 def fetch_session(dbtype='grant'):
     """
@@ -181,18 +189,18 @@ def fetch_session(dbtype='grant'):
     @dbtype: string indicating if we are fetching the session for
              the grant database or the application database
     """
-    #config = get_config()
+    # config = get_config()
     echo = True
-    if dbtype == 'grant': #this is here so we can port to work for applicaitons also
+    if dbtype == 'grant':  # this is here so we can port to work for applicaitons also
         read_database = "NEW_DB"
-        engine = general_helpers.connect_to_db(config['DATABASE']['HOST'],config['DATABASE']['USERNAME'],config['DATABASE']['PASSWORD'], config['DATABASE'][read_database])
+        engine = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'],
+                                               config['DATABASE']['PASSWORD'], config['DATABASE'][read_database])
 
-#     engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
-#         config['DATABASE']['USERNAME'],
-#         config['DATABASE']['PASSWORD'],
-#         config['DATABASE']['HOST'],
-#         config['DATABASE'][read_database], echo=echo))
-
+    #     engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
+    #         config['DATABASE']['USERNAME'],
+    #         config['DATABASE']['PASSWORD'],
+    #         config['DATABASE']['HOST'],
+    #         config['DATABASE'][read_database], echo=echo))
 
     schema.GrantBase.metadata.create_all(engine)
 
@@ -221,9 +229,9 @@ def add_grant(obj, override=True, temp=False):
     """
 
     # if a patent exists, remove it so we can replace it
-    (patent_exists, ), = grantsession.query(exists().where(schema.Patent.number == obj.patent))
-    #pat_query = grantsession.query(Patent).filter(Patent.number == obj.patent)
-    #if pat_query.count():
+    (patent_exists,), = grantsession.query(exists().where(schema.Patent.number == obj.patent))
+    # pat_query = grantsession.query(Patent).filter(Patent.number == obj.patent)
+    # if pat_query.count():
     if patent_exists:
         if override:
             pat_query = grantsession.query(schema.Patent).filter(schema.Patent.id == obj.patent)
@@ -241,7 +249,7 @@ def add_grant(obj, override=True, temp=False):
     grantsession.execute('set foreign_key_checks = 0;')
     grantsession.execute('set unique_checks = 0;')
 
-    #grantsession.commit()
+    # grantsession.commit()
 
     grantsession.merge(pat)
 
@@ -360,7 +368,7 @@ def add_claims(obj, pat):
     for claim in claims:
         claim = fixid(claim)
         claim['text'] = unescape_html(claim['text'])
-        claim['text'] = _char.sub(_char_unescape,claim['text'])
+        claim['text'] = _char.sub(_char_unescape, claim['text'])
         clm = schema.Claim(**claim)
         pat.claims.append(clm)
 
@@ -374,4 +382,4 @@ def commit():
 
 
 grantsession = fetch_session(dbtype='grant')
-session = grantsession # default for clean and consolidate
+session = grantsession  # default for clean and consolidate
