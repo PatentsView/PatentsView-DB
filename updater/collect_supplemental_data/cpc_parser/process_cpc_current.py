@@ -157,7 +157,7 @@ def process_and_upload_cpc_current(config):
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     cpc_xml_file = None
     for filename in os.listdir(cpc_folder):
-        if (filename.startswith('US_Grant_CPC_MCF_XML_') and
+        if (filename.startswith('CPC_grant_mcf') and
                 filename.endswith('.zip')):
             cpc_xml_file = "{cpc_folder}/{cpc_file}".format(cpc_folder=cpc_folder, cpc_file=filename)
 
