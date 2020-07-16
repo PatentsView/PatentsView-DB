@@ -108,7 +108,7 @@ def find_cpc_grant_and_pgpub_urls():
     potential_grant_links = []
     potential_pgpub_links = []
     for link in tree.xpath('//a/@href'):
-        if (link.startswith("US_Grant_CPC_MCF_Text")
+        if (link.startswith("US_Grant_CPC_MCF_XML")
                 and link.endswith(".zip")):
             potential_grant_links.append(link)
         elif (link.startswith("US_PGPub_CPC_MCF_Text")
