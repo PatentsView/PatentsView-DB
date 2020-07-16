@@ -139,7 +139,7 @@ def get_cpc_records(xml_root):
             sequence += 1
 
 
-def load_cpc_records(records_generator):
+def load_cpc_records(records_generator, config):
     """
     Load Extracter CPC Records into CPC Current Table
     :param records_generator: generator that produces cpc records as dictionary
@@ -170,7 +170,7 @@ def process_and_upload_cpc_current(config):
             start = time.time()
             xml_tree = get_cpc_xml_root(cpc_xml_file, xml_file_name)
             cpc_records = get_cpc_records(xml_tree)
-            load_cpc_records(cpc_records)
+            load_cpc_records(cpc_records, config)
             end = time.time()
             print("XML File {xml_file} Processing Time: {duration}".format(duration=round(end - start),
                                                                            xml_file=xml_file_name))
