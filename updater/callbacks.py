@@ -5,8 +5,14 @@ from lib.notifications import send_slack_notification
 
 def airflow_task_success(context):
     section = get_section(context['task'].task_id)
+    dag_id = context['dag'].dag_id
     from lib.configuration import get_config
-    config = get_config()
+    if dag_id in ['01_update_granted_patent', '02_gi_post_manual', '03_disambiguation_support',
+                  '04_disambiguation_postprocessing']:
+        type = 'granted_patent'
+    else:
+        type = 'application'
+    config = get_config(type)
     message = 'AIRFLOW TASK Success:\n' \
               'DAG:    {dag_id}\n' \
               'TASKS:  {task_id}\n' \
@@ -21,7 +27,13 @@ def airflow_task_success(context):
 def airflow_task_failure(context):
     section = get_section(context['task'].task_id)
     from lib.configuration import get_config
-    config = get_config()
+    dag_id = context['dag'].dag_id
+    if dag_id in ['01_update_granted_patent', '02_gi_post_manual', '03_disambiguation_support',
+                  '04_disambiguation_postprocessing']:
+        type = 'granted_patent'
+    else:
+        type = 'application'
+    config = get_config(type)
     message = 'AIRFLOW TASK FAILURE:\n' \
               'DAG:    {dag_id}\n' \
               'TASKS:  {task_id}\n' \
