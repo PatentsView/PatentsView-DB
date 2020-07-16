@@ -76,14 +76,6 @@ def add_supplemental_operators(supplemental_dag, config, project_home, airflow_t
                                                   on_success_callback=airflow_task_success,
                                                   on_failure_callback=airflow_task_failure)
 
-    cpc_parser_operator = PythonOperator(task_id='cpc_parser', python_callable=start_cpc_parser,
-                                         op_kwargs={'config': config}, dag=supplemental_dag,
-                                         on_success_callback=airflow_task_success,
-                                         on_failure_callback=airflow_task_failure)
-    qc_cpc_parser_operator = PythonOperator(task_id='qc_cpc_parser', python_callable=post_cpc_parser,
-                                            op_kwargs={'config': config}, dag=supplemental_dag,
-                                            on_success_callback=airflow_task_success,
-                                            on_failure_callback=airflow_task_failure)
 
     cpc_current_operator = PythonOperator(task_id='cpc_current_processor',
                                           python_callable=process_and_upload_cpc_current,
@@ -109,10 +101,8 @@ def add_supplemental_operators(supplemental_dag, config, project_home, airflow_t
     cpc_class_parser_operator.set_upstream(qc_download_cpc_operator)
     qc_cpc_class_parser_operator.set_upstream(cpc_class_parser_operator)
     cpc_class_operator.set_upstream(qc_cpc_class_parser_operator)
-    cpc_parser_operator.set_upstream(qc_download_cpc_operator)
-    qc_cpc_parser_operator.set_upstream(cpc_parser_operator)
+    cpc_current_operator.set_upstream(qc_download_cpc_operator)
 
-    cpc_current_operator.set_upstream(qc_cpc_parser_operator)
     wipo_operator.set_upstream(cpc_current_operator)
 
     qc_cpc_current_wipo_operator.set_upstream(wipo_operator)
