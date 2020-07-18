@@ -84,16 +84,17 @@ def generate_index_statements(config, database_section, table):
     return add_indexes, drop_indexes
 
 
-def log_writer(log_queue):
+def log_writer(log_queue, log_prefix="uspto_parser"):
     '''listens for messages on the q, writes to file. '''
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
-    EXPANED_LOGFILE = datetime.datetime.now().strftime('logs/expanded_log_%Y%m%d_%H%M%S.log')
+    EXPANED_LOGFILE = datetime.datetime.now().strftime(
+        'logs/{prefix}_expanded_log_%Y%m%d_%H%M%S.log'.format(prefix=log_prefix))
     expanded_filehandler = logging.FileHandler(EXPANED_LOGFILE)
     expanded_filehandler.setLevel(logging.DEBUG)
 
-    BASIC_LOGFILE = datetime.datetime.now().strftime('logs/log_%Y%m%d_%H%M%S.log')
+    BASIC_LOGFILE = datetime.datetime.now().strftime('logs/{prefix}_log_%Y%m%d_%H%M%S.log'.format(prefix=log_prefix))
     filehandler = logging.FileHandler(BASIC_LOGFILE)
     filehandler.setLevel(logging.INFO)
 
@@ -109,7 +110,6 @@ def log_writer(log_queue):
             logger.info("Kill Signal received. Exiting")
             break
         logger.log(message_data["level"], message_data["message"])
-
 
 
 def save_zip_file(url, name, path, counter=0, log_queue=None):
