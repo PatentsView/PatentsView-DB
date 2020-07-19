@@ -193,8 +193,8 @@ def fetch_session(dbtype='grant'):
     echo = True
     if dbtype == 'grant':  # this is here so we can port to work for applicaitons also
         read_database = "NEW_DB"
-        engine = general_helpers.connect_to_db(config['DATABASE']['HOST'], config['DATABASE']['USERNAME'],
-                                               config['DATABASE']['PASSWORD'], config['DATABASE'][read_database])
+        cstr = get_connection_string(config, read_database)
+        engine = create_engine(cstr)
 
     #     engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
     #         config['DATABASE']['USERNAME'],
