@@ -71,7 +71,7 @@ defs = html.entities.entitydefs
 defs['apos'] = "'"
 # need to fix this to pull the database location from the config file
 
-entities = open(project_home + '/Scripts/Raw_Data_Parsers/uspto_parsers/htmlentities').read().split('\n')
+entities = open(project_home + '/persistent_files/htmlentities').read().split('\n')
 for e in entities:
     try:
         first = re.sub('\s+|\"|;|&', '', e[3:15])
