@@ -190,7 +190,7 @@ def write_wide_table(config, entity):
     itr = 0
 
     print('Estimated # of rounds: ', total_rows / limit)
-    if_exists = 'fail'
+    if_exists = 'append'
     while True:
         print('###########################################\n')
         print('Next iteration... ', itr)
