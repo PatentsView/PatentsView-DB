@@ -89,14 +89,14 @@ def add_postprocessing_operators(disambiguation_post_processing, config, project
     )
 
     prepare_persistent_wide_inventor = PythonOperator(
-        task_id='create_persistent_wide_inventor',
+        task_id='prepare_persistent_wide_inventor',
         python_callable=prepare_wide_table,
         op_kwargs={'entity': 'inventor', 'config': config},
         dag=disambiguation_post_processing
     )
 
     prepare_persistent_wide_assignee = PythonOperator(
-        task_id='create_persistent_wide_assignee',
+        task_id='prepare_persistent_wide_assignee',
         python_callable=prepare_wide_table,
         op_kwargs={'entity': 'assignee', 'config': config},
         dag=disambiguation_post_processing
