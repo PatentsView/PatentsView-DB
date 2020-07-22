@@ -214,7 +214,7 @@ def write_wide_table(connection, entity, update_version, config):
     return
 
 
-def begin_entity_persistent_update(config):
+def begin_entity_persistent_update(config, entity):
     connection = pymysql.connect(host=config['DATABASE']['HOST'],
                                  user=config['DATABASE']['USERNAME'],
                                  password=config['DATABASE']['PASSWORD'],
@@ -222,9 +222,9 @@ def begin_entity_persistent_update(config):
                                  charset='utf8mb4',
                                  cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
     update_version = config['DATES']['END_DATE']
-    # update_long_entity(connection, 'inventor', update_version)
-    # print(generate_wide_header(connection, 'assignee', update_version, config))
-    write_wide_table(connection, 'assignee', update_version, config)
+    update_long_entity(connection, entity, update_version)
+    prepare_wide_table(connection, entity, update_version, config)
+    write_wide_table(connection, entity, update_version, config)
 
 
 if __name__ == '__main__':
