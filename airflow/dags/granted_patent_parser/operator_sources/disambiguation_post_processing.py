@@ -5,7 +5,6 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-
 #
 # default_args = {
 #     'owner': 'airflow',
@@ -31,7 +30,7 @@ from airflow.operators.python_operator import PythonOperator
 #     schedule_interval=None)
 # project_home = os.environ['PACKAGE_HOME']
 # config = get_config()
-from updater.post_processing.post_process_persistent import begin_entity_persistent_update
+from updater.post_processing.post_process_persistent import update_long_entity, prepare_wide_table, write_wide_table
 
 
 def add_postprocessing_operators(disambiguation_post_processing, config, project_home, airflow_task_success,
@@ -84,25 +83,38 @@ def add_postprocessing_operators(disambiguation_post_processing, config, project
 
     update_persistent_long_assignee = PythonOperator(
         task_id='update_persistent_long_assignee',
-        python_callable=begin_entity_persistent_update,
+        python_callable=update_long_entity,
+        op_kwargs={'entity': 'assignee', 'config': config},
+        dag=disambiguation_post_processing
+    )
+
+    prepare_persistent_wide_inventor = PythonOperator(
+        task_id='create_persistent_wide_inventor',
+        python_callable=prepare_wide_table,
+        op_kwargs={'entity': 'inventor', 'config': config},
+        dag=disambiguation_post_processing
+    )
+
+    prepare_persistent_wide_assignee = PythonOperator(
+        task_id='create_persistent_wide_assignee',
+        python_callable=prepare_wide_table,
         op_kwargs={'entity': 'assignee', 'config': config},
         dag=disambiguation_post_processing
     )
 
     create_persistent_wide_inventor = PythonOperator(
         task_id='create_persistent_wide_inventor',
-        python_callable=begin_entity_persistent_update,
+        python_callable=write_wide_table,
         op_kwargs={'entity': 'inventor', 'config': config},
         dag=disambiguation_post_processing
     )
 
     create_persistent_wide_assignee = PythonOperator(
         task_id='create_persistent_wide_assignee',
-        python_callable=create_persistent_wide_entity,
+        python_callable=write_wide_table,
         op_kwargs={'entity': 'assignee', 'config': config},
         dag=disambiguation_post_processing
     )
-
     post_process_inventor_operator.set_upstream(download_disambig_operator)
     post_process_assignee_operator.set_upstream(download_disambig_operator)
     post_process_location_operator.set_upstream(download_disambig_operator)
@@ -113,6 +125,7 @@ def add_postprocessing_operators(disambiguation_post_processing, config, project
 
     update_persistent_long_inventor.set_upstream(post_process_inventor_operator)
     update_persistent_long_assignee.set_upstream(post_process_assignee_operator)
-
-    create_persistent_wide_inventor.set_upstream(update_persistent_long_inventor)
-    create_persistent_wide_assignee.set_upstream(update_persistent_long_assignee)
+    prepare_persistent_wide_assignee.set_upstream(update_persistent_long_assignee)
+    prepare_persistent_wide_inventor.set_upstream(update_persistent_long_inventor)
+    create_persistent_wide_inventor.set_upstream(prepare_persistent_wide_inventor)
+    create_persistent_wide_assignee.set_upstream(prepare_persistent_wide_assignee)
