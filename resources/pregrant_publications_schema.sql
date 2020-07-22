@@ -241,6 +241,215 @@ FOR EACH row
 DELIMITER ;;
 DELIMITER ;
 
+CREATE TABLE `brf_sum_text_2011` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2011 BEFORE INSERT
+ON brf_sum_text_2011
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2010` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2010 BEFORE INSERT
+ON brf_sum_text_2010
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2009` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2009 BEFORE INSERT
+ON brf_sum_text_2009
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2008` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2008 BEFORE INSERT
+ON brf_sum_text_2008
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2007` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2007 BEFORE INSERT
+ON brf_sum_text_2007
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2006` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2006 BEFORE INSERT
+ON brf_sum_text_2006
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2005` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2005 BEFORE INSERT
+ON brf_sum_text_2005
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2004` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2004 BEFORE INSERT
+ON brf_sum_text_2004
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2003` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2003 BEFORE INSERT
+ON brf_sum_text_2003
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2002` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2002 BEFORE INSERT
+ON brf_sum_text_2002
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2001` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2001 BEFORE INSERT
+ON brf_sum_text_2001
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
 
 CREATE TABLE `claim` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -472,6 +681,259 @@ FOR EACH row
 DELIMITER ;;
 DELIMITER ;
 
+
+CREATE TABLE `claim_2011` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2011 BEFORE INSERT
+ON claim_2011
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2010` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2010 BEFORE INSERT
+ON claim_2010
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2009` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2009 BEFORE INSERT
+ON claim_2009
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2008` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2008 BEFORE INSERT
+ON claim_2008
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2007` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2007 BEFORE INSERT
+ON claim_2007
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2006` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2006 BEFORE INSERT
+ON claim_2006
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2005` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2005 BEFORE INSERT
+ON claim_2005
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2004` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2004 BEFORE INSERT
+ON claim_2004
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2003` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2003 BEFORE INSERT
+ON claim_2003
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2002` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2002 BEFORE INSERT
+ON claim_2002
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2001` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2001 BEFORE INSERT
+ON claim_2001
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
 
 CREATE TABLE `cpc` (
   `id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -711,6 +1173,238 @@ FOR EACH row
 DELIMITER ;;
 DELIMITER ;
 
+CREATE TABLE `detail_desc_text_2011` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2011 BEFORE INSERT
+ON detail_desc_text_2011
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `detail_desc_text_2010` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2010 BEFORE INSERT
+ON detail_desc_text_2010
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `detail_desc_text_2009` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2009 BEFORE INSERT
+ON detail_desc_text_2009
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `detail_desc_text_2008` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2008 BEFORE INSERT
+ON detail_desc_text_2008
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `detail_desc_text_2007` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2007 BEFORE INSERT
+ON detail_desc_text_2007
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `detail_desc_text_2006` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2006 BEFORE INSERT
+ON detail_desc_text_2006
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+
+CREATE TABLE `detail_desc_text_2005` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2005 BEFORE INSERT
+ON detail_desc_text_2005
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `detail_desc_text_2004` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2004 BEFORE INSERT
+ON detail_desc_text_2004
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `detail_desc_text_2003` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2003 BEFORE INSERT
+ON detail_desc_text_2003
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `detail_desc_text_2002` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2002 BEFORE INSERT
+ON detail_desc_text_2002
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `detail_desc_text_2001` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2001 BEFORE INSERT
+ON detail_desc_text_2001
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
 
 CREATE TABLE `draw_desc_text` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -921,6 +1615,239 @@ FOR EACH row
 
 DELIMITER ;;
 DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2011` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2011 BEFORE INSERT
+ON draw_desc_text_2011
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2010` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2010 BEFORE INSERT
+ON draw_desc_text_2010
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2009` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2009 BEFORE INSERT
+ON draw_desc_text_2009
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2008` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2008 BEFORE INSERT
+ON draw_desc_text_2008
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2007` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2007 BEFORE INSERT
+ON draw_desc_text_2007
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+
+CREATE TABLE `draw_desc_text_2006` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2006 BEFORE INSERT
+ON draw_desc_text_2006
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2005` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2005 BEFORE INSERT
+ON draw_desc_text_2005
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2004` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2004 BEFORE INSERT
+ON draw_desc_text_2004
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2003` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2003 BEFORE INSERT
+ON draw_desc_text_2003
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2002` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2002 BEFORE INSERT
+ON draw_desc_text_2002
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2001` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2001 BEFORE INSERT
+ON draw_desc_text_2001
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
 
 CREATE TABLE `foreign_priority` (
   `id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
