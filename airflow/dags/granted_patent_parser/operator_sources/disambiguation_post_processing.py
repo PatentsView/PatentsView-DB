@@ -31,6 +31,9 @@ from airflow.operators.python_operator import PythonOperator
 #     schedule_interval=None)
 # project_home = os.environ['PACKAGE_HOME']
 # config = get_config()
+from updater.post_processing.post_process_persistent import begin_entity_persistent_update
+
+
 def add_postprocessing_operators(disambiguation_post_processing, config, project_home, airflow_task_success,
                                  airflow_task_failure):
     from lib.configuration import get_config, get_scp_copy_command, get_scp_download_command
@@ -81,14 +84,14 @@ def add_postprocessing_operators(disambiguation_post_processing, config, project
 
     update_persistent_long_assignee = PythonOperator(
         task_id='update_persistent_long_assignee',
-        python_callable=update_long_entity,
+        python_callable=begin_entity_persistent_update,
         op_kwargs={'entity': 'assignee', 'config': config},
         dag=disambiguation_post_processing
     )
 
     create_persistent_wide_inventor = PythonOperator(
         task_id='create_persistent_wide_inventor',
-        python_callable=create_persistent_wide_entity,
+        python_callable=begin_entity_persistent_update,
         op_kwargs={'entity': 'inventor', 'config': config},
         dag=disambiguation_post_processing
     )
