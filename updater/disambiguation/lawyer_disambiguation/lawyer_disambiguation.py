@@ -39,9 +39,10 @@ def prepare_tables(config):
     engine = create_engine(cstr + "&local_infile=1")
     with engine.connect() as connection:
         connection.execute("CREATE TABLE rawlawyer_copy_backup_{} LIKE rawlawyer;".format(timestamp))
-        connection.execute("ALTER TABLE rawlawyer ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;")
-    with engine.connect() as connection:
         connection.execute("INSERT INTO rawlawyer_copy_backup_{} SELECT * FROM rawlawyer".format(timestamp))
+
+    with engine.connect() as connection:
+        connection.execute("ALTER TABLE rawlawyer ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;")
 
     with engine.connect() as connection:
         connection.execute(
