@@ -8,7 +8,7 @@ class RenameTest:
         self.empty_tables = ['assignee', 'cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_subsection', 'claim',
                              'brf_sum_text', 'detail_desc_text', 'draw_desc_text', 'inventor', 'location',
                              'location_assignee', 'location_inventor', 'patent_assignee', 'patent_inventor',
-                             'patent_lawyer', 'wipo']
+                             'patent_lawyer']
         self.config = config
         pass
 
