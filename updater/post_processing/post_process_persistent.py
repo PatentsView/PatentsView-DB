@@ -37,7 +37,7 @@ def get_create_syntax(entity, entity_db_cols, create_stmt):
 
         # regardless of entity, uuid column fixed at 32
         if col == current_rawentity or col == old_rawentity:
-            add_col_stmt = "`{0}` varchar(32),".format(col)
+            add_col_stmt = "`{0}` varchar(64),".format(col)
 
         # if assignee is entity - then disambig cols need to be varchar 64
         elif entity == 'assignee':
