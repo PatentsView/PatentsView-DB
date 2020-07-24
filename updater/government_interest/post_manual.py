@@ -1,3 +1,4 @@
+import ast
 import os
 import csv
 import pandas as pd
@@ -137,13 +138,14 @@ def push_orgs(looked_up_data, org_id_mapping, config):
                 else:
                     missed[patent_id] = org
             for org_id in list(all_orgs):
-                query = "INSERT INTO patent_govintorg (patent_id, organization_id) VALUES ('{}', '{}');".format(
+                query = "INSERT IGNORE INTO patent_govintorg (patent_id, organization_id) VALUES ('{}', '{}');".format(
                     patent_id, org_id)
                 cursor = engine.connect()
                 cursor.execute(query)
                 cursor.close()
         if row['contracts'] is not np.nan:
-            contracts = list(set(row['contracts'].split('|')))
+            contracts=  ast.literal_eval(row['contracts'])
+            # contracts = list(set(row['contracts'].split('|')))
             for contract_award_no in contracts:
                 query = "INSERT INTO patent_contractawardnumber (patent_id, contract_award_number) values ('{}', '{}')".format(
                     patent_id, contract_award_no)
