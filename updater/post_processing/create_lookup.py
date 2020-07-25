@@ -6,11 +6,11 @@ from lib.configuration import get_connection_string
 def create_lookup_tables(config):
     engine = create_engine(get_connection_string(config, "NEW_DB"))
     with engine.connect() as cursor:
-        cursor.execute('insert ignore into patent_inventor select patent_id, inventor_id from rawinventor')
+        cursor.execute('insert ignore into patent_inventor select patent_id, inventor_id from rawinventor where inventor_id is not null')
         print('patent_inventor')
-        cursor.execute('insert ignore into patent_assignee select patent_id, assignee_id from rawassignee')
+        cursor.execute('insert ignore into patent_assignee select patent_id, assignee_id from rawassignee where assignee_id is not null')
         print('patent_assignee')
-        cursor.execute('insert ignore into patent_lawyer select patent_id, lawyer_id from rawlawyer')
+        cursor.execute('insert ignore into patent_lawyer select patent_id, lawyer_id from rawlawyer where lawyer_id is not null')
         print('patent_lawyer')
         cursor.execute(
             "create table temp_assignee_loc as select assignee_id, rawlocation_id, location_id_transformed as location_id from rawassignee r left join rawlocation l on r.rawlocation_id = l.id;")
