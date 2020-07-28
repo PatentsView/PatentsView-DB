@@ -825,6 +825,59 @@
       "filename": "assignee.tsv"
     },
     {
+      "table_name": "usreldoc_related",
+      "friendly_name": "US Related Documents",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/us-related-documents/related-publication/",
+      "fields": [
+        {
+          "field_name": "related_doc_number",
+          "friendly_name": "Related Doc Number",
+          "xml_path": "doc-number",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "doc_type",
+          "friendly_name": "Document Type",
+          "xml_path": "..",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": true,
+          "data-type": "string"
+        },
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        }
+      ],
+      "filename": "usreldoc.tsv"
+    },
+    {
       "table_name": "usreldoc_single",
       "friendly_name": "US Related Documents",
       "multi_valued": true,

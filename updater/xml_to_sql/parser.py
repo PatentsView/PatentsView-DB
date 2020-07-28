@@ -257,6 +257,9 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                             [x if x is not None else '' for x in multi_value_list])
                     else:
                         data_list[field["field_name"]] = None  # Return the extracted data
+                    if tab['table_name'] == 'usreldoc_single' and field_element.tag == 'related-publication':
+                        data_list = {}
+                        break
     return data_list
 
 

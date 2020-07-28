@@ -2214,6 +2214,31 @@ FOR EACH row
 DELIMITER ;;
 DELIMITER ;
 
+CREATE TABLE `usreldoc_related` (
+  `id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `document_number` bigint(16) NOT NULL,
+  `related_doc_number` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `doc_type` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `relkind` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `usreldoc_related_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TRIGGER before_insert_usreldoc_related BEFORE INSERT
+ON usreldoc_related
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
 CREATE TABLE `usreldoc_parent_child` (
   `id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `document_number` bigint(16) NOT NULL,
