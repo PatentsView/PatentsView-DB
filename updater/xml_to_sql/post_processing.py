@@ -95,6 +95,8 @@ def consolidate_usreldoc(config):
         'INSERT INTO usreldoc SELECT * FROM usreldoc_parent_child;')
     engine.execute(
         'INSERT INTO usreldoc SELECT * FROM usreldoc_single;')
+    engine.execute(
+        'INSERT INTO usreldoc SELECT * FROM usreldoc_related;')
 
 
 def consolidate_claim(config):
