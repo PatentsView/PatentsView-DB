@@ -110,7 +110,7 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
         # reset the connection settings
         cursor.execute("SELECT 1;")
 
-        cursor.execute("set foreign_key_checks = 0; set unique_checks = 0;")
+        cursor.execute("set foreign_key_checks = 0; set unique_checks = 0;", multi=True)
     except:
         # raise DisconnectionError - pool will try
         # connecting again up to three times before raising.

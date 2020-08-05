@@ -51,7 +51,8 @@ def commit_inserts(session, insert_statements, table, is_mysql, commit_frequency
     """
     if is_mysql:
         ignore_prefix = ("IGNORE",)
-        session.execute("set foreign_key_checks = 0; set unique_checks = 0;")
+        session.execute("set foreign_key_checks = 0;")
+        session.execute("set unique_checks = 0;")
         session.commit()
     else:
         ignore_prefix = ("OR IGNORE",)

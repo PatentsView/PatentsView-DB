@@ -194,13 +194,16 @@ class LawyerDisambiguator:
         for lawyer in self.blocks.keys():
             ra_ids = (id_map[ra] for ra in self.blocks[lawyer])
             for block in ra_ids:
-                i += 1
-                rawlawyers = [lawyer_dict[ra_id] for ra_id in block]
-                if i % 20000 == 0:
-                    print(i, datetime.now(), flush=True)
-                    self.lawyer_match(rawlawyers, session, commit=True)
+                if block == []:
+                    continue
                 else:
-                    self.lawyer_match(rawlawyers, session, commit=False)
+                    i += 1
+                    rawlawyers = [lawyer_dict[ra_id] for ra_id in block]
+                    if i % 20000 == 0:
+                        print(i, datetime.now(), flush=True)
+                        self.lawyer_match(rawlawyers, session, commit=True)
+                    else:
+                        self.lawyer_match(rawlawyers, session, commit=False)
         t1 = bulk_commit_inserts(self.lawyer_insert_statements, Lawyer.__table__, 20000, 'grant')
         t2 = bulk_commit_inserts(self.patentlawyer_insert_statements, patentlawyer, 20000)
         t3 = bulk_commit_updates('lawyer_id', self.update_statements, RawLawyer.__table__, 20000)
