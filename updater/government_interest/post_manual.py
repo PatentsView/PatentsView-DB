@@ -7,7 +7,7 @@ import codecs
 
 from sqlalchemy import create_engine
 
-from lib.configuration import get_connection_string
+from lib.configuration import get_connection_string, get_config
 
 
 def upload_new_orgs(post_manual, engine):
@@ -147,11 +147,12 @@ def push_orgs(looked_up_data, org_id_mapping, config):
             contracts=  ast.literal_eval(row['contracts'])
             # contracts = list(set(row['contracts'].split('|')))
             for contract_award_no in contracts:
-                query = "INSERT INTO patent_contractawardnumber (patent_id, contract_award_number) values ('{}', '{}')".format(
-                    patent_id, contract_award_no)
-                cursor = engine.connect()
-                cursor.execute(query)
-                cursor.close()
+                if contract_award_no is not None:
+                    query = "INSERT IGNORE INTO patent_contractawardnumber (patent_id, contract_award_number) values ('{}', '{}')".format(
+                        patent_id, contract_award_no)
+                    cursor = engine.connect()
+                    cursor.execute(query)
+                    cursor.close()
     missed_org_list = list(set(missed.keys()))
     missed_org_count = [missed[item] for item in missed_org_list]
     total_missed_orgs = pd.DataFrame(missed_org_list, missed_org_count)
@@ -179,3 +180,7 @@ def process_post_manual(config):
 
     # push the mappings into the db
     push_orgs(looked_up, org_id_mapping, config)
+
+if __name__ =='__main__':
+    config=get_config()
+    process_post_manual(config)
