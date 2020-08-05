@@ -159,8 +159,13 @@ def add_postprocessing_operators(disambiguation_post_processing, config, project
     lookup_tables_operator.set_upstream(post_process_assignee_operator)
     lookup_tables_operator.set_upstream(post_process_location_operator)
 
-    update_persistent_long_inventor.set_upstream(post_process_inventor_operator)
-    update_persistent_long_assignee.set_upstream(post_process_assignee_operator)
+    qc_post_process_assignee_operator.set_upstream(post_process_assignee_operator)
+    qc_post_process_inventor_operator.set_upstream(post_process_inventor_operator)
+    qc_post_process_location_operator.set_upstream(post_process_location_operator)
+
+    update_persistent_long_inventor.set_upstream(qc_post_process_inventor_operator)
+    update_persistent_long_assignee.set_upstream(qc_post_process_assignee_operator)
+
     prepare_persistent_wide_assignee.set_upstream(update_persistent_long_assignee)
     prepare_persistent_wide_inventor.set_upstream(update_persistent_long_inventor)
     create_persistent_wide_inventor.set_upstream(prepare_persistent_wide_inventor)
