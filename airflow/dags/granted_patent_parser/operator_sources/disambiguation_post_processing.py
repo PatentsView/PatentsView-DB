@@ -30,6 +30,9 @@ from airflow.operators.python_operator import PythonOperator
 #     schedule_interval=None)
 # project_home = os.environ['PACKAGE_HOME']
 # config = get_config()
+from updater.post_processing.post_process_assignee import post_process_qc as assignee_post_process_qc
+from updater.post_processing.post_process_inventor import post_process_qc as inventor_post_process_qc
+from updater.post_processing.post_process_location import post_process_qc as location_post_process_qc
 from updater.post_processing.post_process_persistent import update_long_entity, prepare_wide_table, write_wide_table
 
 
@@ -51,70 +54,103 @@ def add_postprocessing_operators(disambiguation_post_processing, config, project
                                               )
     post_process_inventor_operator = PythonOperator(task_id='post_process_inventor',
                                                     python_callable=post_process_inventor,
-                                                    op_kwargs={'config': config}, dag=disambiguation_post_processing,
+                                                    op_kwargs={'config': config},
+                                                    dag=disambiguation_post_processing,
                                                     on_success_callback=airflow_task_success,
                                                     on_failure_callback=airflow_task_failure)
 
     post_process_assignee_operator = PythonOperator(task_id='post_process_assignee',
                                                     python_callable=post_process_assignee,
-                                                    op_kwargs={'config': config}, dag=disambiguation_post_processing,
+                                                    op_kwargs={'config': config},
+                                                    dag=disambiguation_post_processing,
                                                     on_success_callback=airflow_task_success,
                                                     on_failure_callback=airflow_task_failure)
-
+    qc_post_process_assignee_operator = PythonOperator(task_id='qc_post_process_assignee',
+                                                       python_callable=assignee_post_process_qc,
+                                                       op_kwargs={'config': config},
+                                                       dag=disambiguation_post_processing,
+                                                       on_success_callback=airflow_task_success,
+                                                       on_failure_callback=airflow_task_failure)
+    qc_post_process_inventor_operator = PythonOperator(task_id='qc_post_process_inventor',
+                                                       python_callable=inventor_post_process_qc,
+                                                       op_kwargs={'config': config},
+                                                       dag=disambiguation_post_processing,
+                                                       on_success_callback=airflow_task_success,
+                                                       on_failure_callback=airflow_task_failure)
+    qc_post_process_location_operator = PythonOperator(task_id='qc_post_process_location',
+                                                       python_callable=location_post_process_qc,
+                                                       op_kwargs={'config': config},
+                                                       dag=disambiguation_post_processing,
+                                                       on_success_callback=airflow_task_success,
+                                                       on_failure_callback=airflow_task_failure)
     post_process_location_operator = PythonOperator(task_id='post_process_location',
                                                     python_callable=post_process_location,
-                                                    op_kwargs={'config': config}, dag=disambiguation_post_processing,
+                                                    op_kwargs={'config': config},
+                                                    dag=disambiguation_post_processing,
                                                     on_success_callback=airflow_task_success,
                                                     on_failure_callback=airflow_task_failure)
 
     lookup_tables_operator = PythonOperator(task_id='lookup_tables',
-                                            python_callable=create_lookup_tables, dag=disambiguation_post_processing,
+                                            python_callable=create_lookup_tables,
+                                            dag=disambiguation_post_processing,
                                             op_kwargs={'config': config},
                                             on_success_callback=airflow_task_success,
                                             on_failure_callback=airflow_task_failure
                                             )
 
     update_persistent_long_inventor = PythonOperator(
-        task_id='update_persistent_long_inventor',
-        python_callable=update_long_entity,
-        op_kwargs={'entity': 'inventor', 'config': config},
-        dag=disambiguation_post_processing
-    )
+            task_id='update_persistent_long_inventor',
+            python_callable=update_long_entity,
+            op_kwargs={
+                    'entity': 'inventor',
+                    'config': config},
+            dag=disambiguation_post_processing
+            )
 
     update_persistent_long_assignee = PythonOperator(
-        task_id='update_persistent_long_assignee',
-        python_callable=update_long_entity,
-        op_kwargs={'entity': 'assignee', 'config': config},
-        dag=disambiguation_post_processing
-    )
+            task_id='update_persistent_long_assignee',
+            python_callable=update_long_entity,
+            op_kwargs={
+                    'entity': 'assignee',
+                    'config': config},
+            dag=disambiguation_post_processing
+            )
 
     prepare_persistent_wide_inventor = PythonOperator(
-        task_id='prepare_persistent_wide_inventor',
-        python_callable=prepare_wide_table,
-        op_kwargs={'entity': 'inventor', 'config': config},
-        dag=disambiguation_post_processing
-    )
+            task_id='prepare_persistent_wide_inventor',
+            python_callable=prepare_wide_table,
+            op_kwargs={
+                    'entity': 'inventor',
+                    'config': config},
+            dag=disambiguation_post_processing
+            )
 
     prepare_persistent_wide_assignee = PythonOperator(
-        task_id='prepare_persistent_wide_assignee',
-        python_callable=prepare_wide_table,
-        op_kwargs={'entity': 'assignee', 'config': config},
-        dag=disambiguation_post_processing
-    )
+            task_id='prepare_persistent_wide_assignee',
+            python_callable=prepare_wide_table,
+            op_kwargs={
+                    'entity': 'assignee',
+                    'config': config},
+            dag=disambiguation_post_processing
+            )
 
     create_persistent_wide_inventor = PythonOperator(
-        task_id='create_persistent_wide_inventor',
-        python_callable=write_wide_table,
-        op_kwargs={'entity': 'inventor', 'config': config},
-        dag=disambiguation_post_processing
-    )
+            task_id='create_persistent_wide_inventor',
+            python_callable=write_wide_table,
+            op_kwargs={
+                    'entity': 'inventor',
+                    'config': config},
+            dag=disambiguation_post_processing
+            )
 
     create_persistent_wide_assignee = PythonOperator(
-        task_id='create_persistent_wide_assignee',
-        python_callable=write_wide_table,
-        op_kwargs={'entity': 'assignee', 'config': config},
-        dag=disambiguation_post_processing
-    )
+            task_id='create_persistent_wide_assignee',
+            python_callable=write_wide_table,
+            op_kwargs={
+                    'entity': 'assignee',
+                    'config': config},
+            dag=disambiguation_post_processing
+            )
     post_process_inventor_operator.set_upstream(download_disambig_operator)
     post_process_assignee_operator.set_upstream(download_disambig_operator)
     post_process_location_operator.set_upstream(download_disambig_operator)

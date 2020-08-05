@@ -35,44 +35,55 @@ def set_config(config, type='granted_patent'):
 
 
 def get_section(task_id):
-    section_lookup = {'download_xml': "XML Processing", 'process_xml': "XML Processing", 'parse_xml': "XML Processing",
-                      "backup_olddb": "Database Setup", "rename_db": "Database Setup", "upload_new": "Database Setup",
-                      "restore_olddb": "Database Setup", "merge_db": "Database Setup",
-                      "create_text_tables": "Description Parsing", "parse_text_data": "Supplemental Data Collection",
-                      "download_cpc": "Supplemental Data Collection",
-                      "qc_download_cpc": "QC - Supplemental Data Collection",
-                      "cpc_class_parser": "Supplemental Data Collection",
-                      "qc_cpc_class_parser": "QC - Supplemental Data Collection",
-                      "cpc_parser": "Supplemental Data Collection",
-                      "qc_cpc_parser": "QC - Supplemental Data Collection",
-                      "cpc_current_processor": "Supplemental Data Collection",
-                      "wipo_processor": "Supplemental Data Collection",
-                      "cpc_class_uploader": "Supplemental Data Collection",
-                      "qc_cpc_current_wipot": "QC - Supplemental Data Collection",
-                      "qc_rename_db": "QC - Database Setup",
-                      "qc_upload_new": "QC - Database Setup",
-                      "qc_parse_text_data": "Long Text Processing",
-                      "merge_text_db": "Long Text Processing",
-                      "qc_merge_db": "QC - Database Setup", "qc_merge_text_db": "QC - Text Parsing",
-                      "withdrawn_processor": "Supplemental Data", "qc_withdrawn_processor": "QC - Supplemental Data",
-                      'export_disambig_data': 'Disambiguation Support - Export Disambig Inputs',
-                      'gi_NER': 'Government Interest - NER',
-                      'postprocess_NER': 'Government Interest - Post Process NER',
-                      'qc_cpc_current_wipo': 'QC - Supplemental Data - CPC/Wipo',
-                      'run_lawyer_disambiguation': 'Disambiguation - Lawyer Disambiguation',
-                      'upload_disambig_files': 'Disambiguation Support - Upload Disambig Inputs',
-                      'gi_post_manual': 'Government Interest - Post Manual Step',
+    section_lookup = {'download_xml':                    "XML Processing",
+                      'process_xml':                     "XML Processing",
+                      'parse_xml':                       "XML Processing",
+                      "backup_olddb":                    "Database Setup",
+                      "rename_db":                       "Database Setup",
+                      "upload_new":                      "Database Setup",
+                      "restore_olddb":                   "Database Setup",
+                      "merge_db":                        "Database Setup",
+                      "create_text_tables":              "Description Parsing",
+                      "parse_text_data":                 "Supplemental Data Collection",
+                      "download_cpc":                    "Supplemental Data Collection",
+                      "qc_download_cpc":                 "QC - Supplemental Data Collection",
+                      "cpc_class_parser":                "Supplemental Data Collection",
+                      "qc_cpc_class_parser":             "QC - Supplemental Data Collection",
+                      "cpc_parser":                      "Supplemental Data Collection",
+                      "qc_cpc_parser":                   "QC - Supplemental Data Collection",
+                      "cpc_current_processor":           "Supplemental Data Collection",
+                      "wipo_processor":                  "Supplemental Data Collection",
+                      "cpc_class_uploader":              "Supplemental Data Collection",
+                      "qc_cpc_current_wipot":            "QC - Supplemental Data Collection",
+                      "qc_rename_db":                    "QC - Database Setup",
+                      "qc_upload_new":                   "QC - Database Setup",
+                      "qc_parse_text_data":              "Long Text Processing",
+                      "merge_text_db":                   "Long Text Processing",
+                      "qc_merge_db":                     "QC - Database Setup",
+                      "qc_merge_text_db":                "QC - Text Parsing",
+                      "withdrawn_processor":             "Supplemental Data",
+                      "qc_withdrawn_processor":          "QC - Supplemental Data",
+                      'export_disambig_data':            'Disambiguation Support - Export Disambig Inputs',
+                      'gi_NER':                          'Government Interest - NER',
+                      'postprocess_NER':                 'Government Interest - Post Process NER',
+                      'qc_cpc_current_wipo':             'QC - Supplemental Data - CPC/Wipo',
+                      'run_lawyer_disambiguation':       'Disambiguation - Lawyer Disambiguation',
+                      'upload_disambig_files':           'Disambiguation Support - Upload Disambig Inputs',
+                      'gi_post_manual':                  'Government Interest - Post Manual Step',
                       'create_persistent_wide_assignee': 'Post Processing - Assignee Persistent Processing',
                       'create_persistent_wide_inventor': 'Post Processing - Inventor Persistent Processing',
-                      'download_disambiguation': 'Post Processing - Download Results',
-                      'lookup_tables': 'Post Processing - Relationship Tables Generation',
-                      'post_process_assignee': 'Post Processing - Assignee Post Processing',
-                      'post_process_inventor': 'Post Processing - Inventor Post Processing',
-                      'post_process_location': 'Post Processing - Location Post Processing',
+                      'download_disambiguation':         'Post Processing - Download Results',
+                      'lookup_tables':                   'Post Processing - Relationship Tables Generation',
+                      'post_process_assignee':           'Post Processing - Assignee Post Processing',
+                      'post_process_inventor':           'Post Processing - Inventor Post Processing',
+                      'post_process_location':           'Post Processing - Location Post Processing',
+                      'qc_post_process_assignee':        'Post Processing QC - Assignee Post Processing',
+                      'qc_post_process_inventor':        'Post Processing QC - Inventor Post Processing',
+                      'qc_post_process_location':        'Post Processing QC - Location Post Processing',
                       'update_persistent_long_assignee': 'Post Processing - Assignee Persistent Processing',
                       'update_persistent_long_inventor': 'Post Processing - Inventor Persistent Processing',
-                      'create_text_triggers': 'Long Text Processing',
-                      'create_text_yearly_tables': 'Long Text Processing'}
+                      'create_text_triggers':            'Long Text Processing',
+                      'create_text_yearly_tables':       'Long Text Processing'}
 
     return section_lookup[task_id]
 
@@ -108,9 +119,10 @@ def get_backup_command(config, project_home):
     verbosity = 3
     thread = 6
 
-    backup_command = "{command} --defaults-file={conf_parameter} -F 50 -s 5000000 -l 1999999999 -v {verbosity} -t {thread} -B {database} -o {directory_parameter} --lock-all-tables".format(
-        command=command, conf_parameter=conf_parameter, verbosity=verbosity, thread=thread,
-        directory_parameter=directory_parameter, database=database_parameter)
+    backup_command = "{command} --defaults-file={conf_parameter} -F 50 -s 5000000 -l 1999999999 -v {verbosity} -t {" \
+                     "thread} -B {database} -o {directory_parameter} --lock-all-tables".format(
+            command=command, conf_parameter=conf_parameter, verbosity=verbosity, thread=thread,
+            directory_parameter=directory_parameter, database=database_parameter)
 
     return backup_command
 
@@ -125,9 +137,10 @@ def get_loader_command(config, project_home):
     verbosity = 3
     thread = 6
 
-    loader_command = "{command} {script} {conf_parameter} -d {directory_parameter} -s {database_parameter} -v {verbosity} -t {thread} -o".format(
-        command=command, script=script, conf_parameter=conf_parameter, directory_parameter=directory_parameter,
-        database_parameter=database_parameter, verbosity=verbosity, thread=thread)
+    loader_command = "{command} {script} {conf_parameter} -d {directory_parameter} -s {database_parameter} -v {" \
+                     "verbosity} -t {thread} -o".format(
+            command=command, script=script, conf_parameter=conf_parameter, directory_parameter=directory_parameter,
+            database_parameter=database_parameter, verbosity=verbosity, thread=thread)
 
     return loader_command
 
@@ -170,14 +183,15 @@ def get_scp_download_command(config):
     disambig_user = 'disambiguser'
     disambig_host = "ec2-52-21-62-204.compute-1.amazonaws.com"
     source_files = {
-        'inventor_disambiguation.tsv': '/data/disambiguation/exp_out/inventor/disambiguation.postprocessed.tsv',
-        'assignee_disambiguation.tsv': '/data/disambiguation/exp_out/assignee/disambiguation.tsv',
-        'location_disambiguation.tsv': '/data/disambiguation/exp_out/location/location_post_processed.tsv'}
+            'inventor_disambiguation.tsv': '/data/disambiguation/exp_out/inventor/disambiguation.postprocessed.tsv',
+            'assignee_disambiguation.tsv': '/data/disambiguation/exp_out/assignee/disambiguation.tsv',
+            'location_disambiguation.tsv': '/data/disambiguation/exp_out/location/location_post_processed.tsv'}
     command_strings = ["mkdir -p {disambig_output_folder}".format(disambig_output_folder=disambig_output_folder)]
     for dest_file in source_files:
-        command_string = "{command} -i {keyfile} {user}@{host}:{source_file} {disambig_output_folder}/{dest_file} ".format(
-            command=command, keyfile=keyfile_parameter, dest_file=dest_file, source_file=source_files[dest_file],
-            user=disambig_user, host=disambig_host, disambig_output_folder=disambig_output_folder)
+        command_string = "{command} -i {keyfile} {user}@{host}:{source_file} {disambig_output_folder}/{dest_file} " \
+                         "".format(
+                command=command, keyfile=keyfile_parameter, dest_file=dest_file, source_file=source_files[dest_file],
+                user=disambig_user, host=disambig_host, disambig_output_folder=disambig_output_folder)
         command_strings.append(command_string)
     return " && ".join(command_strings)
 
