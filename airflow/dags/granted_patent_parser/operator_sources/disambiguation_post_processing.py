@@ -155,9 +155,9 @@ def add_postprocessing_operators(disambiguation_post_processing, config, project
     post_process_assignee_operator.set_upstream(download_disambig_operator)
     post_process_location_operator.set_upstream(download_disambig_operator)
 
-    lookup_tables_operator.set_upstream(post_process_inventor_operator)
-    lookup_tables_operator.set_upstream(post_process_assignee_operator)
-    lookup_tables_operator.set_upstream(post_process_location_operator)
+    lookup_tables_operator.set_upstream(qc_post_process_assignee_operator)
+    lookup_tables_operator.set_upstream(qc_post_process_inventor_operator)
+    lookup_tables_operator.set_upstream(qc_post_process_location_operator)
 
     qc_post_process_assignee_operator.set_upstream(post_process_assignee_operator)
     qc_post_process_inventor_operator.set_upstream(post_process_inventor_operator)
