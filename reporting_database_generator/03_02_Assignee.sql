@@ -179,8 +179,8 @@ select distinct timl.`new_location_id`,
                 tima.`new_assignee_id`,
                 null
 from `{{params.raw_database}}`.`location_assignee` la
-         inner join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` timl
-                    on timl.`old_location_id_transformed` = la.`location_id`
+         inner join `{{params.reporting_database}}`.`temp_id_mapping_location` timl
+                    on timl.`old_location_id` = la.`location_id`
          inner join `{{params.reporting_database}}`.`temp_id_mapping_assignee` tima
                     on tima.`old_assignee_id` = la.`assignee_id`;
 
