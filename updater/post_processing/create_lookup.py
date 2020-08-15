@@ -1,28 +1,33 @@
 from sqlalchemy import create_engine
 
-from lib.configuration import get_connection_string
+from lib.configuration import get_config, get_connection_string
+
+
+def load_lookup_table(config, entity):
+    patent_entity_table = "patent_{entity}".format(entity=entity)
+    entity_field = "{entity}_id".format(entity=entity)
+    rawtable = "raw{entity}".format(entity=entity)
+    delete_query = "DELETE FROM {pet}".format(pet=patent_entity_table)
+    insert_query = "INSERT INTO {pet} SELECT et.patent_id, et.{ef}, rl.location_id from {rt} et left join rawlocation " \
+                   "" \
+                   "" \
+                   "" \
+                   "rl on " \
+                   "rl.id = et.rawlocation_id".format(pet=patent_entity_table, ef=entity_field, rt=rawtable)
+    engine = create_engine(get_connection_string(config, "NEW_DB"))
+    with engine.begin() as cursor:
+        print(delete_query)
+        # cursor.execute(delete_query)
+        print(insert_query)
+        # cursor.execute(insert_query)
 
 
 def create_lookup_tables(config):
-    engine = create_engine(get_connection_string(config, "NEW_DB"))
-    with engine.connect() as cursor:
-        cursor.execute('insert ignore into patent_inventor select patent_id, inventor_id from rawinventor where inventor_id is not null')
-        print('patent_inventor')
-        cursor.execute('insert ignore into patent_assignee select patent_id, assignee_id from rawassignee where assignee_id is not null')
-        print('patent_assignee')
-        cursor.execute('insert ignore into patent_lawyer select patent_id, lawyer_id from rawlawyer where lawyer_id is not null')
-        print('patent_lawyer')
-        cursor.execute(
-            "create table temp_assignee_loc as select assignee_id, rawlocation_id, location_id_transformed as location_id from rawassignee r left join rawlocation l on r.rawlocation_id = l.id;")
-        print('made locaiton_assignee_temp')
-        cursor.execute(
-            "insert ignore into location_assignee SELECT distinct rl.location_id, ri.assignee_id from rawassignee ri left join rawlocation rl on rl.id = ri.rawlocation_id where ri.assignee_id is not NULL and rl.location_id is not NULL;")
-        print('location_assignee')
-        # I don't understand why location assignee and location inventor have different types of location id
-        cursor.execute(
-            "create table temp_inventor_loc as select inventor_id, location_id from rawinventor r left join rawlocation l on r.rawlocation_id = l.id;")
-        print('done inventor temp')
+    load_lookup_table(config, "inventor")
+    load_lookup_table(config, "assignee")
+    load_lookup_table(config, "lawyer")
 
-        cursor.execute(
-            "insert ignore into location_inventor SELECT rl.location_id, ri.inventor_id from rawinventor ri left join rawlocation rl on rl.id = ri.rawlocation_id where ri.inventor_id is not NULL and rl.location_id is not NULL;")
-        print('location_inventor')
+
+if __name__ == '__main__':
+    config = get_config()
+    create_lookup_tables(config)
