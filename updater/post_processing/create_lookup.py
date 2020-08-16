@@ -17,9 +17,9 @@ def load_lookup_table(config, entity):
     engine = create_engine(get_connection_string(config, "NEW_DB"))
     with engine.begin() as cursor:
         print(delete_query)
-        # cursor.execute(delete_query)
+        cursor.execute(delete_query)
         print(insert_query)
-        # cursor.execute(insert_query)
+        cursor.execute(insert_query)
 
 
 def create_lookup_tables(config):
