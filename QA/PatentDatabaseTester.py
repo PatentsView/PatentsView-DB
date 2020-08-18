@@ -1,8 +1,8 @@
-from abc import ABC, abstractmethod
-import time
-from sqlalchemy import create_engine
+from abc import ABC
+
 import pandas as pd
 import pymysql.cursors
+from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
 from lib.configuration import get_connection_string
@@ -10,9 +10,19 @@ from lib.configuration import get_connection_string
 
 class PatentDatabaseTester(ABC):
     def __init__(self, config, database_section, start_date, end_date):
+        """
+        Do not instantiate. Overriden class constructor
+        :param config: Configparser object containing update parameters
+        :param database_section: Section in config that indicates database to use. NEW_DB or TEMP_UPLOAD_DB
+        :param start_date: Database Update start date
+        :param end_date: Database Update end date
+        """
+        # Tables that do not directly link to patent table
         self.patent_exclusion_list = ['mainclass', 'subclass', 'patent', 'rawlocation']
+        # Update start and end date
         self.start_date = start_date
         self.end_date = end_date
+        # Indicator for Upload/Patents database
         self.database_section = database_section
 
         self.qa_connection_string = get_connection_string(config, 'QA_DATABASE')
@@ -24,23 +34,44 @@ class PatentDatabaseTester(ABC):
                                           cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
         # self.database_connection_string = get_connection_string(config, database_section)
         self.config = config
-        self.table_config = {}
-        self.qa_data = {"DataMonitor_count": [], 'DataMonitor_nullcount': [], 'DataMonitor_patentyearlycount': [],
-                        'DataMonitor_categorycount': [], 'DataMonitor_floatingpatentcount': [],
-                        'DataMonitor_maxtextlength': [], 'DataMonitor_prefixedentitycount': []}
-        self.patent_db_prefix = None
+        # Place Holder for saving QA counts - keys map to table names in patent_QA
+        self.qa_data = {
+                "DataMonitor_count":               [],
+                'DataMonitor_nullcount':           [],
+                'DataMonitor_patentyearlycount':   [],
+                'DataMonitor_categorycount':       [],
+                'DataMonitor_floatingpatentcount': [],
+                'DataMonitor_maxtextlength':       [],
+                'DataMonitor_prefixedentitycount': []
+                }
+
         database_type, version = self.config["DATABASE"][self.database_section].split("_")
         self.version = version
         self.database_type = database_type
 
+        # Following variables are overridden by inherited classes
+        # Dict of tables involved on QC checks
+        self.table_config = {}
+        # Prefix indicates database where patent table is available
+        # Current databaseif prefix is None
+        # Used for Text databases
+        self.patent_db_prefix = None
+
     def test_table_row_count(self, table_name):
+        """
+        Test and collect row counts. Raises exception if any of the tables are empty
+        :param table_name: table name to collect row count for
+        """
         print("\tTesting Table counts for {table_name} in {db}".format(table_name=table_name,
                                                                        db=self.config["DATABASE"][
                                                                            self.database_section]))
         try:
             if not self.connection.open:
                 self.connection.connect()
-            count_query = "SELECT count(*) as table_count from {tbl}".format(tbl=table_name)
+            count_query = """
+SELECT count(*) as table_count
+from {tbl}
+            """.format(tbl=table_name)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(count_query)
                 count_value = count_cursor.fetchall()[0][0]
@@ -52,66 +83,92 @@ class PatentDatabaseTester(ABC):
                 if table_name.startswith(prefix):
                     write_table_name = table_name[len(prefix):]
                 self.qa_data['DataMonitor_count'].append(
-                    {"database_type": self.database_type, 'table_name': write_table_name,
-                     'update_version': self.version,
-                     'table_row_count': count_value})
+                        {
+                                "database_type":   self.database_type,
+                                'table_name':      write_table_name,
+                                'update_version':  self.version,
+                                'table_row_count': count_value
+                                })
         finally:
             if self.connection.open:
                 self.connection.close()
 
     def test_blank_count(self, table, table_config):
+        """
+        Verify there are no blank values in any of the text columns
+        :param table: Table to verify
+        :param table_config: Column configuration for table
+        """
         print("\tTesting blanks for {table_name}".format(table_name=table))
         for field in table_config["fields"]:
             if table_config["fields"][field]["data_type"] in ['varchar', 'mediumtext', 'text']:
                 try:
                     if not self.connection.open:
                         self.connection.connect()
-                    count_query = "SELECT count(*) as blank_count from {tbl} where {field} =''".format(tbl=table,
-                                                                                                       field=field)
+                    count_query = """
+SELECT count(*) as blank_count
+from {tbl}
+where {field} = ''
+                    """.format(tbl=table, field=field)
                     with self.connection.cursor() as count_cursor:
                         count_cursor.execute(count_query)
                         count_value = count_cursor.fetchall()[0][0]
                         if count_value != 0:
-                            raise Exception(
-                                "Blanks encountered in  table found:{database}.{table} column {col}. Count: {count}".format(
-                                    database=self.config['DATABASE'][self.database_section], table=table,
-                                    col=field,
-                                    count=count_value))
+                            exception_message = """
+Blanks encountered in  table found:{database}.{table} column {col}. Count: {count}
+                            """.format(database=self.config['DATABASE'][self.database_section],
+                                       table=table, col=field,
+                                       count=count_value)
+                            raise Exception(exception_message)
                 finally:
-
                     if self.connection.open:
                         self.connection.close()
 
     def test_null_byte(self, table, field):
+        """
+        Verify there are no null bytes in the table fields
+        :param table: Table to verify
+        :param field: Field to verify
+        """
         print("\t\tTesting for NUL bytes for {field} in {table_name}".format(field=field, table_name=table))
         try:
             if not self.connection.open:
                 self.connection.connect()
-            nul_byte_query = "SELECT  count(*) as count from {tbl} where INSTR({field}, CHAR(0x00))>0".format(
-                tbl=table,
-                field=field)
+            nul_byte_query = """
+SELECT count(*) as count
+from {tbl}
+where INSTR({field}, CHAR(0x00)) > 0
+            """.format(
+                    tbl=table,
+                    field=field)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(nul_byte_query)
                 nul_byte_count = count_cursor.fetchall()[0][0]
                 if nul_byte_count > 1:
-                    raise Exception(
-                        "{count} rows with NUL Byte found in {field} of {table_name} for {db}".format(
-                            count=nul_byte_count, field=field, table_name=table,
-                            db=self.config["DATABASE"][
-                                self.database_section]))
+                    exception_message = """
+{count} rows with NUL Byte found in {field} of {table_name} for {db}                    
+                    """.format(count=nul_byte_count, field=field, table_name=table,
+                               db=self.config["DATABASE"][self.database_section])
+                    raise Exception(exception_message)
         finally:
             if self.connection.open:
                 self.connection.close()
 
     def load_category_counts(self, table, field):
+        """
+        Load counts of rows by each value for a given "categorical variable" field
+        :param table: Table to gather counts for
+        :param field: Categorical variable field
+        """
         print("\t\tLoading category counts for {field} in {table_name}".format(field=field, table_name=table))
         try:
             if not self.connection.open:
                 self.connection.connect()
-            category_count_query = "SELECT {field} as value, count(*) as count from {tbl} group by {field}".format(
-                tbl=table,
-                field=field)
-            print(category_count_query)
+            category_count_query = """
+SELECT {field} as value, count(*) as count
+from {tbl}
+group by {field}
+            """.format(tbl=table, field=field)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(category_count_query)
                 for count_row in count_cursor:
@@ -123,13 +180,24 @@ class PatentDatabaseTester(ABC):
                     if table.startswith(prefix):
                         write_table_name = table[len(prefix):]
                     self.qa_data['DataMonitor_categorycount'].append(
-                        {"database_type": self.database_type, 'table_name': write_table_name, "column_name": field,
-                         'update_version': self.version, 'value': value, 'count': count_row[1]})
+                            {
+                                    "database_type":  self.database_type,
+                                    'table_name':     write_table_name,
+                                    "column_name":    field,
+                                    'update_version': self.version,
+                                    'value':          value,
+                                    'count':          count_row[1]
+                                    })
         finally:
             if self.connection.open:
                 self.connection.close()
 
     def test_nulls(self, table, table_config):
+        """
+        Test and collect count NULL values in different fields
+        :param table:
+        :param table_config:
+        """
         print("\tTesting NULLs for {table_name}".format(table_name=table))
         for field in table_config["fields"]:
             try:
@@ -143,17 +211,22 @@ class PatentDatabaseTester(ABC):
                     if not table_config["fields"][field]['null_allowed']:
                         if count_value != 0:
                             raise Exception(
-                                "NULLs encountered in table found:{database}.{table} column {col}. Count: {count}".format(
-                                    database=self.database_section, table=table,
-                                    col=field,
-                                    count=count_value))
+                                    "NULLs encountered in table found:{database}.{table} column {col}. Count: {count}".format(
+                                            database=self.database_section, table=table,
+                                            col=field,
+                                            count=count_value))
                     write_table_name = table
                     prefix = "temp_"
                     if table.startswith(prefix):
                         write_table_name = table[len(prefix):]
                     self.qa_data['DataMonitor_nullcount'].append(
-                        {"database_type": self.database_type, 'table_name': write_table_name, "column_name": field,
-                         'update_version': self.version, 'null_count': count_value})
+                            {
+                                    "database_type":  self.database_type,
+                                    'table_name':     write_table_name,
+                                    "column_name":    field,
+                                    'update_version': self.version,
+                                    'null_count':     count_value
+                                    })
             finally:
                 if self.connection.open:
                     self.connection.close()
@@ -170,9 +243,9 @@ class PatentDatabaseTester(ABC):
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value != 0:
                     raise Exception(
-                        "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {count}".format(
-                            database=self.database_section, table=table, col=field,
-                            count=count_value))
+                            "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {count}".format(
+                                    database=self.database_section, table=table, col=field,
+                                    count=count_value))
         finally:
             if self.connection.open:
                 self.connection.close()
@@ -187,8 +260,8 @@ class PatentDatabaseTester(ABC):
                 count_query = "SELECT year(`date`) as `yr`, count(1) as `year_count` from patent group by year(`date`)"
             else:
                 count_query = "SELECT year(p.`date`) as `yr`, count(1) as `year_count` from {patent_table} p join {entity} et on et.patent_id = p.id group by year(`date`)".format(
-                    patent_table=patent_table,
-                    entity=table_name)
+                        patent_table=patent_table,
+                        entity=table_name)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(count_query)
                 for count_row in count_cursor.fetchall():
@@ -197,8 +270,13 @@ class PatentDatabaseTester(ABC):
                     if table_name.startswith(prefix):
                         write_table_name = table_name[len(prefix):]
                     self.qa_data['DataMonitor_patentyearlycount'].append(
-                        {"database_type": self.database_type, 'update_version': self.version, 'year': count_row[0],
-                         'table_name': write_table_name, 'patent_count': count_row[1]})
+                            {
+                                    "database_type":  self.database_type,
+                                    'update_version': self.version,
+                                    'year':           count_row[0],
+                                    'table_name':     write_table_name,
+                                    'patent_count':   count_row[1]
+                                    })
         except pymysql.err.InternalError as e:
             return
         finally:
@@ -227,9 +305,9 @@ class PatentDatabaseTester(ABC):
 
     def assert_related_floating_entities(self, table_name, related_config):
         related_query = "SELECT count(1) from {related_table} destination left join {source_table} source on source.{source_id}= destination.{destination_id} where source.{source_id} is null".format(
-            source_table=table_name,
-            related_table=related_config['table'], source_id=related_config['source_id'],
-            destination_id=related_config['destination_id'])
+                source_table=table_name,
+                related_table=related_config['table'], source_id=related_config['source_id'],
+                destination_id=related_config['destination_id'])
         if not self.connection.open:
             self.connection.connect()
         try:
@@ -238,20 +316,40 @@ class PatentDatabaseTester(ABC):
                 related_count = float_cursor.fetchall()[0][0]
                 if related_count > 0:
                     raise Exception(
-                        "There are rows in {destination_id} in {related_table} that do not have corresponding {source_id} in {source_table} for {db}".format(
-                            source_table=table_name,
-                            related_table=related_config['table'], source_id=related_config['source_id'],
-                            destination_id=related_config['destination_id'], db=
-                            self.config['DATABASE'][self.database_section]))
+                            "There are rows in {destination_id} in {related_table} that do not have corresponding {source_id} in {source_table} for {db}".format(
+                                    source_table=table_name,
+                                    related_table=related_config['table'], source_id=related_config['source_id'],
+                                    destination_id=related_config['destination_id'], db=
+                                    self.config['DATABASE'][self.database_section]))
 
         finally:
             self.connection.close()
 
+    def assert_null_string(self, table, field):
+        print("\t\tTesting NULL string for {field} in {table_name}".format(field=field, table_name=table))
+        try:
+            if not self.connection.open:
+                self.connection.connect()
+            zero_query = "SELECT count(*) NULL_count from {tbl} where {field} ='NULL'".format(tbl=table,
+                                                                                              field=field)
+            with self.connection.cursor() as count_cursor:
+                count_cursor.execute(zero_query)
+                count_value = count_cursor.fetchall()[0][0]
+                if count_value != 0:
+                    raise Exception(
+                            "NULL strings encountered in table found:{database}.{table} column {col}. Count: {count}".format(
+                                    database=self.database_section, table=table, col=field,
+                                    count=count_value))
+        finally:
+            if self.connection.open:
+                self.connection.close()
+
     def test_floating_entities(self, table_name):
         print("\tTesting floating entities for {table_name}".format(table_name=table_name))
         patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(db=self.patent_db_prefix)
-        float_query = "SELECT count(1) from {table_name} et left join {patent_table} p on p.id =et.patent_id where p.id is null".format(
-            table_name=table_name, patent_table=patent_table)
+        float_query = "SELECT count(1) from {table_name} et left join {patent_table} p on p.id =et.patent_id where " \
+                      "p.id is null".format(
+                table_name=table_name, patent_table=patent_table)
         if not self.connection.open:
             self.connection.connect()
         print(float_query)
@@ -261,8 +359,8 @@ class PatentDatabaseTester(ABC):
                 float_count = count_cursor.fetchall()[0][0]
                 if float_count > 0:
                     raise Exception("There are patents in {table_name} that are not in patent table for {db}".format(
-                        table_name=table_name, db=
-                        self.config['DATABASE'][self.database_section]))
+                            table_name=table_name, db=
+                            self.config['DATABASE'][self.database_section]))
 
         except pymysql.Error as e:
             if table_name not in self.patent_exclusion_list:
@@ -278,8 +376,9 @@ class PatentDatabaseTester(ABC):
         if 'custom_float_condition' in table_config and table_config['custom_float_condition'] is not None:
             additional_where = "and " + table_config['custom_float_condition']
         patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(db=self.patent_db_prefix)
-        float_count_query = "SELECT count(1) as count from {patent_table} p left join {entity_table} et on et.patent_id = p.id where et.patent_id is null {additional_where}".format(
-            patent_table=patent_table, entity_table=table, additional_where=additional_where)
+        float_count_query = "SELECT count(1) as count from {patent_table} p left join {entity_table} et on " \
+                            "et.patent_id = p.id where et.patent_id is null {additional_where}".format(
+                patent_table=patent_table, entity_table=table, additional_where=additional_where)
         print(float_count_query)
         try:
             with self.connection.cursor() as count_cursor:
@@ -289,10 +388,14 @@ class PatentDatabaseTester(ABC):
                 prefix = "temp_"
                 if table.startswith(prefix):
                     write_table_name = table[len(prefix):]
-                self.qa_data['DataMonitor_floatingpatentcount'].append({"database_type": self.database_type,
-                                                                        'update_version': self.version,
-                                                                        'table_name': write_table_name,
-                                                                        'floating_patent_count': float_count})
+                self.qa_data['DataMonitor_floatingpatentcount'].append({
+                        "database_type":
+                                                 self.database_type,
+                        'update_version':        self.version,
+                        'table_name':
+                                                 write_table_name,
+                        'floating_patent_count': float_count
+                        })
         except pymysql.Error as e:
             if table not in self.patent_exclusion_list:
                 raise e
@@ -306,11 +409,11 @@ class PatentDatabaseTester(ABC):
                 if not self.connection.open:
                     self.connection.connect()
                 patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(
-                    db=self.patent_db_prefix)
+                        db=self.patent_db_prefix)
 
                 count_query = "SELECT p.`type` as `type`, count(1) as `type_count` from {patent_table} p join {entity} et on et.patent_id = p.id group by  p.`type`".format(
-                    patent_table=patent_table,
-                    entity=table_name)
+                        patent_table=patent_table,
+                        entity=table_name)
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
                     for count_row in count_cursor.fetchall():
@@ -319,8 +422,13 @@ class PatentDatabaseTester(ABC):
                         if table_name.startswith(prefix):
                             write_table_name = table_name[len(prefix):]
                         self.qa_data['DataMonitor_prefixedentitycount'].append(
-                            {"database_type": self.database_type, 'update_version': self.version, 'patent_type': count_row[0],
-                             'table_name': write_table_name, 'patent_count': count_row[1]})
+                                {
+                                        "database_type":  self.database_type,
+                                        'update_version': self.version,
+                                        'patent_type':    count_row[0],
+                                        'table_name':     write_table_name,
+                                        'patent_count':   count_row[1]
+                                        })
             except pymysql.err.InternalError as e:
                 if table_name not in self.patent_exclusion_list:
                     raise e
@@ -342,7 +450,8 @@ class PatentDatabaseTester(ABC):
 
     def test_text_length(self, table_name, field_name):
         print(
-            "\t\tLoading Text field max Length {field} in {table_name}".format(field=field_name, table_name=table_name))
+                "\t\tLoading Text field max Length {field} in {table_name}".format(field=field_name,
+                                                                                   table_name=table_name))
         text_length_query = "SELECT max(char_length({field})) from {table};".format(field=field_name, table=table_name)
         if not self.connection.open:
             self.connection.connect()
@@ -354,11 +463,13 @@ class PatentDatabaseTester(ABC):
             prefix = "temp_"
             if table_name.startswith(prefix):
                 write_table_name = table_name[len(prefix):]
-            self.qa_data['DataMonitor_maxtextlength'].append({"database_type": self.database_type,
-                                                              'update_version': self.version,
-                                                              'table_name': write_table_name,
-                                                              'column_name': field_name,
-                                                              'max_text_length': text_length})
+            self.qa_data['DataMonitor_maxtextlength'].append({
+                    "database_type":   self.database_type,
+                    'update_version':  self.version,
+                    'table_name':      write_table_name,
+                    'column_name':     field_name,
+                    'max_text_length': text_length
+                    })
 
     def runTests(self):
         skiplist = []
