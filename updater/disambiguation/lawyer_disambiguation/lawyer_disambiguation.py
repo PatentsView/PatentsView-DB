@@ -1,28 +1,23 @@
-import MySQLdb
-import os
 import csv
-import sys
-import pandas as pd
-import tqdm
-import sqlalchemy
+import pickle as pickle
 import re
 import time
-from collections import defaultdict, deque
-import uuid
-from string import ascii_lowercase as alphabet
-from hashlib import md5
-import pickle as pickle
-
-from sqlalchemy import create_engine
-
-from textdistance import jaro_winkler
 from collections import Counter
+from collections import defaultdict
+from datetime import datetime
+from hashlib import md5
+from string import ascii_lowercase as alphabet
+
+import tqdm
+from sqlalchemy import create_engine
+from textdistance import jaro_winkler
+from unidecode import unidecode
+
 # from alchemy import get_config, match
+from QA.post_processing.LawyerPostProcessing import LawyerPostProcessingQC
 from lib.configuration import get_config, get_connection_string
 from updater.disambiguation.lawyer_disambiguation import alchemy
 from updater.disambiguation.lawyer_disambiguation.alchemy.schema import *
-from datetime import datetime
-from unidecode import unidecode
 from updater.disambiguation.lawyer_disambiguation.tasks import bulk_commit_inserts, bulk_commit_updates
 
 
@@ -39,9 +34,10 @@ def prepare_tables(config):
 
     with engine.connect() as connection:
         connection.execute(
-            "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;")
+                "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;")
         connection.execute(
-            "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;")
+                "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE "
+                "rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;")
         connection.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_lawyer_id IS NULL;")
 
 
@@ -52,9 +48,9 @@ def clean_rawlawyer(config):
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
     outfile = csv.writer(open(disambig_folder + '/rawlawyer_cleanalphaids.tsv', 'w'), delimiter='\t')
     outfile.writerow(
-        ['uuid', 'lawyer_id', 'patent_id', 'name_first', 'name_last', 'organization', 'cleaned_alpha_lawyer_id',
-         'country',
-         'sequence'])
+            ['uuid', 'lawyer_id', 'patent_id', 'name_first', 'name_last', 'organization', 'cleaned_alpha_lawyer_id',
+             'country',
+             'sequence'])
 
     stoplist = ['the', 'of', 'and', 'a', 'an', 'at']
 
@@ -68,7 +64,7 @@ def clean_rawlawyer(config):
         counter = 0
         with engine.connect() as db_con:
             rawlaw_chunk = db_con.execute(
-                'SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset))
+                    'SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset))
 
             for lawyer in tqdm.tqdm(rawlaw_chunk, total=limit,
                                     desc="rawlawyer processing - batch:" + str(batch_counter)):
@@ -107,8 +103,9 @@ def load_clean_rawlawyer(config):
     engine.execute("ALTER TABLE rawlawyer RENAME TO rawlawyer_predisambig;")
     engine.execute("CREATE TABLE rawlawyer LIKE rawlawyer_predisambig;")
     engine.execute(
-        "LOAD DATA LOCAL INFILE '{}' INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES;".format(
-            disambig_folder + '/rawlawyer_cleanalphaids.tsv'))
+            "LOAD DATA LOCAL INFILE '{}' INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' "
+            "IGNORE 1 LINES;".format(
+                    disambig_folder + '/rawlawyer_cleanalphaids.tsv'))
 
 
 class LawyerDisambiguator:
@@ -134,7 +131,8 @@ class LawyerDisambiguator:
         class_type = None
         class_type = None
         for obj in objects:
-            if not obj: continue
+            if not obj:
+                continue
             class_type = obj.__related__
             raw_objects.append(obj)
             break
@@ -178,8 +176,14 @@ class LawyerDisambiguator:
         self.lawyer_insert_statements.append(param)
         tmpids = [x.uuid for x in objects]
         patents = [x.patent_id for x in objects]
-        self.patentlawyer_insert_statements.extend([{'patent_id': x, 'lawyer_id': param['id']} for x in patents])
-        self.update_statements.extend([{'pk': x, 'update': param['id']} for x in tmpids])
+        self.patentlawyer_insert_statements.extend([{
+                                                            'patent_id': x,
+                                                            'lawyer_id': param['id']
+                                                            } for x in patents])
+        self.update_statements.extend([{
+                                               'pk': x,
+                                               'update': param['id']
+                                               } for x in tmpids])
 
     def create_lawyer_table(self, id_map, lawyer_dict):
         """
@@ -222,11 +226,13 @@ class LawyerDisambiguator:
         consumed = defaultdict(int)
         print('Doing pairwise Jaro-Winkler...', len(list_of_lawyers), flush=True)
         for i, primary in enumerate(list_of_lawyers):
-            if consumed[primary]: continue
+            if consumed[primary]:
+                continue
             consumed[primary] = 1
             self.blocks[primary].append(primary)
             for secondary in list_of_lawyers[i:]:
-                if consumed[secondary]: continue
+                if consumed[secondary]:
+                    continue
                 if primary == secondary:
                     self.blocks[primary].append(secondary)
                     continue
@@ -276,9 +282,13 @@ def start_lawyer_disambiguation(config):
     cstr = get_connection_string(config, 'NEW_DB')
     engine = create_engine(cstr + "&local_infile=1")
 
-
     engine.execute("ALTER TABLE rawlawyer DROP alpha_lawyer_id")
     engine.dispose()
+
+
+def post_process_qc(config):
+    qc = LawyerPostProcessingQC(config)
+    qc.runTests()
 
 
 if __name__ == '__main__':
