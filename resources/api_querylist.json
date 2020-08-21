@@ -1,0 +1,51 @@
+{
+  "patent": [
+    "patents/query?q={\"patent_number\":\"7861317\"}",
+    "patents/query?q={\"_and\":[{\"inventor_last_name\":\"Whitney\"},{\"patent_date\":\"1981-10-06\"}]}",
+    "patents/query?q={\"_gte\":{\"patent_date\":\"2007-01-04\"}}",
+    "patents/query?q={\"_not\":{\"patent_type\":\"design\"}}",
+    "patents/query?q={\"inventor_last_name\":[\"Whitney\",\"Hopper\"]}",
+    "patents/query?q={\"_and\":[{\"_gte\":{\"patent_date\":\"2007-01-04\"}},{\"_lte\":{\"patent_date\":\"2007-12-31\"}}]}",
+    "patents/query?q={\"_and\":[{\"inventor_last_name\":[\"Whitney\",\"Hopper\"]},{\"_not\":{\"patent_type\":\"design\"}},{\"_gte\":{\"patent_date\":\"2007-01-04\"}},{\"_lte\":{\"patent_date\":\"2007-12-31\"}}]}",
+    "patents/query?q={\"_or\":[{\"inventor_last_name\":[\"Whitney\",\"Hopper\"]},{\"_text_any\":{\"patent_title\":\"COBOL cotton gin\"}}]}",
+    "patents/query?q={\"_or\":[{\"_and\":[{\"inventor_last_name\":\"Whitener\"},{\"_text_phrase\":{\"patent_title\":\"cotton gin\"}}]},{\"_and\":[{\"inventor_last_name\":\"Heath\"},{\"_text_all\":{\"patent_title\":\"COBOL\"}}]}]}",
+    "patents/query?q={\"_and\":[{\"_gte\":{\"patent_date\":\"2007-04-10\"}},{\"inventor_last_name\":\"Whitney\"}]}&f=[\"patent_number\",\"patent_date\",\"inventor_last_name\"]",
+    "patents/query?q={\"_and\":[{\"_gte\":{\"patent_date\":\"2007-04-10\"}},{\"inventor_last_name\":\"Whitney\"}]}&f=[\"patent_number\",\"patent_date\",\"inventor_last_name\"]&o={\"matched_subentities_only\":true}",
+    "patents/query?q={\"_and\":[{\"_gte\":{\"patent_date\":\"2007-04-10\"}},{\"inventor_last_name\":\"Whitney\"}]}&f=[\"patent_number\",\"patent_date\",\"inventor_last_name\",\"assignee_organization\"]",
+    "patents/query?q={\"_and\":[{\"_gte\":{\"patent_date\":\"2007-04-10\"}},{\"inventor_last_name\":\"Whitney\"}]}&f=[\"patent_number\",\"patent_date\",\"inventor_last_name\",\"assignee_organization\"]&o={\"include_subentity_total_counts\":\"true\"}",
+    "patents/query?q={\"_gte\":{\"patent_date\":\"2007-01-04\"}}&f=[\"patent_number\",\"patent_date\"]",
+    "patents/query?q={\"_gte\":{\"patent_date\":\"2007-01-04\"}}&f=[\"patent_number\",\"patent_date\"]",
+    "patents/query?q={\"_and\": [{\"_gte\":{\"patent_date\":\"2001-01-01\"}},{\"_text_any\":{\"patent_abstract\":\"international\"}},{\"_neq\":{\"assignee_lastknown_country\":\"US\"}}]}&f=[\"patent_number\",\"patent_processing_time\",\"patent_kind\"]",
+    "patents/query?q={\"_and\": [{\"_gte\":{\"patent_date\":\"2001-01-01\"}},{\"_text_any\":{\"patent_abstract\":\"international\"}},{\"_neq\":{\"assignee_lastknown_country\":\"US\"}}]}&f=[\"patent_number\",\"patent_processing_time\",\"patent_kind\"]"
+  ],
+  "inventors": [
+    "inventors/query?q={\"inventor_last_name\":\"Young\"}&f=[\"inventor_id\",\"inventor_last_name\",\"inventor_first_name\",\"patent_number\",\"patent_date\"]",
+    "inventors/query?q={\"_and\":[{\"_gte\":{\"patent_date\":\"2000-01-01\"}},{\"_lt\":{\"patent_date\":\"2007-01-01\"}},{\"_text_any\":{\"patent_title\":\"bicycle\"}}]}&f=[\"inventor_first_name\",\"inventor_last_name\"]",
+    "inventors/query?q={\"_and\":[{\"patent_number\":\"9260215\"},{\"rawinventor_last_name\":\"Jones\"}]}&f=[\"inventor_id\",\"inventor_last_name\",\"inventor_first_name\"]",
+    "inventors/query?q={\"nber_subcategory_id\":25}&f=[\"inventor_lastknown_city\",\"inventor_lastknown_state\"]",
+    "inventors/query?q={\"_and\":[{\"inventor_lastknown_city\":\"Washington\"},{\"inventor_lastknown_state\":\"DC\"}]}&f=[\"assignee_organization\"]",
+    "inventors/query?q={\"_and\":[{\"location_city\":\"Chicago\"},{\"location_state\":\"IL\"}]}&f=[\"patent_number\",\"patent_title\"]"
+  ],
+  "assignees": [
+    "assignees/query?q={\"_begins\":{\"assignee_organization\":\"Race\"}}&f=[\"patent_number\",\"patent_date\",\"assignee_organization\",\"assignee_id\"]",
+    "assignees/query?q={\"_and\":[{\"patent_type\":\"utility\"},{\"_text_any\":{\"patent_title\":\"Software\"}}, {\"_gte\":{\"patent_date\":\"1999-01-01\"}},{\"_lte\":{\"patent_date\":\"2001-12-31\"}}]}",
+    "assignees/query?q={\"_eq\":{\"nber_subcategory_id\":\"22\"}}&f=[\"assignee_type\"]"
+  ],
+  "locations": [
+    "locations/query?q={\"location_city\":\"Mount Airy\"}&f=[\"location_id\",\"location_state\",\"location_total_num_patents\"]",
+    "locations/query?q={\"inventor_last_name\":[\"Yamazaki\",\"Weder\",\"Edison\"]}&f=[\"assignee_lastknown_city\",\"assignee_lastknown_state\",\"assignee_lastknown_country\"]"
+  ],
+  "cpc": [
+    "cpc_subsections/query?q={\"cpc_subsection_id\":\"G12\"}&f=[\"cpc_subsection_id\",\"cpc_subsection_title\",\"cpc_total_num_patents\"]",
+    "cpc_subsections/query?q={\"cpc_subsection_id\":\"F41\"}&f=[\"cpc_total_num_inventors\"]",
+    "cpc_subsections/query?q={\"cpc_subsection_id\":\"H02\"}&f=[\"assignee_lastknown_city\",\"assignee_lastknown_state\",\"assignee_lastknown_country\"]"
+  ],
+  "nber": [
+    "nber_subcategories/query?q={\"year_id\":[\"1991\",\"2001\",\"2011\"]}&f=[\"year_id\",\"nber_subcategory_id\",\"nber_subcategory_title\",\"year_num_patents_for_nber_subcategory\"]",
+    "nber_subcategories/query?q={\"nber_subcategory_id\":\"62\"}&f=[\"nber_subcategory_id\",\"nber_subcategory_title\",\"nber_total_num_patents\"]"
+  ],
+  "uspc": [
+    "uspc_mainclasses/query?q={\"uspc_mainclass_id\":\"292\"}&f=[\"uspc_mainclass_id\",\"uspc_mainclass_title\",\"uspc_total_num_patents\"]",
+    "uspc_mainclasses/query?q={\"_and\":[{\"_contains\":{\"assignee_organization\":\"Census\"}},{\"_gte\":{\"patent_date\":\"2000-01-01\"}},{\"_lte\":{\"patent_date\":\"2010-12-31\"}},{\"_contains\":{\"uspc_mainclass_title\":\"Electricity\"}}]}&f=[\"inventor_id\",\"inventor_first_name\",\"inventor_last_name\"]"
+  ]
+}
