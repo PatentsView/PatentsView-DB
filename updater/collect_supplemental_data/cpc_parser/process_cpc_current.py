@@ -103,10 +103,11 @@ def get_cpc_components_from_xml(cpc_xml_element, ns):
                 cpc_class=cpc_class,
                 cpc_subclass=cpc_subclass),
         'subgroup_id':
-            "{cpc_section}{cpc_class}{cpc_subclass}/{cpc_subgroup}".format(
+            "{cpc_section}{cpc_class}{cpc_subclass}{cpc_maingroup}/{cpc_subgroup}".format(
                 cpc_section=cpc_section,
                 cpc_class=cpc_class,
                 cpc_subclass=cpc_subclass,
+                cpc_maingroup=cpc_maingroup,
                 cpc_subgroup=cpc_subgroup),
         'category':
             'inventional' if class_code == 'I' else 'additional'
