@@ -6,7 +6,7 @@ from lib.configuration import get_connection_string
 class RenameTest:
     def __init__(self, config):
         self.empty_tables = ['assignee', 'cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_subsection', 'claim',
-                             'brf_sum_text', 'detail_desc_text', 'draw_desc_text','inventor', 'location',
+                             'brf_sum_text', 'detail_desc_text', 'draw_desc_text', 'inventor', 'location',
                              'location_assignee', 'location_inventor', 'patent_assignee', 'patent_inventor',
                              'patent_lawyer']
         self.config = config
@@ -62,7 +62,7 @@ class RenameTest:
             if table_collation_row[1] != 'utf8mb4_unicode_ci':
                 raise AssertionError(
                     "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
-                        cset=table_collation_row[1], tbl=table_collation_row[0]))
+                        collation=table_collation_row[1], tbl=table_collation_row[0]))
 
     def test_column_encoding(self):
         new_database = self.config['DATABASE']["NEW_DB"]

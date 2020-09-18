@@ -1,6 +1,7 @@
+import datetime
+
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
-
 
 # Helper Imports
 
@@ -30,6 +31,11 @@ from airflow.operators.python_operator import PythonOperator
 #     schedule_interval=None)
 # project_home = os.environ['PACKAGE_HOME']
 # config = get_config()
+from reporting_database_generator.database.validate_query import validate_and_execute
+
+
+class SQLTemplatedPythonOperator(PythonOperator):
+    template_ext = ('.sql',)
 
 
 def add_database_load_operators(upload_dag, config, project_home, airflow_task_success, airflow_task_failure, prefixes):
@@ -69,10 +75,22 @@ def add_database_load_operators(upload_dag, config, project_home, airflow_task_s
                                   on_success_callback=airflow_task_success,
                                   on_failure_callback=airflow_task_failure)
 
-    table_creation_operator = BashOperator(dag=upload_dag, task_id='create_text_tables',
-                                           bash_command=get_text_table_load_command(config, project_home),
-                                           on_success_callback=airflow_task_success,
-                                           on_failure_callback=airflow_task_failure)
+    table_creation_operator = SQLTemplatedPythonOperator(
+        task_id='create_text_yearly_tables',
+        provide_context=True,
+        python_callable=validate_and_execute,
+        dag=upload_dag,
+        op_kwargs={'filename': 'text_tables.sql', 'slack_client': None, 'slack_channel': None, "schema_only": True,
+                   'drop_existing': False, 'fk_check': False},
+        templates_dict={'source_sql': 'text_tables.sql'},
+        templates_exts=['.sql'],
+        params={'database': config['DATABASE']['TEXT_DATABASE'],
+                'year': int(datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d').strftime('%Y'))}
+    )
+    trigger_creation_operator = BashOperator(dag=upload_dag, task_id='create_text_triggers',
+                                             bash_command=get_text_table_load_command(config, project_home),
+                                             on_success_callback=airflow_task_success,
+                                             on_failure_callback=airflow_task_failure)
 
     parse_text_data_operator = PythonOperator(task_id='parse_text_data',
                                               python_callable=begin_text_parsing,
@@ -123,9 +141,10 @@ def add_database_load_operators(upload_dag, config, project_home, airflow_task_s
         upload_new_operator.set_upstream(prefix)
     merge_new_operator.set_upstream(qc_upload_operator)
     qc_merge_operator.set_upstream(merge_new_operator)
-    table_creation_operator.set_upstream(qc_upload_operator)
-    parse_text_data_operator.set_upstream(table_creation_operator)
+    trigger_creation_operator.set_upstream(qc_upload_operator)
+    parse_text_data_operator.set_upstream(trigger_creation_operator)
     qc_parse_text_operator.set_upstream(parse_text_data_operator)
-    merge_text_operator.set_upstream(qc_parse_text_operator)
+    merge_text_operator.set_upstream(table_creation_operator)
+    table_creation_operator.set_upstream(qc_parse_text_operator)
     qc_text_merge_operator.set_upstream(merge_text_operator)
     return [qc_merge_operator, qc_text_merge_operator]

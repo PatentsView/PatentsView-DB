@@ -10,6 +10,7 @@ import os
 from os import listdir
 import re
 
+from lib.configuration import get_config
 from lib.utilities import chunks
 
 
@@ -127,6 +128,8 @@ def process_NER(txt_fp_out, data):
 
 def extract_contract_award(gi_row):
     statement = gi_row.gi_statement
+    print(statement)
+    print(type(statement))
     statement = re.sub('FAR[^a-zA-Z]+', "", statement)
     statement = re.sub('pursuant\s*to\s*.*U(\.)?S\.?C\.?\s*\.?sctn\.?[^s]+', "", statement, flags=re.IGNORECASE)
     statement = re.sub('USC[^a-zA-Z]+', "", statement)
@@ -194,7 +197,7 @@ def add_cols(data, orgs):
 
     # Extract and clean Contract Numbers
     #contracts = clean_contracts(data, gi_statements)
-    contracts = extract_contract_award(data)
+    contracts = data.apply(extract_contract_award, axis=1)
 
     # Add contracts column for contracts
     data['contracts'] = pd.Series(contracts)
@@ -275,8 +278,6 @@ def clean_orgs(orgs):
                  "United States", "U.S. Department", "U.S.C", "U.S.C", "Defense", "Merit", "Government", "U.S.", "USA",
                  "s", "Department"]
     orgs = [x for x in orgs if x not in to_remove]
-
-    final_output_dir = "G:/PatentsView/cssip/PatentsView-DB/Development/government_interest/test_output/"
 
     return orgs
 
@@ -370,8 +371,8 @@ def begin_NER_processing(config):
 
     # Set up vars + directories
     merged_csv = '{}/merged_csvs.csv'.format(pre_manual)
-    ner_dir = "/project/Development/government_interest/stanford-ner-2017-06-09/"
-    ner_txt_indir = "/project/Development/government_interest/stanford-ner-2017-06-09/in/"
+    ner_dir = "/project/persistent_files/stanford-ner-2017-06-09/"
+    ner_txt_indir = "/project/persistent_files/stanford-ner-2017-06-09/in/"
     ner_txt_outdir = '{}/NER_out/'.format(pre_manual)
     if not os.path.exists(ner_txt_outdir):
         os.makedirs(ner_txt_outdir)

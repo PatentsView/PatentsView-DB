@@ -34,7 +34,8 @@ from sqlalchemy.orm import sessionmaker
 
 from datetime import datetime
 
-def commit_inserts(session, insert_statements, table, is_mysql, commit_frequency = 1000):
+
+def commit_inserts(session, insert_statements, table, is_mysql, commit_frequency=1000):
     """
     Executes bulk inserts for a given table. This is typically much faster than going through
     the SQLAlchemy ORM. The insert_statement list of dictionaries may fall victim to SQLAlchemy
@@ -50,7 +51,8 @@ def commit_inserts(session, insert_statements, table, is_mysql, commit_frequency
     """
     if is_mysql:
         ignore_prefix = ("IGNORE",)
-        session.execute("set foreign_key_checks = 0; set unique_checks = 0;")
+        session.execute("set foreign_key_checks = 0;")
+        session.execute("set unique_checks = 0;")
         session.commit()
     else:
         ignore_prefix = ("OR IGNORE",)
@@ -58,18 +60,19 @@ def commit_inserts(session, insert_statements, table, is_mysql, commit_frequency
     for ng in range(numgroups):
         if numgroups == 0:
             break
-        chunk = insert_statements[ng*commit_frequency:(ng+1)*commit_frequency]
+        chunk = insert_statements[ng * commit_frequency:(ng + 1) * commit_frequency]
         session.connection().execute(table.insert(prefixes=ignore_prefix), chunk)
-        print("committing chunk",ng+1,"of",numgroups,"with length",len(chunk),"at",datetime.now())
+        print("committing chunk", ng + 1, "of", numgroups, "with length", len(chunk), "at", datetime.now())
         session.commit()
-    last_chunk = insert_statements[numgroups*commit_frequency:]
+    last_chunk = insert_statements[numgroups * commit_frequency:]
     if last_chunk:
-        print("committing last",len(last_chunk),"records at",datetime.now())
+        print("committing last", len(last_chunk), "records at", datetime.now())
         session.connection().execute(table.insert(prefixes=ignore_prefix), last_chunk)
         print("last chunk in, committing")
         session.commit()
 
-def commit_updates(session, update_key, update_statements, table, commit_frequency = 1000):
+
+def commit_updates(session, update_key, update_statements, table, commit_frequency=1000):
     """
     Executes bulk updates for a given table. This is typically much faster than going through
     the SQLAlchemy ORM. In order to be flexible, the update statements must be set up in a specific
@@ -91,18 +94,18 @@ def commit_updates(session, update_key, update_statements, table, commit_frequen
     """
     primary_key = list(table.primary_key.columns.values())[0]
     update_key = table.columns[update_key]
-    u = table.update().where(primary_key==bindparam('pk')).values({update_key: bindparam('update')})
+    u = table.update().where(primary_key == bindparam('pk')).values({update_key: bindparam('update')})
     numgroups = len(update_statements) / commit_frequency
     for ng in range(numgroups):
         if numgroups == 0:
             break
-        chunk = update_statements[ng*commit_frequency:(ng+1)*commit_frequency]
+        chunk = update_statements[ng * commit_frequency:(ng + 1) * commit_frequency]
         session.connection().execute(u, *chunk)
-        print("committing chunk",ng+1,"of",numgroups,"with length",len(chunk),"at",datetime.now())
+        print("committing chunk", ng + 1, "of", numgroups, "with length", len(chunk), "at", datetime.now())
         session.commit()
-    last_chunk = update_statements[numgroups*commit_frequency:]
+    last_chunk = update_statements[numgroups * commit_frequency:]
     if last_chunk:
-        print("committing last",len(last_chunk),"records at",datetime.now())
+        print("committing last", len(last_chunk), "records at", datetime.now())
         print(" If it sticks here, use the assignee_patch.py file to fix it!")
         session.connection().execute(u, *last_chunk)
         session.commit()

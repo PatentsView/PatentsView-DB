@@ -37,7 +37,7 @@ def get_create_syntax(entity, entity_db_cols, create_stmt):
 
         # regardless of entity, uuid column fixed at 32
         if col == current_rawentity or col == old_rawentity:
-            add_col_stmt = "`{0}` varchar(32),".format(col)
+            add_col_stmt = "`{0}` varchar(64),".format(col)
 
         # if assignee is entity - then disambig cols need to be varchar 64
         elif entity == 'assignee':
@@ -52,7 +52,14 @@ def get_create_syntax(entity, entity_db_cols, create_stmt):
     return create_stmt
 
 
-def update_long_entity(connection, entity, update_version):
+def update_long_entity(config, entity):
+    connection = pymysql.connect(host=config['DATABASE']['HOST'],
+                                 user=config['DATABASE']['USERNAME'],
+                                 password=config['DATABASE']['PASSWORD'],
+                                 db=config['DATABASE']['NEW_DB'],
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
+    update_version = config['DATES']['END_DATE']
     source_entity_table = '{entity}_disambiguation_mapping'.format(entity=entity)
     source_entity_field = '{entity}_id'.format(entity=entity)
 
@@ -86,12 +93,19 @@ def generate_wide_header(connection, entity, update_version, config):
 
     # Add new column for this data update:
     header = [current_rawentity, old_rawentity] + disambig_cols + [
-        'disamb_inventor_id_' + update_version]
+        'disamb_' + entity + '_id_' + update_version]
     header_df = pd.DataFrame(columns=header)
     return header_df
 
 
-def prepare_wide_table(connection, entity, update_version, config):
+def prepare_wide_table(config, entity):
+    connection = pymysql.connect(host=config['DATABASE']['HOST'],
+                                 user=config['DATABASE']['USERNAME'],
+                                 password=config['DATABASE']['PASSWORD'],
+                                 db=config['DATABASE']['NEW_DB'],
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
+    update_version = config['DATES']['END_DATE']
     wide_table_name = "persistent_{entity}_disambig".format(entity=entity)
     old_db = config['DATABASE']['OLD_DB']
     new_db = config['DATABASE']['NEW_DB']
@@ -104,7 +118,7 @@ def prepare_wide_table(connection, entity, update_version, config):
         wide_pid_df = generate_wide_header(connection, entity, update_version, config)
         pid_cols = list(wide_pid_df.columns.values)
 
-        create_stmt = 'create table {0}.{1} ( '.format(new_db, 'persistent_inventor_disambig')
+        create_stmt = 'create table {0}.{1} ( '.format(new_db, wide_table_name)
         create_with_columns = get_create_syntax(entity, pid_cols, create_stmt)
         primary_key_stmt = 'PRIMARY KEY (`{current_rawentity}`));'.format(current_rawentity=current_rawentity)
 
@@ -148,7 +162,14 @@ def get_next_raw_chunk(connection, entity, limit, offset, config):
         return chunk_df
 
 
-def write_wide_table(connection, entity, update_version, config):
+def write_wide_table(config, entity):
+    connection = pymysql.connect(host=config['DATABASE']['HOST'],
+                                 user=config['DATABASE']['USERNAME'],
+                                 password=config['DATABASE']['PASSWORD'],
+                                 db=config['DATABASE']['NEW_DB'],
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
+    update_version = config['DATES']['END_DATE']
     # fixed
     current_rawentity = 'current_raw{0}_id'.format(entity)
     old_rawentity = 'old_raw{0}_id'.format(entity)
@@ -169,7 +190,7 @@ def write_wide_table(connection, entity, update_version, config):
     itr = 0
 
     print('Estimated # of rounds: ', total_rows / limit)
-    if_exists = 'fail'
+    if_exists = 'append'
     while True:
         print('###########################################\n')
         print('Next iteration... ', itr)
@@ -212,20 +233,3 @@ def write_wide_table(connection, entity, update_version, config):
     print('###########################################\n')
 
     return
-
-
-def begin_entity_persistent_update(config):
-    connection = pymysql.connect(host=config['DATABASE']['HOST'],
-                                 user=config['DATABASE']['USERNAME'],
-                                 password=config['DATABASE']['PASSWORD'],
-                                 db=config['DATABASE']['NEW_DB'],
-                                 charset='utf8mb4',
-                                 cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
-    update_version = config['DATES']['END_DATE']
-    # update_long_entity(connection, 'inventor', update_version)
-    # print(generate_wide_header(connection, 'assignee', update_version, config))
-    write_wide_table(connection, 'assignee', update_version, config)
-
-
-if __name__ == '__main__':
-    begin_entity_persistent_update(get_config())

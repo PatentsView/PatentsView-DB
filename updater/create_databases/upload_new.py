@@ -37,10 +37,12 @@ def consolidate_cpc_classes(connection_string):
 def setup_database(update_config):
     connection_string = get_connection_string(update_config, "OLD_DB")
     engine = create_engine(connection_string)
-    new_database = update_config["DATABASE"]["NEW_DB"]
+    old_database = update_config["DATABASE"]["OLD_DB"]
+    old_prefix, old_timestamp = old_database.split("_")
+    source_database = "upload_{ts}".format(ts=old_timestamp)
     temp_upload_database = update_config["DATABASE"]["TEMP_UPLOAD_DB"]
     table_fetch_sql = "select table_name from information_schema.tables where table_type = 'base table' and table_schema ='{}'".format(
-        new_database)
+        source_database)
     tables_data = engine.execute(table_fetch_sql)
     tables = [table['table_name'] for table in tables_data]
 
@@ -49,7 +51,7 @@ def setup_database(update_config):
             temp_upload_database=temp_upload_database))
     for table in tables:
         con = engine.connect()
-        con.execute("create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, new_database, table))
+        con.execute("create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, source_database, table))
         con.close()
     engine.dispose()
 

@@ -51,7 +51,7 @@ def upload_disambig_results(update_config):
 
 
 def post_process_inventor(config):
-    # upload_disambig_results(config)
+    upload_disambig_results(config)
     update_rawinventor(config)
     create_inventor(config)
 

@@ -257,6 +257,9 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                             [x if x is not None else '' for x in multi_value_list])
                     else:
                         data_list[field["field_name"]] = None  # Return the extracted data
+                    if tab['table_name'] == 'usreldoc_single' and field_element.tag == 'related-publication':
+                        data_list = {}
+                        break
     return data_list
 
 
@@ -465,9 +468,9 @@ def get_filenames_to_parse(config):
 
     xml_files = []
     start_date_string = '{}'.format(config['DATES']['START_DATE'])
-    start_date = datetime.strptime(start_date_string, '%y%m%d')
+    start_date = datetime.strptime(start_date_string, '%Y%m%d')
     end_date_string = '{}'.format(config['DATES']['END_DATE'])
-    end_date = datetime.strptime(end_date_string, '%y%m%d')
+    end_date = datetime.strptime(end_date_string, '%Y%m%d')
     for file_name in os.listdir(xml_directory):
         print(file_name)
         if file_name.endswith(".xml"):

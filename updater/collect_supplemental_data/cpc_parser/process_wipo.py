@@ -91,7 +91,9 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
     # Assign Sequence
     wipo_filtered_data_sequenced = wipo_filtered_data.drop(["wipo_count"], axis=1).assign(
         sequence=wipo_filtered_data.groupby(['patent_id']).cumcount())
-    engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
+    cstr =get_connection_string(config, "TEMP_UPLOAD_DB")
+    print(cstr)
+    engine = create_engine(cstr)
     with engine.begin() as conn:
         wipo_filtered_data_sequenced.to_sql('wipo', conn, if_exists='append', index=False, method="multi")
 

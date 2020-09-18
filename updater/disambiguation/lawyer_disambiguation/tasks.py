@@ -29,15 +29,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 Functions for doing bulk inserts and bulk updates
 """
-from alchemy.match import commit_inserts, commit_updates
-from alchemy import session_generator
-from alchemy.schema import temporary_update, app_temporary_update
+
+from updater.disambiguation.lawyer_disambiguation.alchemy.match import commit_inserts, commit_updates
+from updater.disambiguation.lawyer_disambiguation.alchemy import session_generator
+from updater.disambiguation.lawyer_disambiguation.alchemy.schema import temporary_update, app_temporary_update
 from sqlalchemy import create_engine, MetaData, Table, inspect, VARCHAR, Column
 from sqlalchemy.orm import sessionmaker
 
+
 # fetch reference to temporary_update table.
 
-def bulk_commit_inserts(insert_statements, table, commit_frequency = 1000, dbtype='grant'):
+def bulk_commit_inserts(insert_statements, table, commit_frequency=1000, dbtype='grant'):
     """
     Executes bulk inserts for a given table. This is typically much faster than going through
     the SQLAlchemy ORM. The insert_statement list of dictionaries may fall victim to SQLAlchemy
@@ -57,7 +59,8 @@ def bulk_commit_inserts(insert_statements, table, commit_frequency = 1000, dbtyp
     commit_inserts(session, insert_statements, table, commit_frequency)
     session.commit()
 
-def bulk_commit_updates(update_key, update_statements, table, commit_frequency = 1000, dbtype='grant'):
+
+def bulk_commit_updates(update_key, update_statements, table, commit_frequency=1000, dbtype='grant'):
     """
     Executes bulk updates for a given table. This is typically much faster than going through
     the SQLAlchemy ORM. In order to be flexible, the update statements must be set up in a specific
@@ -88,13 +91,15 @@ def bulk_commit_updates(update_key, update_statements, table, commit_frequency =
     session.execute('truncate temporary_update;')
 
     if dbtype == 'grant':
-        commit_inserts(session, update_statements, temporary_update,  10000)
+        commit_inserts(session, update_statements, temporary_update, 10000)
     else:
         commit_inserts(session, update_statements, app_temporary_update, 10000)
     # now update using the join
     primary_key = table.primary_key.columns.values()[0]
     update_key = table.columns[update_key]
-    session.execute("UPDATE {0} join temporary_update ON temporary_update.pk = {1} SET {2} = temporary_update.update;".format(table.name, primary_key.name, update_key.name ))
+    session.execute(
+        "UPDATE {0} join temporary_update ON temporary_update.pk = {1} SET {2} = temporary_update.update;".format(
+            table.name, primary_key.name, update_key.name))
     session.commit()
 
     session.execute('truncate temporary_update;')
