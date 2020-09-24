@@ -24,6 +24,7 @@ ENV LC_MESSAGES en_US.UTF-8
 ENV AIRFLOW_HOME /airflow
 ENV PACKAGE_HOME /project
 ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}"
+ENV PYTHONPATH "${PYTHONPATH}:${AIRFLOW_HOME}"
 
 RUN set -ex \
     && buildDeps=' \
@@ -66,6 +67,8 @@ RUN groupadd --gid=$GID docker-group || :
 RUN usermod -a -G $GID $NB_USER
 RUN apt-get install -y net-tools iputils-ping
 RUN apt-get install -y libmysqlclient-dev
+RUN wget https://github.com/maxbube/mydumper/releases/download/v0.9.3/mydumper_0.9.3-41.stretch_amd64.deb
+RUN dpkg -i mydumper_0.9.3-41.stretch_amd64.deb
 USER $NB_USER
 
 RUN pip install https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tarball/master yapf
@@ -94,7 +97,7 @@ RUN export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -r /setup/requirements
 EXPOSE 8080 5555 8793
 
 
-ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}/Development"
+ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}/airflow/"
 #RUN chown -R airflow:airflow /airflow
 
 WORKDIR /project
