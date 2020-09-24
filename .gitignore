@@ -26,8 +26,10 @@ node_modules/
 app-db-exploration
 QA_*
 airflow-meta*
+output/
 upload_*/*
 *_qa_loc*
 **/*.log
 archive/*
 **/.ipynb_checkpoints
+updater/create_databases/merge_status.json

@@ -582,7 +582,7 @@ group by
 # BEGIN inventor_rawinventor alias 
 
 ###############################################################################################################################
-
+drop table if exists `{{params.reporting_dANatabase}}`.`location_year`;
 create table if not exists `{{params.reporting_database}}`.`inventor_rawinventor` (uuid int(10) unsigned AUTO_INCREMENT PRIMARY KEY,name_first varchar(64),name_last varchar(64),patent_id varchar(20),inventor_id int(10) unsigned);
 
 INSERT INTO `{{params.reporting_database}}`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id) 

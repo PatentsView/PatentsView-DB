@@ -110,4 +110,3 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
         self.test_invalid_id()
         self.top_n_generator(table_name=self.disambiguated_table)
         super(DisambiguationTester, self).runTests()
-        self.save_qa_data()
