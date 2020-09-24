@@ -85,9 +85,9 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
     # Counter for Each Field ID for each patent
     wipo_count = wipo_data.groupby(["patent_id",
                                     "field_id"]).size().to_frame('wipo_count')
+    wipo_count = wipo_count.reset_index()
     # Retain Top 3 most frequent Wipo field IDs
-    wipo_filtered_data = wipo_count.sort_values("wipo_count").groupby(
-        "patent_id").head(3).reset_index()
+    wipo_filtered_data = wipo_count.groupby("patent_id").apply(lambda _df: _df.nlargest(3, 'wipo_count', keep='all')).reset_index(drop=True)
     # Assign Sequence
     wipo_filtered_data_sequenced = wipo_filtered_data.drop(["wipo_count"], axis=1).assign(
         sequence=wipo_filtered_data.groupby(['patent_id']).cumcount())
