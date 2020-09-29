@@ -40,14 +40,14 @@ from sqlalchemy.schema import MetaData
 from unidecode import unidecode
 
 from sqlalchemy import Table
-import schema_func
+from . import schema_func
 
 cascade = "all, delete, delete-orphan"
 
 def init(self, *args, **kwargs):
     for i, arg in enumerate(args):
         self.__dict__[self.kw[i]] = arg
-    for k, v in kwargs.iteritems():
+    for k, v in kwargs.items():
         self.__dict__[k] = v
 
 grantmetadata = MetaData()
@@ -219,7 +219,7 @@ class RawLocation(GrantBase):
             addy.append(self.state)
         if self.country:
             addy.append(self.country)
-        return u", ".join(addy)
+        return ", ".join(addy)
 
     # -- Functions for Disambiguation --
 
@@ -290,7 +290,7 @@ class Location(GrantBase):
             addy.append(self.state)
         if self.country:
             addy.append(self.country)
-        return u", ".join(addy)
+        return ", ".join(addy)
 
     # -- Functions for Disambiguation --
 
@@ -434,7 +434,7 @@ class RawAssignee(GrantBase):
         if self.organization:
             return_string = self.organization
         else:
-            return_string = u"{0} {1}".format(self.name_first, self.name_last)
+            return_string = "{0} {1}".format(self.name_first, self.name_last)
         return "<RawAssignee('{0}')>".format(unidecode(return_string))
 
 
@@ -488,7 +488,7 @@ class RawInventor(GrantBase):
 
     @hybrid_property
     def name_full(self):
-        return u"{first} {last}".format(
+        return "{first} {last}".format(
             first=self.name_first,
             last=self.name_last)
 
@@ -509,7 +509,7 @@ class RawLawyer(GrantBase):
 
     @hybrid_property
     def name_full(self):
-        return u"{first} {last}".format(
+        return "{first} {last}".format(
             first=self.name_first,
             last=self.name_last)
 
@@ -653,7 +653,7 @@ class Assignee(GrantBase):
         if self.organization:
             return_string = self.organization
         else:
-            return_string = u"{0} {1}".format(self.name_first, self.name_last)
+            return_string = "{0} {1}".format(self.name_first, self.name_last)
         return "<Assignee('{0}')>".format(unidecode(return_string))
 
 
@@ -666,7 +666,7 @@ class Inventor(GrantBase):
 
     @hybrid_property
     def name_full(self):
-        return u"{first} {last}".format(
+        return "{first} {last}".format(
             first=self.name_first,
             last=self.name_last)
 
@@ -749,7 +749,7 @@ class Lawyer(GrantBase):
 
     @hybrid_property
     def name_full(self):
-        return u"{first} {last}".format(
+        return "{first} {last}".format(
             first=self.name_first,
             last=self.name_last)
 
@@ -1164,7 +1164,7 @@ class App_RawLocation(ApplicationBase):
             addy.append(self.state)
         if self.country:
             addy.append(self.country)
-        return u", ".join(addy)
+        return ", ".join(addy)
 
     # -- Functions for Disambiguation --
 
@@ -1235,7 +1235,7 @@ class App_Location(ApplicationBase):
             addy.append(self.state)
         if self.country:
             addy.append(self.country)
-        return u", ".join(addy)
+        return ", ".join(addy)
 
     # -- Functions for Disambiguation --
 
@@ -1379,7 +1379,7 @@ class App_RawAssignee(ApplicationBase):
         if self.organization:
             return_string = self.organization
         else:
-            return_string = u"{0} {1}".format(self.name_first, self.name_last)
+            return_string = "{0} {1}".format(self.name_first, self.name_last)
         return "<RawAssignee('{0}')>".format(unidecode(return_string))
 
 
@@ -1433,7 +1433,7 @@ class App_RawInventor(ApplicationBase):
 
     @hybrid_property
     def name_full(self):
-        return u"{first} {last}".format(
+        return "{first} {last}".format(
             first=self.name_first,
             last=self.name_last)
 
@@ -1535,7 +1535,7 @@ class App_Assignee(ApplicationBase):
         if self.organization:
             return_string = self.organization
         else:
-            return_string = u"{0} {1}".format(self.name_first, self.name_last)
+            return_string = "{0} {1}".format(self.name_first, self.name_last)
         return "<Assignee('{0}')>".format(unidecode(return_string))
 
 
@@ -1549,7 +1549,7 @@ class App_Inventor(ApplicationBase):
 
     @hybrid_property
     def name_full(self):
-        return u"{first} {last}".format(
+        return "{first} {last}".format(
             first=self.name_first,
             last=self.name_last)
 

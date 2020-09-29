@@ -1,0 +1,27 @@
+Cython
+pytz
+pandas==0.24.0
+pyOpenSSL
+ndg-httpsclient
+datetime
+pyasn1
+BeautifulSoup4
+lxml
+simplejson
+apache-airflow[celery,postgres,hive,jdbc,mysql]
+celery[redis]
+clint
+mysqlclient
+regex
+slackclient==1.3.1
+sqlparse
+jupyter
+fuzzywuzzy
+python-Levenshtein
+textdistance
+tqdm
+unidecode
+SQLAlchemy == 1.3.10
+boto3
+bs4
+pymysql
