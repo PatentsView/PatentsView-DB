@@ -18,6 +18,11 @@ from sqlalchemy import create_engine
 from lib.configuration import get_connection_string
 
 
+def xstr(s):
+    if s is None:
+        return ''
+    return str(s)
+
 def weekday_count(start_date, end_date):
     week = {}
     for i in range((end_date - start_date).days + 1):
