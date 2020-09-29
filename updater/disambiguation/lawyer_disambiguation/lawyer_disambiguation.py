@@ -101,8 +101,6 @@ def load_clean_rawlawyer(config):
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
     engine.execute("ALTER TABLE rawlawyer RENAME TO rawlawyer_predisambig;")
     engine.execute("CREATE TABLE rawlawyer LIKE rawlawyer_predisambig;")
-    # (one, two, three, @vfour, five)
-    # SET four = NULLIF(@vfour,'')
     engine.execute(
             """
 LOAD DATA LOCAL INFILE '{}' INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\r\n' IGNORE 1 LINES 
