@@ -31,7 +31,7 @@ def consolidate_cpc_data(config, add_indexes):
     :param add_indexes: List of Add Index statments
     """
     engine = create_engine(get_connection_string(config, "NEW_DB"))
-    delete_query = "DELETE cpc FROM cpc_current_dummy cpc LEFT JOIN patent p on p.id = cpc.patent_id WHERE p.id is null"
+    delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN patent p on p.id = cpc.patent_id WHERE p.id is null"
     engine.execute(delete_query)
     for add_statement in add_indexes:
         engine.execute(add_statement[0])
@@ -148,12 +148,9 @@ def load_cpc_records(records_generator, config, log_queue):
     engine = create_engine(get_connection_string(config, "NEW_DB"))
     start = time.time()
     with engine.connect() as conn:
-        cpc_records_frame.to_sql('cpc_current_dummy', conn, if_exists='append', index=False, method="multi")
+        cpc_records_frame.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
     end = time.time()
-    log_queue.put({
-            "level":   logging.INFO,
-            "message": "Chunk Load Time:" + str(round(end - start))
-            })
+    log_queue.put({"level": logging.INFO, "message": "Chunk Load Time:" + str(round(end - start))})
 
 
 def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue):
@@ -180,7 +177,7 @@ def process_and_upload_cpc_current(config):
 
     if cpc_xml_file:
         print(cpc_xml_file)
-        add_index, drop_index = generate_index_statements(config, "NEW_DB", "cpc_current_dummy")
+        add_index, drop_index = generate_index_statements(config, "NEW_DB", "cpc_current")
 
         prepare_cpc_table(config, drop_index)
         xml_file_name_generator = generate_file_list(cpc_xml_file)
