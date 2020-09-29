@@ -11,7 +11,6 @@ from string import ascii_lowercase as alphabet
 import tqdm
 from sqlalchemy import create_engine
 from textdistance import jaro_winkler
-from unidecode import unidecode
 
 # from alchemy import get_config, match
 from QA.post_processing.LawyerPostProcessing import LawyerPostProcessingQC
@@ -102,10 +101,16 @@ def load_clean_rawlawyer(config):
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
     engine.execute("ALTER TABLE rawlawyer RENAME TO rawlawyer_predisambig;")
     engine.execute("CREATE TABLE rawlawyer LIKE rawlawyer_predisambig;")
+    # (one, two, three, @vfour, five)
+    # SET four = NULLIF(@vfour,'')
     engine.execute(
-            "LOAD DATA LOCAL INFILE '{}' INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' "
-            "IGNORE 1 LINES;".format(
-                    disambig_folder + '/rawlawyer_cleanalphaids.tsv'))
+            """
+LOAD DATA LOCAL INFILE '{}' INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\r\n' IGNORE 1 LINES 
+(uuid, @vlawyer_id, @vpatent_id, @vname_first, @vname_last, @vorganization, @valpha_lawyer_id, @vcountry, @vsequence) 
+SET lawyer_id = NULLIF(@vlawyer_id,''),patent_id = NULLIF(@vpatent_id,''),name_first = NULLIF(@vname_first,''),
+name_last = NULLIF(@vname_last,''),organization = NULLIF(@vorganization,''),alpha_lawyer_id = NULLIF(
+@valpha_lawyer_id,''),country = NULLIF(@vcountry,''),sequence= CAST(@vsequence AS UNSIGNED);
+            """.format(disambig_folder + '/rawlawyer_cleanalphaids.tsv'))
 
 
 class LawyerDisambiguator:
