@@ -13,11 +13,11 @@ from sqlalchemy import create_engine
 from textdistance import jaro_winkler
 
 # from alchemy import get_config, match
+from unidecode import unidecode
+
 from QA.post_processing.LawyerPostProcessing import LawyerPostProcessingQC
 from lib.configuration import get_config, get_connection_string
-from updater.disambiguation.lawyer_disambiguation import alchemy
-from updater.disambiguation.lawyer_disambiguation.alchemy.schema import *
-from updater.disambiguation.lawyer_disambiguation.tasks import bulk_commit_inserts, bulk_commit_updates
+
 
 
 def prepare_tables(config):
@@ -127,6 +127,7 @@ class LawyerDisambiguator:
     timestamp = str(int(time.time()))
 
     def lawyer_match(self, objects, session, commit=False):
+
         freq = defaultdict(Counter)
         param = {}
         raw_objects = []
@@ -195,6 +196,9 @@ class LawyerDisambiguator:
         Given a list of lawyers and the redis key-value disambiguation,
         populates the lawyer table in the database
         """
+        from updater.disambiguation.lawyer_disambiguation import alchemy
+        from updater.disambiguation.lawyer_disambiguation.alchemy.schema import RawLawyer,Lawyer, patentlawyer
+        from updater.disambiguation.lawyer_disambiguation.tasks import bulk_commit_inserts, bulk_commit_updates
         print('Disambiguating lawyers...', flush=True)
         session = alchemy.fetch_session(dbtype=self.doctype)
         session.execute('set foreign_key_checks = 0;')
@@ -248,6 +252,9 @@ class LawyerDisambiguator:
         print('lawyer blocks created!', flush=True)
 
     def run_disambiguation(self):
+        from updater.disambiguation.lawyer_disambiguation import alchemy
+        from updater.disambiguation.lawyer_disambiguation.alchemy.schema import RawLawyer,Lawyer, patentlawyer
+
 
         # get all lawyers in database
         print("running")
