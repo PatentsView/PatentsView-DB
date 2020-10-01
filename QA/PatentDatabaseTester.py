@@ -18,7 +18,8 @@ class PatentDatabaseTester(ABC):
         :param end_date: Database Update end date
         """
         # Tables that do not directly link to patent table
-        self.patent_exclusion_list = ['mainclass', 'subclass', 'patent', 'rawlocation']
+        self.patent_exclusion_list = ['mainclass', 'mainclass_current', 'subclass', 'subclass_current', 'patent',
+                                      'rawlocation']
         # Update start and end date
         self.start_date = start_date
         self.end_date = end_date
@@ -211,7 +212,8 @@ group by {field}
                     if not table_config["fields"][field]['null_allowed']:
                         if count_value != 0:
                             raise Exception(
-                                    "NULLs encountered in table found:{database}.{table} column {col}. Count: {count}".format(
+                                    "NULLs encountered in table found:{database}.{table} column {col}. Count: {"
+                                    "count}".format(
                                             database=self.database_section, table=table,
                                             col=field,
                                             count=count_value))
@@ -243,7 +245,8 @@ group by {field}
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value != 0:
                     raise Exception(
-                            "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {count}".format(
+                            "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {"
+                            "count}".format(
                                     database=self.database_section, table=table, col=field,
                                     count=count_value))
         finally:
@@ -259,7 +262,8 @@ group by {field}
             if table_name == 'patent':
                 count_query = "SELECT year(`date`) as `yr`, count(1) as `year_count` from patent group by year(`date`)"
             else:
-                count_query = "SELECT year(p.`date`) as `yr`, count(1) as `year_count` from {patent_table} p join {entity} et on et.patent_id = p.id group by year(`date`)".format(
+                count_query = "SELECT year(p.`date`) as `yr`, count(1) as `year_count` from {patent_table} p join {" \
+                              "entity} et on et.patent_id = p.id group by year(`date`)".format(
                         patent_table=patent_table,
                         entity=table_name)
             with self.connection.cursor() as count_cursor:
@@ -304,7 +308,8 @@ group by {field}
                 self.assert_related_floating_entities(table_name, related_entity_config)
 
     def assert_related_floating_entities(self, table_name, related_config):
-        related_query = "SELECT count(1) from {related_table} destination left join {source_table} source on source.{source_id}= destination.{destination_id} where source.{source_id} is null".format(
+        related_query = "SELECT count(1) from {related_table} destination left join {source_table} source on source.{" \
+                        "source_id}= destination.{destination_id} where source.{source_id} is null".format(
                 source_table=table_name,
                 related_table=related_config['table'], source_id=related_config['source_id'],
                 destination_id=related_config['destination_id'])
@@ -316,7 +321,8 @@ group by {field}
                 related_count = float_cursor.fetchall()[0][0]
                 if related_count > 0:
                     raise Exception(
-                            "There are rows in {destination_id} in {related_table} that do not have corresponding {source_id} in {source_table} for {db}".format(
+                            "There are rows in {destination_id} in {related_table} that do not have corresponding {"
+                            "source_id} in {source_table} for {db}".format(
                                     source_table=table_name,
                                     related_table=related_config['table'], source_id=related_config['source_id'],
                                     destination_id=related_config['destination_id'], db=
@@ -337,7 +343,8 @@ group by {field}
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value != 0:
                     raise Exception(
-                            "NULL strings encountered in table found:{database}.{table} column {col}. Count: {count}".format(
+                            "NULL strings encountered in table found:{database}.{table} column {col}. Count: {"
+                            "count}".format(
                                     database=self.database_section, table=table, col=field,
                                     count=count_value))
         finally:
@@ -411,7 +418,8 @@ group by {field}
                 patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(
                         db=self.patent_db_prefix)
 
-                count_query = "SELECT p.`type` as `type`, count(1) as `type_count` from {patent_table} p join {entity} et on et.patent_id = p.id group by  p.`type`".format(
+                count_query = "SELECT p.`type` as `type`, count(1) as `type_count` from {patent_table} p join {" \
+                              "entity} et on et.patent_id = p.id group by  p.`type`".format(
                         patent_table=patent_table,
                         entity=table_name)
                 with self.connection.cursor() as count_cursor:
