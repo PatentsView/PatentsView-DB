@@ -200,12 +200,6 @@ class UploadTest(PatentDatabaseTester):
                         }, 'mainclass':        {
                         'fields': {'id': {'data_type': 'varchar', 'null_allowed': False, 'category': False}}
                         },
-                'mainclass_current':           {
-                        'fields': {
-                                'id':    {'data_type': 'varchar', 'null_allowed': False, 'category': False},
-                                'title': {'data_type': 'varchar', 'null_allowed': False, 'category': False}
-                                }
-                        },
                 'non_inventor_applicant':      {
                         'fields': {
                                 'fname':          {'data_type': 'varchar', 'null_allowed': True, 'category': False},
@@ -385,12 +379,6 @@ class UploadTest(PatentDatabaseTester):
                         },
                 'subclass':                    {
                         'fields': {'id': {'data_type': 'varchar', 'null_allowed': False, 'category': False}}
-                        },
-                'subclass_current':            {
-                        'fields': {
-                                'id':    {'data_type': 'varchar', 'null_allowed': False, 'category': False},
-                                'title': {'data_type': 'varchar', 'null_allowed': False, 'category': False}
-                                }
                         },
                 'usapplicationcitation':       {
                         'fields': {
