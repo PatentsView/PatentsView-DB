@@ -51,10 +51,11 @@ class TextUploadTest(PatentDatabaseTester):
     def __init__(self, config):
         start_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+        super().__init__(config, 'TEMP_UPLOAD_DB', start_date, end_date)
         self.database_type = 'upload'
         self.version = self.config['DATABASES']['NEW_DB'].split("_")[1]
 
-        super().__init__(config, 'TEMP_UPLOAD_DB', start_date, end_date)
+
         self.table_config = {
             "temp_brf_sum_text": {
                 'fields': {"filename": {"null_allowed": False, "data_type": "varchar", "category": False},
