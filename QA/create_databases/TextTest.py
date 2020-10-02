@@ -53,7 +53,7 @@ class TextUploadTest(PatentDatabaseTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, 'TEMP_UPLOAD_DB', start_date, end_date)
         self.database_type = 'upload'
-        self.version = self.config['DATABASES']['NEW_DB'].split("_")[1]
+        self.version = self.config['DATABASE']['NEW_DB'].split("_")[1]
 
 
         self.table_config = {
