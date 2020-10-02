@@ -59,10 +59,10 @@ class TextUploadTest(PatentDatabaseTester):
         self.table_config = {
             "temp_brf_sum_text": {
                 'fields': {"filename": {"null_allowed": False, "data_type": "varchar", "category": False},
-                           "id": {"null_allowed": False, "data_type": "varchar", "category": False},
+                           "uuid": {"null_allowed": False, "data_type": "varchar", "category": False},
                            "patent_id": {"null_allowed": False, "data_type": "varchar", "category": False}},
                 "text": {"null_allowed": False, "data_type": "mediumtext", "category": False}},
-            "temp_claim": {'fields': {"id": {"null_allowed": False, "data_type": "varchar", "category": False},
+            "temp_claim": {'fields': {"uuid": {"null_allowed": False, "data_type": "varchar", "category": False},
                                       "dependent": {"null_allowed": True, "data_type": "varchar", "category": False},
                                       "patent_id": {"null_allowed": False, "data_type": "varchar",
                                                     "category": False},
@@ -71,7 +71,7 @@ class TextUploadTest(PatentDatabaseTester):
                                       "text": {"null_allowed": False, "data_type": "mediumtext", "category": False},
                                       "sequence": {"null_allowed": False, "data_type": "int", "category": False}}},
             "temp_detail_desc_text": {
-                'fields': {"id": {"null_allowed": False, "data_type": "varchar", "category": False},
+                'fields': {"uuid": {"null_allowed": False, "data_type": "varchar", "category": False},
                            "patent_id": {"null_allowed": False, "data_type": "varchar", "category": False},
                            "text": {"null_allowed": False, "data_type": "mediumtext", "category": False},
                            "length": {"null_allowed": True, "data_type": "bigint", "category": False},
