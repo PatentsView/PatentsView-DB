@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `{{params.database}}`.`brf_sum_text_{{params.year}}`
 (
-    `id`           varchar(512) CHARACTER SET utf8mb4
+    `uuid`           varchar(512) CHARACTER SET utf8mb4
         COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `patent_id`    varchar(32)     DEFAULT NULL,
     `text`         mediumtext CHARACTER SET utf8mb4
@@ -14,15 +14,16 @@ CREATE TABLE IF NOT EXISTS `{{params.database}}`.`brf_sum_text_{{params.year}}`
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4;
+DROP TRIGGER IF EXISTS `{{params.database}}`.before_insert_brf;
 CREATE TRIGGER `{{params.database}}`.before_insert_brf
     BEFORE INSERT
     ON `{{params.database}}`.`brf_sum_text_{{params.year}}`
     FOR EACH row
-    SET new.id = uuid();
+    SET new.uuid = uuid();
 
 CREATE TABLE IF NOT EXISTS `{{params.database}}`.`claim_{{params.year}}`
 (
-    `id`           varchar(512) CHARACTER SET utf8mb4
+    `uuid`           varchar(512) CHARACTER SET utf8mb4
         COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `patent_id`    varchar(32) CHARACTER SET utf8mb4
         COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -42,15 +43,16 @@ CREATE TABLE IF NOT EXISTS `{{params.database}}`.`claim_{{params.year}}`
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4;
+DROP TRIGGER IF EXISTS `{{params.database}}`.before_insert_claim;
 CREATE TRIGGER `{{params.database}}`.before_insert_claim
     BEFORE INSERT
     ON `{{params.database}}`.`claim_{{params.year}}`
     FOR EACH row
-    SET new.id = uuid();
+    SET new.uuid = uuid();
 
 CREATE TABLE IF NOT EXISTS `{{params.database}}`.`detail_desc_text_{{params.year}}`
 (
-    `id`           varchar(512) CHARACTER SET utf8mb4
+    `uuid`           varchar(512) CHARACTER SET utf8mb4
         COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `patent_id`    varchar(32)     DEFAULT NULL,
     `text`         mediumtext CHARACTER SET utf8mb4
@@ -65,15 +67,16 @@ CREATE TABLE IF NOT EXISTS `{{params.database}}`.`detail_desc_text_{{params.year
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4;
+DROP TRIGGER IF EXISTS `{{params.database}}`.before_insert_ddt;
 CREATE TRIGGER `{{params.database}}`.before_insert_ddt
     BEFORE INSERT
     ON `{{params.database}}`.`detail_desc_text_{{params.year}}`
     FOR EACH row
-    SET new.id = uuid();
+    SET new.uuid = uuid();
 
 CREATE TABLE IF NOT EXISTS `{{params.database}}`.`draw_desc_text_{{params.year}}`
 (
-    `id`           varchar(512) CHARACTER SET utf8mb4
+    `uuid`           varchar(512) CHARACTER SET utf8mb4
         COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `patent_id`    varchar(32)     DEFAULT NULL,
     `text`         mediumtext CHARACTER SET utf8mb4
@@ -88,12 +91,12 @@ CREATE TABLE IF NOT EXISTS `{{params.database}}`.`draw_desc_text_{{params.year}}
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4;
-
+DROP TRIGGER IF EXISTS `{{params.database}}`.before_insert_drawdt;
 CREATE TRIGGER `{{params.database}}`.before_insert_drawdt
     BEFORE INSERT
     ON `{{params.database}}`.`draw_desc_text_{{params.year}}`
     FOR EACH row
-    SET new.id = uuid();
+    SET new.uuid = uuid();
 
 
 CREATE TABLE IF NOT EXISTS `{{params.database}}`.`claim_exemplary_{{params.year}}`
