@@ -1009,7 +1009,7 @@ class MergeTest(PatentDatabaseTester):
         self.project_home = os.environ['PACKAGE_HOME']
 
     def test_merge_status(self):
-        status_folder = '{}/{}'.format(self.project_home, 'create_databases')
+        status_folder = '{}/{}/{}'.format(self.project_home, "updater", 'create_databases')
         status_file = '{}/{}'.format(status_folder, 'merge_status.json')
         current_status = json.load(open(status_file))
         if sum(current_status.values()) < len(self.table_config):
