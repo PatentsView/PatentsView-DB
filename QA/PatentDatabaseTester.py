@@ -205,15 +205,14 @@ group by `{field}`
                 if not self.connection.open:
                     self.connection.connect()
                 count_query = "SELECT count(*) as null_count from `{tbl}` where `{field}` is null".format(tbl=table,
-                                                                                                      field=field)
+                                                                                                          field=field)
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
                     count_value = count_cursor.fetchall()[0][0]
                     if not table_config["fields"][field]['null_allowed']:
                         if count_value != 0:
                             raise Exception(
-                                    "NULLs encountered in table found:{database}.{table} column {col}. Count: {"
-                                    "count}".format(
+                                    "NULLs encountered in table found:{database}.{table} column {col}. Count: {count}".format(
                                             database=self.database_section, table=table,
                                             col=field,
                                             count=count_value))
@@ -239,14 +238,13 @@ group by `{field}`
             if not self.connection.open:
                 self.connection.connect()
             zero_query = "SELECT count(*) zero_count from `{tbl}` where `{field}` ='0000-00-00'".format(tbl=table,
-                                                                                                    field=field)
+                                                                                                        field=field)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(zero_query)
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value != 0:
                     raise Exception(
-                            "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {"
-                            "count}".format(
+                            "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {count}".format(
                                     database=self.database_section, table=table, col=field,
                                     count=count_value))
         finally:
@@ -319,8 +317,7 @@ group by `{field}`
                 related_count = float_cursor.fetchall()[0][0]
                 if related_count > 0:
                     raise Exception(
-                            "There are rows in {destination_id} in {related_table} that do not have corresponding {"
-                            "source_id} in {source_table} for {db}".format(
+                            "There are rows in {destination_id} in {related_table} that do not have corresponding {source_id} in {source_table} for {db}".format(
                                     source_table=table_name,
                                     related_table=related_config['table'], source_id=related_config['source_id'],
                                     destination_id=related_config['destination_id'], db=
@@ -335,14 +332,13 @@ group by `{field}`
             if not self.connection.open:
                 self.connection.connect()
             zero_query = "SELECT count(*) NULL_count from `{tbl}` where `{field}` ='NULL'".format(tbl=table,
-                                                                                              field=field)
+                                                                                                  field=field)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(zero_query)
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value != 0:
                     raise Exception(
-                            "NULL strings encountered in table found:{database}.{table} column {col}. Count: {"
-                            "count}".format(
+                            "NULL strings encountered in table found:{database}.{table} column {col}. Count: {""count}".format(
                                     database=self.database_section, table=table, col=field,
                                     count=count_value))
         finally:
@@ -457,7 +453,8 @@ group by `{field}`
         print(
                 "\t\tLoading Text field max Length {field} in {table_name}".format(field=field_name,
                                                                                    table_name=table_name))
-        text_length_query = "SELECT max(char_length(`{field}`)) from `{table}`;".format(field=field_name, table=table_name)
+        text_length_query = "SELECT max(char_length(`{field}`)) from `{table}`;".format(field=field_name,
+                                                                                        table=table_name)
         if not self.connection.open:
             self.connection.connect()
 
