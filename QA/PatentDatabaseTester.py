@@ -108,8 +108,8 @@ from {tbl}
                         self.connection.connect()
                     count_query = """
 SELECT count(*) as blank_count
-from {tbl}
-where {field} = ''
+from `{tbl}`
+where `{field}` = ''
                     """.format(tbl=table, field=field)
                     with self.connection.cursor() as count_cursor:
                         count_cursor.execute(count_query)
@@ -137,8 +137,8 @@ Blanks encountered in  table found:{database}.{table} column {col}. Count: {coun
                 self.connection.connect()
             nul_byte_query = """
 SELECT count(*) as count
-from {tbl}
-where INSTR({field}, CHAR(0x00)) > 0
+from `{tbl}`
+where INSTR(`{field}`, CHAR(0x00)) > 0
             """.format(
                     tbl=table,
                     field=field)
@@ -167,8 +167,8 @@ where INSTR({field}, CHAR(0x00)) > 0
                 self.connection.connect()
             category_count_query = """
 SELECT {field} as value, count(*) as count
-from {tbl}
-group by {field}
+from `{tbl}`
+group by `{field}`
             """.format(tbl=table, field=field)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(category_count_query)
@@ -204,7 +204,7 @@ group by {field}
             try:
                 if not self.connection.open:
                     self.connection.connect()
-                count_query = "SELECT count(*) as null_count from {tbl} where {field} is null".format(tbl=table,
+                count_query = "SELECT count(*) as null_count from `{tbl}` where `{field}` is null".format(tbl=table,
                                                                                                       field=field)
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
@@ -238,7 +238,7 @@ group by {field}
         try:
             if not self.connection.open:
                 self.connection.connect()
-            zero_query = "SELECT count(*) zero_count from {tbl} where {field} ='0000-00-00'".format(tbl=table,
+            zero_query = "SELECT count(*) zero_count from `{tbl}` where `{field}` ='0000-00-00'".format(tbl=table,
                                                                                                     field=field)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(zero_query)
@@ -262,8 +262,7 @@ group by {field}
             if table_name == 'patent':
                 count_query = "SELECT year(`date`) as `yr`, count(1) as `year_count` from patent group by year(`date`)"
             else:
-                count_query = "SELECT year(p.`date`) as `yr`, count(1) as `year_count` from {patent_table} p join {" \
-                              "entity} et on et.patent_id = p.id group by year(`date`)".format(
+                count_query = "SELECT year(p.`date`) as `yr`, count(1) as `year_count` from {patent_table} p join {entity} et on et.patent_id = p.id group by year(`date`)".format(
                         patent_table=patent_table,
                         entity=table_name)
             with self.connection.cursor() as count_cursor:
@@ -308,8 +307,7 @@ group by {field}
                 self.assert_related_floating_entities(table_name, related_entity_config)
 
     def assert_related_floating_entities(self, table_name, related_config):
-        related_query = "SELECT count(1) from {related_table} destination left join {source_table} source on source.{" \
-                        "source_id}= destination.{destination_id} where source.{source_id} is null".format(
+        related_query = "SELECT count(1) from {related_table} destination left join {source_table} source on source.{source_id}= destination.{destination_id} where source.{source_id} is null".format(
                 source_table=table_name,
                 related_table=related_config['table'], source_id=related_config['source_id'],
                 destination_id=related_config['destination_id'])
@@ -336,7 +334,7 @@ group by {field}
         try:
             if not self.connection.open:
                 self.connection.connect()
-            zero_query = "SELECT count(*) NULL_count from {tbl} where {field} ='NULL'".format(tbl=table,
+            zero_query = "SELECT count(*) NULL_count from `{tbl}` where `{field}` ='NULL'".format(tbl=table,
                                                                                               field=field)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(zero_query)
@@ -418,8 +416,7 @@ group by {field}
                 patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(
                         db=self.patent_db_prefix)
 
-                count_query = "SELECT p.`type` as `type`, count(1) as `type_count` from {patent_table} p join {" \
-                              "entity} et on et.patent_id = p.id group by  p.`type`".format(
+                count_query = "SELECT p.`type` as `type`, count(1) as `type_count` from {patent_table} p join {entity} et on et.patent_id = p.id group by  p.`type`".format(
                         patent_table=patent_table,
                         entity=table_name)
                 with self.connection.cursor() as count_cursor:
@@ -460,7 +457,7 @@ group by {field}
         print(
                 "\t\tLoading Text field max Length {field} in {table_name}".format(field=field_name,
                                                                                    table_name=table_name))
-        text_length_query = "SELECT max(char_length({field})) from {table};".format(field=field_name, table=table_name)
+        text_length_query = "SELECT max(char_length(`{field}`)) from `{table}`;".format(field=field_name, table=table_name)
         if not self.connection.open:
             self.connection.connect()
 
