@@ -166,7 +166,7 @@ where INSTR(`{field}`, CHAR(0x00)) > 0
             if not self.connection.open:
                 self.connection.connect()
             category_count_query = """
-SELECT {field} as value, count(*) as count
+SELECT `{field}` as value, count(*) as count
 from `{tbl}`
 group by `{field}`
             """.format(tbl=table, field=field)
@@ -498,4 +498,4 @@ group by `{field}`
                     self.test_text_length(table, field)
                 self.test_null_byte(table, field)
 
-        self.save_qa_data()
+        #self.save_qa_data()
