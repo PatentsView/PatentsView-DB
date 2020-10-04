@@ -145,6 +145,7 @@ def load_cpc_records(records_generator, config, log_queue):
     :param records_generator: generator that produces cpc records as dictionary
     """
     cpc_records_frame = pd.DataFrame(records_generator)
+    cpc_records_frame = cpc_records_frame[~pd.isnull(cpc_records_frame.uuid)]
     engine = create_engine(get_connection_string(config, "NEW_DB"))
     start = time.time()
     with engine.connect() as conn:
