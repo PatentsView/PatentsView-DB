@@ -78,7 +78,7 @@ def download_cpc_grant_and_pgpub_classifications(destination_folder):
         # the contents, so rename the subfiles to ignore their container
         z = zipfile.ZipFile(filepath)
         text_files = [file for file in z.infolist()
-                      if file.filename.endswith('.txt')]
+                      if file.filename.endswith('.xml')]
 
         # For example, zip file contents ['foo/', 'foo/bar.txt, 'foo/baz.txt']
         # would be extracted as ['bar.txt', 'baz.txt'] (with 'foo/' ignored)
