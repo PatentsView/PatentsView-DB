@@ -12,7 +12,7 @@ class CPCDownloadTest:
         if len(files) == 0:
             raise AssertionError("CPC Scheme files not found")
 
-        granted_pattern = destination_folder + '/US_Grant_CPC_MCF_*.txt'
+        granted_pattern = destination_folder + '/US_Grant_CPC_MCF_*.xml'
         files = [x for x in glob.glob(granted_pattern)]
         if len(files) == 0:
             raise AssertionError("Granted patent CPC assignment files not found")
