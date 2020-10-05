@@ -110,7 +110,7 @@ def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordan
 
 def consolidate_wipo(config):
     engine = create_engine(get_connection_string(config, "NEW_DB"))
-    insert_query = "INSERT IGNORE INTO wipo SELECT id from {temp_db}.wipo".format(
+    insert_query = "INSERT IGNORE INTO wipo SELECT * from {temp_db}.wipo".format(
             temp_db=config["DATABASES"]["TEMP_UPLOAD_DB"])
     engine.execute(insert_query)
 
@@ -133,7 +133,7 @@ def process_and_upload_wipo(config):
     limit = 10000
     offset = 0
     batch_counter = 0
-    base_query_template = "SELECT * from patent order by id limit {limit} offset {offset}"
+    base_query_template = "SELECT id from patent order by id limit {limit} offset {offset}"
     cpc_query_template = "SELECT c.* from cpc_current c join ({base_query}) p on p.id = c.patent_id"
     while True:
         start = time.time()
