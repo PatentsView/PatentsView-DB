@@ -63,11 +63,7 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
             right=ipc_tech_map,
             how='left',
             left_on='section',
-            right_on='IPC_Code').drop('IPC_Code',
-                                      axis=1).rename({
-                                                             "Field_number": "field_id"
-                                                             },
-                                                     axis=1)
+            right_on='IPC_Code').drop('IPC_Code',axis=1).rename({"Field_number": "field_id"},axis=1)
     # For failed lookups use "group" field
     secondary_lookup = cpc_current_with_wito_merge_1[
         cpc_current_with_wito_merge_1.field_id.isnull()].merge(
@@ -134,7 +130,8 @@ def process_and_upload_wipo(config):
     offset = 0
     batch_counter = 0
     base_query_template = "SELECT id from patent order by id limit {limit} offset {offset}"
-    cpc_query_template = "SELECT c.* from cpc_current c join ({base_query}) p on p.id = c.patent_id"
+    cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = " \
+                         "c.patent_id"
     while True:
         start = time.time()
         batch_counter += 1
