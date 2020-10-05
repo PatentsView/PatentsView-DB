@@ -79,8 +79,7 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
     # Clean UP
     wipo_data = wipo_data_with_merge.dropna(subset=['field_id'], axis=0).drop(
             [
-                    "subgroup_id", "category", "section_id", "subsection_id",
-                    "group_id", "uuid", "ipc_code", "section", "group", "Field_number"
+                    "subgroup_id", "uuid", "ipc_code", "section", "group", "Field_number"
                     ],
             axis=1)
     # Counter for Each Field ID for each patent
