@@ -106,7 +106,7 @@ def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordan
 def consolidate_wipo(config):
     engine = create_engine(get_connection_string(config, "NEW_DB"))
     insert_query = "INSERT IGNORE INTO wipo SELECT * from {temp_db}.wipo".format(
-            temp_db=config["DATABASES"]["TEMP_UPLOAD_DB"])
+            temp_db=config["DATABASE"]["TEMP_UPLOAD_DB"])
     engine.execute(insert_query)
 
 
