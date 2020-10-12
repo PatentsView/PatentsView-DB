@@ -25,7 +25,6 @@ Scripts/Website_Database_Generator/New_Organization copy/*
 node_modules/
 app-db-exploration
 QA_*
-airflow-meta*
 output/
 upload_*/*
 *_qa_loc*
