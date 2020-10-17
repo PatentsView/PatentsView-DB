@@ -65,10 +65,9 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
             left_on='section',
             right_on='IPC_Code').drop('IPC_Code',axis=1).rename({"Field_number": "field_id"},axis=1)
     # For failed lookups use "group" field
-    secondary_lookup = cpc_current_with_wito_merge_1[
-        cpc_current_with_wito_merge_1.field_id.isnull()].merge(
+    secondary_lookup = cpc_current_with_wito_merge_1.merge(
             right=ipc_tech_map,
-            how='inner',
+            how='left',
             left_on='group',
             right_on='IPC_Code')
     # Merge the secondary lookup with main dataset (Merge by index)
