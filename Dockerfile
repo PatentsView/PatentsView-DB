@@ -43,8 +43,6 @@ RUN apt-get update --fix-missing \
     && apt-get install -y --no-install-recommends \
         $buildDeps \
         python3-pip \
-        python3-requests \
-        python-mysqldb \
         apt-utils \
         curl \
         rsync \
@@ -58,6 +56,7 @@ RUN apt-get update --fix-missing \
         supervisor \
         libmysqlclient-dev \
         openssh-client \
+        libsasl2-dev \
 	default-jre \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
