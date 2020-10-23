@@ -17,9 +17,8 @@ def export_table(config, table, table_config):
            chunk_options={
                    'chunk_size':   1000000,
                    'order_fields': order_fields,
-                   'progress':     False,
-                   'escapechar':   '\\'
-                   })
+                   }, progress=False,
+           escapechar='\\')
 
 
 def export_disambig_data(config):
