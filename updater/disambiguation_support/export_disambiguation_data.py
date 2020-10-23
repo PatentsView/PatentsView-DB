@@ -75,6 +75,7 @@ def export_disambig_data(config):
                     }
             }
     for table in tables_to_export:
+        print(table)
         export_table(config, table, tables_to_export[table])
 
 
