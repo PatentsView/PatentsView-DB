@@ -498,4 +498,4 @@ group by `{field}`
                     self.test_text_length(table, field)
                 self.test_null_byte(table, field)
 
-        #self.save_qa_data()
+        self.save_qa_data()
