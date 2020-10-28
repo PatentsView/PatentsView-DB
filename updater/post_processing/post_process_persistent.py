@@ -1,6 +1,6 @@
-import pandas as pd
 import time
 
+import pandas as pd
 #########################################################################################################
 # UPDATE LONG TABLE
 #########################################################################################################
@@ -10,13 +10,14 @@ import time
 import pymysql
 from sqlalchemy import create_engine
 
-from lib.configuration import get_connection_string, get_config
+from lib.configuration import get_config, get_connection_string
 
 
 def get_long_entity_cols(db_con, new_db, persistent_long_table):
     result = db_con.execute(
-        "select column_name from information_schema.columns where table_schema = '{0}' and table_name = '{1}';".format(
-            new_db, persistent_long_table))
+            "select column_name from information_schema.columns where table_schema = '{0}' and table_name = '{"
+            "1}';".format(
+                    new_db, persistent_long_table))
     result_cols = [r[0] for r in result]
     # skip auto-increment column, we don't need it
     long_cols = [x for x in result_cols if x != 'id']
@@ -65,9 +66,10 @@ def update_long_entity(config, entity):
 
     target_persistent_table = 'persistent_{entity}_disambig_long'.format(entity=entity)
 
-    entity_update_query = "INSERT INTO {target_table} (uuid, database_update, {entity_id}) SELECT uuid, {db_version}, {entity_id} from {source_table}".format(
-        target_table=target_persistent_table, source_table=source_entity_table, entity_id=source_entity_field,
-        db_version=update_version)
+    entity_update_query = "INSERT INTO {target_table} (uuid, database_update, {entity_id}) SELECT uuid, {db_version}, " \
+                          "{entity_id} from {source_table}".format(
+            target_table=target_persistent_table, source_table=source_entity_table, entity_id=source_entity_field,
+            db_version=update_version)
     print(entity_update_query)
     if not connection.open:
         connection.connect()
@@ -84,8 +86,9 @@ def generate_wide_header(connection, entity, update_version, config):
     if not connection.open:
         connection.connect()
     with connection.cursor() as header_cursor:
-        column_query = "select column_name from information_schema.columns where table_schema = '{0}' and table_name = '{1}';".format(
-            config['DATABASE']['OLD_DB'], persistent_table)
+        column_query = "select column_name from information_schema.columns where table_schema = '{0}' and table_name " \
+                       "= '{1}';".format(
+                config['DATABASE']['OLD_DB'], persistent_table)
         header_cursor.execute(column_query)
         pid_cols = [r[0] for r in header_cursor.fetchall()]
     disambig_cols = [x for x in pid_cols if x.startswith('disamb')]
@@ -93,7 +96,7 @@ def generate_wide_header(connection, entity, update_version, config):
 
     # Add new column for this data update:
     header = [current_rawentity, old_rawentity] + disambig_cols + [
-        'disamb_' + entity + '_id_' + update_version]
+            'disamb_' + entity + '_id_' + update_version]
     header_df = pd.DataFrame(columns=header)
     return header_df
 
@@ -150,8 +153,9 @@ def get_next_raw_chunk(connection, entity, limit, offset, config):
 
     sql_stmt_inner = "(select uuid from {0}.{1} order by uuid limit {2} offset {3}) raw".format(new_db, raw_table,
                                                                                                 limit, offset)
-    sql_stmt_template = "select lf.uuid as {0}, raw_old.uuid as {1}, lf.database_update, lf.{2} from {3} left join {4}.{5} lf on raw.uuid = lf.uuid left join {6}.{7} raw_old on lf.uuid = raw_old.uuid;".format(
-        current_rawentity, old_rawentity, id_col, sql_stmt_inner, new_db, persistent_long_table, old_db, raw_table)
+    sql_stmt_template = "select lf.uuid as {0}, raw_old.uuid as {1}, lf.database_update, lf.{2} from {3} left join {" \
+                        "4}.{5} lf on raw.uuid = lf.uuid left join {6}.{7} raw_old on lf.uuid = raw_old.uuid;".format(
+            current_rawentity, old_rawentity, id_col, sql_stmt_inner, new_db, persistent_long_table, old_db, raw_table)
     print(sql_stmt_template)
     if not connection.open:
         connection.connect()
@@ -183,7 +187,7 @@ def write_wide_table(config, entity):
     total_rows = get_raw_count(connection, raw_table, new_db)
     header_df = generate_wide_header(connection, entity, update_version, config)
     ############ 2. Convert long -> wide and output .tsv: grab all uuid rows together for a set of uuids
-    limit = 300000
+    limit = 100
     offset = 0
 
     start = time.time()
@@ -206,8 +210,8 @@ def write_wide_table(config, entity):
         uuid_lookup = chunk_df[[current_rawentity, old_rawentity]].drop_duplicates()
 
         # 1. Pivot, reset index & get back uuid as column, rename axis & remove database_update axis value
-        pivoted_chunk_df = chunk_df.pivot(index=current_rawentity, columns='database_update',
-                                          values=id_col).reset_index()
+        pivoted_chunk_df = chunk_df.pivot_table(index=current_rawentity, columns='database_update',
+                                          values=id_col, aggfunc='first').reset_index()
         pd.options.display.max_columns = 100
 
         # 2. Merge back old rawinventor id column
@@ -233,3 +237,8 @@ def write_wide_table(config, entity):
     print('###########################################\n')
 
     return
+
+
+if __name__ == '__main__':
+    config = get_config()
+    write_wide_table(config, 'inventor')
