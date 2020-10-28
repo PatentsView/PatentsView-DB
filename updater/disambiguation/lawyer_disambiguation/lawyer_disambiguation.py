@@ -6,6 +6,7 @@ from collections import Counter
 from collections import defaultdict
 from datetime import datetime
 from hashlib import md5
+from pathlib import Path
 from string import ascii_lowercase as alphabet
 
 import tqdm
@@ -41,10 +42,12 @@ def prepare_tables(config):
 
 
 def clean_rawlawyer(config):
+
     cstr = get_connection_string(config, 'NEW_DB')
     engine = create_engine(cstr + "&local_infile=1")
     nodigits = re.compile(r'[^\d]+')
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
+    Path(disambig_folder).mkdir(parents=True, exist_ok=True)
     outfile = csv.writer(open(disambig_folder + '/rawlawyer_cleanalphaids.tsv', 'w'), delimiter='\t')
     outfile.writerow(
             ['uuid', 'lawyer_id', 'patent_id', 'name_first', 'name_last', 'organization', 'cleaned_alpha_lawyer_id',
