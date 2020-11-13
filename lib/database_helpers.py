@@ -21,9 +21,21 @@ def check_encoding_and_collation(db_con, tables_list):
     count = int(len(tables_list) / 2)
     table_where_string = " OR ".join(count * [where_part])
     collation_information = db_con.execute(
-        "SELECT DISTINCT CHARACTER_SET_NAME, COLLATION_NAME from information_schema.COLUMNS where DATA_TYPE in ('varchar') AND ("
-        + table_where_string + ") AND CHARACTER_SET_NAME is not null AND COLLATION_NAME is not null", tables_list)
+            "SELECT DISTINCT CHARACTER_SET_NAME, COLLATION_NAME from information_schema.COLUMNS where DATA_TYPE in ("
+            "'varchar') AND ("
+            + table_where_string + ") AND CHARACTER_SET_NAME is not null AND COLLATION_NAME is not null", tables_list)
     collation_data = collation_information.fetchall()
     if len(collation_data) > 1:
         return False
     return True
+
+
+def get_dataframe_from_pymysql_cursor(connection, query):
+    import pandas as pd
+    if not connection.open:
+        connection.connect()
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        results = pd.DataFrame(cursor.fetchall(),
+                               columns=[i[0] for i in cursor.description])
+    return results
