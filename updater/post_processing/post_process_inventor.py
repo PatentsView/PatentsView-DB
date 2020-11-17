@@ -37,11 +37,11 @@ def inventor_clean(inventor_group, stopwords):
     inventor_group['name_last'] = inventor_group['name_last'].apply(
             lambda x: x if pd.isnull(x) else ' '.join(
                     [word for word in x.split() if word not in stopwords]))
-    inventor_group['patent_date'] = pd.to_datetime(inventor_group['patent_date']).dt.date
+    inventor_group['doc_date'] = pd.to_datetime(inventor_group['doc_date']).dt.date
     return inventor_group
 
 
-def generate_disambiguated_inventors(engine, limit, offset):
+def generate_disambiguated_inventors(config,engine, limit, offset):
     inventor_core_template = """
     SELECT inventor_id
     from disambiguated_inventor_ids order by inventor_id
@@ -49,16 +49,22 @@ def generate_disambiguated_inventors(engine, limit, offset):
     """
 
     inventor_data_template = """
-    SELECT ri.inventor_id, name_first, name_last, p.date as patent_date
+    SELECT ri.inventor_id, name_first, name_last, p.date as doc_date
     from rawinventor ri
              join patent p on p.id = ri.patent_id
              join ({inv_core_query}) inventor on inventor.inventor_id = ri.inventor_id
-    where ri.inventor_id is not null;
+    where ri.inventor_id is not null
+    UNION 
+SELECT app_ri.inventor_id, name_first, name_last, p.date as doc_date
+    from   {pgpubs_database}.disambiguated_rawinventor app_ri
+             join {pgpubs_database}.publication p on p.document_number =app_ri.document_number
+             join ({inv_core_query}) inventor on inventor.inventor_id = app_ri.inventor_id
+    where app_ri.inventor_id is not null;
     """
     inventor_core_query = inventor_core_template.format(limit=limit,
                                                         offset=offset)
-    inventor_data_query = inventor_data_template.format(
-            inv_core_query=inventor_core_query)
+    inventor_data_query = inventor_data_template.format(pgpubs_database=config['DATABASE']['PGPUBS_DATABASE'],
+                                                        inv_core_query=inventor_core_query)
 
     current_inventor_data = pd.read_sql_query(sql=inventor_data_query, con=engine)
     return current_inventor_data
@@ -83,17 +89,20 @@ def generate_disambiguated_inventors(engine, limit, offset):
 def inventor_reduce(inventor_data):
     inventor_data['help'] = inventor_data.groupby(['inventor_id', 'name_first', 'name_last'])[
         'inventor_id'].transform('count')
-    out = inventor_data.sort_values(['help', 'patent_date'], ascending=[False, False],
+    out = inventor_data.sort_values(['help', 'doc_date'], ascending=[False, False],
                                     na_position='last').drop_duplicates(
             'inventor_id', keep='first').drop(
-            ['help', 'patent_date'], 1)
+            ['help', 'doc_date'], 1)
     return out
 
 
 def precache_inventors(config):
     inventor_cache_query = """
-    INSERT INTO disambiguated_inventor_ids (inventor_id)  SELECT distinct inventor_id from rawinventor;
-    """
+    INSERT INTO disambiguated_inventor_ids (inventor_id)
+    SELECT distinct inventor_id from rawinventor 
+    UNION
+    SELECT distinct inventor_id from {pgpubs_database}.disambiguated_rawinventor;
+    """.format(pgpubs_database=config['DATABASE']['PGPUBS_DATABASE'])
     engine = create_engine(get_connection_string(config, "NEW_DB"))
     engine.execute(inventor_cache_query)
 
@@ -104,7 +113,7 @@ def create_inventor(update_config):
     offset = 0
     while True:
         start = time.time()
-        current_inventor_data = generate_disambiguated_inventors(engine, limit, offset)
+        current_inventor_data = generate_disambiguated_inventors(update_config,engine, limit, offset)
         if current_inventor_data.shape[0] < 1:
             break
         step_time = time.time() - start
@@ -127,8 +136,8 @@ def create_inventor(update_config):
         #         }, axis=1)
         step_time = time.time() - start
         canonical_assignments = inventor_reduce(current_inventor_data).rename({
-                                                                                      "inventor_id": "id"
-                                                                                      }, axis=1)
+                "inventor_id": "id"
+                }, axis=1)
         canonical_assignments.to_sql(name='inventor', con=engine,
                                      if_exists='append',
                                      index=False)
