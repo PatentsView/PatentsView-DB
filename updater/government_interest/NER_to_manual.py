@@ -77,7 +77,7 @@ def match(org, govt_acc_dict, existing_lookup):
         if name in org:
             solid_matches.append(name)
     for existing, clean in existing_lookup.items():
-        if existing.lower() in org.lower() or clean.lower() in org.lower():
+        if (' ' + existing.lower() + ' ') in org.lower() or (' ' + clean.lower() + ' ') in (' ' + org.lower() + ' '):
             solid_matches.append(clean)
     solid_fuzzy, possible_fuzzy = fuzzy_match(org, govt_acc_dict, existing_lookup)
     solid_matches.extend(solid_fuzzy)

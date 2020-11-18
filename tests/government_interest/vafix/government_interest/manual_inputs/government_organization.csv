@@ -1,0 +1,290 @@
+organization_id,name,level_one,level_two,level_three
+1,Department of Veterans Affairs,Department of Veterans Affairs,,
+2,Department of Commerce,Department of Commerce,,
+3,U.S. Census Bureau,Department of Commerce,U.S. Census Bureau,
+4,Denali Commission,Denali Commission,,
+5,Department of Defense,Department of Defense,,
+6,Department of Housing and Urban Development,Department of Housing and Urban Development,,
+7,Department of Justice,Department of Justice,,
+8,Social Security Administration,Social Security Administration,,
+9,Department of Transportation,Department of Transportation,,
+10,Department of Energy,Department of Energy,,
+11,Postal Service,Postal Service,,
+12,Postal Regulatory Commission,Postal Regulatory Commission,,
+13,"Department of Health, Education, and Welfare","Department of Health, Education, and Welfare",,
+14,Small Business Administration,Small Business Administration,,
+15,Nuclear Regulatory Commission,Nuclear Regulatory Commission,,
+16,Federal Communications Commission,Federal Communications Commission,,
+17,Department of Homeland Security,Department of Homeland Security,,
+18,United States Government,United States Government,,
+19,Department of Health and Human Services,Department of Health and Human Services,,
+20,Office of National Drug Control Policy,Office of National Drug Control Policy,,
+21,Tennessee Valley Authority,Tennessee Valley Authority,,
+22,Federal Reserve System,Federal Reserve System,,
+23,Office of the Director of National Intelligence,Office of the Director of National Intelligence,,
+24,Department of Education,Department of Education,,
+26,Environmental Protection Agency,Environmental Protection Agency,,
+27,Uniformed Services University of the Health Sciences,Uniformed Services University of the Health Sciences,,
+28,National Security Council,National Security Council,,
+29,Department of the Interior,Department of the Interior,,
+30,Antitrust Modernization Commission,Antitrust Modernization Commission,,
+31,National Science Foundation,National Science Foundation,,
+32,Department of State,Department of State,,
+33,Central Intelligence Agency,Central Intelligence Agency,,
+34,Department of Agriculture,Department of Agriculture,,
+35,National Aeronautics and Space Administration,National Aeronautics and Space Administration,,
+36,General Services Administration,General Services Administration,,
+37,Maritime Administration,Department of Commerce,Maritime Administration,
+38,National Telecommunications and Information Administration,Department of Commerce,National Telecommunications and Information Administration,
+39,National Institute of Science and Technology,Department of Commerce,National Institute of Science and Technology,
+40,National Oceanic and Atmospheric Administration,Department of Commerce,National Oceanic and Atmospheric Administration,
+41,Bureau of Industry and Security,Department of Commerce,Bureau of Industry and Security,
+42,Economic Development Administration,Department of Commerce,Economic Development Administration,
+43,Library of Congress,Department of Commerce,Library of Congress,
+44,National Institute of Standards and Technology,Department of Commerce,National Institute of Standards and Technology,
+45,Technology Administration,Department of Commerce,Technology Administration,
+46,International Trade Administration,Department of Commerce,International Trade Administration,
+47,Sandia National Laboratories,Department of Energy,Sandia National Laboratories,
+49,Atomic Energy Commission,Department of Energy,Atomic Energy Commission,
+50,Combating Terrorism Technical Support Office,Department of Defense,Combating Terrorism Technical Support Office,
+51,National Security Agency,Department of Defense,National Security Agency,
+52,Coast Guard,Department of Defense,Coast Guard,
+53,Air Force,Department of Defense,Air Force,
+54,Defense Advanced Research Projects Agency,Department of Defense,Defense Advanced Research Projects Agency,
+55,Army,Department of Defense,Army,
+56,Defense Intelligence Agency,Department of Defense,Defense Intelligence Agency,
+57,Defense Logistics Agency,Department of Defense,Defense Logistics Agency,
+58,Federal Bureau of Investigation,Department of Defense,Federal Bureau of Investigation,
+59,Marine Corps,Department of Defense,Marine Corps,
+60,Defense Information Systems Agency,Department of Defense,Defense Information Systems Agency,
+61,Missile Defense Agency,Department of Defense,Missile Defense Agency,
+62,National Reconnaissance Office,Department of Defense,National Reconnaissance Office,
+63,National Geospatial-Intelligence Agency,Department of Defense,National Geospatial-Intelligence Agency,
+64,Navy,Department of Defense,Navy,
+65,Defense Threat Reduction Agency,Department of Defense,Defense Threat Reduction Agency,
+66,National Institute of Justice,Department of Justice,National Institute of Justice,
+67,Federal Aviation Administration,Department of Transportation,Federal Aviation Administration,
+68,Federal Transit Administration,Department of Transportation,Federal Transit Administration,
+69,Research and Innovative Technology Administration,Department of Transportation,Research and Innovative Technology Administration,
+70,Pipeline and Hazardous Materials Safety Administration,Department of Transportation,Pipeline and Hazardous Materials Safety Administration,
+71,Federal Railroad Administration,Department of Transportation,Federal Railroad Administration,
+72,Federal Highway Administration,Department of Transportation,Federal Highway Administration,
+73,Federal Motor Carrier Safety Administration,Department of Transportation,Federal Motor Carrier Safety Administration,
+74,National Highway Traffic Safety Administration,Department of Transportation,National Highway Traffic Safety Administration,
+75,Oak Ridge National Laboratory,Department of Energy,Oak Ridge National Laboratory,
+76,Lawrence Livermore National Laboratory,Department of Energy,Lawrence Livermore National Laboratory,
+77,National Nuclear Security Administration,Department of Energy,National Nuclear Security Administration,
+78,Argonne National Laboratory,Department of Energy,Argonne National Laboratory,
+79,Energy Research and Development Administration,Department of Energy,Energy Research and Development Administration,
+80,Los Alamos National Laboratory,Department of Energy,Los Alamos National Laboratory,
+81,Lawrence Berkeley National Laboratory,Department of Energy,Lawrence Berkeley National Laboratory,
+82,National Renewable Energy Laboratory,Department of Energy,National Renewable Energy Laboratory,
+83,National Energy Technology Laboratory,Department of Energy,National Energy Technology Laboratory,
+84,Bonneville Power Administration,Department of Energy,Bonneville Power Administration,
+86,Energy Information Administration,Department of Energy,Energy Information Administration,
+87,Small Business Innovation Research,Small Business Administration,Small Business Innovation Research,
+88,Federal Emergency Management Agency,Department of Homeland Security,Federal Emergency Management Agency,
+89,Transportation Security Administration,Department of Homeland Security,Transportation Security Administration,
+90,Centers for Medicare & Medicaid Services,Department of Health and Human Services,Centers for Medicare & Medicaid Services,
+91,Centers for Disease Control and Prevention,Department of Health and Human Services,Centers for Disease Control and Prevention,
+92,Health Resources and Services Administration,Department of Health and Human Services,Health Resources and Services Administration,
+94,National Center for Infectious Diseases,Department of Health and Human Services,National Center for Infectious Diseases,
+95,National Institutes of Health,Department of Health and Human Services,National Institutes of Health,
+96,Food and Drug Administration,Department of Health and Human Services,Food and Drug Administration,
+97,Intelligence Advanced Research Projects Activity,Office of the Director of National Intelligence,Intelligence Advanced Research Projects Activity,
+98,Bureau of Mines,Department of the Interior,Bureau of Mines,
+99,Bureau of Reclamation,Department of the Interior,Bureau of Reclamation,
+100,Agency for International Development,Department of State,Agency for International Development,
+101,Forest Service,Department of Agriculture,Forest Service,
+102,"Cooperative State Research, Education, and Extension Service",Department of Agriculture,"Cooperative State Research, Education, and Extension Service",
+103,National Institute of Food and Agriculture,Department of Agriculture,National Institute of Food and Agriculture,
+104,Natural Resources Conservation Service,Department of Agriculture,Natural Resources Conservation Service,
+105,Animal and Plant Health Inspection Service,Department of Agriculture,Animal and Plant Health Inspection Service,
+106,Agricultural Research Service,Department of Agriculture,Agricultural Research Service,
+107,National Space Biomedical Research Institute,National Aeronautics and Space Administration,National Space Biomedical Research Institute,
+108,Federal Acquisition Regulation,General Services Administration,Federal Acquisition Regulation,
+109,Internal Revenue Service,Department of the Treasury,Internal Revenue Service,
+110,Office of Management and Budget,Executive Office of the President of the United States,Office of Management and Budget,
+111,Advanced Technology Program,Department of Commerce,National Institute of Standards and Technology,Advanced Technology Program
+112,National Institute for Occupational Safety and Health,Department of Health and Human Services,Centers for Disease Control and Prevention,National Institute for Occupational Safety and Health
+113,"National Heart, Lung, and Blood Institute",Department of Health and Human Services,National Institutes of Health,"National Heart, Lung, and Blood Institute"
+114,National Institute of Mental Health,Department of Health and Human Services,National Institutes of Health,National Institute of Mental Health
+115,National Center for Research Resources,Department of Health and Human Services,National Institutes of Health,National Center for Research Resources
+116,National Institute of General Medical Sciences,Department of Health and Human Services,National Institutes of Health,National Institute of General Medical Sciences
+117,National Institute on Deafness and Other Communication Disorders,Department of Health and Human Services,National Institutes of Health,National Institute on Deafness and Other Communication Disorders
+118,National Institute of Arthritis and Musculoskeletal and Skin Diseases,Department of Health and Human Services,National Institutes of Health,National Institute of Arthritis and Musculoskeletal and Skin Diseases
+119,National Cancer Institute,Department of Health and Human Services,National Institutes of Health,National Cancer Institute
+120,National Library of Medicine,Department of Health and Human Services,National Institutes of Health,National Library of Medicine
+121,Fogarty International Center,Department of Health and Human Services,National Institutes of Health,Fogarty International Center
+122,National Institute of Child Health and Human Development,Department of Health and Human Services,National Institutes of Health,National Institute of Child Health and Human Development
+123,National Institute of Environmental Health Sciences,Department of Health and Human Services,National Institutes of Health,National Institute of Environmental Health Sciences
+124,National Institute of Nursing Research,Department of Health and Human Services,National Institutes of Health,National Institute of Nursing Research
+125,National Human Genome Research Institute,Department of Health and Human Services,National Institutes of Health,National Human Genome Research Institute
+126,National Institute of Neurological Disorders and Stroke,Department of Health and Human Services,National Institutes of Health,National Institute of Neurological Disorders and Stroke
+127,National Institute on Drug Abuse,Department of Health and Human Services,National Institutes of Health,National Institute on Drug Abuse
+128,Public Health Service,Department of Health and Human Services,National Institutes of Health,Public Health Service
+129,National Eye Institute,Department of Health and Human Services,National Institutes of Health,National Eye Institute
+130,National Institute on Minority Health and Health Disparities,Department of Health and Human Services,National Institutes of Health,National Institute on Minority Health and Health Disparities
+131,National Institute of Diabetes and Digestive and Kidney Diseases,Department of Health and Human Services,National Institutes of Health,National Institute of Diabetes and Digestive and Kidney Diseases
+132,National Institute on Aging,Department of Health and Human Services,National Institutes of Health,National Institute on Aging
+133,National Institute of Allergy and Infectious Diseases,Department of Health and Human Services,National Institutes of Health,National Institute of Allergy and Infectious Diseases
+134,National Institute on Alcohol Abuse and Alcoholism,Department of Health and Human Services,National Institutes of Health,National Institute on Alcohol Abuse and Alcoholism
+135,National Institute of Biomedical Imaging and Bioengineering,Department of Health and Human Services,National Institutes of Health,National Institute of Biomedical Imaging and Bioengineering
+136,National Institute of Dental and Craniofacial Research,Department of Health and Human Services,National Institutes of Health,National Institute of Dental and Craniofacial Research
+137,National Center for Advancing Translational Sciences,Department of Health and Human Services,National Institutes of Health,National Center for Advancing Translational Sciences
+140,National Park Service,National Park Service,,
+141,Advanced Research Projects Agency-Energy,Department of Energy,Advanced Research Projects Agency-Energy,
+142,Air Force Office of Scientific Research,Department of Defense,Air Force,Air Force Office of Scientific Research
+143,Air Force Research Laboratory,Department of Defense,Air Force,Air Force Research Laboratory
+144,Army Aviation and Missile Command,Department of Defense,Army,Army Materiel Command
+145,Army Contracting Command,Department of Defense,Army,Army Materiel Command
+146,Army Materiel Command,Department of Defense,Army,Army Materiel Command
+147,Army Medical Research,Department of Defense,Army,Army Medical Research and Materiel Command
+148,Army Medical Research and Materiel Command,Department of Defense,Army,Army Medical Research and Materiel Command
+149,"Army Natick Soldier Research, Development and Engineering Center",Department of Defense,Army,"Army Research, Development and Engineering Command"
+151,Army Research Laboratory,Department of Defense,Army,"Army Research, Development and Engineering Command"
+152,Army Research Office,Department of Defense,Army,"Army Research, Development and Engineering Command"
+153,"Army Research, Development and Engineering Command",Department of Defense,Army,"Army Research, Development and Engineering Command"
+154,Army Robert Morris Acquisition Center,Department of Defense,Army,Army Materiel Command
+155,Army Soldier Systems Center,Department of Defense,Army,"Army Research, Development and Engineering Command"
+156,Army Space and Missile Defense Command,Department of Defense,Army,Army Space and Missile Defense Command
+157,Aviation Applied Technology Directorate,Department of Defense,Army,"Aviation and Missile Research, Development, and Engineering Center"
+158,Biomedical Advanced Research and Development Authority,Department of Health and Human Services,Biomedical Advanced Research and Development Authority,
+159,Brookhaven National Laboratory,Department of Energy,Brookhaven National Laboratory,
+160,Center for Plant and Microbial Complex Carbohydrates,Department of Energy,Center for Plant and Microbial Complex Carbohydrates,
+161,Construction Engineering Research Laboratory,Department of Defense,Army,Army Corps of Engineers
+163,Domestic Nuclear Detection Office,Department of Homeland Security,Domestic Nuclear Detection Office,
+164,Electronic Systems Center,Department of Defense,Air Force,Air Force Materiel Command
+165,Energy Efficiency and Renewable Energy,Department of Energy,Office of Energy Efficiency and Renewable Energy,
+166,Glenn Research Center,National Aeronautics and Space Administration,Glenn Research Center,
+167,Interior Business Center,Department of the Interior,Interior Business Center,
+168,Johnson Space Center,National Aeronautics and Space Administration,Johnson Space Center,
+169,Microsystems Technology Office,Department of Defense,Defense Advanced Research Projects Agency,Microsystems Technology Office
+170,National Robotics Initiative,National Science Foundation,National Robotics Initiative,
+171,National Science and Technology Council,Executive Office of the President of the United States,National Science and Technology Council,
+172,Naval Air Warfare Center,Department of Defense,Navy,Naval Air Systems Command.
+173,Naval Medical Research Center,Department of Defense,Navy,Naval Medical Research Center
+174,Naval Sea Systems Command,Department of Defense,Navy,Naval Sea Systems Command
+175,Naval Supply Systems Command,Department of Defense,Navy,Naval Supply Systems Command
+176,Naval Surface Warfare Center,Department of Defense,Navy,Naval Sea Systems Command
+177,Nuclear Energy University Program,Department of Energy,Office ofxa0Nuclear Energy,Nuclear Energy University Program
+178,Office of Energy Efficiency and Renewable Energy,Department of Energy,Office of Energy Efficiency and Renewable Energy,
+179,Office of Naval Research,Department of Defense,Navy,Office of Naval Research
+180,Office of Research and Development,Environmental Protection Agency,Office of Research and Development,
+181,Space and Naval Warfare Systems Center Pacific,Department of Defense,Navy,Space and Naval Warfare Systems Center Pacific
+182,Special Operations Command,Department of Defense,Special Operations Command,
+183,Stennis Space Center,National Aeronautics and Space Administration,Stennis Space Center,
+184,Strategic Environmental Research and Development Program,Department of Defense,Strategic Environmental Research and Development Program,
+185,Walter Reed Army Institute of Research,Department of Defense,Army,Army Materiel Command
+187,Basic Energy Sciences,Department of Energy,Office of Science,Basic Energy Sciences
+189,Air Force Materiel Command,Department of Defense,Air Force,Air Force Materiel Command
+190,Armed Forces Institute of Regenerative Medicine,Department of Defense,Army,Army Medical Research and Materiel Command
+192,Bureau of Safety and Environmental Enforcement,Department of the Interior,Bureau of Safety and Environmental Enforcement,
+193,Homeland Security Advanced Research Projects Agency,Department of Homeland Security,Homeland Security Advanced Research Projects Agency,
+194,National Institute on Disability and Rehabilitation Research,Department of Education,National Institute on Disability and Rehabilitation Research,
+196,Naval Air Systems Command,Department of Defense,Navy,Naval Air Systems Command
+197,Office of Research and Technology Applications,Department of Defense,United States Transportation Command,Office of Research and Technology Applications
+198,Office of Science,Department of Energy,Office of Science,
+199,Telemedicine and Advanced Technology Research Center,Department of Defense,Army,Army Medical Research and Materiel Command
+200,National Ocean Service,Department of Commerce,National Oceanic and Atmospheric Administration,National Ocean Service
+201,National Center for Complementary and Integrative Health,Department of Health and Human Services,National Institutes of Health,National Center for Complementary and Integrative Health
+202,Natick Contracting Division,Department of Defense,Army,"Army Research, Development and Engineering Command"
+203,Knolls Atomic Power Laboratory,Department of Energy,Naval Nuclear Laboratory,Knolls Atomic Power Laboratory
+204,Plant Genome Research Program,National Science Foundation,Plant Genome Research Program,
+205,Bioenergy Research Centers,Department of Energy,Bioenergy Research Centers,
+206,"Chemical, Bioengineering, Environmental, and Transport Systems",National Science Foundation,"Chemical, Bioengineering, Environmental, and Transport Systems",
+207,Defense Sciences Office,Department of Defense,Defense Advanced Research Projects Agency,Defense Sciences Office
+208,National Nanotechnology Infrastructure Network,National Science Foundation,National Nanotechnology Infrastructure Network,
+209,Agriculture and Food Research Initiative,Department of Agriculture,National Institute of Food and Agriculture,Agriculture and Food Research Initiative
+212,Center for Advanced Solar Photophysics,Department of Energy,Office of Science,Energy Frontier Research Centers
+213,Emerging Fronteirs in Research and Innovation,National Science Foundation,Emerging Fronteirs in Research and Innovation,
+214,Naval Explosive Ordnance Disposal Technology Division,Department of Defense,Navy,Naval Supply Systems Command
+215,Earth System Research Laboratory,Department of Commerce,National Oceanic and Atmospheric Administration,Earth System Research Laboratory
+216,Naval Medical Logistics Command,Department of Defense,Navy,Naval Medical Logistics Command
+217,Joint Forces Command,Department of Defense,U.S. Joint Forces Command,
+218,Veterans Health Administration,Department of Veterans Affairs,Veterans Health Administration,
+219,Idaho National Laboratory,Department of Energy,Idaho National Laboratory,
+220,Congressionally Directed Medical Research Programs,Department of Defense,xc2xa0Congressionally Directed Medical Research Programs,
+221,"Army Tank Automotive Research, Development and Engineering Center",Department of Defense,Army,"Army Research, Development and Engineering Command"
+222,"Armament Research, Development and Engineering Center",Department of Defense,Army,"Army Research, Development and Engineering Command"
+223,Naval Undersea Warfare Center,Department of Defense,Navy,Naval Sea Systems Command
+224,Ames Laboratory,Department of Energy,Ames Laboratory,
+225,Jet Propulsion Laboratory,National Aeronautics and Space Administration,Jet Propulsion Laboratory,
+226,Division of Astronomical Sciences,National Science Foundation,Division of Astronomical Sciences,
+228,Materials Research Science and Engineering Center,National Science Foundation,Materials Research Science and Engineering Center,
+229,"Division of Civil, Mechanical and Manufacturing Innovation",National Science Foundation,"Division of Civil, Mechanical and Manufacturing Innovation",
+230,Critical Materials Institute,Department of Energy,Ames Laboratory,Critical Materials Institute
+231,Naval Research Laboratory,Department of Defense,Navy,Office of Naval Research
+232,Army Institute of Surgical Research,Department of Defense,Army,Army Medical Research and Materiel Command
+233,Defense Contract Management Agency,Department of Defense,Defense Contract Management Agency,
+234,Defense Medical Research and Development Program,Department of Defense,Defense Medical Research and Development Program,
+235,Air Force Center for Engineering and the Environment,Department of Defense,Air Force,Air Force Center for Engineering and the Environment
+236,United States Geological Survey,Department of the Interior,United States Geological Survey,
+237,Space Vehicles Directorate,Department of Defense,Air Force,Air Force Research Laboratory
+238,Bioenergy Technologies Office,Department of Energy,Office of Energy Efficiency and Renewable Energy,Bioenergy Technologies Office
+239,Office of Justice Programs,Department of Justice,Office of Justice Programs,
+240,Edgewood Chemical Biological Center,Department of Defense,Army,"Army Research, Development and Engineering Command"
+241,Structural Biology Center,Department of Energy,Argonne National Laboratory,Structural Biology Center
+242,William J. Hughes Technical Center,Department of Transportation,Federal Aviation Administration,
+243,National Pork Board,Department of Agriculture,National Pork Board,
+244,Engineering Research Centers,National Science Foundation,Engineering Research Centers,
+245,Specialized Centers of Clinically Oriented Research,National Institutes of Health,Specialized Centers of Clinically Oriented Research,
+246,Center for Energy Nanoscience,Department of Energy,Center for Energy Nanoscience,
+247,Small Business Technology Transfer,Small Business Administration,Small Business Innovation Research,
+248,Technology Partnerships Office,Department of Commerce,National Institute of Standards and Technology,Technology Partnerships Office
+249,Institute of Education Sciences,Department of Education,Institute of Education Sciences,
+250,Defense Microelectronic Activity,Department of Defense,Defense Microelectronic Activity,
+251,Fuel Cell Technologies Office,Department of Energy,Energy Efficiency and Renewable Energy,
+252,"Joint Program Executive Office for Chemical, Biological, Radiological and Nuclear Defense",Department of Defense,"Joint Program Executive Office for Chemical, Biological, Radiological and Nuclear Defense",
+253,Marine Corps Systems Command,Department of Defense,Marine Corps,Marine Corps Systems Command
+254,Pacific Northwest National Laboratory,Department of Energy,Pacific Northwest National Laboratory,
+255,Tactical Technology Office,Department of Defense,Defense Advanced Research Projects Agency,
+256,Office of Personnel Management,Office of Personnel Management,,
+257,Disruptive Technology Office,Department of Defense,Disruptive Technology Office,
+258,National Biomedical Technology Resource,National Institutes of Health,National Institute of Biomedical Imaging and Bioengineering,Biomedical Technology Resource Centers
+259,National Cooperative Highway Research Program,Department of Transportation,Federal Highway Administration,National Cooperative Highway Research Program
+260,Nitride Electronic NeXt-Generation Technology Program,Department of Defense,Defense Advanced Research Projects Agency,Nitride Electronic NeXt-Generation Technology Program
+261,Space and Naval Warfare Systems Command,Navy,Space and Naval Warfare Systems Command,
+262,Signature Discovery Initiative,Department of Energy,Pacific Northwest National Laboratory,Signature Discovery Initiative
+263,Sustainable Production Platform for Renewable Petroleum Based Oils,National Science Foundation,Sustainable Production Platform for Renewable Petroleum Based Oils,
+264,Grid Modernization Laboratory Consortium,Department of Energy,Grid Modernization Laboratory Consortium,
+265,Division of Information and Intelligent Systems,National Science Foundation,Division of Information and Intelligent Systems,
+266,Center for Gas Separations,Department of Energy,Office of Science,Center for Gas Separations
+267,Information Directorate,Department of Defense,Air Force,Air Force Research Laboratory
+268,Advanced Manufacturing Office,Department of Energy,Advanced Manufacturing Office,
+269,Bureau of Engraving and Printing,Department of the Treasury,Bureau of Engraving and Printing,
+270,Centers of Cancer Nanotechnology Excellence,National Institutes of Health,National Cancer Institute,Centers of Cancer Nanotechnology Excellence
+271,Collaborative Technology and Research Alliances,Army,Collaborative Technology and Research Alliances,
+272,Cooperative Research and Development Agreements,Army,Army Research Laboratory,Cooperative Research and Development Agreements
+273,Science and Technology Directorate,Department of Homeland Security,Science and Technology Directorate,
+275,Deployed Warfighter Protection Research Program,Department of Defense,The Armed Forces Pest Management Board,
+276,"Electrical, Communications and Cyber Systems",National Science Foundation,"Electrical, Communications and Cyber Systems",
+277,Food Technology Development Program,Department of Agriculture,National Institute of Food and Agriculture,Food Technology Development Program
+278,Golden Field Office,Department of Energy,Office of Energy Efficiency and Renewable Energy,Golden Field Office
+280,Marshall Space Flight Center,National Aeronautics and Space Administration,Marshall Space Flight Center,
+281,National Institute for General Medical Sciences,Department of Health and Human Services,National Institutes of Health,National Institute of General Medical Sciences
+282,National Marine Fisheries Service,National Oceanic and Atmospheric Administration,National Marine Fisheries Service,
+283,National Center for Atmospheric Research,National Science Foundation,National Center for Atmospheric Research,
+284,Office of Environmental Management,Department of Energy,Office of Environmental Management,
+285,Office of the Secretary of Defense,Department of Defense,Office of the Secretary of Defense,
+286,Breast Cancer Research Program,Department of Defense,Congressionally Directed Medical Research Programs,Breast Cancer Research Program
+287,Positioning System for Deep Ocean Navigation,Department of Defense,Defense Advanced Research Projects Agency,Positioning System for Deep Ocean Navigation
+288,Extended Collaborative Support Services,National Science Foundation,Extreme Science and Engineering Discovery Environmentxa0,Extended Collaborative Support Services
+289,Global Positioning Systems Directorate,Department of Defense,Air Force,Global Positioning Systems Directorate
+290,Isotope Development and Production for Research and Applications,Department of Energy,Oak Ridge National Laboratory,Isotope Development and Production for Research and Applications
+291,Tactically Exploited Reconnaissance Node program,Department of Defense,Defense Advanced Research Projects Agency,Tactically Exploited Reconnaissance Node program
+292,Young Investigator Program,Department of Defense,Air Force,Young Investigator Program
+293,Office of the Assistant Secretary of Defense for Health Affairs,Department of Defense,Office of the Assistant Secretary of Defense for Health Affairs,
+294,Langley Research Center,National Aeronautics and Space Administration,Langley Research Center,
+295,National Nanotechnology Coordinated Infrastructure,National Science Foundation,National Nanotechnology Coordinated Infrastructure,
+296,Nanoscale Science Research Centers,Department of Energy,Office of Science,Nanoscale Science Research Centers
+297,Office of Research and Development-Veterans Affairs,Department of Veteran Affairs,,
+298,Basic Research Laboratory,National Institutes of Health,National Cancer Institute,Basic Research Laboratory
+299,Ordnance Technology Consortium,Department of Defense,Ordnance Technology Consortium,
+300,Biomedical Laboratory Research and Development,Department of Veteran Affairs,Office of Research and Development-Veterans Affairs,Biomedical Laboratory Research and Development
+301,Eunice Kennedy Shriver National Institute of Child Health and Human Development,Department of Health and Human Services,National Institutes of Health,Eunice Kennedy Shriver National Institute of Child Health and Human Development
+302,Agency for Health Care Research and Quality,Department of Health and Human Services,Agency for Health Care Research and Quality,
+303,Division of Materials Research,National Science Foundation,Division of Materials Research,
+304,Space and Naval Warfare Systems Center Atlantic,Department of Defense,Navy,Space and Naval Warfare Systems Center Atlantic
+305,"Membrane Science, Engineering and Technology Center",Department of Energy,Office of Science,"Membrane Science, Engineering and Technology Center"
+306,National Wildlife Research Center,Department of Agriculture,Animal and Plant Health Inspection Service,National Wildlife Research Center
