@@ -56,7 +56,7 @@ def generate_disambiguated_inventors(config,engine, limit, offset):
     where ri.inventor_id is not null
     UNION 
 SELECT app_ri.inventor_id, name_first, name_last, p.date as doc_date
-    from   {pgpubs_database}.disambiguated_rawinventor app_ri
+    from   {pgpubs_database}.rawinventor app_ri
              join {pgpubs_database}.publication p on p.document_number =app_ri.document_number
              join ({inv_core_query}) inventor on inventor.inventor_id = app_ri.inventor_id
     where app_ri.inventor_id is not null;
@@ -101,7 +101,7 @@ def precache_inventors(config):
     INSERT INTO disambiguated_inventor_ids (inventor_id)
     SELECT distinct inventor_id from rawinventor 
     UNION
-    SELECT distinct inventor_id from {pgpubs_database}.disambiguated_rawinventor;
+    SELECT distinct inventor_id from {pgpubs_database}.rawinventor;
     """.format(pgpubs_database=config['DATABASE']['PGPUBS_DATABASE'])
     engine = create_engine(get_connection_string(config, "NEW_DB"))
     engine.execute(inventor_cache_query)
