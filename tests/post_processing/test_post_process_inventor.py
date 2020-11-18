@@ -7,6 +7,7 @@ from lib.configuration import get_config, get_connection_string
 def config():
     config = get_config()
     config["DATABASE"]["NEW_DB"] = 'sarvo_test_db'
+    config["DATABASE"]["PGPUBS_DATABASE"] = 'pgpub_sarvo_test_db'
     yield config
 
 
