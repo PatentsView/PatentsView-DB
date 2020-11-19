@@ -88,7 +88,7 @@ class TestPostProcessInventor:
         SELECT count(1) as `rows` from disambiguated_inventor_ids;
         """
         distinct_count_query = """
-        SELECT count(distinct inventor_id) distinct_inventor_ids from (SELECT inventor_id from rawinventor UNION SELECT inventor_id from {pgpubs_database}.disambiguated_rawinventor)x;
+        SELECT count(distinct inventor_id) distinct_inventor_ids from (SELECT inventor_id from rawinventor UNION SELECT inventor_id from {pgpubs_database}.rawinventor)x;
         """.format(pgpubs_database=config['DATABASE']['PGPUBS_DATABASE'])
         duplicate_query = """
         SELECT count(1) as duplicates
@@ -122,7 +122,7 @@ class TestPostProcessInventor:
         import pandas as pd
         engine = create_engine(get_connection_string(config, "NEW_DB"))
         count_query = "SELECT count(1)  as `rows` from inventor"
-        distinct_id_query = "SELECT count(distinct inventor_id) inventors from (SELECT inventor_id from rawinventor UNION SELECT inventor_id from {pgpubs_database}.disambiguated_rawinventor)x".format(pgpubs_database=config["DATABASE"]["PGPUBS_DATABASE"])
+        distinct_id_query = "SELECT count(distinct inventor_id) inventors from (SELECT inventor_id from rawinventor UNION SELECT inventor_id from {pgpubs_database}.rawinventor)x".format(pgpubs_database=config["DATABASE"]["PGPUBS_DATABASE"])
         column_query = """
                 SELECT COLUMN_NAME
                 from information_schema.COLUMNS
