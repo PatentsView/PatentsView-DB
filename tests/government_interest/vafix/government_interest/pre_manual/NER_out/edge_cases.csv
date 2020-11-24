@@ -2,13 +2,13 @@
 0,AFRL,Air Force Research Laboratory,Air Force Research Laboratory
 1,AFRL Wright Research Site,Air Force Research Laboratory,Air Force Research Laboratory
 2,ARO,Army Research Office,Army Research Office
-3,Advance Technology Program,Advanced Technology Program,Advanced Technology Program|Department of Veterans Affairs
+3,Advance Technology Program,Advanced Technology Program,Department of Veterans Affairs|Advanced Technology Program
 4,Advance Technology Research Center,Telemedicine and Advanced Technology Research Center,Department of Veterans Affairs|Telemedicine and Advanced Technology Research Center
 5,Advanced Research Development Agency,,Department of Veterans Affairs
-6,Advanced Technology Program,Advanced Technology Program,Advanced Technology Program|Department of Veterans Affairs
+6,Advanced Technology Program,Advanced Technology Program,Department of Veterans Affairs|Advanced Technology Program
 7,Advanced Technology Research Center,Telemedicine and Advanced Technology Research Center,Department of Veterans Affairs|Telemedicine and Advanced Technology Research Center
 8,Agency-Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity|Department of Veterans Affairs
-9,Air Force Office of Scientific Research,Air Force Office of Scientific Research|Air Force,Air Force Office of Scientific Research|Air Force
+9,Air Force Office of Scientific Research,Air Force|Air Force Office of Scientific Research,Air Force|Air Force Office of Scientific Research
 10,Air Force Research Laboratory,Air Force|Air Force Research Laboratory,Air Force|Air Force Research Laboratory
 11,Air Force Research Laboratory Contract,Air Force|Air Force Research Laboratory,Air Force|Air Force Research Laboratory
 12,Army Research Office,,
@@ -34,12 +34,12 @@
 32,EEC,,
 33,Evaluation Command,,Department of Veterans Affairs
 34,Fahd University for Petroleum and Minerals,,
-35,Federal Aviation Administration,non_government|Federal Aviation Administration,
+35,Federal Aviation Administration,Federal Aviation Administration|non_government,
 36,Federal Bureau of Investigation,,
 37,GM,non_government,non_government
 38,George Washington University,,
 39,George Washington University from Research and Development Solutions,,
-40,Harvard Biophysics NIH,National Institutes of Health,Department of Veterans Affairs|National Institutes of Health
+40,Harvard Biophysics NIH,National Institutes of Health,National Institutes of Health|Department of Veterans Affairs
 41,IARPA,Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity|Defense Advanced Research Projects Agency
 42,Innovative Nanobio-convergence Technology for Measurement and Control of Vascular Permeability,,Department of Veterans Affairs
 43,Intelligence Advanced Research Project Activity,Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity|Department of Veterans Affairs
@@ -62,7 +62,7 @@
 60,Mitigate Single Event Upset Perturbation,,
 61,NAMC,,
 62,NAMC Project,,
-63,NAVAIR,Naval Air Systems Command,Naval Air Systems Command|Department of Veterans Affairs
+63,NAVAIR,Naval Air Systems Command,Department of Veterans Affairs|Naval Air Systems Command
 64,NAVAL,,Department of Veterans Affairs
 65,NIH,National Institutes of Health,National Institutes of Health
 66,NIST,National Institute of Standards and Technology,National Institute of Standards and Technology
@@ -81,14 +81,14 @@
 79,National Science Foundation,National Science Foundation,National Science Foundation
 80,National Science Foundations,National Science Foundation,National Science Foundation
 81,"National Science, Technology and Innovation Plan",,National Science Foundation|Department of Veterans Affairs
-82,Nava STTR,Small Business Technology Transfer Program,Small Business Technology Transfer Program|Department of Veterans Affairs
+82,Nava STTR,Small Business Technology Transfer Program,Department of Veterans Affairs|Small Business Technology Transfer Program
 83,Naval Information Warfare Center,,Department of Veterans Affairs
 84,Naval Information Warfare Center Pacific,,Department of Veterans Affairs
-85,Naval Surface Warfare Center Corona,Naval Surface Warfare Center,Naval Surface Warfare Center|Department of Veterans Affairs
-86,Naval Surface Warfare Center Corona Division,Naval Surface Warfare Center,Naval Surface Warfare Center|Department of Veterans Affairs
-87,Naval Surface Warfare Center Crane,Naval Surface Warfare Center,Naval Surface Warfare Center|Department of Veterans Affairs
-88,Naval Surface Warfare Center Dahlgren,Naval Surface Warfare Center,Naval Surface Warfare Center|Department of Veterans Affairs
-89,Naval Surface Warfare Center Port Hueneme,Naval Surface Warfare Center,Naval Surface Warfare Center|Department of Veterans Affairs
+85,Naval Surface Warfare Center Corona,Naval Surface Warfare Center,Department of Veterans Affairs|Naval Surface Warfare Center
+86,Naval Surface Warfare Center Corona Division,Naval Surface Warfare Center,Department of Veterans Affairs|Naval Surface Warfare Center
+87,Naval Surface Warfare Center Crane,Naval Surface Warfare Center,Department of Veterans Affairs|Naval Surface Warfare Center
+88,Naval Surface Warfare Center Dahlgren,Naval Surface Warfare Center,Department of Veterans Affairs|Naval Surface Warfare Center
+89,Naval Surface Warfare Center Port Hueneme,Naval Surface Warfare Center,Department of Veterans Affairs|Naval Surface Warfare Center
 90,Naval Systems Center Pacific,,Department of Veterans Affairs
 91,Navy,Navy,Navy
 92,Next Generation Eco-innovation Technology Development Project of the Ministry of Environment,,Department of Veterans Affairs|National Institute of Standards and Technology
@@ -125,13 +125,13 @@
 123,Technology Transfer Office,,National Science Foundation
 124,Telemedicine  Advanced Technology Research Center,Telemedicine and Advanced Technology Research Center,Department of Veterans Affairs|Telemedicine and Advanced Technology Research Center
 125,Telemedicine and Advance Technology Research Center,Telemedicine and Advanced Technology Research Center,Department of Veterans Affairs|Telemedicine and Advanced Technology Research Center
-126,Texas Advanced Technology Program,Advanced Technology Program|non_government,
-127,The Department of Homeland Security,non_government|Department of Homeland Security,
+126,Texas Advanced Technology Program,non_government|Advanced Technology Program,
+127,The Department of Homeland Security,Department of Homeland Security|non_government,
 128,The Office of Naval Research,Office of Naval Research,Department of Veterans Affairs|Office of Naval Research
 129,Trusted Integrated Chips,,
 130,U.S. Army,Army,Army
 131,U.S. Army Aviation,Army,Army
-132,U.S. Army Aviation and Missile Command-Redstone,Army Aviation and Missile Command|Army,Army|Army Aviation and Missile Command
+132,U.S. Army Aviation and Missile Command-Redstone,Army|Army Aviation and Missile Command,Army|Army Aviation and Missile Command
 133,U.S. Army Medical Materiel Agency,Army,Army
 134,U.S. Army Medical Research and Material Command,,
 135,U.S. Army Research Office,,
@@ -146,8 +146,8 @@
 144,US Office of Naval Research CRDF,Office of Naval Research,Department of Veterans Affairs|Office of Naval Research
 145,UT-Battelle,,
 146,United Stated Government,non_government|United States Government,non_government|United States Government
-147,United States Army,United States Government|Army,United States Government|Army
-148,United States Army Telemedicine,United States Government|Army,United States Government|Army
+147,United States Army,Army|United States Government,Army|United States Government
+148,United States Army Telemedicine,Army|United States Government,Army|United States Government
 149,United States Department of Commerce,,
 150,United States Naval Air Systems Command,,
 151,United States Navy,Navy|United States Government,Navy|United States Government
@@ -159,5 +159,5 @@
 157,VA Center of Excellence,Department of Veterans Affairs,Department of Veterans Affairs
 158,Vapor-Liquid Pump for Mixed Phase Refrigerant,,National Science Foundation|Department of Veterans Affairs
 159,Welch Foundation,,
-160,the National Institutes of Health,non_government|National Institutes of Health,non_government|National Institutes of Health
+160,the National Institutes of Health,National Institutes of Health|non_government,National Institutes of Health|non_government
 161,the Office of Naval Research,Office of Naval Research,Department of Veterans Affairs|Office of Naval Research

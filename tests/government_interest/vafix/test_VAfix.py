@@ -159,6 +159,14 @@ def perform_lookups(existing_lookup, govt_acc_dict, organizations, manual_inputs
         edge_cases['wo_space'].append(solid_for_org_old)
         all_solid.append(solid_for_org)
         all_possible.append(possible_for_org)
+        if " va " in ' ' + org.lower() + ' ':
+            assert (('Department of Veterans Affairs' in solid_for_org))
+        elif "va" in org.lower():
+            if not isinstance(solid_for_org, float):
+                if ('Department of Veterans Affairs' not in solid_for_org):
+                    assert ('Department of Veterans Affairs' not in solid_for_org)
+            else:
+                assert True
     pd.DataFrame(edge_cases).to_csv('edge_cases.csv')
 
     results = pd.DataFrame([organizations, all_solid, all_possible]).T
@@ -196,15 +204,17 @@ def process_ner_to_manual(config):
     get_orgs(engine, manual_inputs)
 
 from configparser import ConfigParser
-from tests.government_interest.vafix.NER import *
+from NER import *
 import os
 from pathlib import Path
-path = os.getcwd()
-project_root = Path(path).parent.parent.parent
-parser = ConfigParser()
-parser.read(os.path.join(project_root, 'config.ini'))
 
-# TODO: execution output/progress bar
+def test_run_gi():
+    path = os.getcwd()
+    project_root = Path(path).parent.parent.parent
+    parser = ConfigParser()
+    parser.read(os.path.join(project_root, 'config.ini'))
 
-begin_NER_processing(parser)
-process_ner_to_manual(parser)
+    # TODO: execution output/progress bar
+
+    begin_NER_processing(parser)
+    process_ner_to_manual(parser)
