@@ -7,7 +7,7 @@ Advance Technology Research Center,Telemedicine and Advanced Technology Research
 Advanced Technology Program,Advanced Technology Program
 Advanced Technology Research Center,Telemedicine and Advanced Technology Research Center
 Agency-Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity
-Air Force Office of Scientific Research,Air Force|Air Force Office of Scientific Research
+Air Force Office of Scientific Research,Air Force Office of Scientific Research|Air Force
 Air Force Research Laboratory,Air Force|Air Force Research Laboratory
 Air Force Research Laboratory Contract,Air Force|Air Force Research Laboratory
 Army Test and Evaluation Command,Army
@@ -69,7 +69,7 @@ The Department of Homeland Security,Department of Homeland Security
 The Office of Naval Research,Office of Naval Research
 U.S. Army,Army
 U.S. Army Aviation,Army
-U.S. Army Aviation and Missile Command-Redstone,Army|Army Aviation and Missile Command
+U.S. Army Aviation and Missile Command-Redstone,Army Aviation and Missile Command|Army
 U.S. Army Medical Materiel Agency,Army
 U.S. Department of Energy,Department of Energy
 U.S. National Science Foundation,National Science Foundation
@@ -79,8 +79,8 @@ U.S. Office of Naval Research,Office of Naval Research
 US Office of Naval Research,Office of Naval Research
 US Office of Naval Research CRDF,Office of Naval Research
 United Stated Government,United States Government
-United States Army,Army|United States Government
-United States Army Telemedicine,Army|United States Government
+United States Army,United States Government|Army
+United States Army Telemedicine,United States Government|Army
 United States Navy,Navy|United States Government
 United States Navy/NAVAIR,Navy|United States Government
 VA Career Development,Department of Veterans Affairs
