@@ -7,10 +7,10 @@
 5,Advanced Research Development Agency,,Department of Veterans Affairs
 6,Advanced Technology Program,Advanced Technology Program,Department of Veterans Affairs|Advanced Technology Program
 7,Advanced Technology Research Center,Telemedicine and Advanced Technology Research Center,Department of Veterans Affairs|Telemedicine and Advanced Technology Research Center
-8,Agency-Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity|Department of Veterans Affairs
+8,Agency-Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity,Department of Veterans Affairs|Intelligence Advanced Research Projects Activity
 9,Air Force Office of Scientific Research,Air Force|Air Force Office of Scientific Research,Air Force|Air Force Office of Scientific Research
-10,Air Force Research Laboratory,Air Force|Air Force Research Laboratory,Air Force|Air Force Research Laboratory
-11,Air Force Research Laboratory Contract,Air Force|Air Force Research Laboratory,Air Force|Air Force Research Laboratory
+10,Air Force Research Laboratory,Air Force Research Laboratory|Air Force,Air Force Research Laboratory|Air Force
+11,Air Force Research Laboratory Contract,Air Force Research Laboratory|Air Force,Air Force Research Laboratory|Air Force
 12,Army Research Office,,
 13,Army Test and Evaluation Command,Army,Department of Veterans Affairs|Army
 14,Center for Advanced Surface Engineering,,Department of Veterans Affairs
@@ -24,11 +24,11 @@
 22,Defense Advanced Research Projects Agency,,
 23,Defense Advanced Research Projects Agency/US Army Research Office,,
 24,Department of Defense,,
-25,Department of Education,Department of Education|non_government,
+25,Department of Education,non_government|Department of Education,
 26,Department of Energy,non_government|Department of Energy,
 27,Department of Energy and,non_government|Department of Energy,
 28,Department of Homeland Security,,
-29,Department of the Navy,Navy|non_government,
+29,Department of the Navy,non_government|Navy,
 30,Diabetic Retinopathy,,
 31,DoD,Department of Defense,Department of Defense
 32,EEC,,
@@ -39,11 +39,11 @@
 37,GM,non_government,non_government
 38,George Washington University,,
 39,George Washington University from Research and Development Solutions,,
-40,Harvard Biophysics NIH,National Institutes of Health,National Institutes of Health|Department of Veterans Affairs
-41,IARPA,Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity|Defense Advanced Research Projects Agency
+40,Harvard Biophysics NIH,National Institutes of Health,Department of Veterans Affairs|National Institutes of Health
+41,IARPA,Intelligence Advanced Research Projects Activity,Defense Advanced Research Projects Agency|Intelligence Advanced Research Projects Activity
 42,Innovative Nanobio-convergence Technology for Measurement and Control of Vascular Permeability,,Department of Veterans Affairs
-43,Intelligence Advanced Research Project Activity,Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity|Department of Veterans Affairs
-44,Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity|Department of Veterans Affairs
+43,Intelligence Advanced Research Project Activity,Intelligence Advanced Research Projects Activity,Department of Veterans Affairs|Intelligence Advanced Research Projects Activity
+44,Intelligence Advanced Research Projects Activity,Intelligence Advanced Research Projects Activity,Department of Veterans Affairs|Intelligence Advanced Research Projects Activity
 45,KACST,,
 46,KFUPM,,
 47,Kentucky Cabinet for Economic Development,,
@@ -69,7 +69,7 @@
 67,NIST ATP,,
 68,NMRDC,,Denali Commission
 69,NRL,Naval Research Laboratory,Naval Research Laboratory
-70,National Aeronautics and Space Administration,National Aeronautics and Space Administration | Ames Laboratory|National Aeronautics and Space Administration,
+70,National Aeronautics and Space Administration,National Aeronautics and Space Administration|National Aeronautics and Space Administration | Ames Laboratory,
 71,National Aeronautics and Space Administration Experimental Program,National Aeronautics and Space Administration,National Aeronautics and Space Administration|National Institute of Standards and Technology
 72,National Aeronautics and Space Administration Experimental Program to Stimulate Competitive Research,National Aeronautics and Space Administration,National Aeronautics and Space Administration|National Institute of Standards and Technology
 73,National Cancer Institute,National Cancer Institute,National Cancer Institute
@@ -80,7 +80,7 @@
 78,National Research,,
 79,National Science Foundation,National Science Foundation,National Science Foundation
 80,National Science Foundations,National Science Foundation,National Science Foundation
-81,"National Science, Technology and Innovation Plan",,National Science Foundation|Department of Veterans Affairs
+81,"National Science, Technology and Innovation Plan",,Department of Veterans Affairs|National Science Foundation
 82,Nava STTR,Small Business Technology Transfer Program,Department of Veterans Affairs|Small Business Technology Transfer Program
 83,Naval Information Warfare Center,,Department of Veterans Affairs
 84,Naval Information Warfare Center Pacific,,Department of Veterans Affairs
@@ -103,7 +103,7 @@
 101,Office of Naval Research Contract,Office of Naval Research,Department of Veterans Affairs|Office of Naval Research
 102,Office of Naval Research DURIP,Office of Naval Research,Department of Veterans Affairs|Office of Naval Research
 103,Office of Naval Research Young Investigator Program,Office of Naval Research,Department of Veterans Affairs|Office of Naval Research
-104,Office of Research,Office of Research and Development|Office of Research and Technology Applications,Office of Research and Development|Office of Research and Technology Applications
+104,Office of Research,Office of Research and Technology Applications|Office of Research and Development,Office of Research and Technology Applications|Office of Research and Development
 105,Office of Research and Technical Applications,Office of Research and Technology Applications,Office of Research and Technology Applications
 106,Office of Research and Technology Applications,Office of Research and Technology Applications,Office of Research and Technology Applications
 107,Office of the Director of National Intelligence,OFFICE OF THE DIRECTOR OF NATIONAL INTELLIGENCE|Office of the Director of National Intelligence,OFFICE OF THE DIRECTOR OF NATIONAL INTELLIGENCE|Office of the Director of National Intelligence
@@ -115,9 +115,9 @@
 113,Robert A. Welch Foundation,,
 114,SBIR,Small Business Innovation Research,Small Business Innovation Research
 115,Small Business Innovation Research,,
-116,Small Business Innovation Research Contract,Small Business Innovation Research,Department of Veterans Affairs|Small Business Innovation Research
-117,Small Business Innovation Research Phase II,Small Business Innovation Research,Department of Veterans Affairs|Small Business Innovation Research
-118,Small Business Innovative Research Program,Small Business Innovation Research,Department of Veterans Affairs|Small Business Innovation Research
+116,Small Business Innovation Research Contract,Small Business Innovation Research,Small Business Innovation Research|Department of Veterans Affairs
+117,Small Business Innovation Research Phase II,Small Business Innovation Research,Small Business Innovation Research|Department of Veterans Affairs
+118,Small Business Innovative Research Program,Small Business Innovation Research,Small Business Innovation Research|Department of Veterans Affairs
 119,Space Naval War Systems Center,,Department of Veterans Affairs
 120,Space and Naval Systems Center Pacific,,Department of Veterans Affairs
 121,Stimulate Competitive Research,,
@@ -126,12 +126,12 @@
 124,Telemedicine  Advanced Technology Research Center,Telemedicine and Advanced Technology Research Center,Department of Veterans Affairs|Telemedicine and Advanced Technology Research Center
 125,Telemedicine and Advance Technology Research Center,Telemedicine and Advanced Technology Research Center,Department of Veterans Affairs|Telemedicine and Advanced Technology Research Center
 126,Texas Advanced Technology Program,non_government|Advanced Technology Program,
-127,The Department of Homeland Security,Department of Homeland Security|non_government,
+127,The Department of Homeland Security,non_government|Department of Homeland Security,
 128,The Office of Naval Research,Office of Naval Research,Department of Veterans Affairs|Office of Naval Research
 129,Trusted Integrated Chips,,
 130,U.S. Army,Army,Army
 131,U.S. Army Aviation,Army,Army
-132,U.S. Army Aviation and Missile Command-Redstone,Army|Army Aviation and Missile Command,Army|Army Aviation and Missile Command
+132,U.S. Army Aviation and Missile Command-Redstone,Army Aviation and Missile Command|Army,Army Aviation and Missile Command|Army
 133,U.S. Army Medical Materiel Agency,Army,Army
 134,U.S. Army Medical Research and Material Command,,
 135,U.S. Army Research Office,,
@@ -150,14 +150,14 @@
 148,United States Army Telemedicine,Army|United States Government,Army|United States Government
 149,United States Department of Commerce,,
 150,United States Naval Air Systems Command,,
-151,United States Navy,Navy|United States Government,Navy|United States Government
+151,United States Navy,United States Government|Navy,United States Government|Navy
 152,United States Navy/NAVAIR,Navy|United States Government,
 153,University of Nevada,,Department of Veterans Affairs
 154,VA Career Development,Department of Veterans Affairs,Department of Veterans Affairs
 155,VA Career Development -2,Department of Veterans Affairs,Department of Veterans Affairs
 156,VA Center,Department of Veterans Affairs,Department of Veterans Affairs
 157,VA Center of Excellence,Department of Veterans Affairs,Department of Veterans Affairs
-158,Vapor-Liquid Pump for Mixed Phase Refrigerant,,National Science Foundation|Department of Veterans Affairs
+158,Vapor-Liquid Pump for Mixed Phase Refrigerant,,Department of Veterans Affairs|National Science Foundation
 159,Welch Foundation,,
-160,the National Institutes of Health,National Institutes of Health|non_government,National Institutes of Health|non_government
+160,the National Institutes of Health,non_government|National Institutes of Health,non_government|National Institutes of Health
 161,the Office of Naval Research,Office of Naval Research,Department of Veterans Affairs|Office of Naval Research

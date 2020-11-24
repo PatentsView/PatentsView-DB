@@ -200,8 +200,8 @@ def process_ner_to_manual(config):
 
     existing_lookup, govt_acc_dict, organizations = get_data(persistent_files, pre_manual)
     perform_lookups(existing_lookup, govt_acc_dict, organizations, manual_inputs)
-    engine = create_engine(get_connection_string(config, 'NEW_DB'))
-    get_orgs(engine, manual_inputs)
+    # engine = create_engine(get_connection_string(config, 'NEW_DB'))
+    # get_orgs(engine, manual_inputs)
 
 from configparser import ConfigParser
 from NER import *
