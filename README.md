@@ -6,11 +6,11 @@ See DEVELOPER.md
 ## Historic Parser Script
 
 ### 1976 -2004 Parser
-# Requirements
+#### Requirements
 1. Python 2.7.8
 2. MySQL-python 1.2.5
 
-# Steps
+#### Steps
 0. Download the zip file from [v0.1](https://github.com/PatentsView/PatentsView-DB/releases/tag/v0.1) release
 1. Download the files to be processed to a directory. Note that you should use separate directories for the two periods; don't mix files in the same input directory.
 2. Unzip the files.
@@ -21,13 +21,13 @@ See DEVELOPER.md
 5. Run the `parser_wrapper.py` script to load the data from the CSV files into a MySQL database.
   1. E.g.: `python parser_wrapper.py --mysql 1 --mysql-input-dir "uspto_parsed/1976-2001" --mysql-host name_or_address_of_host --mysql-username your_username --mysql-passwd your_password --mysql-dbname target_database`
 
-## Classification File Parser
-# Requirements
+### Classification File Parser
+#### Requirements
 1. Python 2.7.8
 2. MySQL-python 1.2.5
 3. Mechanize (installed using easy_install)
 
-# Steps
+#### Steps
 0. Download the zip file from [v0.1](https://github.com/PatentsView/PatentsView-DB/releases/tag/v0.1) release
 1. Run the  parser_wrapper.py  script to parse the raw files into CSV files.
   1. Help for the this script can be obtained by:  python parser_wrapper.py --help .
