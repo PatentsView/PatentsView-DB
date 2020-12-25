@@ -13,7 +13,7 @@ class WithdrawnTest:
         self.connection = pymysql.connect(host=self.config['DATABASE']['HOST'],
                                           user=self.config['DATABASE']['USERNAME'],
                                           password=self.config['DATABASE']['PASSWORD'],
-                                          db=self.config['DATABASE']['NEW_DB'],
+                                          db=self.config['DATABASE']['RAW_DB'],
                                           charset='utf8mb4', cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
         self.qa_data = {"DataMonitor_patentwithdrawncount": []}
 

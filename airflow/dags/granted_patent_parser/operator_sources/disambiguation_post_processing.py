@@ -10,19 +10,19 @@ from updater.post_processing.post_process_persistent import prepare_wide_table, 
 
 def add_postprocessing_operators(disambiguation_post_processing, config, project_home, airflow_task_success,
                                  airflow_task_failure):
-    from lib.configuration import get_scp_download_command
+
     from updater.post_processing.create_lookup import create_lookup_tables
     from updater.post_processing.post_process_assignee import post_process_assignee
     from updater.post_processing.post_process_inventor import post_process_inventor
     from updater.post_processing.post_process_location import post_process_location
     from updater.post_processing.post_process_persistent import update_long_entity
 
-    download_disambig_operator = BashOperator(task_id='download_disambiguation',
-                                              bash_command=get_scp_download_command(config),
-                                              dag=disambiguation_post_processing,
-                                              on_success_callback=airflow_task_success,
-                                              on_failure_callback=airflow_task_failure
-                                              )
+    # download_disambig_operator = BashOperator(task_id='download_disambiguation',
+    #                                           bash_command=get_scp_download_command(config),
+    #                                           dag=disambiguation_post_processing,
+    #                                           on_success_callback=airflow_task_success,
+    #                                           on_failure_callback=airflow_task_failure
+    #                                           )
     post_process_inventor_operator = PythonOperator(task_id='post_process_inventor',
                                                     python_callable=post_process_inventor,
                                                     op_kwargs={

@@ -3,18 +3,16 @@ import pandas as pd
 import re
 import logging
 
+from lib.configuration import get_upload_tables_dict
+
 logger = logging.getLogger("airflow.task")
 
 
 class ParserTest:
     def __init__(self, update_config):
         import glob
-        self.expected_entities = ['application', 'botanic', 'brf_sum_text', 'claim',
-                                  'detail_desc_text', 'draw_desc_text', 'figures', 'foreign_priority',
-                                  'foreigncitation', 'government_interest', 'ipcr', 'mainclass',
-                                  'non_inventor_applicant', 'otherreference', 'patent', 'pct_data', 'rawassignee',
-                                  'rawinventor', 'rawlawyer', 'rawlocation', 'rel_app_text', 'subclass',
-                                  'us_term_of_grant', 'usapplicationcitation', 'uspatentcitation', 'uspc', 'usreldoc']
+        tables_dict = get_upload_tables_dict(update_config)
+        self.expected_entities = tables_dict.keys()
 
         input_folder = '{working_folder}/raw_data'.format(working_folder=update_config['FOLDERS'][
             'WORKING_FOLDER'])
@@ -46,14 +44,14 @@ class ParserTest:
         from pathlib import Path
         import pandas as pd
         my_file = Path(file_path)
-        logger.info(file_path)
+        print(file_path)
         assert my_file.exists()
         try:
             df = pd.read_csv(file_path, sep="\t")
         except:
+
             raise AssertionError("Unable to read CSV file")
 
-        assert df.shape[0] > 0
 
     def get_file_shapes(self, update_config):
         shapes = {'timestamp': [], 'entity': [], 'count': []}

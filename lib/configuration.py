@@ -1,4 +1,7 @@
+import configparser
 import datetime
+import json
+import os
 
 
 def get_config(type='granted_patent'):
@@ -110,7 +113,7 @@ def get_connection_string(config, database='TEMP_UPLOAD_DB'):
 #         print("Connection open for {duration} seconds".format(duration=round(time.time() - connect_time, 3)))
 #
 
-def get_backup_command(config, project_home):
+def get_backup_command(**kwargs):
     command = "mydumper"
     conf_parameter = "{home}/resources/sql.conf".format(home=project_home)
     directory_parameter = "{datahome}/{database}_backup".format(datahome=config["FOLDERS"]["WORKING_FOLDER"],
@@ -145,8 +148,9 @@ def get_loader_command(config, project_home):
     return loader_command
 
 
-def get_text_table_load_command(config, project_home):
+def get_text_table_load_command(project_home, **kwargs):
     command = 'mysql'
+    config = get_current_config(**kwargs)
     defaults_parameter = config['DATABASE']['CONFIG_FILE']
     script_to_load = "{home}/resources/text_table_triggers.sql".format(home=project_home)
     database = config["DATABASE"]['TEMP_UPLOAD_DB']
@@ -157,49 +161,91 @@ def get_text_table_load_command(config, project_home):
     return create_command
 
 
-def get_scp_copy_command(config):
-    # scp -i "$KEYFILE" "$FOLDER"/*.tsv disambiguser@ec2-52-21-62-204.compute-1.amazonaws.com:/data/disambiguation/data
-    command = 'scp'
-    keyfile_parameter = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
-    disambig_input_folder = '{}/disambig_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])
-    source_blob = "{folder}/*.tsv".format(folder=disambig_input_folder)
-    disambig_user = 'disambiguser'
-    disambig_host = "ec2-52-21-62-204.compute-1.amazonaws.com"
-    destination = "/data/disambiguation/data"
+#
+# def get_scp_copy_command(config):
+#     # scp -i "$KEYFILE" "$FOLDER"/*.tsv disambiguser@ec2-52-21-62-204.compute-1.amazonaws.com:/data/disambiguation/data
+#     command = 'scp'
+#     keyfile_parameter = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
+#     disambig_input_folder = '{}/disambig_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])
+#     source_blob = "{folder}/*.tsv".format(folder=disambig_input_folder)
+#     disambig_user = 'disambiguser'
+#     disambig_host = "ec2-52-21-62-204.compute-1.amazonaws.com"
+#     destination = "/data/disambiguation/data"
+#
+#     command = "{command} -i {keyfile} {source_blob} {user}@{host}:{destination}".format(command=command,
+#                                                                                         keyfile=keyfile_parameter,
+#                                                                                         source_blob=source_blob,
+#                                                                                         user=disambig_user,
+#                                                                                         host=disambig_host,
+#                                                                                         destination=destination)
+#     return command
+#
+#
+# def get_scp_download_command(config):
+#     command = 'scp'
+#     keyfile_parameter = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
+#     disambig_output_folder = '{}/disambig_output/'.format(config['FOLDERS']['WORKING_FOLDER'])
+#     disambig_user = 'disambiguser'
+#     disambig_host = "ec2-52-21-62-204.compute-1.amazonaws.com"
+#     source_files = {
+#             'inventor_disambiguation.tsv': '/data/disambiguation/exp_out/inventor/disambiguation.postprocessed.tsv',
+#             'assignee_disambiguation.tsv': '/data/disambiguation/exp_out/assignee/disambiguation.tsv',
+#             'location_disambiguation.tsv': '/data/disambiguation/exp_out/location/location_post_processed.tsv'
+#             }
+#     command_strings = ["mkdir -p {disambig_output_folder}".format(disambig_output_folder=disambig_output_folder)]
+#     for dest_file in source_files:
+#         command_string = "{command} -i {keyfile} {user}@{host}:{source_file} {disambig_output_folder}/{dest_file} " \
+#                          "".format(
+#                 command=command, keyfile=keyfile_parameter, dest_file=dest_file, source_file=source_files[dest_file],
+#                 user=disambig_user, host=disambig_host, disambig_output_folder=disambig_output_folder)
+#         command_strings.append(command_string)
+#     return " && ".join(command_strings)
 
-    command = "{command} -i {keyfile} {source_blob} {user}@{host}:{destination}".format(command=command,
-                                                                                        keyfile=keyfile_parameter,
-                                                                                        source_blob=source_blob,
-                                                                                        user=disambig_user,
-                                                                                        host=disambig_host,
-                                                                                        destination=destination)
-    return command
-
-
-def get_scp_download_command(config):
-    command = 'scp'
-    keyfile_parameter = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
-    disambig_output_folder = '{}/disambig_output/'.format(config['FOLDERS']['WORKING_FOLDER'])
-    disambig_user = 'disambiguser'
-    disambig_host = "ec2-52-21-62-204.compute-1.amazonaws.com"
-    source_files = {
-            'inventor_disambiguation.tsv': '/data/disambiguation/exp_out/inventor/disambiguation.postprocessed.tsv',
-            'assignee_disambiguation.tsv': '/data/disambiguation/exp_out/assignee/disambiguation.tsv',
-            'location_disambiguation.tsv': '/data/disambiguation/exp_out/location/location_post_processed.tsv'
+def get_today_dict(type='granted_patent'):
+    project_home = os.environ['PACKAGE_HOME']
+    config = configparser.ConfigParser()
+    config.read(project_home + '/config.ini')
+    today = datetime.date.today()
+    day_offset = 1
+    if type == 'pregrant_publications':
+        day_offset = 3
+    offset = (today.weekday() - day_offset) % 7
+    latest_release_day = today - datetime.timedelta(days=offset)
+    return {
+            'execution_date': latest_release_day
             }
-    command_strings = ["mkdir -p {disambig_output_folder}".format(disambig_output_folder=disambig_output_folder)]
-    for dest_file in source_files:
-        command_string = "{command} -i {keyfile} {user}@{host}:{source_file} {disambig_output_folder}/{dest_file} " \
-                         "".format(
-                command=command, keyfile=keyfile_parameter, dest_file=dest_file, source_file=source_files[dest_file],
-                user=disambig_user, host=disambig_host, disambig_output_folder=disambig_output_folder)
-        command_strings.append(command_string)
-    return " && ".join(command_strings)
 
 
-def update_config_date(**kwargs):
+def get_table_config(update_config):
+    resources_file = "{root}/{resources}/raw_db_tables.json".format(root=update_config["FOLDERS"]["project_root"],
+                                                                    resources=update_config["FOLDERS"][
+                                                                        "resources_folder"])
+    raw_db_table_settings = json.load(open(resources_file))
+    return raw_db_table_settings
+
+
+def get_required_tables(update_config):
+    raw_db_table_settings = get_table_config(update_config)
+    return raw_db_table_settings.keys()
+
+
+def get_upload_tables_dict(update_config):
+    raw_db_table_settings = get_table_config(update_config)
+    required_tables = {x: False for x in raw_db_table_settings["table_list"] if
+                       raw_db_table_settings["table_list"][x]["raw_data"]}
+    return required_tables
+
+
+def get_lookup_tables(update_config):
+    raw_db_table_settings = get_table_config(update_config)
+    lookup_tables = [x for x in raw_db_table_settings["table_list"] if raw_db_table_settings["table_list"][x]["lookup"]]
+    return lookup_tables
+
+
+def get_current_config(type='granted_patent', **kwargs):
     """
     Update config file start and end date to first and last day of the supplied week
+    :param type: XML type
     :type cfg: object
     :type yr: int
     :type mth: int
@@ -210,18 +256,24 @@ def update_config_date(**kwargs):
     :param cfg: config to update
     :return: updated config
     """
+    config = get_config(type)
+    config_prefix = "upload_"
+    if type == 'pregrant_publication':
+        config_prefix = 'pgpubs_'
+
     execution_date = kwargs['execution_date']
-
-    config = get_config(type='application')
-
-    prev_week = datetime.timedelta(weeks=1)
+    prev_week = datetime.timedelta(days=6)
     end_date = execution_date.strftime('%Y%m%d')
     start_date = (execution_date - prev_week).strftime('%Y%m%d')
     temp_date = execution_date.strftime('%Y%m%d')
+
     config['DATES'] = {
             "START_DATE": start_date,
             "END_DATE":   end_date
             }
-    config['DATABASE']["TEMP_DATABASE"] = "pgpubs_" + temp_date
+    prefixed_string = "{prfx}{date}".format(prfx=config_prefix, date=temp_date)
+    config['DATABASE']["TEMP_UPLOAD_DB"] = prefixed_string
+    config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(prefix=prefixed_string,
+                                                                        data_root=config['FOLDERS']['data_root'])
 
     return config

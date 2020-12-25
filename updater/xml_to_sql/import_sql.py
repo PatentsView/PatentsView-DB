@@ -16,8 +16,9 @@ def subprocess_cmd(command):
     print(proc_stdout)
 
 
-def create_database(**kwargs):
-    config = update_config_date(**kwargs)
+def create_database( **kwargs):
+    config = get_config(type='application')
+    config = update_config_date(config, **kwargs)
 
     database = '{}'.format(config['DATABASE']['TEMP_DATABASE'])
     host = '{}'.format(config['DATABASE']['HOST'])

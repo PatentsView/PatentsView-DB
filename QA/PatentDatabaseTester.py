@@ -13,7 +13,7 @@ class PatentDatabaseTester(ABC):
         """
         Do not instantiate. Overriden class constructor
         :param config: Configparser object containing update parameters
-        :param database_section: Section in config that indicates database to use. NEW_DB or TEMP_UPLOAD_DB
+        :param database_section: Section in config that indicates database to use. RAW_DB or TEMP_UPLOAD_DB
         :param start_date: Database Update start date
         :param end_date: Database Update end date
         """
@@ -46,8 +46,8 @@ class PatentDatabaseTester(ABC):
                 'DataMonitor_prefixedentitycount': []
                 }
 
-        database_type, version = self.config["DATABASE"][self.database_section].split("_")
-        self.version = version
+        database_type = self.config["DATABASE"][self.database_section].split("_")[0]
+        self.version = self.end_date.strftime("%Y%m%d")
         self.database_type = database_type
 
         # Following variables are overridden by inherited classes
@@ -76,8 +76,8 @@ from {tbl}
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(count_query)
                 count_value = count_cursor.fetchall()[0][0]
-                if count_value < 1:
-                    raise Exception("Empty table found:{table}".format(table=table_name))
+                # if count_value < 1:
+                #     raise Exception("Empty table found:{table}".format(table=table_name))
 
                 write_table_name = table_name
                 prefix = "temp_"
@@ -252,39 +252,41 @@ group by `{field}`
                 self.connection.close()
 
     def test_yearly_count(self, table_name, strict=True):
-        print("\tTesting yearly entities counts for {table_name}".format(table_name=table_name))
-        try:
-            if not self.connection.open:
-                self.connection.connect()
-            patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(db=self.patent_db_prefix)
-            if table_name == 'patent':
-                count_query = "SELECT year(`date`) as `yr`, count(1) as `year_count` from patent group by year(`date`)"
-            else:
-                count_query = "SELECT year(p.`date`) as `yr`, count(1) as `year_count` from {patent_table} p join {entity} et on et.patent_id = p.id group by year(`date`)".format(
-                        patent_table=patent_table,
-                        entity=table_name)
-            with self.connection.cursor() as count_cursor:
-                count_cursor.execute(count_query)
-                for count_row in count_cursor.fetchall():
-                    write_table_name = table_name
-                    prefix = "temp_"
-                    if table_name.startswith(prefix):
-                        write_table_name = table_name[len(prefix):]
-                    self.qa_data['DataMonitor_patentyearlycount'].append(
-                            {
-                                    "database_type":  self.database_type,
-                                    'update_version': self.version,
-                                    'year':           count_row[0],
-                                    'table_name':     write_table_name,
-                                    'patent_count':   count_row[1]
-                                    })
-        except pymysql.err.InternalError as e:
-            return
-        finally:
-            if self.connection.open:
-                self.connection.close()
-        if strict:
-            self.assert_yearly_counts()
+        if table_name not in self.patent_exclusion_list:
+            print("\tTesting yearly entities counts for {table_name}".format(table_name=table_name))
+            try:
+                if not self.connection.open:
+                    self.connection.connect()
+                patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(
+                    db=self.patent_db_prefix)
+                if table_name == 'patent':
+                    count_query = "SELECT year(`date`) as `yr`, count(1) as `year_count` from patent group by year(`date`)"
+                else:
+                    count_query = "SELECT year(p.`date`) as `yr`, count(1) as `year_count` from {patent_table} p join {entity} et on et.patent_id = p.id group by year(`date`)".format(
+                            patent_table=patent_table,
+                            entity=table_name)
+                with self.connection.cursor() as count_cursor:
+                    count_cursor.execute(count_query)
+                    for count_row in count_cursor.fetchall():
+                        write_table_name = table_name
+                        prefix = "temp_"
+                        if table_name.startswith(prefix):
+                            write_table_name = table_name[len(prefix):]
+                        self.qa_data['DataMonitor_patentyearlycount'].append(
+                                {
+                                        "database_type":  self.database_type,
+                                        'update_version': self.version,
+                                        'year':           count_row[0],
+                                        'table_name':     write_table_name,
+                                        'patent_count':   count_row[1]
+                                        })
+            except pymysql.err.InternalError as e:
+                return
+            finally:
+                if self.connection.open:
+                    self.connection.close()
+            if strict:
+                self.assert_yearly_counts()
 
     def assert_yearly_counts(self):
         for year in range(self.start_date.year, self.end_date.year + 1):
@@ -404,7 +406,7 @@ group by `{field}`
             self.connection.close()
 
     def load_prefix_counts(self, table_name):
-        if table_name != 'patent':
+        if table_name not in self.patent_exclusion_list:
             print("\tTesting entity counts by patent type for {table_name}".format(table_name=table_name))
             try:
                 if not self.connection.open:
@@ -481,7 +483,7 @@ group by `{field}`
             print("Beginning Test for {table_name} in {db}".format(table_name=table,
                                                                    db=self.config["DATABASE"][self.database_section]))
             self.test_floating_entities(table)
-            self.test_yearly_count(table)
+            self.test_yearly_count(table, strict=False)
             self.test_table_row_count(table)
             self.test_blank_count(table, self.table_config[table])
             self.test_nulls(table, self.table_config[table])

@@ -5,7 +5,7 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-from lib.configuration import get_config, get_scp_copy_command
+from lib.configuration import get_config
 from updater.callbacks import airflow_task_success, airflow_task_failure
 from updater.disambiguation_support.export_disambiguation_data import export_disambig_data
 
@@ -37,10 +37,10 @@ from updater.disambiguation_support.export_disambiguation_data import export_dis
 # config = get_config()
 def add_disambiguation_operators(disambiguation_dag, config, project_home, airflow_task_success,
                                  airflow_task_failure, prefixes):
-    export_disambig_operator = PythonOperator(task_id='export_disambig_data', python_callable=export_disambig_data,
-                                              op_kwargs={'config': config}, dag=disambiguation_dag,
-                                              on_success_callback=airflow_task_success,
-                                              on_failure_callback=airflow_task_failure)
+    # export_disambig_operator = PythonOperator(task_id='export_disambig_data', python_callable=export_disambig_data,
+    #                                           op_kwargs={'config': config}, dag=disambiguation_dag,
+    #                                           on_success_callback=airflow_task_success,
+    #                                           on_failure_callback=airflow_task_failure)
 
 
     run_lawyer_disambiguation_operator = BashOperator(task_id='run_lawyer_disambiguation',
@@ -50,5 +50,5 @@ def add_disambiguation_operators(disambiguation_dag, config, project_home, airfl
                                                       on_failure_callback=airflow_task_failure
                                                       )
     for prefix in prefixes:
-        export_disambig_operator.set_upstream(prefix)
-    run_lawyer_disambiguation_operator.set_upstream(export_disambig_operator)
+        run_lawyer_disambiguation_operator.set_upstream(prefix)
+    # run_lawyer_disambiguation_operator.set_upstream(export_disambig_operator)

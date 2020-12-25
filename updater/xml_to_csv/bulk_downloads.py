@@ -1,9 +1,10 @@
-from bs4 import BeautifulSoup
-from urllib.request import urlretrieve
-import requests
-from zipfile import ZipFile
-import os
 import logging
+import os
+from urllib.request import urlretrieve
+from zipfile import ZipFile
+
+import requests
+from bs4 import BeautifulSoup
 
 from QA.xml_to_csv.DownloadTest import DownloadTest
 
@@ -126,8 +127,8 @@ def begin_download(update_config):
 
 
 def bulk_download(**kwargs):
-    update_config = kwargs['config']
-
+    from lib.configuration import get_current_config
+    update_config = get_current_config('granted_patent', **kwargs)
     begin_download(update_config)
     try:
         post_download(update_config)
@@ -142,8 +143,14 @@ def post_download(update_config):
 
 if __name__ == '__main__':
     import configparser
+    from datetime import date, timedelta
 
     project_home = os.environ['PACKAGE_HOME']
     config = configparser.ConfigParser()
     config.read(project_home + '/config.ini')
-    bulk_download(**{'config': config})
+    today = date.today()
+    offset = (today.weekday() - 1) % 7
+    latest_tuesday = today - timedelta(days=offset)
+    bulk_download(**{
+            'execution_date': latest_tuesday
+            })

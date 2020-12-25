@@ -124,7 +124,7 @@ def create_text_trigger_report(config):
 
 
 def create_text_yearly_tables_report(config):
-    message = "Yearly table added/verified in new database : {newdb}".format(newdb=config['DATABASES']['NEW_DB'])
+    message = "Yearly table added/verified in new database : {newdb}".format(newdb=config['DATABASES']['RAW_DB'])
     return message
 
 

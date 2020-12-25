@@ -7,8 +7,8 @@ def airflow_task_success(context):
     section = get_section(context['task'].task_id)
     dag_id = context['dag'].dag_id
     from lib.configuration import get_config
-    if dag_id in ['01_update_granted_patent', '02_gi_post_manual', '03_disambiguation_support',
-                  '04_disambiguation_postprocessing', '99_daily_checks']:
+    if dag_id in ['granted_patent_updater', '01_update_granted_patent', '02_gi_post_manual',
+                  '03_disambiguation_support', '04_disambiguation_postprocessing', '99_daily_checks']:
         type = 'granted_patent'
     else:
         type = 'application'

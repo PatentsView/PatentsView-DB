@@ -42,7 +42,7 @@ def add_database_load_operators(upload_dag, config, project_home, airflow_task_s
     from lib.configuration import get_backup_command, get_loader_command, get_text_table_load_command
     from updater.create_databases.merge_in_new_data import begin_merging, begin_text_merging, post_merge, \
         post_text_merge
-    from updater.create_databases.rename_db import begin_rename, post_rename
+    from updater.create_databases.rename_db import post_rename
     from updater.create_databases.upload_new import upload_new_data, post_upload
     from updater.text_data_processor.text_table_parsing import begin_text_parsing, post_text_parsing
     backup_old_db = BashOperator(dag=upload_dag, task_id='backup_olddb',
@@ -57,7 +57,7 @@ def add_database_load_operators(upload_dag, config, project_home, airflow_task_s
                                          )
     qc_rename_operator = PythonOperator(task_id='qc_rename_db', python_callable=post_rename,
                                         op_kwargs={'config': config},
-                                        dag=upload_dag, on_success_callback=airflow_task_success,
+                                            dag=upload_dag, on_success_callback=airflow_task_success,
                                         on_failure_callback=airflow_task_failure
                                         )
     upload_new_operator = PythonOperator(task_id='upload_new', python_callable=upload_new_data,
