@@ -46,7 +46,7 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
 
     def top_n_generator(self, table_name=None):
         print("\tLoading Top N Entities for {table_name} in {db}".format(table_name=self.disambiguated_table,
-                                                                         db=self.config["DATABASE"][
+                                                                         db=self.config["PATENTSVIEW_DATABASES"][
                                                                              self.database_section]))
         table_name = self.disambiguated_table
         if 'related_entities' in self.table_config[table_name]:
@@ -54,7 +54,7 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
             for related_table_config in related_table_configs:
                 print("\tLoading Top N Entities for {table_name} in {db} from {related_table}".format(
                     related_table=related_table_config['table'], table_name=self.disambiguated_table,
-                    db=self.config["DATABASE"][
+                    db=self.config["PATENTSVIEW_DATABASES"][
                         self.database_section]))
                 self.load_top_entities(table_name, related_table_config)
 
@@ -89,7 +89,7 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
 
     def test_invalid_id(self, table_name=None):
         print("\tTesting Invalid Disambiguation IDs {table_name} in {db}".format(table_name=self.disambiguated_table,
-                                                                                 db=self.config["DATABASE"][
+                                                                                 db=self.config["PATENTSVIEW_DATABASES"][
                                                                                      self.database_section]))
         invalid_query = "SELECT count(1) from {disambiguated_table} dt left join {entity_table} et on et.{id_field}=dt.id where et.{id_field} is null".format(
             disambiguated_table=self.disambiguated_table, entity_table=self.entity_table,

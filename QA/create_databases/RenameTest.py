@@ -24,7 +24,7 @@ class DatabaseSetupTest:
         self.test_tmp_tables()
 
     def test_table_count(self):
-        raw_database = self.config['DATABASE']["RAW_DB"]
+        raw_database = self.config['PATENTSVIEW_DATABASES']["RAW_DB"]
         print("Checking database encoding for {db}".format(db=raw_database))
         connection_string = get_connection_string(self.config, database='RAW_DB')
         engine = create_engine(connection_string)
@@ -46,7 +46,7 @@ class DatabaseSetupTest:
             raise AssertionError("Required tables are missing: {table_list}".format(table_list=", ".join(missing)))
 
     def test_tmp_tables(self):
-        raw_database = self.config['DATABASE']["RAW_DB"]
+        raw_database = self.config['PATENTSVIEW_DATABASES']["RAW_DB"]
         print("Checking database for temporary tables for {db}".format(db=raw_database))
         connection_string = get_connection_string(self.config, database='RAW_DB')
         engine = create_engine(connection_string)
@@ -58,7 +58,7 @@ class DatabaseSetupTest:
             raise AssertionError("There are {x} temporary tables in the database".format(x=table_count))
 
     def test_database_encoding(self):
-        raw_database = self.config['DATABASE']["RAW_DB"]
+        raw_database = self.config['PATENTSVIEW_DATABASES']["RAW_DB"]
         print("Checking database encoding for {db}".format(db=raw_database))
         connection_string = get_connection_string(self.config, database='RAW_DB')
         engine = create_engine(connection_string)
@@ -74,7 +74,7 @@ class DatabaseSetupTest:
                     "Database collation should be utf8mb4_unicode_ci instead found {cset}".format(cset=collation))
 
     def test_table_encoding(self):
-        raw_database = self.config['DATABASE']["RAW_DB"]
+        raw_database = self.config['PATENTSVIEW_DATABASES']["RAW_DB"]
         print("Checking table encoding for {db}".format(db=raw_database))
         connection_string = get_connection_string(self.config, database='RAW_DB')
         engine = create_engine(connection_string)
@@ -89,7 +89,7 @@ class DatabaseSetupTest:
                                 collation=table_collation_row[1], tbl=table_collation_row[0]))
 
     def test_column_encoding(self):
-        raw_database = self.config['DATABASE']["RAW_DB"]
+        raw_database = self.config['PATENTSVIEW_DATABASES']["RAW_DB"]
 
         connection_string = get_connection_string(self.config, database='RAW_DB')
         engine = create_engine(connection_string)

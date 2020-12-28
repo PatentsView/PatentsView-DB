@@ -6,7 +6,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.create_databases.UploadTest import UploadTest
-from lib.configuration import get_connection_string, get_upload_tables_dict
+from lib.configuration import get_connection_string, get_required_tables
 
 
 def upload_table(table_name, filepath, connection_string, version_indicator):
@@ -37,11 +37,11 @@ def consolidate_cpc_classes(connection_string):
 
 
 def setup_database(update_config):
-    required_tables = get_upload_tables_dict(update_config)
-    connection_string = get_connection_string(update_config, "OLD_DB")
+    required_tables = get_required_tables(update_config)
+    connection_string = get_connection_string(update_config, "RAW_DB")
     engine = create_engine(connection_string)
-    raw_database = update_config["DATABASE"]["RAW_DB"]
-    temp_upload_database = update_config["DATABASE"]["TEMP_UPLOAD_DB"]
+    raw_database = update_config["PATENTSVIEW_DATABASES"]["RAW_DB"]
+    temp_upload_database = update_config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
     table_fetch_sql = "select table_name from information_schema.tables where table_type = 'base table' and table_schema ='{}'".format(
             raw_database)
     tables_data = engine.execute(table_fetch_sql)

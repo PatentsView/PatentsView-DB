@@ -27,10 +27,10 @@ class PatentDatabaseTester(ABC):
         self.database_section = database_section
 
         self.qa_connection_string = get_connection_string(config, 'QA_DATABASE')
-        self.connection = pymysql.connect(host=config['DATABASE']['HOST'],
-                                          user=config['DATABASE']['USERNAME'],
-                                          password=config['DATABASE']['PASSWORD'],
-                                          db=config['DATABASE'][database_section],
+        self.connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
+                                          user=config['DATABASE_SETUP']['USERNAME'],
+                                          password=config['DATABASE_SETUP']['PASSWORD'],
+                                          db=config['PATENTSVIEW_DATABASES'][database_section],
                                           charset='utf8mb4',
                                           cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
         # self.database_connection_string = get_connection_string(config, database_section)
@@ -46,7 +46,7 @@ class PatentDatabaseTester(ABC):
                 'DataMonitor_prefixedentitycount': []
                 }
 
-        database_type = self.config["DATABASE"][self.database_section].split("_")[0]
+        database_type = self.config["PATENTSVIEW_DATABASES"][self.database_section].split("_")[0]
         self.version = self.end_date.strftime("%Y%m%d")
         self.database_type = database_type
 
@@ -64,7 +64,7 @@ class PatentDatabaseTester(ABC):
         :param table_name: table name to collect row count for
         """
         print("\tTesting Table counts for {table_name} in {db}".format(table_name=table_name,
-                                                                       db=self.config["DATABASE"][
+                                                                       db=self.config["PATENTSVIEW_DATABASES"][
                                                                            self.database_section]))
         try:
             if not self.connection.open:
@@ -117,7 +117,7 @@ where `{field}` = ''
                         if count_value != 0:
                             exception_message = """
 Blanks encountered in  table found:{database}.{table} column {col}. Count: {count}
-                            """.format(database=self.config['DATABASE'][self.database_section],
+                            """.format(database=self.config['PATENTSVIEW_DATABASES'][self.database_section],
                                        table=table, col=field,
                                        count=count_value)
                             raise Exception(exception_message)
@@ -149,7 +149,7 @@ where INSTR(`{field}`, CHAR(0x00)) > 0
                     exception_message = """
 {count} rows with NUL Byte found in {field} of {table_name} for {db}                    
                     """.format(count=nul_byte_count, field=field, table_name=table,
-                               db=self.config["DATABASE"][self.database_section])
+                               db=self.config["PATENTSVIEW_DATABASES"][self.database_section])
                     raise Exception(exception_message)
         finally:
             if self.connection.open:
@@ -296,10 +296,10 @@ group by `{field}`
                     found = True
                     if row['patent_count'] < 1:
                         raise Exception("Year {yr} has 0 patents in the database {db}".format(yr=year, db=
-                        self.config['DATABASE'][self.database_section]))
+                        self.config['PATENTSVIEW_DATABASES'][self.database_section]))
             if not found:
                 raise Exception("There are no patents for the Year {yr} in the database {db}".format(yr=year, db=
-                self.config['DATABASE'][self.database_section]))
+                self.config['PATENTSVIEW_DATABASES'][self.database_section]))
 
     def test_related_floating_entities(self, table_name, table_config):
         if 'related_entities' in table_config:
@@ -323,7 +323,7 @@ group by `{field}`
                                     source_table=table_name,
                                     related_table=related_config['table'], source_id=related_config['source_id'],
                                     destination_id=related_config['destination_id'], db=
-                                    self.config['DATABASE'][self.database_section]))
+                                    self.config['PATENTSVIEW_DATABASES'][self.database_section]))
 
         finally:
             self.connection.close()
@@ -363,7 +363,7 @@ group by `{field}`
                 if float_count > 0:
                     raise Exception("There are patents in {table_name} that are not in patent table for {db}".format(
                             table_name=table_name, db=
-                            self.config['DATABASE'][self.database_section]))
+                            self.config['PATENTSVIEW_DATABASES'][self.database_section]))
 
         except pymysql.Error as e:
             if table_name not in self.patent_exclusion_list:
@@ -481,7 +481,7 @@ group by `{field}`
             if table in skiplist:
                 continue
             print("Beginning Test for {table_name} in {db}".format(table_name=table,
-                                                                   db=self.config["DATABASE"][self.database_section]))
+                                                                   db=self.config["PATENTSVIEW_DATABASES"][self.database_section]))
             self.test_floating_entities(table)
             self.test_yearly_count(table, strict=False)
             self.test_table_row_count(table)

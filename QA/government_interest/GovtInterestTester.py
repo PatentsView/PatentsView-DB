@@ -83,7 +83,7 @@ FROM   `government_interest` gi
 ORDER BY RAND()
 LIMIT  5;        
         """
-        database_type, version = self.config["DATABASE"][self.database_section].split("_")
+        database_type, version = self.config["PATENTSVIEW_DATABASES"][self.database_section].split("_")
         for date_clause, where_combination_type in where_combinations:
 
             where_clause = "AND ".join([date_clause, organization_wheres[where_combination_type]])

@@ -510,7 +510,7 @@ class UploadTest(PatentDatabaseTester):
                 raise Exception(
                         "NULLs (Non-design patents) encountered in table found:{database}.{table} column abstract. "
                         "Count: {count}".format(
-                                database=self.config['DATABASE'][self.database_section], table=table,
+                                database=self.config['PATENTSVIEW_DATABASES'][self.database_section], table=table,
                                 count=count_value))
 
     def runTests(self):

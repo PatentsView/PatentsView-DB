@@ -13,10 +13,10 @@ class AppDatabaseTester(ABC):
         self.end_date = end_date
         self.database_section = database_section
         self.qa_connection_string = get_connection_string(config, 'QA_DATABASE')
-        self.connection = pymysql.connect(host=config['DATABASE']['HOST'],
-                                          user=config['DATABASE']['USERNAME'],
-                                          password=config['DATABASE']['PASSWORD'],
-                                          db=config['DATABASE'][database_section],
+        self.connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
+                                          user=config['DATABASE_SETUP']['USERNAME'],
+                                          password=config['DATABASE_SETUP']['PASSWORD'],
+                                          db=config['PATENTSVIEW_DATABASES'][database_section],
                                           charset='utf8mb4',
                                           cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
         # self.database_connection_string = get_connection_string(config, database_section)
@@ -36,7 +36,7 @@ class AppDatabaseTester(ABC):
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value < 1:
                     raise Exception("Empty table found:{table}".format(table=table_name))
-                database_type, version = self.config["DATABASE"][self.database_section].split("_")
+                database_type, version = self.config["PATENTSVIEW_DATABASES"][self.database_section].split("_")
                 self.qa_data['DataMonitor_count'].append(
                     {"database_type": database_type, 'table_name': table_name, 'update_version': version,
                      'table_row_count': count_value})
@@ -58,7 +58,7 @@ class AppDatabaseTester(ABC):
                         if count_value != 0:
                             raise Exception(
                                 "Blanks encountered in  table found:{database}.{table} column {col}. Count: {count}".format(
-                                    database=self.config['DATABASE'][self.database_section], table=table,
+                                    database=self.config['PATENTSVIEW_DATABASES'][self.database_section], table=table,
                                     col=field,
                                     count=count_value))
                 finally:
@@ -83,7 +83,7 @@ class AppDatabaseTester(ABC):
                                     database=self.database_section, table=table,
                                     col=field,
                                     count=count_value))
-                    database_type, version = self.config["DATABASE"][self.database_section].split("_")
+                    database_type, version = self.config["PATENTSVIEW_DATABASES"][self.database_section].split("_")
                     self.qa_data['DataMonitor_nullcount'].append(
                         {"database_type": database_type, 'table_name': table, "column_name": field,
                          'update_version': version, 'null_count': count_value})
@@ -116,7 +116,7 @@ class AppDatabaseTester(ABC):
             count_query = "SELECT year(`date`) as `yr`, count(1) as `year_count` from publication group by year(`date`)"
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(count_query)
-                database_type, version = self.config["DATABASE"][self.database_section].split("_")
+                database_type, version = self.config["PATENTSVIEW_DATABASES"][self.database_section].split("_")
                 for count_row in count_cursor.fetchall():
                     self.qa_data['DataMonitor_patentyearlycount'].append(
                         {"database_type": database_type,

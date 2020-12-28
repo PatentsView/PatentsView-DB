@@ -1,21 +1,25 @@
+import pandas as pd
 import pymysql
 from sqlalchemy import create_engine
 
 from lib import xml_helpers
-from lib.configuration import get_connection_string, get_config
-import pandas as pd
+from lib.configuration import get_config, get_connection_string
 
 
 class WithdrawnTest:
     def __init__(self, config):
         self.config = config
         self.qa_connection_string = get_connection_string(self.config, 'QA_DATABASE')
-        self.connection = pymysql.connect(host=self.config['DATABASE']['HOST'],
-                                          user=self.config['DATABASE']['USERNAME'],
-                                          password=self.config['DATABASE']['PASSWORD'],
-                                          db=self.config['DATABASE']['RAW_DB'],
+        self.connection = pymysql.connect(host=self.config['DATABASE_SETUP']['HOST'],
+                                          user=self.config['DATABASE_SETUP']['USERNAME'],
+                                          password=self.config['DATABASE_SETUP']['PASSWORD'],
+                                          db=self.config['PATENTSVIEW_DATABASES']['RAW_DB'],
                                           charset='utf8mb4', cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
-        self.qa_data = {"DataMonitor_patentwithdrawncount": []}
+        self.qa_data = {
+                "DataMonitor_patentwithdrawncount": []
+                }
+        self.database_type = 'patent'
+        self.version = config['DATES']['END_DATE']
 
     def runTests(self):
         self.test_withdrawn_uploaded()
@@ -37,13 +41,15 @@ class WithdrawnTest:
             missing_withdrawn = [True if x not in file_withdrawn_patents else False for x in withdrawn_patents]
             if any(missing_withdrawn):
                 raise AssertionError(
-                    "Some of the patents marked withdrawn in {db} are not in the withdrawn file, count: {cnt}".format(
-                        cnt=sum(missing_withdrawn), db=self.config["DATABASE"]["NEW_DB"]))
-            database_type, version = self.config["DATABASE"]["NEW_DB"].split("_")
+                        "Some of the patents marked withdrawn in {db} are not in the withdrawn file, count: {cnt}".format(
+                                cnt=sum(missing_withdrawn), db=self.config["PATENTSVIEW_DATABASES"]["NEW_DB"]))
+
             self.qa_data['DataMonitor_patentwithdrawncount'].append(
-                {"database_type": database_type,
-                 'update_version': version,
-                 'withdrawn_patent_count': len(withdrawn_patents)})
+                    {
+                            "database_type":          self.database_type,
+                            'update_version':         self.version,
+                            'withdrawn_patent_count': len(withdrawn_patents)
+                            })
 
     def save_qa_data(self):
         qa_engine = create_engine(self.qa_connection_string)

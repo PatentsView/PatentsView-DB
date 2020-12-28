@@ -19,7 +19,7 @@ class RenameTest:
         self.test_table_count()
 
     def test_table_count(self):
-        new_database = self.config['DATABASE']["TEMP_UPLOAD_DB"]
+        new_database = self.config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
         connection_string = get_connection_string(self.config, database='TEMP_UPLOAD_DB')
         engine = create_engine(connection_string)
         table_query = "SELECT  TABLE_NAME from information_schema.tables where TABLE_SCHEMA='{new_db}'".format(
@@ -37,7 +37,7 @@ class RenameTest:
                     raise AssertionError("Table {table_name} should not be empty".format(table_name=table_name))
 
     def test_database_encoding(self):
-        new_database = self.config['DATABASE']["TEMP_UPLOAD_DB"]
+        new_database = self.config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
         connection_string = get_connection_string(self.config, database='TEMP_UPLOAD_DB')
         engine = create_engine(connection_string)
 
@@ -52,7 +52,7 @@ class RenameTest:
                 "Database collationshould be utf8mb4_unicode_ci instead found {collation}".format(cset=collation))
 
     def test_table_encoding(self):
-        new_database = self.config['DATABASE']["TEMP_UPLOAD_DB"]
+        new_database = self.config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
         connection_string = get_connection_string(self.config, database='TEMP_UPLOAD_DB')
         engine = create_engine(connection_string)
         collation_query = "SELECT  TABLE_NAME, TABLE_COLLATION from information_schema.tables where TABLE_SCHEMA='{new_db}'".format(
@@ -65,7 +65,7 @@ class RenameTest:
                         cset=table_collation_row[1], tbl=table_collation_row[0]))
 
     def test_column_encoding(self):
-        new_database = self.config['DATABASE']["TEMP_UPLOAD_DB"]
+        new_database = self.config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
         connection_string = get_connection_string(self.config, database='TEMP_UPLOAD_DB')
         engine = create_engine(connection_string)
         collation_query = '''

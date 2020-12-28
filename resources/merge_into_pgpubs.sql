@@ -174,17 +174,17 @@ INSERT INTO pregrant_publications.main_cpc SELECT * FROM main_cpc;
 
 INSERT INTO pregrant_publications.pct_data SELECT * FROM pct_data;
 
-INSERT INTO pregrant_publications.rawassignee SELECT * FROM rawassignee;
+INSERT INTO pregrant_publications.rawassignee (id, document_number, `sequence`, name_first, name_last, `organization`, type, rawlocation_id, city, state, country, filename) SELECT id, document_number, sequence, name_first, name_last, organization, type, rawlocation_id, city, state, country, filename FROM rawassignee;
 
-INSERT INTO pregrant_publications.rawinventor SELECT * FROM rawinventor;
+INSERT INTO pregrant_publications.rawinventor (id, document_number, name_first, name_last, `sequence`, designation, deceased, rawlocation_id, city, state, country, filename) SELECT id, document_number, name_first, name_last, sequence, designation, deceased, rawlocation_id, city, state, country, filename FROM rawinventor;
 
-INSERT INTO pregrant_publications.rawlocation SELECT * FROM rawlocation;
+INSERT INTO pregrant_publications.rawlocation (id, city, state, country, lattitude, longitude, filename) SELECT id, city, state, country, lattitude, longitude, filename FROM rawlocation;
 
 INSERT INTO pregrant_publications.rawuspc SELECT * FROM rawuspc;
 
 INSERT INTO pregrant_publications.rel_app_text SELECT * FROM rel_app_text;
 
-INSERT INTO pregrant_publications.us_parties SELECT * FROM us_parties;
+INSERT INTO pregrant_publications.us_parties (id, document_number, name_first, name_last, type, designation, sequence, rawlocation_id, city, state, country, filename) SELECT id, document_number, name_first, name_last, type, designation, sequence, rawlocation_id, city, state, country, filename FROM us_parties;
 
 INSERT INTO pregrant_publications.uspc SELECT * FROM uspc;
 

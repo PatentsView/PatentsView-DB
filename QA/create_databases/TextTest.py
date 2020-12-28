@@ -136,7 +136,7 @@ class TextMergeTest(PatentDatabaseTester):
                         }
                 }
 
-        self.patent_db_prefix = "`{db}`".format(db=self.config['DATABASE']['RAW_DB'])
+        self.patent_db_prefix = "`{db}`".format(db=self.config['PATENTSVIEW_DATABASES']['RAW_DB'])
         self.database_type = 'patent'
         self.version = end_date.strftime('%Y%m%d')
 

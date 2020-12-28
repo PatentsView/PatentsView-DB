@@ -1,3 +1,4 @@
+import datetime
 import logging
 import multiprocessing as mp
 import os
@@ -9,7 +10,7 @@ import pandas as pd
 from lxml import etree
 from sqlalchemy import create_engine
 
-from lib.configuration import get_config, get_connection_string
+from lib.configuration import get_config, get_connection_string, get_current_config
 from lib.utilities import generate_index_statements, log_writer, xstr
 
 
@@ -19,7 +20,7 @@ def prepare_cpc_table(config, drop_indexes):
     :param config: Config file containing variour runtime paramters
     :param drop_indexes: List of Drop Index Statements
     """
-    engine = create_engine(get_connection_string(config, "NEW_DB"))
+    engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
     for drop_statement in drop_indexes:
         engine.execute(drop_statement[0])
 
@@ -27,14 +28,28 @@ def prepare_cpc_table(config, drop_indexes):
 def consolidate_cpc_data(config, add_indexes):
     """
     Finalize CPC Current table by removing patents not in patent database and re-adding indexes
-    :param config: Config file containing variour runtime paramters
+    :param config: Consolidate_cpc_dataonfig file containing variour runtime paramters
     :param add_indexes: List of Add Index statments
     """
-    engine = create_engine(get_connection_string(config, "NEW_DB"))
+    engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
     delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN patent p on p.id = cpc.patent_id WHERE p.id is null"
     engine.execute(delete_query)
     for add_statement in add_indexes:
         engine.execute(add_statement[0])
+    upsert_query = """
+INSERT INTO {raw_db}.cpc_current(patent_id, section_id, subsection_id, group_id, subgroup_id, category, `sequence`,version_indicator)
+SELECT patent_id, section_id, subsection_id, group_id, subgroup_id, category, `sequence` version_indicator
+from cpc_current
+ON DUPLICATE KEY UPDATE patent_id = VALUES(patent_id),
+                        section_id = VALUES(section_id),
+                        subsection_id = VALUES(subsection_id),
+                        group_id = VALUES(group_id),
+                        subgroup_id = VALUES(subgroup_id),
+                        category = VALUES(category),
+                        `sequence` = VALUES(`sequence`),
+                        version_indicator = VALUES(version_indicator);
+    """.format(raw_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    engine.execute(upsert_query)
 
 
 def generate_file_list(zipfilepath, extension='.xml'):
@@ -139,26 +154,30 @@ def get_cpc_records(xml_root):
                 yield cpc_record_dict
 
 
-def load_cpc_records(records_generator, config, log_queue):
+def load_cpc_records(records_generator, config, log_queue, version_indicator):
     """
     Load Extracter CPC Records into CPC Current Table
     :param records_generator: generator that produces cpc records as dictionary
     """
     cpc_records_frame = pd.DataFrame(records_generator)
     cpc_records_frame = cpc_records_frame[~pd.isnull(cpc_records_frame.uuid)]
-    engine = create_engine(get_connection_string(config, "NEW_DB"))
+    cpc_records_frame = cpc_records_frame.assign(version_indicator=version_indicator)
+    engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
     start = time.time()
     with engine.connect() as conn:
         cpc_records_frame.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
     end = time.time()
-    log_queue.put({"level": logging.INFO, "message": "Chunk Load Time:" + str(round(end - start))})
+    log_queue.put({
+            "level":   logging.INFO,
+            "message": "Chunk Load Time:" + str(round(end - start))
+            })
 
 
 def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue):
     start = time.time()
     xml_tree = get_cpc_xml_root(cpc_xml_zip_file, cpc_xml_file)
     cpc_records = get_cpc_records(xml_tree)
-    load_cpc_records(cpc_records, config, log_queue)
+    load_cpc_records(cpc_records, config, log_queue, version_indicator=config['DATES']['END_DATE'])
     end = time.time()
     log_queue.put({
             "level":   logging.INFO,
@@ -168,7 +187,8 @@ def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue):
             })
 
 
-def process_and_upload_cpc_current(config):
+def process_and_upload_cpc_current(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     cpc_xml_file = None
     for filename in os.listdir(cpc_folder):
@@ -178,7 +198,7 @@ def process_and_upload_cpc_current(config):
 
     if cpc_xml_file:
         print(cpc_xml_file)
-        add_index, drop_index = generate_index_statements(config, "NEW_DB", "cpc_current")
+        add_index, drop_index = generate_index_statements(config, "TEMP_UPLOAD_DB", "cpc_current")
 
         prepare_cpc_table(config, drop_index)
         xml_file_name_generator = generate_file_list(cpc_xml_file)
@@ -218,5 +238,6 @@ def process_and_upload_cpc_current(config):
 
 
 if __name__ == '__main__':
-    config = get_config()
-    process_and_upload_cpc_current(config)
+    process_and_upload_cpc_current(**{
+            "execution_date": datetime.date(2020, 12, 15)
+            })

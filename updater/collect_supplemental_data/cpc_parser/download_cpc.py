@@ -1,10 +1,11 @@
+import datetime
 import urllib
 import zipfile
 import os
 from lxml import html
 
 from QA.collect_supplemental_data.cpc_parser.CPCDownloadTest import CPCDownloadTest
-from lib.configuration import get_config
+from lib.configuration import get_config, get_current_config
 from lib.utilities import download
 
 
@@ -179,7 +180,8 @@ def find_ipc_url_test():
     assert (find_ipc_url() == expected_url)
 
 
-def collect_cpc_data(config):
+def collect_cpc_data(**kwargs):
+    config = get_current_config(**kwargs)
     destination_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder)
@@ -188,12 +190,16 @@ def collect_cpc_data(config):
     download_ipc(destination_folder)  # <1 min
 
 
-def post_download(config):
+def post_download(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
     qc = CPCDownloadTest(config)
     qc.runTests()
 
 
 if __name__ == '__main__':
-    config = get_config()
-    collect_cpc_data(config)
-    post_download(config)
+    collect_cpc_data(**{
+            "execution_date": datetime.date(2020, 12, 15)
+            })
+    post_download(**{
+            "execution_date": datetime.date(2020, 12, 15)
+            })

@@ -4,17 +4,13 @@ import json
 import os
 
 
-def get_config(type='granted_patent'):
+def get_config():
     import os
     project_home = os.environ['PACKAGE_HOME']
     import configparser
 
     config = configparser.ConfigParser()
     filename = 'config.ini'
-    if type == 'granted_patent':
-        filename = 'config.ini'
-    elif type == 'application':
-        filename = 'app_config.ini'
     config_file = "{home}/{filename}".format(home=project_home, filename=filename)
     config.read(config_file)
     return config
@@ -34,96 +30,64 @@ def set_config(config, type='granted_patent'):
     return config
 
 
-def get_section(task_id):
+def get_section(dag_id, task_id):
     section_lookup = {
-            'download_xml':                    "XML Processing",
-            'process_xml':                     "XML Processing",
-            'parse_xml':                       "XML Processing",
-            "backup_olddb":                    "Database Setup",
-            "rename_db":                       "Database Setup",
-            "upload_new":                      "Database Setup",
-            "restore_olddb":                   "Database Setup",
-            "merge_db":                        "Database Setup",
-            "create_text_tables":              "Description Parsing",
-            "parse_text_data":                 "Supplemental Data Collection",
-            "download_cpc":                    "Supplemental Data Collection",
-            "qc_download_cpc":                 "QC - Supplemental Data Collection",
-            "cpc_class_parser":                "Supplemental Data Collection",
-            "qc_cpc_class_parser":             "QC - Supplemental Data Collection",
-            "cpc_parser":                      "Supplemental Data Collection",
-            "qc_cpc_parser":                   "QC - Supplemental Data Collection",
-            "cpc_current_processor":           "Supplemental Data Collection",
-            "wipo_processor":                  "Supplemental Data Collection",
-            "cpc_class_uploader":              "Supplemental Data Collection",
-            "qc_cpc_current_wipot":            "QC - Supplemental Data Collection",
-            "qc_rename_db":                    "QC - Database Setup",
-            "qc_upload_new":                   "QC - Database Setup",
-            "qc_parse_text_data":              "Long Text Processing",
-            "merge_text_db":                   "Long Text Processing",
-            "qc_merge_db":                     "QC - Database Setup",
-            "qc_merge_text_db":                "QC - Text Parsing",
-            "withdrawn_processor":             "Supplemental Data",
-            "qc_withdrawn_processor":          "QC - Supplemental Data",
-            'export_disambig_data':            'Disambiguation Support - Export Disambig Inputs',
-            'gi_NER':                          'Government Interest - NER',
-            'postprocess_NER':                 'Government Interest - Post Process NER',
-            'qc_cpc_current_wipo':             'QC - Supplemental Data - CPC/Wipo',
-            'run_lawyer_disambiguation':       'Disambiguation - Lawyer Disambiguation',
-            'upload_disambig_files':           'Disambiguation Support - Upload Disambig Inputs',
-            'gi_post_manual':                  'Government Interest - Post Manual Step',
-            'create_persistent_wide_assignee': 'Post Processing - Assignee Persistent Processing',
-            'create_persistent_wide_inventor': 'Post Processing - Inventor Persistent Processing',
-            'download_disambiguation':         'Post Processing - Download Results',
-            'lookup_tables':                   'Post Processing - Relationship Tables Generation',
-            'post_process_assignee':           'Post Processing - Assignee Post Processing',
-            'post_process_inventor':           'Post Processing - Inventor Post Processing',
-            'post_process_location':           'Post Processing - Location Post Processing',
-            'qc_post_process_assignee':        'Post Processing QC - Assignee Post Processing',
-            'qc_post_process_inventor':        'Post Processing QC - Inventor Post Processing',
-            'qc_post_process_location':        'Post Processing QC - Location Post Processing',
-            'update_persistent_long_assignee': 'Post Processing - Assignee Persistent Processing',
-            'update_persistent_long_inventor': 'Post Processing - Inventor Persistent Processing',
-            'create_text_triggers':            'Long Text Processing',
-            'create_text_yearly_tables':       'Long Text Processing',
-            'api_query_check':                 'Daily Checks'
+            'granted_patent_updater':       {
+                    "create_text_yearly_tables":        "Granted Patent - Database Setup",
+                    "create_text_yearly_tables-upload": "Granted Patent - Database Setup",
+                    "download_xml":                     "Granted Patent - Data Collection",
+                    "fix_patent_ids-upload":            "Granted Patent - Data Processing",
+                    "merge_db":                         "Granted Patent - Data Processing",
+                    "merge_text_db":                    "Granted Patent - Data Processing",
+                    "parse_text_data":                  "Granted Patent - XML Parsing",
+                    "parse_xml":                        "Granted Patent - XML Parsing",
+                    "process_xml":                      "Granted Patent - XML Parsing",
+                    "qc_database_setup":                "Granted Patent - Database Setup (QC)",
+                    "qc_merge_db":                      "Granted Patent - Data Processing (QC)",
+                    "qc_merge_text_db":                 "Granted Patent - Data Processing (QC)",
+                    "qc_parse_text_data":               "Granted Patent - XML Parsing (QC)",
+                    "qc_upload_new":                    "Granted Patent - Data Processing (QC)",
+                    "qc_withdrawn_processor":           "Granted Patent - Data Processing (QC)",
+                    "upload_current":                   "Granted Patent - Data Processing",
+                    "upload_database_setup":            "Granted Patent - Database Setup",
+                    "withdrawn_processor":              "Granted Patent - XML Parsing"
+                    },
+            'pregrant_publication_updater': {
+                    "create_pgpubs_database": "PGPUBS Parser - Database Setup",
+                    "drop_database":          "PGPUBS Parser - Database Setup",
+                    "merge_database":         "PGPUBS Parser - Data Processing",
+                    "parse_pgpubs_xml":       "PGPUBS Parser - XML Parsing",
+                    "post_process":           "PGPUBS Parser - Data Processing"
+                    },
+            '99_daily_checks':              {
+                    'api_query_check': 'System Check - API'
+                    }
+
             }
 
-    return section_lookup[task_id]
+    return section_lookup[dag_id][task_id]
 
 
 def get_connection_string(config, database='TEMP_UPLOAD_DB'):
-    database = '{}'.format(config['DATABASE'][database])
-    host = '{}'.format(config['DATABASE']['HOST'])
-    user = '{}'.format(config['DATABASE']['USERNAME'])
-    password = '{}'.format(config['DATABASE']['PASSWORD'])
-    port = '{}'.format(config['DATABASE']['PORT'])
+    database = '{}'.format(config['PATENTSVIEW_DATABASES'][database])
+    host = '{}'.format(config['DATABASE_SETUP']['HOST'])
+    user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
+    password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
+    port = '{}'.format(config['DATABASE_SETUP']['PORT'])
     return 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database)
 
 
-# def get_query_results(config, database_section, query):
-#     connect_time = time.time()
-#
-#     try:
-#         with connection.cursor() as query_cursor:
-#             query_cursor.execute(query)
-#             return query_cursor
-#     finally:
-#         print(query)
-#         connection.close()
-#         print("Connection open for {duration} seconds".format(duration=round(time.time() - connect_time, 3)))
-#
-
 def get_backup_command(**kwargs):
     command = "mydumper"
-    conf_parameter = "{home}/resources/sql.conf".format(home=project_home)
+    config = get_current_config(**kwargs)
+    conf_parameter = config['DATABASE_SETUP']['CONFIG_FILE']
     directory_parameter = "{datahome}/{database}_backup".format(datahome=config["FOLDERS"]["WORKING_FOLDER"],
-                                                                database=config["DATABASE"]["OLD_DB"])
-    database_parameter = "{database}".format(database=config["DATABASE"]["OLD_DB"])
+                                                                database=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
+    database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
     verbosity = 3
     thread = 6
 
-    backup_command = "{command} --defaults-file={conf_parameter} -F 50 -s 5000000 -l 1999999999 -v {verbosity} -t {" \
-                     "thread} -B {database} -o {directory_parameter} --lock-all-tables".format(
+    backup_command = """{command} --defaults-file={conf_parameter} -F 50 -s 5000000 -l 1999999999 -v {verbosity} -t {thread} -B {database} -o {directory_parameter} --lock-all-tables""".format(
             command=command, conf_parameter=conf_parameter, verbosity=verbosity, thread=thread,
             directory_parameter=directory_parameter, database=database_parameter)
 
@@ -135,13 +99,12 @@ def get_loader_command(config, project_home):
     script = "{home}/lib/loader/index_optimized_loader".format(home=project_home)
     conf_parameter = "{home}/resources/sql.conf".format(home=project_home)
     directory_parameter = "{datahome}/{database}_backup".format(datahome=config["FOLDERS"]["WORKING_FOLDER"],
-                                                                database=config["DATABASE"]["OLD_DB"])
-    database_parameter = "{database}".format(database=config["DATABASE"]["OLD_DB"])
+                                                                database=config["PATENTSVIEW_DATABASES"]["OLD_DB"])
+    database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
     verbosity = 3
     thread = 6
 
-    loader_command = "{command} {script} {conf_parameter} -d {directory_parameter} -s {database_parameter} -v {" \
-                     "verbosity} -t {thread} -o".format(
+    loader_command = "{command} {script} {conf_parameter} -d {directory_parameter} -s {database_parameter} -v {verbosity} -t {thread} -o".format(
             command=command, script=script, conf_parameter=conf_parameter, directory_parameter=directory_parameter,
             database_parameter=database_parameter, verbosity=verbosity, thread=thread)
 
@@ -151,9 +114,9 @@ def get_loader_command(config, project_home):
 def get_text_table_load_command(project_home, **kwargs):
     command = 'mysql'
     config = get_current_config(**kwargs)
-    defaults_parameter = config['DATABASE']['CONFIG_FILE']
+    defaults_parameter = config['DATABASE_SETUP']['CONFIG_FILE']
     script_to_load = "{home}/resources/text_table_triggers.sql".format(home=project_home)
-    database = config["DATABASE"]['TEMP_UPLOAD_DB']
+    database = config["PATENTSVIEW_DATABASES"]['TEMP_UPLOAD_DB']
     create_command = "{command} --defaults-file={default_param} {database} < {script_to_load}".format(command=command,
                                                                                                       default_param=defaults_parameter,
                                                                                                       database=database,
@@ -207,7 +170,7 @@ def get_today_dict(type='granted_patent'):
     config.read(project_home + '/config.ini')
     today = datetime.date.today()
     day_offset = 1
-    if type == 'pregrant_publications':
+    if type == 'pgpubs':
         day_offset = 3
     offset = (today.weekday() - day_offset) % 7
     latest_release_day = today - datetime.timedelta(days=offset)
@@ -256,11 +219,11 @@ def get_current_config(type='granted_patent', **kwargs):
     :param cfg: config to update
     :return: updated config
     """
-    config = get_config(type)
+    config = get_config()
     config_prefix = "upload_"
-    if type == 'pregrant_publication':
-        config_prefix = 'pgpubs_'
 
+    if type == 'pgpubs':
+        config_prefix = 'pgpubs_'
     execution_date = kwargs['execution_date']
     prev_week = datetime.timedelta(days=6)
     end_date = execution_date.strftime('%Y%m%d')
@@ -272,8 +235,11 @@ def get_current_config(type='granted_patent', **kwargs):
             "END_DATE":   end_date
             }
     prefixed_string = "{prfx}{date}".format(prfx=config_prefix, date=temp_date)
-    config['DATABASE']["TEMP_UPLOAD_DB"] = prefixed_string
+    config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"] = prefixed_string
     config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(prefix=prefixed_string,
                                                                         data_root=config['FOLDERS']['data_root'])
+    if type == 'granted_patent':
+        config['FOLDERS']['granted_patent_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
+                working_folder=config['FOLDERS']['WORKING_FOLDER'])
 
     return config

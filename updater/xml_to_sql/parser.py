@@ -6,14 +6,14 @@ import os
 import pprint
 import re
 import time
-from datetime import datetime
+from datetime import datetime,date
 from queue import Queue
 
 import pandas as pd
 from lxml import etree
 from sqlalchemy import create_engine
 
-from lib.configuration import get_config, get_current_config
+from lib.configuration import get_current_config
 from lib.utilities import download_xml_files
 from lib.utilities import log_writer
 
@@ -310,11 +310,11 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
     :param config: credentials to connect to database
     """
     sql_start = time.time()
-    database = '{}'.format(config['DATABASE']['TEMP_UPLOAD_DB'])
-    host = '{}'.format(config['DATABASE']['HOST'])
-    user = '{}'.format(config['DATABASE']['USERNAME'])
-    password = '{}'.format(config['DATABASE']['PASSWORD'])
-    port = '{}'.format(config['DATABASE']['PORT'])
+    database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+    host = '{}'.format(config['DATABASE_SETUP']['HOST'])
+    user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
+    password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
+    port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
     text_output_folder = config['FOLDERS']['TEXT_OUTPUT_FOLDER']
     engine = create_engine(
@@ -367,7 +367,7 @@ def extract_document(xml_file):
         yield current_xml
 
 
-def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, unlink = False):
+def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, unlink=False):
     """
     Parse all data from a single XML file into dataframe for each table
     :param xml_file: XML file with pgpubs data
@@ -482,8 +482,9 @@ def chunks(l, n):
         yield l[i:i + n]
 
 
-def get_filenames_to_parse(config):
-    xml_directory = '{w_folder}/raw_data/'.format(w_folder=config['FOLDERS']['WORKING_FOLDER'])
+def get_filenames_to_parse(config, type='granted_patent'):
+    xml_directory_setting = "{prefix}_bulk_xml_location".format(prefix=type)
+    xml_directory = config['FOLDERS'][xml_directory_setting]
 
     xml_files = []
     start_date_string = '{}'.format(config['DATES']['START_DATE'])
@@ -507,15 +508,17 @@ def get_filenames_to_parse(config):
     return xml_files
 
 
-def queue_parsers(config):
+def queue_parsers(config, type='granted_patent'):
     """
     Multiprocessing call of the parse_publication_xml function
     :param config: config file
     """
-    dtd_file = '{}'.format(config['FILES']['DTD_FILE'])
-    parsing_config_file = config["FILES"]["parsing_config_file"]
+    parsing_file_setting = "{prefix}_parsing_config_file".format(prefix=type)
+    dtd_file_setting = "{prefix}_dtd_file".format(prefix=type)
+    dtd_file = '{}'.format(config['XML_PARSING'][dtd_file_setting])
+    parsing_config_file = config["XML_PARSING"][parsing_file_setting]
     parsing_config = json.load(open(parsing_config_file))
-    xml_files = get_filenames_to_parse(config)
+    xml_files = get_filenames_to_parse(config, type='pgpubs')
     parser_start = time.time()
 
     parallelism = int(config["PARALLELISM"]["parallelism"])
@@ -579,12 +582,12 @@ def delete_xml_file(filename):
 
 
 def begin_parsing(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(type='pgpubs', **kwargs)
     download_xml_files(config)
-    queue_parsers(config)
+    queue_parsers(config, 'pgpubs')
 
 
 if __name__ == "__main__":
-    config = get_config('application')
-    download_xml_files(config)
-    queue_parsers(config)
+    begin_parsing(**{
+            "execution_date": date(2020, 12, 17)
+            })

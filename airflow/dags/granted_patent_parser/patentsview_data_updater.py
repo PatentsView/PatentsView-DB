@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 
+from updater.collect_supplemental_data.update_withdrawn import post_withdrawn, process_withdrawn
+
 
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
@@ -42,7 +44,7 @@ granted_patent_parser = DAG(
         dag_id='granted_patent_updater',
         default_args=default_args,
         description='Download and process granted patent data and corresponding classifications data',
-        start_date=datetime(2021, 1, 1),
+        start_date=datetime(2021, 1, 5),
         schedule_interval=timedelta(weeks=1), catchup=True,
         template_searchpath=templates_searchpath,
         )
@@ -102,18 +104,14 @@ table_creation_operator = SQLTemplatedPythonOperator(
         dag=granted_patent_parser,
         op_kwargs={
                 'filename':      'text_tables.sql',
-                'slack_client':  None,
-                'slack_channel': None,
-                "schema_only":   True,
-                'drop_existing': False,
-                'fk_check':      False
+                "schema_only":   False
                 },
         templates_dict={
                 'source_sql': 'text_tables.sql'
                 },
         templates_exts=['.sql'],
         params={
-                'database':   config['DATABASE']['TEXT_DATABASE'],
+                'database':   config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
                 'add_suffix': False
                 }
         )
@@ -122,15 +120,11 @@ upload_table_creation_operator = SQLTemplatedPythonOperator(
         task_id='create_text_yearly_tables-upload',
         provide_context=True,
         python_callable=validate_and_execute,
-        dag=granted_patent_parser,
         op_kwargs={
-                'filename':      'text_tables.sql',
-                'slack_client':  None,
-                'slack_channel': None,
-                "schema_only":   True,
-                'drop_existing': False,
-                'fk_check':      False
+                'filename':    'text_tables.sql',
+                "schema_only": False
                 },
+        dag=granted_patent_parser,
         templates_dict={
                 'source_sql': 'text_tables.sql'
                 },
@@ -161,12 +155,8 @@ patent_id_fix_operator = SQLTemplatedPythonOperator(
         python_callable=validate_and_execute,
         dag=granted_patent_parser,
         op_kwargs={
-                'filename':      'patent_id_fix_text.sql',
-                'slack_client':  None,
-                'slack_channel': None,
-                "schema_only":   True,
-                'drop_existing': False,
-                'fk_check':      False
+                'filename':    'patent_id_fix_text.sql',
+                "schema_only": False
                 },
         templates_dict={
                 'source_sql': 'patent_id_fix_text.sql'
@@ -218,3 +208,14 @@ qc_text_merge_operator = PythonOperator(task_id='qc_merge_text_db',
                                         on_failure_callback=airflow_task_failure
                                         )
 qc_text_merge_operator.set_upstream(merge_text_operator)
+
+## Withdrawn Patents
+withdrawn_operator = PythonOperator(task_id='withdrawn_processor', python_callable=process_withdrawn,
+                                    dag=granted_patent_parser,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure)
+withdrawn_operator.set_upstream(qc_merge_operator)
+qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_callable=post_withdrawn,
+                                       dag=granted_patent_parser, on_success_callback=airflow_task_success,
+                                       on_failure_callback=airflow_task_failure)
+qc_withdrawn_operator.set_upstream(withdrawn_operator)

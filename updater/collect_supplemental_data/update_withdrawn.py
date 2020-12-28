@@ -1,14 +1,14 @@
+import datetime
 import os
-import sys
 import zipfile
 
+import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.collect_supplemental_data.WithdrawnTest import WithdrawnTest
 from lib import xml_helpers
-from lib.configuration import get_connection_string, get_config
+from lib.configuration import get_connection_string, get_current_config
 from lib.utilities import download
-import pandas as pd
 
 
 def download_withdrawn_patent_numbers(destination_folder):
@@ -47,7 +47,7 @@ def download_withdrawn_patent_numbers(destination_folder):
 
 
 def load_withdrawn(update_config):
-    engine = create_engine(get_connection_string(update_config, "NEW_DB"))
+    engine = create_engine(get_connection_string(update_config, "TEMP_UPLOAD_DB"))
     withdrawn_folder = '{}/withdrawn'.format(update_config['FOLDERS']['WORKING_FOLDER'])
 
     withdrawn_file = '{}/withdrawn.txt'.format(withdrawn_folder)
@@ -57,28 +57,35 @@ def load_withdrawn(update_config):
             withdrawn_patents.append(xml_helpers.process_patent_numbers(line.strip('\n')))
     withdrawn_patents_frame = pd.DataFrame(withdrawn_patents)
     withdrawn_patents_frame.columns = ['patent_id']
-    withdrawn_patents_frame.to_sql(con=engine, name="temp_withdrawn_patent", index=False)
+    withdrawn_patents_frame.to_sql(con=engine, name="withdrawn_patents", if_exists='replace', index=False)
 
 
 def update_withdrawn(update_config):
-    update_query = "UPDATE patent p join temp_withdrawn_patent twp on twp.patent_id = p.id set p.withdrawn = 1; "
-    engine = create_engine(get_connection_string(update_config, "NEW_DB"))
+    update_query = """
+UPDATE patent p join `{temp_upload_db}`.`withdrawn_patents` twp on twp.patent_id = p.id set p.withdrawn = 1;
+    """.format(temp_upload_db=update_config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+    engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     engine.execute(update_query)
 
 
-def process_withdrawn(config):
+def process_withdrawn(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
     withdrawn_folder = '{}/withdrawn'.format(config['FOLDERS']['WORKING_FOLDER'])
     download_withdrawn_patent_numbers(withdrawn_folder)
     load_withdrawn(update_config=config)
     update_withdrawn(update_config=config)
 
 
-def post_withdrawn(config):
+def post_withdrawn(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
     qc = WithdrawnTest(config)
     qc.runTests()
 
 
 if __name__ == '__main__':
-    config = get_config(type="granted_patent")
-    #process_withdrawn(config)
-    post_withdrawn(config)
+    process_withdrawn(**{
+            "execution_date": datetime.date(2020, 12, 15)
+            })
+    post_withdrawn(**{
+            "execution_date": datetime.date(2020, 12, 15)
+            })

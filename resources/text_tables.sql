@@ -8,7 +8,8 @@
     (
         `uuid`         varchar(512) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `patent_id`    varchar(32)     DEFAULT NULL,
+        `patent_id`    varchar(32)  CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci   DEFAULT NULL,
         `text`         longtext CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         `filename`     varchar(32) CHARACTER SET utf8mb4
@@ -60,7 +61,8 @@
     (
         `uuid`         varchar(512) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `patent_id`    varchar(32)     DEFAULT NULL,
+        `patent_id`    varchar(32) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci    DEFAULT NULL,
         `text`         longtext CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         `length`       bigint(16)      DEFAULT NULL,
@@ -84,7 +86,8 @@
     (
         `uuid`         varchar(512) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `patent_id`    varchar(32)     DEFAULT NULL,
+        `patent_id`    varchar(32)  CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci   DEFAULT NULL,
         `text`         longtext CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         `sequence`     int(11)         DEFAULT NULL,
@@ -108,7 +111,8 @@
     CREATE TABLE IF NOT EXISTS `{{target_database}}`.`claim_exemplary_{{year}}`
     (
         `exemplary` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `patent_id`    varchar(32)     DEFAULT NULL,
+        `patent_id`    varchar(32)  CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
         `filename`  text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         KEY `patent_id` (`patent_id`)
 

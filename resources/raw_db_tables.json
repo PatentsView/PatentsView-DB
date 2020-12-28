@@ -30,15 +30,15 @@
     },
     "cpc_group": {
       "raw_data": false,
-      "lookup": false
+      "lookup": true
     },
     "cpc_subgroup": {
       "raw_data": false,
-      "lookup": false
+      "lookup": true
     },
     "cpc_subsection": {
       "raw_data": false,
-      "lookup": false
+      "lookup": true
     },
     "detail_desc_length": {
       "raw_data": false,

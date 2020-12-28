@@ -36,11 +36,9 @@ def db_and_table_as_array(single_line_query):
     return collation_check_parameters
 
 
-def validate_and_execute(filename=None, slack_channel=None, slack_client=None, schema_only=False, drop_existing=True,
+def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                          fk_check=True, **context):
     print(filename)
-    print(slack_channel)
-    print(slack_client)
     print(schema_only)
     print(context)
     ## Schema only run setting
@@ -51,10 +49,10 @@ def validate_and_execute(filename=None, slack_channel=None, slack_client=None, s
     config.read(project_home + '/config.ini')
 
     # Set up database connection
-    cstr = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(config['DATABASE']['USERNAME'],
-                                                                        config['DATABASE']['PASSWORD'],
-                                                                        config['DATABASE']['HOST'],
-                                                                        config['DATABASE']['PORT'],
+    cstr = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(config['DATABASE_SETUP']['USERNAME'],
+                                                                        config['DATABASE_SETUP']['PASSWORD'],
+                                                                        config['DATABASE_SETUP']['HOST'],
+                                                                        config['DATABASE_SETUP']['PORT'],
                                                                         "information_schema")
     db_con = create_engine(cstr)
     if not fk_check:
