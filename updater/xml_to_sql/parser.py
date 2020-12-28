@@ -518,7 +518,7 @@ def queue_parsers(config, type='granted_patent'):
     dtd_file = '{}'.format(config['XML_PARSING'][dtd_file_setting])
     parsing_config_file = config["XML_PARSING"][parsing_file_setting]
     parsing_config = json.load(open(parsing_config_file))
-    xml_files = get_filenames_to_parse(config, type='pgpubs')
+    xml_files = get_filenames_to_parse(config, type=type)
     parser_start = time.time()
 
     parallelism = int(config["PARALLELISM"]["parallelism"])
