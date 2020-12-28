@@ -189,7 +189,7 @@ def get_table_config(update_config):
 
 def get_required_tables(update_config):
     raw_db_table_settings = get_table_config(update_config)
-    return raw_db_table_settings.keys()
+    return raw_db_table_settings['table_list'].keys()
 
 
 def get_upload_tables_dict(update_config):
