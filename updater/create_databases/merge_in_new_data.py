@@ -209,7 +209,7 @@ from {temp_db}.detail_desc_text_{year}
                                          year=year)
                     },
             'detail_desc_length': {
-                    "insert": "INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length) SELECT  patent_id, CHAR_LENGTH(text) from {temp_db}.detail_desc_text_{year}".format(
+                    "insert": "INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(text), '{database_version}' from {temp_db}.detail_desc_text_{year}".format(
                             raw_db=config['PATENTSVIEW_DATABASES']['RAW_DB'], temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
                             database_version=version, year=year)
                     }
