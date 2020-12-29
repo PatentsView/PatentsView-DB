@@ -6,7 +6,7 @@ import os
 import pprint
 import re
 import time
-from datetime import datetime,date
+from datetime import date, datetime
 from queue import Queue
 
 import pandas as pd
@@ -440,12 +440,12 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                                                                                document=pprint.pformat(
                                                                                        patent_app_document.getchildren()))
                                     })
-        log_queue.put({
-                "level":   logging.INFO,
-                "message": "XML Document {xml_file} took {duration} seconds to parse".format(
-                        xml_file=xml_file_name,
-                        duration=time.time() - parse_start)
-                })
+    log_queue.put({
+            "level":   logging.INFO,
+            "message": "XML Document {xml_file} took {duration} seconds to parse".format(
+                    xml_file=xml_file_name,
+                    duration=time.time() - parse_start)
+            })
     # Load the generated data frames to database
     load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map["foreign_key_config"])
 
