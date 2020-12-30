@@ -11,7 +11,7 @@ class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
 
-from lib.configuration import get_current_config, get_today_dict
+from lib.configuration import get_current_config, get_section, get_today_dict
 from reporting_database_generator.database.validate_query import validate_and_execute
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.create_databases.merge_in_new_data import begin_merging, begin_text_merging, post_merge, post_text_merge
@@ -103,8 +103,9 @@ table_creation_operator = SQLTemplatedPythonOperator(
         python_callable=validate_and_execute,
         dag=granted_patent_parser,
         op_kwargs={
-                'filename':      'text_tables.sql',
-                "schema_only":   False
+                'filename':    'text_tables',
+                "schema_only": False,
+                "section":     get_section('granted_patent_parser', 'fix_patent_ids-upload')
                 },
         templates_dict={
                 'source_sql': 'text_tables.sql'
@@ -121,8 +122,9 @@ upload_table_creation_operator = SQLTemplatedPythonOperator(
         provide_context=True,
         python_callable=validate_and_execute,
         op_kwargs={
-                'filename':    'text_tables.sql',
-                "schema_only": False
+                'filename':    'text_tables',
+                "schema_only": False,
+                "section":     get_section('granted_patent_parser', 'fix_patent_ids-upload')
                 },
         dag=granted_patent_parser,
         templates_dict={
@@ -155,8 +157,9 @@ patent_id_fix_operator = SQLTemplatedPythonOperator(
         python_callable=validate_and_execute,
         dag=granted_patent_parser,
         op_kwargs={
-                'filename':    'patent_id_fix_text.sql',
-                "schema_only": False
+                'filename':    'patent_id_fix_text',
+                "schema_only": False,
+                "section":     get_section('granted_patent_parser', 'fix_patent_ids-upload')
                 },
         templates_dict={
                 'source_sql': 'patent_id_fix_text.sql'

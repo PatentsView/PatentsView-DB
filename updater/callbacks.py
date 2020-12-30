@@ -4,13 +4,13 @@ from lib.notifications import send_slack_notification
 
 
 def airflow_task_success(context):
-    section = get_section(context['task_instance'].dag_id, context['task'].task_id)
+    header = get_section(context['task_instance'].dag_id, context['task'].task_id)
+    section = "{header} - {dt}".format(header=header, dt=context['task_instance'].execution_date.strftime("%Y-%m-%d"))
     from lib.configuration import get_config
     config = get_config()
     message = 'AIRFLOW TASK Success:\n' \
               'DAG:    {dag_id}\n' \
               'TASKS:  {task_id}\n' \
-              'Duration:  {duration}\n' \
         .format(dag_id=context['task_instance'].dag_id, task_id=context['task_instance'].task_id,
                 duration=context['task_instance'].duration)
     # report_message = get_report_message(context['task'].task_id, config)
@@ -19,7 +19,8 @@ def airflow_task_success(context):
 
 
 def airflow_task_failure(context):
-    section = get_section(context['task_instance'].dag_id, context['task'].task_id)
+    header = get_section(context['task_instance'].dag_id, context['task'].task_id)
+    section = "{header} - {dt}".format(header=header, dt=context['task_instance'].execution_date.strftime("%Y-%m-%d"))
     from lib.configuration import get_config
     config = get_config()
     message = 'AIRFLOW TASK FAILURE:\n' \
@@ -33,7 +34,8 @@ def airflow_task_failure(context):
 
 
 def airflow_daily_check_success(context):
-    section = get_section(context['task_instance'].dag_id, context['task'].task_id)
+    header = get_section(context['task_instance'].dag_id, context['task'].task_id)
+    section = "{header} - {dt}".format(header=header, dt=context['task_instance'].execution_date.strftime("%Y-%m-%d"))
     from lib.configuration import get_config
     config = get_config()
     message = 'AIRFLOW TASK Success:\n' \
@@ -49,7 +51,8 @@ def airflow_daily_check_success(context):
 
 
 def airflow_daily_check_failure(context):
-    section = get_section(context['task_instance'].dag_id, context['task'].task_id)
+    header = get_section(context['task_instance'].dag_id, context['task'].task_id)
+    section = "{header} - {dt}".format(header=header, dt=context['task_instance'].execution_date.strftime("%Y-%m-%d"))
     from lib.configuration import get_config
     config = get_config()
     message = 'AIRFLOW TASK FAILURE:\n' \
