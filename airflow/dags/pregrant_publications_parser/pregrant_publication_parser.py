@@ -58,15 +58,6 @@ merge_database_operator = PythonOperator(task_id='merge_database',
                                          on_failure_callback=airflow_task_failure
                                          )
 
-drop_database_operator = PythonOperator(task_id='drop_database',
-                                        python_callable=drop_database,
-                                        provide_context=True,
-                                        dag=app_xml_dag,
-                                        on_success_callback=airflow_task_success,
-                                        on_failure_callback=airflow_task_failure
-                                        )
-
 parse_xml_operator.set_upstream(create_database_operator)
 post_processing_operator.set_upstream(parse_xml_operator)
 merge_database_operator.set_upstream(post_processing_operator)
-drop_database_operator.set_upstream(merge_database_operator)
