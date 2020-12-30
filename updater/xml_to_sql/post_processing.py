@@ -99,8 +99,7 @@ def yearly_claim(config):
 
     con = pymysql.connect(host, user, password, database)
 
-    with con:
-        cur = con.cursor()
+    with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(c.document_number, 1, 4) FROM claim c")
 
         rows = cur.fetchall()
@@ -126,8 +125,7 @@ def yearly_brf_sum_text(config):
 
     con = pymysql.connect(host, user, password, database)
 
-    with con:
-        cur = con.cursor()
+    with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(b.document_number, 1, 4) FROM brf_sum_text b")
 
         rows = cur.fetchall()
@@ -152,8 +150,7 @@ def yearly_draw_desc_text(config):
 
     con = pymysql.connect(host, user, password, database)
 
-    with con:
-        cur = con.cursor()
+    with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(d.document_number, 1, 4) FROM draw_desc_text d")
 
         rows = cur.fetchall()
@@ -178,8 +175,7 @@ def yearly_detail_desc_text(config):
 
     con = pymysql.connect(host, user, password, database)
 
-    with con:
-        cur = con.cursor()
+    with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(d.document_number, 1, 4) FROM detail_desc_text d")
 
         rows = cur.fetchall()
