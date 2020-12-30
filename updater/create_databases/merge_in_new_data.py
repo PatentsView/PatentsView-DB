@@ -165,7 +165,8 @@ INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, `text`, filename, ver
 SELECT uuid, patent_id, text, filename, '{database_version}'
 from {temp_db}.brf_sum_text_{year}
                     """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], database_version=version, year=year)
+                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], database_version=version,
+                               year=year)
                     },
             'claim':              {
                     'preprocess': normalize_exemplary,
@@ -188,7 +189,8 @@ from {temp_db}.claim_{year} c
          left join {temp_db}.patent p
                    on p.id = c.patent_id
                     """.format(
-                            text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'], temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
+                            text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
+                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
                             database_version=version, year=year)
                     },
             'draw_desc_text':     {
@@ -197,7 +199,8 @@ INSERT INTO {text_db}.draw_desc_text_{year}(uuid, patent_id, text, sequence, ver
 SELECT uuid, patent_id, text, sequence, '{database_version}'
 from {temp_db}.draw_desc_text_{year}
                     """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], database_version=version, year=year)
+                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], database_version=version,
+                               year=year)
                     },
             'detail_desc_text':   {
                     "insert": """
@@ -205,12 +208,14 @@ INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length, file
 SELECT uuid, patent_id, text,char_length(text), filename, '{database_version}'
 from {temp_db}.detail_desc_text_{year}
                               """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                                         temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], database_version=version,
+                                         temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
+                                         database_version=version,
                                          year=year)
                     },
             'detail_desc_length': {
                     "insert": "INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(text), '{database_version}' from {temp_db}.detail_desc_text_{year}".format(
-                            raw_db=config['PATENTSVIEW_DATABASES']['RAW_DB'], temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
+                            raw_db=config['PATENTSVIEW_DATABASES']['RAW_DB'],
+                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
                             database_version=version, year=year)
                     }
             }
@@ -219,14 +224,22 @@ from {temp_db}.detail_desc_text_{year}
 
 def post_merge(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
-    qc = MergeTest(config, run_id=kwargs['run_id'])
-    qc.runTests()
+    run_id = kwargs.get('run_id')
+    if run_id.startswith("backfill"):
+        print("Skipping QC")
+    else:
+        qc = MergeTest(config, run_id=kwargs['run_id'])
+        qc.runTests()
 
 
 def post_text_merge(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
-    qc = TextMergeTest(config)
-    qc.runTests()
+    run_id = kwargs.get('run_id')
+    if run_id.startswith("backfill"):
+        print("Skipping QC")
+    else:
+        qc = TextMergeTest(config)
+        qc.runTests()
 
 
 if __name__ == '__main__':
