@@ -105,7 +105,7 @@ table_creation_operator = SQLTemplatedPythonOperator(
         op_kwargs={
                 'filename':    'text_tables',
                 "schema_only": False,
-                "section":     get_section('granted_patent_parser', 'fix_patent_ids-upload')
+                "section":     get_section('granted_patent_updater', 'fix_patent_ids-upload')
                 },
         templates_dict={
                 'source_sql': 'text_tables.sql'
@@ -124,7 +124,7 @@ upload_table_creation_operator = SQLTemplatedPythonOperator(
         op_kwargs={
                 'filename':    'text_tables',
                 "schema_only": False,
-                "section":     get_section('granted_patent_parser', 'fix_patent_ids-upload')
+                "section":     get_section('granted_patent_updater', 'fix_patent_ids-upload')
                 },
         dag=granted_patent_parser,
         templates_dict={
@@ -159,7 +159,7 @@ patent_id_fix_operator = SQLTemplatedPythonOperator(
         op_kwargs={
                 'filename':    'patent_id_fix_text',
                 "schema_only": False,
-                "section":     get_section('granted_patent_parser', 'fix_patent_ids-upload')
+                "section":     get_section('granted_patent_updater', 'fix_patent_ids-upload')
                 },
         templates_dict={
                 'source_sql': 'patent_id_fix_text.sql'
