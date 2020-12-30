@@ -2083,11 +2083,6 @@ CREATE TABLE `rawlocation` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TRIGGER before_insert_rawlocation BEFORE INSERT
-ON rawlocation
-FOR EACH row
-  SET new.id = uuid();
-
 
 
 CREATE TABLE `rawuspc` (
