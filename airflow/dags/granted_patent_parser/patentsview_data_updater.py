@@ -24,7 +24,7 @@ from updater.xml_to_csv.preprocess_xml import preprocess_xml
 
 project_home = os.environ['PACKAGE_HOME']
 templates_searchpath = "{home}/resources".format(home=project_home)
-config = get_current_config(**get_today_dict())
+config = get_current_config(type='granted_patent', supplemental_configs=None, **get_today_dict())
 
 default_args = {
         'owner':            'smadhavan',
