@@ -181,7 +181,7 @@ def find_ipc_url_test():
 
 
 def collect_cpc_data(**kwargs):
-    config = get_current_config(**kwargs)
+    config  = get_current_config('granted_patent', **kwargs)
     destination_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder)
