@@ -336,7 +336,7 @@ def update_rawlocation(update_config, database='RAW_DB', uuid_field = 'id'):
 
 def precache_locations(config):
     location_cache_query = """
-    INSERT IGNORE INTO disambiguated_location_ids (location_id)  SELECT  location_id from {granted_db}.rawlocation where location_id is not null UNION SELECT location_id from {pregrant_db}.rawlocation where location_id is not null;
+    INSERT IGNORE INTO disambiguated_location_ids (location_id)  SELECT distinct location_id from {granted_db}.rawlocation where location_id is not null UNION SELECT distinct location_id from {pregrant_db}.rawlocation where location_id is not null;
     """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
                granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
     engine = create_engine(get_connection_string(config, "RAW_DB"))
@@ -439,7 +439,18 @@ def lookup_fips(city, state, country, lookup_dict, lookup_type='city'):
         result = lookup_dict[state]
     return result
 
-
+def find_county(row):
+    city = clean_loc(row['city'])
+    state = clean_loc(row['state'])
+    country = clean_loc(row['country'])
+    
+    county = lookup_fips(city, state, country, county_dict, 'city')
+    county_fips = lookup_fips(city, state, country, county_fips_dict, 'city')
+    state_fips = lookup_fips(city, state, country, state_dict, 'state')
+    
+    result_dict = {'found_county':county, 'found_county_fips':county_fips, 'found_state_fips':state_fips}
+    
+    return pd.Series(result_dict)
 
 def location_reduce(location_data, update_config, engine):
     truncate_max_locs(engine)
@@ -554,17 +565,34 @@ def update_lat_lon(config):
     query = "update location l Join location_lat_lon lll set l.latitude = lll.latitude, l.longitude = lll.longitude where l.`id` = lll.`id`"
     engine.execute(query)
 
+def update_county_info(config):
+	engine = create_engine(get_connection_string(config, "NEW_DB"))
+    query = "update location l Join location_fips lf set l.county = lf.county, l.county_fips = lf.county_fips, l.state_fips, lf.state_fips where l.`id` = lf.`id`"
+    engine.execute(query)
+
 def update_location_lat_lon(config):
     engine = create_engine(get_connection_string(config, "NEW_DB"))
     location_query = "select * from location"
     location_df = pd.read_sql_query(sql=location_query, con=engine)
 
     tqdm.pandas()
-    df = location_df.head(1000).join(location_df.head(1000).progress_apply(run_query, axis=1))
+    df = location_df.join(location_df.progress_apply(run_query, axis=1))
     df2 = df[['id', 'lat', 'lon']]
     df2=df2.rename(columns={'lat':'latitude', 'lon':'longitude'})
     df2.to_sql("location_lat_lon", engine, if_exists="replace", index=False)
     update_lat_lon(config)
+
+def update_fips(config)
+    engine = create_engine(get_connection_string(config, "NEW_DB"))
+    location_query = "select * from location"
+    location_df = pd.read_sql_query(sql=location_query, con=engine)
+
+    tqdm.pandas()
+    df = location_df.join(location_df.progress_apply(find_county, axis=1))
+    df2 = df[['id', 'found_county', 'found_county_fips', 'found_state_fips']]
+    df2=df2.rename(columns={'found_county':'county', 'found_county_fips':'county_fips', 'found_state_fips':'state_fips'})
+    df2.to_sql("location_fips", engine, if_exists="replace", index=False)
+    update_county_info(config)
 
 def post_process_location(config):
     update_rawlocation(config)
@@ -572,12 +600,15 @@ def post_process_location(config):
     precache_locations(config)
     create_location(config)
     update_location_lat_lon(config)
+    update_fips(config)
 
 def post_process_qc(config):
     qc = LocationPostProcessingQC(config)
     qc.runTests()
 
 
+fips_lookups = create_fips_lookups(config['FOLDERS']['PERSISTENT_FILES'])
+county_dict, county_fips_dict, state_dict = fips_lookups
 
 if __name__ == '__main__':
     config = get_config()
