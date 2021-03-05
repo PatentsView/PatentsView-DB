@@ -91,9 +91,17 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
         print("\tTesting Invalid Disambiguation IDs {table_name} in {db}".format(table_name=self.disambiguated_table,
                                                                                  db=self.config["PATENTSVIEW_DATABASES"][
                                                                                      self.database_section]))
-        invalid_query = "SELECT count(1) from {disambiguated_table} dt left join {entity_table} et on et.{id_field}=dt.id where et.{id_field} is null".format(
+        invalid_query = """
+SELECT count(1)
+from {disambiguated_table} dt
+         left join {entity_table} et
+                   on et.{id_field} = dt.id
+         left join {pregrant_db}.{entity_table} et2 on et2.{id_field} = dt.id
+where et.{id_field} is null
+  and et2.{id_field} is null;
+        """.format(
             disambiguated_table=self.disambiguated_table, entity_table=self.entity_table,
-            id_field=self.disambiguated_id)
+            id_field=self.disambiguated_id, pregrant_db=self.config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'])
         if not self.connection.open:
             self.connection.connect()
         with self.connection.cursor() as count_cursor:

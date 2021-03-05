@@ -1,3 +1,4 @@
+import datetime
 import os
 import time
 
@@ -154,5 +155,6 @@ def process_and_upload_wipo(**kwargs):
 
 
 if __name__ == '__main__':
-    config = get_config()
-    process_and_upload_wipo(config)
+    process_and_upload_wipo(**{
+            "execution_date": datetime.date(2020, 12,29)
+            })
