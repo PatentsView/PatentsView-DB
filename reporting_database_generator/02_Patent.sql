@@ -59,7 +59,7 @@ create table `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
 (
   `patent_id` varchar(20) not null,
   `inventor_id` int unsigned null,
-  `persistent_inventor_id` varchar(36) null,
+  `persistent_inventor_id` varchar(256) null,
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
   `city` varchar(256) null,

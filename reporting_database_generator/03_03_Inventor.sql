@@ -9,7 +9,7 @@ SET collation_connection = 'utf8mb4_unicode_ci';
 drop table if exists `{{params.reporting_database}}`.`temp_inventor_lastknown_location`;
 create table `{{params.reporting_database}}`.`temp_inventor_lastknown_location`
 (
-  `inventor_id` varchar(36) not null,
+  `inventor_id` varchar(256) not null,
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
   `city` varchar(256) null,
@@ -74,7 +74,7 @@ select
 drop table if exists `{{params.reporting_database}}`.`temp_inventor_num_patents`;
 create table `{{params.reporting_database}}`.`temp_inventor_num_patents`
 (
-  `inventor_id` varchar(36) not null,
+  `inventor_id` varchar(256) not null,
   `num_patents` int unsigned not null,
   primary key (`inventor_id`)
 )
@@ -94,7 +94,7 @@ group by
 drop table if exists `{{params.reporting_database}}`.`temp_inventor_num_assignees`;
 create table `{{params.reporting_database}}`.`temp_inventor_num_assignees`
 (
-  `inventor_id` varchar(36) not null,
+  `inventor_id` varchar(256) not null,
   `num_assignees` int unsigned not null,
   primary key (`inventor_id`)
 )
@@ -117,7 +117,7 @@ group by
 drop table if exists `{{params.reporting_database}}`.`temp_inventor_years_active`;
 create table `{{params.reporting_database}}`.`temp_inventor_years_active`
 (
-  `inventor_id` varchar(36) not null,
+  `inventor_id` varchar(256) not null,
   `first_seen_date` date null,
   `last_seen_date` date null,
   `actual_years_active` smallint unsigned not null,
@@ -215,7 +215,7 @@ create table `{{params.reporting_database}}`.`inventor`
   `first_seen_date` date null,
   `last_seen_date` date null,
   `years_active` smallint unsigned not null,
-  `persistent_inventor_id` varchar(36) not null,
+  `persistent_inventor_id` varchar(256) not null,
   primary key (`inventor_id`)
 )
 engine=InnoDB;

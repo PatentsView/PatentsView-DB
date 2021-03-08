@@ -9,7 +9,7 @@ create table `{{params.reporting_database}}`.`inventor_entity`
     `inventor_county_fips` varchar(6) null,
     `inventor_first_name` varchar(128) null,
     `inventor_first_seen_date` date null,
-    `inventor_id` varchar(36) null,
+    `inventor_id` varchar(256) null,
     `inventor_key_id` int(10) unsigned,
     `inventor_last_name` varchar(128) null,
    	`inventor_last_seen_date` date null,
