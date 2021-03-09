@@ -46,9 +46,8 @@ from
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_assignee` ta on ta.`old_assignee_id` = ra.`assignee_id`
   left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
   left outer join `{{params.raw_database}}`.`location` l on l.`id` = rl.`location_id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = 
-
-rl.`location_id_transformed`
+  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
+  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`new_location_id` =  tli.`new_location_id`
 where
   ta.`new_assignee_id` is not null or
   tl.`new_location_id` is not null;
@@ -95,9 +94,8 @@ from
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_inventor` ti on ti.`old_inventor_id` = ri.`inventor_id`
   left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
   left outer join `{{params.raw_database}}`.`location` l on l.`id` = rl.`location_id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id_transformed` = 
-
-rl.`location_id_transformed`
+  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
+  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`new_location_id` =  tli.`new_location_id`
 where
   ti.`new_inventor_id` is not null or
   tl.`new_location_id` is not null;
@@ -299,7 +297,7 @@ create table `{{params.reporting_database}}`.`patent`
   `firstnamed_assignee_latitude` float null,
   `firstnamed_assignee_longitude` float null,
   `firstnamed_inventor_id` int unsigned null,
-  `firstnamed_inventor_persistent_id` varchar(36) null,
+  `firstnamed_inventor_persistent_id` varchar(256) null,
   `firstnamed_inventor_location_id` int unsigned null,
   `firstnamed_inventor_persistent_location_id` varchar(128) null,
   `firstnamed_inventor_city` varchar(256) null,
