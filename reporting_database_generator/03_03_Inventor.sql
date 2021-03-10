@@ -67,8 +67,8 @@ select
               p.`id` desc 
           ) t) t where t.rownum = 1 ) t          
        left join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
-left join `{{params.reporting_database}}`.`temp_id_mapping_location` tll on tll.`new_location_id`=t.`location_id`
-       left join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`old_location_id` = tll.`old_location_id` ;
+left join `{{params.reporting_database}}`.`temp_id_mapping_location` tll on tll.`old_location_id`=t.`location_id`
+       left join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`new_location_id` = tll.`new_location_id` ;
 
 
 
