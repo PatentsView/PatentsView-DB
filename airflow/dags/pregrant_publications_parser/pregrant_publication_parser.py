@@ -24,9 +24,8 @@ app_xml_dag = DAG(
         dag_id='pregrant_publication_updater',
         default_args=default_args,
         description='Download and process application patent data and corresponding classifications data',
-        start_date=datetime(2020, 6, 25),
-        schedule_interval=timedelta(weeks=1),
-        end_date=datetime(2020, 10, 15)
+        start_date=datetime(2021, 1, 7),
+        schedule_interval=timedelta(weeks=1)
         # schedule_interval=None
         )
 
