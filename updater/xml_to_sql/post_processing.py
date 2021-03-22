@@ -4,6 +4,7 @@ import pymysql
 
 from QA.text_parser.AppTest import AppUploadTest
 from lib.configuration import get_connection_string, get_current_config
+from sqlalchemy import create_engine
 
 
 def pct_data_doc_type(config):
