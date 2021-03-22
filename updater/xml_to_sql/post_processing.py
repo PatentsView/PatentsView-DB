@@ -23,7 +23,7 @@ def consolidate_uspc(config):
     engine.execute(
             "DELETE  FROM  rawuspc  WHERE  LENGTH(classification) < 3;")
     engine.execute(
-            "INSERT INTO uspc (id, document_number, mainclass_id, subclass_id, sequence, filename) SELECT id, document_number, TRIM(SUBSTRING(classification,1,3)), TRIM(CONCAT(SUBSTRING(classification,1,3), '/', TRIM(SUBSTRING(classification,4, LENGTH(classification))))), sequence, filename FROM rawuspc;")
+            "INSERT IGNORE INTO uspc (id, document_number, mainclass_id, subclass_id, sequence, filename) SELECT id, document_number, TRIM(SUBSTRING(classification,1,3)), TRIM(CONCAT(SUBSTRING(classification,1,3), '/', TRIM(SUBSTRING(classification,4, LENGTH(classification))))), sequence, filename FROM rawuspc;")
 
 
 def consolidate_rawlocation(config):
@@ -54,11 +54,11 @@ def consolidate_usreldoc(config):
     engine.execute(
             'DELETE FROM usreldoc_single WHERE related_doc_number IS NULL;')
     engine.execute(
-            'INSERT INTO usreldoc SELECT * FROM usreldoc_parent_child;')
+            'INSERT IGNORE INTO usreldoc SELECT * FROM usreldoc_parent_child;')
     engine.execute(
-            'INSERT INTO usreldoc SELECT * FROM usreldoc_single;')
+            'INSERT IGNORE INTO usreldoc SELECT * FROM usreldoc_single;')
     engine.execute(
-            'INSERT INTO usreldoc SELECT * FROM usreldoc_related;')
+            'INSERT IGNORE INTO usreldoc SELECT * FROM usreldoc_related;')
 
 
 def consolidate_claim(config):
