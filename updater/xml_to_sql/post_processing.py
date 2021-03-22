@@ -1,7 +1,6 @@
 import datetime
 
 import pymysql
-from sqlalchemy import create_engine
 
 from QA.text_parser.AppTest import AppUploadTest
 from lib.configuration import get_connection_string, get_current_config
@@ -97,7 +96,7 @@ def yearly_claim(config):
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
-    con = pymysql.connect(host, user, password, database)
+    con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(c.document_number, 1, 4) FROM claim c")
@@ -123,7 +122,7 @@ def yearly_brf_sum_text(config):
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
-    con = pymysql.connect(host, user, password, database)
+    con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(b.document_number, 1, 4) FROM brf_sum_text b")
@@ -148,7 +147,7 @@ def yearly_draw_desc_text(config):
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
-    con = pymysql.connect(host, user, password, database)
+    con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(d.document_number, 1, 4) FROM draw_desc_text d")
@@ -173,7 +172,7 @@ def yearly_detail_desc_text(config):
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
-    con = pymysql.connect(host, user, password, database)
+    con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(d.document_number, 1, 4) FROM detail_desc_text d")
