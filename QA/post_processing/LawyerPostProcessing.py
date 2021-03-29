@@ -9,8 +9,8 @@ class LawyerPostProcessingQC(DisambiguationTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, 'RAW_DB', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
-                'rawlawyer':     {
-                        'fields': {
+                'rawlawyer':        {
+                        'fields':           {
                                 'name_last':    {
                                         'data_type':    'varchar',
                                         'null_allowed': True,
@@ -53,7 +53,7 @@ class LawyerPostProcessingQC(DisambiguationTester):
                                         }
                                 }
                         },
-                'lawyer':        {
+                'lawyer':           {
                         "fields":           {
                                 "id":           {
                                         "data_type":    "varchar",
@@ -85,9 +85,13 @@ class LawyerPostProcessingQC(DisambiguationTester):
                                 'table':          'patent_lawyer',
                                 'source_id':      'id',
                                 'destination_id': 'lawyer_id'
+                                },{
+                                'table':          'rawlawyer',
+                                'source_id':      'id',
+                                'destination_id': 'lawyer_id'
                                 }]
                         },
-                'patent_lawyer': {
+                'patent_lawyer':    {
                         "fields": {
                                 "patent_id": {
                                         "data_type":    "varchar",
@@ -100,7 +104,12 @@ class LawyerPostProcessingQC(DisambiguationTester):
                                         "category":     False
                                         }
                                 }
-                        }
+                        },
+                "related_entities": [{
+                        'table':          'lawyer',
+                        'source_id':      'lawyer_id',
+                        'destination_id': 'id'
+                        }]
                 }
 
         self.entity_table = 'rawlawyer'

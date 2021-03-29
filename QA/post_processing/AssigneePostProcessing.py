@@ -9,34 +9,105 @@ class AssigneePostProcessingQC(DisambiguationTester):
         super().__init__(config, 'RAW_DB', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
                 'rawassignee':     {
-                        'fields': {
-                                'patent_id':      {'data_type': 'varchar', 'null_allowed': False, 'category': False},
-                                'name_last':      {'data_type': 'varchar', 'null_allowed': True, 'category': False},
-                                'assignee_id':    {'data_type': 'varchar', 'null_allowed': True, 'category': False},
-                                'organization':   {'data_type': 'varchar', 'null_allowed': True, 'category': False},
-                                'rawlocation_id': {'data_type': 'varchar', 'null_allowed': True, 'category': False},
-                                'sequence':       {'data_type': 'int', 'null_allowed': False, 'category': False},
-                                'type':           {'data_type': 'varchar', 'null_allowed': True, 'category': False},
-                                'uuid':           {'data_type': 'varchar', 'null_allowed': False, 'category': False},
-                                'name_first':     {'data_type': 'varchar', 'null_allowed': True, 'category': False}
+                        'fields':           {
+                                'patent_id':      {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'name_last':      {
+                                        'data_type':    'varchar',
+                                        'null_allowed': True,
+                                        'category':     False
+                                        },
+                                'assignee_id':    {
+                                        'data_type':    'varchar',
+                                        'null_allowed': True,
+                                        'category':     False
+                                        },
+                                'organization':   {
+                                        'data_type':    'varchar',
+                                        'null_allowed': True,
+                                        'category':     False
+                                        },
+                                'rawlocation_id': {
+                                        'data_type':    'varchar',
+                                        'null_allowed': True,
+                                        'category':     False
+                                        },
+                                'sequence':       {
+                                        'data_type':    'int',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'type':           {
+                                        'data_type':    'varchar',
+                                        'null_allowed': True,
+                                        'category':     False
+                                        },
+                                'uuid':           {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'name_first':     {
+                                        'data_type':    'varchar',
+                                        'null_allowed': True,
+                                        'category':     False
+                                        }
                                 }
                         },
                 'assignee':        {
                         "fields":           {
-                                "id":           {"data_type": "varchar", "null_allowed": False, "category": False},
-                                "type":         {"data_type": "varchar", "null_allowed": True, "category": True},
-                                "name_first":   {"data_type": "varchar", "null_allowed": True, "category": False},
-                                "name_last":    {"data_type": "varchar", "null_allowed": True, "category": False},
-                                "organization": {"data_type": "varchar", "null_allowed": True, "category": False}
+                                "id":           {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "type":         {
+                                        "data_type":    "varchar",
+                                        "null_allowed": True,
+                                        "category":     True
+                                        },
+                                "name_first":   {
+                                        "data_type":    "varchar",
+                                        "null_allowed": True,
+                                        "category":     False
+                                        },
+                                "name_last":    {
+                                        "data_type":    "varchar",
+                                        "null_allowed": True,
+                                        "category":     False
+                                        },
+                                "organization": {
+                                        "data_type":    "varchar",
+                                        "null_allowed": True,
+                                        "category":     False
+                                        }
                                 },
                         "related_entities": [
-                                {'table': 'location_assignee', 'source_id': 'id', 'destination_id': 'assignee_id'},
-                                {'table': 'patent_assignee', 'source_id': 'id', 'destination_id': 'assignee_id'}]
+                                {
+                                        'table':          'patent_assignee',
+                                        'source_id':      'id',
+                                        'destination_id': 'assignee_id'
+                                        }, {
+                                        'table':          'rawassignee',
+                                        'source_id':      'id',
+                                        'destination_id': 'assignee_id'
+                                        }]
                         },
                 'patent_assignee': {
-                        "fields": {
-                                "patent_id":   {"data_type": "varchar", "null_allowed": False, "category": False},
-                                "assignee_id": {"data_type": "varchar", "null_allowed": False, "category": False}
+                        "fields":           {
+                                "patent_id":   {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "assignee_id": {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        }
                                 }
                         }
                 }

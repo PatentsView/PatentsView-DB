@@ -258,7 +258,7 @@ group by `{field}`
                 if not self.connection.open:
                     self.connection.connect()
                 patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(
-                    db=self.patent_db_prefix)
+                        db=self.patent_db_prefix)
                 if table_name == 'patent':
                     count_query = "SELECT year(`date`) as `yr`, count(1) as `year_count` from patent group by year(`date`)"
                 else:
@@ -306,8 +306,10 @@ group by `{field}`
             for related_entity_config in table_config['related_entities']:
                 self.assert_related_floating_entities(table_name, related_entity_config)
 
+    #
+    #
     def assert_related_floating_entities(self, table_name, related_config):
-        related_query = "SELECT count(1) from {related_table} destination left join {source_table} source on source.{source_id}= destination.{destination_id} where source.{source_id} is null".format(
+        related_query = "SELECT count(1) from {related_table} destination left join {source_table} source on source.{source_id}= destination.{destination_id} where source.{source_id} is null and destination.{destination_id} is not null".format(
                 source_table=table_name,
                 related_table=related_config['table'], source_id=related_config['source_id'],
                 destination_id=related_config['destination_id'])
@@ -318,6 +320,7 @@ group by `{field}`
                 float_cursor.execute(related_query)
                 related_count = float_cursor.fetchall()[0][0]
                 if related_count > 0:
+                    print(related_query)
                     raise Exception(
                             "There are rows in {destination_id} in {related_table} that do not have corresponding {source_id} in {source_table} for {db}".format(
                                     source_table=table_name,
@@ -350,8 +353,7 @@ group by `{field}`
     def test_floating_entities(self, table_name):
         print("\tTesting floating entities for {table_name}".format(table_name=table_name))
         patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(db=self.patent_db_prefix)
-        float_query = "SELECT count(1) from {table_name} et left join {patent_table} p on p.id =et.patent_id where " \
-                      "p.id is null".format(
+        float_query = "SELECT count(1) from {table_name} et left join {patent_table} p on p.id =et.patent_id where p.id is null".format(
                 table_name=table_name, patent_table=patent_table)
         if not self.connection.open:
             self.connection.connect()
@@ -367,6 +369,7 @@ group by `{field}`
 
         except pymysql.Error as e:
             if table_name not in self.patent_exclusion_list:
+                print(float_query)
                 raise e
         finally:
             self.connection.close()
@@ -379,8 +382,7 @@ group by `{field}`
         if 'custom_float_condition' in table_config and table_config['custom_float_condition'] is not None:
             additional_where = "and " + table_config['custom_float_condition']
         patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(db=self.patent_db_prefix)
-        float_count_query = "SELECT count(1) as count from {patent_table} p left join {entity_table} et on " \
-                            "et.patent_id = p.id where et.patent_id is null {additional_where}".format(
+        float_count_query = "SELECT count(1) as count from {patent_table} p left join {entity_table} et on et.patent_id = p.id where et.patent_id is null {additional_where}".format(
                 patent_table=patent_table, entity_table=table, additional_where=additional_where)
         print(float_count_query)
         try:
@@ -481,12 +483,14 @@ group by `{field}`
             if table in skiplist:
                 continue
             print("Beginning Test for {table_name} in {db}".format(table_name=table,
-                                                                   db=self.config["PATENTSVIEW_DATABASES"][self.database_section]))
+                                                                   db=self.config["PATENTSVIEW_DATABASES"][
+                                                                       self.database_section]))
             self.test_floating_entities(table)
             self.test_yearly_count(table, strict=False)
             self.test_table_row_count(table)
             self.test_blank_count(table, self.table_config[table])
             self.test_nulls(table, self.table_config[table])
+            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
             self.load_floating_patent_count(table, self.table_config[table])
             self.load_prefix_counts(table)
             for field in self.table_config[table]["fields"]:
@@ -499,5 +503,4 @@ group by `{field}`
                 if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
                     self.test_text_length(table, field)
                 self.test_null_byte(table, field)
-
         self.save_qa_data()
