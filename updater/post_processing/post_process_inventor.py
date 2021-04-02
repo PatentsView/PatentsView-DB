@@ -5,7 +5,8 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
-from lib.configuration import get_config, get_connection_string
+from lib.configuration import get_config, get_current_config, get_connection_string
+import datetime
 
 
 def update_rawinventor(update_config, database='RAW_DB', uuid_field='uuid'):
@@ -176,6 +177,6 @@ def post_process_qc(config):
 
 
 if __name__ == '__main__':
-    config = get_config()
+    config = get_current_config(**{"execution_date": datetime.date(2020, 12, 29)})
     # post_process_inventor(config)
     post_process_qc(config)

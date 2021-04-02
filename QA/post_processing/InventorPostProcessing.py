@@ -1,4 +1,5 @@
 import datetime
+from lib.configuration import get_current_config
 
 from QA.post_processing.DisambiguationTester import DisambiguationTester
 
@@ -114,3 +115,12 @@ class InventorPostProcessingQC(DisambiguationTester):
         self.disambiguated_table = 'inventor'
         self.disambiguated_data_fields = ['name_last', 'name_first']
         self.patent_exclusion_list.extend(['inventor'])
+
+
+if __name__ == '__main__':
+    config = get_current_config('granted_patent', **{
+                    "execution_date": datetime.date(2020, 12, 29)
+                                })
+    print({section: dict(config[section]) for section in config.sections()})
+    qc = InventorPostProcessingQC(config)
+    qc.runTests()

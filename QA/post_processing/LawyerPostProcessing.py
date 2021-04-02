@@ -1,7 +1,7 @@
 import datetime
 
 from QA.post_processing.DisambiguationTester import DisambiguationTester
-from lib.configuration import get_config
+from lib.configuration import get_current_config
 
 
 class LawyerPostProcessingQC(DisambiguationTester):
@@ -121,6 +121,9 @@ class LawyerPostProcessingQC(DisambiguationTester):
 
 
 if __name__ == '__main__':
-    config = get_config()
+    config = get_current_config('granted_patent', **{
+                    "execution_date": datetime.date(2020, 12, 31)
+                                })
+    print({section: dict(config[section]) for section in config.sections()})
     qc = LawyerPostProcessingQC(config)
     qc.runTests()

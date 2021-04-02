@@ -1,7 +1,7 @@
 import datetime
 
 from QA.PatentDatabaseTester import PatentDatabaseTester
-from lib.configuration import get_config
+from lib.configuration import get_config, get_current_config
 
 
 class CPCTest(PatentDatabaseTester):
@@ -58,5 +58,5 @@ class CPCTest(PatentDatabaseTester):
 
 
 if __name__ == '__main__':
-    qc = CPCTest(get_config())
+    qc = CPCTest(get_current_config(**{            "execution_date": datetime.date(2020, 12,29)            }))
     qc.runTests()

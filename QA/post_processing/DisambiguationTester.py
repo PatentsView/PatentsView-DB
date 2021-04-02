@@ -18,6 +18,10 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
         self.disambiguated_table = None
         self.disambiguated_data_fields = []
 
+    def init_qa_dict(self):
+        super(DisambiguationTester, self).init_qa_dict()
+        self.qa_data.update(self.extended_qa_data)
+
     def test_floating_entities(self, table_name):
         if "patent_id" in self.table_config[table_name]["fields"]:
             super(DisambiguationTester, self).test_floating_entities(table_name)

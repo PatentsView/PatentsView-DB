@@ -36,15 +36,7 @@ class PatentDatabaseTester(ABC):
         # self.database_connection_string = get_connection_string(config, database_section)
         self.config = config
         # Place Holder for saving QA counts - keys map to table names in patent_QA
-        self.qa_data = {
-                "DataMonitor_count":               [],
-                'DataMonitor_nullcount':           [],
-                'DataMonitor_patentyearlycount':   [],
-                'DataMonitor_categorycount':       [],
-                'DataMonitor_floatingpatentcount': [],
-                'DataMonitor_maxtextlength':       [],
-                'DataMonitor_prefixedentitycount': []
-                }
+        self.init_qa_dict()
 
         database_type = self.config["PATENTSVIEW_DATABASES"][self.database_section].split("_")[0]
         self.version = self.end_date.strftime("%Y%m%d")
@@ -57,6 +49,17 @@ class PatentDatabaseTester(ABC):
         # Current databaseif prefix is None
         # Used for Text databases
         self.patent_db_prefix = None
+    def init_qa_dict(self):
+                # Place Holder for saving QA counts - keys map to table names in patent_QA
+        self.qa_data = {
+                "DataMonitor_count":               [],
+                'DataMonitor_nullcount':           [],
+                'DataMonitor_patentyearlycount':   [],
+                'DataMonitor_categorycount':       [],
+                'DataMonitor_floatingpatentcount': [],
+                'DataMonitor_maxtextlength':       [],
+                'DataMonitor_prefixedentitycount': []
+                }
 
     def test_table_row_count(self, table_name):
         """
@@ -503,4 +506,5 @@ group by `{field}`
                 if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
                     self.test_text_length(table, field)
                 self.test_null_byte(table, field)
-        self.save_qa_data()
+            self.save_qa_data()
+            self.init_qa_dict()
