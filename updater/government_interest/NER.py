@@ -3,14 +3,17 @@
 #### input files: merged csvs, NER, omitLocs
 #### output files: "NER_output.txt","distinctOrgs.txt"
 ##################################################################
-import pandas as pd
+import datetime
 import math
-import subprocess
 import os
-from os import listdir
 import re
+import subprocess
+from os import listdir
 
-from lib.configuration import get_config
+import pandas as pd
+from sqlalchemy import create_engine
+
+from lib.configuration import get_connection_string, get_current_config
 from lib.utilities import chunks
 
 
@@ -25,12 +28,9 @@ def get_heading(gi_statement):
     return ''
 
 
-def prepare_input_files(working_folder, merged_csv_output):
-    input_data = '{}/parsed_data'.format(working_folder)
-    all_gi_data = pd.DataFrame()
-    for folder in os.listdir(input_data):
-        all_gi_data = all_gi_data.append(
-            pd.read_csv('{}/{}/government_interest.csv'.format(input_data, folder), delimiter='\t'))
+def prepare_input_files(connection_string, merged_csv_output):
+    engine = create_engine(connection_string)
+    all_gi_data = pd.read_sql_table(table_name='government_interest', con=engine)
     # reset index after appending all data together
     all_gi_data.reset_index(inplace=True)
     all_gi_data['heading'] = all_gi_data['gi_statement'].apply(get_heading)
@@ -46,8 +46,8 @@ def prepare_input_files(working_folder, merged_csv_output):
 
     # eliminate rows that have statements ~ to "No federal government funds were used in researching or developing this invention..."
     idx_rm_nofunds = all_gi_data[all_gi_data['gi_statement'].str.contains(
-        'No federal government funds|No federal funds|without the sponsorship or funding', flags=re.IGNORECASE,
-        regex=True) == True].index.tolist()
+            'No federal government funds|No federal funds|without the sponsorship or funding', flags=re.IGNORECASE,
+            regex=True) == True].index.tolist()
 
     all_to_rm = idx_rm_na + idx_rm_empty + idx_rm_nofunds
 
@@ -151,22 +151,22 @@ def extract_contract_award(gi_row):
         match_string += start + " [A-Za-z\d][A-Za-z\d-]+[^\s][\d][A-Za-z\d-]+|" + start + " [A-Z\d]{1,5}\s[A-Z\d-]+\d|"
     match_string += "[A-Za-z\d][A-Za-z\d-]+[^\s][\d][A-Za-z\d-]+|[A-Z\d]{1,5}\s[A-Z\d-]+\d"
     contract_nums = re.findall(
-        match_string,
-        statement)
+            match_string,
+            statement)
 
     if "public law" in gi_row.gi_statement.lower() or "p.l." in statement.lower():
         contract_nums = [
-            re.sub("((96|85)-\d{3}|USC\s\d{3}|20\d{3}|111-\d{3})\|?", "", x)
-            for x in contract_nums
-        ]
+                re.sub("((96|85)-\d{3}|USC\s\d{3}|20\d{3}|111-\d{3})\|?", "", x)
+                for x in contract_nums
+                ]
     if "Calif." in gi_row.gi_statement or "Bethesda" in statement:
         contract_nums = [
-            x if x not in [
-                "619)553-5118", "619)553-5120", "553-5118", "(619-)?553-2778",
-                "92152", "72120", "20012", "53510", "D0012", "53560", "20014",
-                "20892"
-            ] else None for x in contract_nums
-        ]
+                x if x not in [
+                        "619)553-5118", "619)553-5120", "553-5118", "(619-)?553-2778",
+                        "92152", "72120", "20012", "53510", "D0012", "53560", "20014",
+                        "20892"
+                        ] else None for x in contract_nums
+                ]
     return contract_nums
 
 
@@ -196,7 +196,7 @@ def add_cols(data, orgs):
     data['orgs'] = pd.Series(gi_all_orgs)
 
     # Extract and clean Contract Numbers
-    #contracts = clean_contracts(data, gi_statements)
+    # contracts = clean_contracts(data, gi_statements)
     contracts = data.apply(extract_contract_award, axis=1)
 
     # Add contracts column for contracts
@@ -233,18 +233,18 @@ def clean_orgs(orgs):
 
     # Grant-related cleaning
     orgs = [re.sub(
-        "Federally[\-,\s]Sponsored\sResearch(\sThis)?|Federal\s(Contract|Government|Government Contract)|(Federal\sGrant|Grant\sNumber).+|Grant\sNo\.?.+|Grant\s#.+|(and)?\s?Grant",
-        "", x) for x in orgs]
+            "Federally[\-,\s]Sponsored\sResearch(\sThis)?|Federal\s(Contract|Government|Government Contract)|(Federal\sGrant|Grant\sNumber).+|Grant\sNo\.?.+|Grant\s#.+|(and)?\s?Grant",
+            "", x) for x in orgs]
 
     # Contract/Case related cleaning
     orgs = [re.sub(
-        "Government\sContract.+|Case?\s(Number)?|Subcontract.+|and\s(Contract)|(and)?\s?Contract\sNos?\.?.+|Contract\s[A-Z,\d,\-,a-z].+[\d].+|Case\sNo\.?.+|(Contract\sNumber|Contract\s#).+|Order\sNo|[C,c]ontract\/|Case"
-        , "", x) for x in orgs]
+            "Government\sContract.+|Case?\s(Number)?|Subcontract.+|and\s(Contract)|(and)?\s?Contract\sNos?\.?.+|Contract\s[A-Z,\d,\-,a-z].+[\d].+|Case\sNo\.?.+|(Contract\sNumber|Contract\s#).+|Order\sNo|[C,c]ontract\/|Case"
+            , "", x) for x in orgs]
 
     # Award/Agreement related cleaning
     orgs = [re.sub(
-        "(Award|Agreement)\sNumbers?.+|(Award|Agreement)\sNos?\.?.+|Award\s[A-Z].+[\d].+\sand|Award\s[A-Z,\d,\-,/]{10,30}|Award",
-        "", x) for x in orgs]
+            "(Award|Agreement)\sNumbers?.+|(Award|Agreement)\sNos?\.?.+|Award\s[A-Z].+[\d].+\sand|Award\s[A-Z,\d,\-,/]{10,30}|Award",
+            "", x) for x in orgs]
 
     # Misc. cleaning
     orgs = [re.sub("Cooperative\sAgreement.+", "Cooperative Agreement", x) for x in orgs]
@@ -259,8 +259,9 @@ def clean_orgs(orgs):
     orgs = [re.sub("\sNos?\.?$|\]|\[|no\.|NS.+|&|;$|\s1$|#|'|[#,A-Z][a-z,\d,A-Z][a-z\d][\d]{3,10}", "", x) for x in
             orgs]
     orgs = [
-        re.sub("Applications?\sI[dD]?.+|Project\s#|Project\sNumber.+|Prime\sContract|Merit\sReview?.+|Merit\sAward", "",
-               x) for x in orgs]
+            re.sub("Applications?\sI[dD]?.+|Project\s#|Project\sNumber.+|Prime\sContract|Merit\sReview?.+|Merit\sAward",
+                   "",
+                   x) for x in orgs]
     orgs = [re.sub("Goverment|Government\sSupport\s?(under)?|(NIH|NHI)\s1|Health 1R43|U01", "", x) for x in orgs]
     orgs = [re.sub("Foundation\sNumber|Foundation\s[\d]{5,15}|U01|R01|P\.O\.|Numbers?", "", x) for x in orgs]
     orgs = [re.sub("NIH[#/]", "NIH", x) for x in orgs]
@@ -328,8 +329,8 @@ def clean_contracts(data, gi_statements):
 
     for idx in idx_cabe:
         contracts[idx] = re.sub(
-            "619\)553-5118\|?|619\)553-5120\|?|553-5118\|?|(619-)?553-2778\|?|92152\|?|72120\|?|20012\|?|53510\|?|D0012\|?|53560\|?|20014\|?|20892\|?",
-            "", contracts[idx])
+                "619\)553-5118\|?|619\)553-5120\|?|553-5118\|?|(619-)?553-2778\|?|92152\|?|72120\|?|20012\|?|53510\|?|D0012\|?|53560\|?|20014\|?|20892\|?",
+                "", contracts[idx])
 
     contracts = [x.lstrip() for x in contracts]
     contracts = [x.rstrip('|') for x in contracts]
@@ -382,9 +383,9 @@ def begin_NER_processing(config):
     ner_classif_dirs = ['out-3class', 'out-4class', 'out-7class']
 
     final_output_dir = pre_manual
-
+    connection_string = get_connection_string(config)
     # 1. Merge csvs together and read in the input file
-    merged_df = prepare_input_files(working_folder, merged_csv)
+    merged_df = prepare_input_files(connection_string, merged_csv)
 
     # # 2. run NER
     run_NER(ner_dir, ner_txt_indir, ner_txt_outdir, merged_df, classifiers, ner_classif_dirs)
@@ -397,3 +398,10 @@ def begin_NER_processing(config):
 
     # 5. write output file
     write_output(final_output_dir, df_final, orgs_final)
+
+
+if __name__ == '__main__':
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+            })
+    begin_NER_processing(config)

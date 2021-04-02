@@ -32,3 +32,4 @@ upload_*/*
 archive/*
 **/.ipynb_checkpoints
 updater/create_databases/merge_status.json
+airflow_db_production/

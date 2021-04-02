@@ -25,7 +25,7 @@ def begin_text_parsing(**kwargs):
     project_home = os.environ['PACKAGE_HOME']
     sys.path.append(project_home + '/updater/text_parser/')
     from updater.xml_to_sql.parser import queue_parsers
-    queue_parsers(config, type='granted_patent')
+    queue_parsers(config, type='long_text')
 
 
 def post_text_parsing(**kwargs):
@@ -37,6 +37,6 @@ def post_text_parsing(**kwargs):
 
 if __name__ == '__main__':
     begin_text_parsing(**{
-            "execution_date": datetime.date(2020, 12, 15)
+            "execution_date": datetime.date(2020, 12, 29)
             })
 

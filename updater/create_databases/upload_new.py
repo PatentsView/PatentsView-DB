@@ -38,6 +38,7 @@ def consolidate_cpc_classes(connection_string):
 
 def setup_database(update_config):
     required_tables = get_required_tables(update_config)
+    print("Required tables are {tlist}".format(tlist=", ".join(required_tables)))
     connection_string = get_connection_string(update_config, "RAW_DB")
     engine = create_engine(connection_string)
     raw_database = update_config["PATENTSVIEW_DATABASES"]["RAW_DB"]
@@ -45,6 +46,7 @@ def setup_database(update_config):
     table_fetch_sql = "select table_name from information_schema.tables where table_type = 'base table' and table_schema ='{}'".format(
             raw_database)
     tables_data = engine.execute(table_fetch_sql)
+    print("Available tables are {tlist}".format(tlist=", ".join([x['table_name'] for x in tables_data])))
     tables = [table['table_name'] for table in tables_data if table['table_name'] in required_tables]
 
     engine.execute(
@@ -97,9 +99,12 @@ def post_upload(**kwargs):
 
 
 if __name__ == '__main__':
-    upload_current_data(**{
-            "execution_date": datetime.date(2020, 12, 1)
+    begin_database_setup(**{
+            "execution_date": datetime.date(2021, 2, 5)
             })
-    post_upload(**{
-            "execution_date": datetime.date(2020, 12, 1)
-            })
+    # upload_current_data(**{
+    #         "execution_date": datetime.date(2020, 12, 1)
+    #         })
+    # post_upload(**{
+    #         "execution_date": datetime.date(2020, 12, 1)
+    #         })

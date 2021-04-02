@@ -10,7 +10,7 @@ ARG GID=1000
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
-
+ENV PYTHONOPTIMIZE 1
 # Airflow
 ARG AIRFLOW_VERSION=1.10.1
 ARG GID=1000

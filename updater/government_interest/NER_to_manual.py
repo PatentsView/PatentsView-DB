@@ -1,16 +1,17 @@
-import pandas as pd
+import datetime
+import os
+import re
+
 import numpy as np
+import pandas as pd
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
-import re
-import os
-
 # Requires: solid matched organizations dataframe
 # Modifies: list of solid matches
 # Effects: if solid match has non_government as extra tag, removes non_government tag
 from sqlalchemy import create_engine
 
-from lib.configuration import get_connection_string
+from lib.configuration import get_connection_string, get_current_config
 from lib.utilities import better_title
 
 
@@ -153,5 +154,12 @@ def process_ner_to_manual(config):
 
     existing_lookup, govt_acc_dict, organizations = get_data(persistent_files, pre_manual)
     perform_lookups(existing_lookup, govt_acc_dict, organizations, manual_inputs)
-    engine = create_engine(get_connection_string(config, 'NEW_DB'))
+    engine = create_engine(get_connection_string(config, 'RAW_DB'))
     get_orgs(engine, manual_inputs)
+
+
+if __name__ == '__main__':
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+            })
+    process_ner_to_manual(config)

@@ -244,6 +244,8 @@ def get_current_config(type='granted_patent', supplemental_configs=None, **kwarg
     if type == 'granted_patent':
         config['FOLDERS']['granted_patent_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
                 working_folder=config['FOLDERS']['WORKING_FOLDER'])
+        config['FOLDERS']['long_text_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
+                working_folder=config['FOLDERS']['WORKING_FOLDER'])
 
     latest_thursday = get_today_dict(type='pgpubs', from_date=kwargs.get('execution_date'))
     latest_tuesday = get_today_dict(type='granted_patent', from_date=kwargs.get('execution_date'))

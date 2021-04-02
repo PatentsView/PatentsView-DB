@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 
 from updater.collect_supplemental_data.update_withdrawn import post_withdrawn, process_withdrawn
 

@@ -61,6 +61,7 @@ def load_withdrawn(update_config):
 
 
 def update_withdrawn(update_config):
+    # JOIN without index; Expected to be fast regardless
     update_query = """
 UPDATE patent p join `{temp_upload_db}`.`withdrawn_patents` twp on twp.patent_id = p.id set p.withdrawn = 1;
     """.format(temp_upload_db=update_config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])

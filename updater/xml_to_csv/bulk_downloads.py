@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 
@@ -24,15 +25,14 @@ def post_download(update_config):
 
 
 if __name__ == '__main__':
-    import configparser
-    from datetime import date, timedelta
+    from lib.configuration import get_current_config
 
-    project_home = os.environ['PACKAGE_HOME']
-    config = configparser.ConfigParser()
-    config.read(project_home + '/config.ini')
-    today = date.today()
-    offset = (today.weekday() - 1) % 7
-    latest_tuesday = today - timedelta(days=offset)
-    bulk_download(**{
-            'execution_date': latest_tuesday
+    update_config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 7, 7)
             })
+    update_config['DATES'] = {
+            "START_DATE": '20201006',
+            "END_DATE":   '20201229'
+            }
+    download_xml_files(update_config, 'granted_patent')
+

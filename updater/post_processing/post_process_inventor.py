@@ -8,17 +8,11 @@ from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
 from lib.configuration import get_config, get_connection_string
 
 
-def update_rawinventor(update_config):
-    engine = create_engine(get_connection_string(update_config, "NEW_DB"))
-    update_statement = "UPDATE rawinventor ri left join inventor_disambiguation_mapping idm on idm.uuid = ri.uuid set " \
-                       "" \
-                       "" \
-                       "" \
-                       "" \
-                       "" \
-                       "" \
-                       "" \
-                       "ri.inventor_id=idm.inventor_id "
+def update_rawinventor(update_config, database='RAW_DB', uuid_field='uuid'):
+    engine = create_engine(get_connection_string(update_config, database))
+    update_statement = "UPDATE rawinventor ri join {granted_db}.inventor_disambiguation_mapping idm on idm.uuid = ri.{uuid_field} set ri.inventor_id=idm.inventor_id ".format(
+            uuid_field=uuid_field, granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    print(update_statement)
     engine.execute(update_statement)
 
 
@@ -49,16 +43,22 @@ def generate_disambiguated_inventors(engine, limit, offset):
     """
 
     inventor_data_template = """
-    SELECT ri.inventor_id, name_first, name_last, p.date as patent_date
+    SELECT ri.inventor_id, ri.name_first, ri.name_last, p.date as patent_date
     from rawinventor ri
              join patent p on p.id = ri.patent_id
              join ({inv_core_query}) inventor on inventor.inventor_id = ri.inventor_id
-    where ri.inventor_id is not null;
+    where ri.inventor_id is not null
+    UNION 
+    SELECT ri2.inventor_id, ri2.name_first, ri2.name_last, a.date as patent_date
+    from {pregrant_db}.rawinventor ri2
+             join {pregrant_db}.application a on a.document_number = ri2.document_number
+             join ({inv_core_query}) inventor on inventor.inventor_id = ri2.inventor_id
+    where ri2.inventor_id is not null;
     """
     inventor_core_query = inventor_core_template.format(limit=limit,
                                                         offset=offset)
     inventor_data_query = inventor_data_template.format(
-            inv_core_query=inventor_core_query)
+            inv_core_query=inventor_core_query, pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'])
 
     current_inventor_data = pd.read_sql_query(sql=inventor_data_query, con=engine)
     return current_inventor_data
@@ -92,14 +92,16 @@ def inventor_reduce(inventor_data):
 
 def precache_inventors(config):
     inventor_cache_query = """
-    INSERT INTO disambiguated_inventor_ids (inventor_id)  SELECT distinct inventor_id from rawinventor;
-    """
-    engine = create_engine(get_connection_string(config, "NEW_DB"))
+    INSERT IGNORE INTO disambiguated_inventor_ids (inventor_id)  SELECT  inventor_id from {granted_db}.rawinventor UNION SELECT  inventor_id from {pregrant_db}.rawinventor;
+    """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
+               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    print(inventor_cache_query)
     engine.execute(inventor_cache_query)
 
 
 def create_inventor(update_config):
-    engine = create_engine(get_connection_string(update_config, "NEW_DB"))
+    engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     limit = 10000
     offset = 0
     while True:
@@ -127,8 +129,8 @@ def create_inventor(update_config):
         #         }, axis=1)
         step_time = time.time() - start
         canonical_assignments = inventor_reduce(current_inventor_data).rename({
-                                                                                      "inventor_id": "id"
-                                                                                      }, axis=1)
+                "inventor_id": "id"
+                }, axis=1)
         canonical_assignments.to_sql(name='inventor', con=engine,
                                      if_exists='append',
                                      index=False)
@@ -137,7 +139,7 @@ def create_inventor(update_config):
 
 
 def upload_disambig_results(update_config):
-    engine = create_engine(get_connection_string(update_config, "NEW_DB"))
+    engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     disambig_output_file = "{wkfolder}/disambig_output/{disamb_file}".format(
             wkfolder=update_config['FOLDERS']['WORKING_FOLDER'], disamb_file="inventor_disambiguation.tsv")
     disambig_output = pd.read_csv(disambig_output_file, sep="\t", chunksize=300000, header=None, quoting=csv.QUOTE_NONE,

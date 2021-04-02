@@ -91,6 +91,27 @@ def generate_index_statements(config, database_section, table):
     return add_indexes, drop_indexes
 
 
+def mp_csv_writer(write_queue, target_file, header):
+    with open(target_file, 'w', newline='') as writefile:
+        filtered_writer = csv.writer(writefile,
+                                     delimiter=',',
+                                     quotechar='"',
+                                     quoting=csv.QUOTE_NONNUMERIC)
+        filtered_writer.writerow(header)
+        while 1:
+            message_data = write_queue.get()
+            if len(message_data) != len(header):
+                # "kill" is the special message to stop listening for messages
+                if message_data[0] == 'kill':
+                    break
+                else:
+                    print(message_data)
+                    raise Exception("Header and data length don't match :{header}/{data_ln}".format(header=len(header),
+                                                                                                    data_ln=len(
+                                                                                                            message_data)))
+            filtered_writer.writerow(message_data)
+
+
 def log_writer(log_queue, log_prefix="uspto_parser"):
     '''listens for messages on the q, writes to file. '''
     home_folder = os.environ['PACKAGE_HOME']
@@ -103,7 +124,8 @@ def log_writer(log_queue, log_prefix="uspto_parser"):
     expanded_filehandler = logging.FileHandler(EXPANED_LOGFILE)
     expanded_filehandler.setLevel(logging.DEBUG)
 
-    BASIC_LOGFILE = datetime.datetime.now().strftime('{home_folder}/logs/{prefix}_log_%Y%m%d_%H%M%S.log'.format(home_folder=home_folder,prefix=log_prefix))
+    BASIC_LOGFILE = datetime.datetime.now().strftime(
+            '{home_folder}/logs/{prefix}_log_%Y%m%d_%H%M%S.log'.format(home_folder=home_folder, prefix=log_prefix))
     filehandler = logging.FileHandler(BASIC_LOGFILE)
     filehandler.setLevel(logging.INFO)
 
