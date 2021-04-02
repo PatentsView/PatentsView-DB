@@ -1,10 +1,10 @@
 import datetime
 
 import pymysql
-from sqlalchemy import create_engine
 
 from QA.text_parser.AppTest import AppUploadTest
 from lib.configuration import get_connection_string, get_current_config
+from sqlalchemy import create_engine
 
 
 def pct_data_doc_type(config):
@@ -23,25 +23,25 @@ def consolidate_uspc(config):
     engine.execute(
             "DELETE  FROM  rawuspc  WHERE  LENGTH(classification) < 3;")
     engine.execute(
-            "INSERT INTO uspc (id, document_number, mainclass_id, subclass_id, sequence, filename) SELECT id, document_number, TRIM(SUBSTRING(classification,1,3)), TRIM(CONCAT(SUBSTRING(classification,1,3), '/', TRIM(SUBSTRING(classification,4, LENGTH(classification))))), sequence, filename FROM rawuspc;")
+            "INSERT IGNORE INTO uspc (id, document_number, mainclass_id, subclass_id, sequence, filename) SELECT id, document_number, TRIM(SUBSTRING(classification,1,3)), TRIM(CONCAT(SUBSTRING(classification,1,3), '/', TRIM(SUBSTRING(classification,4, LENGTH(classification))))), sequence, filename FROM rawuspc;")
 
 
 def consolidate_rawlocation(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
-            'INSERT INTO rawlocation (id, city, state, country, filename) SELECT rawlocation_id, city, state, country, filename FROM rawassignee;')
+            'INSERT IGNORE INTO rawlocation (id, city, state, country, filename) SELECT rawlocation_id, city, state, country, filename FROM rawassignee;')
     engine.execute(
-            'INSERT INTO rawlocation (id, city, state, country, filename) SELECT rawlocation_id, city, state, country, filename FROM rawinventor;')
+            'INSERT IGNORE INTO rawlocation (id, city, state, country, filename) SELECT rawlocation_id, city, state, country, filename FROM rawinventor;')
 
 
 def consolidate_cpc(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
-            "INSERT INTO cpc (id,document_number,sequence,version,section_id,subsection_id,group_id,subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date) SELECT id,document_number,sequence,version,section as section_id,concat(section, class) as subsection_id,concat(section, class, subclass) as group_id,concat(section, class, subclass, main_group, '/', subgroup) as subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date from main_cpc;")
+            "INSERT IGNORE INTO cpc (id,document_number,sequence,version,section_id,subsection_id,group_id,subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date) SELECT id,document_number,sequence,version,section as section_id,concat(section, class) as subsection_id,concat(section, class, subclass) as group_id,concat(section, class, subclass, main_group, '/', subgroup) as subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date from main_cpc;")
     engine.execute(
-            "INSERT INTO cpc (id,document_number,sequence,version,section_id,subsection_id,group_id,subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date) SELECT id,document_number,(sequence+1),version,section as section_id,concat(section, class) as subsection_id,concat(section, class, subclass) as group_id,concat(section, class, subclass, main_group, '/', subgroup) as subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date from further_cpc;")
+            "INSERT IGNORE INTO cpc (id,document_number,sequence,version,section_id,subsection_id,group_id,subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date) SELECT id,document_number,(sequence+1),version,section as section_id,concat(section, class) as subsection_id,concat(section, class, subclass) as group_id,concat(section, class, subclass, main_group, '/', subgroup) as subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date from further_cpc;")
     engine.execute(
             "UPDATE cpc SET category = 'inventional' WHERE value = 'I';")
     engine.execute(
@@ -54,11 +54,11 @@ def consolidate_usreldoc(config):
     engine.execute(
             'DELETE FROM usreldoc_single WHERE related_doc_number IS NULL;')
     engine.execute(
-            'INSERT INTO usreldoc SELECT * FROM usreldoc_parent_child;')
+            'INSERT IGNORE INTO usreldoc SELECT * FROM usreldoc_parent_child;')
     engine.execute(
-            'INSERT INTO usreldoc SELECT * FROM usreldoc_single;')
+            'INSERT IGNORE INTO usreldoc SELECT * FROM usreldoc_single;')
     engine.execute(
-            'INSERT INTO usreldoc SELECT * FROM usreldoc_related;')
+            'INSERT IGNORE INTO usreldoc SELECT * FROM usreldoc_related;')
 
 
 def consolidate_claim(config):
@@ -97,7 +97,7 @@ def yearly_claim(config):
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
-    con = pymysql.connect(host, user, password, database)
+    con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(c.document_number, 1, 4) FROM claim c")
@@ -123,7 +123,7 @@ def yearly_brf_sum_text(config):
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
-    con = pymysql.connect(host, user, password, database)
+    con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(b.document_number, 1, 4) FROM brf_sum_text b")
@@ -148,7 +148,7 @@ def yearly_draw_desc_text(config):
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
-    con = pymysql.connect(host, user, password, database)
+    con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(d.document_number, 1, 4) FROM draw_desc_text d")
@@ -173,7 +173,7 @@ def yearly_detail_desc_text(config):
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
-    con = pymysql.connect(host, user, password, database)
+    con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
         cur.execute("SELECT DISTINCT SUBSTRING(d.document_number, 1, 4) FROM detail_desc_text d")
