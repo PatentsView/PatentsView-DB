@@ -165,9 +165,6 @@ def get_text_table_load_command(project_home, **kwargs):
 #     return " && ".join(command_strings)
 
 def get_today_dict(type='granted_patent', from_date=datetime.date.today()):
-    project_home = os.environ['PACKAGE_HOME']
-    config = configparser.ConfigParser()
-    config.read(project_home + '/config.ini')
     day_offset = 1
     if type == 'pgpubs':
         day_offset = 3
@@ -228,27 +225,29 @@ def get_current_config(type='granted_patent', supplemental_configs=None, **kwarg
     if type == 'pgpubs':
         config_prefix = 'pgpubs_'
     execution_date = kwargs['execution_date']
-    prev_week = datetime.timedelta(days=6)
-    end_date = execution_date.strftime('%Y%m%d')
-    start_date = (execution_date - prev_week).strftime('%Y%m%d')
-    temp_date = execution_date.strftime('%Y%m%d')
+    current_week_start = datetime.timedelta(days=1)
+    current_week_end = datetime.timedelta(days=7)
+    start_date = (execution_date + current_week_start)
+    end_date = (execution_date + current_week_end)
+    temp_date = end_date.strftime('%Y%m%d')
 
     config['DATES'] = {
-            "START_DATE": start_date,
-            "END_DATE":   end_date
+            "START_DATE": start_date.strftime('%Y%m%d'),
+            "END_DATE":   end_date.strftime('%Y%m%d')
             }
     prefixed_string = "{prfx}{date}".format(prfx=config_prefix, date=temp_date)
     config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"] = prefixed_string
-    config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(prefix=prefixed_string,
-                                                                        data_root=config['FOLDERS']['data_root'])
+    config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(
+            prefix=prefixed_string,
+            data_root=config['FOLDERS']['data_root'])
     if type == 'granted_patent':
         config['FOLDERS']['granted_patent_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
                 working_folder=config['FOLDERS']['WORKING_FOLDER'])
         config['FOLDERS']['long_text_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
                 working_folder=config['FOLDERS']['WORKING_FOLDER'])
 
-    latest_thursday = get_today_dict(type='pgpubs', from_date=kwargs.get('execution_date'))
-    latest_tuesday = get_today_dict(type='granted_patent', from_date=kwargs.get('execution_date'))
+    latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
+    latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
 
     config['DISAMBIGUATION']['granted_patent_database'] = "{type}{dt}".format(
             type=config['PATENTSVIEW_DATABASES']['granted_patent_upload_db'],

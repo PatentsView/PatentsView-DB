@@ -57,9 +57,9 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
                             })
 
     def top_n_generator(self, table_name=None):
-        print("\tLoading Top N Entities for {table_name} in {db}".format(table_name=self.disambiguated_table,
-                                                                         db=self.config["PATENTSVIEW_DATABASES"][
-                                                                             self.database_section]))
+        print("\tLoading Top N Entities for {table_name} in {db}".format(
+                table_name=self.disambiguated_table,
+                db=self.config["PATENTSVIEW_DATABASES"][self.database_section]))
         table_name = self.disambiguated_table
         if 'related_entities' in self.table_config[table_name]:
             related_table_configs = self.table_config[table_name]["related_entities"]
