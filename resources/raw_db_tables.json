@@ -1,0 +1,248 @@
+{
+  "table_list": {
+    "application": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "assignee": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "assignee_disambiguation_mapping": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "botanic": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "country_codes": {
+      "raw_data": false,
+      "lookup": true
+    },
+    "cpc": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "cpc_current": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "cpc_group": {
+      "raw_data": false,
+      "lookup": true
+    },
+    "cpc_subgroup": {
+      "raw_data": false,
+      "lookup": true
+    },
+    "cpc_subsection": {
+      "raw_data": false,
+      "lookup": true
+    },
+    "detail_desc_length": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "figures": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "foreign_priority": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "foreigncitation": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "government_interest": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "government_organization": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "inventor": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "inventor_disambiguation_ids": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "inventor_disambiguation_mapping": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "inventor_gender": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "ipcr": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "lawyer": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "location": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "location_assignee": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "location_disambiguation_mapping": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "location_inventor": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "mainclass": {
+      "raw_data": true,
+      "lookup": true
+    },
+    "mainclass_current": {
+      "raw_data": false,
+      "lookup": true
+    },
+    "nber": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "nber_category": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "nber_subcategory": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "non_inventor_applicant": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "otherreference": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "patent": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "patent_assignee": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "patent_contractawardnumber": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "patent_govintorg": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "patent_inventor": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "patent_lawyer": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "pct_data": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "persistent_assignee_disambig": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "persistent_assignee_disambig_long": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "persistent_inventor_disambig": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "persistent_inventor_disambig_long": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "rawassignee": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "rawexaminer": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "rawinventor": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "rawlawyer": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "rawlawyer_predisambig": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "rawlocation": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "rel_app_text": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "subclass": {
+      "raw_data": true,
+      "lookup": true
+    },
+    "subclass_current": {
+      "raw_data": false,
+      "lookup": true
+    },
+    "us_term_of_grant": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "usapplicationcitation": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "uspatentcitation": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "uspc": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "uspc_current": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "usreldoc": {
+      "raw_data": true,
+      "lookup": false
+    },
+    "wipo": {
+      "raw_data": false,
+      "lookup": false
+    },
+    "wipo_field": {
+      "raw_data": false,
+      "lookup": false
+    }
+  }
+}

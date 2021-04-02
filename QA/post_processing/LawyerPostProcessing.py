@@ -1,16 +1,16 @@
 import datetime
 
 from QA.post_processing.DisambiguationTester import DisambiguationTester
-from lib.configuration import get_config
+from lib.configuration import get_current_config
 
 
 class LawyerPostProcessingQC(DisambiguationTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-        super().__init__(config, 'NEW_DB', datetime.date(year=1976, month=1, day=1), end_date)
+        super().__init__(config, 'RAW_DB', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
-                'rawlawyer':     {
-                        'fields': {
+                'rawlawyer':        {
+                        'fields':           {
                                 'name_last':    {
                                         'data_type':    'varchar',
                                         'null_allowed': True,
@@ -53,7 +53,7 @@ class LawyerPostProcessingQC(DisambiguationTester):
                                         }
                                 }
                         },
-                'lawyer':        {
+                'lawyer':           {
                         "fields":           {
                                 "id":           {
                                         "data_type":    "varchar",
@@ -85,9 +85,13 @@ class LawyerPostProcessingQC(DisambiguationTester):
                                 'table':          'patent_lawyer',
                                 'source_id':      'id',
                                 'destination_id': 'lawyer_id'
+                                },{
+                                'table':          'rawlawyer',
+                                'source_id':      'id',
+                                'destination_id': 'lawyer_id'
                                 }]
                         },
-                'patent_lawyer': {
+                'patent_lawyer':    {
                         "fields": {
                                 "patent_id": {
                                         "data_type":    "varchar",
@@ -100,7 +104,12 @@ class LawyerPostProcessingQC(DisambiguationTester):
                                         "category":     False
                                         }
                                 }
-                        }
+                        },
+                "related_entities": [{
+                        'table':          'lawyer',
+                        'source_id':      'lawyer_id',
+                        'destination_id': 'id'
+                        }]
                 }
 
         self.entity_table = 'rawlawyer'
@@ -112,6 +121,9 @@ class LawyerPostProcessingQC(DisambiguationTester):
 
 
 if __name__ == '__main__':
-    config = get_config()
+    config = get_current_config('granted_patent', **{
+                    "execution_date": datetime.date(2020, 12, 31)
+                                })
+    print({section: dict(config[section]) for section in config.sections()})
     qc = LawyerPostProcessingQC(config)
     qc.runTests()

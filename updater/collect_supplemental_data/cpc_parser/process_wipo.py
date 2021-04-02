@@ -1,10 +1,11 @@
+import datetime
 import os
 import time
 
 import pandas as pd
 from sqlalchemy import create_engine
 
-from lib.configuration import get_config, get_connection_string
+from lib.configuration import get_config, get_connection_string, get_current_config
 
 
 def get_ipc_tech_code_field_map(ipc_tech_file):
@@ -17,8 +18,8 @@ def get_ipc_tech_code_field_map(ipc_tech_file):
     ipc_tech_map_frame = cleaned_ipc_tech_data[[
             "IPC_Code_stripped", "Field_number"
             ]].rename({
-                              "IPC_Code_stripped": "IPC_Code"
-                              }, axis=1)
+            "IPC_Code_stripped": "IPC_Code"
+            }, axis=1)
     # Convert to lookup dict
     #     ipc_code_to_field_map = ipc_tech_map_frame.set_index(
     #         'IPC_Code').to_dict()["Field_number"]
@@ -63,7 +64,9 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
             right=ipc_tech_map,
             how='left',
             left_on='section',
-            right_on='IPC_Code').drop('IPC_Code',axis=1).rename({"Field_number": "field_id"},axis=1)
+            right_on='IPC_Code').drop('IPC_Code', axis=1).rename({
+            "Field_number": "field_id"
+            }, axis=1)
     # For failed lookups use "group" field
     secondary_lookup = cpc_current_with_wito_merge_1.merge(
             right=ipc_tech_map,
@@ -87,10 +90,11 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
     wipo_count = wipo_count.reset_index()
     # Retain Top 3 most frequent Wipo field IDs
     wipo_filtered_data = wipo_count.groupby("patent_id").apply(
-        lambda _df: _df.nlargest(3, 'wipo_count', keep='all')).reset_index(drop=True)
+            lambda _df: _df.nlargest(3, 'wipo_count', keep='all')).reset_index(drop=True)
     # Assign Sequence
     wipo_filtered_data_sequenced = wipo_filtered_data.drop(["wipo_count"], axis=1).assign(
             sequence=wipo_filtered_data.groupby(['patent_id']).cumcount())
+    wipo_filtered_data_sequenced = wipo_filtered_data_sequenced.assign(version_indicator=config['DATES']['END_DATE'])
     cstr = get_connection_string(config, "TEMP_UPLOAD_DB")
     print(cstr)
     engine = create_engine(cstr)
@@ -103,14 +107,20 @@ def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordan
 
 
 def consolidate_wipo(config):
-    engine = create_engine(get_connection_string(config, "NEW_DB"))
-    insert_query = "INSERT IGNORE INTO wipo SELECT * from {temp_db}.wipo".format(
-            temp_db=config["DATABASE"]["TEMP_UPLOAD_DB"])
-    engine.execute(insert_query)
+    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    upsert_query = """
+INSERT INTO wipo (patent_id, field_id, sequence, version_indicator) SELECT patent_id, field_id, sequence, version_indicator from {temp_db}.wipo ON DUPLICATE KEY UPDATE patent_id = VALUES(patent_id),
+                        field_id = VALUES(field_id),
+                        `sequence` = VALUES(`sequence`),
+                        version_indicator = VALUES(version_indicator);
+""".format(
+            temp_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
+    engine.execute(upsert_query)
 
 
-def process_and_upload_wipo(config):
-    myengine = create_engine(get_connection_string(config, "NEW_DB"))
+def process_and_upload_wipo(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
+    myengine = create_engine(get_connection_string(config, "RAW_DB"))
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                  'wipo_output')
     if not os.path.exists(wipo_output):
@@ -128,8 +138,7 @@ def process_and_upload_wipo(config):
     offset = 0
     batch_counter = 0
     base_query_template = "SELECT id from patent order by id limit {limit} offset {offset}"
-    cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = " \
-                         "c.patent_id"
+    cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = c.patent_id"
     while True:
         start = time.time()
         batch_counter += 1
@@ -146,5 +155,6 @@ def process_and_upload_wipo(config):
 
 
 if __name__ == '__main__':
-    config = get_config()
-    process_and_upload_wipo(config)
+    process_and_upload_wipo(**{
+            "execution_date": datetime.date(2020, 12,29)
+            })

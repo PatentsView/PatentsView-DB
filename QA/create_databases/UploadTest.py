@@ -1,7 +1,7 @@
 import datetime
 
 from QA.PatentDatabaseTester import PatentDatabaseTester
-
+from lib.configuration import get_current_config
 
 class UploadTest(PatentDatabaseTester):
     def __init__(self, config):
@@ -362,7 +362,7 @@ class UploadTest(PatentDatabaseTester):
                                 'state':                   {
                                         'data_type':    'varchar',
                                         'null_allowed': True,
-                                        'category':     False
+                                        'category':     True
                                         },
                                 'country':                 {
                                         'data_type': 'varchar', 'null_allowed': True,
@@ -510,9 +510,20 @@ class UploadTest(PatentDatabaseTester):
                 raise Exception(
                         "NULLs (Non-design patents) encountered in table found:{database}.{table} column abstract. "
                         "Count: {count}".format(
-                                database=self.config['DATABASE'][self.database_section], table=table,
+                                database=self.config['PATENTSVIEW_DATABASES'][self.database_section], table=table,
                                 count=count_value))
 
     def runTests(self):
         self.test_patent_abstract_null(table='patent')
         super(UploadTest, self).runTests()
+
+
+if __name__ == '__main__':
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+    })
+
+    test_obj = UploadTest(config)
+
+    test_obj.runTests()
+

@@ -1,9 +1,8 @@
 import datetime
 import json
 import os
-
 from QA.PatentDatabaseTester import PatentDatabaseTester
-from lib.configuration import get_config
+from lib.configuration import get_current_config
 
 
 class MergeTest(PatentDatabaseTester):
@@ -12,9 +11,9 @@ class MergeTest(PatentDatabaseTester):
         self.test_merge_status()
         super(MergeTest, self).runTests()
 
-    def __init__(self, config):
+    def __init__(self, config, run_id):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-        super().__init__(config, 'NEW_DB', datetime.date(year=1976, month=1, day=1), end_date)
+        super().__init__(config, 'RAW_DB', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
                 'application':            {
                         'fields': {
@@ -303,20 +302,20 @@ class MergeTest(PatentDatabaseTester):
                                         }
                                 }
                         },
-                'mainclass_current':      {
-                        'fields': {
-                                'id':    {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                'title': {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        }
-                                }
-                        },
+                # 'mainclass_current':      {
+                #         'fields': {
+                #                 'id':    {
+                #                         'data_type':    'varchar',
+                #                         'null_allowed': False,
+                #                         'category':     False
+                #                         },
+                #                 'title': {
+                #                         'data_type':    'varchar',
+                #                         'null_allowed': False,
+                #                         'category':     False
+                #                         }
+                #                 }
+                #         },
                 'non_inventor_applicant': {
                         'fields': {
                                 'fname':          {
@@ -708,7 +707,7 @@ class MergeTest(PatentDatabaseTester):
                                 'state':                   {
                                         'data_type':    'varchar',
                                         'null_allowed': True,
-                                        'category':     False
+                                        'category':     True
                                         },
                                 'country':                 {
                                         'data_type':    'varchar',
@@ -750,20 +749,20 @@ class MergeTest(PatentDatabaseTester):
                                         }
                                 }
                         },
-                'subclass_current':       {
-                        'fields': {
-                                'id':    {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                'title': {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        }
-                                }
-                        },
+                # 'subclass_current':       {
+                #         'fields': {
+                #                 'id':    {
+                #                         'data_type':    'varchar',
+                #                         'null_allowed': False,
+                #                         'category':     False
+                #                         },
+                #                 'title': {
+                #                         'data_type':    'varchar',
+                #                         'null_allowed': False,
+                #                         'category':     False
+                #                         }
+                #                 }
+                #         },
                 'usapplicationcitation':  {
                         'fields': {
                                 'name':                       {
@@ -1007,13 +1006,16 @@ class MergeTest(PatentDatabaseTester):
 
         self.config = config
         self.project_home = os.environ['PACKAGE_HOME']
+        self.run_id = run_id
 
     def test_merge_status(self):
-        status_folder = '{}/{}/{}'.format(self.project_home, "updater", 'create_databases')
-        status_file = '{}/{}'.format(status_folder, 'merge_status.json')
+        status_folder = os.path.join(self.project_home, "updater", 'create_databases')
+        status_file = os.path.join(status_folder, 'merge_status.json')
         current_status = json.load(open(status_file))
-        if sum(current_status.values()) < len(self.table_config):
-            raise Exception("Some tables were not loaded")
+        current_run_status = current_status[str(self.run_id)]
+        if sum(current_run_status.values()) < len(self.table_config):
+            raise Exception("Some tables were not loaded {lst}".format(
+                    lst=set(self.table_config.keys()).difference(current_run_status.keys())))
 
     def test_patent_abstract_null(self, table):
         if not self.connection.open:
@@ -1032,5 +1034,18 @@ class MergeTest(PatentDatabaseTester):
 
 
 if __name__ == '__main__':
-    config = get_config()
-    mc = MergeTest(config)
+    #config = get_config()
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+    })
+
+    # fill with correct run_id
+    run_id = "backfill__2020-12-29T00:00:00+00:00"
+
+    mc = MergeTest(config,run_id)
+
+    mc.runTests()
+
+
+
+

@@ -23,11 +23,11 @@ def parse_and_write_cpc(inputdir, config):
             df['category'] = None
             df['category'] = np.select([df['value'] == 'I',df['value'] == 'A'],['inventional','additional'],df['category'])
 
-            database = '{}'.format(config['DATABASE']['TEMP_DATABASE'])
-            host = '{}'.format(config['DATABASE']['HOST'])
-            user = '{}'.format(config['DATABASE']['USERNAME'])
-            password = '{}'.format(config['DATABASE']['PASSWORD'])
-            port = '{}'.format(config['DATABASE']['PORT'])
+            database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+            host = '{}'.format(config['DATABASE_SETUP']['HOST'])
+            user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
+            password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
+            port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
             engine = create_engine(
                     'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))

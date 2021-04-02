@@ -2000,6 +2000,7 @@ DELIMITER ;
 CREATE TABLE `rawassignee` (
   `id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `document_number` bigint(16) NOT NULL,
+`assignee_id` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `name_first` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name_last` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -2035,6 +2036,7 @@ DELIMITER ;
 CREATE TABLE `rawinventor` (
   `id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `document_number` bigint(16) NOT NULL,
+  `inventor_id` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name_first` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name_last` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
@@ -2069,6 +2071,7 @@ DELIMITER ;
 
 CREATE TABLE `rawlocation` (
   `id` varchar(512) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `location_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `city` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `state` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `country` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -2079,11 +2082,6 @@ CREATE TABLE `rawlocation` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TRIGGER before_insert_rawlocation BEFORE INSERT
-ON rawlocation
-FOR EACH row
-  SET new.id = uuid();
 
 
 
@@ -2136,6 +2134,7 @@ CREATE TABLE `us_parties` (
   `document_number` bigint(16) NOT NULL,
   `name_first` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name_last` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `organization` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `type` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `designation` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,

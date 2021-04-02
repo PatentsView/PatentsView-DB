@@ -153,7 +153,7 @@ select timl.`new_location_id`,
        timlt.`old_location_id_transformed`
 from `{{params.raw_database}}`.`location` l
          inner join `{{params.reporting_database}}`.`temp_id_mapping_location` timl on timl.`old_location_id` = l.`id`
-         left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` timlt
+          inner join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` timlt
                          on timlt.`new_location_id` = timl.`new_location_id`
          left outer join `{{params.reporting_database}}`.`temp_location_num_assignees` tlna
                          on tlna.`location_id` = timl.`new_location_id`

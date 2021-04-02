@@ -1,4 +1,5 @@
 import ast
+import datetime
 import os
 import csv
 import pandas as pd
@@ -7,7 +8,7 @@ import codecs
 
 from sqlalchemy import create_engine
 
-from lib.configuration import get_connection_string, get_config
+from lib.configuration import get_connection_string, get_config, get_current_config
 
 
 def upload_new_orgs(post_manual, engine):
@@ -121,7 +122,7 @@ def readOrgs(db_cursor):
 
 def push_orgs(looked_up_data, org_id_mapping, config):
     missed = {}
-    engine = create_engine(get_connection_string(config, 'NEW_DB'))
+    engine = create_engine(get_connection_string(config, 'TEMP_UPLOAD_DB'))
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     engine.execute('set foreign_key_checks=0')
     for idx, row in looked_up_data.iterrows():
@@ -163,7 +164,7 @@ def process_post_manual(config):
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
-    engine = create_engine(get_connection_string(config, 'NEW_DB'))
+    engine = create_engine(get_connection_string(config, 'TEMP_UPLOAD_DB'))
 
     # upload the new government organization we manually identified
     upload_new_orgs(post_manual, engine)
@@ -181,6 +182,9 @@ def process_post_manual(config):
     # push the mappings into the db
     push_orgs(looked_up, org_id_mapping, config)
 
-if __name__ =='__main__':
-    config=get_config()
+
+if __name__ == '__main__':
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+            })
     process_post_manual(config)

@@ -1,21 +1,21 @@
-import os
-import re
 import csv
-from lxml import etree
-import pandas as pd
 import json
-import time
 import logging
-from datetime import datetime
-import pprint
-from sqlalchemy import create_engine
 import multiprocessing as mp
+import os
+import pprint
+import re
+import time
+from datetime import date, datetime
+from queue import Queue
 
-from lib.configuration import get_config
-from lib.utilities import log_writer
+import pandas as pd
+from lxml import etree
+from sqlalchemy import create_engine
 
+from lib.configuration import get_current_config
 from lib.utilities import download_xml_files
-from lib.configuration import update_config_date
+from lib.utilities import log_writer
 
 newline_tags = ["p", "heading", "br"]
 
@@ -207,9 +207,13 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
     # List for data in this field, initialize with document number
     doc_number_field = foreign_key_config["field_name"]
     try:
-        data_list = {doc_number_field: int(doc_number)}
+        data_list = {
+                doc_number_field: int(doc_number)
+                }
     except ValueError:
-        data_list = {doc_number_field: doc_number}
+        data_list = {
+                doc_number_field: doc_number
+                }
     # Loop through all the fields in the table from the input
     for field in tab['fields']:
         if field["field_name"] not in data_list or data_list[field["field_name"]] is None:
@@ -254,7 +258,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                         multi_value_list.append(extracted_data)
                     if not all([True if x is None else False for x in multi_value_list]):
                         data_list[field["field_name"]] = ", ".join(
-                            [x if x is not None else '' for x in multi_value_list])
+                                [x if x is not None else '' for x in multi_value_list])
                     else:
                         data_list[field["field_name"]] = None  # Return the extracted data
                     if tab['table_name'] == 'usreldoc_single' and field_element.tag == 'related-publication':
@@ -282,7 +286,8 @@ def process_publication_document(patent_app_document, patent_config):
         # If this table has only one value per field extract its data and add to the list
         if table['multi_valued'] == False:
             table_rows.append(
-                extract_table_data(table, patent_app_document, document_number, 0, patent_config['foreign_key_config']))
+                    extract_table_data(table, patent_app_document, document_number, 0,
+                                       patent_config['foreign_key_config']))
         # If this table can have multiple values (i.e. multiple inventors per document) loop through these elements to get the data
         else:
             # This is the start of the path from which the multiple values will exists
@@ -305,43 +310,64 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
     :param config: credentials to connect to database
     """
     sql_start = time.time()
-    database = '{}'.format(config['DATABASE']['TEMP_DATABASE'])
-    host = '{}'.format(config['DATABASE']['HOST'])
-    user = '{}'.format(config['DATABASE']['USERNAME'])
-    password = '{}'.format(config['DATABASE']['PASSWORD'])
-    port = '{}'.format(config['DATABASE']['PORT'])
+    database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+    host = '{}'.format(config['DATABASE_SETUP']['HOST'])
+    user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
+    password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
+    port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
     text_output_folder = config['FOLDERS']['TEXT_OUTPUT_FOLDER']
     engine = create_engine(
-        'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
+            'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
     for df in dfs:
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
-        dfs[df]['filename'] = xml_file_name
+        dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         try:
             dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
         except Exception as e:
-            log_queue.put({"level": logging.ERROR,
-                           "message": "{xml_file}: Error when writing to database : {error}".format(
-                               xml_file=xml_file_name,
-                               error=pprint.pformat(
-                                   e))})
+            log_queue.put({
+                    "level":   logging.ERROR,
+                    "message": "{xml_file}: Error when writing to database : {error}".format(
+                            xml_file=xml_file_name,
+                            error=pprint.pformat(
+                                    e))
+                    })
 
             dfs[df].to_csv(
-                "{folder}/{xml_file}_{entity}.csv".format(folder=text_output_folder, xml_file=xml_file_name,
-                                                          entity=df), sep=",",
-                quotechar='"', quoting=csv.QUOTE_NONNUMERIC, index=False)
+                    "{folder}/{xml_file}_{entity}.csv".format(folder=text_output_folder, xml_file=xml_file_name,
+                                                              entity=df), sep=",",
+                    quotechar='"', quoting=csv.QUOTE_NONNUMERIC, index=False)
             raise e
-    log_queue.put({"level": logging.INFO,
-                   "message": "XML Document {xml_file} took {duration} seconds to load to SQL".format(
-                       xml_file=xml_file_name,
+    log_queue.put({
+            "level":   logging.INFO,
+            "message": "XML Document {xml_file} took {duration} seconds to load to SQL".format(
+                    xml_file=xml_file_name,
 
-                       duration=time.time() - sql_start)})
+                    duration=time.time() - sql_start)
+            })
 
 
-def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue):
+def extract_document(xml_file):
+    xml_marker = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    current_document_lines = []
+    with open(xml_file, "r") as freader:
+        # Loop through all the lines in the file
+        for line in freader:
+            # Determine the start of a new document
+            if line == xml_marker:
+                # Join all lines for a given document
+                current_xml = "".join(current_document_lines)
+                yield current_xml
+                current_document_lines = []
+            current_document_lines.append(line)
+        current_xml = "".join(current_document_lines)
+        yield current_xml
+
+
+def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, unlink=False):
     """
     Parse all data from a single XML file into dataframe for each table
     :param xml_file: XML file with pgpubs data
@@ -352,10 +378,17 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue):
     debug = False
     if config["DEBUG"]["debug"] == "1":
         debug = True
-    stats = {"total_documents": 0, "successful_documents": -1, "total_file_time": 0, "average_time_per_document": 0}
+    stats = {
+            "total_documents":           0,
+            "successful_documents":      -1,
+            "total_file_time":           0,
+            "average_time_per_document": 0
+            }
     xml_marker = '<?xml version="1.0" encoding="UTF-8"?>\n'
-    log_queue.put({"level": logging.INFO,
-                   "message": "{xml_file}: Init: Creating empty data frames".format(xml_file=xml_file_name)})
+    log_queue.put({
+            "level":   logging.INFO,
+            "message": "{xml_file}: Init: Creating empty data frames".format(xml_file=xml_file_name)
+            })
     xml_file_start = time.time()
     # Generate the list of headers and use them to create dataframes for each table
     header_list = generate_headers(table_xml_map)
@@ -363,7 +396,10 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue):
     # Set the dtd
     dtd = etree.DTD(open(dtd_file))
 
-    log_queue.put({"level": logging.INFO, "message": "{xml_file}: Begin XML Processing".format(xml_file=xml_file_name)})
+    log_queue.put({
+            "level":   logging.INFO,
+            "message": "{xml_file}: Begin XML Processing".format(xml_file=xml_file_name)
+            })
     # Counter to show progress
     counter = 0
     error = 0
@@ -375,80 +411,63 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue):
     xml_doc_start = time.time()
     fsize = len(open(xml_file).readlines())
     # Open the given xml_file
-    with open(xml_file, "r") as freader:
-        # Loop through all the lines in the file
-        for line in freader:
-            num_lines += 1
-            if num_lines == (fsize):
-                current_document_lines.append(line)
-                end = True
-            # Determine the start of a new document
-            if line == xml_marker or end == True:
-                # Join all lines for a given document
-                current_xml = "".join(current_document_lines)
-                if len(current_document_lines) > 0:
-                    counter += 1
-                    if debug and counter > 500:
-                        break
-                    # Create an etree element for the current document
-                    parser = etree.XMLParser(load_dtd=True, no_network=False)
-                    patent_app_document = etree.XML(current_xml.encode('utf-8'), parser=parser)
-                    if patent_app_document.tag == 'sequence-cwu':
-                        current_document_lines = []
-                        continue
-                    else:
-                        # Extract the data fields
-                        data = process_publication_document(patent_app_document, table_xml_map)
-                        # Add the data to the proper dataframe
-                        try:
-                            for table_name, extracted_data in data:
-                                if len(table_name) > 0:
-                                    current_data_frame = pd.DataFrame.from_dict(extracted_data)
-                                    dfs[table_name] = dfs[table_name].append(current_data_frame)
-                                else:
-                                    continue
-                        except IndexError as e:
-                            log_queue.put(
-                                {"level": logging.DEBUG,
-                                 "message": "{xml_file}: {document}".format(xml_file=xml_file_name,
-                                                                            document=pprint.pformat(
-                                                                                patent_app_document.getchildren()))})
-                            current_document_lines = []
+    for current_xml in extract_document(xml_file):
+        if len(current_xml) > 0:
+            counter += 1
+            if debug and counter > 500:
+                break
+            # Create an etree element for the current document
+            parser = etree.XMLParser(load_dtd=True, no_network=False)
+            patent_app_document = etree.XML(current_xml.encode('utf-8'), parser=parser)
+            if patent_app_document.tag == 'sequence-cwu':
+                continue
+            else:
+                # Extract the data fields
+                data = process_publication_document(patent_app_document, table_xml_map)
+                # Add the data to the proper dataframe
+                try:
+                    for table_name, extracted_data in data:
+                        if len(table_name) > 0:
+                            current_data_frame = pd.DataFrame(extracted_data)
+                            dfs[table_name] = dfs[table_name].append(current_data_frame)
+                        else:
                             continue
-
-                log_queue.put({"level": logging.DEBUG,
-                               "message": "{xml_file}: Document number {counter} took {duration} seconds to parse.".format(
-                                   xml_file=xml_file_name, counter=counter,
-                                   duration=round(
-                                       time.time() - xml_doc_start,
-                                       3))})
-
-                # Reset variables for next document
-                current_document_lines = []
-                xml_doc_start = time.time()
-
-            # Append current line to current document's list of lines
-            current_document_lines.append(line)
-        log_queue.put({"level": logging.INFO,
-                       "message": "XML Document {xml_file} took {duration} seconds to parse".format(xml_file=xml_file_name,
-                                                                                                    duration=time.time() - parse_start)})
+                except IndexError as e:
+                    log_queue.put(
+                            {
+                                    "level":   logging.DEBUG,
+                                    "message": "{xml_file}: {document}".format(xml_file=xml_file_name,
+                                                                               document=pprint.pformat(
+                                                                                       patent_app_document.getchildren()))
+                                    })
+    log_queue.put({
+            "level":   logging.INFO,
+            "message": "XML Document {xml_file} took {duration} seconds to parse".format(
+                    xml_file=xml_file_name,
+                    duration=time.time() - parse_start)
+            })
     # Load the generated data frames to database
     load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map["foreign_key_config"])
 
     xml_file_duration = round(
-        time.time() - xml_file_start, 3)
-    log_queue.put({"level": logging.INFO,
-                   "message": "XML Document {xml_file} took {duration} seconds to process.".format(xml_file=xml_file_name,
-                                                                                                   duration=xml_file_duration)})
+            time.time() - xml_file_start, 3)
+    log_queue.put({
+            "level":   logging.INFO,
+            "message": "XML Document {xml_file} took {duration} seconds to process.".format(
+                    xml_file=xml_file_name,
+                    duration=xml_file_duration)
+            })
     stats["total_documents"] = counter
     stats["successful_documents"] = counter - error
     stats["total_file_time"] = xml_file_duration
     stats["average_time_per_document"] = (xml_file_duration * 1.0) / (counter - error)
     log_queue.put(
-        {"level": logging.DEBUG,
-         "message": "{xml_file}: {stats}".format(xml_file=xml_file_name, stats=pprint.pformat(stats))})
-
-    delete_xml_file(xml_file)
+            {
+                    "level":   logging.DEBUG,
+                    "message": "{xml_file}: {stats}".format(xml_file=xml_file_name, stats=pprint.pformat(stats))
+                    })
+    if unlink:
+        delete_xml_file(xml_file)
 
 
 def chunks(l, n):
@@ -463,8 +482,9 @@ def chunks(l, n):
         yield l[i:i + n]
 
 
-def get_filenames_to_parse(config):
-    xml_directory = '{}'.format(config['FOLDERS']['BULK_XML_LOCATION'])
+def get_filenames_to_parse(config, type='granted_patent'):
+    xml_directory_setting = "{prefix}_bulk_xml_location".format(prefix=type)
+    xml_directory = config['FOLDERS'][xml_directory_setting]
 
     xml_files = []
     start_date_string = '{}'.format(config['DATES']['START_DATE'])
@@ -488,65 +508,86 @@ def get_filenames_to_parse(config):
     return xml_files
 
 
-def queue_parsers(config):
+def queue_parsers(config, type='granted_patent'):
     """
     Multiprocessing call of the parse_publication_xml function
     :param config: config file
     """
-    # must use Manager queue here, or will not work
-    parallelism = int(config["PARALLELISM"]["parallelism"])
-    manager = mp.Manager()
-    log_queue = manager.Queue()
-
-    dtd_file = '{}'.format(config['FILES']['DTD_FILE'])
-    parsing_config_file = config["FILES"]["parsing_config_file"]
+    parsing_file_setting = "{prefix}_parsing_config_file".format(prefix=type)
+    dtd_file_setting = "{prefix}_dtd_file".format(prefix=type)
+    dtd_file = '{}'.format(config['XML_PARSING'][dtd_file_setting])
+    parsing_config_file = config["XML_PARSING"][parsing_file_setting]
     parsing_config = json.load(open(parsing_config_file))
-    xml_files = get_filenames_to_parse(config)
+    xml_files = get_filenames_to_parse(config, type=type)
     parser_start = time.time()
-    pool = mp.Pool(parallelism)
-    watcher = pool.apply_async(log_writer, (log_queue,))
+
+    parallelism = int(config["PARALLELISM"]["parallelism"])
+
+    pool = None
+    watcher = None
+    if parallelism > 1:
+        # must use Manager queue here, or will not work
+        manager = mp.Manager()
+        log_queue = manager.Queue()
+        pool = mp.Pool(parallelism)
+        watcher = pool.apply_async(log_writer, (log_queue,))
+    else:
+        log_queue = Queue()
     p_list = []
     for file_name in xml_files:
-        # parse_publication_xml(file, dtd_file, parsing_config, config)
+        log_queue.put({
+                "level":   logging.INFO,
+                "message": "Starting parsing of {xml_file} using {parsing_config}; Validated by {validator}".format(
+                        xml_file=file_name,
+                        parsing_config=parsing_config_file,
+                        validator=dtd_file)
+                })
         # break
-        log_queue.put({"level": logging.INFO,
-                       "message": "Starting parsing of {xml_file} using {parsing_config}; Validated by {validator}".format(
-                           xml_file=file_name,
-                           parsing_config=parsing_config_file,
-                           validator=dtd_file)})
-        p = pool.apply_async(parse_publication_xml, (file_name, dtd_file, parsing_config, config, log_queue))
-        p_list.append(p)
-    idx_counter = 0
-    for t in p_list:
-        # try:
-        t.get()
+        if parallelism > 1:
+            p = pool.apply_async(parse_publication_xml, (file_name, dtd_file, parsing_config, config, log_queue))
+            p_list.append(p)
+        else:
+            parse_publication_xml(file_name, dtd_file, parsing_config, config, log_queue)
+    if parallelism > 1:
+        idx_counter = 0
+        for t in p_list:
+            # try:
+            t.get()
 
-        # except Exception as e:
-        #     log_queue.put({"level": logging.INFO,
-        #                    "message": "{xml_file}: Error during parsing {error}".format(
-        #                        xml_file=file_name,
-        #                        error=pprint.pformat(e))})
-        idx_counter += 1
+            # except Exception as e:
+            #     log_queue.put({"level": logging.INFO,
+            #                    "message": "{xml_file}: Error during parsing {error}".format(
+            #                        xml_file=file_name,
+            #                        error=pprint.pformat(e))})
+            idx_counter += 1
+    log_queue.put({
+            "level":   logging.INFO,
+            "message": "Total parsing time {parser_duration}".format(
+                    parser_duration=round(time.time() - parser_start, 3))
+            })
+    log_queue.put({
+            "level":   None,
+            "message": "kill"
+            })
+    if parallelism > 1:
+        watcher.get()
+        pool.close()
+        pool.join()
+    else:
+        log_writer(log_queue)
 
-    log_queue.put({"level": logging.INFO,
-                   "message": "Total parsing time {parser_duration}".format(
-                       parser_duration=round(time.time() - parser_start, 3))})
-    log_queue.put({"level": None, "message": "kill"})
-    watcher.get()
-    pool.close()
-    pool.join()
 
 def delete_xml_file(filename):
     os.remove(filename)
 
 
 def begin_parsing(**kwargs):
-    config = update_config_date(**kwargs)
+    config = get_current_config(type='pgpubs', **kwargs)
     download_xml_files(config)
-    queue_parsers(config)
+    queue_parsers(config, 'pgpubs')
 
 
 if __name__ == "__main__":
-    config = get_config('application')
-    download_xml_files(config)
-    queue_parsers(config)
+    begin_parsing(**{
+            "execution_date": date(2020, 12, 17)
+            })

@@ -1,4 +1,3 @@
-import configparser
 import datetime
 import json
 import os
@@ -8,37 +7,55 @@ from sqlalchemy import create_engine
 
 from QA.create_databases.MergeTest import MergeTest
 from QA.create_databases.TextTest import TextMergeTest
-from lib.configuration import get_connection_string, get_config
+from lib.configuration import get_connection_string, get_current_config, get_lookup_tables, get_upload_tables_dict
 
 
-def get_merge_status(status_folder):
+def get_merge_status(status_folder, run_id):
     if not os.path.exists(status_folder):
         os.makedirs(status_folder)
     status_file = '{}/{}'.format(status_folder, 'merge_status.json')
     try:
         current_status = json.load(open(status_file))
+        current_run_status = current_status[str(run_id)]
     except OSError as e:
         print(e)
-        current_status = {}
-    return current_status
+        current_run_status = {}
+    except KeyError as e:
+        print(e)
+        current_run_status = {}
+    return current_run_status
 
 
-def save_merge_status(status_folder, status):
+def save_merge_status(status_folder, status, run_id):
     status_file = '{}/{}'.format(status_folder, 'merge_status.json')
-    json.dump(status, open(status_file, "w"))
+    saved_status = get_merge_status(status_folder, run_id)
+    saved_status[run_id] = status
+    json.dump(saved_status, open(status_file, "w"))
 
 
-def update_table_data(table_name, config):
-    connection_string = get_connection_string(config, "NEW_DB")
-    upload_db = config["DATABASE"]["TEMP_UPLOAD_DB"]
-    new_db = config["DATABASE"]["NEW_DB"]
+def update_table_data(table_name, config, lookup=False):
+    insert_clause = "INSERT"
+    if lookup:
+        insert_clause = "INSERT IGNORE"
+    connection_string = get_connection_string(config, "RAW_DB")
+    upload_db = config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
+    raw_db = config["PATENTSVIEW_DATABASES"]["RAW_DB"]
     engine = create_engine(connection_string)
     order_by_cursor = engine.execute(
-        "SELECT GROUP_CONCAT(s.COLUMN_NAME SEPARATOR ', ' ) from information_schema.tables t left join information_schema.statistics s on t.TABLE_NAME=s.TABLE_NAME where INDEX_NAME='PRIMARY' and t.TABLE_SCHEMA=s.TABLE_SCHEMA and t.TABLE_SCHEMA ='" + upload_db + "' and s.TABLE_NAME ='" + table_name + "' GROUP BY t.TABLE_NAME;")
+            "SELECT GROUP_CONCAT(s.COLUMN_NAME SEPARATOR ', ' ) from information_schema.tables t left join information_schema.statistics s on t.TABLE_NAME=s.TABLE_NAME where INDEX_NAME='PRIMARY' and t.TABLE_SCHEMA=s.TABLE_SCHEMA and t.TABLE_SCHEMA ='" + upload_db + "' and s.TABLE_NAME ='" + table_name + "' GROUP BY t.TABLE_NAME;")
     if table_name == 'mainclass' or table_name == 'subclass':
         order_by_clause = ''
     else:
-        order_by_clause = order_by_cursor.fetchall()[0][0]
+        order_by_clause = "ORDER BY {order_field}".format(order_field=order_by_cursor.fetchall()[0][0])
+    field_list_cursor = engine.execute(
+            """
+SELECT CONCAT('`', GROUP_CONCAT(COLUMN_NAME SEPARATOR '`, `'), '`')
+from information_schema.COLUMNS c
+where c.TABLE_SCHEMA = '{database}'
+  and c.TABLE_NAME = '{table}'
+  and COLUMN_NAME not in ('created_date', 'updated_date')            
+            """.format(database=upload_db, table=table_name))
+    field_list = field_list_cursor.fetchall()[0][0]
     table_data_count = engine.execute("SELEcT count(1) from " + upload_db + "." + table_name).fetchall()[0][0]
     with engine.begin() as connection:
         limit = 50000
@@ -49,13 +66,15 @@ def update_table_data(table_name, config):
             print('Next iteration...')
 
             # order by with primary key column - this has no nulls
-            insert_table_command_template = "INSERT INTO {0}.{2} SELECT * FROM {1}.{2} ORDER BY " + order_by_clause + " limit {3} offset {4}"
-            if table_name == "mainclass" or table_name == "subclass":
-                insert_table_command_template = "INSERT IGNORE INTO {0}.{2} SELECT * FROM {1}.{2} limit {3} offset {4}"
-
-            insert_table_command = insert_table_command_template.format(
-                new_db, upload_db, table_name, limit,
-                offset)
+            insert_table_command = """
+{insert_clause} INTO {raw_database}.{table_name} ({field_list})
+SELECT {field_list}
+FROM {upload_database}.{table_name}
+{order_clause}
+limit {limit} offset {offset}
+            """.format(insert_clause=insert_clause, raw_database=raw_db, table_name=table_name, field_list=field_list,
+                       upload_database=upload_db,
+                       order_clause=order_by_clause, limit=limit, offset=offset)
             print(insert_table_command, flush=True)
             start = time.time()
 
@@ -69,33 +88,39 @@ def update_table_data(table_name, config):
             offset = offset + limit
 
 
-def merge_new_data(tables, project_home, update_config):
+def merge_new_data(tables, project_home, update_config, run_id):
     status_folder = '{}/{}'.format(project_home, 'updater/create_databases')
-
-    upload_status = get_merge_status(status_folder)
+    lookup_table_list = get_lookup_tables(update_config)
+    upload_status = get_merge_status(status_folder, run_id)
+    print(upload_status)
     try:
         for table in tables:
             if table in upload_status and upload_status[table] == 1:
                 continue
             try:
-                update_table_data(table, update_config)
+                lookup = False
+                if table in lookup_table_list:
+                    lookup = True
+                update_table_data(table, update_config, lookup)
                 upload_status[table] = 1
             except Exception as e:
                 upload_status[table] = 0
                 raise e
     finally:
-        save_merge_status(status_folder, upload_status)
+        save_merge_status(status_folder, upload_status, run_id)
 
 
 def normalize_exemplary(config):
     import pandas as pd
     connection_string = get_connection_string(config, "TEMP_UPLOAD_DB")
     engine = create_engine(connection_string)
-    exemplary_data = pd.read_sql_table(table_name="temp_claim_exemplary", con=engine)
+    exemplary_data = pd.read_sql_table(table_name="claim_exemplary_{year}".format(
+            year=datetime.datetime.strptime(config["DATES"]["END_DATE"], "%Y%m%d").strftime('%Y')),
+            con=engine)
 
     exemplary_data = exemplary_data.join(
-        exemplary_data.exemplary.str.strip().str.split(",", expand=True)).drop(
-        "exemplary", axis=1)
+            exemplary_data.exemplary.str.strip().str.split(",", expand=True)).drop(
+            "exemplary", axis=1)
 
     melted_exemplary = exemplary_data.melt(id_vars=['patent_id', 'filename'], value_name='exemplary')
     melted_exemplary.exemplary = melted_exemplary.exemplary.str.strip()
@@ -120,58 +145,109 @@ def merge_text_data(tables, update_config):
         update_text_data(tables[table], update_config)
 
 
-def begin_merging(config):
-    tables = ['application', 'botanic', 'detail_desc_length', 'draw_desc_text', 'figures', 'foreigncitation',
-              'foreign_priority', 'government_interest', 'ipcr', 'mainclass', 'non_inventor_applicant',
-              'otherreference', 'patent', 'rawassignee', 'rawexaminer', 'pct_data', 'rawinventor', 'rawlawyer',
-              'rawlocation', 'rel_app_text', 'subclass', 'us_term_of_grant', 'usapplicationcitation',
-              'uspatentcitation', 'usreldoc', 'uspc']
+def begin_merging(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('granted_patent', **kwargs)
+    tables_dict = get_upload_tables_dict(config)
+    tables = tables_dict.keys()
     project_home = os.environ['PACKAGE_HOME']
-    merge_new_data(tables, project_home, config)
+    merge_new_data(tables, project_home, config, kwargs['run_id'])
 
 
-def begin_text_merging(config):
-    version = config['DATABASE']['TEMP_UPLOAD_DB'].split("_")[1]
-    start_year = int(datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d').strftime('%Y'))
-    text_table_config = {'brf_sum_text': {
-        "insert": "INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, text,filename, version_indicator) "
-                  "SELECT uuid, patent_id, text, filename,'{database_version}' from {temp_db}.temp_brf_sum_text".format(
-            text_db=config['DATABASE']['TEXT_DATABASE'], temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
-            database_version=version, year=start_year)}, 'claim': {'preprocess': normalize_exemplary,
-                                                                   "insert": "INSERT INTO {text_db}.claim_{year}("
-                                                                             "uuid, patent_id, num, text, sequence, "
-                                                                             "dependent, exemplary,filename, "
-                                                                             "version_indicator, patent_date) SELECT  c.uuid, c.patent_id,c.num, c.text, c.sequence-1,  c.dependent, case when tce.exemplary is null then 0 else 1 end ,c.filename,'{database_version}', p.date from {temp_db}.temp_claim c left join {temp_db}.temp_normalized_claim_exemplary tce on tce.patent_id=c.patent_id and tce.exemplary = c.sequence  left join {temp_db}.patent p on p.id = c.patent_id".format(
-                                                                       text_db=config['DATABASE']['TEXT_DATABASE'],
-                                                                       temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
-                                                                       database_version=version, year=start_year)},
-        'draw_desc_text': {
-            "insert": "INSERT INTO {text_db}.draw_desc_text_{year}(uuid, patent_id, text, sequence, "
-                      "version_indicator) SELECT uuid, patent_id, text, sequence, '{database_version}' from {temp_db}.draw_desc_text".format(
-                text_db=config['DATABASE']['TEXT_DATABASE'], temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
-                database_version=version, year=start_year)}, 'detail_desc_text': {
-            "insert": "INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length, filename, "
-                      "version_indicator) SELECT uuid, patent_id, text,char_length(text), filename, "
-                      "'{database_version}' from {temp_db}.temp_detail_desc_text".format(
-                text_db=config['DATABASE']['TEXT_DATABASE'], temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
-                database_version=version, year=start_year)}, 'detail_desc_length': {
-            "insert": "INSERT INTO {new_db}.detail_desc_length( patent_id, detail_desc_length) SELECT  patent_id, CHAR_LENGTH(text) from {temp_db}.temp_detail_desc_text".format(
-                new_db=config['DATABASE']['NEW_DB'], temp_db=config['DATABASE']['TEMP_UPLOAD_DB'],
-                database_version=version)}}
+def begin_text_merging(**kwargs):
+    config = get_current_config(**kwargs)
+    version = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'].split("_")[1]
+    year = int(kwargs['execution_date'].strftime('%Y'))
+    text_table_config = {
+            'brf_sum_text':       {
+                    "insert": """
+INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, `text`, filename, version_indicator)
+SELECT uuid, patent_id, text, filename, '{database_version}'
+from {temp_db}.brf_sum_text_{year}
+                    """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
+                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], database_version=version,
+                               year=year)
+                    },
+            'claim':              {
+                    'preprocess': normalize_exemplary,
+                    "insert":     """
+INSERT INTO {text_db}.claim_{year}(uuid, patent_id, num, `text`, `sequence`, dependent, exemplary, filename,
+                                   version_indicator, patent_date)
+SELECT c.uuid,
+       c.patent_id,
+       c.num,
+       c.text,
+       c.sequence - 1,
+       c.dependent,
+       case when tce.exemplary is null then 0 else 1 end,
+       c.filename,
+       '{database_version}',
+       p.date
+from {temp_db}.claim_{year} c
+         left join {temp_db}.temp_normalized_claim_exemplary tce
+                   on tce.patent_id = c.patent_id and tce.exemplary = c.sequence
+         left join {temp_db}.patent p
+                   on p.id = c.patent_id
+                    """.format(
+                            text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
+                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
+                            database_version=version, year=year)
+                    },
+            'draw_desc_text':     {
+                    "insert": """
+INSERT INTO {text_db}.draw_desc_text_{year}(uuid, patent_id, text, sequence, version_indicator)
+SELECT uuid, patent_id, text, sequence, '{database_version}'
+from {temp_db}.draw_desc_text_{year}
+                    """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
+                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], database_version=version,
+                               year=year)
+                    },
+            'detail_desc_text':   {
+                    "insert": """
+INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length, filename,version_indicator)
+SELECT uuid, patent_id, text,char_length(text), filename, '{database_version}'
+from {temp_db}.detail_desc_text_{year}
+                              """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
+                                         temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
+                                         database_version=version,
+                                         year=year)
+                    },
+            'detail_desc_length': {
+                    "insert": "INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(text), '{database_version}' from {temp_db}.detail_desc_text_{year}".format(
+                            raw_db=config['PATENTSVIEW_DATABASES']['RAW_DB'],
+                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
+                            database_version=version, year=year)
+                    }
+            }
     merge_text_data(text_table_config, config)
 
 
-def post_merge(config):
-    qc = MergeTest(config)
-    qc.runTests()
+def post_merge(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
+    run_id = kwargs.get('run_id')
+    if run_id.startswith("backfill"):
+        print("Skipping QC")
+    else:
+        qc = MergeTest(config, run_id=kwargs['run_id'])
+        qc.runTests()
 
 
-def post_text_merge(config):
-    qc = TextMergeTest(config)
-    qc.runTests()
+def post_text_merge(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
+    run_id = kwargs.get('run_id')
+    if run_id.startswith("backfill"):
+        print("Skipping QC")
+    else:
+        qc = TextMergeTest(config)
+        qc.runTests()
 
 
 if __name__ == '__main__':
-    config = get_config()
-    # begin_merging(config)
-    post_merge(config)
+    # begin_merging(**{
+    #         "execution_date": datetime.date(2020, 12, 1),
+    #         "run_id":         1
+    #         }, )
+    post_merge(**{
+            "execution_date": datetime.date(2020, 12, 1),
+            "run_id":         1
+            })

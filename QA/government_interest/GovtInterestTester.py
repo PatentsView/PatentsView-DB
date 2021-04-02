@@ -1,13 +1,14 @@
 import datetime
 import itertools
-from lib.configuration import get_config
+
 from QA.PatentDatabaseTester import PatentDatabaseTester
+from lib.configuration import get_current_config
 
 
 class GovtInterestTester(PatentDatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-        super().__init__(config, 'NEW_DB', datetime.date(year=1976, month=1, day=1), end_date)
+        super().__init__(config, 'RAW_DB', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
                 'patent_contractawardnumber': {
                         "fields": {
@@ -24,18 +25,52 @@ class GovtInterestTester(PatentDatabaseTester):
                                 }
                         },
                 'patent_govintorg':           {
-                        "fields": {
-                                "patent_id":       {"data_type": "varchar", "null_allowed": False, "category": False},
-                                "organization_id": {"data_type": "int", "null_allowed": False, "category": False}
-                                }
+                        "fields":           {
+                                "patent_id":       {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "organization_id": {
+                                        "data_type":    "int",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        }
+                                },
+                        "related_entities": [
+                                {
+                                        "table":       'government_organization',
+                                        "source_id":   'organization_id',
+                                        "destination": "organization_id"
+                                        }]
                         },
                 'government_organization':    {
                         "fields":           {
-                                "organization_id": {"data_type": "int", "null_allowed": False, "category": False},
-                                "name":            {"data_type": "varchar", "null_allowed": False, "category": False},
-                                "level_one":       {"data_type": "varchar", "null_allowed": False, "category": False},
-                                "level_two":       {"data_type": "varchar", "null_allowed": True, "category": False},
-                                "level_three":     {"data_type": "varchar", "null_allowed": True, "category": False}
+                                "organization_id": {
+                                        "data_type":    "int",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "name":            {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "level_one":       {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "level_two":       {
+                                        "data_type":    "varchar",
+                                        "null_allowed": True,
+                                        "category":     False
+                                        },
+                                "level_three":     {
+                                        "data_type":    "varchar",
+                                        "null_allowed": True,
+                                        "category":     False
+                                        }
                                 },
                         "related_entities": [
                                 {
@@ -46,7 +81,9 @@ class GovtInterestTester(PatentDatabaseTester):
                         }
                 }
 
-        self.extended_qa_data = {"DataMonitor_govtinterestsampler": []}
+        self.extended_qa_data = {
+                "DataMonitor_govtinterestsampler": []
+                }
         self.qa_data.update(self.extended_qa_data)
         self.patent_exclusion_list.extend(['government_organization'])
 
@@ -81,9 +118,9 @@ FROM   `government_interest` gi
          ON go.`organization_id` = pg.organization_id
 {where_clause}
 ORDER BY RAND()
-LIMIT  5;        
+LIMIT  100;        
         """
-        database_type, version = self.config["DATABASE"][self.database_section].split("_")
+
         for date_clause, where_combination_type in where_combinations:
 
             where_clause = "AND ".join([date_clause, organization_wheres[where_combination_type]])
@@ -93,8 +130,8 @@ LIMIT  5;
                 for gov_int_row in gov_int_cursor:
                     self.qa_data['DataMonitor_govtinterestsampler'].append({
                             'sample_type':     where_combination_type,
-                            "database_type":   database_type,
-                            'update_version':  version,
+                            "database_type":   self.database_type,
+                            'update_version':  self.version,
                             'patent_id':       gov_int_row[0],
                             'gov_int_stmt':    gov_int_row[1],
                             'patent_contract_award_number':
@@ -103,6 +140,12 @@ LIMIT  5;
                             'organization_id': gov_int_row[2],
                             'organization':    gov_int_row[3]
                             })
+
+    def test_floating_entities(self, table_name):
+        if table_name in ['patent_contractawardnumber', 'patent_govintorg']:
+            pass
+        else:
+            super(GovtInterestTester, self).test_floating_entities(table_name)
 
     def runTests(self):
         super(GovtInterestTester, self).runTests()
@@ -116,4 +159,11 @@ def begin_gi_test(config):
 
 
 if __name__ == '__main__':
-    begin_gi_test(get_config())
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+            })
+    config['DATES'] = {
+            "START_DATE": '20201006',
+            "END_DATE":   '20201229'
+            }
+    begin_gi_test(config)

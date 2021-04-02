@@ -1,3 +1,5 @@
+import csv
+import datetime
 import logging
 import multiprocessing as mp
 import os
@@ -5,12 +7,12 @@ import time
 import uuid
 import zipfile
 
-import pandas as pd
 from lxml import etree
 from sqlalchemy import create_engine
+from tqdm import tqdm
 
-from lib.configuration import get_config, get_connection_string
-from lib.utilities import generate_index_statements, log_writer, xstr
+from lib.configuration import get_connection_string, get_current_config
+from lib.utilities import generate_index_statements, log_writer, mp_csv_writer, xstr
 
 
 def prepare_cpc_table(config, drop_indexes):
@@ -19,22 +21,43 @@ def prepare_cpc_table(config, drop_indexes):
     :param config: Config file containing variour runtime paramters
     :param drop_indexes: List of Drop Index Statements
     """
-    engine = create_engine(get_connection_string(config, "NEW_DB"))
+    engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
     for drop_statement in drop_indexes:
         engine.execute(drop_statement[0])
 
 
-def consolidate_cpc_data(config, add_indexes):
+def consolidate_cpc_data(cpc_file, config, add_indexes):
     """
     Finalize CPC Current table by removing patents not in patent database and re-adding indexes
-    :param config: Config file containing variour runtime paramters
+    :param config: Consolidate_cpc_dataonfig file containing variour runtime paramters
     :param add_indexes: List of Add Index statments
     """
-    engine = create_engine(get_connection_string(config, "NEW_DB"))
-    delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN patent p on p.id = cpc.patent_id WHERE p.id is null"
+    import pandas as pd
+    cpc_csv_file_chunks = pd.read_csv(cpc_file, sep=",", quoting=csv.QUOTE_NONNUMERIC, chunksize=100000)
+    engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
+    start = time.time()
+    for cpc_chunk in tqdm(cpc_csv_file_chunks):
+        with engine.connect() as conn:
+            cpc_chunk.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
+    delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null".format(
+            raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
     engine.execute(delete_query)
     for add_statement in add_indexes:
         engine.execute(add_statement[0])
+    upsert_query = """
+INSERT INTO {raw_db}.cpc_current(patent_id, section_id, subsection_id, group_id, subgroup_id, category, `sequence`,version_indicator)
+SELECT patent_id, section_id, subsection_id, group_id, subgroup_id, category, `sequence`, version_indicator
+from cpc_current
+ON DUPLICATE KEY UPDATE patent_id = VALUES(patent_id),
+                        section_id = VALUES(section_id),
+                        subsection_id = VALUES(subsection_id),
+                        group_id = VALUES(group_id),
+                        subgroup_id = VALUES(subgroup_id),
+                        category = VALUES(category),
+                        `sequence` = VALUES(`sequence`),
+                        version_indicator = VALUES(version_indicator);
+    """.format(raw_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    engine.execute(upsert_query)
 
 
 def generate_file_list(zipfilepath, extension='.xml'):
@@ -47,6 +70,7 @@ def generate_file_list(zipfilepath, extension='.xml'):
     for filename in archive.filelist:
         fname, ext = os.path.splitext(filename.filename)
         if ext == extension:
+            print(filename.filename)
             yield filename.filename
 
 
@@ -89,27 +113,23 @@ def get_cpc_components_from_xml(cpc_xml_element, ns):
             'pat:Subgroup', namespaces=ns)
     cpc_subgroup = cpc_subgroup_element.text if cpc_subgroup_element is not None else None
     if not cpc_section:
-        return {}
-    return {
-            'uuid':          xstr(uuid.uuid4()),
-            'section_id':    xstr(cpc_section),
-            'subsection_id': "{cpc_section}{cpc_class}".format(cpc_section=xstr(cpc_section),
-                                                               cpc_class=xstr(cpc_class)),
-            'group_id':      "{cpc_section}{cpc_class}{cpc_subclass}".format(
-                    cpc_section=xstr(cpc_section),
-                    cpc_class=xstr(cpc_class),
-                    cpc_subclass=xstr(cpc_subclass)),
-            'subgroup_id':   "{cpc_section}{cpc_class}{cpc_subclass}{cpc_maingroup}/{cpc_subgroup}".format(
-                    cpc_section=xstr(cpc_section),
-                    cpc_class=xstr(cpc_class),
-                    cpc_subclass=xstr(cpc_subclass),
-                    cpc_maingroup=xstr(cpc_maingroup),
-                    cpc_subgroup=xstr(cpc_subgroup)),
-            'category':      'inventional' if class_code == 'I' else 'additional'
-            }
+        return []
+    return [xstr(uuid.uuid4()), xstr(cpc_section),
+            "{cpc_section}{cpc_class}".format(cpc_section=xstr(cpc_section), cpc_class=xstr(cpc_class)),
+            "{cpc_section}{cpc_class}{cpc_subclass}".format(cpc_section=xstr(cpc_section), cpc_class=xstr(cpc_class),
+                                                            cpc_subclass=xstr(cpc_subclass)),
+            "{cpc_section}{cpc_class}{cpc_subclass}{cpc_maingroup}/{cpc_subgroup}".format(cpc_section=xstr(cpc_section),
+                                                                                          cpc_class=xstr(cpc_class),
+                                                                                          cpc_subclass=xstr(
+                                                                                                  cpc_subclass),
+                                                                                          cpc_maingroup=xstr(
+                                                                                                  cpc_maingroup),
+                                                                                          cpc_subgroup=xstr(
+                                                                                                  cpc_subgroup)),
+            'inventional' if class_code == 'I' else 'additional']
 
 
-def get_cpc_records(xml_root):
+def get_cpc_records(xml_root, version_indicator):
     """
     Extract CPC records from a XML element
     :param xml_root: LXML element root
@@ -123,42 +143,48 @@ def get_cpc_records(xml_root):
         sequence = 0
         main_cpc_element = element.find(main_cpc_path, ns)
         for main_cpc_element in main_cpc_element.getchildren():
-            cpc_record_dict = get_cpc_components_from_xml(main_cpc_element, ns)
-            cpc_record_dict['patent_id'] = pat_number
-            cpc_record_dict['sequence'] = sequence
+            cpc_record = [pat_number, sequence, version_indicator] + get_cpc_components_from_xml(main_cpc_element, ns)
             sequence = sequence + 1
-            yield cpc_record_dict
+            yield cpc_record
 
         further_cpc_element = element.find(further_cpc_path, namespaces=ns)
         if further_cpc_element is not None:
             for further_cpc_element in further_cpc_element.getchildren():
-                cpc_record_dict = get_cpc_components_from_xml(further_cpc_element, ns)
-                cpc_record_dict['patent_id'] = pat_number
-                cpc_record_dict['sequence'] = sequence
+                cpc_record = [pat_number, sequence, version_indicator] + get_cpc_components_from_xml(
+                    further_cpc_element, ns)
                 sequence = sequence + 1
-                yield cpc_record_dict
+                yield cpc_record
 
 
-def load_cpc_records(records_generator, config, log_queue):
+def load_cpc_records(records_generator, log_queue, csv_queue):
     """
     Load Extracter CPC Records into CPC Current Table
     :param records_generator: generator that produces cpc records as dictionary
     """
-    cpc_records_frame = pd.DataFrame(records_generator)
-    cpc_records_frame = cpc_records_frame[~pd.isnull(cpc_records_frame.uuid)]
-    engine = create_engine(get_connection_string(config, "NEW_DB"))
+    # engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
     start = time.time()
-    with engine.connect() as conn:
-        cpc_records_frame.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
+    # with engine.connect() as conn:
+    counter = 0
+    save_counter = 0
+    for cpc_record in records_generator:
+        counter += 1
+        if len(cpc_record) > 3:
+            save_counter += 1
+            csv_queue.put(cpc_record)
     end = time.time()
-    log_queue.put({"level": logging.INFO, "message": "Chunk Load Time:" + str(round(end - start))})
+    duration = str(round(end - start))
+    log_queue.put({
+            "level":   logging.INFO,
+            "message": f"Chunk Load Time: {duration}. Saved {save_counter} out of {counter}".format(
+                    duration=duration, save_counter=save_counter, counter=counter)
+            })
 
 
-def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue):
+def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue, writer):
     start = time.time()
     xml_tree = get_cpc_xml_root(cpc_xml_zip_file, cpc_xml_file)
-    cpc_records = get_cpc_records(xml_tree)
-    load_cpc_records(cpc_records, config, log_queue)
+    cpc_records = get_cpc_records(xml_tree, version_indicator=config['DATES']['END_DATE'])
+    load_cpc_records(cpc_records, log_queue, writer)
     end = time.time()
     log_queue.put({
             "level":   logging.INFO,
@@ -168,8 +194,10 @@ def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue):
             })
 
 
-def process_and_upload_cpc_current(config):
+def process_and_upload_cpc_current(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+    cpc_output_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
     cpc_xml_file = None
     for filename in os.listdir(cpc_folder):
         if (filename.startswith('CPC_grant_mcf') and
@@ -178,7 +206,7 @@ def process_and_upload_cpc_current(config):
 
     if cpc_xml_file:
         print(cpc_xml_file)
-        add_index, drop_index = generate_index_statements(config, "NEW_DB", "cpc_current")
+        add_index, drop_index = generate_index_statements(config, "TEMP_UPLOAD_DB", "cpc_current")
 
         prepare_cpc_table(config, drop_index)
         xml_file_name_generator = generate_file_list(cpc_xml_file)
@@ -186,13 +214,21 @@ def process_and_upload_cpc_current(config):
         parallelism = int(config["PARALLELISM"]["parallelism"])
         manager = mp.Manager()
         log_queue = manager.Queue()
+        csv_queue = manager.Queue()
 
         parser_start = time.time()
         pool = mp.Pool(parallelism)
+        cpc_file = "{data_folder}/cpc_current.csv".format(data_folder=cpc_output_folder)
+        header = ["patent_id", "sequence", "version_indicator", "uuid", "section_id", "subsection_id", "group_id",
+                  "subgroup_id", "category"]
         watcher = pool.apply_async(log_writer, (log_queue, "cpc_parser"))
+        writer = pool.apply_async(mp_csv_writer, (
+                csv_queue,
+                cpc_file, header))
         p_list = []
+        # process_cpc_file(cpc_xml_file, list(xml_file_name_generator)[-1], config, log_queue, csv_queue)
         for xml_file_name in xml_file_name_generator:
-            p = pool.apply_async(process_cpc_file, (cpc_xml_file, xml_file_name, config, log_queue))
+            p = pool.apply_async(process_cpc_file, (cpc_xml_file, xml_file_name, config, log_queue, csv_queue))
             p_list.append(p)
 
         for t in p_list:
@@ -207,16 +243,20 @@ def process_and_upload_cpc_current(config):
                 "level":   None,
                 "message": "kill"
                 })
+        csv_queue.put(['kill'])
         watcher.get()
+        writer.get()
         pool.close()
         pool.join()
 
-        consolidate_cpc_data(config, add_index)
+        consolidate_cpc_data(cpc_file, config, add_index)
     else:
         print("Could not find CPC Zip XML file under {cpc_input}".format(cpc_input=cpc_folder))
         exit(1)
 
 
 if __name__ == '__main__':
-    config = get_config()
-    process_and_upload_cpc_current(config)
+
+    process_and_upload_cpc_current(**{
+            "execution_date": datetime.date(2020, 12,29)
+            })

@@ -14,7 +14,7 @@ class TextParserTest:
 
     def verify_text_loaded(self, update_config):
         engine = create_engine(self.conn_string)
-        upload_database = update_config["DATABASE"]["TEMP_UPLOAD_DB"]
+        upload_database = update_config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
         for text_entity in self.text_items:
             fully_qualified_table_name = "`{database}`.`{table_name}``".format(database=upload_database,
                                                                               table_name=text_entity)

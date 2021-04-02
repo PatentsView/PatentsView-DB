@@ -1,15 +1,14 @@
 import copy
+import datetime
 import json
 import logging
-import multiprocessing
 import os
 import re
 
 import pandas as pd
 
 from QA.xml_to_csv.ParserTest import ParserTest
-from lib import xml_helpers, output_helper
-from lib.configuration import get_config
+from lib import output_helper, xml_helpers
 from lib.utilities import id_generator
 
 logger = logging.getLogger("airflow.task")
@@ -81,56 +80,56 @@ def get_results(patents, field_dictionary):
                                   patent_date, abstract, title, patent_data['document-id-kind'], num_claims, filename,
                                   '0'])
 
-        exemplary = xml_helpers.get_entity(patent, 'us-exemplary-claim')
-        if exemplary[0] is not None:
-            exemplary = [int(list(item_dict.values())[0]) for item_dict in exemplary if
-                         list(item_dict.values())[0] is not None]  # list of exemplary claims as strings
-        else:
-            error_log.append([patent_id, 'exemplary'])
-        claims = xml_helpers.get_claims_data(patent)
-        for num, claim in enumerate(claims):
-            claim_num = num + 1  # add one because they are 1 indexed not 0 indexed
-            is_exemplary = claim_num in exemplary
-            results['claim'].append(
-                [id_generator(), patent_id, claim['claim'], claim['dependency'], claim_num,
-                 is_exemplary])
+        # exemplary = xml_helpers.get_entity(patent, 'us-exemplary-claim')
+        # if exemplary[0] is not None:
+        #     exemplary = [int(list(item_dict.values())[0]) for item_dict in exemplary if
+        #                  list(item_dict.values())[0] is not None]  # list of exemplary claims as strings
+        # else:
+        #     error_log.append([patent_id, 'exemplary'])
+        # claims = xml_helpers.get_claims_data(patent)
+        # for num, claim in enumerate(claims):
+        #     claim_num = num + 1  # add one because they are 1 indexed not 0 indexed
+        #     is_exemplary = claim_num in exemplary
+        #     results['claim'].append(
+        #             [id_generator(), patent_id, claim['claim'], claim['dependency'], claim_num,
+        #              is_exemplary])
 
-        #############################
-        # Text Fields
-        ##############################
-        text_data = xml_helpers.get_main_text_fields(patent)
-
-        if text_data:
-            detail_desc_text_data = text_data['Detailed Description']
-            if detail_desc_text_data:
-                results['detail_desc_text'].append(
-                    [id_generator(), patent_id, detail_desc_text_data, len(detail_desc_text_data)])
-            else:
-                if not patent_id[0] in ['R', 'P', 'H',
-                                        'D']:  # these types are allowed to not have detailed descriptions
-                    error_log.append([patent_id, 'detail-description'])
-
-            brf_sum_text_data = text_data['Brief Summary']
-            if brf_sum_text_data:
-                results['brf_sum_text'].append([id_generator(), patent_id, brf_sum_text_data])
-
-            draw_desc = text_data['Brief Description of Drawings']
-            for i, description in enumerate(draw_desc):
-                results['draw_desc_text'].append([id_generator(), patent_id, description, i])
-
-            rel_app_text_data = text_data['Other Patent Relations']
-            if rel_app_text_data:
-                results['rel_app_text'].append([id_generator(), patent_id, rel_app_text_data, 0])
-
-            government_interest_data = text_data['Government Interest']
-            if government_interest_data:
-                results['government_interest'].append([patent_id, government_interest_data])
-            text_fields = ['Detailed Description', 'Brief Summary', 'Brief Description of Drawings',
-                           'Other Patent Relations', 'Government Interest']
-            if not set(text_data.keys()).issubset(text_fields):
-                error_log.append([patent_id, text_data.keys()])
-        else:
-            error_log.append([patent_id, 'description'])
+        # #############################
+        # # Text Fields
+        # ##############################
+        # text_data = xml_helpers.get_main_text_fields(patent)
+        #
+        # if text_data:
+        #     detail_desc_text_data = text_data['Detailed Description']
+        #     if detail_desc_text_data:
+        #         results['detail_desc_text'].append(
+        #                 [id_generator(), patent_id, detail_desc_text_data, len(detail_desc_text_data)])
+        #     else:
+        #         if not patent_id[0] in ['R', 'P', 'H',
+        #                                 'D']:  # these types are allowed to not have detailed descriptions
+        #             error_log.append([patent_id, 'detail-description'])
+        #
+        #     brf_sum_text_data = text_data['Brief Summary']
+        #     if brf_sum_text_data:
+        #         results['brf_sum_text'].append([id_generator(), patent_id, brf_sum_text_data])
+        #
+        #     draw_desc = text_data['Brief Description of Drawings']
+        #     for i, description in enumerate(draw_desc):
+        #         results['draw_desc_text'].append([id_generator(), patent_id, description, i])
+        #
+        #     rel_app_text_data = text_data['Other Patent Relations']
+        #     if rel_app_text_data:
+        #         results['rel_app_text'].append([id_generator(), patent_id, rel_app_text_data, 0])
+        #
+        #     government_interest_data = text_data['Government Interest']
+        #     if government_interest_data:
+        #         results['government_interest'].append([patent_id, government_interest_data])
+        #     text_fields = ['Detailed Description', 'Brief Summary', 'Brief Description of Drawings',
+        #                    'Other Patent Relations', 'Government Interest']
+        #     if not set(text_data.keys()).issubset(text_fields):
+        #         error_log.append([patent_id, text_data.keys()])
+        # else:
+        #     error_log.append([patent_id, 'description'])
 
         #############################
         # People
@@ -144,8 +143,9 @@ def get_results(patents, field_dictionary):
             for inventor in inventor_data:
                 rawlocid = id_generator()
                 results['rawlocation'].append(
-                    [rawlocid, None, inventor['address-city'], inventor['address-state'], inventor['address-country'],
-                     xml_helpers.clean_country(inventor['address-country'])])
+                        [rawlocid, None, inventor['address-city'], inventor['address-state'],
+                         inventor['address-country'],
+                         xml_helpers.clean_country(inventor['address-country'])])
                 deceased = False
                 if 'deceased' in output_helper.get_alt_tags(inventor,
                                                             ['addressbook-lastname', 'addressbook-last-name']):
@@ -159,8 +159,8 @@ def get_results(patents, field_dictionary):
                                                                            'addressbook-last-name']),
                                                int(inventor['sequence']) - 1, rule_47_flag, deceased])
                 output_helper.mandatory_fields('inventor', patent_id, error_log, [
-                    output_helper.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']),
-                    output_helper.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
+                        output_helper.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']),
+                        output_helper.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
         else:
             error_log.append([patent_id, 'inventor'])
         deceased_inventors = xml_helpers.get_entity(patent, 'us-deceased-inventor', attribute_list=None)
@@ -171,8 +171,9 @@ def get_results(patents, field_dictionary):
             for inventor in deceased_inventors:
                 rawlocid = id_generator()
                 results['rawlocation'].append(
-                    [rawlocid, None, inventor['address-city'], inventor['address-state'], inventor['address-country'],
-                     xml_helpers.clean_country(inventor['address-country'])])
+                        [rawlocid, None, inventor['address-city'], inventor['address-state'],
+                         inventor['address-country'],
+                         xml_helpers.clean_country(inventor['address-country'])])
                 if inventor['sequence']:
                     inventor['sequence'] = int(inventor['sequence']) - 1
                 results['rawinventor'].append([id_generator(), patent_id, None, rawlocid,
@@ -184,8 +185,8 @@ def get_results(patents, field_dictionary):
                                                                            'addressbook-last-name']),
                                                inventor['sequence'], rule_47_flag, True])
                 output_helper.mandatory_fields('inventor', patent_id, error_log, [
-                    output_helper.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']),
-                    output_helper.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
+                        output_helper.get_alt_tags(inventor, ['addressbook-firstname', 'addressbook-first-name']),
+                        output_helper.get_alt_tags(inventor, ['addressbook-lastname', 'addressbook-last-name'])])
 
         # applicant has inventor info for some earlier time periods
         app_inv_data = xml_helpers.get_entity(patent, 'applicant',
@@ -202,17 +203,17 @@ def get_results(patents, field_dictionary):
                 if applicant['app-type'] == "applicant-inventor":
                     # rule_47 flag always 0 for applicant-inventors (becauase they must be alive)
                     results['rawinventor'].append(
-                        [id_generator(), patent_id, None, rawlocid, applicant['addressbook-first-name'],
-                         applicant['addressbook-last-name'], str(inventor_app_seq), 0, False])
+                            [id_generator(), patent_id, None, rawlocid, applicant['addressbook-first-name'],
+                             applicant['addressbook-last-name'], str(inventor_app_seq), 0, False])
                     inventor_app_seq += 1
                     output_helper.mandatory_fields('inventor_applicant', patent_id, error_log,
                                                    [applicant['addressbook-first-name'],
                                                     applicant['addressbook-last-name']])
                 else:
                     results['non_inventor_applicant'].append(
-                        [id_generator(), patent_id, rawlocid, applicant['addressbook-first-name'],
-                         applicant['addressbook-last-name'], applicant['addressbook-orgname'],
-                         str(int(applicant['sequence'])), applicant['designation'], applicant['app-type']])
+                            [id_generator(), patent_id, rawlocid, applicant['addressbook-first-name'],
+                             applicant['addressbook-last-name'], applicant['addressbook-orgname'],
+                             str(int(applicant['sequence'])), applicant['designation'], applicant['app-type']])
                     output_helper.mandatory_fields('non_inventor_applicant', patent_id, error_log,
                                                    [applicant['addressbook-first-name'],
                                                     applicant['addressbook-last-name'],
@@ -227,9 +228,9 @@ def get_results(patents, field_dictionary):
                                                applicant['address-country'],
                                                xml_helpers.clean_country(applicant['address-country'])])
                 results['non_inventor_applicant'].append(
-                    [id_generator(), patent_id, rawlocid, applicant['addressbook-first-name'],
-                     applicant['addressbook-last-name'], applicant['addressbook-orgname'],
-                     str(int(applicant['sequence'])), applicant['designation'], applicant['app-type']])
+                        [id_generator(), patent_id, rawlocid, applicant['addressbook-first-name'],
+                         applicant['addressbook-last-name'], applicant['addressbook-orgname'],
+                         str(int(applicant['sequence'])), applicant['designation'], applicant['app-type']])
                 output_helper.mandatory_fields('non_inventor_applicant', patent_id, error_log,
                                                [applicant['addressbook-first-name'],
                                                 applicant['addressbook-last-name'], applicant['addressbook-orgname']])
@@ -243,19 +244,20 @@ def get_results(patents, field_dictionary):
                         assignee[key.replace('assignee', 'addressbook')] = assignee[key]
                 rawlocid = id_generator()
                 results['rawlocation'].append(
-                    [rawlocid, None, assignee['address-city'], assignee['address-state'], assignee['address-country'],
-                     xml_helpers.clean_country(assignee['address-country'])])
+                        [rawlocid, None, assignee['address-city'], assignee['address-state'],
+                         assignee['address-country'],
+                         xml_helpers.clean_country(assignee['address-country'])])
                 if assignee['addressbook-role']:  # can only strip the leading 0 if exists
                     assignee['addressbook-role'] = assignee['addressbook-role'].lstrip("0")
                 results['rawassignee'].append(
-                    [id_generator(), patent_id, None, rawlocid, assignee['addressbook-role'],
-                     output_helper.get_alt_tags(assignee, ['addressbook-firstname', 'addressbook-first-name']),
-                     output_helper.get_alt_tags(assignee, ['addressbook-lastname', 'addressbook-last-name']),
-                     assignee['addressbook-orgname'], str(i)])
+                        [id_generator(), patent_id, None, rawlocid, assignee['addressbook-role'],
+                         output_helper.get_alt_tags(assignee, ['addressbook-firstname', 'addressbook-first-name']),
+                         output_helper.get_alt_tags(assignee, ['addressbook-lastname', 'addressbook-last-name']),
+                         assignee['addressbook-orgname'], str(i)])
                 name_and_org = [
-                    output_helper.get_alt_tags(assignee, ['addressbook-firstname', 'addressbook-first-name']),
-                    output_helper.get_alt_tags(assignee, ['addressbook-lastname', 'addressbook-last-name']),
-                    assignee['addressbook-orgname']]
+                        output_helper.get_alt_tags(assignee, ['addressbook-firstname', 'addressbook-first-name']),
+                        output_helper.get_alt_tags(assignee, ['addressbook-lastname', 'addressbook-last-name']),
+                        assignee['addressbook-orgname']]
                 output_helper.mandatory_fields('assignee', patent_id, error_log, name_and_org)
 
         else:
@@ -273,12 +275,12 @@ def get_results(patents, field_dictionary):
                                              lawyer['addressbook-orgname'], lawyer['addressbook-country'],
                                              int(lawyer['sequence'])])
                 output_helper.mandatory_fields('rawlawyer', patent_id, error_log, [
-                    output_helper.get_alt_tags(lawyer, ['addressbook-firstname', 'addressbook-first-name']),
-                    output_helper.get_alt_tags(lawyer, ['addressbook-lastname', 'addressbook-last-name']),
-                    lawyer['addressbook-orgname']])
+                        output_helper.get_alt_tags(lawyer, ['addressbook-firstname', 'addressbook-first-name']),
+                        output_helper.get_alt_tags(lawyer, ['addressbook-lastname', 'addressbook-last-name']),
+                        lawyer['addressbook-orgname']])
         examiner_data = xml_helpers.get_entity(patent, 'examiners')[0]
         results['rawexaminer'].append([id_generator(), patent_id, output_helper.get_alt_tags(examiner_data, [
-            'primary-examiner-firstname', 'primary-examiner-first-name']),
+                'primary-examiner-firstname', 'primary-examiner-first-name']),
                                        output_helper.get_alt_tags(examiner_data,
                                                                   ['primary-examiner-lastname',
                                                                    'primary-examiner-last-name']),
@@ -287,13 +289,14 @@ def get_results(patents, field_dictionary):
         if output_helper.get_alt_tags(examiner_data,
                                       ['assistant-examiner-lastname', 'assistant-examiner-last-name']) is not None:
             results['rawexaminer'].append([id_generator(), patent_id, output_helper.get_alt_tags(examiner_data, [
-                'assistant-examiner-firstname', 'assistant-examiner-first-name']),
+                    'assistant-examiner-firstname', 'assistant-examiner-first-name']),
                                            output_helper.get_alt_tags(examiner_data, ['assistant-examiner-lastname',
                                                                                       'assistant-examiner-last-name']),
                                            'assistant', examiner_data['primary-examiner-department']])
         output_helper.mandatory_fields('rawexaminer', patent_id, error_log, [
-            output_helper.get_alt_tags(examiner_data, ['primary-examiner-firstname', 'primary-examiner-first-name']),
-            output_helper.get_alt_tags(examiner_data, ['primary-examiner-lastname', 'primary-examiner-last-name'])])
+                output_helper.get_alt_tags(examiner_data,
+                                           ['primary-examiner-firstname', 'primary-examiner-first-name']),
+                output_helper.get_alt_tags(examiner_data, ['primary-examiner-lastname', 'primary-examiner-last-name'])])
 
         #############################
         # Citations
@@ -331,24 +334,24 @@ def get_results(patents, field_dictionary):
                     if cited_doc_num and not is_app:  # citations without document numbers are otherreferences
                         cited_doc_num = xml_helpers.process_patent_numbers(cited_doc_num)
                         results['uspatentcitation'].append(
-                            [id_generator(), patent_id, cited_doc_num, citation['date'],
-                             citation['name'],
-                             citation['kind'], citation['country'],
-                             citation['category'], str(uspatseq)])
+                                [id_generator(), patent_id, cited_doc_num, citation['date'],
+                                 citation['name'],
+                                 citation['kind'], citation['country'],
+                                 citation['category'], str(uspatseq)])
                         uspatseq += 1
                     if cited_doc_num and is_app:
                         cit_app_id_transformed = cited_doc_num[:5] + cited_doc_num[:4] + cited_doc_num[5:]
                         cit_app_number_transformed = cited_doc_num.replace('/', '')
                         results['usapplicationcitation'].append(
-                            [id_generator(), patent_id, cited_doc_num, citation['date'],
-                             citation['name'],
-                             citation['kind'], cited_doc_num, citation['country'], citation['category'],
-                             str(appseq), cit_app_id_transformed, cit_app_number_transformed])
+                                [id_generator(), patent_id, cited_doc_num, citation['date'],
+                                 citation['name'],
+                                 citation['kind'], cited_doc_num, citation['country'], citation['category'],
+                                 str(appseq), cit_app_id_transformed, cit_app_number_transformed])
                         appseq += 1
                 elif cited_doc_num:
                     results['foreigncitation'].append(
-                        [id_generator(), patent_id, citation['date'], cited_doc_num,
-                         citation['country'], citation['category'], str(forpatseq)])
+                            [id_generator(), patent_id, citation['date'], cited_doc_num,
+                             citation['country'], citation['category'], str(forpatseq)])
                     forpatseq += 1
                 else:
                     error_log.append([patent_id, citation])
@@ -357,7 +360,7 @@ def get_results(patents, field_dictionary):
         if nonpatent_citations is not None:
             for citation in nonpatent_citations:
                 results['otherreference'].append(
-                    [id_generator(), patent_id, citation['text'].replace("\\", "/"), str(otherseq)])
+                        [id_generator(), patent_id, citation['text'].replace("\\", "/"), str(otherseq)])
                 otherseq += 1
         ##########################################
         # Classifications
@@ -380,8 +383,8 @@ def get_results(patents, field_dictionary):
                             further_combined_class = "{0}/{1}".format(further_main_class, further_sub_class)
                             results['subclass'].append(further_combined_class)
                             results['uspc'].append(
-                                [id_generator(), patent_id, further_main_class, further_combined_class,
-                                 str(uspc_seq)])
+                                    [id_generator(), patent_id, further_main_class, further_combined_class,
+                                     str(uspc_seq)])
                             uspc_seq += 1
                 main_sub_class = xml_helpers.process_uspc_class_sub(uspc['main-classification'][0])
                 results['subclass'].append(main_sub_class)
@@ -390,14 +393,14 @@ def get_results(patents, field_dictionary):
         if ipcr_data[0] is not None:
             for i, ipcr in enumerate(ipcr_data):
                 results['ipcr'].append(
-                    [id_generator(), patent_id, ipcr['classification-ipcr-classification-level'],
-                     ipcr['classification-ipcr-section'], ipcr['classification-ipcr-class'],
-                     ipcr['classification-ipcr-subclass'],
-                     ipcr['classification-ipcr-main-group'], ipcr['classification-ipcr-subgroup'],
-                     ipcr['classification-ipcr-symbol-position'], ipcr['classification-ipcr-classification-value'],
-                     ipcr['classification-ipcr-classification-status'],
-                     ipcr['classification-ipcr-classification-data-source'], ipcr['action-date-date'],
-                     ipcr['ipc-version-indicator-date'], i])
+                        [id_generator(), patent_id, ipcr['classification-ipcr-classification-level'],
+                         ipcr['classification-ipcr-section'], ipcr['classification-ipcr-class'],
+                         ipcr['classification-ipcr-subclass'],
+                         ipcr['classification-ipcr-main-group'], ipcr['classification-ipcr-subgroup'],
+                         ipcr['classification-ipcr-symbol-position'], ipcr['classification-ipcr-classification-value'],
+                         ipcr['classification-ipcr-classification-status'],
+                         ipcr['classification-ipcr-classification-data-source'], ipcr['action-date-date'],
+                         ipcr['ipc-version-indicator-date'], i])
         # for the year 2005 data is often in classification-ipc and needs to be preprocessed
         ipc_data = xml_helpers.get_entity(patent, 'classification-ipc')
         if ipc_data[0] is not None:
@@ -417,8 +420,8 @@ def get_results(patents, field_dictionary):
                 # ipc['classification-ipc-edition'] has classification info, either 7 or unknown (as far as I can see)
                 # this is not in the same format as for later years, so I'm skipping this for now
                 results['ipcr'].append(
-                    [id_generator(), patent_id, None, intsec, mainclass, subclass, group, subgroup,
-                     None, None, None, None, None, None, str(i)])
+                        [id_generator(), patent_id, None, intsec, mainclass, subclass, group, subgroup,
+                         None, None, None, None, None, None, str(i)])
 
         #############################
         # usreldocs
@@ -427,8 +430,8 @@ def get_results(patents, field_dictionary):
         if usreldoc_data:
             for doc in usreldoc_data:
                 results['usreldoc'].append(
-                    [id_generator(), patent_id, doc['doc-type'], doc['relation'], doc['doc-number'],
-                     doc['country'], doc['date'], doc['status'], doc['sequence'], doc['kind']])
+                        [id_generator(), patent_id, doc['doc-type'], doc['relation'], doc['doc-number'],
+                         doc['country'], doc['date'], doc['status'], doc['sequence'], doc['kind']])
 
         ########################
         # Various Optional Fields
@@ -444,16 +447,16 @@ def get_results(patents, field_dictionary):
         if foreign_priority[0] is not None:
             for i, priority_claim in enumerate(foreign_priority):
                 results['foreign_priority'].append(
-                    [id_generator(), patent_id, str(i), priority_claim['kind'],
-                     priority_claim['priority-claim-doc-number'], priority_claim['priority-claim-date'],
-                     priority_claim['priority-claim-country'],
-                     xml_helpers.clean_country(priority_claim['priority-claim-country'])])
+                        [id_generator(), patent_id, str(i), priority_claim['kind'],
+                         priority_claim['priority-claim-doc-number'], priority_claim['priority-claim-date'],
+                         priority_claim['priority-claim-country'],
+                         xml_helpers.clean_country(priority_claim['priority-claim-country'])])
         # US term of Grant
         ustog = xml_helpers.get_entity(patent, 'us-term-of-grant/')[0]
         if ustog is not None:
             results['us_term_of_grant'].append(
-                [id_generator(), patent_id, ustog['lapse-of-patent'], ustog['disclaimer-date'],
-                 ustog['disclaimer-text'], ustog['length-of-grant'], ustog['us-term-extension']])
+                    [id_generator(), patent_id, ustog['lapse-of-patent'], ustog['disclaimer-date'],
+                     ustog['disclaimer-text'], ustog['length-of-grant'], ustog['us-term-extension']])
 
         # figures list
         fig_data = xml_helpers.get_entity(patent, 'figures')[0]
@@ -468,17 +471,17 @@ def get_results(patents, field_dictionary):
             if pct_filing_data['us-371c124-date-date'] is not None:
                 pct_filing_data['us-371c12-date-date'] = pct_filing_data['us-371c124-date-date']
             results['pct_data'].append(
-                [id_generator(), patent_id, pct_filing_data['document-id-doc-number'],
-                 pct_filing_data['document-id-date'], pct_filing_data['us-371c12-date-date'],
-                 pct_filing_data['document-id-country'], pct_filing_data['document-id-kind'],
-                 "pct_application", None])
+                    [id_generator(), patent_id, pct_filing_data['document-id-doc-number'],
+                     pct_filing_data['document-id-date'], pct_filing_data['us-371c12-date-date'],
+                     pct_filing_data['document-id-country'], pct_filing_data['document-id-kind'],
+                     "pct_application", None])
         pct_pub_data = xml_helpers.get_entity(patent, 'pct-or-regional-publishing-data')[0]
         if pct_pub_data is not None:
             results['pct_data'].append(
-                [id_generator(), patent_id, pct_pub_data['document-id-doc-number'],
-                 pct_pub_data['document-id-date'], None,
-                 pct_pub_data['document-id-country'], pct_pub_data['document-id-kind'],
-                 "wo_grant", None])
+                    [id_generator(), patent_id, pct_pub_data['document-id-doc-number'],
+                     pct_pub_data['document-id-date'], None,
+                     pct_pub_data['document-id-country'], pct_pub_data['document-id-kind'],
+                     "wo_grant", None])
     return results, error_log
 
 
@@ -520,25 +523,8 @@ def begin_parsing(update_config):
     fields = [field_dictionary for item in in_files]
     files = zip(in_files, out_files, fields)
 
-    total_cpus = multiprocessing.cpu_count()
-    desired_processes = (total_cpus // 2)   # usually num cpu - 1
-    jobs = []
-    pool = multiprocessing.Pool(desired_processes)
     for f in files:
-        p = pool.apply_async(main_process, args=f)
-        jobs.append(p)
-
-    logger.info("{n} jobs have started, running {x} at a time now waiting for them to complete".format(n=len(jobs),
-                                                                                                       x=desired_processes))
-    counter = 0
-    for job in jobs:
-        counter += 1
-        logger.info("Waiting for job {counter} ".format(counter=counter))
-        job.get()
-        logger.info("Job {counter}  has finished".format(counter=counter))
-
-    pool.close()
-    pool.join()
+        main_process(*f)
 
     logger.info("finished processing")
 
@@ -548,7 +534,9 @@ def post_parsing(update_config):
     qc_step.runTests(update_config)
 
 
-def patent_parser(config):
+def patent_parser(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('granted_patent', **kwargs)
     begin_parsing(config)
     try:
         post_parsing(config)
@@ -557,5 +545,6 @@ def patent_parser(config):
 
 
 if __name__ == '__main__':
-    config = get_config()
-    patent_parser(config=config)
+    patent_parser(**{
+            "execution_date": datetime.date(2020, 12, 1)
+            })

@@ -6,7 +6,7 @@ from lib.configuration import get_config, get_connection_string
 @pytest.fixture()
 def config():
     config = get_config()
-    config["DATABASE"]["NEW_DB"] = 'sarvo_test_db'
+    config["PATENTSVIEW_DATABASES"]["NEW_DB"] = 'sarvo_test_db'
     yield config
 
 
@@ -14,7 +14,7 @@ def config():
 def clean_data():
     yield
     config = get_config()
-    config["DATABASE"]["NEW_DB"] = 'sarvo_test_db'
+    config["PATENTSVIEW_DATABASES"]["NEW_DB"] = 'sarvo_test_db'
     from sqlalchemy import create_engine
     engine = create_engine(get_connection_string(config, "NEW_DB"))
     engine.execute("TRUNCATE TABLE inventor;")
@@ -126,7 +126,7 @@ class TestPostProcessInventor:
                 SELECT COLUMN_NAME
                 from information_schema.COLUMNS
                 where TABLE_SCHEMA='{schema}'
-                        and TABLE_NAME='inventor'""".format(schema=config["DATABASE"]["NEW_DB"])
+                        and TABLE_NAME='inventor'""".format(schema=config["PATENTSVIEW_DATABASES"]["NEW_DB"])
 
         column_data = pd.read_sql_query(column_query, con=engine)
         expected_columns = ['id', 'name_first', 'name_last']

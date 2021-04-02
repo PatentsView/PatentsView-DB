@@ -1,11 +1,11 @@
 import csv
 import time
-
+import datetime
 from sqlalchemy import create_engine
 import pandas as pd
 
 from QA.post_processing.AssigneePostProcessing import AssigneePostProcessingQC
-from lib.configuration import get_config, get_connection_string
+from lib.configuration import get_config,get_current_config, get_connection_string
 
 
 def upload_disambig_results(update_config):
@@ -86,6 +86,6 @@ def post_process_qc(config):
 
 
 if __name__ == '__main__':
-    config = get_config()
+    config = get_current_config(**{"execution_date": datetime.date(2020, 12, 29)})
     # post_process_assignee(config)
     post_process_qc(config)

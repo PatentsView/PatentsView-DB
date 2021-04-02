@@ -1,13 +1,13 @@
 import datetime
 
 from QA.PatentDatabaseTester import PatentDatabaseTester
-from lib.configuration import get_config
+from lib.configuration import get_config, get_current_config
 
 
 class CPCTest(PatentDatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-        super().__init__(config, 'NEW_DB', datetime.date(year=1976, month=1, day=1), end_date)
+        super().__init__(config, 'RAW_DB', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
             'cpc_current': {
                 'fields': {'uuid': {'data_type': 'varchar', 'null_allowed': False, 'category': False},
@@ -58,5 +58,5 @@ class CPCTest(PatentDatabaseTester):
 
 
 if __name__ == '__main__':
-    qc = CPCTest(get_config())
+    qc = CPCTest(get_current_config(**{            "execution_date": datetime.date(2020, 12,29)            }))
     qc.runTests()

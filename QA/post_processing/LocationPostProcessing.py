@@ -2,15 +2,17 @@ import datetime
 import time
 
 from QA.post_processing.DisambiguationTester import DisambiguationTester
+from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
+from lib.configuration import get_current_config
 
 
 class LocationPostProcessingQC(DisambiguationTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-        super().__init__(config, 'NEW_DB', datetime.date(year=1976, month=1, day=1), end_date)
+        super().__init__(config, 'RAW_DB', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
                 'rawlocation': {
-                        'fields': {
+                        'fields':           {
                                 'id':                      {
                                         'data_type':    'varchar',
                                         'null_allowed': False,
@@ -106,6 +108,10 @@ class LocationPostProcessingQC(DisambiguationTester):
                                         'table':          'location_inventor',
                                         'source_id':      'id',
                                         'destination_id': 'location_id'
+                                        }, {
+                                        'table':          'rawlocation',
+                                        'source_id':      'id',
+                                        'destination_id': 'location_id'
                                         }]
                         }
                 }
@@ -117,8 +123,8 @@ class LocationPostProcessingQC(DisambiguationTester):
         self.disambiguated_table = 'location'
         self.patent_exclusion_list.extend(['location', 'rawlocation'])
 
-    def test_floating_entities(self, table=None, table_config=None):
-        pass
+    # def test_floating_entities(self, table=None, table_config=None):
+    #     pass
 
     def load_top_n_patents(self):
         chunk_size = 1000
@@ -183,13 +189,19 @@ group by l.id, l.city, l.state, l.country;
                             })
             rank += 1
 
-    def runTests(self):
-        self.load_top_n_patents()
-        super(LocationPostProcessingQC, self).runTests()
+    # def runTests(self):
+    #     self.load_top_n_patents()
+    #     super(LocationPostProcessingQC, self).runTests()
 
 
 if __name__ == '__main__':
-    from lib.configuration import get_config
-
-    lqc = LocationPostProcessingQC(config=get_config())
-    lqc.runTests()
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+            })
+    config['DATES'] = {
+            "START_DATE": '20201006',
+            "END_DATE":   '20201229'
+            }
+    lc = InventorPostProcessingQC(config)
+    for table in lc.table_config:
+        lc.test_related_floating_entities(table_config=lc.table_config[table], table_name=table)

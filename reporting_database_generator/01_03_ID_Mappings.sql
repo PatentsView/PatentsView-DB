@@ -40,8 +40,8 @@ from
 # We need this early for firstnamed stuff.
 drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_inventor`;
 create table `{{params.reporting_database}}`.`temp_id_mapping_inventor`
-(
-  `old_inventor_id` varchar(36) not null,
+('
+  `old_inventor_id` varchar(256) not null,
   `new_inventor_id` int unsigned not null auto_increment,
   primary key (`old_inventor_id`),
   unique index `ak_temp_id_mapping_inventor` (`new_inventor_id`)
@@ -60,12 +60,12 @@ from
   `{{params.raw_database}}`.`patent_inventor`;
 
 
-# END inventor id mapping 
+# END inventor id mapping
 
 #####################################################################################################################################
 
 
-# BEGIN lawyer id mapping 
+# BEGIN lawyer id mapping
 
 ###################################################################################################################################
 
@@ -90,16 +90,16 @@ insert into
 select distinct
   `lawyer_id`
 from
-  `{{params.raw_database}}`.`patent_lawyer` 
+  `{{params.raw_database}}`.`patent_lawyer`
   where lawyer_id is not null and lawyer_id !=  '';
 
 
-# END lawyer id mapping 
+# END lawyer id mapping
 
 #####################################################################################################################################
 
 
-# BEGIN examiner id mapping 
+# BEGIN examiner id mapping
 
 ###################################################################################################################################
 
@@ -127,12 +127,12 @@ from
   `{{params.raw_database}}`.`rawexaminer`;
 
 
-# END examiner id mapping 
+# END examiner id mapping
 
 #####################################################################################################################################
 
 
-# BEGIN location id mapping 
+# BEGIN location id mapping
 
 ###################################################################################################################################
 
@@ -199,6 +199,6 @@ from
     t.`old_location_id_transformed` = rl.`location_id_transformed`;
 
 
-# END location id mapping 
+# END location id mapping
 
 #####################################################################################################################################

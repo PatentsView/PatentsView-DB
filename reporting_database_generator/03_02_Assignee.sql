@@ -30,7 +30,7 @@ insert into `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
 (`assignee_id`, `location_id`, `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`)
 select t.`assignee_id`,
        tl.`new_location_id`,
-       tl.`old_location_id_transformed`,
+       tlt.`old_location_id_transformed`,
        nullif(trim(l.`city`), ''),
        nullif(trim(l.`state`), ''),
        nullif(trim(l.`country`), ''),
@@ -61,8 +61,10 @@ from (
                     ) t) t
          where rownum = 1) t
          left join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
-         left join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl
-                   on tl.`old_location_id_transformed` = t.`location_id_transformed`;
+         left join `{{params.reporting_database}}`.`temp_id_mapping_location` tl
+                   on tl.`old_location_id` = t.`location_id`
+         left join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tlt
+                   on tlt.`new_location_id` = tl.`new_location_id`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_num_patents`;
 create table `{{params.reporting_database}}`.`temp_assignee_num_patents`
