@@ -1,13 +1,28 @@
+from configparser import ConfigParser
+
 from sqlalchemy import create_engine
 
 from lib.configuration import get_config, get_connection_string
 
 
-def load_lookup_table(config, entity, include_location=True):
-    patent_entity_table = "patent_{entity}".format(entity=entity)
+def load_lookup_table(update_config: ConfigParser, database: str,
+                      entity: str, include_location: bool = True):
+    """
+    Load Patent Crosswalk tables with disambiguated tables
+    :param update_config: Configparser object
+    :param database: Target database (Raw database / Pgpubs database)
+    :param entity: disambiguated entity name (assignee, inventor, location)
+    :param include_location: Boolean flag indicating if location id is included in crosswalk
+    """
+    parent_entity = 'patent'
+    parent_entity_id = 'patent_id'
+    if database == 'PGPUBS_DATABASE':
+        parent_entity = 'application'
+        parent_entity_id = 'application_number'
+    patent_entity_table = "{parent}_{entity}".format(parent=parent_entity, entity=entity)
     entity_field = "{entity}_id".format(entity=entity)
     rawtable = "raw{entity}".format(entity=entity)
-    field_list = ["patent_id", "et.{ef}", "et.sequence"]
+    field_list = [parent_entity_id, "et.{ef}", "et.sequence"]
     join_query = ""
     if include_location:
         field_list.append("rl.location_id")
@@ -20,7 +35,7 @@ def load_lookup_table(config, entity, include_location=True):
             pet=patent_entity_table,
             ef=entity_field,
             rt=rawtable)
-    engine = create_engine(get_connection_string(config, "NEW_DB"))
+    engine = create_engine(get_connection_string(update_config, database))
     with engine.begin() as cursor:
         print(delete_query)
         cursor.execute(delete_query)
@@ -28,12 +43,5 @@ def load_lookup_table(config, entity, include_location=True):
         cursor.execute(insert_query)
 
 
-def create_lookup_tables(config):
-    load_lookup_table(config, "inventor")
-    load_lookup_table(config, "assignee")
-    load_lookup_table(config, "lawyer", include_location=False)
-
-
 if __name__ == '__main__':
     config = get_config()
-    create_lookup_tables(config)
