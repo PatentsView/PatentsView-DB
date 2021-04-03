@@ -5,6 +5,8 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from updater.collect_supplemental_data.update_withdrawn import post_withdrawn, process_withdrawn
+from updater.government_interest.NER import begin_NER_processing
+from updater.government_interest.NER_to_manual import process_ner_to_manual
 
 
 class SQLTemplatedPythonOperator(PythonOperator):
@@ -13,7 +15,7 @@ class SQLTemplatedPythonOperator(PythonOperator):
 
 from lib.configuration import get_current_config, get_section, get_today_dict
 from reporting_database_generator.database.validate_query import validate_and_execute
-from updater.callbacks import airflow_task_failure, airflow_task_success
+from updater.callbacks import airflow_task_failure
 from updater.create_databases.merge_in_new_data import begin_merging, begin_text_merging, post_merge, post_text_merge
 from updater.create_databases.rename_db import qc_database
 from updater.create_databases.upload_new import begin_database_setup, post_upload, upload_current_data
@@ -48,53 +50,44 @@ granted_patent_parser = DAG(
         schedule_interval=timedelta(weeks=1), catchup=True,
         template_searchpath=templates_searchpath,
         )
-
+operator_settings = {
+        'dag':                 granted_patent_parser,
+        'on_success_callback': airflow_task_failure,
+        'on_failure_callback': airflow_task_failure
+        }
+operator_sequence_groups = {}
 ###### Download & Parse #######
-download_xml_operator = PythonOperator(dag=granted_patent_parser, task_id='download_xml',
-                                       python_callable=bulk_download,
-                                       provide_context=True,
-                                       on_success_callback=airflow_task_success,
-                                       on_failure_callback=airflow_task_failure)
-upload_setup_operator = PythonOperator(dag=granted_patent_parser, task_id='upload_database_setup',
-                                       python_callable=begin_database_setup,
-                                       provide_context=True,
-                                       on_success_callback=airflow_task_success,
-                                       on_failure_callback=airflow_task_failure)
+download_xml_operator = PythonOperator(task_id='download_xml', python_callable=bulk_download,
+                                       **operator_settings)
+upload_setup_operator = PythonOperator(task_id='upload_database_setup', python_callable=begin_database_setup,
+                                       **operator_settings)
 
 process_xml_operator = PythonOperator(task_id='process_xml',
                                       python_callable=preprocess_xml,
-                                      dag=granted_patent_parser,
-                                      on_success_callback=airflow_task_success,
-                                      on_failure_callback=airflow_task_failure)
-process_xml_operator.set_upstream(download_xml_operator)
+                                      **operator_settings)
 
 parse_xml_operator = PythonOperator(task_id='parse_xml',
                                     python_callable=patent_parser,
-                                    dag=granted_patent_parser,
-                                    on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure)
-parse_xml_operator.set_upstream(process_xml_operator)
+                                    **operator_settings)
 
 #### Database Load ####
 qc_database_operator = PythonOperator(task_id='qc_database_setup',
                                       python_callable=qc_database,
-                                      dag=granted_patent_parser, on_success_callback=airflow_task_success,
-                                      on_failure_callback=airflow_task_failure
-                                      )
+                                      **operator_settings)
 
 upload_new_operator = PythonOperator(task_id='upload_current', python_callable=upload_current_data,
-                                     dag=granted_patent_parser, on_success_callback=airflow_task_success,
-                                     on_failure_callback=airflow_task_failure
+                                     **operator_settings
                                      )
 
-upload_new_operator.set_upstream(upload_setup_operator)
-upload_new_operator.set_upstream(parse_xml_operator)
-
 qc_upload_operator = PythonOperator(task_id='qc_upload_new', python_callable=post_upload,
-                                    dag=granted_patent_parser, on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure
+                                    **operator_settings
                                     )
-qc_upload_operator.set_upstream(upload_new_operator)
+### GI Processing
+gi_NER = PythonOperator(task_id='gi_NER', python_callable=begin_NER_processing,
+                        **operator_settings)
+gi_NER.set_upstream(qc_upload_operator)
+gi_postprocess_NER = PythonOperator(task_id='postprocess_NER', python_callable=process_ner_to_manual,
+                                    **operator_settings)
 
 ### Long Text FIelds Parsing
 table_creation_operator = SQLTemplatedPythonOperator(
@@ -116,7 +109,6 @@ table_creation_operator = SQLTemplatedPythonOperator(
                 'add_suffix': False
                 }
         )
-table_creation_operator.set_upstream(upload_setup_operator)
 upload_table_creation_operator = SQLTemplatedPythonOperator(
         task_id='create_text_yearly_tables-upload',
         provide_context=True,
@@ -124,7 +116,8 @@ upload_table_creation_operator = SQLTemplatedPythonOperator(
         op_kwargs={
                 'filename':    'text_tables',
                 "schema_only": False,
-                "section":     get_section('granted_patent_updater', 'fix_patent_ids-upload')
+                "section":     get_section('granted_patent_updater', 'fix_patent_ids-upload'),
+
                 },
         dag=granted_patent_parser,
         templates_dict={
@@ -136,9 +129,8 @@ upload_table_creation_operator = SQLTemplatedPythonOperator(
                 'add_suffix': True
                 }
         )
-upload_table_creation_operator.set_upstream(table_creation_operator)
 
-# trigger_creation_operator = BashOperator(dag=granted_patent_parser, task_id='create_text_triggers',
+# trigger_creation_operator = BashOperator(task_id='create_text_triggers',
 #                                          bash_command=get_text_table_load_command( project_home),
 #                                          on_success_callback=airflow_task_success,
 #                                          on_failure_callback=airflow_task_failure)
@@ -146,11 +138,8 @@ upload_table_creation_operator.set_upstream(table_creation_operator)
 
 parse_text_data_operator = PythonOperator(task_id='parse_text_data',
                                           python_callable=begin_text_parsing,
-                                          dag=granted_patent_parser,
-                                          on_success_callback=airflow_task_success,
-                                          on_failure_callback=airflow_task_failure)
-parse_text_data_operator.set_upstream(upload_table_creation_operator)
-parse_text_data_operator.set_upstream(download_xml_operator)
+                                          **operator_settings)
+
 patent_id_fix_operator = SQLTemplatedPythonOperator(
         task_id='fix_patent_ids-upload',
         provide_context=True,
@@ -170,55 +159,56 @@ patent_id_fix_operator = SQLTemplatedPythonOperator(
                 'add_suffix': True
                 }
         )
-patent_id_fix_operator.set_upstream(parse_text_data_operator)
+
 qc_parse_text_operator = PythonOperator(task_id='qc_parse_text_data',
                                         python_callable=post_text_parsing,
-                                        dag=granted_patent_parser,
-                                        on_success_callback=airflow_task_success,
-                                        on_failure_callback=airflow_task_failure)
-qc_parse_text_operator.set_upstream(patent_id_fix_operator)
+                                        **operator_settings)
 
 #### merge in newly parsed data
 merge_new_operator = PythonOperator(task_id='merge_db',
                                     python_callable=begin_merging,
-                                    dag=granted_patent_parser,
-                                    on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure
+                                    **operator_settings
                                     )
-merge_new_operator.set_upstream(qc_upload_operator)
-merge_new_operator.set_upstream(qc_database_operator)
+
 qc_merge_operator = PythonOperator(task_id='qc_merge_db',
                                    python_callable=post_merge,
-                                   dag=granted_patent_parser,
-                                   on_success_callback=airflow_task_success,
-                                   on_failure_callback=airflow_task_failure
+                                   **operator_settings
                                    )
-qc_merge_operator.set_upstream(merge_new_operator)
 
 ## Merge Text Data
 merge_text_operator = PythonOperator(task_id='merge_text_db',
                                      python_callable=begin_text_merging,
-                                     dag=granted_patent_parser,
-                                     on_success_callback=airflow_task_success,
-                                     on_failure_callback=airflow_task_failure
+                                     **operator_settings
                                      )
-merge_text_operator.set_upstream(qc_parse_text_operator)
-merge_text_operator.set_upstream(qc_database_operator)
+
 qc_text_merge_operator = PythonOperator(task_id='qc_merge_text_db',
                                         python_callable=post_text_merge,
-                                        dag=granted_patent_parser,
-                                        on_success_callback=airflow_task_success,
-                                        on_failure_callback=airflow_task_failure
+                                        **operator_settings
                                         )
-qc_text_merge_operator.set_upstream(merge_text_operator)
 
 ## Withdrawn Patents
 withdrawn_operator = PythonOperator(task_id='withdrawn_processor', python_callable=process_withdrawn,
-                                    dag=granted_patent_parser,
-                                    on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure)
+                                    **operator_settings)
 withdrawn_operator.set_upstream(qc_merge_operator)
 qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_callable=post_withdrawn,
-                                       dag=granted_patent_parser, on_success_callback=airflow_task_success,
-                                       on_failure_callback=airflow_task_failure)
-qc_withdrawn_operator.set_upstream(withdrawn_operator)
+                                       **operator_settings)
+
+operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,
+                                            parse_xml_operator, upload_new_operator,
+                                            qc_upload_operator, gi_NER, gi_postprocess_NER,
+                                            merge_new_operator, qc_merge_operator, withdrawn_operator,
+                                            qc_withdrawn_operator]
+
+operator_sequence_groups['text_sequence'] = [upload_setup_operator, table_creation_operator,
+                                             upload_table_creation_operator, parse_text_data_operator,
+                                             patent_id_fix_operator, qc_parse_text_operator,
+                                             merge_text_operator, qc_text_merge_operator]
+operator_sequence_groups['xml_text_cross_dependency'] = [download_xml_operator, parse_text_data_operator]
+operator_sequence_groups['xml_preprare_dependency'] = [upload_setup_operator, upload_new_operator]
+operator_sequence_groups['merge_prepare_xml_dependency'] = [qc_database_operator, merge_new_operator]
+operator_sequence_groups['merge_prepare_text_dependency'] = [qc_database_operator, merge_text_operator]
+
+for dependency_group in operator_sequence_groups:
+    dependency_sequence = operator_sequence_groups[dependency_group]
+    for upstream, downstream in zip(dependency_sequence[:-1], dependency_sequence[1:]):
+        downstream.set_upstream(upstream)

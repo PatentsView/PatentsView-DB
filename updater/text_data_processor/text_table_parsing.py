@@ -5,8 +5,8 @@ import sys
 from QA.create_databases.TextTest import TextUploadTest
 
 
-def add_text_table_suffx(config, database_date, type='granted_patent'):
-    parsing_file_setting = "{prefix}_parsing_config_file".format(prefix=type)
+def add_text_table_suffx(config, database_date):
+    parsing_file_setting = "{prefix}_parsing_config_file".format(prefix='long_text')
     parsing_config_file = config["XML_PARSING"][parsing_file_setting]
     import json
     parsing_config = json.load(open(parsing_config_file))
@@ -20,7 +20,8 @@ def add_text_table_suffx(config, database_date, type='granted_patent'):
 def begin_text_parsing(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
-    add_text_table_suffx(config, database_date=config['DATES']['END_DATE'].strptime('%Y%m%d'))
+    add_text_table_suffx(config,
+                         database_date=datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d'))
     project_home = os.environ['PACKAGE_HOME']
     sys.path.append(project_home + '/updater/text_parser/')
     from updater.xml_to_sql.parser import queue_parsers

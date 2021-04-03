@@ -167,7 +167,7 @@ def process_post_manual(config):
     engine = create_engine(get_connection_string(config, 'TEMP_UPLOAD_DB'))
 
     # upload the new government organization we manually identified
-    upload_new_orgs(post_manual, engine)
+    # upload_new_orgs(post_manual, engine)
 
     # make and update the dictionary mapping original to clean org name
     dict_clean_org = create_dict(pre_manual, post_manual, persistent_files)
