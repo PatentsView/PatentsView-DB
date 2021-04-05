@@ -1007,6 +1007,8 @@ class UploadTest(PatentDatabaseTester):
 
     def runTests(self):
         self.test_patent_abstract_null(table='patent')
+        self.save_qa_data()
+        self.init_qa_dict()
         super(UploadTest, self).runTests()
 
 

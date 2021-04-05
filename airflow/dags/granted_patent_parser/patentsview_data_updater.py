@@ -7,11 +7,8 @@ from airflow.operators.python import PythonOperator
 from updater.collect_supplemental_data.update_withdrawn import post_withdrawn, process_withdrawn
 from updater.government_interest.NER import begin_NER_processing
 from updater.government_interest.NER_to_manual import process_ner_to_manual
-
-
-class SQLTemplatedPythonOperator(PythonOperator):
-    template_ext = ('.sql',)
-
+from updater.government_interest.post_manual import process_post_manual
+from updater.government_interest.simulate_manual import simulate_manual
 
 from lib.configuration import get_current_config, get_section, get_today_dict
 from reporting_database_generator.database.validate_query import validate_and_execute
@@ -23,6 +20,9 @@ from updater.text_data_processor.text_table_parsing import begin_text_parsing, p
 from updater.xml_to_csv.bulk_downloads import bulk_download
 from updater.xml_to_csv.parse_patents import patent_parser
 from updater.xml_to_csv.preprocess_xml import preprocess_xml
+
+class SQLTemplatedPythonOperator(PythonOperator):
+    template_ext = ('.sql',)
 
 project_home = os.environ['PACKAGE_HOME']
 templates_searchpath = "{home}/resources".format(home=project_home)
@@ -85,9 +85,13 @@ qc_upload_operator = PythonOperator(task_id='qc_upload_new', python_callable=pos
 ### GI Processing
 gi_NER = PythonOperator(task_id='gi_NER', python_callable=begin_NER_processing,
                         **operator_settings)
-gi_NER.set_upstream(qc_upload_operator)
 gi_postprocess_NER = PythonOperator(task_id='postprocess_NER', python_callable=process_ner_to_manual,
                                     **operator_settings)
+manual_simulation_operator = PythonOperator(task_id='simulate_manual_task', python_callable=simulate_manual,
+                                            **operator_settings)
+
+post_manual_operator = PythonOperator(task_id='post_manual', python_callable=process_post_manual,
+                                      **operator_settings)
 
 ### Long Text FIelds Parsing
 table_creation_operator = SQLTemplatedPythonOperator(
@@ -196,6 +200,7 @@ qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_
 operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,
                                             parse_xml_operator, upload_new_operator,
                                             qc_upload_operator, gi_NER, gi_postprocess_NER,
+                                            manual_simulation_operator, post_manual_operator,
                                             merge_new_operator, qc_merge_operator, withdrawn_operator,
                                             qc_withdrawn_operator]
 
@@ -207,7 +212,7 @@ operator_sequence_groups['xml_text_cross_dependency'] = [download_xml_operator, 
 operator_sequence_groups['xml_preprare_dependency'] = [upload_setup_operator, upload_new_operator]
 operator_sequence_groups['merge_prepare_xml_dependency'] = [qc_database_operator, merge_new_operator]
 operator_sequence_groups['merge_prepare_text_dependency'] = [qc_database_operator, merge_text_operator]
-
+operator_sequence_groups['qc_patent_dependency'] = [qc_upload_operator, qc_parse_text_operator]
 for dependency_group in operator_sequence_groups:
     dependency_sequence = operator_sequence_groups[dependency_group]
     for upstream, downstream in zip(dependency_sequence[:-1], dependency_sequence[1:]):

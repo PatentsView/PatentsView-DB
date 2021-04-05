@@ -1,4 +1,5 @@
 import time
+
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
@@ -6,6 +7,7 @@ from tqdm import tqdm
 
 from QA.post_processing.LocationPostProcessing import LocationPostProcessingQC
 from lib.configuration import get_config, get_connection_string
+from updater.post_processing.create_lookup import load_lookup_table
 
 
 class LocationPostProcessor():
@@ -668,6 +670,10 @@ def post_process_location(config):
     create_location(config)
     update_location_lat_lon(config)
     update_fips(config)
+    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
+                      parent_entity_id='location_id', entity='assignee', include_location=False)
+    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
+                      parent_entity_id='location_id', entity="inventor", include_location=True)
 
 
 def post_process_qc(config):

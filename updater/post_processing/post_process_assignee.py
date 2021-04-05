@@ -138,10 +138,10 @@ def post_process_assignee(config):
     update_rawassignee(config, database='RAW_DB', uuid_field='uuid')
     precache_assignees(config)
     create_assignee(config)
-    load_lookup_table(update_config=config, database='PGPUBS_DATABASE',
-                      entity='assignee', include_location=True)
-    load_lookup_table(update_config=config, database='RAW_DB',
-                      entity='assignee', include_location=True)
+    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
+                      parent_entity_id='patent_id', entity='assignee', include_location=True)
+    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='application',
+                      parent_entity_id='application_number', entity="assignee", include_location=True)
 
 def post_process_qc(config):
     qc = AssigneePostProcessingQC(config)

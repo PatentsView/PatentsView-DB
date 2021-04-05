@@ -6,11 +6,7 @@ from QA.PatentDatabaseTester import PatentDatabaseTester
 class DisambiguationTester(PatentDatabaseTester, ABC):
     def __init__(self, config, database_section, start_date, end_date):
         super().__init__(config, database_section, start_date, end_date)
-        self.extended_qa_data = {
-                "DataMonitor_distinctidcount": [],
-                'DataMonitor_topnentities':    []
-                }
-        self.qa_data.update(self.extended_qa_data)
+
         self.entity_table = None
         self.entity_id = None
 
@@ -20,6 +16,10 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
 
     def init_qa_dict(self):
         super(DisambiguationTester, self).init_qa_dict()
+        self.extended_qa_data = {
+                "DataMonitor_distinctidcount": [],
+                'DataMonitor_topnentities':    []
+                }
         self.qa_data.update(self.extended_qa_data)
 
     def test_floating_entities(self, table_name):
@@ -105,10 +105,9 @@ class DisambiguationTester(PatentDatabaseTester, ABC):
                 rank += 1
 
     def test_invalid_id(self, table_name=None):
-        print("\tTesting Invalid Disambiguation IDs {table_name} in {db}".format(table_name=self.disambiguated_table,
-                                                                                 db=
-                                                                                 self.config["PATENTSVIEW_DATABASES"][
-                                                                                     self.database_section]))
+        print("\tTesting Invalid Disambiguation IDs {table_name} in {db}".format(
+                table_name=self.disambiguated_table,
+                db=self.config["PATENTSVIEW_DATABASES"][self.database_section]))
         invalid_query = """
 SELECT count(1)
 from {disambiguated_table} dt
@@ -135,5 +134,6 @@ where et.{id_field} is null
         print("Beginning Disambiguation Specific Tests")
         self.test_invalid_id()
         self.top_n_generator(table_name=self.disambiguated_table)
-
+        self.save_qa_data()
+        self.init_qa_dict()
         super(DisambiguationTester, self).runTests()
