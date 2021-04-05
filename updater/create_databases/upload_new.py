@@ -43,16 +43,12 @@ def setup_database(update_config):
     engine = create_engine(connection_string)
     raw_database = update_config["PATENTSVIEW_DATABASES"]["RAW_DB"]
     temp_upload_database = update_config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
-    table_fetch_sql = "select table_name from information_schema.tables where table_type = 'base table' and table_schema ='{}'".format(
-            raw_database)
-    tables_data = engine.execute(table_fetch_sql)
-    print("Available tables are {tlist}".format(tlist=", ".join([x['table_name'] for x in tables_data])))
-    tables = [table['table_name'] for table in tables_data if table['table_name'] in required_tables]
-
-    engine.execute(
-            "create database if not exists {temp_upload_database} default character set=utf8mb4 default collate=utf8mb4_unicode_ci".format(
+    engine.execute("""
+create database if not exists {temp_upload_database} default character set=utf8mb4 default collate=utf8mb4_unicode_ci
+            """.format(
                     temp_upload_database=temp_upload_database))
-    for table in tables:
+    for table in required_tables:
+        print("Creating Table : {tbl}".format(tbl=table))
         con = engine.connect()
         con.execute(
                 "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table))

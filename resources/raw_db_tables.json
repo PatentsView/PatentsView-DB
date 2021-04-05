@@ -37,6 +37,18 @@
       "bulk_generated": false,
       "direct_load": true
     },
+    "main_cpc": {
+      "raw_data": true,
+      "lookup": false,
+      "bulk_generated": false,
+      "direct_load": true
+    },
+    "further_cpc": {
+      "raw_data": true,
+      "lookup": false,
+      "bulk_generated": false,
+      "direct_load": true
+    },
     "cpc_current": {
       "raw_data": false,
       "lookup": false,
