@@ -1,5 +1,6 @@
 import datetime
 
+from lib.configuration import get_current_config
 from updater.xml_to_sql.parser import queue_parsers
 from updater.xml_to_sql.post_processing import consolidate_granted_cpc
 
@@ -11,7 +12,6 @@ def patent_sql_parser(**kwargs):
 
 
 if __name__ == '__main__':
-    from lib.configuration import get_current_config
 
     config = get_current_config('granted_patent', **{
             "execution_date": datetime.date(2020, 12, 29)

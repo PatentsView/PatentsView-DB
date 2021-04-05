@@ -46,10 +46,11 @@ def setup_database(update_config):
     engine.execute("""
 create database if not exists {temp_upload_database} default character set=utf8mb4 default collate=utf8mb4_unicode_ci
             """.format(
-                    temp_upload_database=temp_upload_database))
+            temp_upload_database=temp_upload_database))
     for table in required_tables:
         print("Creating Table : {tbl}".format(tbl=table))
         con = engine.connect()
+        con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
         con.execute(
                 "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table))
         con.close()
