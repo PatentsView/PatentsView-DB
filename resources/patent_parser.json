@@ -41,17 +41,6 @@
           "flag": null,
           "tag": false,
           "data-type": "fulltext"
-        },
-        {
-          "field_name": "sequence",
-          "friendly_name": "Sequence",
-          "xml_path": ".",
-          "attribute": "sequence",
-          "description": null,
-          "sequence": false,
-          "flag": null,
-          "tag": false,
-          "data-type": "string"
         }
       ],
       "filename": "rel_app_text.tsv"
