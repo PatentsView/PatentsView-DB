@@ -97,39 +97,39 @@ def get_results(patents, field_dictionary):
         # #############################
         # # Text Fields
         # ##############################
-        # text_data = xml_helpers.get_main_text_fields(patent)
+        text_data = xml_helpers.get_main_text_fields(patent)
         #
-        # if text_data:
-        #     detail_desc_text_data = text_data['Detailed Description']
-        #     if detail_desc_text_data:
-        #         results['detail_desc_text'].append(
-        #                 [id_generator(), patent_id, detail_desc_text_data, len(detail_desc_text_data)])
-        #     else:
-        #         if not patent_id[0] in ['R', 'P', 'H',
-        #                                 'D']:  # these types are allowed to not have detailed descriptions
-        #             error_log.append([patent_id, 'detail-description'])
-        #
-        #     brf_sum_text_data = text_data['Brief Summary']
-        #     if brf_sum_text_data:
-        #         results['brf_sum_text'].append([id_generator(), patent_id, brf_sum_text_data])
-        #
-        #     draw_desc = text_data['Brief Description of Drawings']
-        #     for i, description in enumerate(draw_desc):
-        #         results['draw_desc_text'].append([id_generator(), patent_id, description, i])
-        #
-        #     rel_app_text_data = text_data['Other Patent Relations']
-        #     if rel_app_text_data:
-        #         results['rel_app_text'].append([id_generator(), patent_id, rel_app_text_data, 0])
-        #
-        #     government_interest_data = text_data['Government Interest']
-        #     if government_interest_data:
-        #         results['government_interest'].append([patent_id, government_interest_data])
-        #     text_fields = ['Detailed Description', 'Brief Summary', 'Brief Description of Drawings',
-        #                    'Other Patent Relations', 'Government Interest']
-        #     if not set(text_data.keys()).issubset(text_fields):
-        #         error_log.append([patent_id, text_data.keys()])
-        # else:
-        #     error_log.append([patent_id, 'description'])
+        if text_data:
+            #     detail_desc_text_data = text_data['Detailed Description']
+            #     if detail_desc_text_data:
+            #         results['detail_desc_text'].append(
+            #                 [id_generator(), patent_id, detail_desc_text_data, len(detail_desc_text_data)])
+            #     else:
+            #         if not patent_id[0] in ['R', 'P', 'H',
+            #                                 'D']:  # these types are allowed to not have detailed descriptions
+            #             error_log.append([patent_id, 'detail-description'])
+            #
+            #     brf_sum_text_data = text_data['Brief Summary']
+            #     if brf_sum_text_data:
+            #         results['brf_sum_text'].append([id_generator(), patent_id, brf_sum_text_data])
+            #
+            #     draw_desc = text_data['Brief Description of Drawings']
+            #     for i, description in enumerate(draw_desc):
+            #         results['draw_desc_text'].append([id_generator(), patent_id, description, i])
+            #
+            rel_app_text_data = text_data['Other Patent Relations']
+            if rel_app_text_data:
+                results['rel_app_text'].append([id_generator(), patent_id, rel_app_text_data, 0])
+            #
+            government_interest_data = text_data['Government Interest']
+            if government_interest_data:
+                results['government_interest'].append([patent_id, government_interest_data])
+            text_fields = ['Detailed Description', 'Brief Summary', 'Brief Description of Drawings',
+                           'Other Patent Relations', 'Government Interest']
+            if not set(text_data.keys()).issubset(text_fields):
+                error_log.append([patent_id, text_data.keys()])
+        else:
+            error_log.append([patent_id, 'description'])
 
         #############################
         # People

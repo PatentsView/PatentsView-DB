@@ -80,9 +80,9 @@ qc_database_operator = PythonOperator(task_id='qc_database_setup',
 upload_new_operator = PythonOperator(task_id='upload_current', python_callable=upload_current_data,
                                      **operator_settings
                                      )
-patent_sql_operator = PythonOperator(task_id='parse_xml_to_sql', python_callable=patent_sql_parser,
-                                     **operator_settings
-                                     )
+# patent_sql_operator = PythonOperator(task_id='parse_xml_to_sql', python_callable=patent_sql_parser,
+#                                      **operator_settings
+#                                      )
 qc_upload_operator = PythonOperator(task_id='qc_upload_new', python_callable=post_upload,
                                     **operator_settings
                                     )
@@ -197,13 +197,13 @@ qc_text_merge_operator = PythonOperator(task_id='qc_merge_text_db',
 ## Withdrawn Patents
 withdrawn_operator = PythonOperator(task_id='withdrawn_processor', python_callable=process_withdrawn,
                                     **operator_settings)
-withdrawn_operator.set_upstream(qc_merge_operator)
+
 qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_callable=post_withdrawn,
                                        **operator_settings)
 
 operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,
-                                            parse_xml_operator, upload_new_operator,
-                                            patent_sql_operator, qc_upload_operator,
+                                            parse_xml_operator, upload_new_operator
+                                            , qc_upload_operator,
                                             gi_NER, gi_postprocess_NER,
                                             manual_simulation_operator, post_manual_operator,
                                             merge_new_operator, qc_merge_operator, withdrawn_operator,

@@ -1,9 +1,10 @@
-import os
-import pandas as pd
-import re
 import logging
+import os
+import re
 
-from lib.configuration import get_upload_tables_dict
+import pandas as pd
+
+from lib.configuration import get_parsed_tables_dict
 
 logger = logging.getLogger("airflow.task")
 
@@ -11,7 +12,7 @@ logger = logging.getLogger("airflow.task")
 class ParserTest:
     def __init__(self, update_config):
         import glob
-        tables_dict = get_upload_tables_dict(update_config)
+        tables_dict = get_parsed_tables_dict(update_config)
         self.expected_entities = tables_dict.keys()
 
         input_folder = '{working_folder}/raw_data'.format(working_folder=update_config['FOLDERS'][
@@ -49,12 +50,14 @@ class ParserTest:
         try:
             df = pd.read_csv(file_path, sep="\t")
         except:
-
             raise AssertionError("Unable to read CSV file")
 
-
     def get_file_shapes(self, update_config):
-        shapes = {'timestamp': [], 'entity': [], 'count': []}
+        shapes = {
+                'timestamp': [],
+                'entity':    [],
+                'count':     []
+                }
         output_folder = '{working_folder}/parsed_data'.format(working_folder=update_config['FOLDERS']['WORKING_FOLDER'])
         logger.info(self.ip_filenames)
         for fname in self.ip_filenames:
