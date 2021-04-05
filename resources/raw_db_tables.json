@@ -231,11 +231,6 @@
       "lookup": false,
       "bulk_generated": false
     },
-    "rawlawyer_predisambig": {
-      "raw_data": false,
-      "lookup": false,
-      "bulk_generated": true
-    },
     "rawlocation": {
       "raw_data": true,
       "lookup": false,
