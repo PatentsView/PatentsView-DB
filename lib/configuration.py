@@ -1,4 +1,3 @@
-import configparser
 import datetime
 import json
 import os
@@ -87,10 +86,11 @@ def get_backup_command(**kwargs):
     verbosity = 3
     thread = 6
 
-    backup_command = """{command} --defaults-file={conf_parameter} -F 50 -s 5000000 -l 1999999999 -v {verbosity} -t {thread} -B {database} -o {directory_parameter} --lock-all-tables""".format(
-            command=command, conf_parameter=conf_parameter, verbosity=verbosity, thread=thread,
-            directory_parameter=directory_parameter, database=database_parameter)
-
+    backup_command = """
+{command} --defaults-file={conf_parameter} -F 50 -s 5000000 -l 1999999999 -v {verbosity} -t {thread} -B {database} -o 
+{directory_parameter} --lock-all-tables
+    """.format(command=command, conf_parameter=conf_parameter, verbosity=verbosity,
+               thread=thread, directory_parameter=directory_parameter, database=database_parameter)
     return backup_command
 
 
@@ -104,9 +104,11 @@ def get_loader_command(config, project_home):
     verbosity = 3
     thread = 6
 
-    loader_command = "{command} {script} {conf_parameter} -d {directory_parameter} -s {database_parameter} -v {verbosity} -t {thread} -o".format(
-            command=command, script=script, conf_parameter=conf_parameter, directory_parameter=directory_parameter,
-            database_parameter=database_parameter, verbosity=verbosity, thread=thread)
+    loader_command = """
+{command} {script} {conf_parameter} -d {directory_parameter} -s {database_parameter} -v {verbosity} -t {thread} -o
+    """.format(command=command, script=script, conf_parameter=conf_parameter,
+               directory_parameter=directory_parameter, database_parameter=database_parameter,
+               verbosity=verbosity, thread=thread)
 
     return loader_command
 
@@ -117,52 +119,11 @@ def get_text_table_load_command(project_home, **kwargs):
     defaults_parameter = config['DATABASE_SETUP']['CONFIG_FILE']
     script_to_load = "{home}/resources/text_table_triggers.sql".format(home=project_home)
     database = config["PATENTSVIEW_DATABASES"]['TEMP_UPLOAD_DB']
-    create_command = "{command} --defaults-file={default_param} {database} < {script_to_load}".format(command=command,
-                                                                                                      default_param=defaults_parameter,
-                                                                                                      database=database,
-                                                                                                      script_to_load=script_to_load)
+    create_command = "{command} --defaults-file={default_param} {database} < {script_to_load}".format(
+            command=command, default_param=defaults_parameter,
+            database=database, script_to_load=script_to_load)
     return create_command
 
-
-#
-# def get_scp_copy_command(config):
-#     # scp -i "$KEYFILE" "$FOLDER"/*.tsv disambiguser@ec2-52-21-62-204.compute-1.amazonaws.com:/data/disambiguation/data
-#     command = 'scp'
-#     keyfile_parameter = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
-#     disambig_input_folder = '{}/disambig_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])
-#     source_blob = "{folder}/*.tsv".format(folder=disambig_input_folder)
-#     disambig_user = 'disambiguser'
-#     disambig_host = "ec2-52-21-62-204.compute-1.amazonaws.com"
-#     destination = "/data/disambiguation/data"
-#
-#     command = "{command} -i {keyfile} {source_blob} {user}@{host}:{destination}".format(command=command,
-#                                                                                         keyfile=keyfile_parameter,
-#                                                                                         source_blob=source_blob,
-#                                                                                         user=disambig_user,
-#                                                                                         host=disambig_host,
-#                                                                                         destination=destination)
-#     return command
-#
-#
-# def get_scp_download_command(config):
-#     command = 'scp'
-#     keyfile_parameter = config['DISAMBIGUATION_CREDENTIALS']['KEY_FILE']
-#     disambig_output_folder = '{}/disambig_output/'.format(config['FOLDERS']['WORKING_FOLDER'])
-#     disambig_user = 'disambiguser'
-#     disambig_host = "ec2-52-21-62-204.compute-1.amazonaws.com"
-#     source_files = {
-#             'inventor_disambiguation.tsv': '/data/disambiguation/exp_out/inventor/disambiguation.postprocessed.tsv',
-#             'assignee_disambiguation.tsv': '/data/disambiguation/exp_out/assignee/disambiguation.tsv',
-#             'location_disambiguation.tsv': '/data/disambiguation/exp_out/location/location_post_processed.tsv'
-#             }
-#     command_strings = ["mkdir -p {disambig_output_folder}".format(disambig_output_folder=disambig_output_folder)]
-#     for dest_file in source_files:
-#         command_string = "{command} -i {keyfile} {user}@{host}:{source_file} {disambig_output_folder}/{dest_file} " \
-#                          "".format(
-#                 command=command, keyfile=keyfile_parameter, dest_file=dest_file, source_file=source_files[dest_file],
-#                 user=disambig_user, host=disambig_host, disambig_output_folder=disambig_output_folder)
-#         command_strings.append(command_string)
-#     return " && ".join(command_strings)
 
 def get_today_dict(type='granted_patent', from_date=datetime.date.today()):
     day_offset = 1
@@ -190,8 +151,8 @@ def get_required_tables(update_config):
 
 def get_upload_tables_dict(update_config):
     raw_db_table_settings = get_table_config(update_config)
-    required_tables = {x: False for x in raw_db_table_settings["table_list"] if
-                       raw_db_table_settings["table_list"][x]["raw_data"]}
+    required_tables = {x: False for x in raw_db_table_settings["table_list"] if not
+    raw_db_table_settings["table_list"][x]["bulk_generated"]}
     return required_tables
 
 

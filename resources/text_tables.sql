@@ -1,21 +1,21 @@
 {% set target_database = params.database %}
-    {% set year = execution_date.strftime('%Y') %}
+    {% set dbdate= execution_date+macros.timedelta(days=7) %}
+    {% set year = dbdate.strftime('%Y') %}
     {% if params.add_suffix %}
-    {% set target_database = target_database  +  execution_date.strftime('%Y%m%d')|string  %}
+    {% set target_database = target_database  +  dbdate.strftime('%Y%m%d')|string  %}
     {% endif %}
 
     CREATE TABLE IF NOT EXISTS `{{target_database}}`.`brf_sum_text_{{year}}`
     (
-        `uuid`         varchar(512) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `patent_id`    varchar(32)  CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci   DEFAULT NULL,
-        `text`         longtext CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `filename`     varchar(32) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `created_date` timestamp NULL  DEFAULT current_timestamp(),
-        `updated_date` timestamp NULL  DEFAULT NULL
+        `uuid`              varchar(512) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `patent_id`         varchar(32) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `text`              longtext CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `version_indicator` date           DEFAULT NULL,
+        `created_date`      timestamp NULL DEFAULT current_timestamp(),
+        `updated_date`      timestamp NULL DEFAULT NULL
             ON UPDATE current_timestamp(),
         UNIQUE KEY `patent_id` (`patent_id`)
     )
@@ -30,21 +30,20 @@
 
     CREATE TABLE IF NOT EXISTS `{{target_database}}`.`claim_{{year}}`
     (
-        `uuid`         varchar(512) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `patent_id`    varchar(32) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `num`          varchar(16) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `text`         longtext CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `sequence`     int(11)         DEFAULT NULL,
-        `dependent`    varchar(512) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `filename`     varchar(32) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `created_date` timestamp NULL  DEFAULT current_timestamp(),
-        `updated_date` timestamp NULL  DEFAULT NULL
+        `uuid`              varchar(512) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `patent_id`         varchar(32) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `num`               varchar(16) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `text`              longtext CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `sequence`          int(11)        DEFAULT NULL,
+        `dependent`         varchar(512) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `version_indicator` date           DEFAULT NULL,
+        `created_date`      timestamp NULL DEFAULT current_timestamp(),
+        `updated_date`      timestamp NULL DEFAULT NULL
             ON UPDATE current_timestamp(),
         UNIQUE KEY `patent_id` (`patent_id`, `num`)
     )
@@ -59,17 +58,16 @@
 
     CREATE TABLE IF NOT EXISTS `{{target_database}}`.`detail_desc_text_{{year}}`
     (
-        `uuid`         varchar(512) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `patent_id`    varchar(32) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci    DEFAULT NULL,
-        `text`         longtext CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `length`       bigint(16)      DEFAULT NULL,
-        `filename`     varchar(32) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `created_date` timestamp NULL  DEFAULT current_timestamp(),
-        `updated_date` timestamp NULL  DEFAULT NULL
+        `uuid`              varchar(512) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `patent_id`         varchar(32) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `text`              longtext CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `length`            bigint(16)     DEFAULT NULL,
+        `version_indicator` date           DEFAULT NULL,
+        `created_date`      timestamp NULL DEFAULT current_timestamp(),
+        `updated_date`      timestamp NULL DEFAULT NULL
             ON UPDATE current_timestamp(),
         UNIQUE KEY `patent_id` (`patent_id`)
     )
@@ -84,17 +82,16 @@
 
     CREATE TABLE IF NOT EXISTS `{{target_database}}`.`draw_desc_text_{{year}}`
     (
-        `uuid`         varchar(512) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `patent_id`    varchar(32)  CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci   DEFAULT NULL,
-        `text`         longtext CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `sequence`     int(11)         DEFAULT NULL,
-        `filename`     varchar(32) CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `created_date` timestamp NULL  DEFAULT current_timestamp(),
-        `updated_date` timestamp NULL  DEFAULT NULL
+        `uuid`              varchar(512) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `patent_id`         varchar(32) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `text`              longtext CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `sequence`          int(11)        DEFAULT NULL,
+        `version_indicator` date           DEFAULT NULL,
+        `created_date`      timestamp NULL DEFAULT current_timestamp(),
+        `updated_date`      timestamp NULL DEFAULT NULL
             ON UPDATE current_timestamp(),
         KEY `patent_id` (`patent_id`)
     )
@@ -110,10 +107,10 @@
 
     CREATE TABLE IF NOT EXISTS `{{target_database}}`.`claim_exemplary_{{year}}`
     (
-        `exemplary` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        `patent_id`    varchar(32)  CHARACTER SET utf8mb4
-            COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
-        `filename`  text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        `exemplary`         text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        `patent_id`         varchar(32) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci                      DEFAULT NULL,
+        `version_indicator` date                            DEFAULT NULL,
         KEY `patent_id` (`patent_id`)
 
     )

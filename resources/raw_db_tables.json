@@ -2,247 +2,299 @@
   "table_list": {
     "application": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "assignee": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true,
+      "processed": true
     },
     "assignee_disambiguation_mapping": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "botanic": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "country_codes": {
       "raw_data": false,
-      "lookup": true
+      "lookup": true,
+      "bulk_generated": false
     },
     "cpc": {
-      "raw_data": false,
-      "lookup": false
+      "raw_data": true,
+      "lookup": false,
+      "bulk_generated": false
     },
     "cpc_current": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "cpc_group": {
       "raw_data": false,
-      "lookup": true
+      "lookup": true,
+      "bulk_generated": false
     },
     "cpc_subgroup": {
       "raw_data": false,
-      "lookup": true
+      "lookup": true,
+      "bulk_generated": false
     },
     "cpc_subsection": {
       "raw_data": false,
-      "lookup": true
+      "lookup": true,
+      "bulk_generated": false
     },
     "detail_desc_length": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "figures": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "foreign_priority": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "foreigncitation": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "government_interest": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "government_organization": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "inventor": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "inventor_disambiguation_ids": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "inventor_disambiguation_mapping": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "inventor_gender": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "ipcr": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "lawyer": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "location": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "location_assignee": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "location_disambiguation_mapping": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "location_inventor": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "mainclass": {
       "raw_data": true,
-      "lookup": true
+      "lookup": true,
+      "bulk_generated": false
     },
     "mainclass_current": {
       "raw_data": false,
-      "lookup": true
+      "lookup": true,
+      "bulk_generated": false
     },
     "nber": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "nber_category": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "nber_subcategory": {
       "raw_data": false,
-      "lookup": false
+      "lookup": true,
+      "bulk_generated": false
     },
     "non_inventor_applicant": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "otherreference": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "patent": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "patent_assignee": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "patent_contractawardnumber": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "patent_govintorg": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "patent_inventor": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "patent_lawyer": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "pct_data": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "persistent_assignee_disambig": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "persistent_assignee_disambig_long": {
       "raw_data": false,
-      "lookup": false
-    },
-    "persistent_inventor_disambig": {
-      "raw_data": false,
-      "lookup": false
-    },
-    "persistent_inventor_disambig_long": {
-      "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "rawassignee": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "rawexaminer": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "rawinventor": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "rawlawyer": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "rawlawyer_predisambig": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "rawlocation": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "rel_app_text": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "subclass": {
       "raw_data": true,
-      "lookup": true
+      "lookup": true,
+      "bulk_generated": false
     },
     "subclass_current": {
       "raw_data": false,
-      "lookup": true
+      "lookup": true,
+      "bulk_generated": false
     },
     "us_term_of_grant": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "usapplicationcitation": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "uspatentcitation": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "uspc": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "uspc_current": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "usreldoc": {
       "raw_data": true,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     },
     "wipo": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": true
     },
     "wipo_field": {
       "raw_data": false,
-      "lookup": false
+      "lookup": false,
+      "bulk_generated": false
     }
   }
 }

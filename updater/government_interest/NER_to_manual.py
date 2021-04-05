@@ -140,10 +140,11 @@ def perform_lookups(existing_lookup, govt_acc_dict, organizations, manual_inputs
 
 def get_orgs(db_con, manual_inputs):
     raw = pd.read_sql("select * from government_organization", db_con)
-    raw.to_csv(manual_inputs + "/government_organization.csv", index=None)
+    raw.to_csv(manual_inputs + "/government_organization.csv", index=False)
 
 
-def process_ner_to_manual(config):
+def process_ner_to_manual(**kwargs):
+    config = get_current_config('granted_patent',**kwargs)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     manual_inputs = '{}/government_interest/manual_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])
@@ -159,7 +160,6 @@ def process_ner_to_manual(config):
 
 
 if __name__ == '__main__':
-    config = get_current_config('granted_patent', **{
-            "execution_date": datetime.date(2020, 12, 29)
+    process_ner_to_manual( **{
+            "execution_date": datetime.date(2020, 12, 22)
             })
-    process_ner_to_manual(config)

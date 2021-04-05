@@ -11,8 +11,8 @@ class LocationPostProcessingQC(DisambiguationTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, 'RAW_DB', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
-                'rawlocation': {
-                        'fields':           {
+                'rawlocation':       {
+                        'fields': {
                                 'id':                      {
                                         'data_type':    'varchar',
                                         'null_allowed': False,
@@ -50,7 +50,7 @@ class LocationPostProcessingQC(DisambiguationTester):
                                         }
                                 }
                         },
-                'location':    {
+                'location':          {
                         "fields":           {
                                 "id":          {
                                         "data_type":    "varchar",
@@ -113,7 +113,57 @@ class LocationPostProcessingQC(DisambiguationTester):
                                         'source_id':      'id',
                                         'destination_id': 'location_id'
                                         }]
-                        }
+                        },
+                'location_assignee': {
+                        "fields":           {
+                                "location_id": {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "assignee_id": {
+                                        "data_type":    "varchar",
+                                        "null_allowed": True,
+                                        "category":     False
+                                        },
+                                },
+                        'related_entities': [
+                                {
+                                        'table':          'location',
+                                        'source_id':      'location_id',
+                                        'destination_id': 'id'
+                                        },
+                                {
+                                        'table':          'assignee',
+                                        'source_id':      'assignee_id',
+                                        'destination_id': 'id'
+                                        }]
+                        },
+                'location_inventor': {
+                        "fields":           {
+                                "location_id": {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "inventor_id": {
+                                        "data_type":    "varchar",
+                                        "null_allowed": True,
+                                        "category":     False
+                                        }
+                                },
+                        'related_entities': [
+                                {
+                                        'table':          'location',
+                                        'source_id':      'location_id',
+                                        'destination_id': 'id'
+                                        },
+                                {
+                                        'table':          'inventor',
+                                        'source_id':      'inventor_id',
+                                        'destination_id': 'id'
+                                        }]
+                        },
                 }
 
         self.disambiguated_data_fields = ['city', 'state', 'country']
@@ -202,6 +252,5 @@ if __name__ == '__main__':
             "START_DATE": '20201006',
             "END_DATE":   '20201229'
             }
-    lc = InventorPostProcessingQC(config)
-    for table in lc.table_config:
-        lc.test_related_floating_entities(table_config=lc.table_config[table], table_name=table)
+    lc = LocationPostProcessingQC(config)
+    lc.runTests()

@@ -128,8 +128,6 @@ def process_NER(txt_fp_out, data):
 
 def extract_contract_award(gi_row):
     statement = gi_row.gi_statement
-    print(statement)
-    print(type(statement))
     statement = re.sub('FAR[^a-zA-Z]+', "", statement)
     statement = re.sub('pursuant\s*to\s*.*U(\.)?S\.?C\.?\s*\.?sctn\.?[^s]+', "", statement, flags=re.IGNORECASE)
     statement = re.sub('USC[^a-zA-Z]+', "", statement)
@@ -365,10 +363,9 @@ def test_dataframe(df, rw, col):
     return
 
 
-def begin_NER_processing(config):
-    persistent_files = config['FOLDERS']['PERSISTENT_FILES']
+def begin_NER_processing(**kwargs):
+    config = get_current_config(type='granted_patent', **kwargs)
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
-    working_folder = config['FOLDERS']['WORKING_FOLDER']
 
     # Set up vars + directories
     merged_csv = '{}/merged_csvs.csv'.format(pre_manual)
@@ -401,7 +398,9 @@ def begin_NER_processing(config):
 
 
 if __name__ == '__main__':
-    config = get_current_config('granted_patent', **{
-            "execution_date": datetime.date(2020, 12, 29)
+    # config = get_current_config('granted_patent', **{
+    #         "execution_date": datetime.date(2020, 12, 29)
+    #         })
+    begin_NER_processing(**{
+            "execution_date": datetime.date(2020, 12, 22)
             })
-    begin_NER_processing(config)
