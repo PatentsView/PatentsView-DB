@@ -1,10 +1,10 @@
 import datetime
 
 import pymysql
+from sqlalchemy import create_engine
 
 from QA.text_parser.AppTest import AppUploadTest
 from lib.configuration import get_connection_string, get_current_config
-from sqlalchemy import create_engine
 
 
 def pct_data_doc_type(config):
@@ -187,8 +187,44 @@ def yearly_detail_desc_text(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into detail_desc_text_{} select * from detail_desc_text d where substring(d.document_number, 1, 4) = '{}';".format(
+                "insert into detail_desc_text_{} select * from detail_desc_text d where substring(d.document_number, "
+                "1, 4) = '{}';".format(
                         year, year))
+
+
+def consolidate_granted_cpc(config):
+    cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
+    engine = create_engine(cstr)
+    engine.execute(
+            """
+INSERT INTO cpc (uuid, patent_id, section_id, subsection_id, group_id, subgroup_id, category, sequence,
+                 version_indicator)
+SELECT uuid,
+       patent_id,
+       section,
+       concat(section, class),
+       concat(section, class, subclass),
+       concat(section, class, subclass, main_group, '/', subgroup),
+       IF(value = 'I', 'inventional', 'additional'),
+       sequence,
+       version_indicator
+from main_cpc;
+            """)
+    engine.execute(
+            """
+INSERT INTO cpc (uuid, patent_id, section_id, subsection_id, group_id, subgroup_id, category, sequence,
+                 version_indicator)
+SELECT uuid,
+       patent_id,
+       section,
+       concat(section, class),
+       concat(section, class, subclass),
+       concat(section, class, subclass, main_group, '/', subgroup),
+       IF(value = 'I', 'inventional', 'additional'),
+       sequence,
+       version_indicator
+from further_cpc;
+            """)
 
 
 def begin_post_processing(**kwargs):

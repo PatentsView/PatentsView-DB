@@ -152,14 +152,15 @@ def get_required_tables(update_config):
 def get_upload_tables_dict(update_config):
     raw_db_table_settings = get_table_config(update_config)
     required_tables = {x: False for x in raw_db_table_settings["table_list"] if not
-                       raw_db_table_settings["table_list"][x]["bulk_generated"]}
+    raw_db_table_settings["table_list"][x]["bulk_generated"]}
     return required_tables
 
 
 def get_parsed_tables_dict(update_config):
     raw_db_table_settings = get_table_config(update_config)
     required_tables = {x: False for x in raw_db_table_settings["table_list"] if
-                       raw_db_table_settings["table_list"][x]["raw_data"]}
+                       raw_db_table_settings["table_list"][x]["raw_data"] and not
+                       raw_db_table_settings["table_list"][x]["direct_load"]}
     return required_tables
 
 

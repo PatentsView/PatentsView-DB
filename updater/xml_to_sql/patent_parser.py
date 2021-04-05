@@ -1,11 +1,13 @@
 import datetime
 
 from updater.xml_to_sql.parser import queue_parsers
+from updater.xml_to_sql.post_processing import consolidate_granted_cpc
 
 
 def patent_sql_parser(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
     queue_parsers(config, type='granted_patent')
+    consolidate_granted_cpc(config)
 
 
 if __name__ == '__main__':
