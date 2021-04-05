@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+
 from QA.PatentDatabaseTester import PatentDatabaseTester
 from lib.configuration import get_current_config
 
@@ -316,6 +317,58 @@ class MergeTest(PatentDatabaseTester):
                 #                         }
                 #                 }
                 #         },
+                'nber':                   {
+                        'fields': {
+                                'uuid':           {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'patent_id':      {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'category_id':    {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     True
+                                        },
+                                'subcategory_id': {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     True
+                                        }
+                                }
+                        },
+                'nber_category':          {
+                        'fields': {
+                                'id':    {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'title': {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        }
+                                }
+                        },
+                'nber_subcategory':       {
+                        'fields': {
+                                'id':    {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'title': {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        }
+                                }
+                        },
                 'non_inventor_applicant': {
                         'fields': {
                                 'fname':          {
@@ -879,6 +932,35 @@ class MergeTest(PatentDatabaseTester):
                                 }
                         },
                 'uspc':                   {
+                        'fields': {
+                                'uuid':         {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'patent_id':    {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'mainclass_id': {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     True
+                                        },
+                                'subclass_id':  {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     True
+                                        },
+                                'sequence':     {
+                                        'data_type':    'int',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        }
+                                }
+                        },
+                'uspc_current':           {
                         'fields': {
                                 'uuid':         {
                                         'data_type':    'varchar',

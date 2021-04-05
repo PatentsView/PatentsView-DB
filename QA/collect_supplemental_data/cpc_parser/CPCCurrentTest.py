@@ -54,23 +54,43 @@ class CPCTest(PatentDatabaseTester):
                                 }
                         },
                 'wipo':           {
-                        'fields':   {
+                        'fields': {
                                 'patent_id': {
                                         'data_type':    'varchar',
                                         'null_allowed': False,
                                         'category':     False
+                                        },
+                                'sequence':  {
+                                        'data_type':    'int',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'field_id':  {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     True
                                         }
-                                },
-                        'sequence': {
-                                'data_type':    'int',
-                                'null_allowed': False,
-                                'category':     False
-                                },
-                        'field_id': {
-                                'data_type':    'varchar',
-                                'null_allowed': False,
-                                'category':     True
                                 }
+                        },
+
+                'wipo_field':     {
+                        'fields': {
+                                'id':            {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'section_title': {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'field_title':   {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                },
                         },
                 'cpc_group':      {
                         'fields':           {
@@ -145,7 +165,8 @@ class CPCTest(PatentDatabaseTester):
                 self.connection.connect()
 
             with self.connection.cursor() as count_cursor:
-                in_between_query = "SELECT count(1) as new_count from {table} t join patent p on p.id =t.patent_id and p.date  between '{start_dt}' and '{end_dt}'".format(
+                in_between_query = "SELECT count(1) as new_count from {table} t join patent p on p.id =t.patent_id " \
+                                   "and p.date  between '{start_dt}' and '{end_dt}'".format(
                         table=table, start_dt=start_date_string, end_dt=end_date_string)
                 count_cursor.execute(in_between_query)
                 count_value = count_cursor.fetchall()[0][0]

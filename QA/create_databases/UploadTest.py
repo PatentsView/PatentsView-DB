@@ -892,6 +892,35 @@ class UploadTest(PatentDatabaseTester):
                                         }
                                 }
                         },
+                'uspc_current': {
+                        'fields': {
+                                'uuid':         {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'patent_id':    {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        },
+                                'mainclass_id': {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     True
+                                        },
+                                'subclass_id':  {
+                                        'data_type':    'varchar',
+                                        'null_allowed': False,
+                                        'category':     True
+                                        },
+                                'sequence':     {
+                                        'data_type':    'int',
+                                        'null_allowed': False,
+                                        'category':     False
+                                        }
+                                }
+                        },
                 'usreldoc':               {
                         'fields': {
                                 'status':    {
@@ -986,7 +1015,7 @@ class UploadTest(PatentDatabaseTester):
                                         'category':     False
                                         }
                                 }
-                        }
+                        },
                 }
 
     def test_patent_abstract_null(self, table):
