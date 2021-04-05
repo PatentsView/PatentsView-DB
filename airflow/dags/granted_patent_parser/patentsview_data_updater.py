@@ -4,25 +4,27 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
+from lib.configuration import get_current_config, get_section, get_today_dict
+from reporting_database_generator.database.validate_query import validate_and_execute
+from updater.callbacks import airflow_task_failure
 from updater.collect_supplemental_data.update_withdrawn import post_withdrawn, process_withdrawn
+from updater.create_databases.merge_in_new_data import begin_merging, begin_text_merging, post_merge, post_text_merge
+from updater.create_databases.rename_db import qc_database
+from updater.create_databases.upload_new import begin_database_setup, post_upload, upload_current_data
 from updater.government_interest.NER import begin_NER_processing
 from updater.government_interest.NER_to_manual import process_ner_to_manual
 from updater.government_interest.post_manual import process_post_manual
 from updater.government_interest.simulate_manual import simulate_manual
-
-from lib.configuration import get_current_config, get_section, get_today_dict
-from reporting_database_generator.database.validate_query import validate_and_execute
-from updater.callbacks import airflow_task_failure
-from updater.create_databases.merge_in_new_data import begin_merging, begin_text_merging, post_merge, post_text_merge
-from updater.create_databases.rename_db import qc_database
-from updater.create_databases.upload_new import begin_database_setup, post_upload, upload_current_data
 from updater.text_data_processor.text_table_parsing import begin_text_parsing, post_text_parsing
 from updater.xml_to_csv.bulk_downloads import bulk_download
 from updater.xml_to_csv.parse_patents import patent_parser
 from updater.xml_to_csv.preprocess_xml import preprocess_xml
+from updater.xml_to_sql.patent_parser import patent_sql_parser
+
 
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
+
 
 project_home = os.environ['PACKAGE_HOME']
 templates_searchpath = "{home}/resources".format(home=project_home)
@@ -78,7 +80,9 @@ qc_database_operator = PythonOperator(task_id='qc_database_setup',
 upload_new_operator = PythonOperator(task_id='upload_current', python_callable=upload_current_data,
                                      **operator_settings
                                      )
-
+patent_sql_operator = PythonOperator(task_id='parse_xml_to_sql', python_callable=patent_sql_parser,
+                                     **operator_settings
+                                     )
 qc_upload_operator = PythonOperator(task_id='qc_upload_new', python_callable=post_upload,
                                     **operator_settings
                                     )
@@ -199,7 +203,8 @@ qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_
 
 operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,
                                             parse_xml_operator, upload_new_operator,
-                                            qc_upload_operator, gi_NER, gi_postprocess_NER,
+                                            patent_sql_operator, qc_upload_operator,
+                                            gi_NER, gi_postprocess_NER,
                                             manual_simulation_operator, post_manual_operator,
                                             merge_new_operator, qc_merge_operator, withdrawn_operator,
                                             qc_withdrawn_operator]

@@ -1,0 +1,58 @@
+{
+  "foreign_key_config": {
+    "field_name": "patent_id",
+    "friendly_name": "Patent Number",
+    "xml_path": "us-bibliographic-data-grant/publication-reference/document-id/doc-number",
+    "data-type": "string"
+  },
+  "table_xml_map": [
+    {
+      "table_prefix": "government_interest",
+      "friendly_name": "Government Interest",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "gi_statement",
+          "friendly_name": "GI Text",
+          "xml_path": "description",
+          "description": "Government Interest",
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "gi.tsv",
+      "table_name": "government_interest"
+    },{
+      "table_name": "rel_app_text",
+      "friendly_name": "Related Application Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "description",
+          "description": "Cross Reference To Related Applications",
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        },        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": "sequence",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "rel_app_text.tsv"
+    }
+  ]
+}

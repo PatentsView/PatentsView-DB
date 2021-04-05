@@ -3,6 +3,9 @@ import datetime
 from updater.xml_to_sql.parser import queue_parsers
 
 
+def patent_sql_parser(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
+    queue_parsers(config, type='granted_patent')
 
 
 if __name__ == '__main__':
