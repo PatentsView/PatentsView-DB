@@ -18,4 +18,4 @@ DROP TRIGGER if exists `{{target_database}}`.before_insert_rel_app_text;
 create TRIGGER `{{target_database}}`.before_insert_rel_app_text
     BEFORE INSERT
     ON rel_app_text
-    FOR EACH ROW SET new.uiud= uuid();
+    FOR EACH ROW SET new.uuid= uuid();

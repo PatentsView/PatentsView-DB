@@ -1,8 +1,9 @@
 {% set target_database = params.database %}
-{% set year = execution_date.strftime('%Y') %}
-{% if params.add_suffix %}
-    {% set target_database = target_database  +  execution_date.strftime('%Y%m%d')|string  %}
-{% endif %}
+    {% set dbdate= execution_date+macros.timedelta(days=7) %}
+    {% set year = dbdate.strftime('%Y') %}
+    {% if params.add_suffix %}
+    {% set target_database = target_database  +  dbdate.strftime('%Y%m%d')|string  %}
+    {% endif %}
 
 UPDATE {{ target_database }}.`brf_sum_text_{{ year }}`
 SET patent_id = CONCAT(SUBSTR(patent_id, 1, REGEXP_INSTR(`patent_id`, '[0-9]') - 1),
