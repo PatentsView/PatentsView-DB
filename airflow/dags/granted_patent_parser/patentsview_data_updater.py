@@ -80,6 +80,26 @@ qc_database_operator = PythonOperator(task_id='qc_database_setup',
 upload_new_operator = PythonOperator(task_id='upload_current', python_callable=upload_current_data,
                                      **operator_settings
                                      )
+upload_trigger_operator = SQLTemplatedPythonOperator(
+        task_id='create_uuid_triggers',
+        provide_context=True,
+        python_callable=validate_and_execute,
+        op_kwargs={
+                'filename':    'granted_patent_database',
+                "schema_only": False,
+                "section":     get_section('granted_patent_updater', 'fix_patent_ids-upload'),
+
+                },
+        dag=granted_patent_parser,
+        templates_dict={
+                'source_sql': 'granted_patent_database.sql'
+                },
+        templates_exts=['.sql'],
+        params={
+                'database':   'upload_',
+                'add_suffix': True
+                }
+        )
 patent_sql_operator = PythonOperator(task_id='parse_xml_to_sql', python_callable=patent_sql_parser,
                                      **operator_settings
                                      )
@@ -203,8 +223,8 @@ qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_
 
 operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,
                                             parse_xml_operator, upload_new_operator,
-                                            patent_sql_operator, qc_upload_operator,
-                                            gi_NER, gi_postprocess_NER,
+                                            upload_trigger_operator, patent_sql_operator,
+                                            qc_upload_operator, gi_NER, gi_postprocess_NER,
                                             manual_simulation_operator, post_manual_operator,
                                             merge_new_operator, qc_merge_operator, withdrawn_operator,
                                             qc_withdrawn_operator]

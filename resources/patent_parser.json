@@ -35,7 +35,7 @@
           "field_name": "text",
           "friendly_name": "Text",
           "xml_path": "description",
-          "description": "Cross Reference To Related Applications",
+          "description": "Other Patent Relations",
           "sequence": false,
           "attribute": null,
           "flag": null,
@@ -49,7 +49,7 @@
       "table_name": "main_cpc",
       "friendly_name": "Main CPC",
       "multi_valued": true,
-      "entity_root_path": "us-bibliographic-data-application/classifications-cpc/main-cpc/",
+      "entity_root_path": "us-bibliographic-data-grant/classifications-cpc/main-cpc/",
       "fields": [
         {
           "field_name": "version",
@@ -168,7 +168,7 @@
       "table_name": "further_cpc",
       "friendly_name": "Further CPC",
       "multi_valued": true,
-      "entity_root_path": "us-bibliographic-data-application/classifications-cpc/further-cpc/",
+      "entity_root_path": "us-bibliographic-data-grant/classifications-cpc/further-cpc/",
       "fields": [
         {
           "field_name": "version",
