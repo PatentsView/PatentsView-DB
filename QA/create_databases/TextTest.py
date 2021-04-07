@@ -7,7 +7,7 @@ class TextMergeTest(PatentDatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         brf_key = "brf_sum_text_{year}".format(year=end_date.year)
-        clm_key = "claim_{year}".format(year=end_date.year)
+        clm_key = "claims_{year}".format(year=end_date.year)
         ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
 

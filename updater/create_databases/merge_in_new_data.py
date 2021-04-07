@@ -7,7 +7,8 @@ from sqlalchemy import create_engine
 
 from QA.create_databases.MergeTest import MergeTest
 from QA.create_databases.TextTest import TextMergeTest
-from lib.configuration import get_connection_string, get_current_config, get_lookup_tables, get_parsed_tables_dict
+from lib.configuration import get_connection_string, get_current_config, get_lookup_tables, get_merge_table_candidates, \
+    get_parsed_tables_dict
 
 
 def get_merge_status(status_folder, run_id):
@@ -148,7 +149,7 @@ def merge_text_data(tables, update_config):
 def begin_merging(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
-    tables_dict = get_parsed_tables_dict(config)
+    tables_dict = get_merge_table_candidates(config)
     tables = tables_dict.keys()
     project_home = os.environ['PACKAGE_HOME']
     merge_new_data(tables, project_home, config, kwargs['run_id'])

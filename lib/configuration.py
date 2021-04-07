@@ -164,6 +164,13 @@ def get_parsed_tables_dict(update_config):
     return required_tables
 
 
+def get_merge_table_candidates(update_config):
+    raw_db_table_settings = get_table_config(update_config)
+    required_tables = {x: False for x in raw_db_table_settings["table_list"] if
+                       raw_db_table_settings["table_list"][x]["raw_data"]}
+    return required_tables
+
+
 def get_lookup_tables(update_config):
     raw_db_table_settings = get_table_config(update_config)
     lookup_tables = [x for x in raw_db_table_settings["table_list"] if raw_db_table_settings["table_list"][x]["lookup"]]
