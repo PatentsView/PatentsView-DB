@@ -7,8 +7,7 @@ from sqlalchemy import create_engine
 
 from QA.create_databases.MergeTest import MergeTest
 from QA.create_databases.TextTest import TextMergeTest
-from lib.configuration import get_connection_string, get_current_config, get_lookup_tables, get_parsed_tables_dict, \
-    get_upload_tables_dict
+from lib.configuration import get_connection_string, get_current_config, get_lookup_tables, get_parsed_tables_dict
 
 
 def get_merge_status(status_folder, run_id):
