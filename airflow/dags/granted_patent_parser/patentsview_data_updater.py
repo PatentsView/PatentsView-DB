@@ -231,8 +231,9 @@ operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_o
 
 operator_sequence_groups['text_sequence'] = [upload_setup_operator, table_creation_operator,
                                              upload_table_creation_operator, parse_text_data_operator,
-                                             patent_id_fix_operator, qc_parse_text_operator,
-                                             merge_text_operator, qc_text_merge_operator]
+                                             patent_id_fix_operator, qc_upload_operator,
+                                             qc_parse_text_operator, merge_text_operator,
+                                             qc_text_merge_operator]
 operator_sequence_groups['xml_text_cross_dependency'] = [download_xml_operator, parse_text_data_operator]
 operator_sequence_groups['xml_preprare_dependency'] = [upload_setup_operator, upload_new_operator]
 operator_sequence_groups['merge_prepare_xml_dependency'] = [qc_database_operator, merge_new_operator]
