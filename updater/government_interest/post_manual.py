@@ -1,14 +1,13 @@
 import ast
-import datetime
-import os
-import csv
-import pandas as pd
-import numpy as np
 import codecs
+import csv
+import datetime
 
+import numpy as np
+import pandas as pd
 from sqlalchemy import create_engine
 
-from lib.configuration import get_connection_string, get_config, get_current_config
+from lib.configuration import get_connection_string, get_current_config
 
 
 def upload_new_orgs(post_manual, engine):
@@ -160,7 +159,8 @@ def push_orgs(looked_up_data, org_id_mapping, config):
     total_missed_orgs.to_csv('{}/incorrect_clean_orgs.csv'.format(post_manual))
 
 
-def process_post_manual(config):
+def process_post_manual(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
@@ -184,7 +184,6 @@ def process_post_manual(config):
 
 
 if __name__ == '__main__':
-    config = get_current_config('granted_patent', **{
+    process_post_manual(**{
             "execution_date": datetime.date(2020, 12, 29)
             })
-    process_post_manual(config)
