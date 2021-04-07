@@ -28,7 +28,7 @@
         FOR EACH row
         SET new.uuid = uuid();
 
-    CREATE TABLE IF NOT EXISTS `{{target_database}}`.`claim_{{year}}`
+    CREATE TABLE IF NOT EXISTS `{{target_database}}`.`claims_{{year}}`
     (
         `uuid`              varchar(512) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
@@ -41,6 +41,7 @@
         `sequence`          int(11)        DEFAULT NULL,
         `dependent`         varchar(512) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+        `exemplary`         int(32)        DEFAULT NULL,
         `version_indicator` date           DEFAULT NULL,
         `created_date`      timestamp NULL DEFAULT current_timestamp(),
         `updated_date`      timestamp NULL DEFAULT NULL
@@ -52,7 +53,7 @@
     DROP TRIGGER IF EXISTS `{{target_database}}`.before_insert_claim;
     CREATE TRIGGER `{{target_database}}`.before_insert_claim
         BEFORE INSERT
-        ON `{{target_database}}`.`claim_{{year}}`
+        ON `{{target_database}}`.`claims_{{year}}`
         FOR EACH row
         SET new.uuid = uuid();
 

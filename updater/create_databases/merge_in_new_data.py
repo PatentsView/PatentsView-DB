@@ -171,7 +171,8 @@ from {temp_db}.brf_sum_text_{year}
             'claim':              {
                     'preprocess': normalize_exemplary,
                     "insert":     """
-INSERT INTO {text_db}.claim_{year}(uuid, patent_id, num, `text`, `sequence`, dependent, exemplary, version_indicator, patent_date)
+INSERT INTO {text_db}.claims_{year}(uuid, patent_id, num, `text`, `sequence`, dependent, exemplary, 
+version_indicator, patent_date)
 SELECT c.uuid,
        c.patent_id,
        c.num,
@@ -181,14 +182,14 @@ SELECT c.uuid,
        case when tce.exemplary is null then 0 else 1 end,
        c.version_indicator,
        p.date
-from {temp_db}.claim_{year} c
+from {temp_db}.claims_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
                    on tce.patent_id = c.patent_id and tce.exemplary = c.sequence
          left join {temp_db}.patent p
                    on p.id = c.patent_id
                     """.format(
                             text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],year=year)
+                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], year=year)
                     },
             'draw_desc_text':     {
                     "insert": """

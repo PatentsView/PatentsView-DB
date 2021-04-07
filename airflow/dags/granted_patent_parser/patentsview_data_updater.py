@@ -223,17 +223,16 @@ qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_
 
 operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,
                                             parse_xml_operator, upload_new_operator,
-                                            upload_trigger_operator, patent_sql_operator,patent_id_fix_operator,
+                                            upload_trigger_operator, patent_sql_operator, patent_id_fix_operator,
                                             qc_upload_operator, gi_NER, gi_postprocess_NER,
                                             manual_simulation_operator, post_manual_operator,
                                             merge_new_operator, qc_merge_operator, withdrawn_operator,
                                             qc_withdrawn_operator]
 
-operator_sequence_groups['text_sequence'] = [upload_setup_operator, table_creation_operator,
-                                             upload_table_creation_operator, parse_text_data_operator,
-                                             patent_id_fix_operator,
-                                             qc_parse_text_operator, merge_text_operator,
-                                             qc_text_merge_operator]
+operator_sequence_groups['text_sequence'] = [upload_setup_operator, upload_table_creation_operator,
+                                             parse_text_data_operator, patent_id_fix_operator,
+                                             qc_parse_text_operator, table_creation_operator,
+                                             merge_text_operator, qc_text_merge_operator]
 operator_sequence_groups['xml_text_cross_dependency'] = [download_xml_operator, parse_text_data_operator]
 operator_sequence_groups['xml_preprare_dependency'] = [upload_setup_operator, upload_new_operator]
 operator_sequence_groups['merge_prepare_xml_dependency'] = [qc_database_operator, merge_new_operator]
