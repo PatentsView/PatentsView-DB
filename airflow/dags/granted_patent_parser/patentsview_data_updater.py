@@ -238,7 +238,6 @@ operator_sequence_groups['xml_text_cross_dependency'] = [download_xml_operator, 
 operator_sequence_groups['xml_preprare_dependency'] = [upload_setup_operator, upload_new_operator]
 operator_sequence_groups['merge_prepare_xml_dependency'] = [qc_database_operator, merge_new_operator]
 operator_sequence_groups['merge_prepare_text_dependency'] = [qc_database_operator, merge_text_operator]
-operator_sequence_groups['qc_patent_dependency'] = [qc_upload_operator, qc_parse_text_operator]
 for dependency_group in operator_sequence_groups:
     dependency_sequence = operator_sequence_groups[dependency_group]
     for upstream, downstream in zip(dependency_sequence[:-1], dependency_sequence[1:]):
