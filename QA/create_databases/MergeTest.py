@@ -771,11 +771,6 @@ class MergeTest(PatentDatabaseTester):
                         },
                 'rel_app_text':           {
                         'fields': {
-                                'sequence':  {
-                                        'data_type':    'int',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
                                 'uuid':      {
                                         'data_type':    'varchar',
                                         'null_allowed': False,
