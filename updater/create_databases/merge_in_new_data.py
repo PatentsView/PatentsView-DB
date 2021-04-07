@@ -148,7 +148,7 @@ def merge_text_data(tables, update_config):
 def begin_merging(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
-    tables_dict = get_upload_tables_dict(config)
+    tables_dict = get_parsed_tables_dict(config)
     tables = tables_dict.keys()
     project_home = os.environ['PACKAGE_HOME']
     merge_new_data(tables, project_home, config, kwargs['run_id'])
