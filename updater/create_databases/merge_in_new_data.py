@@ -122,7 +122,7 @@ def normalize_exemplary(config):
             exemplary_data.exemplary.str.strip().str.split(",", expand=True)).drop(
             "exemplary", axis=1)
 
-    melted_exemplary = exemplary_data.melt(id_vars=['patent_id', 'filename'], value_name='exemplary')
+    melted_exemplary = exemplary_data.melt(id_vars=['patent_id', 'version_indicator'], value_name='exemplary')
     melted_exemplary.exemplary = melted_exemplary.exemplary.str.strip()
     normalized_exemplary = melted_exemplary[
         (~melted_exemplary.exemplary.isnull())
@@ -161,8 +161,8 @@ def begin_text_merging(**kwargs):
     text_table_config = {
             'brf_sum_text':       {
                     "insert": """
-INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, `text`, filename, version_indicator)
-SELECT uuid, patent_id, text, filename, '{database_version}'
+INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, `text`, version_indicator, version_indicator)
+SELECT uuid, patent_id, text, version_indicator, '{database_version}'
 from {temp_db}.brf_sum_text_{year}
                     """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
                                temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], database_version=version,
@@ -171,7 +171,7 @@ from {temp_db}.brf_sum_text_{year}
             'claim':              {
                     'preprocess': normalize_exemplary,
                     "insert":     """
-INSERT INTO {text_db}.claim_{year}(uuid, patent_id, num, `text`, `sequence`, dependent, exemplary, filename,
+INSERT INTO {text_db}.claim_{year}(uuid, patent_id, num, `text`, `sequence`, dependent, exemplary, version_indicator,
                                    version_indicator, patent_date)
 SELECT c.uuid,
        c.patent_id,
@@ -180,7 +180,7 @@ SELECT c.uuid,
        c.sequence - 1,
        c.dependent,
        case when tce.exemplary is null then 0 else 1 end,
-       c.filename,
+       c.version_indicator,
        '{database_version}',
        p.date
 from {temp_db}.claim_{year} c
@@ -204,8 +204,8 @@ from {temp_db}.draw_desc_text_{year}
                     },
             'detail_desc_text':   {
                     "insert": """
-INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length, filename,version_indicator)
-SELECT uuid, patent_id, text,char_length(text), filename, '{database_version}'
+INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length, version_indicator,version_indicator)
+SELECT uuid, patent_id, text,char_length(text), version_indicator, '{database_version}'
 from {temp_db}.detail_desc_text_{year}
                               """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
                                          temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
