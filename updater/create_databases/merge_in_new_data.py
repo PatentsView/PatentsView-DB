@@ -180,7 +180,7 @@ SELECT c.uuid,
        c.sequence - 1,
        c.dependent,
        case when tce.exemplary is null then 0 else 1 end,
-       version_indicator,
+       c.version_indicator,
        p.date
 from {temp_db}.claim_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
