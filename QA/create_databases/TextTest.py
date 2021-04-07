@@ -159,9 +159,9 @@ class TextUploadTest(PatentDatabaseTester):
         self.table_config = {
                 brf_key: {
                         'fields': {
-                                "filename":  {
+                                "version_indicator":  {
                                         "null_allowed": False,
-                                        "data_type":    "varchar",
+                                        "data_type":    "date",
                                         "category":     False
                                         },
                                 "uuid":      {
@@ -198,7 +198,7 @@ class TextUploadTest(PatentDatabaseTester):
                                         "data_type":    "varchar",
                                         "category":     False
                                         },
-                                "filename":  {
+                                "version_indicator":  {
                                         "null_allowed": False,
                                         "data_type":    "varchar",
                                         "category":     False
@@ -242,7 +242,7 @@ class TextUploadTest(PatentDatabaseTester):
                                         "data_type":    "bigint",
                                         "category":     False
                                         },
-                                "filename":  {
+                                "version_indicator":  {
                                         "null_allowed": False,
                                         "data_type":    "varchar",
                                         "category":     False
