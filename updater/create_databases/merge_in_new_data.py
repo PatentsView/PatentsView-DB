@@ -161,18 +161,17 @@ def begin_text_merging(**kwargs):
     text_table_config = {
             'brf_sum_text':       {
                     "insert": """
-INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, `text`, version_indicator, version_indicator)
-SELECT uuid, patent_id, text, version_indicator, '{database_version}'
+INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, `text`, version_indicator)
+SELECT uuid, patent_id, text, version_indicator
 from {temp_db}.brf_sum_text_{year}
                     """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], database_version=version,
+                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
                                year=year)
                     },
             'claim':              {
                     'preprocess': normalize_exemplary,
                     "insert":     """
-INSERT INTO {text_db}.claim_{year}(uuid, patent_id, num, `text`, `sequence`, dependent, exemplary, version_indicator,
-                                   version_indicator, patent_date)
+INSERT INTO {text_db}.claim_{year}(uuid, patent_id, num, `text`, `sequence`, dependent, exemplary, version_indicator, patent_date)
 SELECT c.uuid,
        c.patent_id,
        c.num,
@@ -180,8 +179,7 @@ SELECT c.uuid,
        c.sequence - 1,
        c.dependent,
        case when tce.exemplary is null then 0 else 1 end,
-       c.version_indicator,
-       '{database_version}',
+       version_indicator,
        p.date
 from {temp_db}.claim_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
@@ -190,33 +188,30 @@ from {temp_db}.claim_{year} c
                    on p.id = c.patent_id
                     """.format(
                             text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
-                            database_version=version, year=year)
+                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],year=year)
                     },
             'draw_desc_text':     {
                     "insert": """
 INSERT INTO {text_db}.draw_desc_text_{year}(uuid, patent_id, text, sequence, version_indicator)
-SELECT uuid, patent_id, text, sequence, '{database_version}'
+SELECT uuid, patent_id, text, sequence, version_indicator
 from {temp_db}.draw_desc_text_{year}
                     """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], database_version=version,
+                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
                                year=year)
                     },
             'detail_desc_text':   {
                     "insert": """
-INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length, version_indicator,version_indicator)
-SELECT uuid, patent_id, text,char_length(text), version_indicator, '{database_version}'
+INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length,version_indicator)
+SELECT uuid, patent_id, text,char_length(text), version_indicator
 from {temp_db}.detail_desc_text_{year}
                               """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
                                          temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
-                                         database_version=version,
                                          year=year)
                     },
             'detail_desc_length': {
-                    "insert": "INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(text), '{database_version}' from {temp_db}.detail_desc_text_{year}".format(
+                    "insert": "INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(text), version_indicator from {temp_db}.detail_desc_text_{year}".format(
                             raw_db=config['PATENTSVIEW_DATABASES']['RAW_DB'],
-                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
-                            database_version=version, year=year)
+                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], year=year)
                     }
             }
     merge_text_data(text_table_config, config)
