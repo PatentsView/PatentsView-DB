@@ -3,18 +3,22 @@ import os
 import sys
 
 from QA.create_databases.TextTest import TextUploadTest
+from lib.configuration import get_realized_text_json_file
 
 
 def add_text_table_suffx(config, database_date):
-    parsing_file_setting = "{prefix}_parsing_config_file".format(prefix='long_text')
+    parsing_file_setting = "{prefix}_parsing_config_template_file".format(prefix='long_text')
     parsing_config_file = config["XML_PARSING"][parsing_file_setting]
+    parsing_realized_file_setting = "{prefix}_parsing_config_file".format(prefix='long_text')
+    parsing_config_realized_file = config["XML_PARSING"][parsing_realized_file_setting]
+
     import json
     parsing_config = json.load(open(parsing_config_file))
     for table_config in parsing_config['table_xml_map']:
         table_config['table_name'] = "{tname}_{yr_suffix}".format(
                 tname=table_config['table_prefix'],
                 yr_suffix=int(database_date.strftime('%Y')))
-    json.dump(parsing_config, open(parsing_config_file, "w"))
+    json.dump(parsing_config, open(parsing_config_realized_file, "w"))
 
 
 def begin_text_parsing(**kwargs):
