@@ -3,7 +3,6 @@ import os
 import sys
 
 from QA.create_databases.TextTest import TextUploadTest
-from lib.configuration import get_realized_text_json_file
 
 
 def add_text_table_suffx(config, database_date):
