@@ -54,7 +54,8 @@ def load_withdrawn(update_config):
     withdrawn_patents = []
     with open(withdrawn_file, 'r') as f:
         for line in f.readlines():
-            withdrawn_patents.append(xml_helpers.process_patent_numbers(line.strip('\n')))
+            if len(line.strip()) > 0:
+                withdrawn_patents.append(xml_helpers.process_patent_numbers(line.strip('\n')))
     withdrawn_patents_frame = pd.DataFrame(withdrawn_patents)
     withdrawn_patents_frame.columns = ['patent_id']
     withdrawn_patents_frame.to_sql(con=engine, name="withdrawn_patents", if_exists='replace', index=False)
@@ -85,8 +86,8 @@ def post_withdrawn(**kwargs):
 
 if __name__ == '__main__':
     process_withdrawn(**{
-            "execution_date": datetime.date(2020, 12, 15)
+            "execution_date": datetime.date(2020, 1, 5)
             })
     post_withdrawn(**{
-            "execution_date": datetime.date(2020, 12, 15)
+            "execution_date": datetime.date(2020, 1, 5)
             })
