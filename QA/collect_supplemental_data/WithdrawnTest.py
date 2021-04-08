@@ -31,7 +31,7 @@ class WithdrawnTest:
         withdrawn_file = '{}/withdrawn.txt'.format(withdrawn_folder)
         with open(withdrawn_file, 'r') as f:
             for line in f.readlines():
-                if len(line)>0:
+                if len(line.strip())>0:
                     file_withdrawn_patents.append(xml_helpers.process_patent_numbers(line.strip('\n')))
         withdrawn_patent_query = "SELECT id from patent where withdrawn=1"
         if not self.connection.open:
