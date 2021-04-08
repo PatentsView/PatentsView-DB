@@ -44,6 +44,9 @@ def setup_database(update_config):
     raw_database = update_config["PATENTSVIEW_DATABASES"]["RAW_DB"]
     temp_upload_database = update_config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
     engine.execute("""
+DROP DATABASE if exists {temp_upload_database}
+    """.format(temp_upload_database=temp_upload_database))
+    engine.execute("""
 create database if not exists {temp_upload_database} default character set=utf8mb4 default collate=utf8mb4_unicode_ci
             """.format(
             temp_upload_database=temp_upload_database))
