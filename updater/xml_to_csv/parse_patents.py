@@ -265,6 +265,8 @@ def get_results(patents, field_dictionary):
         lawyer_data = xml_helpers.get_entity(patent, 'agent', attribute_list=['sequence'])
         if lawyer_data[0] is not None:  # not all patents have a lawyer, becuase you can self-file
             for lawyer in lawyer_data:
+                if lawyer['sequence']:
+                    lawyer['sequence'] = int(lawyer['sequence']) - 1
                 results['rawlawyer'].append([id_generator(), None, patent_id,
                                              output_helper.get_alt_tags(lawyer,
                                                                         ['addressbook-firstname',
@@ -273,7 +275,7 @@ def get_results(patents, field_dictionary):
                                                                         ['addressbook-lastname',
                                                                          'addressbook-last-name']),
                                              lawyer['addressbook-orgname'], lawyer['addressbook-country'],
-                                             int(lawyer['sequence'])])
+                                             lawyer['sequence']])
                 output_helper.mandatory_fields('rawlawyer', patent_id, error_log, [
                         output_helper.get_alt_tags(lawyer, ['addressbook-firstname', 'addressbook-first-name']),
                         output_helper.get_alt_tags(lawyer, ['addressbook-lastname', 'addressbook-last-name']),
