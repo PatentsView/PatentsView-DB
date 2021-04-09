@@ -135,9 +135,9 @@ def get_results(patents, field_dictionary):
         # People
         ##############################
 
-        rule_47_flag = 0
+        rule_47_flag = 'FALSE'
         if patent.find(".//rule-47-flag") is not None:
-            rule_47_flag = 1
+            rule_47_flag = 'TRUE'
         inventor_data = xml_helpers.get_entity(patent, 'inventor', attribute_list=['sequence'])
         if inventor_data[0] is not None:
             for inventor in inventor_data:
