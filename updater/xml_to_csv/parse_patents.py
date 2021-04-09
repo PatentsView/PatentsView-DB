@@ -213,7 +213,7 @@ def get_results(patents, field_dictionary):
                     results['non_inventor_applicant'].append(
                             [id_generator(), patent_id, rawlocid, applicant['addressbook-first-name'],
                              applicant['addressbook-last-name'], applicant['addressbook-orgname'],
-                             str(int(applicant['sequence'])), applicant['designation'], applicant['app-type']])
+                             str(int(applicant['sequence']) - 1), applicant['designation'], applicant['app-type']])
                     output_helper.mandatory_fields('non_inventor_applicant', patent_id, error_log,
                                                    [applicant['addressbook-first-name'],
                                                     applicant['addressbook-last-name'],
