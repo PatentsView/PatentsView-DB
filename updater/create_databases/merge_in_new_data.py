@@ -158,7 +158,8 @@ def begin_merging(**kwargs):
 def begin_text_merging(**kwargs):
     config = get_current_config(**kwargs)
     version = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'].split("_")[1]
-    year = int(kwargs['execution_date'].strftime('%Y'))
+    end_date=datetime.datetime.strptime(config['DATES']['END_DATE'],"%Y%m%d")
+    year = int(end_date.strftime('%Y'))
     text_table_config = {
             'brf_sum_text':       {
                     "insert": """
