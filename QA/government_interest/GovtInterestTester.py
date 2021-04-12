@@ -81,11 +81,14 @@ class GovtInterestTester(PatentDatabaseTester):
                         }
                 }
 
+        self.patent_exclusion_list.extend(['government_organization'])
+
+    def init_qa_dict(self):
+        super(GovtInterestTester, self).init_qa_dict()
         self.extended_qa_data = {
                 "DataMonitor_govtinterestsampler": []
                 }
         self.qa_data.update(self.extended_qa_data)
-        self.patent_exclusion_list.extend(['government_organization'])
 
     def generate_govt_int_samples(self):
         print("\tGenerating samples for Govt Interest")

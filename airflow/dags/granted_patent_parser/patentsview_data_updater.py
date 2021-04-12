@@ -55,7 +55,8 @@ granted_patent_parser = DAG(
 operator_settings = {
         'dag':                 granted_patent_parser,
         'on_success_callback': airflow_task_success,
-        'on_failure_callback': airflow_task_failure
+        'on_failure_callback': airflow_task_failure,
+        'on_retry_callback': airflow_task_failure
         }
 operator_sequence_groups = {}
 ###### Download & Parse #######
