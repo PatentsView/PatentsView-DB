@@ -236,7 +236,8 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
 
 def rds_free_space(config, identifier):
     cloudwatch = boto3.client('cloudwatch', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
-                              aws_secret_access_key=config['AWS']['SECRET_KEY'])
+                              aws_secret_access_key=config['AWS']['SECRET_KEY'],
+                              region_name='us-east-1')
 
     from datetime import datetime, timedelta
     response = cloudwatch.get_metric_data(
