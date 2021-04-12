@@ -5,6 +5,7 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 
 from daily_checks.api_maintainance.check_documentation_api import start_query_verification
+from daily_checks.aws_maintainance.rds_maintainance import check_aws_rds_space
 from lib.configuration import get_config
 from updater.callbacks import airflow_daily_check_failure, airflow_daily_check_success
 
@@ -39,3 +40,10 @@ api_query_check = PythonOperator(task_id='api_query_check', python_callable=star
                                          'config': config
                                          }, on_success_callback=airflow_daily_check_success,
                                  on_failure_callback=airflow_daily_check_failure)
+
+free_space_check = PythonOperator(task_id='space_check', python_callable=check_aws_rds_space,
+                                  dag=daily_checks_dag,
+                                  op_kwargs={
+                                          'config': config
+                                          }, on_success_callback=airflow_daily_check_success,
+                                  on_failure_callback=airflow_daily_check_failure)

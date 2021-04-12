@@ -1,16 +1,19 @@
+import datetime
 import logging
 import os
 import re
 
 import pandas as pd
 
-from lib.configuration import get_parsed_tables_dict
+from lib.configuration import get_current_config, get_parsed_tables_dict
+from lib.utilities import rds_free_space
 
 logger = logging.getLogger("airflow.task")
 
 
 class ParserTest:
     def __init__(self, update_config):
+        self.update_config = update_config
         import glob
         tables_dict = get_parsed_tables_dict(update_config)
         self.expected_entities = tables_dict.keys()
@@ -24,11 +27,13 @@ class ParserTest:
             self.ip_filenames.append(fname)
             self.xml_files_count += 1
 
-    def runTests(self, update_config):
-        self.test_all_entities(update_config)
+    def runTests(self):
+        self.test_aws_rds_space()
+        self.test_all_entities()
 
-    def test_all_entities(self, update_config):
-        output_folder = '{working_folder}/parsed_data'.format(working_folder=update_config['FOLDERS']['WORKING_FOLDER'])
+    def test_all_entities(self):
+        output_folder = '{working_folder}/parsed_data'.format(
+                working_folder=self.update_config['FOLDERS']['WORKING_FOLDER'])
         for fname in self.ip_filenames:
             filename = os.path.basename(fname)
             name, ext = os.path.splitext(filename)
@@ -52,13 +57,14 @@ class ParserTest:
         except:
             raise AssertionError("Unable to read CSV file")
 
-    def get_file_shapes(self, update_config):
+    def get_file_shapes(self):
         shapes = {
                 'timestamp': [],
                 'entity':    [],
                 'count':     []
                 }
-        output_folder = '{working_folder}/parsed_data'.format(working_folder=update_config['FOLDERS']['WORKING_FOLDER'])
+        output_folder = '{working_folder}/parsed_data'.format(
+                working_folder=self.update_config['FOLDERS']['WORKING_FOLDER'])
         logger.info(self.ip_filenames)
         for fname in self.ip_filenames:
             filename = os.path.basename(fname)
@@ -77,3 +83,20 @@ class ParserTest:
                 shapes['count'].append(df.shape[0])
 
         return pd.DataFrame(shapes)
+
+    def test_aws_rds_space(self):
+        free_space_in_bytes = rds_free_space(
+                self.update_config,
+                self.update_config['PATENTSVIEW_DATABASES']['identifier'])
+        if free_space_in_bytes / (1024 * 1024 * 1024) < 50:
+            raise Exception("Free space less than 50G in RDS, stopping the process")
+
+
+if __name__ == '__main__':
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+            })
+
+    test_obj = ParserTest(config)
+
+    test_obj.runTests()

@@ -9,7 +9,9 @@ import re
 import string
 import zipfile
 from queue import Queue
+from statistics import mean
 
+import boto3
 import requests
 from bs4 import BeautifulSoup
 from clint.textui import progress
@@ -79,11 +81,21 @@ def generate_index_statements(config, database_section, table):
     engine = create_engine(get_connection_string(config, database_section))
     db = config["PATENTSVIEW_DATABASES"][database_section]
     add_indexes_fetcher = engine.execute(
-            "SELECT CONCAT('ALTER TABLE `',TABLE_NAME,'` ','ADD ', IF(NON_UNIQUE = 1, CASE UPPER(INDEX_TYPE) WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE ) END, IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE ), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE ) ) ), '(', GROUP_CONCAT( DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', ' ), ');' ) AS 'Show_Add_Indexes' FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '" + db + "' AND TABLE_NAME='" + table + "' and UPPER(INDEX_NAME) <> 'PRIMARY' GROUP BY TABLE_NAME, INDEX_NAME ORDER BY TABLE_NAME ASC, INDEX_NAME ASC; ")
+            "SELECT CONCAT('ALTER TABLE `',TABLE_NAME,'` ','ADD ', IF(NON_UNIQUE = 1, CASE UPPER(INDEX_TYPE) WHEN "
+            "'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME, "
+            "'` USING ', INDEX_TYPE ) END, IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE "
+            "), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE ) ) ), '(', GROUP_CONCAT( DISTINCT "
+            "CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', ' ), ');' ) AS 'Show_Add_Indexes' "
+            "FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '" + db + "' AND TABLE_NAME='" + table + "' and "
+                                                                                                              "UPPER("
+                                                                                                              "INDEX_NAME) <> 'PRIMARY' GROUP BY TABLE_NAME, INDEX_NAME ORDER BY TABLE_NAME ASC, INDEX_NAME ASC; ")
     add_indexes = add_indexes_fetcher.fetchall()
 
     drop_indexes_fetcher = engine.execute(
-            "SELECT CONCAT( 'ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT( DISTINCT CONCAT( 'DROP ', IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`') ) ) SEPARATOR ', ' ), ';' ) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '" + db + "' AND TABLE_NAME='" + table + "' and UPPER(INDEX_NAME) <> 'PRIMARY' GROUP BY TABLE_NAME ORDER BY TABLE_NAME ASC")
+            "SELECT CONCAT( 'ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT( DISTINCT CONCAT( 'DROP ', "
+            "IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`') ) ) SEPARATOR ', "
+            "' ), ';' ) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '" + db + "' AND TABLE_NAME='" +
+            table + "' and UPPER(INDEX_NAME) <> 'PRIMARY' GROUP BY TABLE_NAME ORDER BY TABLE_NAME ASC")
     drop_indexes = drop_indexes_fetcher.fetchall()
     print(add_indexes)
     print(drop_indexes)
@@ -220,3 +232,35 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
         watcher.get()
         pool.close()
         pool.join()
+
+
+def rds_free_space(config, identifier):
+    cloudwatch = boto3.client('cloudwatch', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
+                              aws_secret_access_key=config['AWS']['SECRET_KEY'])
+
+    from datetime import datetime, timedelta
+    response = cloudwatch.get_metric_data(
+            MetricDataQueries=[
+                    {
+                            'Id':         'fetching_FreeStorageSpace',
+                            'MetricStat': {
+                                    'Metric': {
+                                            'Namespace':  'AWS/RDS',
+                                            'MetricName': 'FreeStorageSpace',
+                                            'Dimensions': [
+                                                    {
+                                                            "Name":  "DBInstanceIdentifier",
+                                                            "Value": identifier
+                                                            }
+                                                    ]
+                                            },
+                                    'Period': 300,
+                                    'Stat':   'Minimum'
+                                    }
+                            }
+                    ],
+            StartTime=(datetime.now() - timedelta(seconds=300 * 3)).timestamp(),
+            EndTime=datetime.now().timestamp(),
+            ScanBy='TimestampDescending'
+            )
+    return mean(response['MetricDataResults'][0]['Values'])
