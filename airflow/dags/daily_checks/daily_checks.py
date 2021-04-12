@@ -30,7 +30,8 @@ daily_checks_dag = DAG(
         description='Daily Checks of PatentsView Tools',
         start_date=datetime(2020, 8, 20, 18, 0, 0),
         catchup=False,
-        schedule_interval=timedelta(days=1))
+        schedule_interval=timedelta(days=1), on_success_callback=airflow_daily_check_success,
+        on_failure_callback=airflow_daily_check_failure)
 project_home = os.environ['PACKAGE_HOME']
 config = get_config()
 
@@ -38,12 +39,10 @@ api_query_check = PythonOperator(task_id='api_query_check', python_callable=star
                                  dag=daily_checks_dag,
                                  op_kwargs={
                                          'config': config
-                                         }, on_success_callback=airflow_daily_check_success,
-                                 on_failure_callback=airflow_daily_check_failure)
+                                         })
 
 free_space_check = PythonOperator(task_id='space_check', python_callable=check_aws_rds_space,
                                   dag=daily_checks_dag,
                                   op_kwargs={
                                           'config': config
-                                          }, on_success_callback=airflow_daily_check_success,
-                                  on_failure_callback=airflow_daily_check_failure)
+                                          })
