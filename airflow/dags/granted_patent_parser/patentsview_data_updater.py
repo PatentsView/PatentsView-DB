@@ -13,7 +13,7 @@ from updater.create_databases.rename_db import qc_database
 from updater.create_databases.upload_new import begin_database_setup, post_upload, upload_current_data
 from updater.government_interest.NER import begin_NER_processing
 from updater.government_interest.NER_to_manual import process_ner_to_manual
-from updater.government_interest.post_manual import process_post_manual
+from updater.government_interest.post_manual import process_post_manual, qc_gi
 from updater.government_interest.simulate_manual import simulate_manual
 from updater.text_data_processor.text_table_parsing import begin_text_parsing, post_text_parsing
 from updater.xml_to_csv.bulk_downloads import bulk_download
@@ -51,11 +51,12 @@ granted_patent_parser = DAG(
         start_date=datetime(2021, 1, 5),
         schedule_interval=timedelta(weeks=1), catchup=True,
         template_searchpath=templates_searchpath,
-        on_success_callback=airflow_task_success,
-        on_failure_callback=airflow_task_failure
         )
 operator_settings = {
-        'dag': granted_patent_parser,}
+        'dag':                 granted_patent_parser,
+        'on_success_callback': airflow_task_success,
+        'on_failure_callback': airflow_task_failure
+        }
 operator_sequence_groups = {}
 ###### Download & Parse #######
 download_xml_operator = PythonOperator(task_id='download_xml', python_callable=bulk_download,
@@ -115,6 +116,8 @@ manual_simulation_operator = PythonOperator(task_id='simulate_manual_task', pyth
 
 post_manual_operator = PythonOperator(task_id='post_manual', python_callable=process_post_manual,
                                       **operator_settings)
+gi_qc_operator = PythonOperator(task_id='GI_QC', python_callable=qc_gi,
+                                **operator_settings)
 
 ### Long Text FIelds Parsing
 table_creation_operator = SQLTemplatedPythonOperator(
@@ -225,7 +228,7 @@ operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_o
                                             upload_trigger_operator, patent_sql_operator,
                                             patent_id_fix_operator, qc_upload_operator,
                                             gi_NER, gi_postprocess_NER, manual_simulation_operator,
-                                            post_manual_operator, withdrawn_operator,
+                                            post_manual_operator, gi_qc_operator, withdrawn_operator,
                                             qc_withdrawn_operator, merge_new_operator]
 
 operator_sequence_groups['text_sequence'] = [upload_setup_operator, upload_table_creation_operator,

@@ -49,7 +49,15 @@ def get_section(dag_id, task_id):
                     "qc_withdrawn_processor":           "Granted Patent - Data Processing (QC)",
                     "upload_current":                   "Granted Patent - Data Processing",
                     "upload_database_setup":            "Granted Patent - Database Setup",
-                    "withdrawn_processor":              "Granted Patent - XML Parsing"
+                    "withdrawn_processor":              "Granted Patent - XML Parsing",
+                    "create_uuid_triggers":             "Granted Patent - Database Setup",
+                    "parse_xml_to_sql":                 "Granted Patent - XML Parsing",
+                    "gi_NER":                           "Granted Patent - GI Processing",
+                    "postprocess_NER":                  "Granted Patent - GI Processing",
+                    "simulate_manual_task":             "Granted Patent - GI Processing",
+                    "gi_QC":                            "Granted Patent - GI Processing (QC)",
+                    "post_manual":                      "Granted Patent - GI Processing",
+                    "create_text_triggers":             "Granted Patent - Database Setup"
                     },
             'pregrant_publication_updater': {
                     "create_pgpubs_database": "PGPUBS Parser - Database Setup",
@@ -59,7 +67,8 @@ def get_section(dag_id, task_id):
                     "post_process":           "PGPUBS Parser - Data Processing"
                     },
             '99_daily_checks':              {
-                    'api_query_check': 'System Check - API'
+                    'api_query_check': 'System Check - API',
+                    'space_check':     'System Check - Free space on Ingest MySQL'
                     }
 
             }

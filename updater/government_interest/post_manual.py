@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 
+from QA.government_interest.GovtInterestTester import GovtInterestTester
 from lib.configuration import get_connection_string, get_current_config
 
 
@@ -183,7 +184,14 @@ def process_post_manual(**kwargs):
     push_orgs(looked_up, org_id_mapping, config)
 
 
+def qc_gi(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
+    qc = GovtInterestTester(config)
+    qc.runTests()
+
+
 if __name__ == '__main__':
+
     process_post_manual(**{
             "execution_date": datetime.date(2020, 12, 29)
             })
