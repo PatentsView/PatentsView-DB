@@ -320,16 +320,16 @@ def get_report_message(task, update_config):
             'create_text_triggers':             create_text_trigger_report,
             'create_text_yearly_tables':        create_text_yearly_tables_report,
             'api_query_check':                  api_check_report,
-            'space_check':                      lambda: 'No space issues.',
-            'upload_database_setup':            lambda: 'Upload DB Setup Complete',
-            'qc_database_setup':                lambda: 'Patent Database Verified',
-            'upload_current':                   lambda: 'Current week data uploaded',
-            'create_uuid_triggers':             lambda: 'UUID Triggers created for new parser',
-            'parse_xml_to_sql':                 lambda: 'New parser data directly loaded to upload DB',
-            'simulate_manual_task':             lambda: 'GI Manual Task Simulation Complete',
-            'post_manual':                      lambda: 'GI Process Complete',
-            'create_text_yearly_tables-upload': lambda: 'Yearly Text Tables Created',
-            'fix_patent_ids-upload':            lambda: 'Removed 0 prefix from patent ids'
+            'space_check':                      lambda x: 'No space issues.',
+            'upload_database_setup':            lambda x: 'Upload DB Setup Complete',
+            'qc_database_setup':                lambda x: 'Patent Database Verified',
+            'upload_current':                   lambda x: 'Current week data uploaded',
+            'create_uuid_triggers':             lambda x: 'UUID Triggers created for new parser',
+            'parse_xml_to_sql':                 lambda x: 'New parser data directly loaded to upload DB',
+            'simulate_manual_task':             lambda x: 'GI Manual Task Simulation Complete',
+            'post_manual':                      lambda x: 'GI Process Complete',
+            'create_text_yearly_tables-upload': lambda x: 'Yearly Text Tables Created',
+            'fix_patent_ids-upload':            lambda x: 'Removed 0 prefix from patent ids'
 
             }
 

@@ -32,32 +32,12 @@ def set_config(config, type='granted_patent'):
 def get_section(dag_id, task_id):
     section_lookup = {
             'granted_patent_updater':       {
-                    "create_text_yearly_tables":        "Granted Patent - Database Setup",
-                    "create_text_yearly_tables-upload": "Granted Patent - Database Setup",
-                    "download_xml":                     "Granted Patent - Data Collection",
-                    "fix_patent_ids-upload":            "Granted Patent - Data Processing",
-                    "merge_db":                         "Granted Patent - Data Processing",
-                    "merge_text_db":                    "Granted Patent - Data Processing",
-                    "parse_text_data":                  "Granted Patent - XML Parsing",
-                    "parse_xml":                        "Granted Patent - XML Parsing",
-                    "process_xml":                      "Granted Patent - XML Parsing",
-                    "qc_database_setup":                "Granted Patent - Database Setup (QC)",
-                    "qc_merge_db":                      "Granted Patent - Data Processing (QC)",
-                    "qc_merge_text_db":                 "Granted Patent - Data Processing (QC)",
-                    "qc_parse_text_data":               "Granted Patent - XML Parsing (QC)",
-                    "qc_upload_new":                    "Granted Patent - Data Processing (QC)",
-                    "qc_withdrawn_processor":           "Granted Patent - Data Processing (QC)",
-                    "upload_current":                   "Granted Patent - Data Processing",
-                    "upload_database_setup":            "Granted Patent - Database Setup",
-                    "withdrawn_processor":              "Granted Patent - XML Parsing",
-                    "create_uuid_triggers":             "Granted Patent - Database Setup",
-                    "parse_xml_to_sql":                 "Granted Patent - XML Parsing",
-                    "gi_NER":                           "Granted Patent - GI Processing",
-                    "postprocess_NER":                  "Granted Patent - GI Processing",
-                    "simulate_manual_task":             "Granted Patent - GI Processing",
-                    "gi_QC":                            "Granted Patent - GI Processing (QC)",
-                    "post_manual":                      "Granted Patent - GI Processing",
-                    "create_text_triggers":             "Granted Patent - Database Setup"
+                    "merge_db":           "Granted Patent - Data Processing",
+                    "merge_text_db":      "Granted Patent - Data Processing",
+                    "parse_xml":          "Granted Patent - XML Parsing",
+                    "qc_parse_text_data": "Granted Patent - XML Parsing (QC)",
+                    "qc_upload_new":      "Granted Patent - Data Processing (QC)",
+                    "gi_QC":              "Granted Patent - GI Processing (QC)"
                     },
             'pregrant_publication_updater': {
                     "create_pgpubs_database": "PGPUBS Parser - Database Setup",
@@ -72,8 +52,11 @@ def get_section(dag_id, task_id):
                     }
 
             }
-
-    return section_lookup[dag_id][task_id]
+    section = None
+    if dag_id in section_lookup:
+        if task_id in section_lookup[dag_id]:
+            section = section_lookup[dag_id][task_id]
+    return section
 
 
 def get_connection_string(config, database='TEMP_UPLOAD_DB'):
