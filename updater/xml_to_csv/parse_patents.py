@@ -533,7 +533,7 @@ def begin_parsing(update_config):
 
 def post_parsing(update_config):
     qc_step = ParserTest(update_config)
-    qc_step.runTests(update_config)
+    qc_step.runTests()
 
 
 def patent_parser(**kwargs):
