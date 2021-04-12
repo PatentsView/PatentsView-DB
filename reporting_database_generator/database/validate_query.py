@@ -1,11 +1,12 @@
-import sqlparse
-import re
-import os
 import configparser
+import os
+import re
 
+import sqlparse
 from sqlalchemy import create_engine
-from lib.notifications import send_slack_notification
+
 from lib import database_helpers
+from lib.notifications import send_slack_notification
 
 
 def parse_and_format_sql(parsed_statement):
@@ -37,7 +38,7 @@ def db_and_table_as_array(single_line_query):
 
 
 def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
-                         fk_check=True, section=None,**context):
+                         fk_check=True, section=None, **context):
     print(filename)
     print(schema_only)
     print(context)
@@ -48,20 +49,21 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
     config = configparser.ConfigParser()
     config.read(project_home + '/config.ini')
     if section is None:
-        section="*Reporting DB (" + filename + ") *"
+        section = "*SQL Executor (" + filename + ") *"
     # Set up database connection
-    cstr = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(config['DATABASE_SETUP']['USERNAME'],
-                                                                        config['DATABASE_SETUP']['PASSWORD'],
-                                                                        config['DATABASE_SETUP']['HOST'],
-                                                                        config['DATABASE_SETUP']['PORT'],
-                                                                        "information_schema")
+    cstr = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(
+            config['DATABASE_SETUP']['USERNAME'],
+            config['DATABASE_SETUP']['PASSWORD'],
+            config['DATABASE_SETUP']['HOST'],
+            config['DATABASE_SETUP']['PORT'],
+            "information_schema")
     db_con = create_engine(cstr)
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
     send_slack_notification(
-        "Executing Query File: `" + filename + "`", config, section,
-        "info")
+            "Executing Query File: `" + filename + "`", config, section,
+            "info")
     # Get processed template file content
     sql_content = context['templates_dict']['source_sql']
     # Extract individual statements from sql file
@@ -89,7 +91,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                 # Check if query plan includes full table scan, if it does send an alert
                 query_plan_check = database_helpers.check_query_plan(db_con, single_line_query)
                 if not query_plan_check:
-                    message = "Query execution plan involves full table scan: ```" + single_line_query + "```"
+                    message = """
+                        Query execution plan involves full table scan: ```{single_line_query} ```
+                        """.format(single_line_query=single_line_query)
                     send_slack_notification(message, config,
                                             section,
                                             "warning")
@@ -101,7 +105,10 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                 # Stops the process if the collation check fails
                 # This is because joins involving tables with inconsistent collation run forever
                 if not database_helpers.check_encoding_and_collation(db_con, collation_check_parameters):
-                    message = "Character set and/or collation mismatch between tables involved in query :```" + single_line_query + "```"
+                    message = """
+                        Character set and/or collation mismatch between tables involved in query :
+                            ```{single_line_query}```
+                            """.format(single_line_query=single_line_query)
                     send_slack_notification(message, config,
                                             section,
                                             "warning")
@@ -117,12 +124,20 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
         try:
             db_con.execute(single_line_query)
         except Exception as e:
-            send_slack_notification("Execution of Query failed: ```" + single_line_query + "```", config,
-                                    section, "error")
+            send_slack_notification(
+                    """
+            Execution of Query failed: ```{single_line_query} ```
+                """.format(single_line_query=single_line_query),
+                    config,
+                    section,
+                    "error")
             raise e
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=1")
     db_con.dispose()
-    send_slack_notification(
-        "Execution for Query File: `" + filename + "` is complete", config, "*Reporting DB (" + filename + ")*",
-        "success")
+    completion_message = """
+    Execution for Query file `{filename}` is complete
+    """.format(filename=filename)
+    send_slack_notification(completion_message,
+                            config, "*SQL Executor (" + filename + ")*",
+                            "success")

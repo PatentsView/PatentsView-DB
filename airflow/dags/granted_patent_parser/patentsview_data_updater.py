@@ -6,9 +6,9 @@ from airflow.operators.python import PythonOperator
 
 from lib.configuration import get_current_config, get_section, get_today_dict
 from reporting_database_generator.database.validate_query import validate_and_execute
-from updater.callbacks import airflow_task_failure
+from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.collect_supplemental_data.update_withdrawn import post_withdrawn, process_withdrawn
-from updater.create_databases.merge_in_new_data import begin_merging, begin_text_merging, post_merge, post_text_merge
+from updater.create_databases.merge_in_new_data import begin_merging, begin_text_merging
 from updater.create_databases.rename_db import qc_database
 from updater.create_databases.upload_new import begin_database_setup, post_upload, upload_current_data
 from updater.government_interest.NER import begin_NER_processing
@@ -51,12 +51,11 @@ granted_patent_parser = DAG(
         start_date=datetime(2021, 1, 5),
         schedule_interval=timedelta(weeks=1), catchup=True,
         template_searchpath=templates_searchpath,
+        on_success_callback=airflow_task_success,
+        on_failure_callback=airflow_task_failure
         )
 operator_settings = {
-        'dag':                 granted_patent_parser,
-        'on_success_callback': airflow_task_failure,
-        'on_failure_callback': airflow_task_failure
-        }
+        'dag': granted_patent_parser,}
 operator_sequence_groups = {}
 ###### Download & Parse #######
 download_xml_operator = PythonOperator(task_id='download_xml', python_callable=bulk_download,
@@ -225,7 +224,7 @@ operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_o
                                             parse_xml_operator, upload_new_operator,
                                             upload_trigger_operator, patent_sql_operator,
                                             patent_id_fix_operator, qc_upload_operator,
-                                            gi_NER, gi_postprocess_NER,manual_simulation_operator,
+                                            gi_NER, gi_postprocess_NER, manual_simulation_operator,
                                             post_manual_operator, withdrawn_operator,
                                             qc_withdrawn_operator, merge_new_operator]
 
