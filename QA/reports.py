@@ -330,7 +330,6 @@ def get_report_message(task, update_config):
             'post_manual':                      lambda x: 'GI Process Complete',
             'create_text_yearly_tables-upload': lambda x: 'Yearly Text Tables Created',
             'fix_patent_ids-upload':            lambda x: 'Removed 0 prefix from patent ids'
-
             }
 
     return report_lookup[task](update_config)
