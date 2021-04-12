@@ -29,7 +29,7 @@ daily_checks_dag = DAG(
         '99_daily_checks',
         description='Daily Checks of PatentsView Tools',
         start_date=datetime(2020, 8, 20, 18, 0, 0),
-        catchup=True,
+        catchup=False,
         schedule_interval=timedelta(days=1))
 project_home = os.environ['PACKAGE_HOME']
 config = get_config()
