@@ -23,7 +23,7 @@ def parse_and_write_cpc(inputdir, config):
             df['category'] = None
             df['category'] = np.select([df['value'] == 'I',df['value'] == 'A'],['inventional','additional'],df['category'])
 
-            database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+            database = '{}'.format(config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'])
             host = '{}'.format(config['DATABASE_SETUP']['HOST'])
             user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
             password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -32,7 +32,7 @@ def parse_and_write_cpc(inputdir, config):
             engine = create_engine(
                     'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
-
+            engine.execute("TRUNCATE TABLE pregrant_publications.cpc_current;")
             df.to_sql('cpc_current', con=engine, if_exists='append', index=False)
 
 def parse_pgpub_file(filepath):
@@ -99,6 +99,10 @@ def strip_whitespace(s):
 
     """
     return ''.join(s.split())
+
+def begin_cpc_upload(config)
+    location_of_cpc_files = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+    parse_and_write_cpc(location_of_cpc_files, config)
 
 
 if __name__ == '__main__':

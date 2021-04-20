@@ -172,6 +172,37 @@ def find_ipc_url_test():
     assert (find_ipc_url() == expected_url)
 
 
+def begin_download(config):
+    import sys
+    import datetime
+    import configparser
+    config = get_current_config(type='pgpubs', **kwargs)
+    # Find URLs correctly
+    #TODO: update these to reflect most recent dates
+    print(find_cpc_schema_url())
+    #find_cpc_schema_url_test()
+
+    print(find_cpc_pgpub_urls())
+    #find_cpc_pgpub_urls_test()
+
+    print(find_ipc_url())
+    #find_ipc_url_test()
+
+    destination_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+
+    if not os.path.exists(destination_folder):
+        os.makedirs(destination_folder)
+    # Download CPC data, and manually inspect output
+    print(str(datetime.datetime.now()))
+    download_cpc_schema(destination_folder)  # <1 min
+    print(str(datetime.datetime.now()))
+    download_cpc_pgpub_classifications(destination_folder)  # few minutes
+    print(str(datetime.datetime.now()))
+    download_ipc(destination_folder)  # <1 min
+    print(str(datetime.datetime.now()))
+
+
+
 if __name__ == '__main__':
     """ Running this script will execute tests; importing it will not """
 
