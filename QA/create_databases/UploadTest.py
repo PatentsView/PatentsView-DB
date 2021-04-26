@@ -362,7 +362,7 @@ class UploadTest(PatentDatabaseTester):
                                 'state':                   {
                                         'data_type':    'varchar',
                                         'null_allowed': True,
-                                        'category':     False
+                                        'category':     True
                                         },
                                 'country':                 {
                                         'data_type': 'varchar', 'null_allowed': True,
