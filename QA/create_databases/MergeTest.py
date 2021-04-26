@@ -1005,47 +1005,6 @@ class MergeTest(PatentDatabaseTester):
                         }
                 }
 
-        self.table_config = {
-                'rawlocation': {
-                        'fields': {
-                                'id': {
-                                        'data_type': 'varchar',
-                                        'null_allowed': False,
-                                        'category': False
-                                },
-                                'country_transformed': {
-                                        'data_type': 'varchar',
-                                        'null_allowed': True,
-                                        'category': True
-                                },
-                                'location_id': {
-                                        'data_type': 'varchar',
-                                        'null_allowed': True,
-                                        'category': False
-                                },
-                                'location_id_transformed': {
-                                        'data_type': 'varchar',
-                                        'null_allowed': True,
-                                        'category': False
-                                },
-                                'city': {
-                                        'data_type': 'varchar',
-                                        'null_allowed': True,
-                                        'category': False
-                                },
-                                'state': {
-                                        'data_type': 'varchar',
-                                        'null_allowed': True,
-                                        'category': True
-                                },
-                                'country': {
-                                        'data_type': 'varchar',
-                                        'null_allowed': True,
-                                        'category': True
-                                }
-                        }
-                }
-        }
 
         self.config = config
         self.project_home = os.environ['PACKAGE_HOME']
