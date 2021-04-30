@@ -1081,6 +1081,7 @@ class MergeTest(PatentDatabaseTester):
                         }
                 }
 
+
         self.config = config
         self.project_home = os.environ['PACKAGE_HOME']
         self.run_id = run_id

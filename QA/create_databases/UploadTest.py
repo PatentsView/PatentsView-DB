@@ -364,7 +364,7 @@ class UploadTest(PatentDatabaseTester):
                                 'organization':   {
                                         'data_type':    'varchar',
                                         'null_allowed': True,
-                                        'category':     False
+                                        'category':     True
                                         },
                                 'patent_id':      {
                                         'data_type':    'varchar',
