@@ -1,0 +1,2988 @@
+{
+  "application": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "type": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "application_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "series_code": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "invention_title": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "invention_abstract": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "rule_47_flag": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2005": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2006": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2007": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2008": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2009": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2010": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2011": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2012": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2013": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2014": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2015": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2016": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2017": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2018": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2019": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2020": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "brf_sum_text_2021": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2005": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2006": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2007": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2008": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2009": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2010": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2011": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2012": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2013": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2014": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2015": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2016": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2017": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2018": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2019": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2020": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "claim_2021": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "version": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": true
+      },
+      "section_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "subgroup_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "value": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "category": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "action_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_current": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "version": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": true
+      },
+      "section_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "subgroup_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "value": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "category": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      }
+    }
+  },
+  "detail_desc_text_2005": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2006": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2007": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2008": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2009": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2010": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2011": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2012": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2013": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2014": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2015": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2016": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2017": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2018": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2019": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2020": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "detail_desc_text_2021": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "length": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2007": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2008": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2009": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2009": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2010": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2011": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2012": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2013": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2014": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2015": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2016": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2017": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2018": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2019": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2020": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "draw_desc_text_2021": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "longtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "foreign_priority": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": false
+      },
+      "foreign_doc_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "further_cpc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "version": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": false
+      },
+      "section": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "class": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "subclass": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "main_group": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "subgroup": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "value": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "action_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "granted_patent_crosswalk": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "application_number": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "ipcr": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "version": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": true
+      },
+      "class_level": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "section": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "class": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "subclass": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "main_group": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "subgroup": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "class_value": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "action_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": false
+      },
+      "class_status": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "class_data_source": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "main_cpc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "version": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": true
+      },
+      "section": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "class": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "subclass": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "main_group": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "subgroup": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "value": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "action_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "pct_data": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "pct_doc_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "date_field": true,
+        "category": false
+      },
+      "us_371c124_date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "date_field": true,
+        "category": false
+      },
+      "us_371c12_date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "date_field": true,
+        "category": false
+      },
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "doc_type": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "publication": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "date_field": true,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "filing_type": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "rawassignee": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "assignee_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "organization": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "type": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": true
+      },
+      "rawlocation_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "city": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "state": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "rawinventor": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "inventor_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "designation": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "deceased": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "rawlocation_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "city": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "state": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "rawlocation": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "location_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "city": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "state": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "latitude": {
+        "data_type": "float",
+        "null_allowed": true,
+        "category": false
+      },
+      "longitude": {
+        "data_type": "float",
+        "null_allowed": true,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "rawuspc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "classification": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "rel_app_text": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "text": {
+        "data_type": "mediumtext",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "us_parties": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "organization": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "designation": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "rawlocation_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "city": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "state": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "uspc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "subclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "usreldoc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "document_number": {
+        "data_type": "bigint",
+        "null_allowed": false,
+        "category": false
+      },
+      "related_doc_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "doc_type": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "relkind": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": true
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "date_field": true,
+        "category": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  }
+}
