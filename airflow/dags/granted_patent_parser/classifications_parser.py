@@ -7,6 +7,7 @@ from airflow.operators.python import PythonOperator
 from QA.collect_supplemental_data.cpc_parser.CPCCurrentTest import CPCTest
 from lib.configuration import get_current_config, get_today_dict
 # appending a path
+from lib.utilities import chain_operators
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.collect_supplemental_data.cpc_parser.cpc_class_parser import post_class_parser, process_cpc_class_parser
 from updater.collect_supplemental_data.cpc_parser.download_cpc import collect_cpc_data, post_download
@@ -44,6 +45,7 @@ default_args = {
         # 'priority_weight': 10,
         # 'end_date': datetime(2016, 1, 1),
         }
+
 cpc_wipo_updater = DAG(
         dag_id='classifications_parser',
         default_args=default_args,
@@ -99,32 +101,16 @@ qc_cpc_current_wipo_operator = PythonOperator(task_id='qc_cpc_current_wipo',
                                               provide_context=True,
                                               on_success_callback=airflow_task_success,
                                               on_failure_callback=airflow_task_failure)
+operator_sequence = {}
+operator_sequence['cpc_lookup_sequence'] = [download_cpc_operator,
+                                            qc_download_cpc_operator,
+                                            cpc_class_parser_operator,
+                                            qc_cpc_class_parser_operator, cpc_class_operator,
+                                            qc_cpc_current_wipo_operator]
 
-qc_download_cpc_operator.set_upstream(download_cpc_operator)
+operator_sequence['cpc_current_sequence'] = [qc_download_cpc_operator, cpc_current_operator, wipo_operator,
+                                             qc_cpc_current_wipo_operator]
 
-cpc_class_parser_operator.set_upstream(qc_download_cpc_operator)
-qc_cpc_class_parser_operator.set_upstream(cpc_class_parser_operator)
-cpc_class_operator.set_upstream(qc_cpc_class_parser_operator)
-cpc_current_operator.set_upstream(qc_download_cpc_operator)
-
-wipo_operator.set_upstream(cpc_current_operator)
-
-qc_cpc_current_wipo_operator.set_upstream(wipo_operator)
-# qc_cpc_current_wipo_operator.set_upstream(cpc_current_operator)
-qc_cpc_current_wipo_operator.set_upstream(cpc_class_operator)
-# qc_withdrawn_operator.set_upstream(withdrawn_operator)
-
-
-# # withdrawn_operator.set_upstream(check_patent_parser)
-# qc_withdrawn_operator.set_upstream(withdrawn_operator)
-# download_cpc_operator.set_upstream(qc_withdrawn_operator)
-# qc_download_cpc_operator.set_upstream(download_cpc_operator)
-
-# cpc_class_parser_operator.set_upstream(qc_download_cpc_operator)
-# qc_cpc_class_parser_operator.set_upstream(cpc_class_parser_operator)
-# cpc_current_operator.set_upstream(qc_cpc_class_parser_operator)
-
-# wipo_operator.set_upstream(cpc_current_operator)
-
-# cpc_class_operator.set_upstream(wipo_operator)
-# qc_cpc_current_wipo_operator.set_upstream(cpc_class_operator)
+for dependency_group in operator_sequence:
+    dependency_sequence = operator_sequence[dependency_group]
+    chain_operators(dependency_sequence)

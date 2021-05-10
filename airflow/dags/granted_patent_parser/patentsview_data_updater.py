@@ -5,6 +5,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from lib.configuration import get_current_config, get_section, get_today_dict
+from lib.utilities import chain_operators
 from reporting_database_generator.database.validate_query import validate_and_execute
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.collect_supplemental_data.update_withdrawn import post_withdrawn, process_withdrawn
@@ -43,12 +44,13 @@ default_args = {
         # 'pool': 'backfill',
         # 'priority_weight': 10,
         # 'end_date': datetime(2016, 1, 1),
+
         }
 granted_patent_parser = DAG(
         dag_id='granted_patent_updater',
         default_args=default_args,
         description='Download and process granted patent data and corresponding classifications data',
-        start_date=datetime(2021, 1, 5),
+        start_date=datetime(2021, 1, 5, hour=5, minute=0, second=0),
         schedule_interval=timedelta(weeks=1), catchup=True,
         template_searchpath=templates_searchpath,
         )
@@ -56,7 +58,7 @@ operator_settings = {
         'dag':                 granted_patent_parser,
         'on_success_callback': airflow_task_success,
         'on_failure_callback': airflow_task_failure,
-        'on_retry_callback': airflow_task_failure
+        'on_retry_callback':   airflow_task_failure
         }
 operator_sequence_groups = {}
 ###### Download & Parse #######
@@ -242,5 +244,4 @@ operator_sequence_groups['merge_prepare_xml_dependency'] = [qc_database_operator
 operator_sequence_groups['merge_prepare_text_dependency'] = [qc_database_operator, merge_text_operator]
 for dependency_group in operator_sequence_groups:
     dependency_sequence = operator_sequence_groups[dependency_group]
-    for upstream, downstream in zip(dependency_sequence[:-1], dependency_sequence[1:]):
-        downstream.set_upstream(upstream)
+    chain_operators(dependency_sequence)

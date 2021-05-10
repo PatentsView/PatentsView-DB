@@ -265,3 +265,8 @@ def rds_free_space(config, identifier):
             ScanBy='TimestampDescending'
             )
     return mean(response['MetricDataResults'][0]['Values'])
+
+
+def chain_operators(chain):
+    for upstream, downstream in zip(chain[:-1], chain[1:]):
+        downstream.set_upstream(upstream)
