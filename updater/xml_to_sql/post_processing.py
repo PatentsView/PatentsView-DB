@@ -226,6 +226,15 @@ SELECT uuid,
 from further_cpc;
             """)
 
+def trim_rawassignee(config):
+    cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
+    engine = create_engine(cstr)
+    engine.execute(
+        """DELETE FROM rawassignee WHERE
+        (name_first IS NULL) AND
+        (name_last IS NULL) AND
+        (organization IS NULL);""")
+
 
 def begin_post_processing(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
@@ -236,6 +245,7 @@ def begin_post_processing(**kwargs):
     pct_data_doc_type(config)
     consolidate_claim(config)
     consolidate_usreldoc(config)
+    trim_rawassignee(config)
     yearly_claim(config)
     yearly_brf_sum_text(config)
     yearly_draw_desc_text(config)
