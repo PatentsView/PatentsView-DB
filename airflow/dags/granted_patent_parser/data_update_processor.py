@@ -34,7 +34,7 @@ data_updater = DAG(
         default_args=default_args,
         description='Start update process after verifying data collection is complete',
         start_date=datetime(2021, 2, 1),
-        schedule_interval='0 0 10 * * 3,5',
+        schedule_interval='0 0 10 * 3,5',
         template_searchpath=templates_searchpath,
         catchup=True
         )
