@@ -238,6 +238,7 @@ def trim_rawassignee(config):
 
 def begin_post_processing(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
+    trim_rawassignee(config)
     consolidate_rawlocation(config)
     consolidate_cpc(config)
     detail_desc_length(config)
@@ -245,7 +246,6 @@ def begin_post_processing(**kwargs):
     pct_data_doc_type(config)
     consolidate_claim(config)
     consolidate_usreldoc(config)
-    trim_rawassignee(config)
     yearly_claim(config)
     yearly_brf_sum_text(config)
     yearly_draw_desc_text(config)
