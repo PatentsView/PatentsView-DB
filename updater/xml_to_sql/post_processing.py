@@ -229,6 +229,7 @@ from further_cpc;
 def trim_rawassignee(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
+    print("Removing NULLS from rawassignee")
     engine.execute(
         """DELETE FROM rawassignee WHERE
         (name_first IS NULL) AND
