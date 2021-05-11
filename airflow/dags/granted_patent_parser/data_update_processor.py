@@ -44,8 +44,8 @@ weekly_update_check_granted_db = ExternalTaskSensor(task_id='check_granted_data_
                                                     execution_date_fn=determine_granted_sensor_date,
                                                     mode='poke')
 weekly_update_check_pregrant = ExternalTaskSensor(task_id='check_pregrant_data_collection', dag=data_updater,
-                                                  external_dag_id='prerequisite',
-                                                  external_task_id='test_task',
+                                                  external_dag_id='pregrant_publication_updater',
+                                                  external_task_id='create_pgpubs_database',
                                                   execution_date_fn=determine_pregranted_sensor_date, mode='poke')
 weekly_update_check_granted_text_db = ExternalTaskSensor(task_id='check_text_data_collection',
                                                          dag=data_updater,
