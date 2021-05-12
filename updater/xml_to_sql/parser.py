@@ -293,7 +293,7 @@ def process_publication_document(patent_app_document, patent_config):
             # This is the start of the path from which the multiple values will exists
             # i.e. /inventors can contain multiple /inventor tags within it
             entity_root_path = table['entity_root_path']
-            sequence = 1
+            sequence = 0
             # extract all data necessary
             for entity_element in patent_app_document.findall(entity_root_path):
                 table_rows.append(extract_table_data(table, entity_element, document_number, sequence,
