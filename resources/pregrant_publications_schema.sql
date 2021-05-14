@@ -8,6 +8,7 @@ CREATE TABLE `publication` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `document_number` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -36,6 +37,7 @@ CREATE TABLE `application` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `application_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -58,12 +60,33 @@ CREATE TABLE `brf_sum_text` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TRIGGER before_insert_brf_sum_text BEFORE INSERT
 ON brf_sum_text
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `brf_sum_text_2021` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2021 BEFORE INSERT
+ON brf_sum_text_2021
 FOR EACH row
   SET new.id = uuid();
 
@@ -77,6 +100,7 @@ CREATE TABLE `brf_sum_text_2020` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -96,6 +120,7 @@ CREATE TABLE `brf_sum_text_2019` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -115,6 +140,7 @@ CREATE TABLE `brf_sum_text_2018` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -134,6 +160,7 @@ CREATE TABLE `brf_sum_text_2017` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -153,6 +180,7 @@ CREATE TABLE `brf_sum_text_2016` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -172,6 +200,7 @@ CREATE TABLE `brf_sum_text_2015` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -191,6 +220,7 @@ CREATE TABLE `brf_sum_text_2014` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -210,6 +240,7 @@ CREATE TABLE `brf_sum_text_2013` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -229,6 +260,7 @@ CREATE TABLE `brf_sum_text_2012` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -248,6 +280,7 @@ CREATE TABLE `brf_sum_text_2011` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -267,6 +300,7 @@ CREATE TABLE `brf_sum_text_2010` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -286,6 +320,7 @@ CREATE TABLE `brf_sum_text_2009` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -305,6 +340,7 @@ CREATE TABLE `brf_sum_text_2008` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -324,6 +360,7 @@ CREATE TABLE `brf_sum_text_2007` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -343,6 +380,7 @@ CREATE TABLE `brf_sum_text_2006` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -362,6 +400,7 @@ CREATE TABLE `brf_sum_text_2005` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -381,6 +420,7 @@ CREATE TABLE `brf_sum_text_2004` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -400,6 +440,7 @@ CREATE TABLE `brf_sum_text_2003` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -419,6 +460,7 @@ CREATE TABLE `brf_sum_text_2002` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -438,6 +480,7 @@ CREATE TABLE `brf_sum_text_2001` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -460,6 +503,7 @@ CREATE TABLE `claim` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -467,6 +511,30 @@ CREATE TABLE `claim` (
 
 CREATE TRIGGER before_insert_claim BEFORE INSERT
 ON claim
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2021` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2021 BEFORE INSERT
+ON claim_2021
 FOR EACH row
   SET new.id = uuid();
 
@@ -483,6 +551,7 @@ CREATE TABLE `claim_2020` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -506,6 +575,7 @@ CREATE TABLE `claim_2019` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -529,6 +599,7 @@ CREATE TABLE `claim_2018` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -552,6 +623,7 @@ CREATE TABLE `claim_2017` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -575,6 +647,7 @@ CREATE TABLE `claim_2016` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -598,6 +671,7 @@ CREATE TABLE `claim_2015` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -621,6 +695,7 @@ CREATE TABLE `claim_2014` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -644,6 +719,7 @@ CREATE TABLE `claim_2013` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -667,6 +743,7 @@ CREATE TABLE `claim_2012` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -691,6 +768,7 @@ CREATE TABLE `claim_2011` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -714,6 +792,7 @@ CREATE TABLE `claim_2010` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -737,6 +816,7 @@ CREATE TABLE `claim_2009` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -760,6 +840,7 @@ CREATE TABLE `claim_2008` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -783,6 +864,7 @@ CREATE TABLE `claim_2007` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -806,6 +888,7 @@ CREATE TABLE `claim_2006` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -829,6 +912,7 @@ CREATE TABLE `claim_2005` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -852,6 +936,7 @@ CREATE TABLE `claim_2004` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -875,6 +960,7 @@ CREATE TABLE `claim_2003` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -898,6 +984,7 @@ CREATE TABLE `claim_2002` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -921,6 +1008,7 @@ CREATE TABLE `claim_2001` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -951,6 +1039,7 @@ CREATE TABLE `cpc` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `document_number` (`document_number`,`sequence`),
   CONSTRAINT `temp_cpc_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -971,12 +1060,35 @@ CREATE TABLE `detail_desc_text` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TRIGGER before_insert_detail_desc_text BEFORE INSERT
 ON detail_desc_text
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `detail_desc_text_2021` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2021 BEFORE INSERT
+ON detail_desc_text_2021
 FOR EACH row
   SET new.id = uuid();
 
@@ -992,6 +1104,7 @@ CREATE TABLE `detail_desc_text_2020` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1013,6 +1126,7 @@ CREATE TABLE `detail_desc_text_2019` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1034,6 +1148,7 @@ CREATE TABLE `detail_desc_text_2018` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1055,6 +1170,7 @@ CREATE TABLE `detail_desc_text_2017` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1076,6 +1192,7 @@ CREATE TABLE `detail_desc_text_2016` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1097,6 +1214,7 @@ CREATE TABLE `detail_desc_text_2015` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1118,6 +1236,7 @@ CREATE TABLE `detail_desc_text_2014` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1139,6 +1258,7 @@ CREATE TABLE `detail_desc_text_2013` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1160,6 +1280,7 @@ CREATE TABLE `detail_desc_text_2012` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1181,6 +1302,7 @@ CREATE TABLE `detail_desc_text_2011` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1202,6 +1324,7 @@ CREATE TABLE `detail_desc_text_2010` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1223,6 +1346,7 @@ CREATE TABLE `detail_desc_text_2009` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1244,6 +1368,7 @@ CREATE TABLE `detail_desc_text_2008` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1265,6 +1390,7 @@ CREATE TABLE `detail_desc_text_2007` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1286,6 +1412,7 @@ CREATE TABLE `detail_desc_text_2006` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1308,6 +1435,7 @@ CREATE TABLE `detail_desc_text_2005` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1329,6 +1457,7 @@ CREATE TABLE `detail_desc_text_2004` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1350,6 +1479,7 @@ CREATE TABLE `detail_desc_text_2003` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1371,6 +1501,7 @@ CREATE TABLE `detail_desc_text_2002` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1392,6 +1523,7 @@ CREATE TABLE `detail_desc_text_2001` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1414,12 +1546,35 @@ CREATE TABLE `draw_desc_text` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TRIGGER before_insert_draw_desc_text BEFORE INSERT
 ON draw_desc_text
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2021` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2021 BEFORE INSERT
+ON draw_desc_text_2021
 FOR EACH row
   SET new.id = uuid();
 
@@ -1435,6 +1590,7 @@ CREATE TABLE `draw_desc_text_2020` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1456,6 +1612,7 @@ CREATE TABLE `draw_desc_text_2019` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1477,6 +1634,7 @@ CREATE TABLE `draw_desc_text_2018` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1498,6 +1656,7 @@ CREATE TABLE `draw_desc_text_2017` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1519,6 +1678,7 @@ CREATE TABLE `draw_desc_text_2016` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1540,6 +1700,7 @@ CREATE TABLE `draw_desc_text_2015` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1561,6 +1722,7 @@ CREATE TABLE `draw_desc_text_2014` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1582,6 +1744,7 @@ CREATE TABLE `draw_desc_text_2013` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1603,6 +1766,7 @@ CREATE TABLE `draw_desc_text_2012` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1624,6 +1788,7 @@ CREATE TABLE `draw_desc_text_2011` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1645,6 +1810,7 @@ CREATE TABLE `draw_desc_text_2010` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1666,6 +1832,7 @@ CREATE TABLE `draw_desc_text_2009` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1687,6 +1854,7 @@ CREATE TABLE `draw_desc_text_2008` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1708,6 +1876,7 @@ CREATE TABLE `draw_desc_text_2007` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1730,6 +1899,7 @@ CREATE TABLE `draw_desc_text_2006` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1751,6 +1921,7 @@ CREATE TABLE `draw_desc_text_2005` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1772,6 +1943,7 @@ CREATE TABLE `draw_desc_text_2004` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1793,6 +1965,7 @@ CREATE TABLE `draw_desc_text_2003` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1814,6 +1987,7 @@ CREATE TABLE `draw_desc_text_2002` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1835,6 +2009,7 @@ CREATE TABLE `draw_desc_text_2001` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1859,6 +2034,7 @@ CREATE TABLE `foreign_priority` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `foreign_priority_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -1889,6 +2065,7 @@ CREATE TABLE `further_cpc` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `further_cpc_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -1923,6 +2100,7 @@ CREATE TABLE `ipcr` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `document_number` (`document_number`,`sequence`),
   CONSTRAINT `ipcr_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -1954,6 +2132,7 @@ CREATE TABLE `main_cpc` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `main_cpc_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -1982,6 +2161,7 @@ CREATE TABLE `pct_data` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `pct_data_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -2013,6 +2193,7 @@ CREATE TABLE `rawassignee` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `rawassignee_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -2049,6 +2230,7 @@ CREATE TABLE `rawinventor` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `rawinventor_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -2080,6 +2262,7 @@ CREATE TABLE `rawlocation` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -2093,6 +2276,7 @@ CREATE TABLE `rawuspc` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `document_number` (`document_number`,`sequence`),
   CONSTRAINT `rawuspc_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -2115,6 +2299,7 @@ CREATE TABLE `rel_app_text` (
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `rel_app_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -2145,6 +2330,7 @@ CREATE TABLE `us_parties` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `us_parties_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -2174,6 +2360,7 @@ CREATE TABLE `uspc` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `document_number` (`document_number`,`sequence`),
   CONSTRAINT `uspc_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -2199,6 +2386,7 @@ CREATE TABLE `usreldoc_single` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `usreldoc_single_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -2224,6 +2412,7 @@ CREATE TABLE `usreldoc_related` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `usreldoc_related_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -2249,6 +2438,7 @@ CREATE TABLE `usreldoc_parent_child` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `usreldoc_parent_child_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
@@ -2274,6 +2464,7 @@ CREATE TABLE `usreldoc` (
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `document_number` (`document_number`),
   CONSTRAINT `usreldoc_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
