@@ -37,7 +37,7 @@ def get_section(dag_id, task_id):
                     "parse_xml":          "Granted Patent - XML Parsing",
                     "qc_parse_text_data": "Granted Patent - XML Parsing (QC)",
                     "qc_upload_new":      "Granted Patent - Data Processing (QC)",
-                    "gi_QC":              "Granted Patent - GI Processing (QC)"
+                    "GI_QC":              "Granted Patent - GI Processing (QC)"
                     },
             'pregrant_publication_updater': {
                     "create_pgpubs_database": "PGPUBS Parser - Database Setup",

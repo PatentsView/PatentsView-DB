@@ -587,7 +587,7 @@ class MergeTest(PatentDatabaseTester):
                                         'category':     False
                                         },
                                 'type':           {
-                                        'data_type':    'varchar',
+                                        'data_type':    'int',
                                         'null_allowed': True,
                                         'category':     True
                                         },

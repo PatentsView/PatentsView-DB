@@ -55,6 +55,7 @@ class DatabaseSetupTest:
         table_cursor = engine.execute(table_query)
         table_count = table_cursor.fetchall()[0][0]
         if table_count > 0:
+            print(table_query)
             raise AssertionError("There are {x} temporary tables in the database".format(x=table_count))
 
     def test_database_encoding(self):

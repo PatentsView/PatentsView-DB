@@ -44,7 +44,7 @@ class AssigneePostProcessingQC(DisambiguationTester):
                                         'category':     False
                                         },
                                 'type':           {
-                                        'data_type':    'varchar',
+                                        'data_type':    'int',
                                         'null_allowed': True,
                                         'category':     False
                                         },
