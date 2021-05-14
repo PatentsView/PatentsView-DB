@@ -63,10 +63,8 @@ class PatentsViewDatabaseTester(ABC):
             "DataMonitor_count":               [],
             'DataMonitor_nullcount':           [],
             'DataMonitor_patentyearlycount':   [],
-            'DataMonitor_applicationyearlycount':   [],
             'DataMonitor_categorycount':       [],
             'DataMonitor_floatingpatentcount': [],
-            'DataMonitor_floatingapplicationcount': [],
             'DataMonitor_maxtextlength':       [],
             'DataMonitor_prefixedentitycount': [],
             'DataMonitor_locationcount': []
@@ -90,8 +88,8 @@ from {tbl}
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(count_query)
                 count_value = count_cursor.fetchall()[0][0]
-                # if count_value < 1:
-                #     raise Exception("Empty table found:{table}".format(table=table_name))
+                if count_value < 1:
+                    raise Exception("Empty table found:{table}".format(table=table_name))
 
                 write_table_name = table_name
                 prefix = "temp_"
@@ -134,8 +132,7 @@ Blanks encountered in  table found:{database}.{table} column {col}. Count: {coun
                             """.format(database=self.config['PATENTSVIEW_DATABASES'][self.database_section],
                                        table=table, col=field,
                                        count=count_value)
-                            print(exception_message)
-                            #raise Exception(exception_message)
+                            raise Exception(exception_message)
                 finally:
                     if self.connection.open:
                         self.connection.close()
@@ -165,8 +162,7 @@ where INSTR(`{field}`, CHAR(0x00)) > 0
 {count} rows with NUL Byte found in {field} of {table_name} for {db}                    
                     """.format(count=nul_byte_count, field=field, table_name=table,
                                db=self.config["PATENTSVIEW_DATABASES"][self.database_section])
-                    print(exception_message)
-                    #raise Exception(exception_message)
+                    raise Exception(exception_message)
         finally:
             if self.connection.open:
                 self.connection.close()
@@ -227,17 +223,12 @@ group by `{field}`
                     count_value = count_cursor.fetchall()[0][0]
                     if not table_config["fields"][field]['null_allowed']:
                         if count_value != 0:
-                            print("NULLs encountered in table found:{database}.{table} column {col}. Count: {"
-                                  "count}".format(
-                                database=self.database_section, table=table,
-                                col=field,
-                                count=count_value))
-                            # raise Exception(
-                            #     "NULLs encountered in table found:{database}.{table} column {col}. Count: {"
-                            #     "count}".format(
-                            #         database=self.database_section, table=table,
-                            #         col=field,
-                            #         count=count_value))
+                            raise Exception(
+                                "NULLs encountered in table found:{database}.{table} column {col}. Count: {"
+                                "count}".format(
+                                    database=self.database_section, table=table,
+                                    col=field,
+                                    count=count_value))
                     write_table_name = table
                     prefix = "temp_"
                     if table.startswith(prefix):
@@ -265,16 +256,11 @@ group by `{field}`
                 count_cursor.execute(zero_query)
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value != 0:
-                    print(
+                    raise Exception(
                         "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {"
                         "count}".format(
                             database=self.database_section, table=table, col=field,
                             count=count_value))
-                    # raise Exception(
-                    #     "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {"
-                    #     "count}".format(
-                    #         database=self.database_section, table=table, col=field,
-                    #         count=count_value))
         finally:
             if self.connection.open:
                 self.connection.close()
@@ -334,26 +320,18 @@ group by `{field}`
                     found = True
                     if row['patent_count'] < 1:
                         if self.central_entity == 'patent':
-                            print("Year {yr} has 0 patents in the database {db}".format(yr=year, db=
+                            raise Exception("Year {yr} has 0 patents in the database {db}".format(yr=year, db=
                             self.config['PATENTSVIEW_DATABASES'][self.database_section]))
-                            # raise Exception("Year {yr} has 0 patents in the database {db}".format(yr=year, db=
-                            # self.config['PATENTSVIEW_DATABASES'][self.database_section]))
                         else:
-                            print("Year {yr} has 0 document_numbers in the database {db}".format(yr=year, db=
+                            raise Exception("Year {yr} has 0 document_numbers in the database {db}".format(yr=year, db=
                             self.config['PATENTSVIEW_DATABASES'][self.database_section]))
-                            # raise Exception("Year {yr} has 0 document_numbers in the database {db}".format(yr=year, db=
-                            # self.config['PATENTSVIEW_DATABASES'][self.database_section]))
             if not found:
                 if self.central_entity == 'patent':
-                    print("There are no patents for the Year {yr} in the database {db}".format(yr=year, db=
+                    raise Exception("There are no patents for the Year {yr} in the database {db}".format(yr=year, db=
                     self.config['PATENTSVIEW_DATABASES'][self.database_section]))
-                    # raise Exception("There are no patents for the Year {yr} in the database {db}".format(yr=year, db=
-                    # self.config['PATENTSVIEW_DATABASES'][self.database_section]))
                 else:
-                    print("There are no document_numbers for the Year {yr} in the database {db}".format(yr=year, db=
+                    raise Exception("There are no document_numbers for the Year {yr} in the database {db}".format(yr=year, db=
                     self.config['PATENTSVIEW_DATABASES'][self.database_section]))
-                    # raise Exception("There are no document_numbers for the Year {yr} in the database {db}".format(yr=year, db=
-                    # self.config['PATENTSVIEW_DATABASES'][self.database_section]))
 
     def test_related_floating_entities(self, table_name, table_config):
         if 'related_entities' in table_config:
@@ -376,20 +354,13 @@ group by `{field}`
                     related_count = float_cursor.fetchall()[0][0]
                     if related_count > 0:
                         print(related_query)
-                        print(
+                        raise Exception(
                             "There are rows in {destination_id} in {related_table} that do not have corresponding {"
                             "source_id} in {source_table} for {db}".format(
                                 source_table=table_name,
                                 related_table=related_config['table'], source_id=related_config['source_id'],
                                 destination_id=related_config['destination_id'], db=
                                 self.config['PATENTSVIEW_DATABASES'][self.database_section]))
-                        # raise Exception(
-                        #     "There are rows in {destination_id} in {related_table} that do not have corresponding {"
-                        #     "source_id} in {source_table} for {db}".format(
-                        #         source_table=table_name,
-                        #         related_table=related_config['table'], source_id=related_config['source_id'],
-                        #         destination_id=related_config['destination_id'], db=
-                        #         self.config['PATENTSVIEW_DATABASES'][self.database_section]))
 
             finally:
                 self.connection.close()
@@ -405,14 +376,10 @@ group by `{field}`
                 count_cursor.execute(zero_query)
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value != 0:
-                    print("""
+                    raise Exception("""
                         NULL strings encountered in table found:{database}.{table} column {col}. Count: {count}
                             """.format(database=self.database_section, table=table,
                                        col=field, count=count_value))
-                    # raise Exception("""
-                    #     NULL strings encountered in table found:{database}.{table} column {col}. Count: {count}
-                    #         """.format(database=self.database_section, table=table,
-                    #                    col=field, count=count_value))
         finally:
             if self.connection.open:
                 self.connection.close()
@@ -450,19 +417,13 @@ group by `{field}`
                 float_count = count_cursor.fetchall()[0][0]
                 if float_count > 0:
                     if self.central_entity == 'patent':
-                        print("There are patents in {table_name} that are not in the patent table for {db}".format(
+                        raise Exception("There are patents in {table_name} that are not in the patent table for {db}".format(
                             table_name=table_name, db=
                             self.config['PATENTSVIEW_DATABASES'][self.database_section]))
-                        # raise Exception("There are patents in {table_name} that are not in the patent table for {db}".format(
-                        #     table_name=table_name, db=
-                        #     self.config['PATENTSVIEW_DATABASES'][self.database_section]))
                     else:
-                        print("There are document_numbers in {table_name} that are not in the publication table for {db}".format(
+                        raise Exception("There are document_numbers in {table_name} that are not in the publication table for {db}".format(
                             table_name=table_name, db=
                             self.config['PATENTSVIEW_DATABASES'][self.database_section]))
-                        # raise Exception("There are document_numbers in {table_name} that are not in the publication table for {db}".format(
-                        #     table_name=table_name, db=
-                        #     self.config['PATENTSVIEW_DATABASES'][self.database_section]))
 
         except pymysql.Error as e:
             if table_name not in self.exclusion_list:
@@ -550,10 +511,10 @@ group by `{field}`
                         entity=table_name)
                 else:
                     count_query = """
-                        SELECT p.`filing_type` as `type`, count(1) as `type_count`
+                        SELECT p.`kind` as `type`, count(1) as `type_count`
                         from {central_table} p join {entity} et
                         on et.document_number = p.document_number
-                        group by p.`filing_type`                
+                        group by p.`kind`                
                     """.format(
                         central_table=central_table,
                         entity=table_name)
