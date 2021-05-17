@@ -38,12 +38,7 @@ SET patent_id = CONCAT(SUBSTR(patent_id, 1, REGEXP_INSTR(`patent_id`, '[0-9]') -
                        TRIM(LEADING '0' FROM SUBSTR(patent_id, REGEXP_INSTR(`patent_id`, '[0-9]'))))
 where patent_id REGEXP '^[a-zA-Z]';
 
-UPDATE {{ target_database }}.`main_cpc`
-SET patent_id = CONCAT(SUBSTR(patent_id, 1, REGEXP_INSTR(`patent_id`, '[0-9]') - 1),
-                       TRIM(LEADING '0' FROM SUBSTR(patent_id, REGEXP_INSTR(`patent_id`, '[0-9]'))))
-where patent_id REGEXP '^[a-zA-Z]';
-
-UPDATE {{ target_database }}.`further_cpc`
+UPDATE {{ target_database }}.`cpc`
 SET patent_id = CONCAT(SUBSTR(patent_id, 1, REGEXP_INSTR(`patent_id`, '[0-9]') - 1),
                        TRIM(LEADING '0' FROM SUBSTR(patent_id, REGEXP_INSTR(`patent_id`, '[0-9]'))))
 where patent_id REGEXP '^[a-zA-Z]';
