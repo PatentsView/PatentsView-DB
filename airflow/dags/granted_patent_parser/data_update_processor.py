@@ -42,17 +42,17 @@ weekly_update_check_granted_db = ExternalTaskSensor(task_id='check_granted_data_
                                                     external_dag_id='granted_patent_updater',
                                                     external_task_id='merge_db',
                                                     execution_date_fn=determine_granted_sensor_date,
-                                                    mode='poke')
+                                                    mode='reschedule')
 weekly_update_check_pregrant = ExternalTaskSensor(task_id='check_pregrant_data_collection', dag=data_updater,
                                                   external_dag_id='pregrant_publication_updater',
                                                   external_task_id='merge_database',
-                                                  execution_date_fn=determine_pregranted_sensor_date, mode='poke')
+                                                  execution_date_fn=determine_pregranted_sensor_date, mode='reschedule')
 weekly_update_check_granted_text_db = ExternalTaskSensor(task_id='check_text_data_collection',
                                                          dag=data_updater,
                                                          external_dag_id='granted_patent_updater',
                                                          external_task_id='merge_text_db',
                                                          execution_date_fn=determine_granted_sensor_date,
-                                                         mode='poke')
+                                                         mode='reschedule')
 update_eligibility_operator = ShortCircuitOperator(dag=data_updater, python_callable=determine_update_eligibility,
                                                    task_id='determine_update_eligibility')
 
