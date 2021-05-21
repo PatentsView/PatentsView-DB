@@ -21,8 +21,9 @@ def determine_update_eligibility(**context):
     if execution_date.month in [3, 6, 9, 12]:
         month, lastday = calendar.monthrange(execution_date.year, execution_date.month)
         end_of_month = datetime.datetime(year=execution_date.year, month=execution_date.month, day=lastday).date()
-        if busday_count(execution_date, end_of_month, weekmask='Tue') > 1 and busday_count(execution_date, end_of_month,
-                                                                                           weekmask='Thu') > 1:
+        if busday_count(execution_date - datetime.timedelta(days=1), end_of_month, weekmask='Tue') > 1 and busday_count(
+                execution_date - datetime.timedelta(days=1), end_of_month,
+                weekmask='Thu') > 1:
             return False
         else:
             return True
