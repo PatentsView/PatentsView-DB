@@ -22,7 +22,7 @@ from lib.configuration import get_config, get_connection_string
 
 
 def prepare_tables(config):
-    cstr = get_connection_string(config, 'NEW_DB')
+    cstr = get_connection_string(config, 'RAW_DB')
     engine = create_engine(cstr + "&local_infile=1")
     timestamp = str(int(time.time()))
     with engine.connect() as connection:
@@ -43,7 +43,7 @@ def prepare_tables(config):
 
 def clean_rawlawyer(config):
 
-    cstr = get_connection_string(config, 'NEW_DB')
+    cstr = get_connection_string(config, 'RAW_DB')
     engine = create_engine(cstr + "&local_infile=1")
     nodigits = re.compile(r'[^\d]+')
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
@@ -99,7 +99,7 @@ def clean_rawlawyer(config):
 
 
 def load_clean_rawlawyer(config):
-    cstr = get_connection_string(config, 'NEW_DB')
+    cstr = get_connection_string(config, 'RAW_DB')
     engine = create_engine(cstr + "&local_infile=1")
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
     engine.execute("ALTER TABLE rawlawyer RENAME TO temp_rawlawyer_predisambig;")
@@ -292,7 +292,7 @@ def start_lawyer_disambiguation(config):
     load_clean_rawlawyer(config)
     disambiguator = LawyerDisambiguator(config)
     disambiguator.run_disambiguation()
-    cstr = get_connection_string(config, 'NEW_DB')
+    cstr = get_connection_string(config, 'RAW_DB')
     engine = create_engine(cstr + "&local_infile=1")
 
     engine.execute("ALTER TABLE rawlawyer DROP alpha_lawyer_id")
