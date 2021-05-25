@@ -30,7 +30,7 @@ CREATE TABLE `application` (
   `application_number` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `date` date DEFAULT NULL,
   `country` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `series_code` int(11) DEFAULT NULL,
+  `series_code` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `invention_title` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `invention_abstract` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `rule_47_flag` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
