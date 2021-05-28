@@ -70,9 +70,11 @@ prepare_persistent_wide_assignee = PythonOperator(
         dag=assignee_post_processor
         )
 
-
 qc_post_process_assignee_operator = PythonOperator(task_id='qc_post_process_assignee',
                                                    python_callable=post_process_qc,
                                                    dag=assignee_post_processor,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure)
+
+dependency_list = [post_process_assignee_operator, update_persistent_long_assignee, prepare_persistent_wide_assignee,
+                   create_persistent_wide_assignee, qc_post_process_assignee_operator]
