@@ -15,7 +15,7 @@ def update_rawinventor(update_config, database='RAW_DB', uuid_field='uuid'):
     update_statement = """
         UPDATE rawinventor ri join inventor_disambiguation_mapping idm
             on idm.uuid =  ri.{uuid_field}
-        set ri.inventor_id=idm.inventor_id
+        set ri.inventor_id=idm.inventor_id where ri.inventor_id is null
     """.format(uuid_field=uuid_field)
     print(update_statement)
     engine.execute(update_statement)

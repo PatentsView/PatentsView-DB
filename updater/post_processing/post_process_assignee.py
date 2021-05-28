@@ -47,9 +47,9 @@ def upload_disambig_results(update_config):
 def update_rawassignee(update_config, database='RAW_DB', uuid_field='uuid'):
     engine = create_engine(get_connection_string(update_config, database))
     update_statement = """
-        UPDATE rawassignee ra left join {granted_db}.temp_assignee_disambiguation_mapping adm
+        UPDATE rawassignee ra left join {granted_db}.assignee_disambiguation_mapping adm
             on adm.uuid = ra.{uuid_field} 
-        set  ra.assignee_id = adm.assignee_id
+        set  ra.assignee_id = adm.assignee_id where ra.assignee_id is null
     """.format(uuid_field=uuid_field,
                granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
     print(update_statement)
