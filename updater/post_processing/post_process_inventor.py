@@ -141,7 +141,8 @@ def upload_disambig_results(update_config):
         engine.dispose()
 
 
-def post_process_inventor(config):
+def post_process_inventor(**kwargs):
+    config = get_current_config(**kwargs)
     update_rawinventor(config, database='PGPUBS_DATABASE', uuid_field='id')
     update_rawinventor(config, database='RAW_DB', uuid_field='uuid')
     precache_inventors(config)
@@ -152,7 +153,8 @@ def post_process_inventor(config):
                       parent_entity_id='application_number', entity="inventor", include_location=True)
 
 
-def post_process_qc(config):
+def post_process_qc(**kwargs):
+    config = get_current_config(**kwargs)
     qc = InventorPostProcessingQC(config)
     qc.runTests()
 
