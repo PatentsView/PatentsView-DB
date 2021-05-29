@@ -40,7 +40,7 @@ def inventor_clean(inventor_group, stopwords):
     return inventor_group
 
 
-def generate_disambiguated_inventors(engine, limit, offset):
+def generate_disambiguated_inventors(config,engine, limit, offset):
     inventor_core_template = """
         SELECT inventor_id
         from disambiguated_inventor_ids order by inventor_id
@@ -100,7 +100,7 @@ def create_inventor(update_config):
     offset = 0
     while True:
         start = time.time()
-        current_inventor_data = generate_disambiguated_inventors(engine, limit, offset)
+        current_inventor_data = generate_disambiguated_inventors(update_config,engine, limit, offset)
         if current_inventor_data.shape[0] < 1:
             break
         step_time = time.time() - start
