@@ -18,14 +18,14 @@ def load_lookup_table(update_config: ConfigParser, database: str, parent_entity:
     patent_entity_table = "{parent}_{entity}".format(parent=parent_entity, entity=entity)
     entity_field = "{entity}_id".format(entity=entity)
     rawtable = "raw{entity}".format(entity=entity)
-    field_list = [parent_entity_id, "et.{ef}", "et.sequence"]
-    insert_sequence = ["{peid}", "{ef}", "sequence"]
+    field_list = ["{vind}", parent_entity_id, "et.{ef}", "et.sequence"]
+    insert_sequence = ["version_indicator", "{peid}", "{ef}", "sequence"]
     join_query = ""
     if include_location:
         field_list.append("rl.location_id")
         insert_sequence.append("location_id")
         join_query = "left join rawlocation rl on rl.id = et.rawlocation_id"
-    field_select = ", ".join(field_list).format(ef=entity_field)
+    field_select = ", ".join(field_list).format(ef=entity_field, vind=version_indicator)
     field_list_sequence = ", ".join(insert_sequence).format(peid=parent_entity_id, ef=entity_field)
     delete_query = "DELETE FROM {pet}".format(pet=patent_entity_table)
     insert_query = """
