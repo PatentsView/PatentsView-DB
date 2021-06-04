@@ -6,7 +6,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.post_processing.AssigneePostProcessing import AssigneePostProcessingQC
-from lib.configuration import get_connection_string, get_current_config
+from lib.configuration import get_connection_string, get_current_config, get_version_indicator
 from updater.post_processing.create_lookup import load_lookup_table
 
 
@@ -85,7 +85,7 @@ def generate_disambiguated_assignees(engine, limit, offset):
     return current_assignee_data
 
 
-def create_assignee(update_config):
+def create_assignee(update_config, version_indicator):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     limit = 10000
     offset = 0
@@ -101,6 +101,7 @@ def create_assignee(update_config):
         canonical_assignments = assignee_reduce(current_assignee_data).rename({
                 "assignee_id": "id"
                 }, axis=1)
+        canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
         canonical_assignments.to_sql(name='assignee', con=engine,
                                      if_exists='append',
                                      index=False)
@@ -133,15 +134,20 @@ def assignee_reduce(assignee_data):
     return out
 
 
-def post_process_assignee(config):
+def post_process_assignee(**kwargs):
+    config = get_current_config(**kwargs)
+    version_indicator = get_version_indicator(**kwargs)
     update_rawassignee(config, database='PGPUBS_DATABASE', uuid_field='id')
     update_rawassignee(config, database='RAW_DB', uuid_field='uuid')
     precache_assignees(config)
-    create_assignee(config)
+    create_assignee(config, version_indicator=version_indicator)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
-                      parent_entity_id='patent_id', entity='assignee', include_location=True)
+                      parent_entity_id='patent_id', entity='assignee', version_indicator=version_indicator,
+                      include_location=True)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='application',
-                      parent_entity_id='application_number', entity="assignee", include_location=True)
+                      parent_entity_id='application_number', entity="assignee", version_indicator=version_indicator,
+                      include_location=True)
+
 
 def post_process_qc(config):
     qc = AssigneePostProcessingQC(config)

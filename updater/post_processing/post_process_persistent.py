@@ -10,7 +10,7 @@ import pandas as pd
 import pymysql
 from sqlalchemy import create_engine
 
-from lib.configuration import get_config, get_connection_string
+from lib.configuration import get_config, get_connection_string, get_current_config
 
 
 def get_long_entity_cols(db_con, new_db, persistent_long_table):
@@ -53,7 +53,8 @@ def get_create_syntax(entity, entity_db_cols, create_stmt):
     return create_stmt
 
 
-def update_long_entity(config, entity):
+def update_long_entity(entity, **kwargs):
+    config = get_current_config(type='granted_patent', **kwargs)
     connection = pymysql.connect(host=config['DATABASE']['HOST'],
                                  user=config['DATABASE']['USERNAME'],
                                  password=config['DATABASE']['PASSWORD'],
@@ -66,7 +67,7 @@ def update_long_entity(config, entity):
 
     target_persistent_table = 'persistent_{entity}_disambig_long'.format(entity=entity)
 
-    entity_update_query = "INSERT INTO {target_table} (uuid, database_update, {entity_id}) SELECT uuid, {db_version}, " \
+    entity_update_query = "INSERT INTO {target_table} (uuid, database_update, {entity_id}) SELECT uuid, {db_version}," \
                           "{entity_id} from {source_table}".format(
             target_table=target_persistent_table, source_table=source_entity_table, entity_id=source_entity_field,
             db_version=update_version)
@@ -101,7 +102,8 @@ def generate_wide_header(connection, entity, update_version, config):
     return header_df
 
 
-def prepare_wide_table(config, entity):
+def prepare_wide_table(entity, **kwargs):
+    config = get_current_config(type='granted_patent', **kwargs)
     connection = pymysql.connect(host=config['DATABASE']['HOST'],
                                  user=config['DATABASE']['USERNAME'],
                                  password=config['DATABASE']['PASSWORD'],
@@ -166,7 +168,8 @@ def get_next_raw_chunk(connection, entity, limit, offset, config):
         return chunk_df
 
 
-def write_wide_table(config, entity):
+def write_wide_table(entity, **kwargs):
+    config = get_current_config(type='granted_patent', **kwargs)
     connection = pymysql.connect(host=config['DATABASE']['HOST'],
                                  user=config['DATABASE']['USERNAME'],
                                  password=config['DATABASE']['PASSWORD'],
@@ -211,7 +214,7 @@ def write_wide_table(config, entity):
 
         # 1. Pivot, reset index & get back uuid as column, rename axis & remove database_update axis value
         pivoted_chunk_df = chunk_df.pivot_table(index=current_rawentity, columns='database_update',
-                                          values=id_col, aggfunc='first').reset_index()
+                                                values=id_col, aggfunc='first').reset_index()
         pd.options.display.max_columns = 100
 
         # 2. Merge back old rawinventor id column

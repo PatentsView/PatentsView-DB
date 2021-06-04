@@ -169,6 +169,11 @@ def get_lookup_tables(update_config):
     return lookup_tables
 
 
+def get_version_indicator(**kwargs):
+    execution_date = kwargs['execution_date']
+    return execution_date.strftime('%Y%m%d')
+
+
 def get_current_config(type='granted_patent', supplemental_configs=None, **kwargs):
     """
     Update config file start and end date to first and last day of the supplied week

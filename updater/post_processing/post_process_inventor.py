@@ -6,7 +6,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
-from lib.configuration import get_connection_string, get_current_config
+from lib.configuration import get_connection_string, get_current_config, get_version_indicator
 from updater.post_processing.create_lookup import load_lookup_table
 
 
@@ -40,7 +40,7 @@ def inventor_clean(inventor_group, stopwords):
     return inventor_group
 
 
-def generate_disambiguated_inventors(config,engine, limit, offset):
+def generate_disambiguated_inventors(config, engine, limit, offset):
     inventor_core_template = """
         SELECT inventor_id
         from disambiguated_inventor_ids order by inventor_id
@@ -94,19 +94,20 @@ def precache_inventors(config):
     engine.execute(inventor_cache_query)
 
 
-def create_inventor(update_config):
+def create_inventor(update_config, version_indicator):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     limit = 10000
     offset = 0
     while True:
         start = time.time()
-        current_inventor_data = generate_disambiguated_inventors(update_config,engine, limit, offset)
+        current_inventor_data = generate_disambiguated_inventors(update_config, engine, limit, offset)
         if current_inventor_data.shape[0] < 1:
             break
         step_time = time.time() - start
         canonical_assignments = inventor_reduce(current_inventor_data).rename({
                 "inventor_id": "id"
                 }, axis=1)
+        canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
         canonical_assignments.to_sql(name='inventor', con=engine,
                                      if_exists='append',
                                      index=False)
@@ -143,14 +144,17 @@ def upload_disambig_results(update_config):
 
 def post_process_inventor(**kwargs):
     config = get_current_config(**kwargs)
+    version_indicator = get_version_indicator(**kwargs)
     update_rawinventor(config, database='PGPUBS_DATABASE', uuid_field='id')
     update_rawinventor(config, database='RAW_DB', uuid_field='uuid')
     precache_inventors(config)
-    create_inventor(config)
+    create_inventor(config, version_indicator=version_indicator)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
-                      parent_entity_id='patent_id', entity='inventor', include_location=True)
+                      parent_entity_id='patent_id', entity='inventor', version_indicator=version_indicator,
+                      include_location=True)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='application',
-                      parent_entity_id='application_number', entity="inventor", include_location=True)
+                      parent_entity_id='application_number', entity="inventor", version_indicator=version_indicator,
+                      include_location=True)
 
 
 def post_process_qc(**kwargs):
@@ -160,8 +164,7 @@ def post_process_qc(**kwargs):
 
 
 if __name__ == '__main__':
-    config = get_current_config(**{
+    # post_process_inventor(config)
+    post_process_qc(**{
             "execution_date": datetime.date(2020, 12, 29)
             })
-    # post_process_inventor(config)
-    post_process_qc(config)
