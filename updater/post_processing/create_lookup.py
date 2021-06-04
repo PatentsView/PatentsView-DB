@@ -29,7 +29,7 @@ def load_lookup_table(update_config: ConfigParser, database: str, parent_entity:
     field_list_sequence = ", ".join(insert_sequence).format(peid=parent_entity_id, ef=entity_field)
     delete_query = "DELETE FROM {pet}".format(pet=patent_entity_table)
     insert_query = """
-        INSERT IGNORE INTO {pet} ({fseq})) SELECT {fs} from {rt} et {jq} where {ef} is not null
+        INSERT IGNORE INTO {pet} ({fseq}) SELECT {fs} from {rt} et {jq} where {ef} is not null
         """.format(fseq=field_list_sequence,
                    fs=field_select,
                    jq=join_query,
