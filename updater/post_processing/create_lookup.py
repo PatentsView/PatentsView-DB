@@ -18,7 +18,7 @@ def load_lookup_table(update_config: ConfigParser, database: str, parent_entity:
     patent_entity_table = "{parent}_{entity}".format(parent=parent_entity, entity=entity)
     entity_field = "{entity}_id".format(entity=entity)
     rawtable = "raw{entity}".format(entity=entity)
-    field_list = ["{vind}", parent_entity_id, "et.{ef}", "et.sequence"]
+    field_list = ["'{vind}'", parent_entity_id, "et.{ef}", "et.sequence"]
     insert_sequence = ["version_indicator", "{peid}", "{ef}", "sequence"]
     join_query = ""
     if include_location:
