@@ -30,44 +30,6 @@ class PatentDatabaseTester(PatentsViewDatabaseTester):
         self.central_entity = 'patent'
         self.table_config = json.load(open("{}".format(self.config["FOLDERS"]["resources_folder"] + "/" + self.config["FILES"]["table_config_granted"]),))
 
-    def temp_save_qa_data(self, table_dict):
-        table_dict[self.qa_data['DataMonitor_count'][0]['table_name']] = self.qa_data
-        return table_dict
-
-    def runTests(self):
-        skiplist = []
-        qa_dict = {}
-        for table in self.table_config:
-            if table in skiplist:
-                continue
-            print("Beginning Test for {table_name} in {db}".format(table_name=table,
-                                                                   db=self.config["PATENTSVIEW_DATABASES"][
-                                                                       self.database_section]))
-            self.test_floating_entities(table)
-            self.test_yearly_count(table, strict=False)
-            self.test_table_row_count(table)
-            self.test_blank_count(table, self.table_config[table])
-            self.test_nulls(table, self.table_config[table])
-            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
-            self.load_floating_patent_count(table, self.table_config[table])
-            self.load_prefix_counts(table)
-            for field in self.table_config[table]["fields"]:
-                print("\tBeginning tests for {field} in {table_name}".format(field=field, table_name=table))
-                if "date_field" in self.table_config[table]["fields"][field] and \
-                        self.table_config[table]["fields"][field]["date_field"]:
-                    self.assert_zero_dates(table, field)
-                if self.table_config[table]["fields"][field]['category']:
-                    self.load_category_counts(table, field)
-                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-                    self.test_text_length(table, field)
-                if "location_field" in self.table_config[table]["fields"][field] and \
-                        self.table_config[table]["fields"][field]["location_field"]:
-                    self.test_counts_by_location(table, field)
-                self.test_null_byte(table, field)
-            #self.save_qa_data()
-            qa_dict = self.temp_save_qa_data(qa_dict)
-            self.init_qa_dict()
-
 
 if __name__ == '__main__':
     #config = get_config()
