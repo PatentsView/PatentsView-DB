@@ -152,8 +152,8 @@ def post_process_inventor(**kwargs):
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
                       parent_entity_id='patent_id', entity='inventor', version_indicator=version_indicator,
                       include_location=True)
-    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='application',
-                      parent_entity_id='application_number', entity="inventor", version_indicator=version_indicator,
+    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
+                      parent_entity_id='document_number', entity="inventor", version_indicator=version_indicator,
                       include_location=True)
 
 
