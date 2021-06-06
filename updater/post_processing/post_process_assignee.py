@@ -136,7 +136,7 @@ def assignee_reduce(assignee_data):
 
 def post_process_assignee(**kwargs):
     config = get_current_config(**kwargs)
-    version_indicator =config['DATES']['END_DATE ']
+    version_indicator =config['DATES']['END_DATE']
     update_rawassignee(config, database='PGPUBS_DATABASE', uuid_field='id')
     update_rawassignee(config, database='RAW_DB', uuid_field='uuid')
     precache_assignees(config)
