@@ -51,7 +51,7 @@ def update_rawassignee(update_config, database='RAW_DB', uuid_field='uuid'):
             on adm.uuid = ra.{uuid_field} 
         set  ra.assignee_id = adm.assignee_id
     """.format(uuid_field=uuid_field,
-               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+               granted_db=update_config['PATENTSVIEW_DATABASES']['RAW_DB'])
     print(update_statement)
     engine.execute(update_statement)
 
@@ -136,7 +136,7 @@ def assignee_reduce(assignee_data):
 
 def post_process_assignee(**kwargs):
     config = get_current_config(**kwargs)
-    version_indicator = get_version_indicator(**kwargs)
+    version_indicator =config['DATES']['END_DATE ']
     update_rawassignee(config, database='PGPUBS_DATABASE', uuid_field='id')
     update_rawassignee(config, database='RAW_DB', uuid_field='uuid')
     precache_assignees(config)

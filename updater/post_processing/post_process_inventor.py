@@ -144,7 +144,7 @@ def upload_disambig_results(update_config):
 
 def post_process_inventor(**kwargs):
     config = get_current_config(**kwargs)
-    version_indicator = get_version_indicator(**kwargs)
+    version_indicator =config['DATES']['END_DATE ']
     update_rawinventor(config, database='PGPUBS_DATABASE', uuid_field='id')
     update_rawinventor(config, database='RAW_DB', uuid_field='uuid')
     precache_inventors(config)
