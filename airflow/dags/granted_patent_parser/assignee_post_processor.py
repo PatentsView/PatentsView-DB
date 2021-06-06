@@ -5,6 +5,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from lib.configuration import get_current_config, get_today_dict
+from lib.utilities import chain_operators
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.post_processing.post_process_assignee import post_process_assignee, post_process_qc
 from updater.post_processing.post_process_persistent import prepare_wide_table, update_long_entity, write_wide_table
@@ -75,6 +76,10 @@ qc_post_process_assignee_operator = PythonOperator(task_id='qc_post_process_assi
                                                    dag=assignee_post_processor,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure)
+dependency_list = {}
+dependency_list['main_dependency'] = [post_process_assignee_operator, update_persistent_long_assignee,
+                                      prepare_persistent_wide_assignee,
+                                      create_persistent_wide_assignee, qc_post_process_assignee_operator]
 
-dependency_list = [post_process_assignee_operator, update_persistent_long_assignee, prepare_persistent_wide_assignee,
-                   create_persistent_wide_assignee, qc_post_process_assignee_operator]
+for dependency_group, dependency_sequence in dependency_list.items():
+    chain_operators(dependency_sequence)
