@@ -6,7 +6,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.post_processing.AssigneePostProcessing import AssigneePostProcessingQC
-from lib.configuration import get_connection_string, get_current_config, get_version_indicator
+from lib.configuration import get_connection_string, get_current_config
 from updater.post_processing.create_lookup import load_lookup_table
 
 
@@ -56,7 +56,7 @@ def update_rawassignee(update_config, database='RAW_DB', uuid_field='uuid'):
     engine.execute(update_statement)
 
 
-def generate_disambiguated_assignees(engine, limit, offset):
+def generate_disambiguated_assignees(update_config, engine, limit, offset):
     assignee_core_template = """
         SELECT assignee_id
         from disambiguated_assignee_ids order by assignee_id
@@ -79,7 +79,8 @@ def generate_disambiguated_assignees(engine, limit, offset):
     assignee_core_query = assignee_core_template.format(limit=limit,
                                                         offset=offset)
     assignee_data_query = assignee_data_template.format(
-            assign_core_query=assignee_core_query, pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'])
+            assign_core_query=assignee_core_query,
+            pregrant_db=update_config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'])
 
     current_assignee_data = pd.read_sql_query(sql=assignee_data_query, con=engine)
     return current_assignee_data
@@ -91,7 +92,11 @@ def create_assignee(update_config, version_indicator):
     offset = 0
     while True:
         start = time.time()
-        current_assignee_data = generate_disambiguated_assignees(engine, limit, offset)
+        current_assignee_data = generate_disambiguated_assignees(
+                update_config,
+                engine,
+                limit,
+                offset)
         if current_assignee_data.shape[0] < 1:
             break
         step_time = time.time() - start
@@ -136,7 +141,7 @@ def assignee_reduce(assignee_data):
 
 def post_process_assignee(**kwargs):
     config = get_current_config(**kwargs)
-    version_indicator =config['DATES']['END_DATE']
+    version_indicator = config['DATES']['END_DATE']
     update_rawassignee(config, database='PGPUBS_DATABASE', uuid_field='id')
     update_rawassignee(config, database='RAW_DB', uuid_field='uuid')
     precache_assignees(config)
