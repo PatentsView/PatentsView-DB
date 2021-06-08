@@ -9,7 +9,7 @@ from lib.configuration import get_current_config
 class AssigneePostProcessingQC(DisambiguationTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-        super().__init__(config, 'UPDATE_DB', datetime.date(year=1976, month=1, day=1), end_date)
+        super().__init__(config, 'RAW_DB', datetime.date(year=1976, month=1, day=1), end_date)
         self.table_config = {
                 'rawassignee':     {
                         'fields': {
@@ -148,7 +148,7 @@ class AssigneePostProcessingQC(DisambiguationTester):
             where TABLE_NAME = 'persistent_assignee_disambig'
               and TABLE_SCHEMA = '{db}'
               and column_name not in ('updated_date','created_date', 'version_indicator');
-        """.format(db=self.config['PATENTSVIEW_DATABASES']['UPDATE_DB'])
+        """.format(db=self.config['PATENTSVIEW_DATABASES']['RAW_DB'])
         if not self.connection.open:
             self.connection.connect()
         with self.connection.cursor() as crsr:
