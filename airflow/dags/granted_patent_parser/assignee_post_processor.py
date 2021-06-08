@@ -45,7 +45,7 @@ post_process_assignee_operator = PythonOperator(task_id='post_process_assignee',
                                                 on_failure_callback=airflow_task_failure)
 
 update_granted_persistent_long_assignee = PythonOperator(
-        task_id='update_persistent_long_assignee',
+        task_id='update_granted_persistent_long_assignee',
         python_callable=update_long_entity,
         op_kwargs={
                 'entity': 'assignee',
@@ -55,7 +55,7 @@ update_granted_persistent_long_assignee = PythonOperator(
         )
 
 create_granted_persistent_wide_assignee = PythonOperator(
-        task_id='create_persistent_wide_assignee',
+        task_id='create_granted_persistent_wide_assignee',
         python_callable=write_wide_table,
         op_kwargs={
                 'entity': 'assignee',
@@ -65,7 +65,7 @@ create_granted_persistent_wide_assignee = PythonOperator(
         )
 
 prepare_granted_persistent_wide_assignee = PythonOperator(
-        task_id='prepare_persistent_wide_assignee',
+        task_id='prepare_granted_persistent_wide_assignee',
         python_callable=prepare_wide_table,
         op_kwargs={
                 'entity': 'assignee',
@@ -75,7 +75,7 @@ prepare_granted_persistent_wide_assignee = PythonOperator(
         )
 
 update_pregrant_persistent_long_assignee = PythonOperator(
-        task_id='update_persistent_long_assignee',
+        task_id='update_pregrant_persistent_long_assignee',
         python_callable=update_long_entity,
         op_kwargs={
                 'entity': 'assignee',
@@ -85,7 +85,7 @@ update_pregrant_persistent_long_assignee = PythonOperator(
         )
 
 create_pregrant_persistent_wide_assignee = PythonOperator(
-        task_id='create_persistent_wide_assignee',
+        task_id='create_pregrant_persistent_wide_assignee',
         python_callable=write_wide_table,
         op_kwargs={
                 'entity': 'assignee',
@@ -95,7 +95,7 @@ create_pregrant_persistent_wide_assignee = PythonOperator(
         )
 
 prepare_pregrant_persistent_wide_assignee = PythonOperator(
-        task_id='prepare_persistent_wide_assignee',
+        task_id='prepare_pregrant_persistent_wide_assignee',
         python_callable=prepare_wide_table,
         op_kwargs={
                 'entity': 'assignee',

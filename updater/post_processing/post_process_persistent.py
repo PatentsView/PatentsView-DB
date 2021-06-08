@@ -40,7 +40,7 @@ def update_long_entity(entity, database_type='granted_patent', **kwargs):
         persiste_update_cursor.execute(entity_update_query)
 
 
-def generate_wide_header(connection, entity, config):
+def generate_wide_header(connection, entity, config,section):
     ############ 1. Create output file for wide format and needed wide/long column lists
     # get disambig cols from old db's persistent_inventor_disambig
     current_rawentity = 'current_raw{0}_id'.format(entity)
