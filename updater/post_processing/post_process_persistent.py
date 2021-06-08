@@ -91,7 +91,7 @@ def prepare_wide_table(entity, database_type='granted_patent', **kwargs):
         # only read header for creating table
         wide_pid_df = generate_wide_header(connection, entity, config,section)
 
-        alter_stmt = 'alter table {0}.{1} add column disambig_{2}_id_{3} after {4} '.format(
+        alter_stmt = 'alter table {0}.{1} add column disamb_{2}_id_{3} varchar(256) null after {4} '.format(
                 RAW_DB,
                 wide_table_name,
                 entity,
