@@ -89,7 +89,7 @@ def prepare_wide_table(entity, database_type='granted_patent', **kwargs):
         connection.connect()
     with connection.cursor() as wide_table_prep_cursor:
         # only read header for creating table
-        wide_pid_df = generate_wide_header(connection, entity, config)
+        wide_pid_df = generate_wide_header(connection, entity, config,section)
 
         alter_stmt = 'alter table {0}.{1} add column disambig_{2}_id_{3} after {4} '.format(
                 RAW_DB,
