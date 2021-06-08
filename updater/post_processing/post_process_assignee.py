@@ -154,7 +154,8 @@ def post_process_assignee(**kwargs):
                       include_location=True)
 
 
-def post_process_qc(config):
+def post_process_qc(**kwargs):
+    config = get_current_config(**kwargs)
     qc = AssigneePostProcessingQC(config)
     qc.runTests()
 
