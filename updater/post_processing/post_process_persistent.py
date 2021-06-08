@@ -123,7 +123,7 @@ def write_wide_table(entity, database_type='granted_patent', **kwargs):
     id_col = '{0}_id'.format(entity)
     upsert_query = """
     INSERT INTO {wide_table} ({current_id},{disambig_id}) select uuid,{entity_id} from {source_entity} ON DUPLICATE  
-    KEY UPDATE {disambig_id} = VALUES({entity_id})
+    KEY UPDATE {disambig_id} = VALUES({disambig_id})
     """.format(wide_table=persistent_wide_table, current_id=current_rawentity, disambig_id=disamb_col, entity_id=id_col,
                source_entity=source_entity_table)
     # fixed
