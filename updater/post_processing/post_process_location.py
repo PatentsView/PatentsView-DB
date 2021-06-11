@@ -1,3 +1,4 @@
+import datetime
 import time
 
 import numpy as np
@@ -6,7 +7,7 @@ from sqlalchemy import create_engine
 from tqdm import tqdm
 
 from QA.post_processing.LocationPostProcessing import LocationPostProcessingQC
-from lib.configuration import get_config, get_connection_string
+from lib.configuration import get_connection_string, get_current_config
 from updater.post_processing.create_lookup import load_lookup_table
 
 
@@ -334,28 +335,31 @@ class LocationPostProcessor():
 
     def create_fips_lookups(self):
         persistent_files = self.config['FOLDERS']['PERSISTENT_FILES']
+        state_lookup = pd.read_csv('{}/state_fips.csv'.format(persistent_files), dtype=object)
         # TODO: maybe just store this as a json file that directly becomes a dict?
         county_lookup = pd.read_csv('{}/county_lookup.csv'.format(persistent_files))
-        city = county_lookup['city']
-        state = county_lookup['state']
-        county = county_lookup['county']
-        county_fips = county_lookup['county_fips']
-        self.county_fips_dict = {}
-        self.county_dict = {}
-        for i in range(len(county)):
-            self.county_dict[(state[i], city[i])] = county[i]
-            self.county_fips_dict[(state[i], city[i])] = county_fips[i]
-        state_df = pd.read_csv('{}/state_fips.csv'.format(persistent_files), dtype=object)
-        self.state_dict = dict(zip(list(state_df['State']), list(state_df['State_FIPS'])))
+        self.fips_dict = state_lookup.set_index('State').to_dict(orient='index')
+        for state in self.state_dict:
+            self.fips_dict[state]['counties'] = county_lookup.loc[
+                county_lookup.state == state, ["county", "county_fips"]].drop_duplicates().set_index('county').to_dict(
+                    orient='index')
+            self.fips_dict[state]['cities'] = county_lookup.loc[county_lookup.state == state,
+                                                                ["city", "county"]].set_index(
+                    'city').to_dict(orient='index')
 
     def find_county(self, row):
         city = clean_loc(row['city'])
         state = clean_loc(row['state'])
         country = clean_loc(row['country'])
-
-        county = lookup_fips(city, state, country, self.county_dict, 'city')
-        county_fips = lookup_fips(city, state, country, self.county_fips_dict, 'city')
-        state_fips = lookup_fips(city, state, country, self.state_dict, 'state')
+        state_fips = None
+        county = None
+        county_fips = None
+        if country == 'US' and state in self.state_dict:
+            state_settings = self.fips_dict[state]
+            state_fips = state_settings['State_FIPS']
+            if city in state_settings['cities']:
+                county = state_settings['cities'][city]
+                county_fips = state_settings['counties'][county]['county_fips']
 
         result_dict = {
                 'found_county':      county,
@@ -450,7 +454,7 @@ def clean_loc(loc):
     return cleaned_loc
 
 
-def lookup_fips(city, state, country, lookup_dict, lookup_type='city'):
+def lookup_fips(city, state, country, lookup_dict):
     result = None
     if lookup_type == 'city':
         if country == 'US' and (state, city) in lookup_dict:
@@ -496,12 +500,12 @@ def generate_disambiguated_locations(engine, limit, offset):
     """
 
     location_data_template = """
-        SELECT rl.location_id, rl.city, rl.state, rl.country
+        SELECT rl.location_id, rl.city, rl.state, rl.country_transformed as country, rl.location_id_transformed
         FROM rawlocation rl
             JOIN ({loc_core_query}) location on location.location_id = rl.location_id
         WHERE rl.location_id is not null
         UNION ALL
-        SELECT rl2.location_id, rl2.city, rl2.state, rl2.country
+        SELECT rl2.location_id, rl2.city, rl2.state, rl2.country_transformed as country,rl.location_id_transformed
             FROM pregrant_publications.rawlocation rl2
                 JOIN ({loc_core_query}) location on location.location_id = rl2.location_id
             WHERE rl2.location_id is not null
@@ -558,8 +562,9 @@ def truncate_max_locs(engine):
 def location_reduce(location_data, update_config, engine):
     truncate_max_locs(engine)
     location_data = location_data.fillna(value='None')
-    location_data = location_data.groupby(['location_id', 'city', 'state', 'country']).size().reset_index().groupby(
-            ['location_id', 'city', 'state', 'country'])[[0]].max()
+    location_data = location_data.groupby(
+            ['location_id', 'city', 'state', 'country', 'location_id_transformed']).size().reset_index().groupby(
+            ['location_id', 'city', 'state', 'country', 'location_id_transformed'])[[0]].max()
     location_data = location_data.reset_index()
     location_data = location_data.rename(columns={
             0: "location_count"
@@ -577,12 +582,20 @@ def location_reduce(location_data, update_config, engine):
             'location_id').sort_index()
 
     final_loc = one_max.append(location_date_df)
-    final_loc = final_loc[['location_id', 'city', 'state', 'country']]
+    final_loc = final_loc.join(
+            final_loc.location_id_transformed.str.split(
+                    '|',
+                    expand=True).rename(
+                    {
+                            0: 'lattitude',
+                            1: 'longitude'
+                            },
+                    axis=1))
+    final_loc = final_loc[['location_id', 'city', 'state', 'country', 'lattitude', 'longitude']]
     final_loc = final_loc.rename(columns={
             'location_id': 'id'
             })
     final_loc = final_loc.reset_index(drop=True)
-
     return final_loc
 
 
@@ -663,25 +676,33 @@ def update_fips(config):
     update_county_info(config)
 
 
-def post_process_location(config):
+def post_process_location(**kwargs):
+    config = get_current_config(**kwargs)
+    version_indicator = config['DATES']['END_DATE']
     update_rawlocation(config)
     update_rawlocation(config, database='PGPUBS_DATABASE')
     precache_locations(config)
     create_location(config)
-    update_location_lat_lon(config)
+    # update_location_lat_lon(config)
     update_fips(config)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
-                      parent_entity_id='location_id', entity='assignee', include_location=False)
+                      parent_entity_id='location_id', entity='assignee', include_location=False,
+                      version_indicator=version_indicator)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
-                      parent_entity_id='location_id', entity="inventor", include_location=True)
+                      parent_entity_id='location_id', entity="inventor", include_location=True,
+                      version_indicator=version_indicator)
 
 
-def post_process_qc(config):
+def post_process_qc(**kwargs):
+    config = get_current_config(**kwargs)
     qc = LocationPostProcessingQC(config)
     qc.runTests()
 
 
 if __name__ == '__main__':
-    config = get_config()
-    post_process_location(config)
-    post_process_qc(config)
+    post_process_location(**{
+            "execution_date": datetime.date(2021, 3, 23)
+            })
+    post_process_qc(**{
+            "execution_date": datetime.date(2021, 3, 23)
+            })
