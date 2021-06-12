@@ -470,7 +470,7 @@ def update_rawlocation(update_config, database='RAW_DB', uuid_field='id'):
         UPDATE rawlocation rl left join location_disambiguation_mapping ldm
             on ldm.uuid = rl.{uuid_field}
         set rl.location_id = ldm.location_id
-    """.format(uuid_field=uuid_field, granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    """.format(uuid_field=uuid_field, granted_db=update_config['PATENTSVIEW_DATABASES']['RAW_DB'])
     print(update_statement)
     engine.execute(update_statement)
 
