@@ -198,7 +198,7 @@ class LawyerDisambiguator:
         populates the lawyer table in the database
         """
         from updater.disambiguation.lawyer_disambiguation import alchemy
-        from updater.disambiguation.lawyer_disambiguation.alchemy.schema import RawLawyer,Lawyer, patentlawyer
+        from updater.disambiguation.lawyer_disambiguation.alchemy.schema import RawLawyer, Lawyer, patentlawyer
         from updater.disambiguation.lawyer_disambiguation.tasks import bulk_commit_inserts, bulk_commit_updates
         print('Disambiguating lawyers...', flush=True)
         session = alchemy.fetch_session(dbtype=self.doctype)
@@ -254,8 +254,7 @@ class LawyerDisambiguator:
 
     def run_disambiguation(self):
         from updater.disambiguation.lawyer_disambiguation import alchemy
-        from updater.disambiguation.lawyer_disambiguation.alchemy.schema import RawLawyer,Lawyer, patentlawyer
-
+        from updater.disambiguation.lawyer_disambiguation.alchemy.schema import RawLawyer
 
         # get all lawyers in database
         print("running")
@@ -264,7 +263,6 @@ class LawyerDisambiguator:
         # global patentlawyer_insert_statements
         # global update_statements
         #
-        session = alchemy.fetch_session(dbtype=self.doctype)
 
         print("going through alphabet")
         for letter in alphabet:
@@ -275,12 +273,14 @@ class LawyerDisambiguator:
             lawyer_dict = {}
             letterblock = []
             # query by letter
+            session = alchemy.fetch_session(dbtype=self.doctype)
             lawyers_object = session.query(RawLawyer).filter(RawLawyer.alpha_lawyer_id.like(letter + '%'))
             print("query returned")
             for lawyer in lawyers_object:
                 lawyer_dict[lawyer.uuid] = lawyer
                 id_map[lawyer.alpha_lawyer_id].append(lawyer.uuid)
                 letterblock.append(lawyer.alpha_lawyer_id)
+            session.close_all()
             print(letterblock[0:5])
             self.create_jw_blocks(letterblock)
             self.create_lawyer_table(id_map, lawyer_dict)
