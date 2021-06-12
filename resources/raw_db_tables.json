@@ -224,16 +224,16 @@
       "direct_load": false
     },
     "patent_contractawardnumber": {
-      "raw_data": false,
+      "raw_data": true,
       "lookup": false,
       "bulk_generated": false,
-      "direct_load": false
+      "direct_load": true
     },
     "patent_govintorg": {
-      "raw_data": false,
+      "raw_data": true,
       "lookup": false,
       "bulk_generated": false,
-      "direct_load": false
+      "direct_load": true
     },
     "patent_inventor": {
       "raw_data": false,

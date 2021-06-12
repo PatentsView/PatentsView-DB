@@ -166,7 +166,7 @@ def process_post_manual(**kwargs):
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     engine = create_engine(get_connection_string(config, 'TEMP_UPLOAD_DB'))
-
+    full_db_engine = create_engine(get_connection_string(config, 'RAW_DB'))
     # upload the new government organization we manually identified
     # upload_new_orgs(post_manual, engine)
 
@@ -178,7 +178,7 @@ def process_post_manual(**kwargs):
     looked_up = process_NER(pre_manual, post_manual, dict_clean_org)
 
     # get the mapping of orgs to org_ids
-    org_id_mapping = readOrgs(engine)
+    org_id_mapping = readOrgs(full_db_engine)
 
     # push the mappings into the db
     push_orgs(looked_up, org_id_mapping, config)
@@ -191,7 +191,10 @@ def qc_gi(**kwargs):
 
 
 if __name__ == '__main__':
+    from dateutil import rrule
 
-    process_post_manual(**{
-            "execution_date": datetime.date(2020, 12, 29)
-            })
+    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime.date(2020, 12, 29), until=datetime.date(2021, 3, 23)):
+        process_post_manual(**{
+                "execution_date": dt
+                })
+        break
