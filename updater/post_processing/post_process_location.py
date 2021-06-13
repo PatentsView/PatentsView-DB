@@ -597,7 +597,7 @@ def location_reduce(location_data, update_config, engine):
             'location_id': 'id'
             })
     final_loc = final_loc.reset_index(drop=True)
-    final_loc.replace('None', np.nan)
+    final_loc=final_loc.replace('None', np.nan)
     return final_loc
 
 
