@@ -543,7 +543,7 @@ def create_date_table(engine):
         SELECT ml4.location_id, ml4.city, ml4.state, ml4.country, ml4.location_count, a.date
         from max_location_counts ml4
                 left join location_disambiguation_mapping ldm4 on ldm4.location_id = ml4.location_id
-                left join pregrant_publications.rawassignee pri on pra.rawlocation_id = ldm4.uuid
+                left join pregrant_publications.rawassignee pra on pra.rawlocation_id = ldm4.uuid
                 left join pregrant_publications.application a on a.document_number = pra.document_number
     """
     location_date_df = pd.read_sql_query(sql=date_query, con=engine)
