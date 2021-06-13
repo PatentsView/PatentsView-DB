@@ -339,7 +339,7 @@ class LocationPostProcessor():
         # TODO: maybe just store this as a json file that directly becomes a dict?
         county_lookup = pd.read_csv('{}/county_lookup.csv'.format(persistent_files))
         self.fips_dict = state_lookup.set_index('State').to_dict(orient='index')
-        for state in self.state_dict:
+        for state in self.fips_dict:
             self.fips_dict[state]['counties'] = county_lookup.loc[
                 county_lookup.state == state, ["county", "county_fips"]].drop_duplicates().set_index('county').to_dict(
                     orient='index')
