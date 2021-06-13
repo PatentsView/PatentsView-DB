@@ -505,7 +505,7 @@ def generate_disambiguated_locations(engine, limit, offset):
             JOIN ({loc_core_query}) location on location.location_id = rl.location_id
         WHERE rl.location_id is not null
         UNION ALL
-        SELECT rl2.location_id, rl2.city, rl2.state, rl2.country_transformed as country,rl.location_id_transformed
+        SELECT rl2.location_id, rl2.city, rl2.state, rl2.country_transformed as country,rl2.location_id_transformed
             FROM pregrant_publications.rawlocation rl2
                 JOIN ({loc_core_query}) location on location.location_id = rl2.location_id
             WHERE rl2.location_id is not null
