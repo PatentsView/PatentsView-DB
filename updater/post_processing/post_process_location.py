@@ -583,7 +583,7 @@ def location_reduce(location_data, update_config, engine):
 
     final_loc = one_max.append(location_date_df)
     final_loc = final_loc.join(
-            final_loc.location_id_transformed.str.split(
+            final_loc.location_id_transformed.astype(str).str.split(
                     '|',
                     expand=True).rename(
                     {
@@ -591,7 +591,8 @@ def location_reduce(location_data, update_config, engine):
                             1: 'longitude'
                             },
                     axis=1))
-    final_loc = final_loc[['location_id', 'city', 'state', 'country', 'lattitude', 'longitude']]
+    final_loc = final_loc.loc[:,
+                final_loc.columns.isin(['location_id', 'city', 'state', 'country', 'lattitude', 'longitude'])]
     final_loc = final_loc.rename(columns={
             'location_id': 'id'
             })
