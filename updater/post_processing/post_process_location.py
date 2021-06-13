@@ -587,12 +587,12 @@ def location_reduce(location_data, update_config, engine):
                     '|',
                     expand=True).rename(
                     {
-                            0: 'lattitude',
+                            0: 'latitude',
                             1: 'longitude'
                             },
                     axis=1))
     final_loc = final_loc.loc[:,
-                final_loc.columns.isin(['location_id', 'city', 'state', 'country', 'lattitude', 'longitude'])]
+                final_loc.columns.isin(['location_id', 'city', 'state', 'country', 'latitude', 'longitude'])]
     final_loc = final_loc.rename(columns={
             'location_id': 'id'
             })
