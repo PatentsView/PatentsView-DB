@@ -6,7 +6,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
-from lib.configuration import get_connection_string, get_current_config, get_version_indicator
+from lib.configuration import get_connection_string, get_current_config
 from updater.post_processing.create_lookup import load_lookup_table
 
 
