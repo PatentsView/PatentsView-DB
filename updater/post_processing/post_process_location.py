@@ -357,8 +357,12 @@ class LocationPostProcessor():
         if country == 'US' and state in self.state_dict:
             state_settings = self.fips_dict[state]
             state_fips = state_settings['State_FIPS']
+            # fips_dict['DC']['cities']['Washington']
+            # {'county': 'District of Columbia'}
             if city in state_settings['cities']:
-                county = state_settings['cities'][city]
+                county = state_settings['cities'][city]['county']
+                # fips_dict['DC']['counties']
+                # {'District of Columbia': {'county_fips': 11001}}
                 county_fips = state_settings['counties'][county]['county_fips']
 
         result_dict = {
