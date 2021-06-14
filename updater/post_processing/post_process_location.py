@@ -692,11 +692,11 @@ def post_process_location(**kwargs):
     # update_location_lat_lon(config)
     update_fips(config)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
-                      parent_entity_id='location_id', entity='assignee', include_location=False,
-                      version_indicator=version_indicator)
+                      parent_entity_id=None, entity='assignee', include_location=True,
+                      location_strict=True, version_indicator=version_indicator)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
-                      parent_entity_id='location_id', entity="inventor", include_location=True,
-                      version_indicator=version_indicator)
+                      parent_entity_id=None, entity="inventor", include_location=True,
+                      location_strict=True, version_indicator=version_indicator)
 
 
 def post_process_qc(**kwargs):
