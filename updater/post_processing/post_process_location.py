@@ -687,8 +687,7 @@ def post_process_location(**kwargs):
     update_rawlocation(config)
     update_rawlocation(config, database='PGPUBS_DATABASE')
     precache_locations(config)
-    create_location(config)
-    # update_location_lat_lon(config)
+    create_location(config, version_indicator=version_indicator)
     update_fips(config)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
                       parent_entity_id=None, entity='assignee', include_location=True,
