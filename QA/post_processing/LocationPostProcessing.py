@@ -171,7 +171,7 @@ class LocationPostProcessingQC(DisambiguationTester):
         self.entity_id = 'id'
         self.disambiguated_id = 'location_id'
         self.disambiguated_table = 'location'
-        self.patent_exclusion_list.extend(['location', 'rawlocation'])
+        self.patent_exclusion_list.extend(['location', 'rawlocation','location_assignee','location_inventor'])
 
     # def test_floating_entities(self, table=None, table_config=None):
     #     pass
