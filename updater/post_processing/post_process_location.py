@@ -574,7 +574,6 @@ def location_reduce(location_data, update_config, engine):
             0: "location_count"
             })
     location_data['max_count'] = location_data.groupby('location_id')['location_count'].transform('max')
-    location_data = location_data.replace('None', None)
     max_df = location_data[location_data['location_count'] == location_data['max_count']].drop(['max_count'], axis=1)
     one_max = max_df.drop_duplicates(subset='location_id', keep=False)
     max_df[max_df.duplicated('location_id', keep=False)].to_sql('max_location_counts', con=engine, if_exists='append',
@@ -601,7 +600,7 @@ def location_reduce(location_data, update_config, engine):
             'location_id': 'id'
             })
     final_loc = final_loc.reset_index(drop=True)
-    final_loc=final_loc.replace('None', np.nan)
+    final_loc = final_loc.replace('None', None)
     return final_loc
 
 
