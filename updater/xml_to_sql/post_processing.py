@@ -35,6 +35,14 @@ def consolidate_rawlocation(config):
             'INSERT IGNORE INTO rawlocation (id, city, state, country, filename) SELECT rawlocation_id, city, state, country, filename FROM rawinventor;')
 
 
+def create_country_transformed(config):
+    cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
+    engine = create_engine(cstr)
+    engine.execute(
+        "UPDATE rawlocation SET country_transformed = SUBSTRING(country, 1, 2) WHERE country != 'unknown' AND country != 'omitted';")
+
+
+
 def consolidate_cpc(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
@@ -241,6 +249,7 @@ def begin_post_processing(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
     trim_rawassignee(config)
     consolidate_rawlocation(config)
+    create_country_transformed(config)
     consolidate_cpc(config)
     detail_desc_length(config)
     consolidate_uspc(config)
