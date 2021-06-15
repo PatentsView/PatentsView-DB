@@ -565,10 +565,10 @@ def truncate_max_locs(engine):
 
 def location_reduce(location_data, update_config, engine):
     truncate_max_locs(engine)
-    location_data = location_data.fillna(value='None')
     location_data = location_data.groupby(
-            ['location_id', 'city', 'state', 'country', 'location_id_transformed']).size().reset_index().groupby(
-            ['location_id', 'city', 'state', 'country', 'location_id_transformed'])[[0]].max()
+            ['location_id', 'city', 'state', 'country', 'location_id_transformed'],
+            dropna=False).size().reset_index().groupby(
+            ['location_id', 'city', 'state', 'country', 'location_id_transformed'], dropna=False)[[0]].max()
     location_data = location_data.reset_index()
     location_data = location_data.rename(columns={
             0: "location_count"
@@ -585,26 +585,25 @@ def location_reduce(location_data, update_config, engine):
             'location_id').sort_index()
 
     final_loc = one_max.append(location_date_df)
-    final_loc = final_loc.join(
-            final_loc.location_id_transformed.astype(str).str.split(
-                    '|',
-                    expand=True).rename(
-                    {
-                            0: 'latitude',
-                            1: 'longitude'
-                            },
-                    axis=1))
+    final_loc = final_loc.join(pd.Series(np.where(
+            pd.isnull(final_loc.location_id_transformed), None,
+            final_loc.location_id_transformed.astype(str))).str.split("|", expand=True).rename(
+            {
+                    0: 'latitude',
+                    1: 'longitude'
+                    },
+            axis=1))
+
     final_loc = final_loc.loc[:,
                 final_loc.columns.isin(['location_id', 'city', 'state', 'country', 'latitude', 'longitude'])]
     final_loc = final_loc.rename(columns={
             'location_id': 'id'
             })
     final_loc = final_loc.reset_index(drop=True)
-    final_loc = final_loc.replace('None', None)
     return final_loc
 
 
-def create_location(update_config):
+def create_location(update_config, version_indicator):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     limit = 10000
     offset = 0
@@ -619,6 +618,7 @@ def create_location(update_config):
 
         step_time = time.time() - start
         canonical_assignments = location_reduce(current_location_data, update_config, engine)
+        canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
         canonical_assignments.to_sql(name='location', con=engine,
                                      if_exists='append',
                                      index=False)
