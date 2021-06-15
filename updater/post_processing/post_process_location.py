@@ -540,13 +540,13 @@ def create_date_table(engine):
         UNION ALL
         SELECT ml3.location_id, ml3.city, ml3.state, ml3.country, ml3.location_count, a.date
         from max_location_counts ml3
-                left join location_disambiguation_mapping ldm3 on ldm3.location_id = ml3.location_id
+                left join pregrant_publications.location_disambiguation_mapping ldm3 on ldm3.location_id = ml3.location_id
                 left join pregrant_publications.rawinventor pri on pri.rawlocation_id = ldm3.uuid
                 left join pregrant_publications.application a on a.document_number = pri.document_number
                 UNION ALL
         SELECT ml4.location_id, ml4.city, ml4.state, ml4.country, ml4.location_count, a.date
         from max_location_counts ml4
-                left join location_disambiguation_mapping ldm4 on ldm4.location_id = ml4.location_id
+                left join pregrant_publications.location_disambiguation_mapping ldm4 on ldm4.location_id = ml4.location_id
                 left join pregrant_publications.rawassignee pra on pra.rawlocation_id = ldm4.uuid
                 left join pregrant_publications.application a on a.document_number = pra.document_number
     """
