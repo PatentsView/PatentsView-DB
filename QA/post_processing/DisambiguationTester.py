@@ -125,6 +125,7 @@ where et.{id_field} is null
             count_cursor.execute(invalid_query)
             count_value = count_cursor.fetchall()[0][0]
             if count_value > 0:
+                print(invalid_query)
                 raise Exception(
                         "There are {id_field} in {disambiguated_table} table that are not in  {entity_table}".format(
                                 disambiguated_table=self.disambiguated_table, entity_table=self.entity_table,
