@@ -130,6 +130,9 @@ where et.{id_field} is null
                                 disambiguated_table=self.disambiguated_table, entity_table=self.entity_table,
                                 id_field=self.disambiguated_id))
 
+    def test_related_floating_entities(self, table_name, table_config):
+        pass
+
     def runTests(self):
         print("Beginning Disambiguation Specific Tests")
         self.test_invalid_id()

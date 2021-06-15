@@ -151,7 +151,7 @@ def post_process_inventor(**kwargs):
     create_inventor(config, version_indicator=version_indicator)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
                       parent_entity_id='patent_id', entity='inventor', version_indicator=version_indicator,
-                      include_location=True)
+                      include_location=True, location_strict=False)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
                       parent_entity_id='document_number', entity="inventor", version_indicator=version_indicator,
                       include_location=True)
@@ -165,6 +165,9 @@ def post_process_qc(**kwargs):
 
 if __name__ == '__main__':
     # post_process_inventor(config)
-    post_process_qc(**{
+    post_process_inventor(**{
             "execution_date": datetime.date(2020, 12, 29)
             })
+    # post_process_qc(**{
+    #         "execution_date": datetime.date(2020, 12, 29)
+    #         })

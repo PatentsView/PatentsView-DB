@@ -42,7 +42,7 @@ post_process_inventor_operator = PythonOperator(task_id='post_process_location',
                                                 on_success_callback=airflow_task_success,
                                                 on_failure_callback=airflow_task_failure)
 
-qc_post_process_inventor_operator = PythonOperator(task_id='qc_post_process_inventor',
+qc_post_process_inventor_operator = PythonOperator(task_id='qc_post_process_location',
                                                    python_callable=post_process_qc,
                                                    dag=inventor_post_processor,
                                                    on_success_callback=airflow_task_success,
