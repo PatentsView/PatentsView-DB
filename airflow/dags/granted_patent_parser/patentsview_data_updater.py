@@ -22,7 +22,9 @@ from updater.xml_to_csv.parse_patents import patent_parser
 from updater.xml_to_csv.preprocess_xml import preprocess_xml
 from updater.xml_to_sql.patent_parser import patent_sql_parser
 
+import pendulum
 
+local_tz = pendulum.timezone("America/New_York")
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
@@ -50,7 +52,7 @@ granted_patent_parser = DAG(
         dag_id='granted_patent_updater',
         default_args=default_args,
         description='Download and process granted patent data and corresponding classifications data',
-        start_date=datetime(2021, 1, 5, hour=5, minute=0, second=0),
+        start_date=datetime(2021, 1, 5, hour=5, minute=0, second=0, tzinfo=local_tz),
         schedule_interval=timedelta(weeks=1), catchup=True,
         template_searchpath=templates_searchpath,
         )
