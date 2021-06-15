@@ -120,7 +120,7 @@ class AssigneePostProcessingQC(DisambiguationTester):
         self.disambiguated_id = 'assignee_id'
         self.disambiguated_table = 'assignee'
         self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
-        self.patent_exclusion_list.extend(['assignee'])
+        self.patent_exclusion_list.extend(['assignee','persistent_assignee_disambig'])
         self.add_persistent_table_to_config()
 
     def assert_name_or_organization(self):
