@@ -364,12 +364,12 @@ rep_tbl_1 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_1 = SQLTemplatedPythonOperator(
-        task_id='Indexes',
+        task_id='Indexes - 01',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
         op_kwargs={
-                'filename':    '05_Indexes - 01',
+                'filename':    '05_Indexes',
                 "schema_only": schema_only
                 },
         templates_dict={
@@ -379,12 +379,12 @@ idx_1 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_2 = SQLTemplatedPythonOperator(
-       task_id='Indexes',
+       task_id='Indexes - 02',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
         op_kwargs={
-                'filename':    '05_Indexes - 02',
+                'filename':    '05_Indexes',
                 "schema_only": schema_only
                 },
         templates_dict={
