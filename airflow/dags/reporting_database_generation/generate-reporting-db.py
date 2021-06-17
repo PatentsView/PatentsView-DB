@@ -364,7 +364,7 @@ rep_tbl_1 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_1 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 01',
+        task_id='Indexes-01',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -379,7 +379,7 @@ idx_1 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_2 = SQLTemplatedPythonOperator(
-       task_id='Indexes - 02',
+       task_id='Indexes-02',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -394,7 +394,7 @@ idx_2 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_3 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 03',
+        task_id='Indexes-03',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -409,7 +409,7 @@ idx_3 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_4 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 04',
+        task_id='Indexes-04',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -424,7 +424,7 @@ idx_4 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_5 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 05',
+        task_id='Indexes-05',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -439,7 +439,7 @@ idx_5 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_6 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 06',
+        task_id='Indexes-06',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -454,7 +454,7 @@ idx_6 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_7 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 07',
+        task_id='Indexes-07',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -469,7 +469,7 @@ idx_7 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_8 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 08',
+        task_id='Indexes-08',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -484,7 +484,7 @@ idx_8 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_9 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 09',
+        task_id='Indexes-09',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -499,7 +499,7 @@ idx_9 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_10 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 10',
+        task_id='Indexes-10',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -514,7 +514,7 @@ idx_10 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_11 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 11',
+        task_id='Indexes-11',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -529,7 +529,7 @@ idx_11 = SQLTemplatedPythonOperator(
         params=database_name_config
         )
 idx_12 = SQLTemplatedPythonOperator(
-        task_id='Indexes - 12',
+        task_id='Indexes-12',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
