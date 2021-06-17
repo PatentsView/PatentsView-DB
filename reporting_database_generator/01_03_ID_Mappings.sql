@@ -40,7 +40,7 @@ from
 # We need this early for firstnamed stuff.
 drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_inventor`;
 create table `{{params.reporting_database}}`.`temp_id_mapping_inventor`
-('
+(
   `old_inventor_id` varchar(256) not null,
   `new_inventor_id` int unsigned not null auto_increment,
   primary key (`old_inventor_id`),
