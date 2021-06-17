@@ -363,8 +363,38 @@ rep_tbl_1 = SQLTemplatedPythonOperator(
         templates_exts=template_extension_config,
         params=database_name_config
         )
-idx = SQLTemplatedPythonOperator(
+idx_1 = SQLTemplatedPythonOperator(
         task_id='Indexes',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes - 01',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_01_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_2 = SQLTemplatedPythonOperator(
+       task_id='Indexes',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes - 02',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_02_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_3 = SQLTemplatedPythonOperator(
+        task_id='Indexes - 03',
         provide_context=True,
         python_callable=validate_query.validate_and_execute,
         dag=reporting_db_dag,
@@ -373,7 +403,142 @@ idx = SQLTemplatedPythonOperator(
                 "schema_only": schema_only
                 },
         templates_dict={
-                'source_sql': '05_Indexes.sql'
+                'source_sql': '05_03_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_4 = SQLTemplatedPythonOperator(
+        task_id='Indexes - 04',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_04_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_5 = SQLTemplatedPythonOperator(
+        task_id='Indexes - 05',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_05_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_6 = SQLTemplatedPythonOperator(
+        task_id='Indexes - 06',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_06_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_7 = SQLTemplatedPythonOperator(
+        task_id='Indexes - 07',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_07_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_8 = SQLTemplatedPythonOperator(
+        task_id='Indexes - 08',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_08_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_9 = SQLTemplatedPythonOperator(
+        task_id='Indexes - 09',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_09_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_10 = SQLTemplatedPythonOperator(
+        task_id='Indexes - 10',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_10_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_11 = SQLTemplatedPythonOperator(
+        task_id='Indexes - 11',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_11_index.sql'
+                },
+        templates_exts=template_extension_config,
+        params=database_name_config
+        )
+idx_12 = SQLTemplatedPythonOperator(
+        task_id='Indexes - 12',
+        provide_context=True,
+        python_callable=validate_query.validate_and_execute,
+        dag=reporting_db_dag,
+        op_kwargs={
+                'filename':    '05_Indexes',
+                "schema_only": schema_only
+                },
+        templates_dict={
+                'source_sql': '05_12_index.sql'
                 },
         templates_exts=template_extension_config,
         params=database_name_config
@@ -443,5 +608,29 @@ cpc.set_upstream(nber)
 
 rep_tbl_1.set_upstream(uspc)
 
-idx.set_upstream(rep_tbl_1)
-rep_tbl_2.set_upstream(idx)
+idx_1.set_upstream(rep_tbl_1)
+idx_2.set_upstream(rep_tbl_1)
+idx_3.set_upstream(rep_tbl_1)
+idx_4.set_upstream(rep_tbl_1)
+idx_5.set_upstream(rep_tbl_1)
+idx_6.set_upstream(rep_tbl_1)
+idx_7.set_upstream(rep_tbl_1)
+idx_8.set_upstream(rep_tbl_1)
+idx_9.set_upstream(rep_tbl_1)
+idx_10.set_upstream(rep_tbl_1)
+idx_11.set_upstream(rep_tbl_1)
+idx_12.set_upstream(rep_tbl_1)
+
+
+idx_1.set_upstream(rep_tbl_2)
+idx_2.set_upstream(rep_tbl_2)
+idx_3.set_upstream(rep_tbl_2)
+idx_4.set_upstream(rep_tbl_2)
+idx_5.set_upstream(rep_tbl_2)
+idx_6.set_upstream(rep_tbl_2)
+idx_7.set_upstream(rep_tbl_2)
+idx_8.set_upstream(rep_tbl_2)
+idx_9.set_upstream(rep_tbl_2)
+idx_10.set_upstream(rep_tbl_2)
+idx_11.set_upstream(rep_tbl_2)
+idx_12.set_upstream(rep_tbl_2)
