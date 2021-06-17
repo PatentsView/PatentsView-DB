@@ -214,7 +214,7 @@ from
   left outer join `{{params.reporting_database}}`.`temp_cpc_group_title` g on g.`id` = c.`group_id`
   left outer join `{{params.reporting_database}}`.`temp_cpc_subgroup_title` sg on sg.`id` = c.`subgroup_id`
   left outer join `{{params.reporting_database}}`.`temp_cpc_current_subsection_aggregate_counts` tccsac on tccsac.`subsection_id` = c.`subsection_id`
-  left outer join `{{params.reporting_database}}`.`temp_cpc_current_group_aggregate_counts` tccgac on tccgac.`group_id` = c.`group_id`;
+  left outer join `{{params.reporting_database}}`.`temp_cpc_current_group_aggregate_counts` tccgac on tccgac.`group_id` = c.`group_id` where p.version_indicator<= {{ params.version_indicator }};
 
 
 drop table if exists `{{params.reporting_database}}`.`cpc_current_subsection`;

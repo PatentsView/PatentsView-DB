@@ -60,7 +60,7 @@ select
               inner join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
             where
               ri.`inventor_id` is not null and
-              rl.`location_id` is not null
+              rl.`location_id` is not null and version_indicator <={{ params.version_indicator }}
             order by
               ri.`inventor_id`,
               p.`date` desc,
@@ -88,7 +88,7 @@ insert into `{{params.reporting_database}}`.`temp_inventor_num_patents`
 select
   `inventor_id`, count(distinct `patent_id`)
 from
-  `{{params.raw_database}}`.`patent_inventor`
+  `{{params.raw_database}}`.`patent_inventor`  pi join `{{ params.raw_database }}`.`patent` p on p.id=pi.patent_id where p.version_indicator <={{ params.version_indicator }}
 group by
   `inventor_id`;
 
@@ -110,7 +110,7 @@ select
 from
   `{{params.raw_database}}`.`patent_inventor` ii
   join `{{params.raw_database}}`.`patent_assignee` aa
-  on aa.`patent_id` = ii.`patent_id`
+  on aa.`patent_id` = ii.`patent_id`  join `{{ params.raw_database }}`.`patent` p on p.id=ii.patent_id where p.version_indicator <={{ params.version_indicator }}
 group by
   ii.`inventor_id`;
 
@@ -137,7 +137,7 @@ from
   `{{params.raw_database}}`.`patent_inventor` pa
   inner join `{{params.reporting_database}}`.`patent` p on p.`patent_id`= pa.`patent_id`
 where
-  p.`date` is not null
+  p.`date` is not null and p.version_indicator <={{ params.version_indicator }}
 group by
   pa.`inventor_id`;
 

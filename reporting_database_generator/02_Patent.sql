@@ -49,8 +49,8 @@ from
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`new_location_id` =  tli.`new_location_id`
 where
-  ta.`new_assignee_id` is not null or
-  tl.`new_location_id` is not null;
+  (ta.`new_assignee_id` is not null or
+  tl.`new_location_id` is not null) and  p.version_indicator<={{params.version_indicator}};
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`;
@@ -97,8 +97,8 @@ from
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`new_location_id` =  tli.`new_location_id`
 where
-  ti.`new_inventor_id` is not null or
-  tl.`new_location_id` is not null;
+  (ti.`new_inventor_id` is not null or
+  tl.`new_location_id` is not null)and  p.version_indicator<={{params.version_indicator}};
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`;
@@ -118,7 +118,7 @@ insert into `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`
 select
   `patent_id`, count(*)
 from
-  `{{params.raw_database}}`.`foreigncitation`
+  `{{params.raw_database}}`.`foreigncitation`  where version_indicator<={{params.version_indicator}}
 group by
   `patent_id`;
 
@@ -140,7 +140,7 @@ insert into `{{params.reporting_database}}`.`temp_num_us_applications_cited`
 select
   `patent_id`, count(*)
 from
-  `{{params.raw_database}}`.`usapplicationcitation`
+  `{{params.raw_database}}`.`usapplicationcitation`  where version_indicator<={{params.version_indicator}}
 group by
   `patent_id`;
 
@@ -162,7 +162,7 @@ insert into `{{params.reporting_database}}`.`temp_num_us_patents_cited`
 select
   `patent_id`, count(*)
 from
-  `{{params.raw_database}}`.`uspatentcitation`
+  `{{params.raw_database}}`.`uspatentcitation`  where version_indicator<={{params.version_indicator}}
 group by
   `patent_id`;
 
@@ -186,7 +186,7 @@ select
 from
   `{{params.raw_database}}`.`uspatentcitation`
 where
-  `citation_id` is not null and `citation_id` != ''
+  `citation_id` is not null and `citation_id` != ''  and version_indicator<={{params.version_indicator}}
 group by
   `citation_id`;
 
@@ -224,7 +224,7 @@ from
   left outer join `{{params.reporting_database}}`.`temp_num_foreign_documents_cited` t1 on t1.`patent_id` = p.`id`
   left outer join `{{params.reporting_database}}`.`temp_num_us_applications_cited` t2 on t2.`patent_id` = p.`id`
   left outer join `{{params.reporting_database}}`.`temp_num_us_patents_cited` t3 on t3.`patent_id` = p.`id`
-  left outer join `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents` t4 on t4.`patent_id` = p.`id`;
+  left outer join `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents` t4 on t4.`patent_id` = p.`id`  where version_indicator<={{params.version_indicator}};
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_patent_earliest_application_date`;
@@ -246,7 +246,7 @@ select
 from
   `{{params.raw_database}}`.`application` a
 where
-  a.`date` is not null and a.`date` > date('1899-12-31') and a.`date` < date_add(current_date, interval 10 year)
+  a.`date` is not null and a.`date` > date('1899-12-31') and a.`date` < date_add(current_date, interval 10 year)  and version_indicator<='{{params.version_indicator}}'
 group by
   a.`patent_id`;
 
@@ -270,7 +270,7 @@ select
 from
   `{{params.raw_database}}`.`patent` p
 where
-  p.`date` is not null and p.`date` > date('1899-12-31') and p.`date` < date_add(current_date, interval 10 year);
+  p.`date` is not null and p.`date` > date('1899-12-31') and p.`date` < date_add(current_date, interval 10 year) and version_indicator<={{params.version_indicator}};
 
 
 drop table if exists `{{params.reporting_database}}`.`patent`;
@@ -365,7 +365,7 @@ from
   left outer join `{{params.reporting_database}}`.`temp_patent_aggregations` tpa on tpa.`patent_id` = p.`id`
   left outer join `{{params.reporting_database}}`.`temp_patent_earliest_application_date` tpead on tpead.`patent_id` = p.`id`
   left outer join `{{params.raw_database}}`.`us_term_of_grant` ustog on ustog.`patent_id`=p.`id`
-  left outer join `{{params.raw_database}}`.`detail_desc_length` ddl on ddl.`patent_id` = p.`id`;
+  left outer join `{{params.raw_database}}`.`detail_desc_length` ddl on ddl.`patent_id` = p.`id` where  p.version_indicator<={{params.version_indicator}};
 
 # END patent 
 

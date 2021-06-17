@@ -19,12 +19,12 @@ engine=InnoDB;
 # There are assignees in the raw data that are not linked to anything so we will take our
 # assignee ids from the patent_assignee table to ensure we don't copy any unused assignees over.
 # 345,185 @ 0:23
-insert into
+insert ignore into
   `{{params.reporting_database}}`.`temp_id_mapping_assignee` (`old_assignee_id`)
-select distinct
+select
   pa.`assignee_id`
 from
-  `{{params.raw_database}}`.`patent_assignee` pa;
+  `{{params.raw_database}}`.`rawassignee` pa where assignee_id is not null and  version_indicator<={{params.version_indicator}};
 
 
 # END assignee id mapping
@@ -52,12 +52,12 @@ engine=InnoDB;
 # There are inventors in the raw data that are not linked to anything so we will take our
 # inventor ids from the patent_inventor table to ensure we don't copy any unused inventors over.
 # 3,572,763 @ 1:08
-insert into
+insert ignore into
   `{{params.reporting_database}}`.`temp_id_mapping_inventor` (`old_inventor_id`)
-select distinct
+select
   `inventor_id`
 from
-  `{{params.raw_database}}`.`patent_inventor`;
+  `{{params.raw_database}}`.`rawinventor` where inventor_id is not null and version_indicator<={{params.version_indicator}};
 
 
 # END inventor id mapping
@@ -85,13 +85,13 @@ engine=InnoDB;
 # There are inventors in the raw data that are not linked to anything so we will take our
 # lawyer ids from the patent_lawyer table to ensure we don't copy any unused lawyers over.
 # 3,572,763 @ 1:08
-insert into
+insert ignore into
   `{{params.reporting_database}}`.`temp_id_mapping_lawyer` (`old_lawyer_id`)
-select distinct
+select
   `lawyer_id`
 from
-  `{{params.raw_database}}`.`patent_lawyer`
-  where lawyer_id is not null and lawyer_id !=  '';
+  `{{params.raw_database}}`.`rawlaywer`
+  where lawyer_id is not null and lawyer_id !=  ''  and version_indicator<={{params.version_indicator}};
 
 
 # END lawyer id mapping
@@ -124,7 +124,7 @@ insert into
 select distinct
   `uuid`
 from
-  `{{params.raw_database}}`.`rawexaminer`;
+  `{{params.raw_database}}`.`rawexaminer` where version_indicator<= {{params.version_indicator}};
 
 
 # END examiner id mapping
@@ -165,6 +165,7 @@ engine=InnoDB;
 
 
 # 97,725 @ 0:02
+# One id per lat/long
 insert into
   `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` (`old_location_id_transformed`)
 select distinct
@@ -172,7 +173,7 @@ select distinct
 from
   `{{params.raw_database}}`.`rawlocation`
 where
-  `location_id_transformed` is not null and `location_id_transformed` != '' and `location_id_transformed`!='undisambiguated';
+  `location_id_transformed` is not null and `location_id_transformed` != '' and `location_id_transformed`!='undisambiguated' and   version_indicator<={{params.version_indicator}};
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_location`;
@@ -190,12 +191,14 @@ engine=InnoDB;
 # 120,449 @ 3:27
 insert into
   `{{params.reporting_database}}`.`temp_id_mapping_location` (`old_location_id`, `new_location_id`)
-select distinct
-  rl.`location_id`,
-  t.`new_location_id`
-from
-  (select distinct location_id, location_id_transformed from `{{params.raw_database}}`.`rawlocation` where location_id != '' and location_id is not null and `location_id_transformed`!='undisambiguated') rl
-  inner join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` t on
+select distinct rl.`location_id`,
+                t.`new_location_id`
+from (select distinct location_id, location_id_transformed
+      from `{{params.raw_database}}`.`rawlocation`
+      where location_id != ''
+        and location_id is not null
+        and `location_id_transformed` != 'undisambiguated' and  version_indicator<={{params.version_indicator}}) rl
+         inner join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` t on
     t.`old_location_id_transformed` = rl.`location_id_transformed`;
 
 

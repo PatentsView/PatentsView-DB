@@ -33,7 +33,7 @@ select
   nullif(trim(ac.`category`), '')
 from
   `{{params.reporting_database}}`.`patent` p
-  inner join `{{params.raw_database}}`.`usapplicationcitation` ac on ac.`patent_id` = p.`patent_id`;
+  inner join `{{params.raw_database}}`.`usapplicationcitation` ac on ac.`patent_id` = p.`patent_id`  where p.version_indicator<= {{ params.version_indicator }};
 
 
 # END usapplicationcitation 

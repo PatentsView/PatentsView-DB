@@ -38,7 +38,7 @@ from
   left outer join `{{params.raw_database}}`.`patent_inventor` pii on pii.`patent_id` = u.`patent_id`
   left outer join `{{params.reporting_database}}`.`patent` p on p.`patent_id` = u.`patent_id` and p.`date` is not null
 where
-  u.`mainclass_id` is not null and u.`mainclass_id` != ''
+  u.`mainclass_id` is not null and u.`mainclass_id` != ''  and u.version_indicator<= {{ params.version_indicator }}
 group by
   u.`mainclass_id`;
 
@@ -136,7 +136,7 @@ from
   inner join `{{params.raw_database}}`.`uspc_current` u on u.`patent_id` = p.`patent_id`
   left outer join `{{params.reporting_database}}`.`temp_mainclass_current_title` m on m.`id` = u.`mainclass_id`
   left outer join `{{params.reporting_database}}`.`temp_subclass_current_title` s on s.`id` = u.`subclass_id`
-  left outer join `{{params.reporting_database}}`.`temp_mainclass_current_aggregate_counts` tmcac on tmcac.`mainclass_id` = u.`mainclass_id`;
+  left outer join `{{params.reporting_database}}`.`temp_mainclass_current_aggregate_counts` tmcac on tmcac.`mainclass_id` = u.`mainclass_id`  where u.version_indicator<= {{ params.version_indicator }};
 
 
 drop table if exists `{{params.reporting_database}}`.`uspc_current_mainclass`;
@@ -256,7 +256,7 @@ from
   `{{params.raw_database}}`.`uspc_current` u
   inner join `{{params.reporting_database}}`.`patent` p on p.`patent_id` = u.`patent_id` and p.`date` is not null
 where
-  u.`mainclass_id` is not null and u.`mainclass_id` != ''
+  u.`mainclass_id` is not null and u.`mainclass_id` != ''  and p.version_indicator<= {{ params.version_indicator }}
 group by
   u.`mainclass_id`, year(p.`date`);
 

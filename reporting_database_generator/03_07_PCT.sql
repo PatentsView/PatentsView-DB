@@ -31,7 +31,7 @@ select
   case when ac.`371_date` > date('1899-12-31') and ac.`371_date` < date_add(current_date, interval 10 year) then ac.`371_date` else null end
 from
   `{{params.reporting_database}}`.`patent` p
-  inner join `{{params.raw_database}}`.`pct_data` ac on ac.`patent_id` = p.`patent_id`;
+  inner join `{{params.raw_database}}`.`pct_data` ac on ac.`patent_id` = p.`patent_id`  where p.version_indicator<= {{ params.version_indicator }};
 
 
 # END pctdata

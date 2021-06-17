@@ -27,7 +27,7 @@ select
   i.`uuid`
 from
   `{{params.raw_database}}`.`rawexaminer` i
-  inner join `{{params.reporting_database}}`.`temp_id_mapping_examiner` t on t.`old_examiner_id` = i.`uuid`;
+  inner join `{{params.reporting_database}}`.`temp_id_mapping_examiner` t on t.`old_examiner_id` = i.`uuid` where i.version_indicator<= {{ params.version_indicator }};
 
 
 drop table if exists `{{params.reporting_database}}`.`patent_examiner`;
@@ -51,7 +51,7 @@ select distinct
   ri.`patent_id`, t.`new_examiner_id`, ri.`role`
 from
   `{{params.raw_database}}`.`rawexaminer` ri
-  inner join `{{params.reporting_database}}`.`temp_id_mapping_examiner` t on t.`old_examiner_id` = ri.`uuid`;
+  inner join `{{params.reporting_database}}`.`temp_id_mapping_examiner` t on t.`old_examiner_id` = ri.`uuid`  where ri.version_indicator<= {{ params.version_indicator }};
 
 # END examiner
 
