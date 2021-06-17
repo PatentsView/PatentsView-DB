@@ -31,7 +31,7 @@ select
   nullif(trim(ac.`kind`), '')
 from
   `{{params.reporting_database}}`.`patent` p
-  inner join `{{params.raw_database}}`.`foreign_priority` ac on ac.`patent_id` = p.`patent_id`  where p.version_indicator<= {{ params.version_indicator }};
+  inner join `{{params.raw_database}}`.`foreign_priority` ac on ac.`patent_id` = p.`patent_id`;
 
 
 # END foreignpriority

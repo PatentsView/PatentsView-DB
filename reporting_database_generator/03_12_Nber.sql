@@ -84,7 +84,7 @@ from
   inner join `{{params.raw_database}}`.`nber` n on p.`patent_id` = n.`patent_id`
   left outer join `{{params.raw_database}}`.`nber_category` c on c.`id` = n.`category_id`
   left outer join `{{params.raw_database}}`.`nber_subcategory` s on s.`id` = n.`subcategory_id`
-  left outer join `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_counts` tnsac on tnsac.`subcategory_id` = n.`subcategory_id`  where p.version_indicator<= {{ params.version_indicator }};
+  left outer join `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_counts` tnsac on tnsac.`subcategory_id` = n.`subcategory_id`;
 
 
 # END nber 

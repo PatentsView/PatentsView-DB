@@ -96,7 +96,7 @@ from
   inner join `{{params.reporting_database}}`.`patent` p on p.`patent_id`= pa.`patent_id`
 where
   p.`date` is not null
-and `lawyer_id` is not null and p.version_indicator <={{ params.version_indicator }}
+and `lawyer_id` is not null
 group by
   pa.`lawyer_id`;
 

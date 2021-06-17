@@ -60,7 +60,7 @@ select
               inner join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
             where
               ri.`inventor_id` is not null and
-              rl.`location_id` is not null and version_indicator <={{ params.version_indicator }}
+              rl.`location_id` is not null and ri.version_indicator <={{ params.version_indicator }}
             order by
               ri.`inventor_id`,
               p.`date` desc,

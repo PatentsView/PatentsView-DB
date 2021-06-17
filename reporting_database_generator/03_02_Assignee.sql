@@ -123,7 +123,7 @@ select pa.`assignee_id`,
        ifnull(round(timestampdiff(day, min(p.`date`), max(p.`date`)) / 365), 0)
 from `{{params.raw_database}}`.`patent_assignee` pa
          inner join `{{params.reporting_database}}`.`patent` p on p.`patent_id` = pa.`patent_id`
-where p.`date` is not null and p.version_indicator <={{ params.version_indicator }}
+where p.`date` is not null
 group by pa.`assignee_id`;
 
 drop table if exists `{{params.reporting_database}}`.`patent_assignee`;

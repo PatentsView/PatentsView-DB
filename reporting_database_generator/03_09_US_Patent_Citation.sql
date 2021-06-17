@@ -23,7 +23,7 @@ select
   pc.`patent_id`, pc.`sequence`, nullif(trim(pc.`citation_id`), ''), nullif(trim(pc.`category`), '')
 from
   `{{params.reporting_database}}`.`patent` p
-  inner join `{{params.raw_database}}`.`uspatentcitation` pc on pc.`patent_id` = p.`patent_id`  where p.version_indicator<= {{ params.version_indicator }};
+  inner join `{{params.raw_database}}`.`uspatentcitation` pc on pc.`patent_id` = p.`patent_id`;
 
 
 # END uspatentcitation 
