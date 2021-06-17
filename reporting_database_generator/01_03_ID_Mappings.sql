@@ -90,7 +90,7 @@ insert ignore into
 select
   `lawyer_id`
 from
-  `{{params.raw_database}}`.`rawlaywer`
+  `{{params.raw_database}}`.`rawlawyer`
   where lawyer_id is not null and lawyer_id !=  ''  and version_indicator<={{params.version_indicator}};
 
 
