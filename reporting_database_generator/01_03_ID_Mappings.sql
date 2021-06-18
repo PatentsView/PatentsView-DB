@@ -166,7 +166,7 @@ engine=InnoDB;
 
 # 97,725 @ 0:02
 # One id per lat/long
-insert into
+insert ignore into
   `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` (`old_location_id_transformed`)
 select concat(latitude,'|',longitude)
   as `location_id_transformed`
