@@ -168,12 +168,12 @@ engine=InnoDB;
 # One id per lat/long
 insert into
   `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` (`old_location_id_transformed`)
-select distinct
-  `location_id_transformed`
+select concat(latitude,'|',longitude)
+  as `location_id_transformed`
 from
-  `{{params.raw_database}}`.`rawlocation`
+  `{{paramsj.raw_database}}`.`location` l join rawlocation rl on rl.location_id=l.id
 where
-  `location_id_transformed` is not null and `location_id_transformed` != '' and `location_id_transformed`!='undisambiguated' and   version_indicator<={{params.version_indicator}};
+  `latitude` is not null and `latitude` != '' and version_indicator<={{params.version_indicator}};
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_location`;
