@@ -171,7 +171,7 @@ insert into
 select concat(latitude,'|',longitude)
   as `location_id_transformed`
 from
-  `{{paramsj.raw_database}}`.`location` l join rawlocation rl on rl.location_id=l.id
+  `{{params.raw_database}}`.`location` l join rawlocation rl on rl.location_id=l.id
 where
   `latitude` is not null and `latitude` != '' and version_indicator<={{params.version_indicator}};
 
