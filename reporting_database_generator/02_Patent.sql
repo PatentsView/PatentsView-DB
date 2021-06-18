@@ -96,7 +96,7 @@ from
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
 where
   (ti.`new_inventor_id` is not null or
-  tl.`new_location_id` is not null)and  p.version_indicator<={{params.version_indicator}};
+  tli.`new_location_id` is not null)and  p.version_indicator<={{params.version_indicator}};
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`;
