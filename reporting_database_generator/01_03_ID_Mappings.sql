@@ -173,7 +173,7 @@ select concat(latitude,'|',longitude)
 from
   `{{params.raw_database}}`.`location` l join `{{params.raw_database}}`.rawlocation rl on rl.location_id=l.id
 where
-  `latitude` is not null and `latitude` != '' and version_indicator<={{params.version_indicator}};
+  `latitude` is not null and `latitude` != '' and rl.version_indicator<={{params.version_indicator}};
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_location`;
