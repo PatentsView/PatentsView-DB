@@ -46,8 +46,7 @@ from
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_assignee` ta on ta.`old_assignee_id` = ra.`assignee_id`
   left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
   left outer join `{{params.raw_database}}`.`location` l on l.`id` = rl.`location_id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`new_location_id` =  tli.`new_location_id`
+  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on l.`id` =  tl.`old_location_id`
 where
   (ta.`new_assignee_id` is not null or
   tl.`new_location_id` is not null) and  p.version_indicator<={{params.version_indicator}};
@@ -81,8 +80,8 @@ select
   p.`id`,
   ti.`new_inventor_id`,
   ti.`old_inventor_id`,
-  tl.`new_location_id`,
-  tl.`old_location_id_transformed`,
+  tli.`new_location_id`,
+  tli.`old_location_id_transformed`,
   nullif(l.`city`, ''),
   nullif(l.`state`, ''),
   nullif(l.`country`, ''),
@@ -95,7 +94,6 @@ from
   left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
   left outer join `{{params.raw_database}}`.`location` l on l.`id` = rl.`location_id`
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`new_location_id` =  tli.`new_location_id`
 where
   (ti.`new_inventor_id` is not null or
   tl.`new_location_id` is not null)and  p.version_indicator<={{params.version_indicator}};

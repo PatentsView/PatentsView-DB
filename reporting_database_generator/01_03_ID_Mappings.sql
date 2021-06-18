@@ -153,34 +153,14 @@ from
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_location_transformed`;
-create table `{{params.reporting_database}}`.`temp_id_mapping_location_transformed`
-(
-  `old_location_id_transformed` varchar(128) not null,
-  `new_location_id` int unsigned not null auto_increment,
-  primary key (`old_location_id_transformed`),
-  unique index `ak_temp_id_mapping_location_transformed` (`new_location_id`),
-  unique index `ak_old_id_mapping_location_transformed` (`old_location_id_transformed`)
-)
-engine=InnoDB;
-
-
-# 97,725 @ 0:02
-# One id per lat/long
-insert ignore into
-  `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` (`old_location_id_transformed`)
-select concat(latitude,'|',longitude)
-  as `location_id_transformed`
-from
-  `{{params.raw_database}}`.`location` l join `{{params.raw_database}}`.rawlocation rl on rl.location_id=l.id
-where
-  `latitude` is not null and `latitude` != '' and rl.version_indicator<={{params.version_indicator}};
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_location`;
 create table `{{params.reporting_database}}`.`temp_id_mapping_location`
 (
   `old_location_id` varchar(128) not null,
-  `new_location_id` int unsigned not null,
+`old_location_id_transformed` varchar(128) null,
+  `new_location_id` int unsigned not null auto_increment,
   primary key (`old_location_id`),
   index `ak_temp_id_mapping_location` (`new_location_id`),
   index `ak_old_id_mapping_location` (`old_location_id`)
@@ -190,16 +170,12 @@ engine=InnoDB;
 
 # 120,449 @ 3:27
 insert into
-  `{{params.reporting_database}}`.`temp_id_mapping_location` (`old_location_id`, `new_location_id`)
-select distinct rl.`location_id`,
-                t.`new_location_id`
-from (select distinct location_id, location_id_transformed
-      from `{{params.raw_database}}`.`rawlocation`
-      where location_id != ''
-        and location_id is not null
-        and `location_id_transformed` != 'undisambiguated' and  version_indicator<={{params.version_indicator}}) rl
-         inner join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` t on
-    t.`old_location_id_transformed` = rl.`location_id_transformed`;
+  `{{params.reporting_database}}`.`temp_id_mapping_location` (`old_location_id`,`old_location_id_transformed`)
+select
+      `id`,concat(latitude,'|',longitude)
+from
+  `{{params.raw_database}}`.`location`;
+
 
 
 # END location id mapping

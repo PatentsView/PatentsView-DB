@@ -30,7 +30,7 @@ insert into `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
 (`assignee_id`, `location_id`, `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`)
 select t.`assignee_id`,
        tl.`new_location_id`,
-       tlt.`old_location_id_transformed`,
+       tl.`old_location_id_transformed`,
        nullif(trim(l.`city`), ''),
        nullif(trim(l.`state`), ''),
        nullif(trim(l.`country`), ''),
@@ -38,33 +38,27 @@ select t.`assignee_id`,
        l.`longitude`
 from (
          select t.`assignee_id`,
-                t.`location_id`,
-                t.`location_id_transformed`
+                t.`location_id`
          from (select ROW_NUMBER() OVER (PARTITION BY t.assignee_id ORDER BY t.`date` desc) AS rownum,
                       t.`assignee_id`,
-                      t.`location_id`,
-                      t.`location_id_transformed`
+                      t.`location_id`
                from (
                         select ra.`assignee_id`,
                                rl.`location_id`,
-                               rl.`location_id_transformed`,
                                p.`date`,
                                p.`id`
                         from `{{params.raw_database}}`.`rawassignee` ra
                                  inner join `{{params.raw_database}}`.`patent` p on p.`id` = ra.`patent_id`
                                  inner join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
-                        where rl.`location_id_transformed` is not null
                           and ra.`assignee_id` is not null and ra.version_indicator <={{ params.version_indicator }}
                         order by ra.`assignee_id`,
                                  p.`date` desc,
                                  p.`id` desc
-                    ) t) t
+                    ) raw) t
          where rownum = 1) t
          left join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
          left join `{{params.reporting_database}}`.`temp_id_mapping_location` tl
-                   on tl.`old_location_id` = t.`location_id`
-         left join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tlt
-                   on tlt.`new_location_id` = tl.`new_location_id`;
+                   on tl.`old_location_id` = t.`location_id`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_num_patents`;
 create table `{{params.reporting_database}}`.`temp_assignee_num_patents`
