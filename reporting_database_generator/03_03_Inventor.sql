@@ -1,5 +1,5 @@
 
-# BEGIN inventor 
+# BEGIN inventor
 
 ##############################################################################################################################################
 
@@ -38,20 +38,18 @@ select
   nullif(trim(l.`country`), ''),
   l.`latitude`,
   l.`longitude`
-  
-  from (select * from 
+
+  from (select * from
 
 	(select
           ROW_NUMBER() OVER (PARTITION BY t.inventor_id ORDER BY t.`date` desc) AS rownum,
           t.`inventor_id`,
-          t.`location_id`,
-	  t.`location_id_transformed`
+          t.`location_id`
         from
           (
             select
               ri.`inventor_id`,
               rl.`location_id`,
-	      rl.`location_id_transformed`,
 	      p.`date`,
 	      p.`id`
             from
@@ -64,11 +62,10 @@ select
             order by
               ri.`inventor_id`,
               p.`date` desc,
-              p.`id` desc 
-          ) t) t where t.rownum = 1 ) t          
+              p.`id` desc
+          ) t) t where t.rownum = 1 ) t
        left join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
-left join `{{params.reporting_database}}`.`temp_id_mapping_location` tll on tll.`old_location_id`=t.`location_id`
-       left join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`new_location_id` = tll.`new_location_id` ;
+left join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on tl.`old_location_id`=t.`location_id`;
 
 
 
@@ -260,6 +257,6 @@ from
   left outer join `{{params.reporting_database}}`.`temp_inventor_num_assignees` tina on tina.`inventor_id` = i.`id`;
 
 
-# END inventor 
+# END inventor
 
 ################################################################################################################################################
