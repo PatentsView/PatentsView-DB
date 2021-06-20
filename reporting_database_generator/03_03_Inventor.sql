@@ -141,7 +141,7 @@ where
 group by
   pa.`inventor_id`;
 
-drop table if exists `{{ params.reporting_databsae }}`.`temp_first_inventor`;
+drop table if exists `{{ params.reporting_database }}`.`temp_first_inventor`;
 create table `{{ params.reporting_database }}`.`temp_first_inventor`
 (
   `patent_id` varchar(20) not null,
