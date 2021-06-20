@@ -28,7 +28,7 @@ create table `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
 # 320,156 @ 3:51
 insert into `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
 (`assignee_id`, `location_id`, `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`)
-select t.`assignee_id`,
+select lastknown.`assignee_id`,
        tl.`new_location_id`,
        tl.`old_location_id_transformed`,
        nullif(trim(l.`city`), ''),
@@ -37,11 +37,11 @@ select t.`assignee_id`,
        l.`latitude`,
        l.`longitude`
 from (
-         select t.`assignee_id`,
-                t.`location_id`
-         from (select ROW_NUMBER() OVER (PARTITION BY t.assignee_id ORDER BY t.`date` desc) AS rownum,
-                      t.`assignee_id`,
-                      t.`location_id`
+         select srw.`assignee_id`,
+                srw.`location_id`
+         from (select ROW_NUMBER() OVER (PARTITION BY rw.assignee_id ORDER BY rw.`date` desc) AS rownum,
+                      rw.`assignee_id`,
+                      rw.`location_id`
                from (
                         select ra.`assignee_id`,
                                rl.`location_id`,
@@ -54,11 +54,11 @@ from (
                         order by ra.`assignee_id`,
                                  p.`date` desc,
                                  p.`id` desc
-                    ) raw) t
-         where rownum = 1) t
-         left join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
+                    ) rw) srw
+         where rownum = 1) lastknown
+         left join `{{params.raw_database}}`.`location` l on l.`id` = lastknown.`location_id`
          left join `{{params.reporting_database}}`.`temp_id_mapping_location` tl
-                   on tl.`old_location_id` = t.`location_id`;
+                   on tl.`old_location_id` = lastknown.`location_id`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_num_patents`;
 create table `{{params.reporting_database}}`.`temp_assignee_num_patents`
@@ -242,6 +242,6 @@ from `{{params.raw_database}}`.`assignee` a
                          on tani.`assignee_id` = a.`id`;
 
 
-# END assignee 
+# END assignee
 
 ################################################################################################################################################
