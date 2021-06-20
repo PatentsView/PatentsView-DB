@@ -142,7 +142,7 @@ drop table if exists `{{ params.reporting_database }}`.`temp_first_inventor`;
 create table `{{ params.reporting_database }}`.`temp_first_inventor`
 (
   `patent_id` varchar(20) not null,
-  `inventor_id` int unsigned not null,
+  `inventor_id` varchar(256)  not null,
   `sequence` smallint unsigned not null,
   primary key (`patent_id`, `inventor_id`),
   unique index ak_temp_first_inventor (`inventor_id`, `patent_id`)
