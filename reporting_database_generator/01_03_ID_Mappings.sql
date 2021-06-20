@@ -174,7 +174,7 @@ insert into
 select
       `id`,concat(latitude,'|',longitude)
 from
-  `{{params.raw_database}}`.`location`;
+  `{{params.raw_database}}`.`location` where latitude is not null;
 
 
 
