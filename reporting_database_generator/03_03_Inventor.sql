@@ -177,7 +177,7 @@ select distinct
 from
   `{{params.raw_database}}`.`patent_inventor` pii
   inner join `{{params.reporting_database}}`.`temp_id_mapping_inventor` t on t.`old_inventor_id` = pii.`inventor_id`
-  left outer join  temp_first_inventor t2
+  left outer join  `{{params.reporting_database}}`.temp_first_inventor t2
 
 on t2.`patent_id` = pii.`patent_id` and t2.`inventor_id` = pii.`inventor_id`
   left outer join `{{params.raw_database}}`.`rawinventor` ri on ri.`patent_id` = t.`patent_id` and ri.`inventor_id` = t.`inventor_id` and ri.`sequence`
