@@ -180,8 +180,8 @@ from
   left outer join  `{{params.reporting_database}}`.temp_first_inventor t2
 
 on t2.`patent_id` = pii.`patent_id` and t2.`inventor_id` = pii.`inventor_id`
-  left outer join `{{params.raw_database}}`.`rawinventor` ri on ri.`patent_id` = t.`patent_id` and ri.`inventor_id` = t.`inventor_id` and ri.`sequence`
-= t.`sequence`
+  left outer join `{{params.raw_database}}`.`rawinventor` ri on ri.`patent_id` = t2.`patent_id` and ri.`inventor_id` = t2.`inventor_id` and ri.`sequence`
+= t2.`sequence`
   left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`location_id`;
 
