@@ -138,22 +138,6 @@ where
 group by
   pa.`inventor_id`;
 
-drop table if exists `{{ params.reporting_database }}`.`temp_first_inventor`;
-create table `{{ params.reporting_database }}`.`temp_first_inventor`
-(
-  `patent_id` varchar(20) not null,
-  `inventor_id` varchar(256)  not null,
-  `sequence` smallint unsigned not null,
-  primary key (`patent_id`, `inventor_id`),
-  unique index ak_temp_first_inventor (`inventor_id`, `patent_id`)
-)
-engine=InnoDB;
-insert into `{{params.reporting_database}}`.`temp_first_inventor`
-(
-  `patent_id`, `inventor_id`, `sequence`
-)
-select patent_id, inventor_id, min(sequence) sequence from `{{params.raw_database}}`.`rawinventor` where version_indicator<={{ params.version_indicator }} group by patent_id, inventor_id;
-
 drop table if exists `{{params.reporting_database}}`.`patent_inventor`;
 create table `{{params.reporting_database}}`.`patent_inventor`
 (
@@ -173,17 +157,12 @@ insert into `{{params.reporting_database}}`.`patent_inventor`
   `patent_id`, `inventor_id`, `location_id`, `sequence`
 )
 select distinct
-  pii.`patent_id`, t.`new_inventor_id`, tl.`new_location_id`, ri.`sequence`
+  pii.`patent_id`, t.`new_inventor_id`, tl.`new_location_id`, pii.`sequence`
 from
   `{{params.raw_database}}`.`patent_inventor` pii
   inner join `{{params.reporting_database}}`.`temp_id_mapping_inventor` t on t.`old_inventor_id` = pii.`inventor_id`
-  left outer join  `{{params.reporting_database}}`.temp_first_inventor t2
-
-on t2.`patent_id` = pii.`patent_id` and t2.`inventor_id` = pii.`inventor_id`
-  left outer join `{{params.raw_database}}`.`rawinventor` ri on ri.`patent_id` = t2.`patent_id` and ri.`inventor_id` = t2.`inventor_id` and ri.`sequence`
-= t2.`sequence`
-  left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`location_id`;
+  left outer join `{{params.raw_database}}`.`location` rl on rl.`id` = pii.`location_id`
+  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`id`;
 
 
 drop table if exists `{{params.reporting_database}}`.`location_inventor`;
