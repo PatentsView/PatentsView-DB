@@ -145,18 +145,18 @@ create table `{{params.reporting_database}}`.`patent_inventor`
   `inventor_id` int unsigned not null,
   `location_id` int unsigned null,
   `sequence` smallint unsigned not null,
-  primary key (`patent_id`, `inventor_id`),
+  primary key (`patent_id`, `inventor_id`,`sequence`),
   unique index ak_patent_inventor (`inventor_id`, `patent_id`,`sequence`)
 )
 engine=InnoDB;
 
 
 # 12,389,559 @ 29:50
-insert into `{{params.reporting_database}}`.`patent_inventor`
+insert ignore into `{{params.reporting_database}}`.`patent_inventor`
 (
   `patent_id`, `inventor_id`, `location_id`, `sequence`
 )
-select distinct
+select
   pii.`patent_id`, t.`new_inventor_id`, tl.`new_location_id`, pii.`sequence`
 from
   `{{params.raw_database}}`.`patent_inventor` pii
