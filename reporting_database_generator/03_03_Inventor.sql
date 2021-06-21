@@ -146,7 +146,7 @@ create table `{{params.reporting_database}}`.`patent_inventor`
   `location_id` int unsigned null,
   `sequence` smallint unsigned not null,
   primary key (`patent_id`, `inventor_id`),
-  unique index ak_patent_inventor (`inventor_id`, `patent_id`)
+  unique index ak_patent_inventor (`inventor_id`, `patent_id`,`sequence`)
 )
 engine=InnoDB;
 
