@@ -31,7 +31,7 @@ def load_lookup_table(update_config: ConfigParser, database: str, parent_entity:
     if include_location:
         field_list.append("rl.location_id")
         insert_sequence.append("location_id")
-        join_query = "left join rawlocation rl on rl.id = et.rawlocation_id"
+        join_query = "left join rawlocation rl on rl.id = et.rawlocation_id where"
         if location_strict:
             join_query=join_query + " where rl.location_id is not null and "
     field_select = ", ".join(field_list).format(ef=entity_field, vind=version_indicator)
