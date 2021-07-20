@@ -8,7 +8,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.government_interest.GovtInterestTester import GovtInterestTester
-from lib.configuration import get_connection_string, get_current_config
+from lib.configuration import get_connection_string, get_current_config, get_version_indicator
 
 
 def upload_new_orgs(post_manual, engine):
@@ -147,10 +147,11 @@ def push_orgs(looked_up_data, org_id_mapping, config):
         if row['contracts'] is not np.nan:
             contracts=  ast.literal_eval(row['contracts'])
             # contracts = list(set(row['contracts'].split('|')))
+            version_indicator = get_version_indicator(**kwargs)
             for contract_award_no in contracts:
                 if contract_award_no is not None:
-                    query = "INSERT IGNORE INTO patent_contractawardnumber (patent_id, contract_award_number) values ('{}', '{}')".format(
-                        patent_id, contract_award_no)
+                    query = "INSERT IGNORE INTO patent_contractawardnumber (patent_id, contract_award_number, version_indicator) values ('{}', '{}', '{}')".format(
+                        patent_id, contract_award_no, version_indicator)
                     cursor = engine.connect()
                     cursor.execute(query)
                     cursor.close()
