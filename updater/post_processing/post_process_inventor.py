@@ -3,7 +3,8 @@ import datetime
 import time
 
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, exc
+from sqlalchemy.engine import ResultProxy
 
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
 from lib.configuration import get_connection_string, get_current_config
@@ -96,6 +97,25 @@ def precache_inventors(config):
 
 def create_inventor(update_config, version_indicator):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
+    rename_name = "inventor_{tstamp}".format(tstamp=version_indicator)
+    rename_sql = """
+    RENAME TABLE inventor TO {target}
+    """.format(target=rename_name)
+    create_sql = """
+    CREATE TABLE inventor like {target}
+    """.format(target=rename_name)
+    try:
+        engine.execute(rename_sql)
+    except exc.SQLAlchemyError as e:
+        count_sql = "select count(1) from rename_name"
+        x: ResultProxy = engine.execute(count_sql)
+    try:
+        engine.execute(create_sql)
+    except exc.SQLAlchemyError as e:
+        count_sql = "select count(1) from inventor"
+        x: ResultProxy = engine.execute(count_sql)
+        if x.fetchall()[0][0] > 0:
+            raise
     limit = 10000
     offset = 0
     while True:
@@ -144,7 +164,7 @@ def upload_disambig_results(update_config):
 
 def post_process_inventor(**kwargs):
     config = get_current_config(**kwargs)
-    version_indicator =config['DATES']['END_DATE']
+    version_indicator = config['DATES']['END_DATE']
     update_rawinventor(config, database='PGPUBS_DATABASE', uuid_field='id')
     update_rawinventor(config, database='RAW_DB', uuid_field='uuid')
     precache_inventors(config)
