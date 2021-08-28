@@ -4,7 +4,7 @@ import re
 import time
 from collections import Counter
 from collections import defaultdict
-from datetime import datetime
+from datetime import date, datetime
 from hashlib import md5
 from pathlib import Path
 from string import ascii_lowercase as alphabet
@@ -12,13 +12,12 @@ from string import ascii_lowercase as alphabet
 import tqdm
 from sqlalchemy import create_engine
 from textdistance import jaro_winkler
-
+from tqdm import tqdm
 # from alchemy import get_config, match
 from unidecode import unidecode
 
 from QA.post_processing.LawyerPostProcessing import LawyerPostProcessingQC
-from lib.configuration import get_config, get_connection_string
-
+from lib.configuration import get_connection_string, get_current_config
 
 
 def prepare_tables(config):
@@ -42,7 +41,6 @@ def prepare_tables(config):
 
 
 def clean_rawlawyer(config):
-
     cstr = get_connection_string(config, 'RAW_DB')
     engine = create_engine(cstr + "&local_infile=1")
     nodigits = re.compile(r'[^\d]+')
@@ -184,13 +182,13 @@ class LawyerDisambiguator:
         tmpids = [x.uuid for x in objects]
         patents = [x.patent_id for x in objects]
         self.patentlawyer_insert_statements.extend([{
-                                                            'patent_id': x,
-                                                            'lawyer_id': param['id']
-                                                            } for x in patents])
+                'patent_id': x,
+                'lawyer_id': param['id']
+                } for x in patents])
         self.update_statements.extend([{
-                                               'pk': x,
-                                               'update': param['id']
-                                               } for x in tmpids])
+                'pk':     x,
+                'update': param['id']
+                } for x in tmpids])
 
     def create_lawyer_table(self, id_map, lawyer_dict):
         """
@@ -263,9 +261,11 @@ class LawyerDisambiguator:
         # global patentlawyer_insert_statements
         # global update_statements
         #
-
+        completed_alphabets=[]
         print("going through alphabet")
         for letter in alphabet:
+            if letter in completed_alphabets:
+                continue
             # track memory usage by letter
             print("letter is: ", letter, datetime.now(), flush=True)
             # bookkeeping
@@ -276,7 +276,7 @@ class LawyerDisambiguator:
             session = alchemy.fetch_session(dbtype=self.doctype)
             lawyers_object = session.query(RawLawyer).filter(RawLawyer.alpha_lawyer_id.like(letter + '%'))
             print("query returned")
-            for lawyer in lawyers_object:
+            for lawyer in tqdm(lawyers_object):
                 lawyer_dict[lawyer.uuid] = lawyer
                 id_map[lawyer.alpha_lawyer_id].append(lawyer.uuid)
                 letterblock.append(lawyer.alpha_lawyer_id)
@@ -305,5 +305,7 @@ def post_process_qc(config):
 
 
 if __name__ == '__main__':
-    config = get_config()
+    config = get_current_config(**{
+            "execution_date": date(2021, 3, 23)
+            })
     start_lawyer_disambiguation(config)
