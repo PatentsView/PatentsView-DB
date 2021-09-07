@@ -586,15 +586,15 @@ def truncate_max_locs(engine):
 
 def location_reduce(location_data):
     location_data = location_data.fillna(value='None')
-    location_data['help'] = location_data.groupby(['location_id', 'city', 'state', 'country', 'location_id_transformed']).transform('count')
-    out = location_data.sort_values(['help', 'patent_date'], ascending=[False, False],
+    location_data['help'] = location_data.groupby(['location_id', 'city', 'state', 'country', 'location_id_transformed'])['location_id'].transform('count')
+    final_loc = location_data.sort_values(['help', 'patent_date'], ascending=[False, False],
                                     na_position='last').drop_duplicates(
             'location_id', keep='first').drop(
             ['help', 'patent_date'], 1)
-    location_data = location_data.replace('None', np.nan)
-    final_loc = location_data.join(pd.Series(np.where(
-            pd.isnull(location_data.location_id_transformed), None,
-            location_data.location_id_transformed.astype(str))).str.split("|", expand=True).rename(
+    final_loc = final_loc.replace('None', np.nan)
+    final_loc = final_loc.join(pd.Series(np.where(
+            pd.isnull(final_loc.location_id_transformed), None,
+            final_loc.location_id_transformed.astype(str))).str.split("|", expand=True).rename(
             {
                     0: 'latitude',
                     1: 'longitude'
