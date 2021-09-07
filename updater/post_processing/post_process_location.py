@@ -499,19 +499,42 @@ def precache_locations(config):
 def generate_disambiguated_locations(engine, rank_chunk):
     location_core_template = """
         SELECT location_id
-        FROM location_id_rank where rk % 50 = {rank_chunk}
+        FROM location_id_rank where rk % 100 = {rank_chunk}
     """
 
     location_data_template = """
-        SELECT rl.location_id, rl.city, rl.state, rl.country_transformed as country, rl.location_id_transformed
-        FROM rawlocation rl
-            JOIN ({loc_core_query}) location on location.location_id = rl.location_id
-        WHERE rl.location_id is not null
-        UNION ALL
-        SELECT rl2.location_id, rl2.city, rl2.state, rl2.country_transformed as country,rl2.location_id_transformed
-            FROM pregrant_publications.rawlocation rl2
-                JOIN ({loc_core_query}) location on location.location_id = rl2.location_id
-            WHERE rl2.location_id is not null
+        SELECT rl.location_id,
+       rl.city,
+       rl.state,
+       rl.country_transformed as           country,
+       rl.location_id_transformed,
+       IF(p1.id is null, p2.date, p1.date) patent_date
+FROM rawlocation rl
+         left join rawassignee ra on ra.rawlocation_id = rl.id
+         left join patent p1 on p1.id = ra.patent_id
+         left join rawinventor ri on ri.rawlocation_id = rl.id
+         left join patent p2 on p2.id = ri.patent_id
+         JOIN
+     ({loc_core_query}) location on location.location_id = rl.location_id
+WHERE rl.location_id is not null
+  and (ri.patent_id is not null
+    or ra.patent_id is not null)
+UNION ALL
+SELECT rl2.location_id,
+       rl2.city,
+       rl2.state,
+       rl2.country_transformed as country,
+       rl2.location_id_transformed,
+       IF(pb1.document_number is null, pb2.date, pb1.date)
+FROM pregrant_publications.rawlocation rl2
+         left join pregrant_publications.rawassignee ra2 on ra2.rawlocation_id = rl2.id
+         left join pregrant_publications.publication pb1 on pb1.document_number = ra2.document_number
+         left join pregrant_publications.rawinventor ri2 on ri2.rawlocation_id = rl2.id
+         left join pregrant_publications.publication pb2 on pb2.document_number = ri2.document_number
+         JOIN
+     ({loc_core_query}) location on location.location_id = rl2.location_id
+WHERE rl2.location_id is not null and ri2.document_number is not null
+   or ra2.document_number is not null;
     """
 
     location_core_query = location_core_template.format(rank_chunk=rank_chunk)
@@ -561,31 +584,17 @@ def truncate_max_locs(engine):
         print('max_location_counts truncated')
 
 
-def location_reduce(location_data, update_config, engine):
-    truncate_max_locs(engine)
-    location_data = location_data.groupby(
-            ['location_id', 'city', 'state', 'country', 'location_id_transformed'],
-            dropna=False).size().reset_index().groupby(
-            ['location_id', 'city', 'state', 'country', 'location_id_transformed'], dropna=False)[[0]].max()
-    location_data = location_data.reset_index()
-    location_data = location_data.rename(columns={
-            0: "location_count"
-            })
-    location_data['max_count'] = location_data.groupby('location_id')['location_count'].transform('max')
-    max_df = location_data[location_data['location_count'] == location_data['max_count']].drop(['max_count'], axis=1)
-    one_max = max_df.drop_duplicates(subset='location_id', keep=False)
-    max_df[max_df.duplicated('location_id', keep=False)].to_sql('max_location_counts', con=engine, if_exists='append',
-                                                                index=False)
-
-    date_df = create_date_table(engine)
-
-    location_date_df = date_df.sort_values(by=['location_id', 'date'], ascending=False).drop_duplicates(
-            'location_id').sort_index()
-
-    final_loc = one_max.append(location_date_df)
-    final_loc = final_loc.join(pd.Series(np.where(
-            pd.isnull(final_loc.location_id_transformed), None,
-            final_loc.location_id_transformed.astype(str))).str.split("|", expand=True).rename(
+def location_reduce(location_data):
+    location_data = location_data.fillna(value='None')
+    location_data['help'] = location_data.groupby(['location_id', 'city', 'state', 'country', 'location_id_transformed']).transform('count')
+    out = location_data.sort_values(['help', 'patent_date'], ascending=[False, False],
+                                    na_position='last').drop_duplicates(
+            'location_id', keep='first').drop(
+            ['help', 'patent_date'], 1)
+    location_data = location_data.replace('None', np.nan)
+    final_loc = location_data.join(pd.Series(np.where(
+            pd.isnull(location_data.location_id_transformed), None,
+            location_data.location_id_transformed.astype(str))).str.split("|", expand=True).rename(
             {
                     0: 'latitude',
                     1: 'longitude'
@@ -605,7 +614,7 @@ def create_location(update_config, version_indicator):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     limit = 10000
     offset = 0
-    for rank in range(0,50):
+    for rank in range(0,100):
         start = time.time()
         current_location_data = generate_disambiguated_locations(engine,rank)
         print(current_location_data.shape[0])
@@ -615,7 +624,7 @@ def create_location(update_config, version_indicator):
         start = time.time()
 
         step_time = time.time() - start
-        canonical_assignments = location_reduce(current_location_data, update_config, engine)
+        canonical_assignments = location_reduce(current_location_data)
         canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
         canonical_assignments.to_sql(name='location', con=engine,
                                      if_exists='append',
@@ -703,8 +712,8 @@ def post_process_qc(**kwargs):
 
 if __name__ == '__main__':
     post_process_location(**{
-            "execution_date": datetime.date(2021, 3, 23)
+            "execution_date": datetime.date(2021, 6, 22)
             })
     post_process_qc(**{
-            "execution_date": datetime.date(2021, 3, 23)
+            "execution_date": datetime.date(2021, 6, 22)
             })
