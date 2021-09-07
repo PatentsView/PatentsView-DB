@@ -496,11 +496,10 @@ def precache_locations(config):
     engine.execute(location_cache_query)
 
 
-def generate_disambiguated_locations(engine, limit, offset):
+def generate_disambiguated_locations(engine, rank_chunk):
     location_core_template = """
         SELECT location_id
-        FROM disambiguated_location_ids order by location_id
-        LIMIT {limit} OFFSET {offset}
+        FROM location_id_rank where rk % 50 = {rank_chunk}
     """
 
     location_data_template = """
@@ -515,8 +514,7 @@ def generate_disambiguated_locations(engine, limit, offset):
             WHERE rl2.location_id is not null
     """
 
-    location_core_query = location_core_template.format(limit=limit,
-                                                        offset=offset)
+    location_core_query = location_core_template.format(rank_chunk=rank_chunk)
     location_data_query = location_data_template.format(
             loc_core_query=location_core_query)
 
@@ -607,9 +605,9 @@ def create_location(update_config, version_indicator):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     limit = 10000
     offset = 0
-    while True:
+    for rank in range(0,50):
         start = time.time()
-        current_location_data = generate_disambiguated_locations(engine, limit, offset)
+        current_location_data = generate_disambiguated_locations(engine,rank)
         print(current_location_data.shape[0])
         if current_location_data.shape[0] < 1:
             break
