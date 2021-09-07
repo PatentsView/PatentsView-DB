@@ -3,6 +3,7 @@ import time
 
 import numpy as np
 import pandas as pd
+from pandas import DataFrame
 from sqlalchemy import create_engine
 from tqdm import tqdm
 
@@ -584,39 +585,48 @@ def truncate_max_locs(engine):
         print('max_location_counts truncated')
 
 
-def location_reduce(location_data):
-    location_data = location_data.fillna(value='None')
-    location_data['help'] = location_data.groupby(['location_id', 'city', 'state', 'country', 'location_id_transformed'])['location_id'].transform('count')
-    final_loc = location_data.sort_values(['help', 'patent_date'], ascending=[False, False],
-                                    na_position='last').drop_duplicates(
+def location_reduce(location_full_data: pd.DataFrame):
+    location_full_data = location_full_data.fillna(value='None')
+    location_data: pd.DataFrame = location_full_data
+    location_data['help'] = location_data.groupby(['location_id', 'city', 'state', 'country'])['location_id'].transform(
+            'count')
+    final_loc: DataFrame = location_data.sort_values(['help', 'patent_date'], ascending=[False, False],
+                                                     na_position='last').drop_duplicates(
             'location_id', keep='first').drop(
             ['help', 'patent_date'], 1)
     final_loc = final_loc.replace('None', np.nan)
-    final_loc = final_loc.join(pd.Series(np.where(
-            pd.isnull(final_loc.location_id_transformed), None,
-            final_loc.location_id_transformed.astype(str))).str.split("|", expand=True).rename(
+    location_lat_long_data = location_full_data
+    location_lat_long_data['help'] = location_lat_long_data.groupby(['location_id', 'location_id_transformed'])[
+        'location_id'].transform('count')
+    final_lat_long = location_lat_long_data.sort_values(['help', 'patent_date'], ascending=[False, False],
+                                                        na_position='last').drop_duplicates(
+            'location_id', keep='first').drop(
+            ['help', 'patent_date'], 1)
+    final_lat_long = final_lat_long.join(pd.Series(np.where(
+            pd.isnull(final_lat_long.location_id_transformed), None,
+            final_lat_long.location_id_transformed.astype(str))).str.split("|", expand=True).rename(
             {
                     0: 'latitude',
                     1: 'longitude'
                     },
             axis=1))
-
-    final_loc = final_loc.loc[:,
-                final_loc.columns.isin(['location_id', 'city', 'state', 'country', 'latitude', 'longitude'])]
-    final_loc = final_loc.rename(columns={
+    final_lat_long = final_lat_long.replace('None', np.nan)
+    full_final_data = final_loc[["location_id", "city", "state", "country"]].merge(
+            other=final_lat_long[["location_id", "latitude", "longitude"]], how='outer', on='location_id')
+    full_final_data = full_final_data.rename(columns={
             'location_id': 'id'
             })
-    final_loc = final_loc.reset_index(drop=True)
-    return final_loc
+    full_final_data = full_final_data.reset_index(drop=True)
+    return full_final_data
 
 
 def create_location(update_config, version_indicator):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     limit = 10000
     offset = 0
-    for rank in range(0,100):
+    for rank in range(0, 100):
         start = time.time()
-        current_location_data = generate_disambiguated_locations(engine,rank)
+        current_location_data = generate_disambiguated_locations(engine, rank)
         print(current_location_data.shape[0])
         if current_location_data.shape[0] < 1:
             break
