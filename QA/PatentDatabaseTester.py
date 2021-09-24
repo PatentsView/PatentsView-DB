@@ -258,7 +258,7 @@ group by `{field}`
             if self.connection.open:
                 self.connection.close()
 
-    def test_yearly_count(self, table_name, strict=True):
+    def test_yearly_count(self, table_name, strict=True,patent_id_field='id'):
         if table_name not in self.patent_exclusion_list:
             print("\tTesting yearly entities counts for {table_name}".format(table_name=table_name))
             try:
@@ -271,9 +271,9 @@ group by `{field}`
                                   "`date`)"
                 else:
                     count_query = "SELECT year(p.`date`) as `yr`, count(1) as `year_count` from {patent_table} p join " \
-                                  "{entity} et on et.patent_id = p.id group by year(`date`)".format(
+                                  "{entity} et on et.patent_id = p.{patent_id_field} group by year(`date`)".format(
                             patent_table=patent_table,
-                            entity=table_name)
+                            entity=table_name,patent_id_field=patent_id_field)
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
                     for count_row in count_cursor.fetchall():
@@ -431,7 +431,7 @@ group by `{field}`
         finally:
             self.connection.close()
 
-    def load_prefix_counts(self, table_name):
+    def load_prefix_counts(self, table_name,patent_id_field='id'):
         if table_name not in self.patent_exclusion_list:
             print("\tTesting entity counts by patent type for {table_name}".format(table_name=table_name))
             try:
@@ -443,11 +443,11 @@ group by `{field}`
                 count_query = """
                     SELECT p.`type` as `type`, count(1) as `type_count`
                     from {patent_table} p join {entity} et
-                    on et.patent_id = p.id
+                    on et.patent_id = p.{patent_id_field}
                     group by p.`type`                
                 """.format(
                         patent_table=patent_table,
-                        entity=table_name)
+                        entity=table_name,patent_id_field=patent_id_field)
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
                     for count_row in count_cursor.fetchall():
