@@ -41,7 +41,6 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                          fk_check=True, section=None, **context):
     print(filename)
     print(schema_only)
-    print(context)
     ## Schema only run setting
     # schema_only=context["schema_only"]
     ## Initialization from config files

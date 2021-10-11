@@ -1,5 +1,5 @@
 
-# BEGIN inventor 
+# BEGIN inventor
 
 ##############################################################################################################################################
 
@@ -38,20 +38,18 @@ select
   nullif(trim(l.`country`), ''),
   l.`latitude`,
   l.`longitude`
-  
-  from (select * from 
+
+  from (select * from
 
 	(select
           ROW_NUMBER() OVER (PARTITION BY t.inventor_id ORDER BY t.`date` desc) AS rownum,
           t.`inventor_id`,
-          t.`location_id`,
-	  t.`location_id_transformed`
+          t.`location_id`
         from
           (
             select
               ri.`inventor_id`,
               rl.`location_id`,
-	      rl.`location_id_transformed`,
 	      p.`date`,
 	      p.`id`
             from
@@ -60,15 +58,14 @@ select
               inner join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
             where
               ri.`inventor_id` is not null and
-              rl.`location_id` is not null
+              rl.`location_id` is not null and ri.version_indicator <={{ params.version_indicator }}
             order by
               ri.`inventor_id`,
               p.`date` desc,
-              p.`id` desc 
-          ) t) t where t.rownum = 1 ) t          
+              p.`id` desc
+          ) t) t where t.rownum = 1 ) t
        left join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
-left join `{{params.reporting_database}}`.`temp_id_mapping_location` tll on tll.`old_location_id`=t.`location_id`
-       left join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl on tl.`new_location_id` = tll.`new_location_id` ;
+left join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on tl.`old_location_id`=t.`location_id`;
 
 
 
@@ -88,7 +85,7 @@ insert into `{{params.reporting_database}}`.`temp_inventor_num_patents`
 select
   `inventor_id`, count(distinct `patent_id`)
 from
-  `{{params.raw_database}}`.`patent_inventor`
+  `{{params.raw_database}}`.`patent_inventor`  pi join `{{ params.raw_database }}`.`patent` p on p.id=pi.patent_id where p.version_indicator <={{ params.version_indicator }}
 group by
   `inventor_id`;
 
@@ -110,7 +107,7 @@ select
 from
   `{{params.raw_database}}`.`patent_inventor` ii
   join `{{params.raw_database}}`.`patent_assignee` aa
-  on aa.`patent_id` = ii.`patent_id`
+  on aa.`patent_id` = ii.`patent_id`  join `{{ params.raw_database }}`.`patent` p on p.id=ii.patent_id where p.version_indicator <={{ params.version_indicator }}
 group by
   ii.`inventor_id`;
 
@@ -141,7 +138,6 @@ where
 group by
   pa.`inventor_id`;
 
-
 drop table if exists `{{params.reporting_database}}`.`patent_inventor`;
 create table `{{params.reporting_database}}`.`patent_inventor`
 (
@@ -149,29 +145,24 @@ create table `{{params.reporting_database}}`.`patent_inventor`
   `inventor_id` int unsigned not null,
   `location_id` int unsigned null,
   `sequence` smallint unsigned not null,
-  primary key (`patent_id`, `inventor_id`),
-  unique index ak_patent_inventor (`inventor_id`, `patent_id`)
+  primary key (`patent_id`, `inventor_id`,`sequence`),
+  unique index ak_patent_inventor (`inventor_id`, `patent_id`,`sequence`)
 )
 engine=InnoDB;
 
 
 # 12,389,559 @ 29:50
-insert into `{{params.reporting_database}}`.`patent_inventor`
+insert ignore into `{{params.reporting_database}}`.`patent_inventor`
 (
   `patent_id`, `inventor_id`, `location_id`, `sequence`
 )
-select distinct
-  pii.`patent_id`, t.`new_inventor_id`, tl.`new_location_id`, ri.`sequence`
+select
+  pii.`patent_id`, t.`new_inventor_id`, tl.`new_location_id`, pii.`sequence`
 from
   `{{params.raw_database}}`.`patent_inventor` pii
   inner join `{{params.reporting_database}}`.`temp_id_mapping_inventor` t on t.`old_inventor_id` = pii.`inventor_id`
-  left outer join (select patent_id, inventor_id, min(sequence) sequence from `{{params.raw_database}}`.`rawinventor` group by patent_id, inventor_id) t 
-
-on t.`patent_id` = pii.`patent_id` and t.`inventor_id` = pii.`inventor_id`
-  left outer join `{{params.raw_database}}`.`rawinventor` ri on ri.`patent_id` = t.`patent_id` and ri.`inventor_id` = t.`inventor_id` and ri.`sequence`
-= t.`sequence`
-  left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`location_id`;
+  left outer join `{{params.raw_database}}`.`location` rl on rl.`id` = pii.`location_id`
+  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on tl.`old_location_id` = rl.`id`;
 
 
 drop table if exists `{{params.reporting_database}}`.`location_inventor`;
@@ -245,6 +236,6 @@ from
   left outer join `{{params.reporting_database}}`.`temp_inventor_num_assignees` tina on tina.`inventor_id` = i.`id`;
 
 
-# END inventor 
+# END inventor
 
 ################################################################################################################################################

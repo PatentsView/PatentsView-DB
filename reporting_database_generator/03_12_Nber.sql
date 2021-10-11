@@ -38,7 +38,7 @@ from
   `{{params.raw_database}}`.`nber` n
   left outer join `{{params.raw_database}}`.`patent_assignee` pa on pa.`patent_id` = n.`patent_id`
   left outer join `{{params.raw_database}}`.`patent_inventor` pii on pii.`patent_id` = n.`patent_id`
-  left outer join `{{params.reporting_database}}`.`patent` p on p.`patent_id` = n.`patent_id`
+  left outer join `{{params.reporting_database}}`.`patent` p on p.`patent_id` = n.`patent_id`  where n.version_indicator<= {{ params.version_indicator }}
 group by
   n.`subcategory_id`;
 
@@ -119,7 +119,7 @@ from
   `{{params.raw_database}}`.`nber` n
   inner join `{{params.reporting_database}}`.`patent` p on p.`patent_id` = n.`patent_id` and p.`date` is not null
 where
-  n.`subcategory_id` is not null and n.`subcategory_id` != ''
+  n.`subcategory_id` is not null and n.`subcategory_id` != ''  and n.version_indicator<= {{ params.version_indicator }}
 group by
   n.`subcategory_id`, year(p.`date`);
 

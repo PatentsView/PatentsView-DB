@@ -27,7 +27,7 @@ select
   nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''),
   case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end
 from
-  `{{params.raw_database}}`.`application`;
+  `{{params.raw_database}}`.`application`  where version_indicator<={{params.version_indicator}};
 
 
 # END application 

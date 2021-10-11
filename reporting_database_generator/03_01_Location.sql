@@ -150,11 +150,9 @@ select timl.`new_location_id`,
        ifnull(tlna.`num_assignees`, 0),
        ifnull(tlni.`num_inventors`, 0),
        ifnull(tlnp.`num_patents`, 0),
-       timlt.`old_location_id_transformed`
+       timl.`old_location_id_transformed`
 from `{{params.raw_database}}`.`location` l
          inner join `{{params.reporting_database}}`.`temp_id_mapping_location` timl on timl.`old_location_id` = l.`id`
-          inner join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` timlt
-                         on timlt.`new_location_id` = timl.`new_location_id`
          left outer join `{{params.reporting_database}}`.`temp_location_num_assignees` tlna
                          on tlna.`location_id` = timl.`new_location_id`
          left outer join `{{params.reporting_database}}`.`temp_location_num_inventors` tlni
