@@ -26,7 +26,10 @@ Example:
 4. Run this command from your host system. `docker network create patentsview-pipeline-network` . The name you use here must be used in `docker-compose.yaml` file.
 
 ## Credentials
-5. You must copy the 'Development/config_template.ini' to one called 'Development/config.ini' and enter your database password and the name of the upload, old and new databases. 
+5. Use the following command to create a copy of config_template.ini, named config.ini. Config_template is located in **PROJECT_HOME**.
+
+`cp -v config_template.ini config.ini`
+
 6. You must also enter the key file for the disambiguation server into a file called 'disambig' in the 'credentials' folder. Ask Sarah to get a copy of the key, which you can just copy into the file. 
 =======
 
