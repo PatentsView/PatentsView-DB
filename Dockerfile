@@ -59,6 +59,7 @@ RUN apt-get update --fix-missing \
         openssh-client \
         libsasl2-dev \
 	default-jre \
+    g++ \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
@@ -69,6 +70,12 @@ RUN apt-get install -y net-tools iputils-ping libffi-dev
 RUN apt-get install -y libmysqlclient-dev
 RUN wget https://github.com/maxbube/mydumper/releases/download/v0.9.3/mydumper_0.9.3-41.stretch_amd64.deb
 RUN dpkg -i mydumper_0.9.3-41.stretch_amd64.deb
+WORKDIR /setup/
+COPY requirements.txt /setup
+COPY updater/disambiguation/hierarchical_clustering_disambiguation/requirements.txt /setup/disambig_requirements.txt
+
+RUN export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -r /setup/requirements.txt && pip install -r /setup/disambig_requirements.txt && pip install git+git://github.com/iesl/grinch.git && pip install git+git://github.com/epfml/sent2vec.git && python -m nltk.downloader stopwords && python -m nltk.downloader punkt && pip install gdown
+
 USER $NB_USER
 
 RUN pip install https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tarball/master yapf
@@ -90,11 +97,6 @@ RUN jupyter nbextension enable tree-filter/index
 RUN jupyter nbextension enable runtools/main
 RUN jupyter nbextension enable snippets/main
 RUN jupyter nbextension enable autoscroll/main
-WORKDIR /setup/
-COPY requirements.txt /setup
-COPY updater/disambiguation/hierarchical_clustering_disambiguation/requirements.txt /setup/disambig_requirements.txt
-
-RUN export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -r /setup/requirements.txt && pip install -r /setup/disambig_requirements.txt && pip install git+git://github.com/iesl/grinch.git && pip install git+git://github.com/epfml/sent2vec.git && python -m nltk.downloader stopwords && python -m nltk.downloader punkt && pip install gdown
 
 
 
