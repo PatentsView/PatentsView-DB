@@ -74,11 +74,12 @@ class GovtInterestTester(PatentDatabaseTester):
                                         }
                                 },
                         "related_entities": [
-                                {
-                                        "table":          'patent_govintorg',
-                                        "source_id":      'organization_id',
-                                        "destination_id": "organization_id"
-                                        }]
+                                # {
+                                #         "table":          'patent_govintorg',
+                                #         "source_id":      'organization_id',
+                                #         "destination_id": "organization_id"
+                                #         }
+                             ]
                         }
                 }
 
