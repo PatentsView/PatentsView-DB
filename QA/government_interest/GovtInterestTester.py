@@ -38,11 +38,12 @@ class GovtInterestTester(PatentDatabaseTester):
                                         }
                                 },
                         "related_entities": [
-                                {
-                                        "table":          'government_organization',
-                                        "source_id":      'organization_id',
-                                        "destination_id": "organization_id"
-                                        }]
+                                # {
+                                #         "table":          'government_organization',
+                                #         "source_id":      'organization_id',
+                                #         "destination_id": "organization_id"
+                                #         }
+                            ]
                         },
                 'government_organization':    {
                         "fields":           {
