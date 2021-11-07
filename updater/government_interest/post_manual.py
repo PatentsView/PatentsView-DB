@@ -120,7 +120,7 @@ def readOrgs(db_cursor):
     return org_dict
 
 
-def push_orgs(looked_up_data, org_id_mapping, config):
+def push_orgs(looked_up_data, org_id_mapping, config, version_indicator):
     missed = {}
     engine = create_engine(get_connection_string(config, 'TEMP_UPLOAD_DB'))
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
@@ -145,9 +145,8 @@ def push_orgs(looked_up_data, org_id_mapping, config):
                 cursor.execute(query)
                 cursor.close()
         if row['contracts'] is not np.nan:
-            contracts=  ast.literal_eval(row['contracts'])
+            contracts = ast.literal_eval(row['contracts'])
             # contracts = list(set(row['contracts'].split('|')))
-            version_indicator = get_version_indicator(**kwargs)
             for contract_award_no in contracts:
                 if contract_award_no is not None:
                     query = "INSERT IGNORE INTO patent_contractawardnumber (patent_id, contract_award_number, version_indicator) values ('{}', '{}', '{}')".format(
@@ -170,6 +169,7 @@ def process_post_manual(**kwargs):
     full_db_engine = create_engine(get_connection_string(config, 'RAW_DB'))
     # upload the new government organization we manually identified
     # upload_new_orgs(post_manual, engine)
+    version_indicator = get_version_indicator(**kwargs)
 
     # make and update the dictionary mapping original to clean org name
     dict_clean_org = create_dict(pre_manual, post_manual, persistent_files)
@@ -182,7 +182,7 @@ def process_post_manual(**kwargs):
     org_id_mapping = readOrgs(full_db_engine)
 
     # push the mappings into the db
-    push_orgs(looked_up, org_id_mapping, config)
+    push_orgs(looked_up, org_id_mapping, config, version_indicator)
 
 
 def qc_gi(**kwargs):
