@@ -58,8 +58,8 @@ GrantBase.__init__ = init
 ApplicationBase.__init__ = init
 
 # table to handle joins for updates (see lib.tasks)
-temporary_update = Table('temporary_update', grantmetadata, Column('pk', VARCHAR(length=36), primary_key=True), Column('update', VARCHAR(length=36), index=True))
-app_temporary_update = Table('temporary_update', appmetadata, Column('pk', VARCHAR(length=36), primary_key=True), Column('update', VARCHAR(length=36), index=True))
+temporary_update = Table('lawyer_disambiguation_results', grantmetadata, Column('pk', VARCHAR(length=36), primary_key=True), Column('update', VARCHAR(length=36), index=True))
+app_temporary_update = Table('lawyer_disambiguation_results', appmetadata, Column('pk', VARCHAR(length=36), primary_key=True), Column('update', VARCHAR(length=36), index=True))
 
 # ASSOCIATION ----------------------
 
