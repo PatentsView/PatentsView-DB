@@ -32,22 +32,23 @@ Example:
 5. Use the following command to create a copy of config_template.ini, named config.ini. Config_template is located in **PROJECT_HOME**.
 
 `cp -v config_template.ini config.ini`
+
 =======
 
 ## MySQL Setup  
-7. Create a copy of `init-sample.sql` with the name `airflow-metadata-db-sql/init.sql`  
+6. Create a copy of `init-sample.sql` with the name `airflow-metadata-db-sql/init.sql`  
 	a. Generate a password for `airflow` mysql user and put that in the file you created above
 	b. Use the same password generated in #5.a. in the `environment` section in your docker-compose file. i.e. `AIRFLOW__CORE__SQL_ALCHEMY_CONN: "mysql://airflow:airflow_db_password@airflow-metadata-db:3306/airflow"` 
    	c. Across yaml file, Change "airflow-db-{suffix}" to a suitable image name for MySQL container
-8. Generate a mysql root password and use that in the line `MYSQL_ROOT_PASSWORD: mysql_root_password` in `docker-compose.yaml` file
-9. Run the following command in your host system: `id -u` and then `id -g` 
-10. In the USER line in `MySQL` section of docker-compose.yaml, replace `1000 - 1000` with output from above command  
+7. Generate a mysql root password and use that in the line `MYSQL_ROOT_PASSWORD: mysql_root_password` in `docker-compose.yaml` file
+8. Run the following command in your host system: `id -u` and then `id -g` 
+9. In the USER line in `MySQL` section of docker-compose.yaml, replace `1000 - 1000` with output from above command  
 #### Note: Any SQL file within the `airflow-metadata-db-sql` directory will be executed when MySQL is first setup. ####
 ## Jupyter Setup  
-11. In your `docker-compose.yaml` file, update the line `- 8889:8888` to `yourDesiredPort:8888` and then you can access the notebook at `localhost:yourDesiredPort`.  
-12. When you start the container, it outputs the token that you can use in browser when prompted for password  
+10. In your `docker-compose.yaml` file, update the line `- 8889:8888` to `yourDesiredPort:8888` and then you can access the notebook at `localhost:yourDesiredPort`.  
+11. When you start the container, it outputs the token that you can use in browser when prompted for password  
 ## Debugging Setup
-13. Using  `docker-compose-debug-sample.yaml` as reference, create a file called `docker-compose-debug.yaml`. Make the same changes that you made to `docker-compose.yaml`
+12. Using  `docker-compose-debug-sample.yaml` as reference, create a file called `docker-compose-debug.yaml`. Make the same changes that you made to `docker-compose.yaml`
 
 ## Port Numbers Setup
 There are 3 different ports used by different tools. See table below for reference:
@@ -77,12 +78,12 @@ In effect, if there is a MySQL server running at 3308 in `gp-linux-server`, afte
 * Update port number in the `docker-compose.yaml` based on your chosen port numbers
 
 ## Running the created image
-14. Use the command `docker-compose up` to run the airflow & database server. This will print logs to the console. Use `-d` flag to avoid this: `docker-compose up -d`  
+13. Use the command `docker-compose up` to run the airflow & database server. This will print logs to the console. Use `-d` flag to avoid this: `docker-compose up -d`  
 	a. 	If you choose to use daemon `-d` flag, you can still see logs using `docker logs -f {container_id/container_name}` command. 
-15. Open the UI at `localhost:{desiredPortNumber}` (port number from #3.d or whatever port number you used in SSH tunneling, see section : **Cleanup & Shared Systems** ) 
-16. All the airflow related files such as logs, cfg, airflow.db will be available at **PROJECT_HOME/airflow**
+14. Open the UI at `localhost:{desiredPortNumber}` (port number from #3.d or whatever port number you used in SSH tunneling, see section : **Cleanup & Shared Systems** ) 
+15. All the airflow related files such as logs, cfg, airflow.db will be available at **PROJECT_HOME/airflow**
 
-17. If the UI does not open or if you want to get into the docker container for debugging purposes use the following command.   
+16. If the UI does not open or if you want to get into the docker container for debugging purposes use the following command.   
 	a.	`docker-compose -f docker-compose-debug.yaml up -d`  
 	b. This will start the container but not the scheduler or the webserver. You can use `docker exec` to get into the container and start these programs yourself. 
 	
