@@ -40,7 +40,7 @@ Example:
 7. Create a copy of `init-sample.sql` with the name `airflow-metadata-db-sql/init.sql`  
 	a. Generate a password for `airflow` mysql user and put that in the file you created above
 	b. Use the same password generated in #5.a. in the `environment` section in your docker-compose file. i.e. `AIRFLOW__CORE__SQL_ALCHEMY_CONN: "mysql://airflow:airflow_db_password@airflow-metadata-db:3306/airflow"` 
-   c. Across yaml file, Change "airflow-db-{suffix}" to a suitable image name for MySQL container
+   	c. Across yaml file, Change "airflow-db-{suffix}" to a suitable image name for MySQL container
 8. Generate a mysql root password and use that in the line `MYSQL_ROOT_PASSWORD: mysql_root_password` in `docker-compose.yaml` file
 9. Run the following command in your host system: `id -u` and then `id -g` 
 10. In the USER line in `MySQL` section of docker-compose.yaml, replace `1000 - 1000` with output from above command  
