@@ -174,9 +174,9 @@ INSERT INTO pregrant_publications.main_cpc SELECT * FROM main_cpc;
 
 INSERT INTO pregrant_publications.pct_data SELECT * FROM pct_data;
 
-INSERT INTO pregrant_publications.rawassignee (id, document_number, `sequence`, name_first, name_last, `organization`, type, rawlocation_id, city, state, country, filename) SELECT id, document_number, sequence, name_first, name_last, organization, type, rawlocation_id, city, state, country, filename FROM rawassignee;
+INSERT INTO pregrant_publications.rawassignee (id, document_number, `sequence`, name_first, name_last, `organization`, type, rawlocation_id, city, state, country, filename, version_indicator) SELECT id, document_number, sequence, name_first, name_last, organization, type, rawlocation_id, city, state, country, filename,version_indicator FROM rawassignee;
 
-INSERT INTO pregrant_publications.rawinventor (id, document_number, name_first, name_last, `sequence`, designation, deceased, rawlocation_id, city, state, country, filename) SELECT id, document_number, name_first, name_last, sequence, designation, deceased, rawlocation_id, city, state, country, filename FROM rawinventor;
+INSERT INTO pregrant_publications.rawinventor (id, document_number, name_first, name_last, `sequence`, designation, deceased, rawlocation_id, city, state, country, filename,version_indicator) SELECT id, document_number, name_first, name_last, sequence, designation, deceased, rawlocation_id, city, state, country, filename,version_indicator FROM rawinventor;
 
 INSERT INTO pregrant_publications.rawlocation (id, city, state, country, lattitude, longitude, filename) SELECT id, city, state, country, lattitude, longitude, filename FROM rawlocation;
 

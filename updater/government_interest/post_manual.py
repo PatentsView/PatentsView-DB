@@ -139,8 +139,8 @@ def push_orgs(looked_up_data, org_id_mapping, config, version_indicator):
                 else:
                     missed[patent_id] = org
             for org_id in list(all_orgs):
-                query = "INSERT IGNORE INTO patent_govintorg (patent_id, organization_id) VALUES ('{}', '{}');".format(
-                    patent_id, org_id)
+                query = "INSERT IGNORE INTO patent_govintorg (patent_id, organization_id, version_indicator) VALUES ('{}', '{}', '{}');".format(
+                    patent_id, org_id, version_indicator)
                 cursor = engine.connect()
                 cursor.execute(query)
                 cursor.close()
@@ -196,6 +196,6 @@ if __name__ == '__main__':
 
     for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime.date(2020, 12, 29), until=datetime.date(2021, 3, 23)):
         process_post_manual(**{
-                "execution_date": dt
-                })
+            "execution_date": dt
+        })
         break
