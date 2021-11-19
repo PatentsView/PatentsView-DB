@@ -1,3 +1,4 @@
+import datetime
 from abc import ABC
 
 import pandas as pd
@@ -20,7 +21,7 @@ class PatentDatabaseTester(ABC):
         # Tables that do not directly link to patent table
         self.patent_exclusion_list = ['mainclass', 'mainclass_current', 'nber_category',
                                       'nber_subcategory', 'subclass', 'subclass_current',
-                                      'patent','rawlocation']
+                                      'patent', 'rawlocation']
         # Update start and end date
         self.start_date = start_date
         self.end_date = end_date
@@ -54,14 +55,14 @@ class PatentDatabaseTester(ABC):
     def init_qa_dict(self):
         # Place Holder for saving QA counts - keys map to table names in patent_QA
         self.qa_data = {
-                "DataMonitor_count":               [],
-                'DataMonitor_nullcount':           [],
-                'DataMonitor_patentyearlycount':   [],
-                'DataMonitor_categorycount':       [],
-                'DataMonitor_floatingpatentcount': [],
-                'DataMonitor_maxtextlength':       [],
-                'DataMonitor_prefixedentitycount': []
-                }
+            "DataMonitor_count": [],
+            'DataMonitor_nullcount': [],
+            'DataMonitor_patentyearlycount': [],
+            'DataMonitor_categorycount': [],
+            'DataMonitor_floatingpatentcount': [],
+            'DataMonitor_maxtextlength': [],
+            'DataMonitor_prefixedentitycount': []
+        }
 
     def test_table_row_count(self, table_name):
         """
@@ -76,25 +77,25 @@ class PatentDatabaseTester(ABC):
                 self.connection.connect()
             count_query = """
 SELECT count(*) as table_count
-from {tbl}
-            """.format(tbl=table_name)
+from {tbl} where version_indicator<='{vind}'
+            """.format(tbl=table_name, vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(count_query)
-                count_value = count_cursor.fetchall()[0][0]
-                # if count_value < 1:
-                #     raise Exception("Empty table found:{table}".format(table=table_name))
+            count_value = count_cursor.fetchall()[0][0]
+            # if count_value < 1:
+            #     raise Exception("Empty table found:{table}".format(table=table_name))
 
-                write_table_name = table_name
-                prefix = "temp_"
-                if table_name.startswith(prefix):
-                    write_table_name = table_name[len(prefix):]
-                self.qa_data['DataMonitor_count'].append(
-                        {
-                                "database_type":   self.database_type,
-                                'table_name':      write_table_name,
-                                'update_version':  self.version,
-                                'table_row_count': count_value
-                                })
+            write_table_name = table_name
+            prefix = "temp_"
+            if table_name.startswith(prefix):
+                write_table_name = table_name[len(prefix):]
+            self.qa_data['DataMonitor_count'].append(
+                {
+                    "database_type": self.database_type,
+                    'table_name': write_table_name,
+                    'update_version': self.version,
+                    'table_row_count': count_value
+                })
         finally:
             if self.connection.open:
                 self.connection.close()
@@ -114,8 +115,9 @@ from {tbl}
                     count_query = """
 SELECT count(*) as blank_count
 from `{tbl}`
-where `{field}` = ''
-                    """.format(tbl=table, field=field)
+where `{field}` = '' and version_indicator<='{vind}'
+                    """.format(tbl=table, field=field,
+                               vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
                     with self.connection.cursor() as count_cursor:
                         count_cursor.execute(count_query)
                         count_value = count_cursor.fetchall()[0][0]
@@ -141,12 +143,11 @@ Blanks encountered in  table found:{database}.{table} column {col}. Count: {coun
             if not self.connection.open:
                 self.connection.connect()
             nul_byte_query = """
-SELECT count(*) as count
-from `{tbl}`
-where INSTR(`{field}`, CHAR(0x00)) > 0
-            """.format(
-                    tbl=table,
-                    field=field)
+                SELECT count(*) as count
+                from `{tbl}`
+                where INSTR(`{field}`, CHAR(0x00)) > 0 and  version_indicator<='{vind}'
+            """.format(tbl=table, field=field,
+                       vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(nul_byte_query)
                 nul_byte_count = count_cursor.fetchall()[0][0]
@@ -172,9 +173,10 @@ where INSTR(`{field}`, CHAR(0x00)) > 0
                 self.connection.connect()
             category_count_query = """
 SELECT `{field}` as value, count(*) as count
-from `{tbl}`
+from `{tbl}` where version_indicator<='{vind}'
 group by `{field}`
-            """.format(tbl=table, field=field)
+            """.format(tbl=table, field=field,
+                       vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(category_count_query)
                 for count_row in count_cursor:
@@ -186,14 +188,14 @@ group by `{field}`
                     if table.startswith(prefix):
                         write_table_name = table[len(prefix):]
                     self.qa_data['DataMonitor_categorycount'].append(
-                            {
-                                    "database_type":  self.database_type,
-                                    'table_name':     write_table_name,
-                                    "column_name":    field,
-                                    'update_version': self.version,
-                                    'value':          value,
-                                    'count':          count_row[1]
-                                    })
+                        {
+                            "database_type": self.database_type,
+                            'table_name': write_table_name,
+                            "column_name": field,
+                            'update_version': self.version,
+                            'value': value,
+                            'count': count_row[1]
+                        })
         finally:
             if self.connection.open:
                 self.connection.close()
@@ -209,31 +211,34 @@ group by `{field}`
             try:
                 if not self.connection.open:
                     self.connection.connect()
-                count_query = "SELECT count(*) as null_count from `{tbl}` where `{field}` is null".format(tbl=table,
-                                                                                                          field=field)
+                count_query = """
+                    SELECT count(*) as null_count from `{tbl}` where `{field}` is null and  version_indicator<='{vind}'
+                """.format(tbl=table, field=field,
+                           vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
                     count_value = count_cursor.fetchall()[0][0]
                     if not table_config["fields"][field]['null_allowed']:
                         if count_value != 0:
                             raise Exception(
-                                    "NULLs encountered in table found:{database}.{table} column {col}. Count: {"
-                                    "count}".format(
-                                            database=self.database_section, table=table,
-                                            col=field,
-                                            count=count_value))
+                                """
+                                    NULLs encountered in table found:{database}.{table} column {col}. Count: {count}
+                                """.format(
+                                    database=self.database_section, table=table,
+                                    col=field,
+                                    count=count_value))
                     write_table_name = table
                     prefix = "temp_"
                     if table.startswith(prefix):
                         write_table_name = table[len(prefix):]
                     self.qa_data['DataMonitor_nullcount'].append(
-                            {
-                                    "database_type":  self.database_type,
-                                    'table_name':     write_table_name,
-                                    "column_name":    field,
-                                    'update_version': self.version,
-                                    'null_count':     count_value
-                                    })
+                        {
+                            "database_type": self.database_type,
+                            'table_name': write_table_name,
+                            "column_name": field,
+                            'update_version': self.version,
+                            'null_count': count_value
+                        })
             finally:
                 if self.connection.open:
                     self.connection.close()
@@ -243,37 +248,51 @@ group by `{field}`
         try:
             if not self.connection.open:
                 self.connection.connect()
-            zero_query = "SELECT count(*) zero_count from `{tbl}` where `{field}` ='0000-00-00'".format(tbl=table,
-                                                                                                        field=field)
+            zero_query = """
+                SELECT count(*) zero_count from `{tbl}` where `{field}` ='0000-00-00' and  version_indicator<='{vind}'
+            """.format(
+                tbl=table,
+                field=field, vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(zero_query)
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value != 0:
                     raise Exception(
-                            "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {"
-                            "count}".format(
-                                    database=self.database_section, table=table, col=field,
-                                    count=count_value))
+                        """
+                            0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {count}
+                        """.format(
+                            database=self.database_section, table=table, col=field,
+                            count=count_value))
         finally:
             if self.connection.open:
                 self.connection.close()
 
-    def test_yearly_count(self, table_name, strict=True,patent_id_field='id'):
+    def test_yearly_count(self, table_name, strict=True, patent_id_field='id'):
         if table_name not in self.patent_exclusion_list:
             print("\tTesting yearly entities counts for {table_name}".format(table_name=table_name))
             try:
                 if not self.connection.open:
                     self.connection.connect()
                 patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(
-                        db=self.patent_db_prefix)
+                    db=self.patent_db_prefix)
                 if table_name == 'patent':
-                    count_query = "SELECT year(`date`) as `yr`, count(1) as `year_count` from patent group by year(" \
-                                  "`date`)"
+                    count_query = """
+                        SELECT year(`date`) as `yr`, count(1) as `year_count`
+                        from patent
+                        where version_indicator <= '{vind}'
+                        group by year(`date`)
+                    """
                 else:
-                    count_query = "SELECT year(p.`date`) as `yr`, count(1) as `year_count` from {patent_table} p join " \
-                                  "{entity} et on et.patent_id = p.{patent_id_field} group by year(`date`)".format(
-                            patent_table=patent_table,
-                            entity=table_name,patent_id_field=patent_id_field)
+                    count_query = """
+                        SELECT year(p.`date`) as `yr`, count(1) as `year_count`
+                        from {patent_table} p
+                                 join {entity} et on et.patent_id = p.{patent_id_field}
+                        where p.version_indicator <= '{vind}'
+                        group by year(`date`)
+                    """.format(
+                        patent_table=patent_table,
+                        entity=table_name, patent_id_field=patent_id_field,
+                        vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
                     for count_row in count_cursor.fetchall():
@@ -282,13 +301,13 @@ group by `{field}`
                         if table_name.startswith(prefix):
                             write_table_name = table_name[len(prefix):]
                         self.qa_data['DataMonitor_patentyearlycount'].append(
-                                {
-                                        "database_type":  self.database_type,
-                                        'update_version': self.version,
-                                        'year':           count_row[0],
-                                        'table_name':     write_table_name,
-                                        'patent_count':   count_row[1]
-                                        })
+                            {
+                                "database_type": self.database_type,
+                                'update_version': self.version,
+                                'year': count_row[0],
+                                'table_name': write_table_name,
+                                'patent_count': count_row[1]
+                            })
             except pymysql.err.InternalError as e:
                 return
             finally:
@@ -318,12 +337,19 @@ group by `{field}`
     #
     #
     def assert_related_floating_entities(self, table_name, related_config):
-        related_query = "SELECT count(1) from {related_table} destination left join {source_table} source on source.{" \
-                        "source_id}= destination.{destination_id} where source.{source_id} is null and destination.{" \
-                        "destination_id} is not null".format(
-                source_table=table_name,
-                related_table=related_config['table'], source_id=related_config['source_id'],
-                destination_id=related_config['destination_id'])
+        related_query = """
+            SELECT count(1)
+            from {related_table} destination
+                     left join {source_table} source
+                               on source.{source_id} = destination.{destination_id}
+            where source.{source_id} is null
+              and destination.{destination_id} is not null
+              and destination.version_indicator <= '{vind}'
+            """.format(
+            source_table=table_name,
+            related_table=related_config['table'], source_id=related_config['source_id'],
+            destination_id=related_config['destination_id'],
+            vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
         if not self.connection.open:
             self.connection.connect()
         try:
@@ -333,12 +359,14 @@ group by `{field}`
                 if related_count > 0:
                     print(related_query)
                     raise Exception(
-                            "There are rows in {destination_id} in {related_table} that do not have corresponding {"
-                            "source_id} in {source_table} for {db}".format(
-                                    source_table=table_name,
-                                    related_table=related_config['table'], source_id=related_config['source_id'],
-                                    destination_id=related_config['destination_id'], db=
-                                    self.config['PATENTSVIEW_DATABASES'][self.database_section]))
+                        """
+                        There are rows in {destination_id} in {related_table} that do not have corresponding {source_id}
+                         in {source_table} for {db}
+                        """.format(
+                            source_table=table_name,
+                            related_table=related_config['table'], source_id=related_config['source_id'],
+                            destination_id=related_config['destination_id'],
+                            db=self.config['PATENTSVIEW_DATABASES'][self.database_section]))
 
         finally:
             self.connection.close()
@@ -348,8 +376,11 @@ group by `{field}`
         try:
             if not self.connection.open:
                 self.connection.connect()
-            zero_query = "SELECT count(*) NULL_count from `{tbl}` where `{field}` ='NULL'".format(tbl=table,
-                                                                                                  field=field)
+            zero_query = """
+                SELECT count(*) NULL_count from `{tbl}` where `{field}` ='NULL' and  version_indicator<='{vind}'
+            """.format(
+                tbl=table,
+                field=field, vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(zero_query)
                 count_value = count_cursor.fetchall()[0][0]
@@ -370,9 +401,10 @@ group by `{field}`
             from {table_name} et left join {patent_table} p
             on p.id =et.patent_id
             where
-                p.id is null
+                p.id is null and p.version_indicator<='{vind}'
         """.format(
-                table_name=table_name, patent_table=patent_table)
+            table_name=table_name, patent_table=patent_table,
+            vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
         if not self.connection.open:
             self.connection.connect()
         print(float_query)
@@ -382,8 +414,8 @@ group by `{field}`
                 float_count = count_cursor.fetchall()[0][0]
                 if float_count > 0:
                     raise Exception("There are patents in {table_name} that are not in patent table for {db}".format(
-                            table_name=table_name, db=
-                            self.config['PATENTSVIEW_DATABASES'][self.database_section]))
+                        table_name=table_name, db=
+                        self.config['PATENTSVIEW_DATABASES'][self.database_section]))
 
         except pymysql.Error as e:
             if table_name not in self.patent_exclusion_list:
@@ -405,9 +437,10 @@ group by `{field}`
             from {patent_table} p left join {entity_table} et
             on
                 et.patent_id = p.id
-            where et.patent_id is null {additional_where}
+            where et.patent_id is null and  version_indicator<='{vind}' {additional_where}
         """.format(
-                patent_table=patent_table, entity_table=table, additional_where=additional_where)
+            patent_table=patent_table, entity_table=table, additional_where=additional_where,
+            vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
         print(float_count_query)
         try:
             with self.connection.cursor() as count_cursor:
@@ -418,36 +451,39 @@ group by `{field}`
                 if table.startswith(prefix):
                     write_table_name = table[len(prefix):]
                 self.qa_data['DataMonitor_floatingpatentcount'].append({
-                        "database_type":
-                                                 self.database_type,
-                        'update_version':        self.version,
-                        'table_name':
-                                                 write_table_name,
-                        'floating_patent_count': float_count
-                        })
+                    "database_type":
+                        self.database_type,
+                    'update_version': self.version,
+                    'table_name':
+                        write_table_name,
+                    'floating_patent_count': float_count
+                })
         except pymysql.Error as e:
             if table not in self.patent_exclusion_list:
                 raise e
         finally:
             self.connection.close()
 
-    def load_prefix_counts(self, table_name,patent_id_field='id'):
+    def load_prefix_counts(self, table_name, patent_id_field='id'):
         if table_name not in self.patent_exclusion_list:
             print("\tTesting entity counts by patent type for {table_name}".format(table_name=table_name))
             try:
                 if not self.connection.open:
                     self.connection.connect()
                 patent_table = 'patent' if self.patent_db_prefix is None else '{db}.patent'.format(
-                        db=self.patent_db_prefix)
+                    db=self.patent_db_prefix)
 
                 count_query = """
-                    SELECT p.`type` as `type`, count(1) as `type_count`
-                    from {patent_table} p join {entity} et
-                    on et.patent_id = p.{patent_id_field}
-                    group by p.`type`                
+                SELECT p.`type` as `type`, count(1) as `type_count`
+                from {patent_table} p
+                         join {entity} et
+                              on et.patent_id = p.{patent_id_field}
+                where p.version_indicator<='{vind}'
+                group by p.`type`               
                 """.format(
-                        patent_table=patent_table,
-                        entity=table_name,patent_id_field=patent_id_field)
+                    patent_table=patent_table,
+                    entity=table_name, patent_id_field=patent_id_field,
+                    vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
                     for count_row in count_cursor.fetchall():
@@ -456,13 +492,13 @@ group by `{field}`
                         if table_name.startswith(prefix):
                             write_table_name = table_name[len(prefix):]
                         self.qa_data['DataMonitor_prefixedentitycount'].append(
-                                {
-                                        "database_type":  self.database_type,
-                                        'update_version': self.version,
-                                        'patent_type':    count_row[0],
-                                        'table_name':     write_table_name,
-                                        'patent_count':   count_row[1]
-                                        })
+                            {
+                                "database_type": self.database_type,
+                                'update_version': self.version,
+                                'patent_type': count_row[0],
+                                'table_name': write_table_name,
+                                'patent_count': count_row[1]
+                            })
             except pymysql.err.InternalError as e:
                 if table_name not in self.patent_exclusion_list:
                     raise e
@@ -484,10 +520,13 @@ group by `{field}`
 
     def test_text_length(self, table_name, field_name):
         print(
-                "\t\tLoading Text field max Length {field} in {table_name}".format(field=field_name,
-                                                                                   table_name=table_name))
-        text_length_query = "SELECT max(char_length(`{field}`)) from `{table}`;".format(field=field_name,
-                                                                                        table=table_name)
+            "\t\tLoading Text field max Length {field} in {table_name}".format(field=field_name,
+                                                                               table_name=table_name))
+        text_length_query = """
+            SELECT max(char_length(`{field}`)) from `{table}` where  version_indicator<='{vind}';
+        """.format(
+            field=field_name,
+            table=table_name, vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
         if not self.connection.open:
             self.connection.connect()
 
@@ -499,12 +538,12 @@ group by `{field}`
             if table_name.startswith(prefix):
                 write_table_name = table_name[len(prefix):]
             self.qa_data['DataMonitor_maxtextlength'].append({
-                    "database_type":   self.database_type,
-                    'update_version':  self.version,
-                    'table_name':      write_table_name,
-                    'column_name':     field_name,
-                    'max_text_length': text_length
-                    })
+                "database_type": self.database_type,
+                'update_version': self.version,
+                'table_name': write_table_name,
+                'column_name': field_name,
+                'max_text_length': text_length
+            })
 
     def runTests(self):
         skiplist = []
