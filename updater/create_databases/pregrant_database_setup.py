@@ -30,6 +30,7 @@ def create_database(**kwargs):
         subprocess_cmd('mysql --defaults-file=' + defaults_file + ' ' + database + ' < ' + sql_path)
     except:
         print('bash command failed')
+        raise
 
 
 def merge_database(**kwargs):
