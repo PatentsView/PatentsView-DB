@@ -2257,6 +2257,7 @@ CREATE TABLE `rawlocation` (
   `city` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `state` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `country` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country_transformed` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lattitude` float DEFAULT NULL,
   `longitude` float DEFAULT NULL,
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
