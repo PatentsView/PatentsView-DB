@@ -119,7 +119,7 @@ INSERT INTO wipo (patent_id, field_id, sequence, version_indicator) SELECT paten
 
 
 def process_and_upload_wipo(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     myengine = create_engine(get_connection_string(config, "RAW_DB"))
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                  'wipo_output')

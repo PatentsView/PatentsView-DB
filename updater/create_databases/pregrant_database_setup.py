@@ -44,7 +44,7 @@ def merge_database(**kwargs):
         subprocess_cmd('mysql --defaults-file=' + defaults_file + ' ' + database + ' < ' + sql_path)
     except:
         print('bash command failed')
-
+        raise
 
 def drop_database(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)

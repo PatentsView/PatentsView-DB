@@ -214,14 +214,14 @@ def parse_cpc_subgroups(soup):
 
 
 def process_cpc_class_parser(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     location_of_cpc_files = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     output_directory = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
     parse_and_write_cpc_class(location_of_cpc_files, output_directory)
 
 
 def post_class_parser(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     qc = CPCClassParserTest(config)
     qc.runTests()
 
