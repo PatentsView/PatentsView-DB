@@ -108,14 +108,19 @@ def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordan
 
 def consolidate_wipo(config):
     engine = create_engine(get_connection_string(config, "RAW_DB"))
-    upsert_query = """
-INSERT INTO wipo (patent_id, field_id, sequence, version_indicator) SELECT patent_id, field_id, sequence, version_indicator from {temp_db}.wipo ON DUPLICATE KEY UPDATE patent_id = VALUES(patent_id),
-                        field_id = VALUES(field_id),
-                        `sequence` = VALUES(`sequence`),
-                        version_indicator = VALUES(version_indicator);
-""".format(
-            temp_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
-    engine.execute(upsert_query)
+    start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
+    suffix = (start_date - datetime.timedelta(days=1)).strftime('%Y%m%d')
+    rename_raw_statement = """
+    rename table {raw_db}.wipo to {raw_db}.wipo_{suffix}
+    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], suffix=suffix)
+    rename_upload_statement = """
+    rename table {upload_db}.wipo to {raw_db}.wipo
+    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"],
+               upload_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
+    print(rename_raw_statement)
+    engine.execute(rename_raw_statement)
+    print(rename_upload_statement)
+    engine.execute(rename_upload_statement)
 
 
 def process_and_upload_wipo(**kwargs):
