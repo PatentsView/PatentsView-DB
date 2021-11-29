@@ -11,40 +11,44 @@
 #### Note: See Port Numbers section on how to connect to different tools #### 
 ## Base & Airflow Setup
 
-1. Clone into this repository (cloned local folder referred to as **PROJECT_HOME** for the rest of this documentation)
-2. Build docker image from **PROJECT_HOME** using `docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t {image-name} .`
-3. Using `docker-compose-sample.yaml` as reference, create a file called `docker-compose.yaml`  
+1. Using recursive to ensure that submodules are installed, clone the repository (cloned local folder referred to as **PROJECT_HOME** for the rest of this documentation)
+`git clone https://github.com/PatentsView/PatentsView-DB.git --recursive`
+3. Build docker image from **PROJECT_HOME** using `docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t {image-name} .`
+4. Using `docker-compose-sample.yaml` as reference, create a file called `docker-compose.yaml`  
+`cp -v docker-compose-sample.yaml docker-compose.yaml`
 	a. Replace `/Path/to/Project/Root/PatentsView-DB/` with the **PROJECT_HOME** location in all `volumes` lines  (total of 3)  
 	b. Replace **{docker-image-name}** with docker image name you used/intend to use. This is the value that you use in `docker build -t . {docker-image-name}`  
 	c. Replace **{service-name}** with a suitable name. In the absence of a container name in the `yaml` file, this name will be used as a basis for any docker container that is spawned based on the above image  
+	d. Across the yaml file, replace **{airflow\_container\_name}** with a suitable container name. This is the name you will be using in `docker exec` command 
+ 	e. Across the yaml file, replace **{db\_container\_name}** with a suitable name. This will be the `hostname` at which airflow will connect to MySQL (it doesn't have to be in URL format)    
 
 Example:  
  **image-name**: patent-data-processing  
  **service-name**: patent-data-processor  
- 	d. Across the yaml file, replace **{airflow\_container\_name}** with a suitable container name. This is the name you will be using in `docker exec` command  
- 	e. Across the yaml file, replace **{db\_container\_name}** with a suitable name. This will be the `hostname` at which airflow will connect to MySQL (it doesn't have to be in URL format)    
+
 4. Run this command from your host system. `docker network create patentsview-pipeline-network` . The name you use here must be used in `docker-compose.yaml` file.
 
 ## Credentials
-5. You must copy the 'Development/config_template.ini' to one called 'Development/config.ini' and enter your database password and the name of the upload, old and new databases. 
-6. You must also enter the key file for the disambiguation server into a file called 'disambig' in the 'credentials' folder. Ask Sarah to get a copy of the key, which you can just copy into the file. 
+5. Use the following command to create a copy of config_template.ini, named config.ini. Config_template is located in **PROJECT_HOME**.
+
+`cp -v config_template.ini config.ini`
+
 =======
 
 ## MySQL Setup  
-
-5. Create a copy of `init-sample.sql` with the name `airflow-metadata-db-sql/init.sql`  
+6. Create a copy of `init-sample.sql` with the name `airflow-metadata-db-sql/init.sql`  
 	a. Generate a password for `airflow` mysql user and put that in the file you created above
 	b. Use the same password generated in #5.a. in the `environment` section in your docker-compose file. i.e. `AIRFLOW__CORE__SQL_ALCHEMY_CONN: "mysql://airflow:airflow_db_password@airflow-metadata-db:3306/airflow"` 
-   c. Across yaml file, Change "airflow-db-{suffix}" to a suitable image name for MySQL container
-6. Generate a mysql root password and use that in the line `MYSQL_ROOT_PASSWORD: mysql_root_password` in `docker-compose.yaml` file
-7. Run the following command in your host system: `id -u` and then `id -g` 
-8. In the USER line in `MySQL` section of docker-compose.yaml, replace `1000 - 1000` with output from above command  
+   	c. Across yaml file, Change "airflow-db-{suffix}" to a suitable image name for MySQL container
+7. Generate a mysql root password and use that in the line `MYSQL_ROOT_PASSWORD: mysql_root_password` in `docker-compose.yaml` file
+8. Run the following command in your host system: `id -u` and then `id -g` 
+9. In the USER line in `MySQL` section of docker-compose.yaml, replace `1000 - 1000` with output from above command  
 #### Note: Any SQL file within the `airflow-metadata-db-sql` directory will be executed when MySQL is first setup. ####
 ## Jupyter Setup  
-7. In your `docker-compose.yaml` file, update the line `- 8889:8888` to `yourDesiredPort:8888` and then you can access the notebook at `localhost:yourDesiredPort`.  
-8. When you start the container, it outputs the token that you can use in browser when prompted for password  
+10. In your `docker-compose.yaml` file, update the line `- 8889:8888` to `yourDesiredPort:8888` and then you can access the notebook at `localhost:yourDesiredPort`.  
+11. When you start the container, it outputs the token that you can use in browser when prompted for password  
 ## Debugging Setup
-9. Using  `docker-compose-debug-sample.yaml` as reference, create a file called `docker-compose-debug.yaml`. Make the same changes that you made to `docker-compose.yaml`
+12. Using  `docker-compose-debug-sample.yaml` as reference, create a file called `docker-compose-debug.yaml`. Make the same changes that you made to `docker-compose.yaml`
 
 ## Port Numbers Setup
 There are 3 different ports used by different tools. See table below for reference:
@@ -74,12 +78,12 @@ In effect, if there is a MySQL server running at 3308 in `gp-linux-server`, afte
 * Update port number in the `docker-compose.yaml` based on your chosen port numbers
 
 ## Running the created image
-10. Use the command `docker-compose up` to run the airflow & database server. This will print logs to the console. Use `-d` flag to avoid this: `docker-compose up -d`  
+13. Use the command `docker-compose up` to run the airflow & database server. This will print logs to the console. Use `-d` flag to avoid this: `docker-compose up -d`  
 	a. 	If you choose to use daemon `-d` flag, you can still see logs using `docker logs -f {container_id/container_name}` command. 
-11. Open the UI at `localhost:{desiredPortNumber}` (port number from #3.d or whatever port number you used in SSH tunneling, see section : **Cleanup & Shared Systems** ) 
-12. All the airflow related files such as logs, cfg, airflow.db will be available at **PROJECT_HOME/airflow**
+14. Open the UI at `localhost:{desiredPortNumber}` (port number from #3.d or whatever port number you used in SSH tunneling, see section : **Cleanup & Shared Systems** ) 
+15. All the airflow related files such as logs, cfg, airflow.db will be available at **PROJECT_HOME/airflow**
 
-13. If the UI does not open or if you want to get into the docker container for debugging purposes use the following command.   
+16. If the UI does not open or if you want to get into the docker container for debugging purposes use the following command.   
 	a.	`docker-compose -f docker-compose-debug.yaml up -d`  
 	b. This will start the container but not the scheduler or the webserver. You can use `docker exec` to get into the container and start these programs yourself. 
 	
