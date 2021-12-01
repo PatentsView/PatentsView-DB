@@ -142,7 +142,7 @@ def process_and_upload_wipo(**kwargs):
     limit = 10000
     offset = 0
     batch_counter = 0
-    base_query_template = "SELECT id from patent order by id limit {limit} offset {offset}"
+    base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
     cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = c.patent_id"
     while True:
         start = time.time()
