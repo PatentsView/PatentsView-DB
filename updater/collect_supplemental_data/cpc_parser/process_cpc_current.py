@@ -11,7 +11,7 @@ from lxml import etree
 from sqlalchemy import create_engine
 from tqdm import tqdm
 
-from lib.configuration import get_connection_string, get_current_config
+from lib.configuration import get_connection_string, get_current_config, get_version_indicator
 from lib.utilities import generate_index_statements, log_writer, mp_csv_writer, xstr
 from updater.create_databases.upload_new import setup_database
 
@@ -38,12 +38,13 @@ def consolidate_cpc_data(cpc_file, config, add_indexes):
     engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
     start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
     suffix = (start_date - datetime.timedelta(days=1)).strftime('%Y%m%d')
+    end_date = config['DATES']['END_DATE']
     start = time.time()
     for cpc_chunk in tqdm(cpc_csv_file_chunks):
         with engine.connect() as conn:
             cpc_chunk.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
-    delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null".format(
-        raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
+    delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null or p.version_indicator >'{vind}'".format(
+        raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], vind=end_date)
     engine.execute(delete_query)
     for add_statement in add_indexes:
         engine.execute(add_statement[0])
