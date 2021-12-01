@@ -128,6 +128,7 @@ def process_and_upload_wipo(**kwargs):
     myengine = create_engine(get_connection_string(config, "RAW_DB"))
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                  'wipo_output')
+    version_indicator = config['DATES']['END_DATE']
     if not os.path.exists(wipo_output):
         os.mkdir(wipo_output)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
@@ -147,7 +148,7 @@ def process_and_upload_wipo(**kwargs):
     while True:
         start = time.time()
         batch_counter += 1
-        base_query = base_query_template.format(limit=limit, offset=offset)
+        base_query = base_query_template.format(limit=limit, offset=offset, vind=version_indicator)
         cpc_join_query = cpc_query_template.format(base_query=base_query)
         cpc_current_data = pd.read_sql_query(con=myengine, sql=cpc_join_query)
         if cpc_current_data.shape[0] < 1:
