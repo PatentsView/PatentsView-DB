@@ -10,7 +10,6 @@ from hashlib import md5
 from pathlib import Path
 from string import ascii_lowercase as alphabet
 import multiprocessing as mp
-import tqdm
 from sqlalchemy import create_engine
 from textdistance import jaro_winkler
 from tqdm import tqdm
@@ -68,9 +67,9 @@ def clean_rawlawyer(**kwargs):
         counter = 0
         with engine.connect() as db_con:
             rawlaw_chunk = db_con.execute(
-                    'SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset))
+                'SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset))
 
-            for lawyer in tqdm.tqdm(rawlaw_chunk, total=limit,
+            for lawyer in tqdm(rawlaw_chunk, total=limit,
                                     desc="rawlawyer processing - batch:" + str(batch_counter)):
                 uuid_match = lawyer[0]
                 law_id = lawyer[1]
