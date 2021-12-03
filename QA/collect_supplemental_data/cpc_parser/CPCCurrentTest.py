@@ -80,7 +80,7 @@ class CPCTest(PatentDatabaseTester):
                                         'null_allowed': False,
                                         'category':     False
                                         },
-                                'section_title': {
+                                'sector_title': {
                                         'data_type':    'varchar',
                                         'null_allowed': False,
                                         'category':     False
