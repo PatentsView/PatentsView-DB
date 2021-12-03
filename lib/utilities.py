@@ -299,6 +299,19 @@ def rds_free_space(config, identifier):
     return mean(response['MetricDataResults'][0]['Values'])
 
 
+def get_host_name(local=True):
+    import requests
+    from requests.exceptions import ConnectionError
+    from airflow.utils import net
+    try:
+        host_key = 'local-hostname'
+        if not local:
+            host_key = 'public-hostname'
+        r = requests.get("http://169.254.169.254/latest/meta-data/{hkey}".format(hkey=host_key))
+        return r.text
+    except ConnectionError:
+        return net.get_host_ip_address()
+
 def chain_operators(chain):
     for upstream, downstream in zip(chain[:-1], chain[1:]):
         downstream.set_upstream(upstream)
