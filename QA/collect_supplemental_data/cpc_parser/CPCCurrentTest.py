@@ -153,7 +153,7 @@ class CPCTest(PatentDatabaseTester):
                                         }]
                         }
                 }
-        self.patent_exclusion_list.extend(['cpc_group', 'cpc_subgroup', 'cpc_subsection'])
+        self.patent_exclusion_list.extend(['cpc_group', 'cpc_subgroup', 'cpc_subsection','wipo_field'])
 
     def test_yearly_count(self, table, strict=True):
         start_date = datetime.datetime.strptime(self.config['DATES']['START_DATE'], '%Y%m%d')
