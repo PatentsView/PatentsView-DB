@@ -260,8 +260,7 @@ class LawyerDisambiguator:
         # track memory usage by letter
         log_queue.put({
             "level": logging.INFO,
-            "message": "letter is: {letter} at {t}".format(letter=letter, t=datetime.now())},
-            flush=True)
+            "message": "letter is: {letter} at {t}".format(letter=letter, t=datetime.now())})
         # bookkeeping
         id_map = defaultdict(list)
         lawyer_dict = {}
