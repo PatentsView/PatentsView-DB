@@ -81,7 +81,7 @@ from {tbl} where version_indicator<='{vind}'
             """.format(tbl=table_name, vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(count_query)
-            count_value = count_cursor.fetchall()[0][0]
+                count_value = count_cursor.fetchall()[0][0]
             # if count_value < 1:
             #     raise Exception("Empty table found:{table}".format(table=table_name))
 
@@ -437,7 +437,7 @@ group by `{field}`
             from {patent_table} p left join {entity_table} et
             on
                 et.patent_id = p.id
-            where et.patent_id is null and  version_indicator<='{vind}' {additional_where}
+            where et.patent_id is null and p.version_indicator<='{vind}' {additional_where}
         """.format(
             patent_table=patent_table, entity_table=table, additional_where=additional_where,
             vind=datetime.datetime.strptime(self.version, "%Y%m%d").strftime("%Y-%m-%d"))
