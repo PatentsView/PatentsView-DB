@@ -117,11 +117,17 @@ FROM   `government_interest` gi
          ON pca.patent_id = gi.patent_id
        LEFT JOIN `patent_govintorg` pg
          ON pg.patent_id = gi.patent_id
-       LEFT JOIN government_organization go
+       LEFT JOIN patent.government_organization go
          ON go.`organization_id` = pg.organization_id
-{where_clause}
-ORDER BY RAND()
-LIMIT  100;        
+           inner join 
+           		(select id 
+           		from patent p
+           		       Join `government_interest` gi on p.id=gi.patent_id
+           			   LEFT JOIN `patent_govintorg` pg ON pg.patent_id = p.id
+           		       LEFT JOIN patent.`government_organization` go ON go.`organization_id` = pg.organization_id
+           		{where_clause}
+           		order by rand() 
+           		limit 5) as rand_5_samples ON p.id=rand_5_samples.id;       
         """
 
         for date_clause, where_combination_type in where_combinations:
@@ -170,3 +176,4 @@ if __name__ == '__main__':
             "END_DATE":   '20201229'
             }
     begin_gi_test(config)
+
