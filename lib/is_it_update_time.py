@@ -1,16 +1,12 @@
 import calendar
 from datetime import datetime, timedelta, date
-from typing import Optional, Any, Dict
 
 import pandas as pd
 import pendulum
 from numpy import busday_count
-from pendulum import DateTime, Time
+from pendulum import DateTime
 
 from lib.configuration import get_current_config
-
-from airflow.plugins_manager import AirflowPlugin
-from airflow.timetables.base import Timetable, DataInterval, TimeRestriction, DagRunInfo
 
 local_tz = pendulum.timezone("America/New_York")
 
@@ -53,44 +49,45 @@ def get_update_range(ref: DateTime):
     # if exec_date < quarter_latest_x_day:
     #     quarter_latest_x_day = get_update_x_day(previous_quarter(exec_date))
     previous_quarter_latest_x_day = get_update_x_day(previous_quarter(quarter_latest_x_day))
-    return previous_quarter_latest_x_day, quarter_latest_x_day
+    return previous_quarter_latest_x_day + timedelta(days=1), quarter_latest_x_day
 
 
-class DataUpdateTimeTable(Timetable):
-    def __init__(self, pipeline='granted_patent'):
-        self._pipeline = pipeline
-
-    def serialize(self) -> Dict[str, Any]:
-        return {'pipeline': self._pipeline}
-
-    @classmethod
-    def deserialize(cls, data: Dict[str, Any]) -> "Timetable":
-        return cls(data['pipeline'])
-
-    def next_dagrun_info(self, *, last_automated_data_interval: Optional[DataInterval], restriction: TimeRestriction) -> \
-            Optional[DagRunInfo]:
-
-        if last_automated_data_interval is not None:
-            start_date = last_automated_data_interval.end.date() + timedelta(days=1)
-            end_date = get_update_x_day(next_quarter(start_date))
-        else:
-            start_date = restriction.earliest
-            if start_date is None:
-                return None
-
-    def infer_manual_data_interval(self, *, run_after: DateTime) -> DataInterval:
-        previous_update_date, update_date = get_update_range(run_after.date())
-        start: DateTime = DateTime.combine(previous_update_date,
-                                           Time(hour=9, minute=0, second=0, microsecond=0)).replace(
-            tzinfo=local_tz)
-        end: DateTime = DateTime.combine(update_date, Time(hour=9, minute=0, second=0, microsecond=0)).replace(
-            tzinfo=local_tz)
-        return DataInterval(start=start, end=end)
-
-
-class DataUpdateTimeTablePlugin(AirflowPlugin):
-    name = 'data_update_timetable_plugin'
-    timetables = [DataUpdateTimeTable]
+#
+# class DataUpdateTimeTable(Timetable):
+#     def __init__(self, pipeline='granted_patent'):
+#         self._pipeline = pipeline
+#
+#     def serialize(self) -> Dict[str, Any]:
+#         return {'pipeline': self._pipeline}
+#
+#     @classmethod
+#     def deserialize(cls, data: Dict[str, Any]) -> "Timetable":
+#         return cls(data['pipeline'])
+#
+#     def next_dagrun_info(self, *, last_automated_data_interval: Optional[DataInterval], restriction: TimeRestriction) -> \
+#             Optional[DagRunInfo]:
+#
+#         if last_automated_data_interval is not None:
+#             start_date = last_automated_data_interval.end.date() + timedelta(days=1)
+#             end_date = get_update_x_day(next_quarter(start_date))
+#         else:
+#             start_date = restriction.earliest
+#             if start_date is None:
+#                 return None
+#
+#     def infer_manual_data_interval(self, *, run_after: DateTime) -> DataInterval:
+#         previous_update_date, update_date = get_update_range(run_after.date())
+#         start: DateTime = DateTime.combine(previous_update_date,
+#                                            Time(hour=9, minute=0, second=0, microsecond=0)).replace(
+#             tzinfo=local_tz)
+#         end: DateTime = DateTime.combine(update_date, Time(hour=9, minute=0, second=0, microsecond=0)).replace(
+#             tzinfo=local_tz)
+#         return DataInterval(start=start, end=end)
+#
+#
+# class DataUpdateTimeTablePlugin(AirflowPlugin):
+#     name = 'data_update_timetable_plugin'
+#     timetables = [DataUpdateTimeTable]
 
 
 def is_it_last_xday_of_third_month(end_date, atmost=2):

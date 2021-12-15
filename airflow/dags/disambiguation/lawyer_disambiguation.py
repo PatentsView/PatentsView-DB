@@ -40,9 +40,9 @@ default_args = {
 }
 
 disambiguation = DAG(
-    dag_id='disambiguation',
+    dag_id='lawyer_disambiguation',
     default_args=default_args,
-    description='Perform various disambiguation',
+    description='Perform lawyer disambiguation',
     start_date=datetime(2021, 7, 1),
     schedule_interval='@quarterly',
     template_searchpath=templates_searchpath,

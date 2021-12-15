@@ -176,7 +176,41 @@ def get_version_indicator(**kwargs):
     return execution_date.strftime('%Y%m%d')
 
 
-def get_current_config(type='granted_patent', supplemental_configs=None, schedule='weekly', **kwargs):
+def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwargs):
+    disambiguation_root = os.environ['DISAMBIGUATION_ROOT']
+    import configparser
+
+    config = get_config()
+    execution_date: DateTime = kwargs['execution_date']
+    if schedule == 'weekly':
+        current_week_start = datetime.timedelta(days=1)
+        current_week_end = datetime.timedelta(days=7)
+        start_date = (execution_date + current_week_start)
+        end_date = (execution_date + current_week_end)
+    else:
+        from lib.is_it_update_time import get_update_range
+        start_date, end_date = get_update_range(execution_date)
+    temp_date = end_date.strftime('%Y%m%d')
+
+    config['DATES'] = {
+        "START_DATE": start_date.strftime('%Y-%m-%d'),
+        "END_DATE": end_date.strftime('%Y-%m-%d')
+    }
+    if supplemental_configs is not None:
+        for supplemental_config in supplemental_configs:
+            s_config = configparser.ConfigParser()
+            config_file = "{disambiguation_root}/{filename}".format(disambiguation_root=disambiguation_root,
+                                                                    filename=supplemental_config)
+            s_config.read(config_file)
+            config.update(s_config)
+    incremental = 1
+    if start_date.month == 1:
+        incremental = 0
+    config['DISAMBIGUATION']['INCREMENTAL'] = str(incremental)
+    return config
+
+
+def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     """
     Update config file start and end date to first and last day of the supplied week
     :param supplemental_configs:
@@ -191,8 +225,6 @@ def get_current_config(type='granted_patent', supplemental_configs=None, schedul
     :param cfg: config to update
     :return: updated config
     """
-    project_home = os.environ['PACKAGE_HOME']
-    import configparser
 
     config = get_config()
     config_prefix = "upload_"
@@ -224,21 +256,7 @@ def get_current_config(type='granted_patent', supplemental_configs=None, schedul
             working_folder=config['FOLDERS']['WORKING_FOLDER'])
         config['FOLDERS']['long_text_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
             working_folder=config['FOLDERS']['WORKING_FOLDER'])
-
     latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
     latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
-
-    config['DISAMBIGUATION']['granted_patent_database'] = "{type}{dt}".format(
-        type=config['PATENTSVIEW_DATABASES']['granted_patent_upload_db'],
-        dt=latest_tuesday['execution_date'].strftime("%Y%m%d"))
-    config['DISAMBIGUATION']['pregrant_database'] = "{type}{dt}".format(
-        type=config['PATENTSVIEW_DATABASES']['pgpubs_upload_db'],
-        dt=latest_thursday['execution_date'].strftime("%Y%m%d"))
-    if supplemental_configs is not None:
-        for supplemental_config in supplemental_configs:
-            s_config = configparser.ConfigParser()
-            config_file = "{home}/{filename}".format(home=project_home, filename=supplemental_config)
-            s_config.read(config_file)
-            config.update(s_config)
 
     return config
