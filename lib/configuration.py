@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 
+from elasticsearch import Elasticsearch
 from pendulum import DateTime
 
 
@@ -260,3 +261,11 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
 
     return config
+
+
+def get_es(config):
+    es_hostname = config['ELASTICSEARCH']['HOST']
+    username = config['ELASTICSEARCH']['USER']
+    password = config['ELASTICSEARCH']['PASSWORD']
+    es = Elasticsearch(hosts=es_hostname, http_auth=(username, password))
+    return es

@@ -11,7 +11,7 @@ from lib.configuration import get_connection_string, get_current_config
 from updater.post_processing.create_lookup import load_lookup_table
 
 
-def update_rawinventor(update_config, database='RAW_DB', uuid_field='uuid'):
+def update_rawinventor_for_type(update_config, database='RAW_DB', uuid_field='uuid'):
     engine = create_engine(get_connection_string(update_config, database))
     update_statement = """
         UPDATE rawinventor ri join inventor_disambiguation_mapping idm
@@ -32,11 +32,11 @@ def get_inventor_stopwords(config):
 
 def inventor_clean(inventor_group, stopwords):
     inventor_group['name_first'] = inventor_group['name_first'].apply(
-            lambda x: x if pd.isnull(x) else ' '.join(
-                    [word for word in x.split() if word not in stopwords]))
+        lambda x: x if pd.isnull(x) else ' '.join(
+            [word for word in x.split() if word not in stopwords]))
     inventor_group['name_last'] = inventor_group['name_last'].apply(
-            lambda x: x if pd.isnull(x) else ' '.join(
-                    [word for word in x.split() if word not in stopwords]))
+        lambda x: x if pd.isnull(x) else ' '.join(
+            [word for word in x.split() if word not in stopwords]))
     inventor_group['patent_date'] = pd.to_datetime(inventor_group['patent_date']).dt.date
     return inventor_group
 
@@ -64,7 +64,7 @@ def generate_disambiguated_inventors(config, engine, limit, offset):
     inventor_core_query = inventor_core_template.format(limit=limit,
                                                         offset=offset)
     inventor_data_query = inventor_data_template.format(
-            inv_core_query=inventor_core_query, pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'])
+        inv_core_query=inventor_core_query, pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'])
 
     current_inventor_data = pd.read_sql_query(sql=inventor_data_query, con=engine)
     return current_inventor_data
@@ -75,12 +75,12 @@ def inventor_reduce(inventor_data):
         'inventor_id'].transform('count')
     out = inventor_data.sort_values(['help', 'patent_date'], ascending=[False, False],
                                     na_position='last').drop_duplicates(
-            'inventor_id', keep='first').drop(
-            ['help', 'patent_date'], 1)
+        'inventor_id', keep='first').drop(
+        ['help', 'patent_date'], 1)
     return out
 
 
-def precache_inventors(config):
+def precache_inventors_ids(config):
     inventor_cache_query = """
         INSERT IGNORE INTO disambiguated_inventor_ids (inventor_id)
         SELECT inventor_id
@@ -95,8 +95,9 @@ def precache_inventors(config):
     engine.execute(inventor_cache_query)
 
 
-def create_inventor(update_config, version_indicator):
+def create_inventor(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
+    version_indicator = update_config['DATES']['END_DATE']
     rename_name = "inventor_{tstamp}".format(tstamp=version_indicator)
     rename_sql = """
     RENAME TABLE inventor TO {target}
@@ -125,8 +126,8 @@ def create_inventor(update_config, version_indicator):
             break
         step_time = time.time() - start
         canonical_assignments = inventor_reduce(current_inventor_data).rename({
-                "inventor_id": "id"
-                }, axis=1)
+            "inventor_id": "id"
+        }, axis=1)
         canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
         canonical_assignments.to_sql(name='inventor', con=engine,
                                      if_exists='append',
@@ -138,8 +139,8 @@ def create_inventor(update_config, version_indicator):
 def upload_disambig_results(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     disambig_output_file = "{wkfolder}/disambig_output/{disamb_file}".format(
-            wkfolder=update_config['FOLDERS']['WORKING_FOLDER'],
-            disamb_file="inventor_disambiguation.tsv")
+        wkfolder=update_config['FOLDERS']['WORKING_FOLDER'],
+        disamb_file="inventor_disambiguation.tsv")
     disambig_output = pd.read_csv(disambig_output_file, sep="\t",
                                   chunksize=300000, header=None, quoting=csv.QUOTE_NONE,
                                   names=['unknown_1', 'uuid', 'inventor_id', 'name_first',
@@ -157,24 +158,52 @@ def upload_disambig_results(update_config):
                                   method='multi')
         end = time.time()
         print("It took {duration} seconds to get to {cnt}".format(duration=round(
-                end - start, 3),
-                cnt=count))
+            end - start, 3),
+            cnt=count))
         engine.dispose()
 
 
-def post_process_inventor(**kwargs):
+def update_granted_rawinventor(**kwargs):
     config = get_current_config(**kwargs)
-    version_indicator = config['DATES']['END_DATE']
-    update_rawinventor(config, database='PGPUBS_DATABASE', uuid_field='id')
-    update_rawinventor(config, database='RAW_DB', uuid_field='uuid')
-    precache_inventors(config)
-    create_inventor(config, version_indicator=version_indicator)
+    update_rawinventor_for_type(config, database='RAW_DB', uuid_field='id')
+
+
+def update_pregranted_rawinventor(**kwargs):
+    config = get_current_config(**kwargs)
+    update_rawinventor_for_type(config, database='PGPUBS_DATABASE', uuid_field='id')
+
+
+def precache_inventors(**kwargs):
+    config = get_current_config(**kwargs)
+    precache_inventors_ids(config)
+
+
+def create_canonical_inventors(**kwargs):
+    config = get_current_config(**kwargs)
+    create_inventor(config)
+
+
+def load_granted_lookup(**kwargs):
+    config = get_current_config(**kwargs)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
-                      parent_entity_id='patent_id', entity='inventor', version_indicator=version_indicator,
+                      parent_entity_id='patent_id', entity='inventor',
                       include_location=True, location_strict=False)
+
+
+def load_pregranted_lookup(**kwargs):
+    config = get_current_config(**kwargs)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
-                      parent_entity_id='document_number', entity="inventor", version_indicator=version_indicator,
+                      parent_entity_id='document_number', entity="inventor",
                       include_location=True)
+
+
+def post_process_inventor(**kwargs):
+    update_granted_rawinventor(**kwargs)
+    update_pregranted_rawinventor(**kwargs)
+    precache_inventors(**kwargs)
+    create_canonical_inventors(**kwargs)
+    load_granted_lookup(**kwargs)
+    load_pregranted_lookup(**kwargs)
 
 
 def post_process_qc(**kwargs):
@@ -186,8 +215,8 @@ def post_process_qc(**kwargs):
 if __name__ == '__main__':
     # post_process_inventor(config)
     post_process_inventor(**{
-            "execution_date": datetime.date(2020, 12, 29)
-            })
+        "execution_date": datetime.date(2020, 12, 29)
+    })
     # post_process_qc(**{
     #         "execution_date": datetime.date(2020, 12, 29)
     #         })

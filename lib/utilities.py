@@ -6,6 +6,7 @@ import multiprocessing as mp
 import os
 import random
 import re
+import shutil
 import string
 import zipfile
 from queue import Queue
@@ -312,6 +313,26 @@ def get_host_name(local=True):
     except ConnectionError:
         return net.get_host_ip_address()
 
+
 def chain_operators(chain):
     for upstream, downstream in zip(chain[:-1], chain[1:]):
         downstream.set_upstream(upstream)
+
+
+def archive_folder(source_folder, targets: list):
+    files = os.listdir(source_folder)
+    for target_folder in targets:
+        os.makedirs(target_folder, exist_ok=True)
+        for file_name in files:
+            shutil.move(os.path.join(source_folder, file_name), target_folder)
+
+
+def link_view_to_new_disambiguation_table(connection, table_name, disambiguation_type):
+    g_cursor = connection.cursor()
+    index_query = 'alter table {table_name} add primary key (uuid)'.format(
+        table_name=table_name)
+    replace_view_query = """
+        CREATE OR REPLACE VIEW {dtype}_disambiguation_mapping as SELECT uuid,{dtype}_id from {table_name}
+        """.format(table_name=table_name, dtype=disambiguation_type)
+    g_cursor.execute(index_query)
+    g_cursor.execute(replace_view_query)

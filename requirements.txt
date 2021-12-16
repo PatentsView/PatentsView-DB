@@ -21,3 +21,4 @@ apache-airflow[celery,postgres,hive,jdbc,mysql]==2.2.2
 clint
 pytest
 xlrd
+elasticsearch

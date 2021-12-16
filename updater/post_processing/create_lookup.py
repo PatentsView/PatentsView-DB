@@ -6,7 +6,7 @@ from lib.configuration import get_config, get_connection_string
 
 
 def load_lookup_table(update_config: ConfigParser, database: str, parent_entity: str,
-                      parent_entity_id: str, entity: str, version_indicator: int,
+                      parent_entity_id: str, entity: str,
                       include_location: bool = True, location_strict=False):
     """
     Load Patent Crosswalk tables with disambiguated tables
@@ -18,6 +18,7 @@ def load_lookup_table(update_config: ConfigParser, database: str, parent_entity:
     :param entity: disambiguated entity name (assignee, inventor, location)
     :param include_location: Boolean flag indicating if location id is included in crosswalk
     """
+    version_indicator = update_config['DATES']['END_DATE']
     patent_entity_table = "{parent}_{entity}".format(parent=parent_entity, entity=entity)
     entity_field = "{entity}_id".format(entity=entity)
     rawtable = "raw{entity}".format(entity=entity)
