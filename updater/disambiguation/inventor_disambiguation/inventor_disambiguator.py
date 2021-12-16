@@ -8,35 +8,35 @@ from pv.disambiguation.util.config_util import prepare_config
 
 def build_assignee_features(**kwargs):
     config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/inventor/consolidated_config.ini'],
+                                 supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
     pv.disambiguation.inventor.build_assignee_features_consolidated.generate_assignee_mentions(config)
 
 
 def build_coinventor_features(**kwargs):
     config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/inventor/consolidated_config.ini'],
+                                 supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
     pv.disambiguation.inventor.build_coinventor_features_consolidated.generate_coinventor_mentions(config)
 
 
 def build_title_map(**kwargs):
     config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/inventor/consolidated_config.ini'],
+                                 supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
     pv.disambiguation.inventor.build_title_map_consolidated.generate_title_maps(config)
 
 
 def build_canopies(**kwargs):
     config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/inventor/consolidated_config.ini'],
+                                 supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
     pv.disambiguation.inventor.build_canopies_consolidated.generate_inventor_canopies(config)
 
 
 def run_hierarchical_clustering(**kwargs):
     config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/inventor/consolidated_config.ini'],
+                                 supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
     config = prepare_config(config)
     pv.disambiguation.inventor.run_clustering.run_clustering(config)
@@ -44,14 +44,14 @@ def run_hierarchical_clustering(**kwargs):
 
 def finalize_disambiguation(**kwargs):
     config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/inventor/consolidated_config.ini'],
+                                 supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
     pv.disambiguation.inventor.finalize.finalize(config)
 
 
 def upload_results(**kwargs):
     config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/inventor/consolidated_config.ini'],
+                                 supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
     config = prepare_config(config)
     pv.disambiguation.inventor.upload.upload(config)
@@ -59,7 +59,7 @@ def upload_results(**kwargs):
 
 def archive_results(**kwargs):
     config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/inventor/consolidated_config.ini'],
+                                 supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
     config = prepare_config(config)
     incremental = True if config['DISMBIGUATION']['INCREMENTAL'] == "1" else False
