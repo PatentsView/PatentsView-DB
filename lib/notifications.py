@@ -23,7 +23,8 @@ def send_slack_notification(message, config, section="DB Update", level="info"):
     slack_token = config["SLACK"]["API_TOKEN"]
     slack_client = WebClient(slack_token)
     slack_channel = config["SLACK"]["CHANNEL"]
-    client = WebClient(token=token)
+    client = WebClient(token=slack_token)
+    client = WebClient(token=slack_token)
     try:
         response=slack_client.chat_postMessage(
         channel=slack_channel,
