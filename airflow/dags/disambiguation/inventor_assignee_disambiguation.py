@@ -124,7 +124,7 @@ assignee_build_assignee_features = PythonOperator(task_id='Assignee_Build_Assign
                                                   dag=disambiguation,
                                                   on_success_callback=airflow_task_success,
                                                   on_failure_callback=airflow_task_failure,
-                                                  queue='disambiguator')
+                                                  queue='disambiguator', pool='high_memory_pool')
 
 assignee_run_clustering = PythonOperator(task_id='Assignee_Run_Clustering',
                                          python_callable=run_assignee_hierarchical_clustering,
@@ -132,7 +132,7 @@ assignee_run_clustering = PythonOperator(task_id='Assignee_Run_Clustering',
                                          dag=disambiguation,
                                          on_success_callback=airflow_task_success,
                                          on_failure_callback=airflow_task_failure,
-                                         queue='disambiguator')
+                                         queue='disambiguator', pool='high_memory_pool')
 
 assignee_create_uuid_map = PythonOperator(task_id='Assignee_Create_UUID_Map',
                                           python_callable=create_uuid_map,
@@ -148,7 +148,7 @@ assignee_upload_results = PythonOperator(task_id='Assignee_Upload_Results',
                                          dag=disambiguation,
                                          on_success_callback=airflow_task_success,
                                          on_failure_callback=airflow_task_failure,
-                                         queue='disambiguator')
+                                         queue='disambiguator', pool='database_write_iops_contender')
 
 assignee_archive_results = PythonOperator(task_id='Assignee_Archive_Assignee_Results',
                                           python_callable=archive_assignee_results,

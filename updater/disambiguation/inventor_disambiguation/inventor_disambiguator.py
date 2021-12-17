@@ -46,6 +46,7 @@ def finalize_disambiguation(**kwargs):
     config = get_disambig_config(schedule='quarterly',
                                  supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
+    config = prepare_config(config)
     pv.disambiguation.inventor.finalize.finalize(config)
 
 
