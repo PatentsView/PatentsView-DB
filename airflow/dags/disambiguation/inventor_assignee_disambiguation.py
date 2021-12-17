@@ -314,7 +314,7 @@ location_assign_existing_granted_locations = PythonOperator(task_id='Location_As
                                                             dag=disambiguation,
                                                             on_success_callback=airflow_task_success,
                                                             on_failure_callback=airflow_task_failure,
-                                                            queue='disambiguator')
+                                                            queue='disambiguator', pool='database_write_iops_contender')
 
 location_assign_existing_pregranted_locations = PythonOperator(task_id='Location_Assign_Existing_Preranted_Locations',
                                                                python_callable=update_rawlocation_for_pregranted,
@@ -322,7 +322,8 @@ location_assign_existing_pregranted_locations = PythonOperator(task_id='Location
                                                                dag=disambiguation,
                                                                on_success_callback=airflow_task_success,
                                                                on_failure_callback=airflow_task_failure,
-                                                               queue='disambiguator')
+                                                               queue='disambiguator',
+                                                               pool='database_write_iops_contender')
 
 location_search_granted_geo = PythonOperator(task_id='Location_Search_Granted_Geo',
                                              python_callable=update_latitude_longitude_for_granted,
