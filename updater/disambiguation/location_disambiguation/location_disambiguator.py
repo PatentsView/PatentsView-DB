@@ -7,8 +7,8 @@ from updater.disambiguation.location_disambiguation.geo_search import search_for
 
 def assign_existing_location_ids(config, database_section):
     update_query = """
-           update rawlocation rl join location l on l.city <=> rl.city and l.country <=> rl.country_transformed and
-                                                    l.state <=> rl.state <=> l.state
+           update rawlocation rl join location l on l.city = rl.city and l.country <=> rl.country_transformed and
+                                                    l.state <=> rl.state 
            set rl.location_id=l.id, rl.location_id_transformed=CONCAT(l.latitude,'|', l.longitude)
            where rl.location_id is null and rl.version_indicator between  '{start_dt}' and '{end_date}';
        """.format(start_dt=config['DATES']['START_DATE'], end_date=config['DATES']['END_DATE'])
