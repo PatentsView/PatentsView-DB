@@ -74,7 +74,7 @@ WORKDIR /setup/
 COPY requirements.txt /setup
 COPY updater/disambiguation/hierarchical_clustering_disambiguation/requirements.txt /setup/disambig_requirements.txt
 
-RUN export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -r /setup/requirements.txt && pip install -r /setup/disambig_requirements.txt && pip install git+git://github.com/iesl/grinch.git && pip install git+git://github.com/epfml/sent2vec.git && python -m nltk.downloader stopwords && python -m nltk.downloader punkt && pip install gdown
+RUN export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -r /setup/requirements.txt && pip install -r /setup/disambig_requirements.txt && pip install git+git://github.com/PatentsView/grinch.git && pip install git+git://github.com/epfml/sent2vec.git && python -m nltk.downloader stopwords && python -m nltk.downloader punkt && pip install gdown
 
 USER $NB_USER
 
