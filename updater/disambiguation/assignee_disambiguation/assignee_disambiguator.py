@@ -29,6 +29,14 @@ def create_uuid_map(**kwargs):
     pv.disambiguation.assignee.create_uuid_map.generate_uuid_map(config)
 
 
+def finalize_assignee_clustering(**kwargs):
+    config = get_disambig_config(schedule='quarterly',
+                                 supplemental_configs=['config/consolidated_config.ini'],
+                                 **kwargs)
+    config = prepare_config(config)
+    pv.disambiguation.assignee.finalize.finalize_results(config)
+
+
 def upload_results(**kwargs):
     config = get_disambig_config(schedule='quarterly',
                                  supplemental_configs=['config/consolidated_config.ini'],

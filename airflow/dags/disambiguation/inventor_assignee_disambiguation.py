@@ -10,7 +10,7 @@ from lib.utilities import chain_operators
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.disambiguation.assignee_disambiguation.assignee_disambiguator import build_assignee_name_mentions, \
     run_hierarchical_clustering as run_assignee_hierarchical_clustering, create_uuid_map, \
-    upload_results as upload_assignee_results, archive_results as archive_assignee_results
+    upload_results as upload_assignee_results, archive_results as archive_assignee_results, finalize_assignee_clustering
 from updater.disambiguation.inventor_disambiguation.inventor_disambiguator import build_assignee_features, \
     build_canopies, archive_results as archive_inventor_results, build_coinventor_features, build_title_map, \
     run_hierarchical_clustering as run_inventor_hierarchical_clustering, \
@@ -141,6 +141,13 @@ assignee_create_uuid_map = PythonOperator(task_id='Assignee_Create_UUID_Map',
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure,
                                           queue='disambiguator')
+assignee_finalize_results = PythonOperator(task_id='Assignee_Finalize_Results',
+                                           python_callable=finalize_assignee_clustering,
+                                           provide_context=True,
+                                           dag=disambiguation,
+                                           on_success_callback=airflow_task_success,
+                                           on_failure_callback=airflow_task_failure,
+                                           queue='disambiguator')
 
 assignee_upload_results = PythonOperator(task_id='Assignee_Upload_Results',
                                          python_callable=upload_assignee_results,
@@ -314,7 +321,8 @@ location_assign_existing_granted_locations = PythonOperator(task_id='Location_As
                                                             dag=disambiguation,
                                                             on_success_callback=airflow_task_success,
                                                             on_failure_callback=airflow_task_failure,
-                                                            queue='disambiguator', pool='database_write_iops_contenders')
+                                                            queue='disambiguator',
+                                                            pool='database_write_iops_contenders')
 
 location_assign_existing_pregranted_locations = PythonOperator(task_id='Location_Assign_Existing_Preranted_Locations',
                                                                python_callable=update_rawlocation_for_pregranted,
@@ -373,7 +381,8 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                      'cross_link_1': [inv_build_coinventor_features, assignee_run_clustering],
                      'cross_link_2': [inv_build_titles, assignee_run_clustering],
                      'cross_link_3': [inv_build_assignee_features, assignee_run_clustering],
-                     'assignee_clustering': [assignee_run_clustering, assignee_create_uuid_map, assignee_upload_results,
+                     'assignee_clustering': [assignee_run_clustering, assignee_create_uuid_map,
+                                             assignee_finalize_results, assignee_upload_results,
                                              assignee_archive_results, post_process_update_pregranted_rawassignee,
                                              post_process_update_granted_rawassignee, post_process_precache_assignees,
                                              post_process_create_canonical_assignees
