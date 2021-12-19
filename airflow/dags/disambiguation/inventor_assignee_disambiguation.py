@@ -109,7 +109,7 @@ inv_upload_results = PythonOperator(task_id='Inventor_Upload_Inventor_Results',
                                     dag=disambiguation,
                                     on_success_callback=airflow_task_success,
                                     on_failure_callback=airflow_task_failure,
-                                    queue='disambiguator', pool='database_write_iops_contender')
+                                    queue='disambiguator', pool='database_write_iops_contenders')
 inv_archive_results = PythonOperator(task_id='Inventor_Archive_Inventor_Results',
                                      python_callable=archive_inventor_results,
                                      provide_context=True,
@@ -148,7 +148,7 @@ assignee_upload_results = PythonOperator(task_id='Assignee_Upload_Results',
                                          dag=disambiguation,
                                          on_success_callback=airflow_task_success,
                                          on_failure_callback=airflow_task_failure,
-                                         queue='disambiguator', pool='database_write_iops_contender')
+                                         queue='disambiguator', pool='database_write_iops_contenders')
 
 assignee_archive_results = PythonOperator(task_id='Assignee_Archive_Assignee_Results',
                                           python_callable=archive_assignee_results,
@@ -314,7 +314,7 @@ location_assign_existing_granted_locations = PythonOperator(task_id='Location_As
                                                             dag=disambiguation,
                                                             on_success_callback=airflow_task_success,
                                                             on_failure_callback=airflow_task_failure,
-                                                            queue='disambiguator', pool='database_write_iops_contender')
+                                                            queue='disambiguator', pool='database_write_iops_contenders')
 
 location_assign_existing_pregranted_locations = PythonOperator(task_id='Location_Assign_Existing_Preranted_Locations',
                                                                python_callable=update_rawlocation_for_pregranted,
@@ -323,7 +323,7 @@ location_assign_existing_pregranted_locations = PythonOperator(task_id='Location
                                                                on_success_callback=airflow_task_success,
                                                                on_failure_callback=airflow_task_failure,
                                                                queue='disambiguator',
-                                                               pool='database_write_iops_contender')
+                                                               pool='database_write_iops_contenders')
 
 location_search_granted_geo = PythonOperator(task_id='Location_Search_Granted_Geo',
                                              python_callable=update_latitude_longitude_for_granted,
