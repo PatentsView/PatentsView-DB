@@ -41,15 +41,17 @@ def archive_results(**kwargs):
     config = get_disambig_config(schedule='quarterly',
                                  supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
+    print("Archiving files")
     config = prepare_config(config)
     folder = config['DATES']['END_DATE']
     source_folder = "data/current/assignee"
     targets = ["data/{folder}/assignee/".format(folder=folder)]
     archive_folder(source_folder, targets)
+    print("Mapping tables")
     cnx_g = pv.disambiguation.util.db.connect_to_disambiguation_database(config, dbtype='granted_patent_database')
     link_view_to_new_disambiguation_table(connection=cnx_g, table_name=config['ASSIGNEE_UPLOAD']['target_table'],
                                           disambiguation_type='assignee')
 
 
 if __name__ == '__main__':
-    run_hierarchical_clustering(**{'execution_date': DateTime(year=2021, month=7, day=1)})
+    build_assignee_name_mentions(**{'execution_date': DateTime(year=2021, month=7, day=1)})

@@ -321,10 +321,13 @@ def chain_operators(chain):
 
 def archive_folder(source_folder, targets: list):
     files = os.listdir(source_folder)
-    for target_folder in targets:
+    for target_folder in targets[0:-1]:
         os.makedirs(target_folder, exist_ok=True)
         for file_name in files:
-            shutil.move(os.path.join(source_folder, file_name), target_folder)
+            shutil.copy(os.path.join(source_folder, file_name), target_folder)
+    os.makedirs(targets[-1], exist_ok=True)
+    for file_name in files:
+        shutil.copy(os.path.join(source_folder, file_name), targets[-1])
 
 
 def link_view_to_new_disambiguation_table(connection, table_name, disambiguation_type):

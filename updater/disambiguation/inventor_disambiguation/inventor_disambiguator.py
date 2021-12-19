@@ -62,6 +62,7 @@ def archive_results(**kwargs):
     config = get_disambig_config(schedule='quarterly',
                                  supplemental_configs=['config/consolidated_config.ini'],
                                  **kwargs)
+    print('Archiving files')
     config = prepare_config(config)
     incremental = True if config['DISMBIGUATION']['INCREMENTAL'] == "1" else False
     folders = [config['DATES']['END_DATE']]
@@ -70,10 +71,11 @@ def archive_results(**kwargs):
     source_folder = "data/current/inventor"
     targets = ["data/{folder}/inventor/".format(folder=x) for x in folders]
     archive_folder(source_folder, targets)
+    print('Mapping tables')
     cnx_g = pv.disambiguation.util.db.connect_to_disambiguation_database(config, dbtype='granted_patent_database')
     link_view_to_new_disambiguation_table(connection=cnx_g, table_name=config['INVENTOR_UPLOAD']['target_table'],
                                           disambiguation_type='inventor')
 
 
 if __name__ == '__main__':
-    run_hierarchical_clustering(**{'execution_date': DateTime(year=2021, month=7, day=1)})
+    build_title_map(**{'execution_date': DateTime(year=2021, month=7, day=1)})
