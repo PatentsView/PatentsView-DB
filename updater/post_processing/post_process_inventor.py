@@ -80,7 +80,7 @@ def inventor_reduce(inventor_data):
 
 
 def precache_inventors_ids(config):
-    suffix = datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y-%m-%d").strftime("%Y%m%d")
+    suffix = config['DATES']['END_DATE']
     create_query = """
     CREATE TABLE disambiguated_inventor_ids_{suffix} (inventor_id varchar(256)  PRIMARY KEY (`inventor_id`))
     """.format(suffix=suffix)
@@ -108,7 +108,7 @@ def precache_inventors_ids(config):
 def create_inventor(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     version_indicator = update_config['DATES']['END_DATE']
-    suffix = datetime.datetime.strptime(update_config['DATES']['END_DATE'], "%Y-%m-%d").strftime("%Y%m%d")
+    suffix = update_config['DATES']['END_DATE']
     rename_name = "inventor_{tstamp}".format(tstamp=suffix)
     create_sql = """
         CREATE TABLE {rename_name} 
@@ -177,34 +177,34 @@ def upload_disambig_results(update_config):
 
 
 def update_granted_rawinventor(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     update_rawinventor_for_type(config, database='RAW_DB', uuid_field='uuid')
 
 
 def update_pregranted_rawinventor(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     update_rawinventor_for_type(config, database='PGPUBS_DATABASE', uuid_field='id')
 
 
 def precache_inventors(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     precache_inventors_ids(config)
 
 
 def create_canonical_inventors(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     create_inventor(config)
 
 
 def load_granted_lookup(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
                       parent_entity_id='patent_id', entity='inventor',
                       include_location=True, location_strict=False)
 
 
 def load_pregranted_lookup(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
                       parent_entity_id='document_number', entity="inventor",
                       include_location=True)
@@ -220,7 +220,7 @@ def post_process_inventor(**kwargs):
 
 
 def post_process_qc(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQC(config)
     qc.runTests()
 

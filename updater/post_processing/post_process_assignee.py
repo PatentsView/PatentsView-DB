@@ -89,7 +89,7 @@ def generate_disambiguated_assignees(update_config, engine, limit, offset):
 def create_assignee(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     version_indicator = config['DATES']['END_DATE']
-    suffix = datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y-%m-%d").strftime("%Y%m%d")
+    suffix = config['DATES']['END_DATE']
     target_table = "assignee_{suffix}".format(suffix=suffix)
     create_sql = """
     CREATE TABLE `{target_table}` (
@@ -137,7 +137,7 @@ def create_assignee(update_config):
 
 
 def precache_assignees_ids(config):
-    suffix = datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y-%m-%d").strftime("%Y%m%d")
+    suffix =  config['DATES']['END_DATE']
     create_query = """
         CREATE TABLE disambiguated_assignee_ids_{suffix} (assignee_id varchar(256)  PRIMARY KEY (`assignee_id`))
         """.format(suffix=suffix)
@@ -173,34 +173,34 @@ def assignee_reduce(assignee_data):
 
 
 def update_granted_rawassignee(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly',**kwargs)
     update_rawassignee_for_type(config, database='RAW_DB', uuid_field='uuid')
 
 
 def update_pregranted_rawassignee(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly',**kwargs)
     update_rawassignee_for_type(config, database='PGPUBS_DATABASE', uuid_field='id')
 
 
 def precache_assignees(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly',**kwargs)
     precache_assignees_ids(config)
 
 
 def create_canonical_assignees(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly',**kwargs)
     create_assignee(config)
 
 
 def load_granted_lookup(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly',**kwargs)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
                       parent_entity_id='patent_id', entity='assignee',
                       include_location=True, location_strict=False)
 
 
 def load_pregranted_lookup(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly',**kwargs)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
                       parent_entity_id='document_number', entity="assignee",
                       include_location=True)
@@ -216,13 +216,13 @@ def post_process_assignee(**kwargs):
 
 
 def post_process_qc(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule='quarterly',**kwargs)
     qc = AssigneePostProcessingQC(config)
     qc.runTests()
 
 
 if __name__ == '__main__':
-    config = get_current_config(**{
+    config = get_current_config(schedule='quarterly',**{
         "execution_date": datetime.date(2020, 12, 29)
     })
     # post_process_assignee(config)
