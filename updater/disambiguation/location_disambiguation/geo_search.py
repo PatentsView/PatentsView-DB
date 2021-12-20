@@ -1,5 +1,3 @@
-import datetime
-
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -53,8 +51,8 @@ OFFSET
     rawlocation_query = rawlocation_query_template.format(limit=limit,
                                                           offset=offset)
     with c.connect() as rawlocation_cursor:
-        rawlocation_cursor.execute(rawlocation_query)
-        for record in rawlocation_cursor:
+        rawlocation_records = rawlocation_cursor.execute(rawlocation_query)
+        for record in rawlocation_records:
             yield record
 
 
