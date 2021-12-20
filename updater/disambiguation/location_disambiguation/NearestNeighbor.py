@@ -169,11 +169,14 @@ def find_nearest_neighbor_for_source(config, source):
     bt = build_search_tree(augmented_authority)
     augmented_search_dataset = get_search_dataset(cstr, start_date=config['DATES']["START_DATE"],
                                                   end_date=config['DATES']['END_DATE'])
-    output = "{workdir}/disambiguation/{src}_nearest_neighbor.csv".format(src=source,
-                                                                          workdir=config['FOLDERS']["WORKING_FOLDER"])
-    os.makedirs(output, exist_ok=True)
-    queue_searchers(augmented_search_dataset, augmented_authority, bt, output)
-    load_nearest_neighbor(config, source, output, cstr)
+    if augmented_search_dataset.shape[0] > 0:
+        output = "{workdir}/disambiguation/{src}_nearest_neighbor.csv".format(src=source,
+                                                                              workdir=config['FOLDERS'][
+                                                                                  "WORKING_FOLDER"])
+
+        os.makedirs(output, exist_ok=True)
+        queue_searchers(augmented_search_dataset, augmented_authority, bt, output)
+        load_nearest_neighbor(config, source, output, cstr)
 
 
 if __name__ == '__main__':
