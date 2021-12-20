@@ -40,7 +40,7 @@ FROM
 WHERE 
 (  rl.city IS NOT NULL 
   OR sc.`State/Possession` IS NOT NULL 
-  OR rl.country_transformed IS NOT NULL ) and location_id_transformed is null and version_indicator between '{start_dt}' and '{end_dt}'
+  OR rl.country_transformed IS NOT NULL ) and location_id_transformed is null and rl.version_indicator between '{start_dt}' and '{end_dt}'
 ORDER BY 
   id
 LIMIT 
