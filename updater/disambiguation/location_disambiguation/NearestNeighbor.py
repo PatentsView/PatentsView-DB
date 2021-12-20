@@ -151,10 +151,10 @@ def load_nearest_neighbor(config, src, output, cstr):
     nn_df.to_sql(name=target_table, con=engine, index=False)
     index_query = """
     ALTER TABLE {target_table} add index (id)
-    """.format(target_table= target_table)
+    """.format(target_table=target_table)
     update_query = """
     UPDATE rawlocation rl join {target_table}  tt on tt.id = rl.id set rl.location_id = tt.location_id
-    """.format(target_table= target_table)
+    """.format(target_table=target_table)
     engine.execute(index_query)
     engine.execute(update_query)
 
@@ -163,7 +163,8 @@ def find_nearest_neighbor_for_source(config, source):
     cstr = get_connection_string(config, source)
     augmented_authority = get_authority_dataset(cstr)
     bt = build_search_tree(augmented_authority)
-    augmented_search_dataset = get_search_dataset(cstr)
+    augmented_search_dataset = get_search_dataset(cstr, start_date=config['DATES']["START_DATE"],
+                                                  end_date=config['DATES']['END_DATE'])
     output = "{workdir}/disambiguation/{src}_nearest_neighbor.csv".format(src=source,
                                                                           workdir=config['FOLDERS']["WORKING_FOLDER"])
     os.makedirs(output, exist_ok=True)
