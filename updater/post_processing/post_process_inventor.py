@@ -3,8 +3,7 @@ import datetime
 import time
 
 import pandas as pd
-from sqlalchemy import create_engine, exc
-from sqlalchemy.engine import ResultProxy
+from sqlalchemy import create_engine
 
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
 from lib.configuration import get_connection_string, get_current_config
@@ -109,25 +108,28 @@ def precache_inventors_ids(config):
 def create_inventor(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     version_indicator = update_config['DATES']['END_DATE']
-    rename_name = "inventor_{tstamp}".format(tstamp=version_indicator)
-    rename_sql = """
-    RENAME TABLE inventor TO {target}
-    """.format(target=rename_name)
+    suffix = datetime.datetime.strptime(update_config['DATES']['END_DATE'], "%Y-%m-%d").strftime("%Y%m%d")
+    rename_name = "inventor_{tstamp}".format(tstamp=suffix)
     create_sql = """
-    CREATE TABLE inventor like {target}
-    """.format(target=rename_name)
-    try:
-        engine.execute(rename_sql)
-    except exc.SQLAlchemyError as e:
-        count_sql = "select count(1) from rename_name"
-        x: ResultProxy = engine.execute(count_sql)
-    try:
-        engine.execute(create_sql)
-    except exc.SQLAlchemyError as e:
-        count_sql = "select count(1) from inventor"
-        x: ResultProxy = engine.execute(count_sql)
-        if x.fetchall()[0][0] > 0:
-            raise
+        CREATE TABLE {rename_name} 
+            `id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+            `name_first` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            `name_last` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            `male_flag` int(11) DEFAULT NULL,
+            `attribution_status` int(11) DEFAULT NULL,
+            `version_indicator` date NOT NULL DEFAULT '2020-09-29',
+            `created_date` timestamp NOT NULL DEFAULT current_timestamp(),
+            `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+            PRIMARY KEY (`id`),
+            KEY `inventor_version_indicator_index` (`version_indicator`),
+            KEY `inventor_name_last_name_first_index` (`name_last`(256),`name_first`(256))
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    """.format(rename_name=rename_name)
+    view_sql = """
+    CREATE OR REPLACE VIEW inventor as select * from inventor_{suffix}
+    """.format(suffix=suffix)
+    engine.execute(create_sql)
+    engine.execute(view_sql)
     limit = 10000
     offset = 0
     while True:
@@ -140,7 +142,7 @@ def create_inventor(update_config):
             "inventor_id": "id"
         }, axis=1)
         canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
-        canonical_assignments.to_sql(name='inventor', con=engine,
+        canonical_assignments.to_sql(name=rename_name, con=engine,
                                      if_exists='append',
                                      index=False)
         current_iteration_duration = time.time() - start

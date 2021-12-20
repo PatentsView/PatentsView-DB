@@ -88,7 +88,28 @@ def generate_disambiguated_assignees(update_config, engine, limit, offset):
 
 def create_assignee(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
-    version_indicator = update_config['DATES']['END_DATE']
+    version_indicator = config['DATES']['END_DATE']
+    suffix = datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y-%m-%d").strftime("%Y%m%d")
+    target_table = "assignee_{suffix}".format(suffix=suffix)
+    create_sql = """
+    CREATE TABLE `{target_table}` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` int(4) DEFAULT NULL,
+  `name_first` varchar(96) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_last` varchar(96) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `organization` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `version_indicator` date NOT NULL DEFAULT '{version_indicator}',
+  `created_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `assignee_version_indicator_index` (`version_indicator`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    """.format(version_indicator=version_indicator, target_table=target_table)
+    view_query = """
+    CREATE OR REPLACE VIEW assignee as select * from {target_table}
+    """.format(target_table=target_table)
+    engine.execute(create_sql)
+    engine.execute(view_query)
     limit = 10000
     offset = 0
     while True:
@@ -108,7 +129,7 @@ def create_assignee(update_config):
             "assignee_id": "id"
         }, axis=1)
         canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
-        canonical_assignments.to_sql(name='assignee', con=engine,
+        canonical_assignments.to_sql(name=target_table, con=engine,
                                      if_exists='append',
                                      index=False)
         current_iteration_duration = time.time() - start
@@ -131,7 +152,7 @@ def precache_assignees_ids(config):
         SELECT assignee_id
         from {pregrant_db}.rawassignee;
     """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
-               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'], suffix= suffix)
+               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'], suffix=suffix)
     engine = create_engine(get_connection_string(config, "RAW_DB"))
     print(create_query)
     engine.execute(create_query)
@@ -139,7 +160,6 @@ def precache_assignees_ids(config):
     engine.execute(assignee_cache_query)
     print(view_query)
     engine.execute(view_query)
-
 
 
 def assignee_reduce(assignee_data):
