@@ -69,9 +69,9 @@ def get_total_records(c):
       OR state IS NOT NULL 
       OR country_transformed IS NOT NULL) and location_id_transformed is null
     """
-    with c.connect() as count_cursor:
+    with c.cursor() as count_cursor:
         count_cursor.execute(count_statement)
-    total_rows = count_cursor.fetchall()[0][0]
+        total_rows = count_cursor.fetchall()[0][0]
     return total_rows
 
 
