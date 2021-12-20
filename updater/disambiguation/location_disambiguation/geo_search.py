@@ -26,7 +26,7 @@ def generate_search_json(row):
     return None
 
 
-def generate_next_record_set(c, limit, offset):
+def generate_next_record_set(c, limit, offset, start_dt, end_dt):
     rawlocation_query_template = """
 SELECT 
   rl.id, 
@@ -40,14 +40,14 @@ FROM
 WHERE 
 (  rl.city IS NOT NULL 
   OR sc.`State/Possession` IS NOT NULL 
-  OR rl.country_transformed IS NOT NULL ) and location_id_transformed is null
+  OR rl.country_transformed IS NOT NULL ) and location_id_transformed is null and version_indicator between '{start_dt}' and '{end_dt}'
 ORDER BY 
   id
 LIMIT 
   {limit}
 OFFSET
   {offset}
-"""
+""".format(start_dt=start_dt, end_dt=end_dt)
     rawlocation_query = rawlocation_query_template.format(limit=limit,
                                                           offset=offset)
     with c.connect() as rawlocation_cursor:
@@ -56,7 +56,7 @@ OFFSET
             yield record
 
 
-def get_total_records(c):
+def get_total_records(c, start_dt, end_dt):
     count_statement = """
     SELECT 
       count(1) 
@@ -65,8 +65,8 @@ def get_total_records(c):
     WHERE 
     (  city IS NOT NULL 
       OR state IS NOT NULL 
-      OR country_transformed IS NOT NULL) and location_id_transformed is null
-    """
+      OR country_transformed IS NOT NULL) and location_id_transformed is null and version_indicator between '{start_dt}' and '{end_dt}'
+    """.format(start_dt=start_dt, end_dt=end_dt)
     result = c.execute(count_statement)
     total_rows = result.fetchall()[0][0]
     return total_rows
@@ -84,7 +84,7 @@ def search_for_lat_lon(config, source):
     connection = get_db_connection(config, source)
     limit = 10000
     offset = 0
-    total_rows = get_total_records(connection)
+    total_rows = get_total_records(connection, config['DATES']['START_DATE'], config['DATES']['END_DATE'])
     suffix = config['DATES']['END_DATE']
     target_table = 'rawlocation_lat_lon_{suffix}'.format(suffix=suffix)
     view_sql = """
@@ -97,7 +97,8 @@ def search_for_lat_lon(config, source):
         geo_records = []
         #     try:
         search_bodies = []
-        for db_record in generate_next_record_set(connection, limit, offset):
+        for db_record in generate_next_record_set(connection, limit, offset, config['DATES']['START_DATE'],
+                                                  config['DATES']['END_DATE']):
             if not all([x is None or len(x) < 1 for x in db_record[1:]]):
                 ids.append(db_record[0])
                 search_body = generate_search_json(db_record)
