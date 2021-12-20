@@ -116,18 +116,30 @@ def create_assignee(update_config):
 
 
 def precache_assignees_ids(config):
+    suffix = datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y-%m-%d").strftime("%Y%m%d")
+    create_query = """
+        CREATE TABLE disambiguated_assignee_ids_{suffix} (assignee_id varchar(256)  PRIMARY KEY (`assignee_id`))
+        """.format(suffix=suffix)
+    view_query = """
+        CREATE OR REPLACE VIEW disambiguated_assignee_ids as select assignee_id from disambiguated_assignee_ids_{suffix}
+        """.format(suffix=suffix)
     assignee_cache_query = """
-        INSERT IGNORE INTO disambiguated_assignee_ids (assignee_id)
+        INSERT IGNORE INTO disambiguated_assignee_ids_{suffix} (assignee_id)
         SELECT assignee_id
         from {granted_db}.rawassignee
         UNION
         SELECT assignee_id
         from {pregrant_db}.rawassignee;
     """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
-               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'], suffix= suffix)
     engine = create_engine(get_connection_string(config, "RAW_DB"))
+    print(create_query)
+    engine.execute(create_query)
     print(assignee_cache_query)
     engine.execute(assignee_cache_query)
+    print(view_query)
+    engine.execute(view_query)
+
 
 
 def assignee_reduce(assignee_data):

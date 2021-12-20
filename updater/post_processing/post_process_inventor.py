@@ -81,18 +81,29 @@ def inventor_reduce(inventor_data):
 
 
 def precache_inventors_ids(config):
+    suffix = datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y-%m-%d").strftime("%Y%m%d")
+    create_query = """
+    CREATE TABLE disambiguated_inventor_ids_{suffix} (inventor_id varchar(256)  PRIMARY KEY (`inventor_id`))
+    """.format(suffix=suffix)
+    view_query = """
+    CREATE OR REPLACE VIEW disambiguated_inventor_ids as select inventor_id from disambiguated_inventor_ids_{suffix}
+    """.format(suffix=suffix)
     inventor_cache_query = """
-        INSERT IGNORE INTO disambiguated_inventor_ids (inventor_id)
+        INSERT IGNORE INTO disambiguated_inventor_ids_{suffix} (inventor_id)
         SELECT inventor_id
         from {granted_db}.rawinventor
         UNION
         SELECT inventor_id
         from {pregrant_db}.rawinventor;
     """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
-               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'], suffix=suffix)
     engine = create_engine(get_connection_string(config, "RAW_DB"))
+    print(create_query)
+    engine.execute(create_query)
     print(inventor_cache_query)
     engine.execute(inventor_cache_query)
+    print(view_query)
+    engine.execute(view_query)
 
 
 def create_inventor(update_config):
