@@ -117,17 +117,23 @@ FROM   `government_interest` gi
          ON pca.patent_id = gi.patent_id
        LEFT JOIN `patent_govintorg` pg
          ON pg.patent_id = gi.patent_id
-       LEFT JOIN government_organization go
+       LEFT JOIN {raw_db}.government_organization go
          ON go.`organization_id` = pg.organization_id
-{where_clause}
-ORDER BY RAND()
-LIMIT  100;        
+           inner join 
+           		(select id 
+           		from patent p
+           		       Join `government_interest` gi on p.id=gi.patent_id
+           			   LEFT JOIN `patent_govintorg` pg ON pg.patent_id = p.id
+           		       LEFT JOIN {raw_db}.`government_organization` go ON go.`organization_id` = pg.organization_id
+           		{where_clause}
+           		order by rand() 
+           		limit 5) as rand_5_samples ON p.id=rand_5_samples.id;       
         """
 
         for date_clause, where_combination_type in where_combinations:
 
             where_clause = "AND ".join([date_clause, organization_wheres[where_combination_type]])
-            sampler_query = sampler_template.format(where_clause=where_clause)
+            sampler_query = sampler_template.format(where_clause=where_clause, raw_db=self.config['PATENTSVIEW_DATABASES']['RAW_DB'])
             with self.connection.cursor() as gov_int_cursor:
                 gov_int_cursor.execute(sampler_query)
                 for gov_int_row in gov_int_cursor:
@@ -170,3 +176,4 @@ if __name__ == '__main__':
             "END_DATE":   '20201229'
             }
     begin_gi_test(config)
+
