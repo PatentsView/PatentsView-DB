@@ -138,6 +138,7 @@ def get_authority_dataset(cstr):
                 0: 'lat',
                 1: 'long'
             }, axis=1))
+    print(augmented_authority.head())
     augmented_authority = augmented_authority.assign(lattitude=augmented_authority.lat.astype(np.float64))
     augmented_authority = augmented_authority.assign(longitude=augmented_authority.long.astype(np.float64))
     return augmented_authority
@@ -161,7 +162,8 @@ def load_nearest_neighbor(config, src, output, cstr):
 
 def find_nearest_neighbor_for_source(config, source):
     cstr = get_connection_string(config, source)
-    augmented_authority = get_authority_dataset(cstr)
+    cstr_granted = get_connection_string(config, 'RAW_DB')
+    augmented_authority = get_authority_dataset(cstr_granted)
     bt = build_search_tree(augmented_authority)
     augmented_search_dataset = get_search_dataset(cstr, start_date=config['DATES']["START_DATE"],
                                                   end_date=config['DATES']['END_DATE'])
