@@ -141,7 +141,7 @@ def assignee_reduce(assignee_data):
 
 def update_granted_rawassignee(**kwargs):
     config = get_current_config(**kwargs)
-    update_rawassignee_for_type(config, database='RAW_DB', uuid_field='id')
+    update_rawassignee_for_type(config, database='RAW_DB', uuid_field='uuid')
 
 
 def update_pregranted_rawassignee(**kwargs):

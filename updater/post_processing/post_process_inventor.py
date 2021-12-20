@@ -165,7 +165,7 @@ def upload_disambig_results(update_config):
 
 def update_granted_rawinventor(**kwargs):
     config = get_current_config(**kwargs)
-    update_rawinventor_for_type(config, database='RAW_DB', uuid_field='id')
+    update_rawinventor_for_type(config, database='RAW_DB', uuid_field='uuid')
 
 
 def update_pregranted_rawinventor(**kwargs):
