@@ -86,8 +86,9 @@ def generate_disambiguated_assignees(update_config, engine, limit, offset):
     return current_assignee_data
 
 
-def create_assignee(update_config, version_indicator):
+def create_assignee(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
+    version_indicator = update_config['DATES']['END_DATE']
     limit = 10000
     offset = 0
     while True:
