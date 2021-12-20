@@ -18,7 +18,8 @@ from updater.disambiguation.inventor_disambiguation.inventor_disambiguator impor
 from updater.disambiguation.location_disambiguation.location_disambiguator import *
 from updater.post_processing.post_process_assignee import post_process_qc as qc_post_process_assignee, \
     update_granted_rawassignee, update_pregranted_rawassignee, \
-    precache_assignees, create_canonical_assignees
+    precache_assignees, create_canonical_assignees, load_granted_lookup as load_granted_assignee_lookup, \
+    load_pregranted_lookup as load_pregranted_assignee_lookup
 from updater.post_processing.post_process_inventor import update_granted_rawinventor, update_pregranted_rawinventor, \
     precache_inventors, create_canonical_inventors, load_granted_lookup, load_pregranted_lookup, \
     post_process_qc as qc_inventor_post_processing
@@ -236,13 +237,13 @@ post_process_create_canonical_assignees = PythonOperator(task_id='assignee_creat
                                                          on_failure_callback=airflow_task_failure,
                                                          queue='disambiguator')
 post_process_load_assignee_granted_lookup = PythonOperator(task_id='assignee_load_granted_lookup',
-                                                           python_callable=load_granted_lookup,
+                                                           python_callable=load_granted_assignee_lookup,
                                                            dag=disambiguation,
                                                            on_success_callback=airflow_task_success,
                                                            on_failure_callback=airflow_task_failure,
                                                            queue='disambiguator')
 post_process_load_assignee_pregranted_lookup = PythonOperator(task_id='assignee_load_pregranted_lookup',
-                                                              python_callable=load_pregranted_lookup,
+                                                              python_callable=load_pregranted_assignee_lookup,
                                                               dag=disambiguation,
                                                               on_success_callback=airflow_task_success,
                                                               on_failure_callback=airflow_task_failure,
