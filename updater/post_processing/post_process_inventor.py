@@ -111,7 +111,7 @@ def create_inventor(update_config):
     suffix = update_config['DATES']['END_DATE']
     rename_name = "inventor_{tstamp}".format(tstamp=suffix)
     create_sql = """
-        CREATE TABLE {rename_name} 
+        CREATE TABLE {rename_name} (
             `id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
             `name_first` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
             `name_last` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,

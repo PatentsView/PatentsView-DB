@@ -93,7 +93,7 @@ def create_assignee(update_config):
     target_table = "assignee_{suffix}".format(suffix=suffix)
     create_sql = """
     CREATE TABLE `{target_table}` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` int(4) DEFAULT NULL,
   `name_first` varchar(96) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name_last` varchar(96) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
