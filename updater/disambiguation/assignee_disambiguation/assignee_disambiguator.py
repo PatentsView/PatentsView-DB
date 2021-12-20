@@ -59,6 +59,9 @@ def archive_results(**kwargs):
     cnx_g = pv.disambiguation.util.db.connect_to_disambiguation_database(config, dbtype='granted_patent_database')
     link_view_to_new_disambiguation_table(connection=cnx_g, table_name=config['ASSIGNEE_UPLOAD']['target_table'],
                                           disambiguation_type='assignee')
+    cnx_pg = pv.disambiguation.util.db.connect_to_disambiguation_database(config, dbtype='pregrant_database')
+    link_view_to_new_disambiguation_table(connection=cnx_pg, table_name=config['ASSIGNEE_UPLOAD']['target_table'],
+                                          disambiguation_type='assignee')
 
 
 if __name__ == '__main__':

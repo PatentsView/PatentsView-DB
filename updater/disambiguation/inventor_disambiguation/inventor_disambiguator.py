@@ -67,12 +67,15 @@ def archive_results(**kwargs):
     incremental = True if config['DISAMBIGUATION']['INCREMENTAL'] == "1" else False
     folders = [config['DATES']['END_DATE']]
     if incremental:
-        folders.append("full_disambiguation")
+            folders.append("full_disambiguation")
     source_folder = "data/current/inventor"
     targets = ["data/{folder}/inventor/".format(folder=x) for x in folders]
     archive_folder(source_folder, targets)
     print('Mapping tables')
     cnx_g = pv.disambiguation.util.db.connect_to_disambiguation_database(config, dbtype='granted_patent_database')
+    link_view_to_new_disambiguation_table(connection=cnx_g, table_name=config['INVENTOR_UPLOAD']['target_table'],
+                                          disambiguation_type='inventor')
+    cnx_g = pv.disambiguation.util.db.connect_to_disambiguation_database(config, dbtype='pregrant_database')
     link_view_to_new_disambiguation_table(connection=cnx_g, table_name=config['INVENTOR_UPLOAD']['target_table'],
                                           disambiguation_type='inventor')
 
