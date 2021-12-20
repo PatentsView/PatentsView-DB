@@ -112,6 +112,7 @@ def search_for_lat_lon(config, source):
                 if search_body is not None:
                     search_bodies.append({"index": "locations"})
                     search_bodies.append(search_body)
+        offset = offset + limit
         if len(search_bodies) < 1:
             continue
         search_hits = es.msearch(search_bodies)
@@ -130,7 +131,6 @@ def search_for_lat_lon(config, source):
         #     tries = 0
         geo_frame.to_sql(name=target_table, con=connection,
                          index=False, if_exists='append')
-        offset = offset + limit
     connection.execute(view_sql)
     update_lat_lon(connection, target_table)
 
