@@ -171,90 +171,95 @@ post_process_update_granted_rawinventor = PythonOperator(task_id='Inventor_updat
                                                          dag=disambiguation,
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
-                                                         queue='disambiguator')
+
+                                                         queue='data_collector')
 
 post_process_update_pregranted_rawinventor = PythonOperator(task_id='Inventor_update_pregranted_rawinventor',
                                                             python_callable=update_pregranted_rawinventor,
                                                             dag=disambiguation,
                                                             on_success_callback=airflow_task_success,
                                                             on_failure_callback=airflow_task_failure,
-                                                            queue='disambiguator')
+                                                            queue='data_collector',
+                                                            pool='database_write_iops_contenders')
 post_process_precache_inventors = PythonOperator(task_id='Inventor_precache_inventors',
                                                  python_callable=precache_inventors,
                                                  dag=disambiguation,
                                                  on_success_callback=airflow_task_success,
                                                  on_failure_callback=airflow_task_failure,
-                                                 queue='disambiguator')
+                                                 queue='data_collector', pool='database_write_iops_contenders')
 post_process_create_canonical_inventors = PythonOperator(task_id='Inventor_create_canonical_inventors',
                                                          python_callable=create_canonical_inventors,
                                                          dag=disambiguation,
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
-                                                         queue='disambiguator')
+                                                         queue='data_collector', pool='database_write_iops_contenders')
 post_process_load_granted_lookup = PythonOperator(task_id='Inventor_load_granted_lookup',
                                                   python_callable=load_granted_lookup,
                                                   dag=disambiguation,
                                                   on_success_callback=airflow_task_success,
                                                   on_failure_callback=airflow_task_failure,
-                                                  queue='disambiguator')
+                                                  queue='data_collector', pool='database_write_iops_contenders')
 post_process_load_pregranted_lookup = PythonOperator(task_id='Inventor_load_pregranted_lookup',
                                                      python_callable=load_pregranted_lookup,
                                                      dag=disambiguation,
                                                      on_success_callback=airflow_task_success,
                                                      on_failure_callback=airflow_task_failure,
-                                                     queue='disambiguator')
+                                                     queue='data_collector', pool='database_write_iops_contenders')
 
 qc_post_process_inventor_operator = PythonOperator(task_id='qc_post_process_inventor',
                                                    python_callable=qc_inventor_post_processing,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
-                                                   queue='disambiguator')
+                                                   queue='data_collector')
 
 post_process_update_granted_rawassignee = PythonOperator(task_id='assignee_update_granted_rawassignee',
                                                          python_callable=update_granted_rawassignee,
                                                          dag=disambiguation,
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
-                                                         queue='disambiguator')
+                                                         queue='data_collector', pool='database_write_iops_contenders')
 
 post_process_update_pregranted_rawassignee = PythonOperator(task_id='assignee_update_pregranted_rawassignee',
                                                             python_callable=update_pregranted_rawassignee,
                                                             dag=disambiguation,
                                                             on_success_callback=airflow_task_success,
                                                             on_failure_callback=airflow_task_failure,
-                                                            queue='disambiguator')
+                                                            queue='data_collector',
+                                                            pool='database_write_iops_contenders')
 post_process_precache_assignees = PythonOperator(task_id='assignee_precache_assignees',
                                                  python_callable=precache_assignees,
                                                  dag=disambiguation,
                                                  on_success_callback=airflow_task_success,
                                                  on_failure_callback=airflow_task_failure,
-                                                 queue='disambiguator')
+                                                 queue='data_collector', pool='database_write_iops_contenders')
 post_process_create_canonical_assignees = PythonOperator(task_id='assignee_create_canonical_assignees',
                                                          python_callable=create_canonical_assignees,
                                                          dag=disambiguation,
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
-                                                         queue='disambiguator')
+                                                         queue='data_collector', pool='database_write_iops_contenders')
 post_process_load_assignee_granted_lookup = PythonOperator(task_id='assignee_load_granted_lookup',
                                                            python_callable=load_granted_assignee_lookup,
                                                            dag=disambiguation,
                                                            on_success_callback=airflow_task_success,
                                                            on_failure_callback=airflow_task_failure,
-                                                           queue='disambiguator')
+                                                           queue='data_collector',
+                                                           pool='database_write_iops_contenders')
 post_process_load_assignee_pregranted_lookup = PythonOperator(task_id='assignee_load_pregranted_lookup',
                                                               python_callable=load_pregranted_assignee_lookup,
                                                               dag=disambiguation,
                                                               on_success_callback=airflow_task_success,
                                                               on_failure_callback=airflow_task_failure,
-                                                              queue='disambiguator')
+                                                              queue='data_collector',
+                                                              pool='database_write_iops_contenders')
 
 qc_post_process_assignee_operator = PythonOperator(task_id='qc_post_process_assignee',
                                                    python_callable=qc_post_process_assignee,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
-                                                   queue='disambiguator')
+                                                   queue='data_collector')
 
 update_granted_persistent_long_assignee = PythonOperator(
     task_id='update_granted_persistent_long_assignee',
@@ -263,7 +268,7 @@ update_granted_persistent_long_assignee = PythonOperator(
         'entity': 'assignee',
         'database_type': 'granted_patent'
     },
-    dag=disambiguation
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 )
 
 create_granted_persistent_wide_assignee = PythonOperator(
@@ -273,7 +278,7 @@ create_granted_persistent_wide_assignee = PythonOperator(
         'entity': 'assignee',
         'database_type': 'granted_patent'
     },
-    dag=disambiguation
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 )
 
 prepare_granted_persistent_wide_assignee = PythonOperator(
@@ -283,7 +288,7 @@ prepare_granted_persistent_wide_assignee = PythonOperator(
         'entity': 'assignee',
         'database_type': 'granted_patent'
     },
-    dag=disambiguation
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 )
 
 update_pregrant_persistent_long_assignee = PythonOperator(
@@ -293,7 +298,7 @@ update_pregrant_persistent_long_assignee = PythonOperator(
         'entity': 'assignee',
         'database_type': 'pgpubs'
     },
-    dag=disambiguation
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 )
 
 create_pregrant_persistent_wide_assignee = PythonOperator(
@@ -303,7 +308,7 @@ create_pregrant_persistent_wide_assignee = PythonOperator(
         'entity': 'assignee',
         'database_type': 'pgpubs'
     },
-    dag=disambiguation
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 )
 
 prepare_pregrant_persistent_wide_assignee = PythonOperator(
@@ -313,7 +318,7 @@ prepare_pregrant_persistent_wide_assignee = PythonOperator(
         'entity': 'assignee',
         'database_type': 'pgpubs'
     },
-    dag=disambiguation
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 )
 
 location_assign_existing_granted_locations = PythonOperator(task_id='Location_Assign_Existing_Granted_Locations',
@@ -322,7 +327,7 @@ location_assign_existing_granted_locations = PythonOperator(task_id='Location_As
                                                             dag=disambiguation,
                                                             on_success_callback=airflow_task_success,
                                                             on_failure_callback=airflow_task_failure,
-                                                            queue='disambiguator',
+                                                            queue='data_collector',
                                                             pool='database_write_iops_contenders')
 
 location_assign_existing_pregranted_locations = PythonOperator(task_id='Location_Assign_Existing_Preranted_Locations',
@@ -331,7 +336,7 @@ location_assign_existing_pregranted_locations = PythonOperator(task_id='Location
                                                                dag=disambiguation,
                                                                on_success_callback=airflow_task_success,
                                                                on_failure_callback=airflow_task_failure,
-                                                               queue='disambiguator',
+                                                               queue='data_collector',
                                                                pool='database_write_iops_contenders')
 
 location_search_granted_geo = PythonOperator(task_id='Location_Search_Granted_Geo',
@@ -340,7 +345,7 @@ location_search_granted_geo = PythonOperator(task_id='Location_Search_Granted_Ge
                                              dag=disambiguation,
                                              on_success_callback=airflow_task_success,
                                              on_failure_callback=airflow_task_failure,
-                                             queue='disambiguator')
+                                             queue='data_collector', pool='database_write_iops_contenders')
 
 location_search_pregranted_geo = PythonOperator(task_id='Location_Search_Pregranted_Geo',
                                                 python_callable=update_latitude_longitude_for_pregranted,
@@ -348,7 +353,7 @@ location_search_pregranted_geo = PythonOperator(task_id='Location_Search_Pregran
                                                 dag=disambiguation,
                                                 on_success_callback=airflow_task_success,
                                                 on_failure_callback=airflow_task_failure,
-                                                queue='disambiguator')
+                                                queue='data_collector', pool='database_write_iops_contenders')
 location_granted_nearest_neighbor = PythonOperator(task_id='Location_Granted_NN',
                                                    python_callable=find_nearest_neighbor_for_granted,
                                                    provide_context=True,
