@@ -64,7 +64,7 @@ def archive_results(**kwargs):
                                  **kwargs)
     print('Archiving files')
     config = prepare_config(config)
-    incremental = True if config['DISMBIGUATION']['INCREMENTAL'] == "1" else False
+    incremental = True if config['DISAMBIGUATION']['INCREMENTAL'] == "1" else False
     folders = [config['DATES']['END_DATE']]
     if incremental:
         folders.append("full_disambiguation")
@@ -78,4 +78,10 @@ def archive_results(**kwargs):
 
 
 if __name__ == '__main__':
-    build_title_map(**{'execution_date': DateTime(year=2021, month=7, day=1)})
+    config = get_disambig_config(schedule='quarterly',
+                                 supplemental_configs=['config/consolidated_config.ini'],
+                                 **{'execution_date': DateTime(year=2021, month=7, day=1)})
+    config = prepare_config(config)
+    import pprint
+    pprint.pprint({section: dict(config[section]) for section in config.sections()})
+#    build_title_map(**{'execution_date': DateTime(year=2021, month=7, day=1)})
