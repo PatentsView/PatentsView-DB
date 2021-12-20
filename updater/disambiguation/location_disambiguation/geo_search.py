@@ -137,7 +137,7 @@ def search_for_lat_lon(config, source):
 
 def update_lat_lon(engine, source_table):
     index_query = """
-    ALTER TABLE {source_table} add primary key(id(256))
+    ALTER TABLE {source_table} add primary key(id)
     """.format(source_table=source_table)
     engine.execute(index_query)
     update_query = """
