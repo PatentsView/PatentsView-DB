@@ -139,7 +139,7 @@ def create_assignee(update_config):
 def precache_assignees_ids(config):
     suffix =  config['DATES']['END_DATE']
     create_query = """
-        CREATE TABLE disambiguated_assignee_ids_{suffix} (assignee_id varchar(256)  PRIMARY KEY (`assignee_id`))
+        CREATE TABLE disambiguated_assignee_ids_{suffix} (assignee_id varchar(256),  PRIMARY KEY (`assignee_id`))
         """.format(suffix=suffix)
     view_query = """
         CREATE OR REPLACE VIEW disambiguated_assignee_ids as select assignee_id from disambiguated_assignee_ids_{suffix}

@@ -82,7 +82,7 @@ def inventor_reduce(inventor_data):
 def precache_inventors_ids(config):
     suffix = config['DATES']['END_DATE']
     create_query = """
-    CREATE TABLE disambiguated_inventor_ids_{suffix} (inventor_id varchar(256)  PRIMARY KEY (`inventor_id`))
+    CREATE TABLE disambiguated_inventor_ids_{suffix} (inventor_id varchar(256),  PRIMARY KEY (`inventor_id`))
     """.format(suffix=suffix)
     view_query = """
     CREATE OR REPLACE VIEW disambiguated_inventor_ids as select inventor_id from disambiguated_inventor_ids_{suffix}
