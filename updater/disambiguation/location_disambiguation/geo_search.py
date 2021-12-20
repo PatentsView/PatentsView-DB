@@ -47,9 +47,8 @@ LIMIT
   {limit}
 OFFSET
   {offset}
-""".format(start_dt=start_dt, end_dt=end_dt)
-    rawlocation_query = rawlocation_query_template.format(limit=limit,
-                                                          offset=offset)
+"""
+    rawlocation_query = rawlocation_query_template.format(limit=limit, offset=offset, start_dt=start_dt, end_dt=end_dt)
     with c.connect() as rawlocation_cursor:
         rawlocation_records = rawlocation_cursor.execute(rawlocation_query)
         for record in rawlocation_records:
