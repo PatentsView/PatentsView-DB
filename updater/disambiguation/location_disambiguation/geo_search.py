@@ -86,6 +86,14 @@ def search_for_lat_lon(config, source):
     total_rows = get_total_records(connection, config['DATES']['START_DATE'], config['DATES']['END_DATE'])
     suffix = config['DATES']['END_DATE']
     target_table = 'rawlocation_lat_lon_{suffix}'.format(suffix=suffix)
+    create_sql = """
+    CREATE TABLE `{target_table}` (
+  `lat` float DEFAULT NULL,
+  `lon` float DEFAULT NULL,
+  `id`  varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    """.format(target_table=target_table)
+    connection.execute(create_sql)
     view_sql = """
     CREATE OR REPLACE VIEW rawlocation_lat_lon as SELECT id, lat, lon from {target_table}
     """.format(target_table=target_table)
