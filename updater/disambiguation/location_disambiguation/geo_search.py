@@ -87,7 +87,7 @@ def search_for_lat_lon(config, source):
     limit = 10000
     offset = 0
     total_rows = get_total_records(connection)
-    suffix = datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y-%m-%d").strftime("%Y-%m-%d")
+    suffix = config['DATES']['END_DATE']
     target_table = 'rawlocation_lat_lon_{suffix}'.format(suffix=suffix)
     view_sql = """
     CREATE OR REPLACE VIEW rawlocation_lat_lon SELECT id, lat, lon from {target_table}
