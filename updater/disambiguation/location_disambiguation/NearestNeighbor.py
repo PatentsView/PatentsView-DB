@@ -25,18 +25,20 @@ def get_search_dataset(cstr, start_date, end_date):
     null and location_id_transformed !='undisambiguated' and version_indicator between '{start_dt}' and '{end_dt}' 
     """.format(start_dt=start_date, end_dt=end_date)
     search_dataset = pd.read_sql_query(sql=search_dataset_sql, con=engine)
-    augmented_search_dataset = search_dataset.join(
-        search_dataset.location_id_transformed.str.split("|", expand=True).rename(
-            {
-                0: 'lat',
-                1: 'long'
-            }, axis=1))
+    augmented_search_dataset = pd.DataFrame()
+    if search_dataset.shape[0] > 0:
+        augmented_search_dataset = search_dataset.join(
+            search_dataset.location_id_transformed.str.split("|", expand=True).rename(
+                {
+                    0: 'lat',
+                    1: 'long'
+                }, axis=1))
 
-    augmented_search_dataset = augmented_search_dataset.assign(
-        lattitude=augmented_search_dataset.lat.astype(np.float64))
+        augmented_search_dataset = augmented_search_dataset.assign(
+            lattitude=augmented_search_dataset.lat.astype(np.float64))
 
-    augmented_search_dataset = augmented_search_dataset.assign(
-        longitude=augmented_search_dataset.long.astype(np.float64))
+        augmented_search_dataset = augmented_search_dataset.assign(
+            longitude=augmented_search_dataset.long.astype(np.float64))
 
     return augmented_search_dataset
 
