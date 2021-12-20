@@ -88,7 +88,7 @@ def generate_disambiguated_assignees(update_config, engine, limit, offset):
 
 def create_assignee(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
-    version_indicator = config['DATES']['END_DATE']
+    version_indicator = update_config['DATES']['END_DATE']
     suffix = config['DATES']['END_DATE']
     target_table = "assignee_{suffix}".format(suffix=suffix)
     create_sql = """
