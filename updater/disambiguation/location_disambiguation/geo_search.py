@@ -87,7 +87,7 @@ def search_for_lat_lon(config, source):
     suffix = config['DATES']['END_DATE']
     target_table = 'rawlocation_lat_lon_{suffix}'.format(suffix=suffix)
     view_sql = """
-    CREATE OR REPLACE VIEW as rawlocation_lat_lon SELECT id, lat, lon from {target_table}
+    CREATE OR REPLACE VIEW rawlocation_lat_lon as SELECT id, lat, lon from {target_table}
     """.format(target_table=target_table)
     while True:
         if offset >= total_rows:
