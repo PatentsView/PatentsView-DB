@@ -14,7 +14,7 @@ from lib.configuration import get_config, get_connection_string, get_current_con
 
 
 def update_long_entity(entity, database_type='granted_patent', **kwargs):
-    config = get_current_config(type=database_type, **kwargs)
+    config = get_current_config(schedule='quarterly',type=database_type, **kwargs)
     section = get_database_section(database_type)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
@@ -74,7 +74,7 @@ def get_database_section(database_type='granted_patent'):
 
 
 def prepare_wide_table(entity, database_type='granted_patent', **kwargs):
-    config = get_current_config(type=database_type, **kwargs)
+    config = get_current_config(schedule='quarterly',type=database_type, **kwargs)
     section = get_database_section(database_type)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
@@ -89,14 +89,14 @@ def prepare_wide_table(entity, database_type='granted_patent', **kwargs):
         connection.connect()
     with connection.cursor() as wide_table_prep_cursor:
         # only read header for creating table
-        wide_pid_df = generate_wide_header(connection, entity, config,section)
+        wide_pid_df = generate_wide_header(connection, entity, config, section)
 
         alter_stmt = 'alter table {0}.{1} add column disamb_{2}_id_{3} varchar(256) null after {4} '.format(
-                RAW_DB,
-                wide_table_name,
-                entity,
-                update_version,
-                wide_pid_df.columns[-1])
+            RAW_DB,
+            wide_table_name,
+            entity,
+            update_version,
+            wide_pid_df.columns[-1])
         # create_with_columns = get_create_syntax(entity, pid_cols, create_stmt)
         # primary_key_stmt = 'PRIMARY KEY (`{current_rawentity}`));'.format(current_rawentity=current_rawentity)
         #
@@ -105,7 +105,7 @@ def prepare_wide_table(entity, database_type='granted_patent', **kwargs):
 
 
 def write_wide_table(entity, database_type='granted_patent', **kwargs):
-    config = get_current_config(type=database_type, **kwargs)
+    config = get_current_config(schedule='quarterly',type=database_type, **kwargs)
     section = get_database_section(database_type=database_type)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
