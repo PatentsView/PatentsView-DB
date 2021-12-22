@@ -12,7 +12,7 @@ import datetime
 import json
 
 
-class PatentDatabaseTester(PatentsViewDatabaseTester):
+class PregrantDatabaseTester(PatentsViewDatabaseTester):
     def __init__(self, config, database_section, start_date, end_date):
         """
         Do not instantiate. Overriden class constructor
@@ -21,25 +21,23 @@ class PatentDatabaseTester(PatentsViewDatabaseTester):
         :param start_date: Database Update start date
         :param end_date: Database Update end date
         """
-        # Tables that do not directly link to patent table
+        # Tables that do not directly link to publication table
         super().__init__(config, database_section, start_date, end_date)
-        self.exclusion_list = [ 'assignee', 'mainclass', 'mainclass_current', 'nber_category',
-                                      'nber_subcategory', 'subclass', 'subclass_current',
-                                      'patent', 'rawlocation']
+        self.exclusion_list = ['rawlocation']
+        self.central_entity = 'publication'
+        self.table_config = json.load(open("{}".format(self.config["FOLDERS"]["resources_folder"] + "/" + self.config["FILES"]["table_config_pgpubs"]),))
 
-        self.central_entity = 'patent'
-        self.table_config = json.load(open("{}".format(self.config["FOLDERS"]["resources_folder"] + "/" + self.config["FILES"]["table_config_granted"]),))
 
 
 if __name__ == '__main__':
     #config = get_config()
-    config = get_current_config('granted_patent', **{
+    config = get_current_config('pgpubs', **{
         "execution_date": datetime.date(2020, 12, 29)
     })
 
     # fill with correct run_id
     run_id = "backfill__2020-12-29T00:00:00+00:00"
 
-    pt = PatentDatabaseTester(config, "RAW_DB", datetime.date(2020, 1, 1), datetime.date(2020, 12, 29))
+    pt = PregrantDatabaseTester(config,"PGPUBS_DATABASE", datetime.date(2020, 1, 1), datetime.date(2020, 12, 31))
+
     pt.runTests()
-    print("hi")
