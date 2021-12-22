@@ -417,8 +417,12 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
             if debug and counter > 500:
                 break
             # Create an etree element for the current document
-            parser = etree.XMLParser(load_dtd=True, no_network=False)
-            patent_app_document = etree.XML(current_xml.encode('utf-8'), parser=parser)
+            if 'v1' in dtd_file: #pgpubs versions 1.5 and 1.6 need an HTML parser instead
+                parser = etree.HTMLParser(no_network=False)
+                patent_app_document = etree.HTML(current_xml.encode('utf-8'), parser=parser)
+            else:
+                parser = etree.XMLParser(load_dtd=True, no_network=False)
+                patent_app_document = etree.XML(current_xml.encode('utf-8'), parser=parser)
             if patent_app_document.tag == 'sequence-cwu':
                 continue
             else:
@@ -508,16 +512,50 @@ def get_filenames_to_parse(config, type='granted_patent'):
     return xml_files
 
 
+dtd_to_json = {
+    # to be filled out - we can provide a default
+    # granted patents
+    'ST32-US-Grant-024.dtd' : None,
+    'ST32-US-Grant-025xml.dtd' : None,
+    'us-patent-grant-v40-2004-12-02.dtd' : None,
+    'us-patent-grant-v41-2005-08-25.dtd' : None,
+    'us-patent-grant-v42-2006-08-23.dtd' : None,
+    'us-patent-grant-v43-2012-12-04.dtd' : None,
+    'us-patent-grant-v44-2013-05-16.dtd' : None,
+    'us-patent-grant-v45-2014-04-03.dtd' : None, # is patent_parser.json configured for this version?
+    'us-patent-grant-v46-2021-08-30.dtd' : None,
+    # pgpubs
+    'pap-v15-2001-01-31.dtd' : None,
+    'pap-v16-2002-01-01.dtd' : 'pgp_xml_map_v16.json',
+    'us-patent-application-v40-2004-12-02.dtd' : None,
+    'us-patent-application-v41-2005-08-25.dtd' : None,
+    'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_map_v42.json',
+    'us-patent-application-v43-2012-12-04.dtd' : None,
+    'us-patent-application-v44-2014-04-03.dtd' : None,
+    'us-patent-application-v45-2021-08-30.dtd' : None,
+    None : None,
+}
+
+
+def dtd_finder(xml_file):
+    with open(xml_file) as reader:
+        for line in reader:
+            found = re.findall('SYSTEM "(.*\.dtd)"', line)
+            if len(found) > 0:
+                return(found[0])
+    return None
+
+
 def queue_parsers(config, type='granted_patent'):
     """
     Multiprocessing call of the parse_publication_xml function
     :param config: config file
     """
-    parsing_file_setting = "{prefix}_parsing_config_file".format(prefix=type)
-    dtd_file_setting = "{prefix}_dtd_file".format(prefix=type)
-    dtd_file = '{}'.format(config['XML_PARSING'][dtd_file_setting])
-    parsing_config_file = config["XML_PARSING"][parsing_file_setting]
-    parsing_config = json.load(open(parsing_config_file))
+    #parsing_file_setting = "{prefix}_parsing_config_file".format(prefix=type)
+    #dtd_file_setting = "{prefix}_dtd_file".format(prefix=type)
+    #dtd_file = '{}'.format(config['XML_PARSING'][dtd_file_setting])
+    #parsing_config_file = config["XML_PARSING"][parsing_file_setting]
+    #parsing_config = json.load(open(parsing_config_file))
     xml_files = get_filenames_to_parse(config, type=type)
     parser_start = time.time()
 
@@ -535,6 +573,21 @@ def queue_parsers(config, type='granted_patent'):
         log_queue = Queue()
     p_list = []
     for file_name in xml_files:
+        dtd_file = dtd_finder(file_name)
+        # as a precaution
+        if dtd_file is None and type == 'granted_patent':
+            dtd_file = config['XML_PARSING']['default_grant_dtd']
+        if dtd_file is None:
+            dtd_file = config['XML_PARSING']['default_pgp_dtd']
+        parsing_config_file =  dtd_to_json[dtd_file]
+        #this should be unnecessary after the json dictionary is filled in, but provided as a precaution
+        if parsing_config_file is None and type == 'granted_patent': 
+            parsing_config_file = config['XML_PARSING']['default_grant_parsing_config']
+        if parsing_config_file is None:
+            parsing_config_file = config['XML_PARSING']['default_pgp_parsing_config']
+        parsing_config_file = '/'.join((config['XML_PARSING']['json_folder'], parsing_config_file))
+        parsing_config = json.load(open(parsing_config_file))
+        dtd_file = '/'.join((config['XML_PARSING']['dtd_folder'], dtd_file))
         log_queue.put({
                 "level":   logging.INFO,
                 "message": "Starting parsing of {xml_file} using {parsing_config}; Validated by {validator}".format(

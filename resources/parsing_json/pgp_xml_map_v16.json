@@ -1,0 +1,570 @@
+{
+  "foreign_key_config": {
+    "field_name": "document_number",
+    "friendly_name": "Document Number",
+    "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/document-id/doc-number",
+    "data-type": "string"
+  },
+  "table_xml_map": [
+    {
+      "table_name": "government_interest",
+      "friendly_name": "Government Interest",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "gi_statement",
+          "friendly_name": "GI Text",
+          "xml_path": "body/p/patent-application-publication/subdoc-description/federal-research-statement",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "gi.tsv"
+    },
+    {
+      "table_name": "publication",
+      "friendly_name": "Publication",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/document-id/document-date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/correspondence-address/address/country/country-code",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "kind",
+          "friendly_name": "Kind",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/document-id/kind-code",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "filing_type",
+          "friendly_name": "Filing Type",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/publication-filing-type",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": true,
+          "data-type": "date"
+        }
+      ],
+      "filename": "publication.tsv"
+    },
+    {
+      "table_name": "application",
+      "friendly_name": "Application",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "application_number",
+          "friendly_name": "Application Number",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/application-number/doc-number",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "number"
+        },
+        {
+          "field_name": "rule_47_flag",
+          "friendly_name": "Rule 47 Flag",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/.",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": "rule-47-flag",
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/filing-date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/correspondence-address/address/country/country-code",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "series_code",
+          "friendly_name": "Series Code",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/application-number-series-code",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "type",
+          "friendly_name": "Type",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/publication-filing-type",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "invention_title",
+          "friendly_name": "Invention Title",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/technical-information/title-of-invention",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        },
+        {
+          "field_name": "invention_abstract",
+          "friendly_name": "Invention Abstract",
+          "xml_path": "body/p/patent-application-publication/subdoc-abstract",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "application.tsv"
+    },
+    {
+      "table_name": "rawinventor",
+      "friendly_name": "Rawinventor",
+      "multi_valued": true,
+      "entity_root_path": "body/p/patent-application-publication/subdoc-bibliographic-information/inventors/",
+      "fields": [
+        {
+          "field_name": "name_first",
+          "friendly_name": "First Name",
+          "xml_path": "name/given-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "name_last",
+          "friendly_name": "Last Name",
+          "xml_path": "name/family-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "city",
+          "friendly_name": "City",
+          "xml_path": "residence/*/city",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "state",
+          "friendly_name": "State",
+          "xml_path": "residence/*/state",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "residence/*/country-code",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "inventors.tsv"
+    },
+    {
+      "table_name": "foreign_priority",
+      "friendly_name": "Foreign Priority",
+      "multi_valued": true,
+      "entity_root_path": "body/p/patent-application-publication/subdoc-bibliographic-information/foreign-priority-data",
+      "fields": [
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "country-code",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "filing-date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "foreign_doc_number",
+          "friendly_name": "Foreign Document Number",
+          "xml_path": "priority-application-number",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "foreign_priority.tsv"
+    },
+    {
+      "table_name": "rawassignee",
+      "friendly_name": "Rawassignee",
+      "multi_valued": true,
+      "entity_root_path": "body/p/patent-application-publication/subdoc-bibliographic-information/assignee",
+      "fields": [
+        {
+          "field_name": "name_first",
+          "friendly_name": "Name First",
+          "xml_path": "name/given-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "name_last",
+          "friendly_name": "Name Last",
+          "xml_path": "name/family-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "organization",
+          "friendly_name": "Organization",
+          "xml_path": "organization-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "city",
+          "friendly_name": "City",
+          "xml_path": "address/city",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "state",
+          "friendly_name": "State",
+          "xml_path": "address/state",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "address/country/country-code",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "type",
+          "friendly_name": "Type",
+          "xml_path": "assignee-type",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "assignee.tsv"
+    },
+    {
+      "table_name": "pct_data",
+      "friendly_name": "PCT Data",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "pct_doc_number",
+          "friendly_name": "PCT Doc Number",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/doc-number",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/country-code",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/document-date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "kind",
+          "friendly_name": "Kind",
+          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/kind-code",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "pct_data.tsv"
+    },
+    {
+      "table_name": "brf_sum_text",
+      "friendly_name": "Brief Summary Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "body/p/patent-application-publication/subdoc-description/summary-of-invention",
+          "description": null,
+          "attribute": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "brf_sum_text.tsv"
+    },
+    {
+        "table_name": "draw_desc_text",
+        "friendly_name": "Drawing Description Text",
+        "multi_valued": true,
+        "entity_root_path": "body/p/patent-application-publication/subdoc-description",
+        "fields": [{
+            "field_name": "text",
+            "friendly_name": "Text",
+            "xml_path": "brief-description-of-drawings",
+            "description": null,
+            "sequence": false,
+            "attribute": null,
+            "flag": null,
+            "tag": false,
+            "data-type": "fulltext"
+        }
+      ],
+      "filename": "draw_desc_text.tsv"
+    },
+    {
+      "table_name": "detail_desc_text",
+      "friendly_name": "Detailed Description Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "body/p/patent-application-publication/subdoc-description/detailed-description",
+          "description": null,
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "detail_desc_text.tsv"
+    },
+    {
+      "table_name": "rel_app_text",
+      "friendly_name": "Related Application Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "body/p/patent-application-publication/subdoc-description/cross-reference-to-related-applications",
+          "description": null,
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "rel_app_text.tsv"
+    },
+{
+      "table_name": "claim",
+      "friendly_name": "Claim",
+      "multi_valued": true,
+      "entity_root_path": "body/p/patent-application-publication/subdoc-claims/claim",
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "claim-text",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        },
+        {
+          "field_name": "num",
+          "friendly_name": "num",
+          "xml_path": ".",
+          "attribute": "id",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "dependent",
+          "friendly_name": "Dependent",
+          "xml_path": "claim-text/dependent-claim-reference",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "claim.tsv"
+    },
+    {
+      "table_name": "rawuspc",
+      "friendly_name": "Raw USPC",
+      "multi_valued": true,
+      "entity_root_path": "body/p/patent-application-publication/subdoc-bibliographic-information/technical-information/classification-us/",
+      "fields": [
+        {
+          "field_name": "mainclass_id",
+          "friendly_name": "Classification",
+          "xml_path": "uspc/class",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subclass_id",
+          "friendly_name": "Classification",
+          "xml_path": "uspc/subclass",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+        "filename": "rawuspc.tsv"
+      }
+  ]
+}

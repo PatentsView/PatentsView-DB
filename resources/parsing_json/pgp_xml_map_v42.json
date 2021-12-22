@@ -7,6 +7,26 @@
   },
   "table_xml_map": [
     {
+      "table_name": "government_interest",
+      "table_prefix": "government_interest",
+      "friendly_name": "Government Interest",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "gi_statement",
+          "friendly_name": "GI Text",
+          "xml_path": "description",
+          "description": "Federal Research Statement",
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "gi.tsv"
+    },
+    {
       "table_name": "publication",
       "friendly_name": "Publication",
       "multi_valued": false,
@@ -1091,7 +1111,7 @@
         "table_name": "draw_desc_text",
         "friendly_name": "Drawing Description Text",
         "multi_valued": true,
-        "entity_root_path": "description/description-of-drawings/",
+        "entity_root_path": "description",
         "fields": [{
             "field_name": "text",
             "friendly_name": "Text",
