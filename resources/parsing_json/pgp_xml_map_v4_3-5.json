@@ -178,7 +178,7 @@
       "table_name": "rawinventor",
       "friendly_name": "Rawinventor",
       "multi_valued": true,
-      "entity_root_path": "us-bibliographic-data-application/parties/inventors/",
+      "entity_root_path": "us-bibliographic-data-application/us-parties/inventors/",
       "fields": [
         {
           "field_name": "name_first",
@@ -497,7 +497,7 @@
           "field_name": "sequence",
           "friendly_name": "Sequence",
           "xml_path": ".",
-          "attribute": null,
+          "attribute": "sequence",
           "description": null,
           "sequence": true,
           "flag": null,
@@ -616,7 +616,7 @@
           "field_name": "sequence",
           "friendly_name": "Sequence",
           "xml_path": ".",
-          "attribute": null,
+          "attribute": "sequence",
           "description": null,
           "sequence": true,
           "flag": null,
@@ -1262,7 +1262,7 @@
       "table_name": "us_parties",
       "friendly_name": "US Parties",
       "multi_valued": true,
-      "entity_root_path": "us-bibliographic-data-application/parties/applicants/",
+      "entity_root_path": "us-bibliographic-data-application/us-parties/us-applicants/",
       "fields": [
         {
           "field_name": "name_first",
@@ -1345,7 +1345,7 @@
             "field_name": "sequence",
             "friendly_name": "Sequence",
             "xml_path": ".",
-            "attribute": null,
+            "attribute": "sequence",
             "description": null,
             "sequence": true,
             "flag": null,

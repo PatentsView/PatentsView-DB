@@ -2,7 +2,7 @@
   "foreign_key_config": {
     "field_name": "document_number",
     "friendly_name": "Document Number",
-    "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/document-id/doc-number",
+    "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/document-id/doc-number",
     "data-type": "string"
   },
   "table_xml_map": [
@@ -14,7 +14,7 @@
         {
           "field_name": "gi_statement",
           "friendly_name": "GI Text",
-          "xml_path": "body/p/patent-application-publication/subdoc-description/federal-research-statement",
+          "xml_path": "body//patent-application-publication/subdoc-description/federal-research-statement",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -33,7 +33,7 @@
         {
           "field_name": "date",
           "friendly_name": "Date",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/document-id/document-date",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/document-id/document-date",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -44,7 +44,7 @@
         {
           "field_name": "country",
           "friendly_name": "Country",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/correspondence-address/address/country/country-code",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/correspondence-address/address/country/country-code",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -55,7 +55,7 @@
         {
           "field_name": "kind",
           "friendly_name": "Kind",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/document-id/kind-code",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/document-id/kind-code",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -66,7 +66,7 @@
         {
           "field_name": "filing_type",
           "friendly_name": "Filing Type",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/publication-filing-type",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/publication-filing-type",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -85,7 +85,7 @@
         {
           "field_name": "application_number",
           "friendly_name": "Application Number",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/application-number/doc-number",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/application-number/doc-number",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -96,7 +96,7 @@
         {
           "field_name": "rule_47_flag",
           "friendly_name": "Rule 47 Flag",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/.",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/.",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -107,7 +107,7 @@
         {
           "field_name": "date",
           "friendly_name": "Date",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/filing-date",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/filing-date",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -118,7 +118,7 @@
         {
           "field_name": "country",
           "friendly_name": "Country",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/correspondence-address/address/country/country-code",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/correspondence-address/address/country/country-code",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -129,7 +129,7 @@
         {
           "field_name": "series_code",
           "friendly_name": "Series Code",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/application-number-series-code",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/domestic-filing-data/application-number-series-code",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -140,7 +140,7 @@
         {
           "field_name": "type",
           "friendly_name": "Type",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/publication-filing-type",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/publication-filing-type",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -151,7 +151,7 @@
         {
           "field_name": "invention_title",
           "friendly_name": "Invention Title",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/technical-information/title-of-invention",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/technical-information/title-of-invention",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -162,7 +162,7 @@
         {
           "field_name": "invention_abstract",
           "friendly_name": "Invention Abstract",
-          "xml_path": "body/p/patent-application-publication/subdoc-abstract",
+          "xml_path": "body//patent-application-publication/subdoc-abstract",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -177,7 +177,7 @@
       "table_name": "rawinventor",
       "friendly_name": "Rawinventor",
       "multi_valued": true,
-      "entity_root_path": "body/p/patent-application-publication/subdoc-bibliographic-information/inventors/",
+      "entity_root_path": "body//patent-application-publication/subdoc-bibliographic-information/inventors/",
       "fields": [
         {
           "field_name": "name_first",
@@ -241,7 +241,7 @@
       "table_name": "foreign_priority",
       "friendly_name": "Foreign Priority",
       "multi_valued": true,
-      "entity_root_path": "body/p/patent-application-publication/subdoc-bibliographic-information/foreign-priority-data",
+      "entity_root_path": "body//patent-application-publication/subdoc-bibliographic-information/foreign-priority-data",
       "fields": [
         {
           "field_name": "country",
@@ -283,7 +283,7 @@
       "table_name": "rawassignee",
       "friendly_name": "Rawassignee",
       "multi_valued": true,
-      "entity_root_path": "body/p/patent-application-publication/subdoc-bibliographic-information/assignee",
+      "entity_root_path": "body//patent-application-publication/subdoc-bibliographic-information/assignee",
       "fields": [
         {
           "field_name": "name_first",
@@ -373,7 +373,7 @@
         {
           "field_name": "pct_doc_number",
           "friendly_name": "PCT Doc Number",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/doc-number",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/doc-number",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -384,7 +384,7 @@
         {
           "field_name": "country",
           "friendly_name": "Country",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/country-code",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/country-code",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -395,7 +395,7 @@
         {
           "field_name": "date",
           "friendly_name": "Date",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/document-date",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/document-date",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -406,7 +406,7 @@
         {
           "field_name": "kind",
           "friendly_name": "Kind",
-          "xml_path": "body/p/patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/kind-code",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/international-conventions/pct-application/document-id/kind-code",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -425,7 +425,7 @@
         {
           "field_name": "text",
           "friendly_name": "Text",
-          "xml_path": "body/p/patent-application-publication/subdoc-description/summary-of-invention",
+          "xml_path": "body//patent-application-publication/subdoc-description/summary-of-invention",
           "description": null,
           "attribute": null,
           "sequence": false,
@@ -440,7 +440,7 @@
         "table_name": "draw_desc_text",
         "friendly_name": "Drawing Description Text",
         "multi_valued": true,
-        "entity_root_path": "body/p/patent-application-publication/subdoc-description",
+        "entity_root_path": "body//patent-application-publication/subdoc-description",
         "fields": [{
             "field_name": "text",
             "friendly_name": "Text",
@@ -463,7 +463,7 @@
         {
           "field_name": "text",
           "friendly_name": "Text",
-          "xml_path": "body/p/patent-application-publication/subdoc-description/detailed-description",
+          "xml_path": "body//patent-application-publication/subdoc-description/detailed-description",
           "description": null,
           "sequence": false,
           "attribute": null,
@@ -482,7 +482,7 @@
         {
           "field_name": "text",
           "friendly_name": "Text",
-          "xml_path": "body/p/patent-application-publication/subdoc-description/cross-reference-to-related-applications",
+          "xml_path": "body//patent-application-publication/subdoc-description/cross-reference-to-related-applications",
           "description": null,
           "sequence": false,
           "attribute": null,
@@ -497,7 +497,7 @@
       "table_name": "claim",
       "friendly_name": "Claim",
       "multi_valued": true,
-      "entity_root_path": "body/p/patent-application-publication/subdoc-claims/claim",
+      "entity_root_path": "body//patent-application-publication/subdoc-claims/claim",
       "fields": [
         {
           "field_name": "text",
@@ -539,7 +539,7 @@
       "table_name": "rawuspc",
       "friendly_name": "Raw USPC",
       "multi_valued": true,
-      "entity_root_path": "body/p/patent-application-publication/subdoc-bibliographic-information/technical-information/classification-us/",
+      "entity_root_path": "body//patent-application-publication/subdoc-bibliographic-information/technical-information/classification-us/",
       "fields": [
         {
           "field_name": "mainclass_id",
