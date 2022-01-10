@@ -2,11 +2,11 @@ import datetime
 import json
 import os
 
-from QA.PatentDatabaseTester import PatentDatabaseTester
+from QA.DatabaseTester import DatabaseTester
 from lib.configuration import get_current_config
 
 
-class MergeTest(PatentDatabaseTester):
+class MergeTest(DatabaseTester):
 
     def runTests(self):
         self.test_merge_status()
@@ -1120,7 +1120,7 @@ if __name__ == '__main__':
     # fill with correct run_id
     run_id = "backfill__2020-12-29T00:00:00+00:00"
 
-    mc = MergeTest(config,run_id)
+    mc = MergeTest(config, run_id)
 
     mc.runTests()
 

@@ -1,10 +1,10 @@
 import datetime
 
-from QA.PatentDatabaseTester import PatentDatabaseTester
+from QA.DatabaseTester import DatabaseTester
 from lib.configuration import get_current_config
 
 
-class CPCTest(PatentDatabaseTester):
+class CPCTest(DatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, 'RAW_DB', datetime.date(year=1976, month=1, day=1), end_date)

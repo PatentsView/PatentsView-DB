@@ -1,10 +1,10 @@
 import datetime
 
-from QA.PatentDatabaseTester import PatentDatabaseTester
+from QA.DatabaseTester import DatabaseTester
 from lib.configuration import get_current_config
 
 
-class UploadTest(PatentDatabaseTester):
+class UploadTest(DatabaseTester):
     def __init__(self, config):
         start_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')

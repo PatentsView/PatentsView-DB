@@ -1,9 +1,9 @@
 from abc import ABC
 
-from QA.PatentDatabaseTester import PatentDatabaseTester
+from QA.DatabaseTester import DatabaseTester
 
 
-class DisambiguationTester(PatentDatabaseTester, ABC):
+class DisambiguationTester(DatabaseTester, ABC):
     def __init__(self, config, database_section, start_date, end_date):
         super().__init__(config, database_section, start_date, end_date)
 

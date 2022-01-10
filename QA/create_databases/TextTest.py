@@ -1,9 +1,9 @@
 import datetime
 
-from QA.PatentDatabaseTester import PatentDatabaseTester
+from QA.DatabaseTester import DatabaseTester
 
 
-class TextMergeTest(PatentDatabaseTester):
+class TextMergeTest(DatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         brf_key = "brf_sum_text_{year}".format(year=end_date.year)
@@ -144,7 +144,7 @@ class TextMergeTest(PatentDatabaseTester):
         super().test_yearly_count(table_name, strict)
 
 
-class TextUploadTest(PatentDatabaseTester):
+class TextUploadTest(DatabaseTester):
     def __init__(self, config):
         start_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')

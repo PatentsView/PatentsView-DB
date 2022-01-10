@@ -10,7 +10,7 @@ from lib.configuration import get_connection_string
 
 
 class PatentsViewDatabaseTester(ABC):
-    def __init__(self, config, database_section, start_date, end_date):
+    def __init__(self, config, database_section, start_date, end_date, exclusion_list, central_entity):
         """
         Do not instantiate. Overriden class constructor
         :param config: Configparser object containing update parameters
@@ -19,17 +19,17 @@ class PatentsViewDatabaseTester(ABC):
         :param end_date: Database Update end date
         """
         # Tables that do not directly link to patent/publication table
-        self.exclusion_list = []
+        self.exclusion_list = exclusion_list
 
         # Central table: patent for granted data/publication for pgpubs
-        self.central_entity = ''
+        self.central_entity = central_entity
 
         # Update start and end date
         self.start_date = start_date
         self.end_date = end_date
         # Indicator for Upload/Patents database
 
-        self.qa_connection_string = get_connection_string(config, 'QA_DATABASE')
+        self.qa_connection_string = get_connection_string(config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
         self.connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                           user=config['DATABASE_SETUP']['USERNAME'],
                                           password=config['DATABASE_SETUP']['PASSWORD'],
@@ -60,15 +60,16 @@ class PatentsViewDatabaseTester(ABC):
     def init_qa_dict(self):
         # Place Holder for saving QA counts - keys map to table names in patent_QA
         self.qa_data = {
-            "DataMonitor_count":               [],
-            'DataMonitor_nullcount':           [],
-            'DataMonitor_patentyearlycount':   [],
-            'DataMonitor_categorycount':       [],
+            'DataMonitor_count': [],
+            'DataMonitor_nullcount': [],
+            'DataMonitor_patentyearlycount': [],
+            'DataMonitor_categorycount': [],
             'DataMonitor_floatingpatentcount': [],
-            'DataMonitor_maxtextlength':       [],
+            'DataMonitor_maxtextlength': [],
             'DataMonitor_prefixedentitycount': [],
-            'DataMonitor_locationcount': []
+            'DataMonitor_locationcount': [],
         }
+
 
     def test_table_row_count(self, table_name):
         """
@@ -284,7 +285,7 @@ group by `{field}`
                                       "{entity} et on et.patent_id = p.id group by year(`date`)".format(
                             central_table=central_table,
                             entity=table_name)
-                    else:
+                    elif self.central_entity == 'publication':
                         count_query = "SELECT year(p.`date`) as `yr`, count(1) as `year_count` from {central_table} p join " \
                                       "{entity} et on et.document_number = p.document_number group by year(`date`)".format(
                             central_table=central_table,
@@ -322,21 +323,26 @@ group by `{field}`
                         if self.central_entity == 'patent':
                             raise Exception("Year {yr} has 0 patents in the database {db}".format(yr=year, db=
                             self.config['PATENTSVIEW_DATABASES'][self.database_section]))
-                        else:
+                        elif self.central_entity == 'publication':
                             raise Exception("Year {yr} has 0 document_numbers in the database {db}".format(yr=year, db=
                             self.config['PATENTSVIEW_DATABASES'][self.database_section]))
+                        else:
+                            raise NotImplementedError
             if not found:
                 if self.central_entity == 'patent':
                     raise Exception("There are no patents for the Year {yr} in the database {db}".format(yr=year, db=
                     self.config['PATENTSVIEW_DATABASES'][self.database_section]))
-                else:
+                elif self.central_entity == 'publication':
                     raise Exception("There are no document_numbers for the Year {yr} in the database {db}".format(yr=year, db=
                     self.config['PATENTSVIEW_DATABASES'][self.database_section]))
+                else:
+                    raise NotImplementedError
 
     def test_related_floating_entities(self, table_name, table_config):
-        if 'related_entities' in table_config:
-            for related_entity_config in table_config['related_entities']:
-                self.assert_related_floating_entities(table_name, related_entity_config)
+        if table_name not in self.exclusion_list:
+            if 'related_entities' in table_config:
+                for related_entity_config in table_config['related_entities']:
+                    self.assert_related_floating_entities(table_name, related_entity_config)
 
     def assert_related_floating_entities(self, table_name, related_config):
         if table_name not in self.exclusion_list:
@@ -385,108 +391,114 @@ group by `{field}`
                 self.connection.close()
 
     def test_floating_entities(self, table_name):
-        print("\tTesting floating entities for {table_name}".format(table_name=table_name))
+        if table_name != self.central_entity:
+            print("\tTesting floating entities for {table_name}".format(table_name=table_name))
 
-        central_table = self.central_entity if self.db_prefix is None else '{db}.{ce}'.format(
-            db=self.db_prefix, ce=self.central_entity)
-        if self.central_entity == 'patent':
-            float_query = """
-                    SELECT count(1)
-                    from {table_name} et left join {central_table} p
-                    on p.id =et.patent_id
-                    where
-                        p.id is null
-                """.format(
-                table_name=table_name, central_table=central_table)
-        else:
-            float_query = """
-                    SELECT count(1)
-                    from {table_name} et left join {central_table} p
-                    on p.document_number =et.document_number
-                    where
-                        p.document_number is null
-                """.format(
-                table_name=table_name, central_table=central_table)
+            central_table = self.central_entity if self.db_prefix is None else '{db}.{ce}'.format(
+                db=self.db_prefix, ce=self.central_entity)
 
-        if not self.connection.open:
-            self.connection.connect()
-        print(float_query)
-        try:
-            with self.connection.cursor() as count_cursor:
-                count_cursor.execute(float_query)
-                float_count = count_cursor.fetchall()[0][0]
-                if float_count > 0:
-                    if self.central_entity == 'patent':
-                        raise Exception("There are patents in {table_name} that are not in the patent table for {db}".format(
-                            table_name=table_name, db=
-                            self.config['PATENTSVIEW_DATABASES'][self.database_section]))
-                    else:
-                        raise Exception("There are document_numbers in {table_name} that are not in the publication table for {db}".format(
-                            table_name=table_name, db=
-                            self.config['PATENTSVIEW_DATABASES'][self.database_section]))
+            if self.central_entity == 'patent':
+                float_query = """
+                        SELECT count(1)
+                        from {table_name} et left join {central_table} p
+                        on p.id =et.patent_id
+                        where
+                            p.id is null
+                    """.format(
+                    table_name=table_name, central_table=central_table)
+            else:
+                float_query = """
+                        SELECT count(1)
+                        from {table_name} et left join {central_table} p
+                        on p.document_number =et.document_number
+                        where
+                            p.document_number is null
+                    """.format(
+                    table_name=table_name, central_table=central_table)
 
-        except pymysql.Error as e:
-            if table_name not in self.exclusion_list:
-                print(float_query)
-                raise e
-        finally:
-            self.connection.close()
+            if not self.connection.open:
+                self.connection.connect()
+            print(float_query)
+            try:
+                with self.connection.cursor() as count_cursor:
+                    count_cursor.execute(float_query)
+                    float_count = count_cursor.fetchall()[0][0]
+                    if float_count > 0:
+                        if self.central_entity == 'patent':
+                            raise Exception("There are patents in {table_name} that are not in the patent table for {db}".format(
+                                table_name=table_name, db=
+                                self.config['PATENTSVIEW_DATABASES'][self.database_section]))
+                        else:
+                            raise Exception("There are document_numbers in {table_name} that are not in the publication table for {db}".format(
+                                table_name=table_name, db=
+                                self.config['PATENTSVIEW_DATABASES'][self.database_section]))
 
+            except pymysql.Error as e:
+                if table_name not in self.exclusion_list:
+                    print(float_query)
+                    raise e
+            finally:
+                self.connection.close()
 
     def load_floating_patent_count(self, table, table_config):
-        if self.central_entity == 'patent':
-            print("\tTesting floating patent counts for {table_name}".format(table_name=table))
-        else:
-            print("\tTesting floating document_number counts for {table_name}".format(table_name=table))
-        if not self.connection.open:
-            self.connection.connect()
-        additional_where = ""
-        if 'custom_float_condition' in table_config and table_config['custom_float_condition'] is not None:
-            additional_where = "and " + table_config['custom_float_condition']
+        if table != self.central_entity:
+            if self.central_entity == 'patent':
+                print("\tTesting floating patent counts for {table_name}".format(table_name=table))
+            elif self.central_entity == 'publication':
+                print("\tTesting floating document_number counts for {table_name}".format(table_name=table))
+            else:
+                NotImplementedError
+            if not self.connection.open:
+                self.connection.connect()
+            additional_where = ""
+            if 'custom_float_condition' in table_config and table_config['custom_float_condition'] is not None:
+                additional_where = "and " + table_config['custom_float_condition']
 
-        central_table = self.central_entity if self.db_prefix is None else '{db}.{ce}'.format(
-            db=self.db_prefix, ce=self.central_entity)
-        if self.central_entity == 'patent':
-            float_count_query = """
-                        SELECT count(1) as count
-                        from {central_table} p left join {entity_table} et
-                        on
-                            et.patent_id = p.id
-                        where et.patent_id is null {additional_where}
-                    """.format(
-                central_table=central_table, entity_table=table, additional_where=additional_where)
-        else:
-            float_count_query = """
-                        SELECT count(1) as count
-                        from {central_table} p left join {entity_table} et
-                        on
-                            et.document_number = p.document_number
-                        where et.document_number is null {additional_where}
-                    """.format(
-                central_table=central_table, entity_table=table, additional_where=additional_where)
+            central_table = self.central_entity if self.db_prefix is None else '{db}.{ce}'.format(
+                db=self.db_prefix, ce=self.central_entity)
+            if self.central_entity == 'patent':
+                float_count_query = """
+                            SELECT count(1) as count
+                            from {central_table} p left join {entity_table} et
+                            on
+                                et.patent_id = p.id
+                            where et.patent_id is null {additional_where}
+                        """.format(
+                    central_table=central_table, entity_table=table, additional_where=additional_where)
+            elif self.central_entity == 'publication':
+                float_count_query = """
+                            SELECT count(1) as count
+                            from {central_table} p left join {entity_table} et
+                            on
+                                et.document_number = p.document_number
+                            where et.document_number is null {additional_where}
+                        """.format(
+                    central_table=central_table, entity_table=table, additional_where=additional_where)
+            else:
+                raise NotImplementedError
 
-        print(float_count_query)
-        try:
-            with self.connection.cursor() as count_cursor:
-                count_cursor.execute(float_count_query)
-                float_count = count_cursor.fetchall()[0][0]
-                write_table_name = table
-                prefix = "temp_"
-                if table.startswith(prefix):
-                    write_table_name = table[len(prefix):]
-                self.qa_data['DataMonitor_floatingpatentcount'].append({
-                    "database_type":
-                        self.database_type,
-                    'update_version':        self.version,
-                    'table_name':
-                        write_table_name,
-                    'floating_patent_count': float_count
-                })
-        except pymysql.Error as e:
-            if table not in self.exclusion_list:
-                raise e
-        finally:
-            self.connection.close()
+            print(float_count_query)
+            try:
+                with self.connection.cursor() as count_cursor:
+                    count_cursor.execute(float_count_query)
+                    float_count = count_cursor.fetchall()[0][0]
+                    write_table_name = table
+                    prefix = "temp_"
+                    if table.startswith(prefix):
+                        write_table_name = table[len(prefix):]
+                    self.qa_data['DataMonitor_floatingpatentcount'].append({
+                        "database_type":
+                            self.database_type,
+                        'update_version':        self.version,
+                        'table_name':
+                            write_table_name,
+                        'floating_patent_count': float_count
+                    })
+            except pymysql.Error as e:
+                if table not in self.exclusion_list:
+                    raise e
+            finally:
+                self.connection.close()
 
 
     def load_prefix_counts(self, table_name):
@@ -500,7 +512,13 @@ group by `{field}`
                     self.connection.connect()
                 central_table = self.central_entity if self.db_prefix is None else '{db}.{ce}'.format(
                     db=self.db_prefix, ce=self.central_entity)
-                if self.central_entity == 'patent':
+                if table_name == 'patent':
+                    count_query = """
+                        select type, count(1)
+                        from patent
+                        group by type            
+                    """
+                elif self.central_entity == 'patent':
                     count_query = """
                         SELECT p.`type` as `type`, count(1) as `type_count`
                         from {central_table} p join {entity} et
@@ -509,7 +527,7 @@ group by `{field}`
                     """.format(
                         central_table=central_table,
                         entity=table_name)
-                else:
+                elif self.central_entity == 'publication':
                     count_query = """
                         SELECT p.`kind` as `type`, count(1) as `type_count`
                         from {central_table} p join {entity} et
@@ -518,6 +536,8 @@ group by `{field}`
                     """.format(
                         central_table=central_table,
                         entity=table_name)
+                else:
+                    raise NotImplementedError
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
                     for count_row in count_cursor.fetchall():
@@ -550,16 +570,46 @@ group by `{field}`
         if table not in self.exclusion_list:
             if self.central_entity == 'patent':
                 print("\tTesting patent_ids by location for {table_name}".format(table_name=table))
-            else:
+            elif self.central_entity == 'publication':
                 print("\tTesting document_numbers by location for {table_name}".format(table_name=table))
+            else:
+                raise NotImplementedError
             try:
                 if not self.connection.open:
                     self.connection.connect()
                 row_query = "select count(1) from {tbl}".format(tbl=table)
-                if self.central_entity == 'patent':
-                    location_query = "select {field}, count(distinct patent_id) from {tbl} group by {field};".format(tbl=table, field=field)
+                if table == 'patent':
+                    # location_query = "select {field}, count(distinct id) from {tbl} inner join {loc_table} on {field}={loc_field} group by {field};".format(tbl=table, field=field, loc_table="patent.country_codes", loc_field="alpha-2")
+                    location_query = """
+                        SELECT t.{field}, count(distinct t.id) 
+                        from {tbl} t join patent.country_codes cc
+                        on t.country = cc.`alpha-2`
+                        group by t.{field}               
+                    """.format(
+                        tbl=table,
+                        field=field)
+                elif self.central_entity == 'patent':
+                    # location_query = "select {field}, count(distinct patent_id) from {tbl} group by {field};".format(tbl=table, field=field)
+                    location_query = """
+                        SELECT t.{field}, count(distinct t.patent_id) 
+                        from {tbl} t join patent.country_codes cc
+                        on t.country = cc.`alpha-2`
+                        group by t.{field}               
+                    """.format(
+                        tbl=table,
+                        field=field)
+                elif self.central_entity == 'publication':
+                    # location_query = "select {field}, count(distinct document_number) from {tbl} group by {field};".format(tbl=table, field=field)
+                    location_query = """
+                        SELECT t.{field}, count(distinct t.document_number) 
+                        from {tbl} t join patent.country_codes cc
+                        on t.country = cc.`alpha-2`
+                        group by t.{field}               
+                    """.format(
+                        tbl=table,
+                        field=field)
                 else:
-                    location_query = "select {field}, count(distinct document_number) from {tbl} group by {field};".format(tbl=table, field=field)
+                    raise NotImplementedError
 
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(row_query)
@@ -625,20 +675,22 @@ group by `{field}`
             })
 
     def runTests(self):
-        skiplist = []
-        for table in self.table_config:
+        skiplist = self.exclusion_list
+        # for table in self.table_config:
+        # for table in ['rawassignee_20201229']
+        for table in [ 'rawinventor', 'rawuspc', 'rel_app_text', 'us_parties', 'uspc', 'usreldoc']:
             if table in skiplist:
                 continue
             print("Beginning Test for {table_name} in {db}".format(table_name=table,
                                                                    db=self.config["PATENTSVIEW_DATABASES"][
                                                                        self.database_section]))
-            self.test_yearly_count(table, strict=False)
-            self.test_table_row_count(table)
+            # self.test_yearly_count(table, strict=False)
+            # self.test_table_row_count(table)
             self.test_blank_count(table, self.table_config[table])
-            self.test_nulls(table, self.table_config[table])
-            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
-            self.load_floating_patent_count(table, self.table_config[table])
-            self.load_prefix_counts(table)
+            # self.test_nulls(table, self.table_config[table])
+            # self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
+            # self.load_floating_patent_count(table, self.table_config[table])
+            # self.load_prefix_counts(table)
             for field in self.table_config[table]["fields"]:
                 print("\tBeginning tests for {field} in {table_name}".format(field=field, table_name=table))
                 if "date_field" in self.table_config[table]["fields"][field] and \
@@ -648,9 +700,9 @@ group by `{field}`
                     self.load_category_counts(table, field)
                 if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
                     self.test_text_length(table, field)
-                if "location_field" in self.table_config[table]["fields"][field] and \
-                        self.table_config[table]["fields"][field]["location_field"]:
-                    self.test_counts_by_location(table, field)
+                # if self.table_config[table]["fields"][field]['location_field']:
+                #     self.test_counts_by_location(table, field)
                 self.test_null_byte(table, field)
             self.save_qa_data()
             self.init_qa_dict()
+            print(f"Finished With Table: {table}")
