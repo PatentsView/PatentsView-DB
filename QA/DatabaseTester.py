@@ -15,16 +15,9 @@ from lib.configuration import get_current_config
 class DatabaseTester(ABC):
     def __init__(self, config, database_section, start_date, end_date):
         # super().__init__(config, database_section, start_date, end_date)
-        """
-        Do not instantiate. Overriden class constructor
-        :param config: Configparser object containing update parameters
-        :param database_section: Section in config that indicates database to use. RAW_DB or TEMP_UPLOAD_DB
-        :param start_date: Database Update start date
-        :param end_date: Database Update end date
-        """
         self.project_home = os.environ['PACKAGE_HOME']
         class_called = self.__class__.__name__
-        if (database_section == "RAW_DB") or (database_section == "TEMP_UPLOAD_DB" and class_called[:5] == 'Merge'):
+        if database_section == "patent" or database_section[:6] == 'upload':
             self.exclusion_list = ['assignee',
                                    'cpc_group',
                                    'cpc_subgroup',
@@ -51,7 +44,7 @@ class DatabaseTester(ABC):
                     "table_config_granted"]), ))
             self.p_key = "id"
             self.f_key = "patent_id"
-        elif database_section == "PGPUBS_DATABASE":
+        elif database_section == "pregrant_publications" or database_section[:6] == 'pgpubs':
             # TABLES WITHOUT DOCUMENT_NUMBER ARE EXCLUDED FROM THE TABLE CONFIG
             self.central_entity = "publication"
             self.category = 'kind'
@@ -74,11 +67,11 @@ class DatabaseTester(ABC):
                     "table_config_pgpubs"]), ))
             self.p_key = "document_number"
             self.f_key = "document_number"
-        elif database_section == "TEXT_DATABASE" or (database_section == "TEMP_UPLOAD_DB" and class_called[:4] == 'Text'):
+        elif database_section == "TEXT_DATABASE":
             self.table_config = json.load(open("{}".format(
                 self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
                     "table_config_text"]), ))
-        self.exclusion_list = []
+
         # Update start and end date
         self.start_date = start_date
         self.end_date = end_date
@@ -88,7 +81,7 @@ class DatabaseTester(ABC):
         self.connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                           user=config['DATABASE_SETUP']['USERNAME'],
                                           password=config['DATABASE_SETUP']['PASSWORD'],
-                                          db=config['PATENTSVIEW_DATABASES'][database_section],
+                                          db=database_section,
                                           charset='utf8mb4',
                                           cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
         # self.database_connection_string = get_connection_string(config, database_section)
@@ -98,28 +91,38 @@ class DatabaseTester(ABC):
         self.database_section = database_section
 
         try:
-            database_type = self.config["PATENTSVIEW_DATABASES"][self.database_section].split("_")[0]
+            database_type = [self.database_section].split("_")[0]
         except:
-            database_type = self.config["PATENTSVIEW_DATABASES"][self.database_section]
+            database_type = [self.database_section]
 
         self.version = self.end_date.strftime("%Y%m%d")
         self.database_type = database_type
 
-        # Generates Class Specific Config
+        # Generates Class & DB Specific Config
         keep_tables = []
-        for i in self.table_config.keys():
-            if class_called in self.table_config[i]['TestScripts']:
-                keep_tables.append(i)
-        self.table_config = self.with_keys(self.table_config, keep_tables)
-        print(f"The following list of tables are run for {class_called}:")
-        print(self.table_config.keys())
+        if database_section == "TEXT_DATABASE":
+            brf_key = f"brf_sum_text_{end_date.year}"
+            clm_key = f"claims_{end_date.year}"
+            ddr_key = f"draw_desc_text_{end_date.year}"
+            ddt_key = f"detail_desc_text_{end_date.year}"
+            for i in self.table_config.keys():
+                if i in [brf_key, clm_key, ddr_key, ddt_key]:
+                    keep_tables.append(i)
+            self.table_config = self.with_keys(self.table_config, keep_tables)
+        else:
+            for i in self.table_config.keys():
+                if class_called in self.table_config[i]['TestScripts']:
+                    keep_tables.append(i)
+            self.table_config = self.with_keys(self.table_config, keep_tables)
+            print(f"The following list of tables are run for {class_called}:")
+            print(self.table_config.keys())
 
         # Following variables are overridden by inherited classes
         # Dict of tables involved on QC checks
         # Prefix indicates database where patent table is available
         # Current databaseif prefix is None
         # Used for Text databases
-        self.db_prefix = None
+        # self.db_prefix = None
 
     # UTILITY FUNCTIONS
     def with_keys(self, d, keys):
@@ -139,13 +142,7 @@ class DatabaseTester(ABC):
         }
 
     def load_table_row_count(self, table_name):
-        """
-        Test and collect row counts. Raises exception if any of the tables are empty
-        :param table_name: table name to collect row count for
-        """
-        print("\tTesting Table counts for {table_name} in {db}".format(table_name=table_name,
-                                                                       db=self.config["PATENTSVIEW_DATABASES"][
-                                                                           self.database_section]))
+        print(f"\tTesting Table counts for {table_name} in {self.database_section}")
         try:
             if not self.connection.open:
                 self.connection.connect()
@@ -176,11 +173,6 @@ where 1=0
                 self.connection.close()
 
     def test_blank_count(self, table, table_config):
-        """
-        Verify there are no blank values in any of the text columns
-        :param table: Table to verify
-        :param table_config: Column configuration for table
-        """
         print("\tTesting blanks for {table_name}".format(table_name=table))
         for field in table_config["fields"]:
             if table_config["fields"][field]["data_type"] in ['varchar', 'mediumtext', 'text']:
@@ -198,7 +190,7 @@ where `{field}` = '' and 1=0
                         if count_value != 0:
                             exception_message = """
 Blanks encountered in  table found:{database}.{table} column {col}. Count: {count}
-                            """.format(database=self.config['PATENTSVIEW_DATABASES'][self.database_section],
+                            """.format(database=self.database_section,
                                        table=table, col=field,
                                        count=count_value)
                             raise Exception(exception_message)
@@ -228,18 +220,13 @@ where INSTR(`{field}`, CHAR(0x00)) > 0 and 1=0
                     exception_message = """
 {count} rows with NUL Byte found in {field} of {table_name} for {db}                    
                     """.format(count=nul_byte_count, field=field, table_name=table,
-                               db=self.config["PATENTSVIEW_DATABASES"][self.database_section])
+                               db=self.database_section)
                     raise Exception(exception_message)
         finally:
             if self.connection.open:
                 self.connection.close()
 
     def load_category_counts(self, table, field):
-        """
-        Load counts of rows by each value for a given "categorical variable" field
-        :param table: Table to gather counts for
-        :param field: Categorical variable field
-        """
         print("\t\tLoading category counts for {field} in {table_name}".format(field=field, table_name=table))
         try:
             if not self.connection.open:
@@ -335,7 +322,7 @@ group by 1
 
     def load_yearly_count(self, table_name, strict=True):
         if table_name not in self.exclusion_list:
-            print("\tTesting yearly entities counts for {table_name}".format(table_name=table_name))
+            print(f"\tTesting yearly entities counts for {table_name}")
             try:
                 if not self.connection.open:
                     self.connection.connect()
@@ -383,8 +370,8 @@ group by 1
                         found = True
                         if row['patent_count'] < 1:
                             raise Exception(
-                                "Year {yr} has 0 {f_key} in the database {db}".format(yr=year, f_key=self.f_key, db=
-                                self.config['PATENTSVIEW_DATABASES'][self.database_section]))
+                                f"Year {year} has 0 {self.f_key} in the database {self.database_section}"
+                            )
             if self.connection.open:
                     self.connection.close()
             # if strict:
@@ -435,8 +422,8 @@ group by 1
                                                 main_table=table_name,
                                                 related_table=related_entity_config['related_table'],
                                                 main_table_id=related_entity_config['main_table_id'],
-                                                related_table_id=related_entity_config['related_table_id'], db=
-                                            self.config['PATENTSVIEW_DATABASES'][self.database_section])
+                                                related_table_id=related_entity_config['related_table_id'],
+                                                db=self.database_section)
                                         )
                             except pymysql.Error as e:
                                 if table_name not in self.exclusion_list:
@@ -569,60 +556,54 @@ group by 1
                     self.connection.close()
 
     def load_counts_by_location(self, table, field):
-        """
-        Test and collect count NULL values in different fields
-        :param table:
-        :param table_config:
-        """
-        if table not in self.exclusion_list:
-            print("\tTesting {f_key} by location for {table_name}".format(table_name=table, f_key=self.f_key))
-            try:
-                if not self.connection.open:
-                    self.connection.connect()
-                row_query = "select count(1) from {tbl}".format(tbl=table)
-                if table == 'patent':
-                    location_query = f"""
-                        SELECT t.`{field}`, count(distinct t.{self.p_key}) 
-                        from {table} t join patent.country_codes cc
-                        on t.country = cc.`alpha-2`
-                        where 1=0
-                        group by t.`{field}`             
-                    """
-                else:
-                    location_query = f"""
-                        SELECT t.`{field}`, count(distinct t.{self.f_key}) 
-                        from {table} t join patent.country_codes cc
-                        on t.country = cc.`alpha-2`
-                        where 1=0
-                        group by t.`{field}`               
-                    """
-                print(location_query)
+        print("\tTesting {f_key} by location for {table_name}".format(table_name=table, f_key=self.f_key))
+        try:
+            if not self.connection.open:
+                self.connection.connect()
+            row_query = "select count(1) from {tbl}".format(tbl=table)
+            if table == 'patent':
+                location_query = f"""
+                    SELECT t.`{field}`, count(*) 
+                    from {table} t join patent.country_codes cc
+                    on t.country = cc.`alpha-2`
+                    where 1=0
+                    group by t.`{field}`             
+                """
+            else:
+                location_query = f"""
+                    SELECT t.`{field}`, count(*) 
+                    from {table} t join patent.country_codes cc
+                    on t.country = cc.`alpha-2`
+                    where 1=0
+                    group by t.`{field}`               
+                """
+            print(location_query)
 
-                with self.connection.cursor() as count_cursor:
-                    count_cursor.execute(row_query)
-                    row_count = count_cursor.fetchall()
-                    count_cursor.execute(location_query)
-                    for count_row in count_cursor.fetchall():
-                        write_table_name = table
-                        prefix = "temp_"
-                        if table.startswith(prefix):
-                            write_table_name = table[len(prefix):]
-                        self.qa_data['DataMonitor_locationcount'].append(
-                            {
-                                "database_type": self.database_type,
-                                'update_version': self.version,
-                                'table_name': write_table_name,
-                                'table_row_count': row_count[0][0],
-                                'patent_id_count': count_row[1],
-                                'location': count_row[0]
-                            })
+            with self.connection.cursor() as count_cursor:
+                count_cursor.execute(row_query)
+                row_count = count_cursor.fetchall()
+                count_cursor.execute(location_query)
+                for count_row in count_cursor.fetchall():
+                    write_table_name = table
+                    prefix = "temp_"
+                    if table.startswith(prefix):
+                        write_table_name = table[len(prefix):]
+                    self.qa_data['DataMonitor_locationcount'].append(
+                        {
+                            "database_type": self.database_type,
+                            'update_version': self.version,
+                            'table_name': write_table_name,
+                            'table_row_count': row_count[0][0],
+                            'patent_id_count': count_row[1],
+                            'location': count_row[0]
+                        })
 
-            except pymysql.err.InternalError as e:
-                if table not in self.exclusion_list:
-                    raise e
-            finally:
-                if self.connection.open:
-                    self.connection.close()
+        except pymysql.err.InternalError as e:
+            if table not in self.exclusion_list:
+                raise e
+        finally:
+            if self.connection.open:
+                self.connection.close()
 
     def save_qa_data(self):
         qa_engine = create_engine(self.qa_connection_string)
@@ -661,33 +642,31 @@ group by 1
         # Skiplist is Used for Testing ONLY, Should remain blank
         skiplist = []
         for table in self.table_config:
-            #if table[:1] >= 'p':
-            print("Beginning Test for {table_name} in {db}".format(table_name=table,
-                                                                   db=self.config["PATENTSVIEW_DATABASES"][
-                                                                       self.database_section]))
-            self.load_yearly_count(table, strict=False)
-            self.load_table_row_count(table)
-            self.test_blank_count(table, self.table_config[table])
-            self.load_nulls(table, self.table_config[table])
-            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
-            self.load_main_floating_entity_count(table, self.table_config[table])
-            self.load_entity_category_counts(table)
-            for field in self.table_config[table]["fields"]:
-                print("\tBeginning tests for {field} in {table_name}".format(field=field, table_name=table))
-                if "date_field" in self.table_config[table]["fields"][field] and \
-                        self.table_config[table]["fields"][field]["date_field"]:
-                    print("DATE FIELD")
-                    # self.test_zero_dates(table, field)
-                if self.table_config[table]["fields"][field]['category']:
-                    self.load_category_counts(table, field)
-                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-                    self.load_text_length(table, field)
-                if self.table_config[table]["fields"][field]['location_field']:
-                    self.load_counts_by_location(table, field)
-                self.test_null_byte(table, field)
-            # self.save_qa_data()
-            # self.init_qa_dict()
-            print(f"Finished With Table: {table}")
+            if table[:1] >= 'r':
+                print(f"Beginning Test for {table} in {self.database_section}")
+                self.load_yearly_count(table, strict=False)
+                self.load_table_row_count(table)
+                self.test_blank_count(table, self.table_config[table])
+                self.load_nulls(table, self.table_config[table])
+                self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
+                self.load_main_floating_entity_count(table, self.table_config[table])
+                self.load_entity_category_counts(table)
+                for field in self.table_config[table]["fields"]:
+                    print(f"\tBeginning tests for {field} in {table}")
+                    if "date_field" in self.table_config[table]["fields"][field] and \
+                            self.table_config[table]["fields"][field]["date_field"]:
+                        print("DATE FIELD")
+                        # self.test_zero_dates(table, field)
+                    if self.table_config[table]["fields"][field]['category']:
+                        self.load_category_counts(table, field)
+                    if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
+                        self.load_text_length(table, field)
+                    if self.table_config[table]["fields"][field]['location_field']:
+                        self.load_counts_by_location(table, field)
+                    self.test_null_byte(table, field)
+                # self.save_qa_data()
+                # self.init_qa_dict()
+                print(f"Finished With Table: {table}")
 
 
 if __name__ == '__main__':
@@ -700,5 +679,5 @@ if __name__ == '__main__':
     # databases = ["RAW_DB", "PGPUBS_DATABASE"]
     databases = ["PGPUBS_DATABASE"]
     for d in databases:
-        pt = DatabaseTester(config, d, datetime.date(2021, 12, 7), datetime.date(2022, 1, 19))
+        pt = DatabaseTester(config, 'patent', datetime.date(2021, 12, 7), datetime.date(2022, 1, 19))
         pt.runTests()

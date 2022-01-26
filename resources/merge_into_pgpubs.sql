@@ -2,6 +2,8 @@ INSERT INTO pregrant_publications.publication SELECT * FROM publication;
 
 INSERT INTO pregrant_publications.application SELECT * FROM application;
 
+INSERT INTO pregrant_publications.brf_sum_text_2021 SELECT * FROM brf_sum_text_2021;
+
 INSERT INTO pregrant_publications.brf_sum_text_2020 SELECT * FROM brf_sum_text_2020;
 
 INSERT INTO pregrant_publications.brf_sum_text_2019 SELECT * FROM brf_sum_text_2019;
@@ -41,6 +43,8 @@ INSERT INTO pregrant_publications.brf_sum_text_2003 SELECT * FROM brf_sum_text_2
 INSERT INTO pregrant_publications.brf_sum_text_2002 SELECT * FROM brf_sum_text_2002;
 
 INSERT INTO pregrant_publications.brf_sum_text_2001 SELECT * FROM brf_sum_text_2001;
+
+INSERT INTO pregrant_publications.claim_2021 SELECT * FROM claim_2021;
 
 INSERT INTO pregrant_publications.claim_2020 SELECT * FROM claim_2020;
 
@@ -84,6 +88,8 @@ INSERT INTO pregrant_publications.claim_2001 SELECT * FROM claim_2001;
 
 INSERT INTO pregrant_publications.cpc SELECT * FROM cpc;
 
+INSERT INTO pregrant_publications.detail_desc_text_2021 SELECT * FROM detail_desc_text_2021;
+
 INSERT INTO pregrant_publications.detail_desc_text_2020 SELECT * FROM detail_desc_text_2020;
 
 INSERT INTO pregrant_publications.detail_desc_text_2019 SELECT * FROM detail_desc_text_2019;
@@ -123,6 +129,8 @@ INSERT INTO pregrant_publications.detail_desc_text_2003 SELECT * FROM detail_des
 INSERT INTO pregrant_publications.detail_desc_text_2002 SELECT * FROM detail_desc_text_2002;
 
 INSERT INTO pregrant_publications.detail_desc_text_2001 SELECT * FROM detail_desc_text_2001;
+
+INSERT INTO pregrant_publications.draw_desc_text_2021 SELECT * FROM draw_desc_text_2021;
 
 INSERT INTO pregrant_publications.draw_desc_text_2020 SELECT * FROM draw_desc_text_2020;
 

@@ -1,15 +1,16 @@
 import pandas as pd
+import datetime
 import pymysql
 from sqlalchemy import create_engine
 
 from lib import xml_helpers
-from lib.configuration import get_config, get_connection_string
+from lib.configuration import get_config, get_connection_string, get_current_config
 
 
 class WithdrawnTest:
     def __init__(self, config):
         self.config = config
-        self.qa_connection_string = get_connection_string(self.config, 'QA_DATABASE')
+        self.qa_connection_string = get_connection_string(self.config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
         self.connection = pymysql.connect(host=self.config['DATABASE_SETUP']['HOST'],
                                           user=self.config['DATABASE_SETUP']['USERNAME'],
                                           password=self.config['DATABASE_SETUP']['PASSWORD'],
@@ -61,6 +62,9 @@ class WithdrawnTest:
 
 
 if __name__ == '__main__':
-    config = get_config()
+    # config = get_config()
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+            })
     qc = WithdrawnTest(config)
     qc.runTests()

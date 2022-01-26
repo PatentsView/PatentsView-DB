@@ -1,0 +1,2 @@
+database_type,update_version,table_name,column_name,max_text_length
+patent,20220111,cpc_subgroup,title,
