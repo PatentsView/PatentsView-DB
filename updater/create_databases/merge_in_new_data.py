@@ -5,7 +5,8 @@ import time
 
 from sqlalchemy import create_engine
 
-from QA.create_databases.MergeTest import MergeTest
+from QA.create_databases.MergeTestQuarterly import MergeTestQuarterly
+from QA.create_databases.MergeTestWeekly import MergeTestWeekly
 from QA.create_databases.TextTest import TextMergeTest
 from lib.configuration import get_connection_string, get_current_config, get_lookup_tables, get_merge_table_candidates
 
@@ -216,24 +217,51 @@ from {temp_db}.detail_desc_text_{year}
     merge_text_data(text_table_config, config)
 
 
-def post_merge(**kwargs):
+def post_merge_weekly_granted(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
     run_id = kwargs.get('run_id')
-    if run_id.startswith("backfill"):
-        print("Skipping QC")
-    else:
-        qc = MergeTest(config, run_id=kwargs['run_id'])
-        qc.runTests()
+    # if run_id.startswith("backfill"):
+    #     print("Skipping QC")
+    # else:
+    qc = MergeTestWeekly(config, run_id=kwargs['run_id'])
+    qc.runTests()
+
+def post_merge_quarterly_granted(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
+    run_id = kwargs.get('run_id')
+    # if run_id.startswith("backfill"):
+    #     print("Skipping QC")
+    # else:
+    qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
+    qc.runTests()
+
+def post_merge_weekly_pgpubs(**kwargs):
+    config = get_current_config('pgpubs', **kwargs)
+    run_id = kwargs.get('run_id')
+    # if run_id.startswith("backfill"):
+    #     print("Skipping QC")
+    # else:
+    qc = MergeTestWeekly(config, run_id=kwargs['run_id'])
+    qc.runTests()
+
+def post_merge_quarterly_pgpubs(**kwargs):
+    config = get_current_config('pgpubs', **kwargs)
+    run_id = kwargs.get('run_id')
+    # if run_id.startswith("backfill"):
+    #     print("Skipping QC")
+    # else:
+    qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
+    qc.runTests()
 
 
 def post_text_merge(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
     run_id = kwargs.get('run_id')
-    if run_id.startswith("backfill"):
-        print("Skipping QC")
-    else:
-        qc = TextMergeTest(config)
-        qc.runTests()
+    # if run_id.startswith("backfill"):
+    #     print("Skipping QC")
+    # else:
+    qc = TextMergeTest(config)
+    qc.runTests()
 
 
 if __name__ == '__main__':
@@ -241,7 +269,8 @@ if __name__ == '__main__':
     #         "execution_date": datetime.date(2020, 12, 1),
     #         "run_id":         1
     #         }, )
-    post_merge(**{
+    post_merge_weekly(**{
             "execution_date": datetime.date(2020, 12, 1),
-            "run_id":         1
+            "run_id":         "testing"
             })
+    print("TESTING POST MERGE")

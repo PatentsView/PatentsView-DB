@@ -17,7 +17,7 @@ class DatabaseTester(ABC):
         # super().__init__(config, database_section, start_date, end_date)
         self.project_home = os.environ['PACKAGE_HOME']
         class_called = self.__class__.__name__
-        if database_section == "patent" or database_section[:6] == 'upload':
+        if database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload'):
             self.exclusion_list = ['assignee',
                                    'cpc_group',
                                    'cpc_subgroup',
@@ -44,21 +44,15 @@ class DatabaseTester(ABC):
                     "table_config_granted"]), ))
             self.p_key = "id"
             self.f_key = "patent_id"
-        elif database_section == "pregrant_publications" or database_section[:6] == 'pgpubs':
+        elif (database_section == "pregrant_publications") or (class_called[:6] == 'Upload' and database_section[:6] == 'pgpubs'):
             # TABLES WITHOUT DOCUMENT_NUMBER ARE EXCLUDED FROM THE TABLE CONFIG
             self.central_entity = "publication"
             self.category = 'kind'
             self.exclusion_list = ['assignee',
-                                 'assignee_disambiguation_mapping',
                                  'clean_rawlocation',
                                  'inventor',
-                                 'inventor_disambiguation_mapping',
                                  'location_assignee',
-                                 'location_assignee_20210330',
-                                 'location_disambiguation_mapping',
                                  'location_inventor',
-                                 'persistent_assignee_disambig',
-                                 'persistent_assignee_disambig_long',
                                  'rawlocation',
                                  'rawlocation_geos_missed',
                                  'rawlocation_lat_lon']
@@ -67,12 +61,24 @@ class DatabaseTester(ABC):
                     "table_config_pgpubs"]), ))
             self.p_key = "document_number"
             self.f_key = "document_number"
-        elif database_section == "TEXT_DATABASE":
-            self.table_config = json.load(open("{}".format(
-                self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                    "table_config_text"]), ))
+        elif class_called[:4] == 'Text':
+            self.category = ""
+            self.central_entity = ""
+            self.p_key = ""
+            self.exclusion_list = []
 
-        # Update start and end date
+            if database_section[:6] == 'upload' or database_section == 'patent_text':
+                self.table_config = json.load(open("{}".format(
+                    self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+                        "table_config_text_granted"]), ))
+            elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
+                self.table_config = json.load(open("{}".format(
+                    self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+                        "table_config_text_pgpubs"]), ))
+            else:
+                raise NotImplementedError
+
+            # Update start and end date
         self.start_date = start_date
         self.end_date = end_date
 
@@ -91,29 +97,22 @@ class DatabaseTester(ABC):
         self.database_section = database_section
 
         try:
-            database_type = [self.database_section].split("_")[0]
+            database_type = self.database_section.split("_")[0]
         except:
-            database_type = [self.database_section]
+            database_type = self.database_section
 
         self.version = self.end_date.strftime("%Y%m%d")
         self.database_type = database_type
 
         # Generates Class & DB Specific Config
         keep_tables = []
-        if database_section == "TEXT_DATABASE":
-            brf_key = f"brf_sum_text_{end_date.year}"
-            clm_key = f"claims_{end_date.year}"
-            ddr_key = f"draw_desc_text_{end_date.year}"
-            ddt_key = f"detail_desc_text_{end_date.year}"
-            for i in self.table_config.keys():
-                if i in [brf_key, clm_key, ddr_key, ddt_key]:
-                    keep_tables.append(i)
-            self.table_config = self.with_keys(self.table_config, keep_tables)
+        for i in self.table_config.keys():
+            if class_called in self.table_config[i]['TestScripts']:
+                keep_tables.append(i)
+        self.table_config = self.with_keys(self.table_config, keep_tables)
+        if database_section == "TEXT_DATABASE" or (class_called[:4] == 'Text'):
+            pass
         else:
-            for i in self.table_config.keys():
-                if class_called in self.table_config[i]['TestScripts']:
-                    keep_tables.append(i)
-            self.table_config = self.with_keys(self.table_config, keep_tables)
             print(f"The following list of tables are run for {class_called}:")
             print(self.table_config.keys())
 
@@ -321,7 +320,7 @@ group by 1
                 self.connection.close()
 
     def load_yearly_count(self, table_name, strict=True):
-        if table_name not in self.exclusion_list:
+        if table_name not in self.exclusion_list and self.p_key != '':
             print(f"\tTesting yearly entities counts for {table_name}")
             try:
                 if not self.connection.open:
@@ -512,8 +511,8 @@ group by 1
                     self.connection.close()
 
     def load_entity_category_counts(self, table_name):
-        if table_name not in self.exclusion_list:
-            print("\t Loading entity counts by {category} type for {table_name}".format(table_name=table_name, category=self.category))
+        if table_name not in self.exclusion_list and self.category != '':
+            print(f"\t Loading entity counts by {self.category} type for {table_name}")
             try:
                 if not self.connection.open:
                     self.connection.connect()
@@ -638,35 +637,60 @@ group by 1
                 'max_text_length': text_length
             })
 
+    def test_patent_abstract_null(self, table):
+        if not self.connection.open:
+            self.connection.connect()
+        if self.central_entity == 'patent':
+            count_query = f"""
+            SELECT count(*) as null_abstract_count 
+            from {self.central_entity} 
+            where abstract is null and type!='design' and type!='reissue' 
+                and id not in ('4820515', '4885173', '6095757', '6363330', '6571026', '6601394', '6602488', '6602501', '6602630', '6602899', '6603179', '6615064', '6744569', 'H002199', 'H002200', 'H002203', 'H002204', 'H002217', 'H002235')
+            """
+        elif self.central_entity == 'publication':
+            count_query = f"""
+            SELECT count(*) as null_abstract_count 
+            from {self.central_entity} p
+                left join application a on p.document_number=a.document_number 
+            where invention_abstract is null """
+        with self.connection.cursor() as count_cursor:
+            count_cursor.execute(count_query)
+            count_value = count_cursor.fetchall()[0][0]
+            if count_value != 0:
+                raise Exception(
+                        f"NULLs (Non-design patents) encountered in table found:{self.database_section}.{table} column abstract. Count: {count_value}")
+
     def runTests(self):
         # Skiplist is Used for Testing ONLY, Should remain blank
         skiplist = []
         for table in self.table_config:
-            if table[:1] >= 'r':
-                print(f"Beginning Test for {table} in {self.database_section}")
-                self.load_yearly_count(table, strict=False)
-                self.load_table_row_count(table)
-                self.test_blank_count(table, self.table_config[table])
-                self.load_nulls(table, self.table_config[table])
-                self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
-                self.load_main_floating_entity_count(table, self.table_config[table])
-                self.load_entity_category_counts(table)
-                for field in self.table_config[table]["fields"]:
-                    print(f"\tBeginning tests for {field} in {table}")
-                    if "date_field" in self.table_config[table]["fields"][field] and \
-                            self.table_config[table]["fields"][field]["date_field"]:
-                        print("DATE FIELD")
-                        # self.test_zero_dates(table, field)
-                    if self.table_config[table]["fields"][field]['category']:
-                        self.load_category_counts(table, field)
-                    if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-                        self.load_text_length(table, field)
-                    if self.table_config[table]["fields"][field]['location_field']:
-                        self.load_counts_by_location(table, field)
-                    self.test_null_byte(table, field)
-                # self.save_qa_data()
-                # self.init_qa_dict()
-                print(f"Finished With Table: {table}")
+            print(f"Beginning Test for {table} in {self.database_section}")
+            self.load_yearly_count(table, strict=False)
+            self.load_table_row_count(table)
+            self.test_blank_count(table, self.table_config[table])
+            self.load_nulls(table, self.table_config[table])
+            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
+            self.load_main_floating_entity_count(table, self.table_config[table])
+            self.load_entity_category_counts(table)
+            if table == self.central_entity:
+                self.test_patent_abstract_null(table)
+            for field in self.table_config[table]["fields"]:
+                print(f"\tBeginning tests for {field} in {table}")
+                if "date_field" in self.table_config[table]["fields"][field] and \
+                        self.table_config[table]["fields"][field]["date_field"]:
+                    self.test_zero_dates(table, field)
+                if "category" in self.table_config[table]["fields"][field] and \
+                        self.table_config[table]["fields"][field]["category"]:
+                    self.load_category_counts(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
+                    self.load_text_length(table, field)
+                if self.table_config[table]["fields"][field]['location_field'] and \
+                        self.table_config[table]["fields"][field]["location_field"]:
+                    self.load_counts_by_location(table, field)
+                self.test_null_byte(table, field)
+            # self.save_qa_data()
+            # self.init_qa_dict()
+            print(f"Finished With Table: {table}")
 
 
 if __name__ == '__main__':

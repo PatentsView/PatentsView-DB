@@ -83,13 +83,12 @@ class MergeTestWeekly(DatabaseTester):
 
 
 if __name__ == '__main__':
-    # granted_patent pgpubs
-    # config = get_current_config('granted_patent', **{
-    #     "execution_date": datetime.date(2021, 10, 5)
-    # })
-    config = get_current_config('pgpubs', **{
-        "execution_date": datetime.date(2021, 12, 2)
+    config = get_current_config('granted_patent', **{
+        "execution_date": datetime.date(2021, 10, 5)
     })
+    # config = get_current_config('pgpubs', **{
+    #     "execution_date": datetime.date(2021, 12, 2)
+    # })
     print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
     print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
     print(config['PATENTSVIEW_DATABASES']["TEXT"])

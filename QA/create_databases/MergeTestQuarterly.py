@@ -14,8 +14,11 @@ class MergeTestQuarterly(DatabaseTester):
 
 
 if __name__ == '__main__':
+    # config = get_current_config('granted_patent', **{
+    #     "execution_date": datetime.date(2021, 10, 5)
+    # })
     config = get_current_config('pgpubs', **{
-        "execution_date": datetime.date(2021, 1, 6)
+        "execution_date": datetime.date(2021, 12, 2)
     })
     # fill with correct run_id
     run_id = "scheduled__2021-12-11T09:00:00+00:00"

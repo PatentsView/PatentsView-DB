@@ -115,12 +115,6 @@
       "bulk_generated": true,
       "direct_load": false
     },
-    "inventor_disambiguation_ids": {
-      "raw_data": false,
-      "lookup": false,
-      "bulk_generated": false,
-      "direct_load": false
-    },
     "inventor_disambiguation_mapping": {
       "raw_data": false,
       "lookup": false,

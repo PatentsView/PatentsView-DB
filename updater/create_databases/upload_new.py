@@ -91,20 +91,25 @@ def upload_current_data(**kwargs):
     begin_upload(update_config=config)
 
 
-def post_upload(**kwargs):
+def post_upload_granted(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
     qc = UploadTest(config)
     qc.runTests()
 
 
+def post_upload_pgpubs(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('pgpubs', **kwargs)
+    qc = UploadTest(config)
+    qc.runTests()
+
 if __name__ == '__main__':
-    begin_database_setup(**{
+    # begin_database_setup(**{
+    #         "execution_date": datetime.date(2021, 2, 5)
+    #         })
+    pu = post_upload(**{
             "execution_date": datetime.date(2021, 2, 5)
             })
-    # upload_current_data(**{
-    #         "execution_date": datetime.date(2020, 12, 1)
-    #         })
-    # post_upload(**{
-    #         "execution_date": datetime.date(2020, 12, 1)
-    #         })
+    breakpoint()
+    print("Checking Post Upload")
