@@ -15,11 +15,11 @@ from lib.configuration import get_config, get_connection_string, get_current_con
 
 def update_long_entity(entity, database_type='granted_patent', **kwargs):
     config = get_current_config(type=database_type, **kwargs)
-    section = get_database_section(database_type)
+    # section = get_database_section(database_type)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
                                  password=config['DATABASE_SETUP']['PASSWORD'],
-                                 db=config['PATENTSVIEW_DATABASES'][section],
+                                 db=config['PATENTSVIEW_DATABASES']["PROD_DB"],
                                  charset='utf8mb4',
                                  cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
     update_version = config['DATES']['END_DATE']
@@ -29,7 +29,7 @@ def update_long_entity(entity, database_type='granted_patent', **kwargs):
     target_persistent_table = 'persistent_{entity}_disambig_long'.format(entity=entity)
 
     entity_update_query = """
-    INSERT INTO {target_table} (uuid, database_update, {entity_id}) SELECT uuid, {db_version},{entity_id} from {source_table}
+    INSERT INTO {target_table} (uuid, database_update, {entity_id}) SELECT uuid, {db_version}, {entity_id} from {source_table}
     """.format(
             target_table=target_persistent_table, source_table=source_entity_table, entity_id=source_entity_field,
             db_version=update_version)
@@ -40,7 +40,7 @@ def update_long_entity(entity, database_type='granted_patent', **kwargs):
         persiste_update_cursor.execute(entity_update_query)
 
 
-def generate_wide_header(connection, entity, config,section):
+def generate_wide_header(connection, entity, config, section):
     ############ 1. Create output file for wide format and needed wide/long column lists
     # get disambig cols from old db's persistent_inventor_disambig
     current_rawentity = 'current_raw{0}_id'.format(entity)
@@ -51,8 +51,7 @@ def generate_wide_header(connection, entity, config,section):
     with connection.cursor() as header_cursor:
         column_query = """
         select column_name from information_schema.columns where table_schema = '{0}' and table_name = '{1}';
-        """.format(
-                config['PATENTSVIEW_DATABASES'][section], persistent_table)
+        """.format(section, persistent_table)
         header_cursor.execute(column_query)
         pid_cols = [r[0] for r in header_cursor.fetchall()]
     disambig_cols = [x for x in pid_cols if x.startswith('disamb')]
@@ -64,32 +63,32 @@ def generate_wide_header(connection, entity, config,section):
     return header_df
 
 
-def get_database_section(database_type='granted_patent'):
-    if database_type == 'granted_patent':
-        return 'RAW_DB'
-    elif database_type == 'pgpubs':
-        return 'PGPUBS_DATABASE'
-    else:
-        return None
+# def get_database_section(database_type='granted_patent'):
+#     if database_type == 'granted_patent':
+#         return 'RAW_DB'
+#     elif database_type == 'pgpubs':
+#         return 'PGPUBS_DATABASE'
+#     else:
+#         return None
 
 
 def prepare_wide_table(entity, database_type='granted_patent', **kwargs):
     config = get_current_config(type=database_type, **kwargs)
-    section = get_database_section(database_type)
+    # section = get_database_section(database_type)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
                                  password=config['DATABASE_SETUP']['PASSWORD'],
-                                 db=config['PATENTSVIEW_DATABASES'][section],
+                                 db=config['PATENTSVIEW_DATABASES']['PROD_DB'],
                                  charset='utf8mb4',
                                  cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
     update_version = config['DATES']['END_DATE']
     wide_table_name = "persistent_{entity}_disambig".format(entity=entity)
-    RAW_DB = config['PATENTSVIEW_DATABASES'][section]
+    RAW_DB = config['PATENTSVIEW_DATABASES']['PROD_DB']
     if not connection.open:
         connection.connect()
     with connection.cursor() as wide_table_prep_cursor:
         # only read header for creating table
-        wide_pid_df = generate_wide_header(connection, entity, config,section)
+        wide_pid_df = generate_wide_header(connection, entity, config, RAW_DB)
 
         alter_stmt = 'alter table {0}.{1} add column disamb_{2}_id_{3} varchar(256) null after {4} '.format(
                 RAW_DB,
@@ -106,11 +105,11 @@ def prepare_wide_table(entity, database_type='granted_patent', **kwargs):
 
 def write_wide_table(entity, database_type='granted_patent', **kwargs):
     config = get_current_config(type=database_type, **kwargs)
-    section = get_database_section(database_type=database_type)
+    # section = get_database_section(database_type=database_type)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
                                  password=config['DATABASE_SETUP']['PASSWORD'],
-                                 db=config['PATENTSVIEW_DATABASES'][section],
+                                 db=config['PATENTSVIEW_DATABASES']['PROD_DB'],
                                  charset='utf8mb4',
                                  cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
     update_version = config['DATES']['END_DATE']
@@ -128,7 +127,7 @@ def write_wide_table(entity, database_type='granted_patent', **kwargs):
                source_entity=source_entity_table)
     # fixed
 
-    cstr = get_connection_string(config, database=section)
+    cstr = get_connection_string(config, database=config['PATENTSVIEW_DATABASES']['PROD_DB'])
     engine = create_engine(cstr)
     with engine.connect() as connection:
         connection.execute(upsert_query)

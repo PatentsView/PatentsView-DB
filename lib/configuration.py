@@ -73,8 +73,8 @@ def get_backup_command(**kwargs):
     config = get_current_config(**kwargs)
     conf_parameter = config['DATABASE_SETUP']['CONFIG_FILE']
     directory_parameter = "{datahome}/{database}_backup".format(datahome=config["FOLDERS"]["WORKING_FOLDER"],
-                                                                database=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
-    database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
+                                                                database=config["PATENTSVIEW_DATABASES"]["PROD_DB"])
+    database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["PROD_DB"])
     verbosity = 3
     thread = 6
 
@@ -92,7 +92,7 @@ def get_loader_command(config, project_home):
     conf_parameter = "{home}/resources/sql.conf".format(home=project_home)
     directory_parameter = "{datahome}/{database}_backup".format(datahome=config["FOLDERS"]["WORKING_FOLDER"],
                                                                 database=config["PATENTSVIEW_DATABASES"]["OLD_DB"])
-    database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
+    database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["PROD_DB"])
     verbosity = 3
     thread = 6
 
@@ -244,9 +244,12 @@ def get_current_config(type='granted_patent', supplemental_configs=None, **kwarg
 
 if __name__ == '__main__':
     # pgpubs, granted_patent
-    config = get_current_config('granted_patent', **{
+    # config = get_current_config('granted_patent', **{
+    #     "execution_date": datetime.date(2021, 11, 4)
+    # })
+    get_backup_command(**{
         "execution_date": datetime.date(2021, 11, 4)
     })
-    print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["TEXT"])
+    # print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
+    # print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
+    # print(config['PATENTSVIEW_DATABASES']["TEXT"])

@@ -21,7 +21,7 @@ from lib.configuration import get_connection_string, get_current_config
 
 
 def prepare_tables(config):
-    cstr = get_connection_string(config, 'RAW_DB')
+    cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr + "&local_infile=1")
     timestamp = str(int(time.time()))
     with engine.connect() as connection:

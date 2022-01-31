@@ -40,7 +40,7 @@ def consolidate_cpc_data(cpc_file, config, add_indexes):
         with engine.connect() as conn:
             cpc_chunk.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
     delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null".format(
-            raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
+            raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"])
     engine.execute(delete_query)
     for add_statement in add_indexes:
         engine.execute(add_statement[0])
@@ -56,7 +56,7 @@ ON DUPLICATE KEY UPDATE patent_id = VALUES(patent_id),
                         category = VALUES(category),
                         `sequence` = VALUES(`sequence`),
                         version_indicator = VALUES(version_indicator);
-    """.format(raw_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    """.format(raw_db=config['PATENTSVIEW_DATABASES']['PROD_DB'])
     engine.execute(upsert_query)
 
 

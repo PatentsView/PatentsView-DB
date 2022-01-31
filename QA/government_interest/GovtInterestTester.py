@@ -64,7 +64,7 @@ FROM   `government_interest` gi
         for date_clause, where_combination_type in where_combinations:
 
             where_clause = "AND ".join([date_clause, organization_wheres[where_combination_type]])
-            sampler_query = sampler_template.format(where_clause=where_clause, raw_db=self.config['PATENTSVIEW_DATABASES']['RAW_DB'])
+            sampler_query = sampler_template.format(where_clause=where_clause, raw_db=self.config['PATENTSVIEW_DATABASES']['PROD_DB'])
             with self.connection.cursor() as gov_int_cursor:
                 gov_int_cursor.execute(sampler_query)
                 for gov_int_row in gov_int_cursor:

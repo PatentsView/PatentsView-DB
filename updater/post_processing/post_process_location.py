@@ -411,7 +411,7 @@ class LocationPostProcessor():
         city = clean_loc(row['city'])
         state = clean_loc(row['state'])
         country = clean_loc(row['country'])
-        engine = create_engine(get_connection_string(config, "RAW_DB"))
+        engine = create_engine(get_connection_string(config, 'PROD_DB'))
         query = self.build_location_query(city, state, country)
         if query is not None:
             results = pd.read_sql_query(sql=query, con=engine)
@@ -469,32 +469,33 @@ def lookup_fips(city, state, country, lookup_dict):
     return result
 
 
-def update_rawlocation(update_config, database='RAW_DB', uuid_field='id'):
+def update_rawlocation(update_config, database='PROD_DB', uuid_field='id'):
     engine = create_engine(get_connection_string(update_config, database))
     update_statement = """
         UPDATE rawlocation rl left join location_disambiguation_mapping ldm
             on ldm.uuid = rl.{uuid_field}
         set rl.location_id = ldm.location_id
-    """.format(uuid_field=uuid_field, granted_db=update_config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    """.format(uuid_field=uuid_field, granted_db=update_config['PATENTSVIEW_DATABASES']['PROD_DB'])
     print(update_statement)
-    engine.execute(update_statement)
+    # engine.execute(update_statement)
 
 
 def precache_locations(config):
     location_cache_query = """
         INSERT IGNORE INTO disambiguated_location_ids (location_id)
         SELECT distinct location_id 
-        from {granted_db}.rawlocation 
+        from patent.rawlocation 
         where location_id is not null
         UNION
         SELECT distinct location_id 
-        from {pregrant_db}.rawlocation
+        from pregrant_publications.rawlocation
         where location_id is not null;
-    """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
-               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    """
+    # format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
+    #            granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    engine = create_engine(get_connection_string(config, 'PROD_DB'))
     print(location_cache_query)
-    engine.execute(location_cache_query)
+    # engine.execute(location_cache_query)
 
 
 def generate_disambiguated_locations(engine, rank_chunk):
@@ -621,7 +622,7 @@ def location_reduce(location_full_data: pd.DataFrame):
 
 
 def create_location(update_config, version_indicator):
-    engine = create_engine(get_connection_string(update_config, "RAW_DB"))
+    engine = create_engine(get_connection_string(update_config, "PROD_DB"))
     limit = 10000
     offset = 0
     for rank in range(0, 100):
@@ -646,14 +647,14 @@ def create_location(update_config, version_indicator):
 
 
 def update_lat_lon(config):
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
     query = "update location l Join location_lat_lon lll set l.latitude = lll.latitude, l.longitude = lll.longitude " \
             "where l.`id` = lll.`id`"
     engine.execute(query)
 
 
 def update_county_info(config):
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
     query = """
     update location l Join location_fips lf
     set l.county      = lf.county,
@@ -665,7 +666,7 @@ def update_county_info(config):
 
 
 def update_location_lat_lon(config):
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
     location_query = "select * from location"
     location_df = pd.read_sql_query(sql=location_query, con=engine)
     lp = LocationPostProcessor(config)
@@ -681,7 +682,7 @@ def update_location_lat_lon(config):
 
 
 def update_fips(config):
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
     location_query = "select * from location"
     location_df = pd.read_sql_query(sql=location_query, con=engine)
 
@@ -699,19 +700,21 @@ def update_fips(config):
 
 
 def post_process_location(**kwargs):
-    config = get_current_config(**kwargs)
-    version_indicator = config['DATES']['END_DATE']
-    update_rawlocation(config)
-    update_rawlocation(config, database='PGPUBS_DATABASE')
-    precache_locations(config)
-    create_location(config, version_indicator=version_indicator)
-    update_fips(config)
-    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
+    pgpubs_config = get_current_config('pgpubs', **kwargs)
+    patent_config = get_current_config('granted_patent', **kwargs)
+    patent_version_indicator = patent_config['DATES']['END_DATE']
+    pgpubs_version_indicator = pgpubs_config['DATES']['END_DATE']
+    update_rawlocation(patent_config, database='PROD_DB')
+    update_rawlocation(pgpubs_config, database='PROD_DB')
+    precache_locations(patent_config)
+    create_location(patent_config, version_indicator=patent_version_indicator)
+    update_fips(patent_config)
+    load_lookup_table(update_config=patent_config, database='PROD_DB', parent_entity='location',
                       parent_entity_id=None, entity='assignee', include_location=True,
-                      location_strict=True, version_indicator=version_indicator)
-    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
+                      location_strict=True, version_indicator=patent_version_indicator)
+    load_lookup_table(update_config=pgpubs_config, database='PROD_DB', parent_entity='location',
                       parent_entity_id=None, entity="inventor", include_location=True,
-                      location_strict=True, version_indicator=version_indicator)
+                      location_strict=True, version_indicator=patent_version_indicator)
 
 
 def post_process_qc(**kwargs):
@@ -724,6 +727,6 @@ if __name__ == '__main__':
     post_process_location(**{
             "execution_date": datetime.date(2021, 6, 22)
             })
-    post_process_qc(**{
-            "execution_date": datetime.date(2021, 6, 22)
-            })
+    # post_process_qc(**{
+    #         "execution_date": datetime.date(2021, 6, 22)
+    #         })

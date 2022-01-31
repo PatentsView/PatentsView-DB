@@ -44,14 +44,14 @@ def upload_disambig_results(update_config):
         engine.dispose()
 
 
-def update_rawassignee(update_config, database='RAW_DB', uuid_field='uuid'):
+def update_rawassignee(update_config, database='PROD_DB', uuid_field='uuid'):
     engine = create_engine(get_connection_string(update_config, database))
     update_statement = """
         UPDATE rawassignee ra left join assignee_disambiguation_mapping adm
             on adm.uuid = ra.{uuid_field} 
         set  ra.assignee_id = adm.assignee_id
     """.format(uuid_field=uuid_field,
-               granted_db=update_config['PATENTSVIEW_DATABASES']['RAW_DB'])
+               granted_db=update_config['PATENTSVIEW_DATABASES']['PROD_DB'])
     print(update_statement)
     engine.execute(update_statement)
 
@@ -87,7 +87,7 @@ def generate_disambiguated_assignees(update_config, engine, limit, offset):
 
 
 def create_assignee(update_config, version_indicator):
-    engine = create_engine(get_connection_string(update_config, "RAW_DB"))
+    engine = create_engine(get_connection_string(update_config, "PROD_DB"))
     limit = 10000
     offset = 0
     while True:
@@ -118,13 +118,14 @@ def precache_assignees(config):
     assignee_cache_query = """
         INSERT IGNORE INTO disambiguated_assignee_ids (assignee_id)
         SELECT assignee_id
-        from {granted_db}.rawassignee
+        from patent.rawassignee
         UNION
         SELECT assignee_id
-        from {pregrant_db}.rawassignee;
-    """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
-               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
+        from pregrant_publications.rawassignee;
+    """
+        # .format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
+        #        granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
     print(assignee_cache_query)
     engine.execute(assignee_cache_query)
 
@@ -140,17 +141,19 @@ def assignee_reduce(assignee_data):
 
 
 def post_process_assignee(**kwargs):
-    config = get_current_config(**kwargs)
-    version_indicator = config['DATES']['END_DATE']
-    update_rawassignee(config, database='PGPUBS_DATABASE', uuid_field='id')
-    update_rawassignee(config, database='RAW_DB', uuid_field='uuid')
+    pgpubs_config = get_current_config('pgpubs', **kwargs)
+    patent_config = get_current_config('granted_patent', **kwargs)
+    patent_version_indicator = patent_config['DATES']['END_DATE']
+    pgpubs_version_indicator = pgpubs_config['DATES']['END_DATE']
+    update_rawassignee(pgpubs_config, database='PROD_DB', uuid_field='id')
+    update_rawassignee(patent_config, database='PROD_DB', uuid_field='uuid')
     precache_assignees(config)
-    create_assignee(config, version_indicator=version_indicator)
-    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
-                      parent_entity_id='patent_id', entity='assignee', version_indicator=version_indicator,
+    create_assignee(patent_config, version_indicator=patent_version_indicator)
+    load_lookup_table(update_config=config, database='PROD_DB', parent_entity='patent',
+                      parent_entity_id='patent_id', entity='assignee', version_indicator=patent_version_indicator,
                       include_location=True)
-    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
-                      parent_entity_id='document_number', entity="assignee", version_indicator=version_indicator,
+    load_lookup_table(update_config=config, database='PROD_DB', parent_entity='publication',
+                      parent_entity_id='document_number', entity="assignee", version_indicator=pgpubs_version_indicator,
                       include_location=True)
 
 

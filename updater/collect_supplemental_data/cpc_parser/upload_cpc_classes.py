@@ -94,7 +94,7 @@ def upload_cpc_classes(**kwargs):
     upload_cpc_subgroup(db_con, config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], cpc_folder,
                         config['DATES']['END_DATE'])
 
-    raw_cstr = get_connection_string(config, "RAW_DB")
+    raw_cstr = get_connection_string(config, "PROD_DB")
     raw_db_con = create_engine(raw_cstr)
     update_raw_db(raw_db_con, config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
 

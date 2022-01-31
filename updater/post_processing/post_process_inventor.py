@@ -11,7 +11,7 @@ from lib.configuration import get_connection_string, get_current_config
 from updater.post_processing.create_lookup import load_lookup_table
 
 
-def update_rawinventor(update_config, database='RAW_DB', uuid_field='uuid'):
+def update_rawinventor(update_config, database='PROD_DB', uuid_field='uuid'):
     engine = create_engine(get_connection_string(update_config, database))
     update_statement = """
         UPDATE rawinventor ri join inventor_disambiguation_mapping idm
@@ -84,19 +84,20 @@ def precache_inventors(config):
     inventor_cache_query = """
         INSERT IGNORE INTO disambiguated_inventor_ids (inventor_id)
         SELECT inventor_id
-        from {granted_db}.rawinventor
+        from patent.rawinventor
         UNION
         SELECT inventor_id
-        from {pregrant_db}.rawinventor;
-    """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
-               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
+        from pregrant_publications.rawinventor;
+    """
+        # .format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
+        #        granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
     print(inventor_cache_query)
     engine.execute(inventor_cache_query)
 
 
 def create_inventor(update_config, version_indicator):
-    engine = create_engine(get_connection_string(update_config, "RAW_DB"))
+    engine = create_engine(get_connection_string(update_config, "PROD_DB"))
     rename_name = "inventor_{tstamp}".format(tstamp=version_indicator)
     rename_sql = """
     RENAME TABLE inventor TO {target}
@@ -136,7 +137,7 @@ def create_inventor(update_config, version_indicator):
 
 
 def upload_disambig_results(update_config):
-    engine = create_engine(get_connection_string(update_config, "RAW_DB"))
+    engine = create_engine(get_connection_string(update_config, "PROD_DB"))
     disambig_output_file = "{wkfolder}/disambig_output/{disamb_file}".format(
             wkfolder=update_config['FOLDERS']['WORKING_FOLDER'],
             disamb_file="inventor_disambiguation.tsv")
@@ -163,17 +164,19 @@ def upload_disambig_results(update_config):
 
 
 def post_process_inventor(**kwargs):
-    config = get_current_config(**kwargs)
-    version_indicator = config['DATES']['END_DATE']
-    update_rawinventor(config, database='PGPUBS_DATABASE', uuid_field='id')
-    update_rawinventor(config, database='RAW_DB', uuid_field='uuid')
-    precache_inventors(config)
-    create_inventor(config, version_indicator=version_indicator)
-    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
-                      parent_entity_id='patent_id', entity='inventor', version_indicator=version_indicator,
+    pgpubs_config = get_current_config('pgpubs', **kwargs)
+    patent_config = get_current_config('granted_patent', **kwargs)
+    patent_version_indicator = patent_config['DATES']['END_DATE']
+    pgpubs_version_indicator = pgpubs_config['DATES']['END_DATE']
+    update_rawinventor(pgpubs_config, database='PROD_DB', uuid_field='id')
+    update_rawinventor(patent_config, database='PROD_DB', uuid_field='uuid')
+    precache_inventors(patent_config)
+    create_inventor(patent_config, version_indicator=patent_version_indicator)
+    load_lookup_table(update_config=patent_config, database='PROD_DB', parent_entity='patent',
+                      parent_entity_id='patent_id', entity='inventor', version_indicator=patent_version_indicator,
                       include_location=True, location_strict=False)
-    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
-                      parent_entity_id='document_number', entity="inventor", version_indicator=version_indicator,
+    load_lookup_table(update_config=pgpubs_config, database='PROD_DB', parent_entity='publication',
+                      parent_entity_id='document_number', entity="inventor", version_indicator=pgpubs_version_indicator,
                       include_location=True)
 
 

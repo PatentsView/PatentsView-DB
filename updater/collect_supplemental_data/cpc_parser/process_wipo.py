@@ -107,7 +107,7 @@ def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordan
 
 
 def consolidate_wipo(config):
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
     upsert_query = """
 INSERT INTO wipo (patent_id, field_id, sequence, version_indicator) SELECT patent_id, field_id, sequence, version_indicator from {temp_db}.wipo ON DUPLICATE KEY UPDATE patent_id = VALUES(patent_id),
                         field_id = VALUES(field_id),
@@ -115,12 +115,13 @@ INSERT INTO wipo (patent_id, field_id, sequence, version_indicator) SELECT paten
                         version_indicator = VALUES(version_indicator);
 """.format(
             temp_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
+    breakpoint()
     engine.execute(upsert_query)
 
 
 def process_and_upload_wipo(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
-    myengine = create_engine(get_connection_string(config, "RAW_DB"))
+    myengine = create_engine(get_connection_string(config, "PROD_DB"))
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                  'wipo_output')
     if not os.path.exists(wipo_output):
@@ -155,6 +156,12 @@ def process_and_upload_wipo(**kwargs):
 
 
 if __name__ == '__main__':
+    # process_and_upload_wipo(**{
+    #         "execution_date": datetime.date(2020, 12,29)
+    #         })
+    # config = get_current_config('granted_patent', **{
+    #     "execution_date": datetime.date(2021, 12, 2)
+    # })
     process_and_upload_wipo(**{
-            "execution_date": datetime.date(2020, 12,29)
-            })
+        "execution_date": datetime.date(2021, 12, 2)
+    })
