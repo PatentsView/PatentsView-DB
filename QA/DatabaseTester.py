@@ -10,73 +10,15 @@ import os
 
 from lib.configuration import get_connection_string
 from lib.configuration import get_current_config
-
+from lib.utilities import with_keys, get_relevant_attributes, class_db_specific_config
 
 class DatabaseTester(ABC):
     def __init__(self, config, database_section, start_date, end_date):
         # super().__init__(config, database_section, start_date, end_date)
         self.project_home = os.environ['PACKAGE_HOME']
         class_called = self.__class__.__name__
-        if database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload'):
-            self.exclusion_list = ['assignee',
-                                   'cpc_group',
-                                   'cpc_subgroup',
-                                   'cpc_subsection',
-                                   'government_organization',
-                                   'inventor',
-                                   'lawyer',
-                                   'location',
-                                   'location_assignee',
-                                   'location_inventor',
-                                   'location_nber_subcategory',
-                                   'mainclass',
-                                   'nber_category',
-                                   'nber_subcategory',
-                                   'rawlocation',
-                                   'subclass',
-                                   'usapplicationcitation',
-                                   'uspatentcitation',
-                                   'wipo_field']
-            self.central_entity = 'patent'
-            self.category = 'type'
-            self.table_config = json.load(open("{}".format(
-                self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                    "table_config_granted"]), ))
-            self.p_key = "id"
-            self.f_key = "patent_id"
-        elif (database_section == "pregrant_publications") or (class_called[:6] == 'Upload' and database_section[:6] == 'pgpubs'):
-            # TABLES WITHOUT DOCUMENT_NUMBER ARE EXCLUDED FROM THE TABLE CONFIG
-            self.central_entity = "publication"
-            self.category = 'kind'
-            self.exclusion_list = ['assignee',
-                                 'clean_rawlocation',
-                                 'inventor',
-                                 'location_assignee',
-                                 'location_inventor',
-                                 'rawlocation',
-                                 'rawlocation_geos_missed',
-                                 'rawlocation_lat_lon']
-            self.table_config = json.load(open("{}".format(
-                self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                    "table_config_pgpubs"]), ))
-            self.p_key = "document_number"
-            self.f_key = "document_number"
-        elif class_called[:4] == 'Text':
-            self.category = ""
-            self.central_entity = ""
-            self.p_key = ""
-            self.exclusion_list = []
+        get_relevant_attributes(self, class_called, database_section, config)
 
-            if database_section[:6] == 'upload' or database_section == 'patent_text':
-                self.table_config = json.load(open("{}".format(
-                    self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                        "table_config_text_granted"]), ))
-            elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
-                self.table_config = json.load(open("{}".format(
-                    self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                        "table_config_text_pgpubs"]), ))
-            else:
-                raise NotImplementedError
 
             # Update start and end date
         self.start_date = start_date
@@ -98,34 +40,13 @@ class DatabaseTester(ABC):
 
         try:
             database_type = self.database_section.split("_")[0]
-        except:
+        except IndexError:
             database_type = self.database_section
 
         self.version = self.end_date.strftime("%Y%m%d")
         self.database_type = database_type
 
-        # Generates Class & DB Specific Config
-        keep_tables = []
-        for i in self.table_config.keys():
-            if class_called in self.table_config[i]['TestScripts']:
-                keep_tables.append(i)
-        self.table_config = self.with_keys(self.table_config, keep_tables)
-        if class_called[:4] == 'Text':
-            pass
-        else:
-            print(f"The following list of tables are run for {class_called}:")
-            print(self.table_config.keys())
-
-        # Following variables are overridden by inherited classes
-        # Dict of tables involved on QC checks
-        # Prefix indicates database where patent table is available
-        # Current databaseif prefix is None
-        # Used for Text databases
-        # self.db_prefix = None
-
-    # UTILITY FUNCTIONS
-    def with_keys(self, d, keys):
-        return {x: d[x] for x in d if x in keys}
+        class_db_specific_config(self, self.table_config, class_called)
 
     def init_qa_dict(self):
         # Place Holder for saving QA counts - keys map to table names in patent_QA
@@ -148,7 +69,6 @@ class DatabaseTester(ABC):
             count_query = f"""
 SELECT count(*) as table_count
 from {table_name}
-where 1=0
             """
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(count_query)
@@ -181,7 +101,7 @@ where 1=0
                     count_query = f"""
 SELECT count(*) as blank_count
 from `{table}`
-where `{field}` = '' and 1=0
+where `{field}` = ''
                     """
                     with self.connection.cursor() as count_cursor:
                         count_cursor.execute(count_query)
@@ -210,7 +130,7 @@ Blanks encountered in  table found:{database}.{table} column {col}. Count: {coun
             nul_byte_query = f"""
 SELECT count(*) as count
 from `{table}`
-where INSTR(`{field}`, CHAR(0x00)) > 0 and 1=0
+where INSTR(`{field}`, CHAR(0x00)) > 0
             """
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(nul_byte_query)
@@ -234,7 +154,6 @@ where INSTR(`{field}`, CHAR(0x00)) > 0 and 1=0
 SELECT `{field}` as value
     , count(*) as count
 from `{table}`
-where 1=0
 group by 1
             """
             with self.connection.cursor() as count_cursor:
@@ -271,7 +190,7 @@ group by 1
             try:
                 if not self.connection.open:
                     self.connection.connect()
-                count_query = f"SELECT count(*) as null_count from `{table}` where `{field}` is null and 1=0"
+                count_query = f"SELECT count(*) as null_count from `{table}` where `{field}` is null"
                 with self.connection.cursor() as count_cursor:
                     count_cursor.execute(count_query)
                     count_value = count_cursor.fetchall()[0][0]
@@ -304,7 +223,7 @@ group by 1
         try:
             if not self.connection.open:
                 self.connection.connect()
-            zero_query = f"SELECT count(*) zero_count from `{table}` where `{field}` ='0000-00-00' and 1=0"
+            zero_query = f"SELECT count(*) zero_count from `{table}` where `{field}` ='0000-00-00'"
             print(zero_query)
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(zero_query)
@@ -331,7 +250,6 @@ group by 1
                     SELECT year(`date`) as `yr`, 
                             count(1) as `year_count` 
                     from {self.central_entity} 
-                    where 1=0 
                     group by year(`date`)
                     """
                 else:
@@ -340,7 +258,6 @@ group by 1
                         , count(1) as `year_count` 
                     from {self.central_entity} p join {table_name} et 
                         on et.{self.f_key} = p.{self.p_key} 
-                    where 1=0 
                     group by year(`date`)
                     """
                 print(count_query)
@@ -384,7 +301,6 @@ group by 1
                 related_table_exists_query = """
                                 SELECT count( distinct {related_table_id}) as count 
                                 from {related_table}  
-                                where 1=0
                             """.format(
                     related_table=related_entity_config["related_table"],
                     related_table_id=related_entity_config["related_table_id"])
@@ -401,7 +317,7 @@ group by 1
                             SELECT count(1) 
                             from {related_table} related_table 
                                 left join {main_table} main_table on main_table.{main_table_id}= related_table.{related_table_id} 
-                            where main_table.{main_table_id} is null and related_table.{related_table_id} is not null and 1=0
+                            where main_table.{main_table_id} is null and related_table.{related_table_id} is not null
                             """.format(
                                 main_table=table_name,
                                 related_table=related_entity_config['related_table'],
@@ -445,7 +361,7 @@ group by 1
                 if not self.connection.open:
                     self.connection.connect()
                 related_table_exists_query = """
-                                SELECT count( distinct {related_table_id}) as count from {related_table}  where 1=0
+                                SELECT count( distinct {related_table_id}) as count from {related_table} 
                             """.format(
                     related_table=related_entity_config["related_table"],
                     related_table_id=related_entity_config["related_table_id"])
@@ -478,7 +394,7 @@ group by 1
                                             SELECT count(1) as count
                                             from {main_table} main 
                                             left join {related_table} related on main.{main_table_id}=related.{related_table_id} 
-                                            where related.{related_table_id} is null and 1=0 {additional_where}
+                                            where related.{related_table_id} is null {additional_where}
                                         """.format(
                                 main_table=table_name,
                                 related_table=related_entity_config["related_table"],
@@ -520,7 +436,6 @@ group by 1
                     count_query = f"""
                         select {self.category}, count(1)
                         from {self.central_entity}
-                        where 1=0
                         group by 1            
                     """
                 else:
@@ -528,7 +443,6 @@ group by 1
                         SELECT main.{self.category}, count(1)
                         from {self.central_entity} main join {table_name} related
                         on related.{self.f_key} = main.{self.p_key}
-                        where 1=0
                         group by 1               
                     """
                 print(count_query)
@@ -565,7 +479,6 @@ group by 1
                     SELECT t.`{field}`, count(*) 
                     from {table} t join patent.country_codes cc
                     on t.country = cc.`alpha-2`
-                    where 1=0
                     group by t.`{field}`             
                 """
             else:
@@ -573,7 +486,6 @@ group by 1
                     SELECT t.`{field}`, count(*) 
                     from {table} t join patent.country_codes cc
                     on t.country = cc.`alpha-2`
-                    where 1=0
                     group by t.`{field}`               
                 """
             print(location_query)
@@ -617,7 +529,7 @@ group by 1
 
     def load_text_length(self, table_name, field_name):
         print(f"\tLoading Text field max Length {field_name} in {table_name}")
-        text_length_query = f"SELECT max(char_length(`{field_name}`)) from `{table_name}` where 1=0;"
+        text_length_query = f"SELECT max(char_length(`{field_name}`)) from `{table_name}`;"
         print(text_length_query)
         if not self.connection.open:
             self.connection.connect()
@@ -662,7 +574,7 @@ group by 1
 
     def runTests(self):
         # Skiplist is Used for Testing ONLY, Should remain blank
-        skiplist = []
+        # skiplist = []
         for table in self.table_config:
             print(f"Beginning Test for {table} in {self.database_section}")
             self.load_yearly_count(table, strict=False)
@@ -688,8 +600,8 @@ group by 1
                         self.table_config[table]["fields"][field]["location_field"]:
                     self.load_counts_by_location(table, field)
                 self.test_null_byte(table, field)
-            # self.save_qa_data()
-            # self.init_qa_dict()
+            self.save_qa_data()
+            self.init_qa_dict()
             print(f"Finished With Table: {table}")
 
 
@@ -700,8 +612,5 @@ if __name__ == '__main__':
     })
     # fill with correct run_id
     run_id = "backfill__2020-12-29T00:00:00+00:00"
-    # databases = ["RAW_DB", "PGPUBS_DATABASE"]
-    databases = ["PGPUBS_DATABASE"]
-    for d in databases:
-        pt = DatabaseTester(config, 'patent', datetime.date(2021, 12, 7), datetime.date(2022, 1, 19))
-        pt.runTests()
+    pt = DatabaseTester(config, 'patent', datetime.date(2021, 12, 7), datetime.date(2022, 1, 19))
+    pt.runTests()

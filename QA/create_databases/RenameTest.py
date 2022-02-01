@@ -24,12 +24,12 @@ class DatabaseSetupTest:
 
 
     def runTests(self):
-        # self.test_database_encoding()
-        # self.test_table_encoding()
-        # self.test_column_encoding()
+        self.test_database_encoding()
+        self.test_table_encoding()
+        self.test_column_encoding()
         self.test_table_count()
-        # self.test_all_tables()
-        # self.test_tmp_tables()
+        self.test_all_tables()
+        self.test_tmp_tables()
 
     def test_table_count(self):
         print("Checking database encoding for {db}".format(db=self.raw_database))
@@ -131,5 +131,4 @@ if __name__ == '__main__':
     print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
     print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     DBSU = DatabaseSetupTest(config)
-    # DBSU.test_table_count()
     DBSU.runTests()

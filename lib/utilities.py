@@ -4,6 +4,7 @@ import datetime
 import logging
 import multiprocessing as mp
 import os
+import json
 import random
 import re
 import shutil
@@ -20,6 +21,87 @@ from sqlalchemy import create_engine
 
 from lib.configuration import get_connection_string
 
+
+def with_keys(d, keys):
+    return {x: d[x] for x in d if x in keys}
+
+
+def class_db_specific_config(self, table_config, class_called):
+    keep_tables = []
+    for i in table_config.keys():
+        if class_called in table_config[i]['TestScripts']:
+            keep_tables.append(i)
+    self.table_config = with_keys(table_config, keep_tables)
+    if class_called[:4] == 'Text':
+        pass
+    else:
+        print(f"The following list of tables are run for {class_called}:")
+        print(self.table_config.keys())
+
+
+
+def get_relevant_attributes(self, class_called, database_section, config):
+    if database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload'):
+        self.exclusion_list = ['assignee',
+                               'cpc_group',
+                               'cpc_subgroup',
+                               'cpc_subsection',
+                               'government_organization',
+                               'inventor',
+                               'lawyer',
+                               'location',
+                               'location_assignee',
+                               'location_inventor',
+                               'location_nber_subcategory',
+                               'mainclass',
+                               'nber_category',
+                               'nber_subcategory',
+                               'rawlocation',
+                               'subclass',
+                               'usapplicationcitation',
+                               'uspatentcitation',
+                               'wipo_field']
+        self.central_entity = 'patent'
+        self.category = 'type'
+        self.table_config = json.load(open("{}".format(
+            self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+                "table_config_granted"]), ))
+        self.p_key = "id"
+        self.f_key = "patent_id"
+    elif (database_section == "pregrant_publications") or (
+            class_called[:6] == 'Upload' and database_section[:6] == 'pgpubs'):
+        # TABLES WITHOUT DOCUMENT_NUMBER ARE EXCLUDED FROM THE TABLE CONFIG
+        self.central_entity = "publication"
+        self.category = 'kind'
+        self.exclusion_list = ['assignee',
+                               'clean_rawlocation',
+                               'inventor',
+                               'location_assignee',
+                               'location_inventor',
+                               'rawlocation',
+                               'rawlocation_geos_missed',
+                               'rawlocation_lat_lon']
+        self.table_config = json.load(open("{}".format(
+            self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+                "table_config_pgpubs"]), ))
+        self.p_key = "document_number"
+        self.f_key = "document_number"
+    elif class_called[:4] == 'Text':
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.exclusion_list = []
+
+        if database_section[:6] == 'upload' or database_section == 'patent_text':
+            self.table_config = json.load(open("{}".format(
+                self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+                    "table_config_text_granted"]), ))
+        elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
+            self.table_config = json.load(open("{}".format(
+                self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+                    "table_config_text_pgpubs"]), ))
+        else:
+            raise NotImplementedError
 
 def xstr(s):
     if s is None:

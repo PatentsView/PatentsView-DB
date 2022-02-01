@@ -299,7 +299,7 @@ def post_merge_weekly_granted(**kwargs):
     qc.runTests()
 
 def post_merge_quarterly_granted(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     run_id = kwargs.get('run_id')
     # if run_id.startswith("backfill"):
     #     print("Skipping QC")
@@ -317,7 +317,7 @@ def post_merge_weekly_pgpubs(**kwargs):
     qc.runTests()
 
 def post_merge_quarterly_pgpubs(**kwargs):
-    config = get_current_config('pgpubs', **kwargs)
+    config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     run_id = kwargs.get('run_id')
     # if run_id.startswith("backfill"):
     #     print("Skipping QC")
@@ -355,8 +355,11 @@ if __name__ == '__main__':
     #         "execution_date": datetime.date(2020, 12, 1),
     #         "run_id":         "testing"
     #         })
-    begin_text_merging_pgpubs(**{
-            "execution_date": datetime.date(2021, 12, 2),
-            })
+    post_merge_quarterly_granted( **{
+        "execution_date": datetime.date(2021, 12, 2)
+    })
+    # begin_text_merging_pgpubs(**{
+    #         "execution_date": datetime.date(2021, 12, 2),
+    #         })
     # update_table_data("application", config)
     print("TESTING POST MERGE")

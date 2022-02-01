@@ -44,7 +44,7 @@ def get_update_x_day(ref):
 
 
 def get_update_range(ref: DateTime):
-    exec_date = ref.date()
+    exec_date = ref
     quarter_latest_x_day = get_update_x_day((exec_date + pd.tseries.offsets.QuarterEnd(n=0)).date())
     # if exec_date < quarter_latest_x_day:
     #     quarter_latest_x_day = get_update_x_day(previous_quarter(exec_date))

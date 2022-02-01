@@ -258,6 +258,3 @@ operator_sequence_groups['merge_prepare_text_dependency'] = [qc_database_operato
 for dependency_group in operator_sequence_groups:
     dependency_sequence = operator_sequence_groups[dependency_group]
     chain_operators(dependency_sequence)
-
-breakpoint()
-print("These are all the GPU tasks! ")

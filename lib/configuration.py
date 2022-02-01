@@ -94,7 +94,7 @@ def get_loader_command(config, project_home):
     script = "{home}/lib/loader/index_optimized_loader".format(home=project_home)
     conf_parameter = "{home}/resources/sql.conf".format(home=project_home)
     directory_parameter = "{datahome}/{database}_backup".format(datahome=config["FOLDERS"]["WORKING_FOLDER"],
-                                                                database=config["PATENTSVIEW_DATABASES"]["OLD_DB"])
+                                                                database=config["PATENTSVIEW_DATABASES"]["PROD_DB"])
     database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["PROD_DB"])
     verbosity = 3
     thread = 6
