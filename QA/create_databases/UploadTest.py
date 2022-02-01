@@ -20,6 +20,6 @@ if __name__ == '__main__':
     })
     print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
     print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["TEXT"])
+    print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     upt = UploadTest(config)
     upt.runTests()

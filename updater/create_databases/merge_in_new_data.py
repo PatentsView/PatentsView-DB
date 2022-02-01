@@ -133,7 +133,7 @@ def normalize_exemplary(config):
 
 
 def update_text_data(table, update_config):
-    # connection_string = get_connection_string(update_config, "TEXT_DATABASE")
+    # connection_string = get_connection_string(update_config, "TEXT_DB")
     qa_connection_string = get_connection_string(update_config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
     engine = create_engine(qa_connection_string)
     query = table["insert"]
@@ -144,7 +144,7 @@ def merge_text_data(tables, update_config):
     print(tables)
     print(update_config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
     print(update_config['PATENTSVIEW_DATABASES']["PROD_DB"])
-    print(update_config['PATENTSVIEW_DATABASES']["TEXT_DATABASE"])
+    print(update_config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     breakpoint()
 
     for table in tables:
@@ -173,7 +173,7 @@ def begin_text_merging(**kwargs):
 INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, `text`, version_indicator)
 SELECT uuid, patent_id, text, version_indicator
 from {temp_db}.brf_sum_text_{year}
-                    """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
+                    """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DB'],
                                temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
                                year=year)
                     },
@@ -194,7 +194,7 @@ from {temp_db}.claims_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
                    on tce.patent_id = c.patent_id and tce.exemplary = c.sequence
                     """.format(
-                            text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
+                            text_db=config['PATENTSVIEW_DATABASES']['TEXT_DB'],
                             temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], year=year)
                     },
             'draw_desc_text':     {
@@ -202,7 +202,7 @@ from {temp_db}.claims_{year} c
 INSERT INTO {text_db}.draw_desc_text_{year}(uuid, patent_id, text, sequence, version_indicator)
 SELECT uuid, patent_id, text, sequence, version_indicator
 from {temp_db}.draw_desc_text_{year}
-                    """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
+                    """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DB'],
                                temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
                                year=year)
                     },
@@ -211,7 +211,7 @@ from {temp_db}.draw_desc_text_{year}
 INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length,version_indicator)
 SELECT uuid, patent_id, text,char_length(text), version_indicator
 from {temp_db}.detail_desc_text_{year}
-                              """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
+                              """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DB'],
                                          temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
                                          year=year)
                     },
@@ -228,7 +228,7 @@ def begin_text_merging_pgpubs(**kwargs):
     config = get_current_config('pgpubs', **kwargs)
     version = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'].split("_")[1]
     temp_db = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB']
-    text_db = config['PATENTSVIEW_DATABASES']['TEXT_DATABASE']
+    text_db = config['PATENTSVIEW_DATABASES']['TEXT_DB']
     prod_db = config['PATENTSVIEW_DATABASES']['PROD_DB']
     end_date=datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y%m%d")
     year = int(end_date.strftime('%Y'))

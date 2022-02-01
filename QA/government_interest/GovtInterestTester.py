@@ -9,10 +9,81 @@ class GovtInterestTester(DatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, 'TEMP_UPLOAD_DB', datetime.date(year=1976, month=1, day=1), end_date)
-        table_keys = ["patent_contractawardnumber", "patent_govintorg","government_organization"]
-        self.table_config = {key: value for key, value in self.table_config.items() if key in table_keys}
+        self.table_config = {
+                'patent_contractawardnumber': {
+                        "fields": {
+                                "patent_id":             {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "contract_award_number": {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        }
+                                }
+                        },
+                'patent_govintorg':           {
+                        "fields":           {
+                                "patent_id":       {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "organization_id": {
+                                        "data_type":    "int",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        }
+                                },
+                        "related_entities": [
+                                # {
+                                #         "table":          'government_organization',
+                                #         "source_id":      'organization_id',
+                                #         "destination_id": "organization_id"
+                                #         }
+                            ]
+                        },
+                'government_organization':    {
+                        "fields":           {
+                                "organization_id": {
+                                        "data_type":    "int",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "name":            {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "level_one":       {
+                                        "data_type":    "varchar",
+                                        "null_allowed": False,
+                                        "category":     False
+                                        },
+                                "level_two":       {
+                                        "data_type":    "varchar",
+                                        "null_allowed": True,
+                                        "category":     False
+                                        },
+                                "level_three":     {
+                                        "data_type":    "varchar",
+                                        "null_allowed": True,
+                                        "category":     False
+                                        }
+                                },
+                        "related_entities": [
+                                # {
+                                #         "table":          'patent_govintorg',
+                                #         "source_id":      'organization_id',
+                                #         "destination_id": "organization_id"
+                                #         }
+                             ]
+                        }
+                }
 
-        self.exclusion_list.extend(['government_organization'])
+        self.patent_exclusion_list.extend(['government_organization'])
 
     def init_qa_dict(self):
         super(GovtInterestTester, self).init_qa_dict()
@@ -107,4 +178,3 @@ if __name__ == '__main__':
             "END_DATE":   '20201229'
             }
     begin_gi_test(config)
-

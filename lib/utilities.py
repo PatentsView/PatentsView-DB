@@ -6,6 +6,7 @@ import multiprocessing as mp
 import os
 import random
 import re
+import shutil
 import string
 import zipfile
 from queue import Queue
@@ -81,21 +82,42 @@ def generate_index_statements(config, database_section, table):
     engine = create_engine(get_connection_string(config, database_section))
     db = config["PATENTSVIEW_DATABASES"][database_section]
     add_indexes_fetcher = engine.execute(
-            "SELECT CONCAT('ALTER TABLE `',TABLE_NAME,'` ','ADD ', IF(NON_UNIQUE = 1, CASE UPPER(INDEX_TYPE) WHEN "
-            "'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME, "
-            "'` USING ', INDEX_TYPE ) END, IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE "
-            "), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE ) ) ), '(', GROUP_CONCAT( DISTINCT "
-            "CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', ' ), ');' ) AS 'Show_Add_Indexes' "
-            "FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '" + db + "' AND TABLE_NAME='" + table + "' and "
-                                                                                                              "UPPER("
-                                                                                                              "INDEX_NAME) <> 'PRIMARY' GROUP BY TABLE_NAME, INDEX_NAME ORDER BY TABLE_NAME ASC, INDEX_NAME ASC; ")
+        """
+        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', 'ADD ', IF(NON_UNIQUE = 1, CASE UPPER(INDEX_TYPE)
+                                                                                        WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX'
+                                                                                        WHEN 'SPATIAL' THEN 'SPATIAL INDEX'
+                                                                                        ELSE CONCAT('INDEX `', INDEX_NAME,
+                                                                                            '` USING ', INDEX_TYPE) END,
+                                                                    IF(UPPER(INDEX_NAME) = 'PRIMARY',
+                                                                       CONCAT('PRIMARY KEY USING ', INDEX_TYPE),
+                                                                       CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ',
+                                                                           INDEX_TYPE))),
+                      '(', GROUP_CONCAT(DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', '),
+                      ');') AS 'Show_Add_Indexes'
+        FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = '{db}'
+          AND TABLE_NAME = '{table}'
+          and UPPER(INDEX_NAME) <> 'PRIMARY'
+        GROUP BY TABLE_NAME, INDEX_NAME, NON_UNIQUE, INDEX_TYPE
+        ORDER BY TABLE_NAME ASC, INDEX_NAME ASC;
+""".format(db=db, table=table))
     add_indexes = add_indexes_fetcher.fetchall()
 
     drop_indexes_fetcher = engine.execute(
-            "SELECT CONCAT( 'ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT( DISTINCT CONCAT( 'DROP ', "
-            "IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`') ) ) SEPARATOR ', "
-            "' ), ';' ) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '" + db + "' AND TABLE_NAME='" +
-            table + "' and UPPER(INDEX_NAME) <> 'PRIMARY' GROUP BY TABLE_NAME ORDER BY TABLE_NAME ASC")
+        """
+        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT(DISTINCT CONCAT('DROP ',
+                                                                                      IF(UPPER(INDEX_NAME) = 'PRIMARY',
+                                                                                         'PRIMARY KEY',
+                                                                                         CONCAT('INDEX `', INDEX_NAME, '`')))
+                                                                      SEPARATOR ',
+                    '), ';')
+        FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = '{db}'
+          AND TABLE_NAME = '{table}'
+          and UPPER(INDEX_NAME) <> 'PRIMARY'
+        GROUP BY TABLE_NAME
+        ORDER BY TABLE_NAME ASC
+            """.format(db=db, table=table))
     drop_indexes = drop_indexes_fetcher.fetchall()
     print(add_indexes)
     print(drop_indexes)
@@ -234,6 +256,17 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
         pool.join()
 
 
+def manage_ec2_instance(config, button='ON',identifier='xml_collector'):
+    instance_id=config['AWS_WORKER'][identifier]
+    ec2 = boto3.client('ec2', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
+                              aws_secret_access_key=config['AWS']['SECRET_KEY'],
+                              region_name='us-east-1')
+    if button=='ON':
+        response=ec2.start_instances(InstanceIds=[instance_id])
+    else:
+        response=ec2.stop_instances(InstanceIds=[instance_id])
+    return response['ResponseMetadata']['HTTPStatusCode']==200
+
 def rds_free_space(config, identifier):
     cloudwatch = boto3.client('cloudwatch', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
                               aws_secret_access_key=config['AWS']['SECRET_KEY'],
@@ -267,6 +300,42 @@ def rds_free_space(config, identifier):
     return mean(response['MetricDataResults'][0]['Values'])
 
 
+def get_host_name(local=True):
+    import requests
+    from requests.exceptions import ConnectionError
+    from airflow.utils import net
+    try:
+        host_key = 'local-hostname'
+        if not local:
+            host_key = 'public-hostname'
+        r = requests.get("http://169.254.169.254/latest/meta-data/{hkey}".format(hkey=host_key))
+        return r.text
+    except ConnectionError:
+        return net.get_host_ip_address()
+
+
 def chain_operators(chain):
     for upstream, downstream in zip(chain[:-1], chain[1:]):
         downstream.set_upstream(upstream)
+
+
+def archive_folder(source_folder, targets: list):
+    files = os.listdir(source_folder)
+    for target_folder in targets[0:-1]:
+        os.makedirs(target_folder, exist_ok=True)
+        for file_name in files:
+            shutil.copy(os.path.join(source_folder, file_name), target_folder)
+    os.makedirs(targets[-1], exist_ok=True)
+    for file_name in files:
+        shutil.copy(os.path.join(source_folder, file_name), targets[-1])
+
+
+def link_view_to_new_disambiguation_table(connection, table_name, disambiguation_type):
+    g_cursor = connection.cursor()
+    index_query = 'alter table {table_name} add primary key (uuid)'.format(
+        table_name=table_name)
+    replace_view_query = """
+        CREATE OR REPLACE VIEW {dtype}_disambiguation_mapping as SELECT uuid,{dtype}_id from {table_name}
+        """.format(table_name=table_name, dtype=disambiguation_type)
+    g_cursor.execute(index_query)
+    g_cursor.execute(replace_view_query)

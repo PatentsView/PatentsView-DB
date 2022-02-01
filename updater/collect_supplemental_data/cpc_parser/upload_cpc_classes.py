@@ -7,6 +7,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from lib.configuration import get_connection_string, get_current_config
+from updater.create_databases.upload_new import setup_database
 
 
 def upload_cpc_small_tables(db_con, db, folder, version_indicator):
@@ -74,7 +75,7 @@ from `{temp_db}`.`{table}`
 ON DUPLICATE KEY UPDATE title = VALUES(title),
                         version_indicator= VALUES(version_indicator);
 """
-    cpc_subsection_upsert_query = upsert_query_template.format(temp_db=temp_db,table='cpc_subsection')
+    cpc_subsection_upsert_query = upsert_query_template.format(temp_db=temp_db, table='cpc_subsection')
     cpc_group_upsert_query = upsert_query_template.format(temp_db=temp_db, table='cpc_group')
     cpc_subgroup_upsert_query = upsert_query_template.format(temp_db=temp_db, table='cpc_subgroup')
     with db_con.connect() as connection:
@@ -84,11 +85,12 @@ ON DUPLICATE KEY UPDATE title = VALUES(title),
 
 
 def upload_cpc_classes(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+
     cstr = get_connection_string(config, "TEMP_UPLOAD_DB")
     db_con = create_engine(cstr)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
-
+    setup_database(config, drop=False)
     upload_cpc_small_tables(db_con, config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], cpc_folder,
                             config['DATES']['END_DATE'])
     upload_cpc_subgroup(db_con, config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], cpc_folder,
@@ -101,5 +103,5 @@ def upload_cpc_classes(**kwargs):
 
 if __name__ == '__main__':
     upload_cpc_classes(**{
-            "execution_date": datetime.date(2020, 12, 15)
-            })
+        "execution_date": datetime.date(2020, 12, 15)
+    })

@@ -4,14 +4,16 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
-from slackclient import SlackClient
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
 
 project_home = os.environ['PACKAGE_HOME']
 config = configparser.ConfigParser()
 config.read(project_home + '/config.ini')
 
 slack_token = config["SLACK"]["API_TOKEN"]
-slack_client = SlackClient(slack_token)
+slack_client = WebClient(slack_token)
 slack_channel = config["SLACK"]["CHANNEL"]
 schema_only = config["REPORTING_DATABASE_OPTIONS"]["SCHEMA_ONLY"]
 if schema_only == "TRUE":

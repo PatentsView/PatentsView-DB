@@ -181,7 +181,7 @@ def find_ipc_url_test():
 
 
 def collect_cpc_data(**kwargs):
-    config  = get_current_config('granted_patent', **kwargs)
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     destination_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder)
@@ -191,15 +191,15 @@ def collect_cpc_data(**kwargs):
 
 
 def post_download(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     qc = CPCDownloadTest(config)
     qc.runTests()
 
 
 if __name__ == '__main__':
     collect_cpc_data(**{
-            "execution_date": datetime.date(2020, 12, 15)
-            })
+        "execution_date": datetime.date(2020, 12, 15)
+    })
     post_download(**{
-            "execution_date": datetime.date(2020, 12, 15)
-            })
+        "execution_date": datetime.date(2020, 12, 15)
+    })

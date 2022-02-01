@@ -44,8 +44,8 @@ default_args = {
     'email_on_retry': False,
     'retries': 3,
     'retry_delay': timedelta(minutes=5),
-    'concurrency': 4
-    # 'queue': 'bash_queue',
+    'concurrency': 4,
+    'queue': 'data_collector',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
     # 'end_date': datetime(2016, 1, 1),
@@ -55,7 +55,7 @@ granted_patent_parser = DAG(
     dag_id='granted_patent_updater',
     default_args=default_args,
     description='Download and process granted patent data and corresponding classifications data',
-    start_date=datetime(2021, 1, 5, hour=5, minute=0, second=0, tzinfo=local_tz),
+    start_date=datetime(2021, 7, 1, hour=5, minute=0, second=0, tzinfo=local_tz),
     schedule_interval=timedelta(weeks=1), catchup=True,
     template_searchpath=templates_searchpath,
 )
@@ -66,6 +66,9 @@ operator_settings = {
     'on_retry_callback': airflow_task_failure
 }
 operator_sequence_groups = {}
+# ##### Start Instance #####
+# instance_starter = PythonOperator(task_id='start_data_collector', python_callable=start_data_collector_instance,
+#                                   **operator_settings)
 ###### Download & Parse #######
 download_xml_operator = PythonOperator(task_id='download_xml', python_callable=bulk_download,
                                        **operator_settings)
@@ -74,11 +77,11 @@ upload_setup_operator = PythonOperator(task_id='upload_database_setup', python_c
 
 process_xml_operator = PythonOperator(task_id='process_xml',
                                       python_callable=preprocess_xml,
-                                      **operator_settings)
+                                      **operator_settings, pool='memory_intensive_pool')
 
 parse_xml_operator = PythonOperator(task_id='parse_xml',
                                     python_callable=patent_parser,
-                                    **operator_settings)
+                                    **operator_settings, pool='high_memory_pool')
 
 #### Database Load ####
 qc_database_operator = PythonOperator(task_id='qc_database_setup',
@@ -143,7 +146,7 @@ table_creation_operator = SQLTemplatedPythonOperator(
     },
     templates_exts=['.sql'],
     params={
-        'database': config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
+        'database': config['PATENTSVIEW_DATABASES']['TEXT_DB'],
         'add_suffix': False
     }
 )

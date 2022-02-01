@@ -108,22 +108,27 @@ def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordan
 
 def consolidate_wipo(config):
     engine = create_engine(get_connection_string(config, "PROD_DB"))
-    upsert_query = """
-INSERT INTO wipo (patent_id, field_id, sequence, version_indicator) SELECT patent_id, field_id, sequence, version_indicator from {temp_db}.wipo ON DUPLICATE KEY UPDATE patent_id = VALUES(patent_id),
-                        field_id = VALUES(field_id),
-                        `sequence` = VALUES(`sequence`),
-                        version_indicator = VALUES(version_indicator);
-""".format(
-            temp_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
-    breakpoint()
-    engine.execute(upsert_query)
+    start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
+    suffix = (start_date - datetime.timedelta(days=1)).strftime('%Y%m%d')
+    rename_raw_statement = """
+    rename table {raw_db}.wipo to {raw_db}.wipo_{suffix}
+    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"], suffix=suffix)
+    rename_upload_statement = """
+    rename table {upload_db}.wipo to {raw_db}.wipo
+    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"],
+               upload_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
+    print(rename_raw_statement)
+    engine.execute(rename_raw_statement)
+    print(rename_upload_statement)
+    engine.execute(rename_upload_statement)
 
 
 def process_and_upload_wipo(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     myengine = create_engine(get_connection_string(config, "PROD_DB"))
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                  'wipo_output')
+    version_indicator = config['DATES']['END_DATE']
     if not os.path.exists(wipo_output):
         os.mkdir(wipo_output)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
@@ -138,12 +143,12 @@ def process_and_upload_wipo(**kwargs):
     limit = 10000
     offset = 0
     batch_counter = 0
-    base_query_template = "SELECT id from patent order by id limit {limit} offset {offset}"
+    base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
     cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = c.patent_id"
     while True:
         start = time.time()
         batch_counter += 1
-        base_query = base_query_template.format(limit=limit, offset=offset)
+        base_query = base_query_template.format(limit=limit, offset=offset, vind=version_indicator)
         cpc_join_query = cpc_query_template.format(base_query=base_query)
         cpc_current_data = pd.read_sql_query(con=myengine, sql=cpc_join_query)
         if cpc_current_data.shape[0] < 1:
@@ -156,12 +161,6 @@ def process_and_upload_wipo(**kwargs):
 
 
 if __name__ == '__main__':
-    # process_and_upload_wipo(**{
-    #         "execution_date": datetime.date(2020, 12,29)
-    #         })
-    # config = get_current_config('granted_patent', **{
-    #     "execution_date": datetime.date(2021, 12, 2)
-    # })
     process_and_upload_wipo(**{
-        "execution_date": datetime.date(2021, 12, 2)
-    })
+            "execution_date": datetime.date(2020, 12,29)
+            })

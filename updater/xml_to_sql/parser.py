@@ -256,9 +256,9 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                     for field_element in field_elements:
                         extracted_data = extract_field_data(field_element, field, attribute, description, flag, tag)
                         multi_value_list.append(extracted_data)
-                    if not all([True if x is None else False for x in multi_value_list]):
+                    if not all([x is None for x in multi_value_list]):
                         data_list[field["field_name"]] = ", ".join(
-                                [x if x is not None else '' for x in multi_value_list])
+                            [x if x is not None else '' for x in multi_value_list])
                     else:
                         data_list[field["field_name"]] = None  # Return the extracted data
                     if tab['table_name'] == 'usreldoc_single' and field_element.tag == 'related-publication':
@@ -588,6 +588,18 @@ def begin_parsing(**kwargs):
 
 
 if __name__ == "__main__":
-    begin_parsing(**{
-            "execution_date": date(2020, 12, 17)
-            })
+    # begin_parsing(**{
+    #         "execution_date": date(2020, 12, 17)
+    #         })
+    type = 'pgpubs'
+    config = get_current_config(type=type, **{
+        "execution_date": date(2021, 7, 8)
+    })
+    parsing_file_setting = "{prefix}_parsing_config_file".format(prefix=type)
+    dtd_file_setting = "{prefix}_dtd_file".format(prefix=type)
+    dtd_file = '{}'.format(config['XML_PARSING'][dtd_file_setting])
+    parsing_config_file = "/opt/project/rawinventor.json"
+    parsing_config = json.load(open(parsing_config_file))
+    log_queue = Queue()
+    parse_publication_xml("/opt/project/ipa210708.xml", dtd_file='{}'.format(config['XML_PARSING'][dtd_file_setting]),
+                          table_xml_map=parsing_config, config=config, log_queue=log_queue)

@@ -110,7 +110,7 @@ class DatabaseTester(ABC):
             if class_called in self.table_config[i]['TestScripts']:
                 keep_tables.append(i)
         self.table_config = self.with_keys(self.table_config, keep_tables)
-        if database_section == "TEXT_DATABASE" or (class_called[:4] == 'Text'):
+        if class_called[:4] == 'Text':
             pass
         else:
             print(f"The following list of tables are run for {class_called}:")

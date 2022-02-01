@@ -129,7 +129,7 @@ if __name__ == '__main__':
     })
     print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
     print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["TEXT"])
+    print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     DBSU = DatabaseSetupTest(config)
     # DBSU.test_table_count()
     DBSU.runTests()

@@ -166,7 +166,7 @@ def session_generator(dbtype='grant'):
     # config = get_config()
     # echo = config.get('GLOBAL').get('echo')
     echo = True
-    read_database = "NEW_DB"
+    read_database = "RAW_DB"
     cstr = get_connection_string(config, read_database)
     engine = create_engine(cstr)
 
@@ -192,7 +192,7 @@ def fetch_session(dbtype='grant'):
     # config = get_config()
     echo = True
     if dbtype == 'grant':  # this is here so we can port to work for applicaitons also
-        read_database = "NEW_DB"
+        read_database = "RAW_DB"
         cstr = get_connection_string(config, read_database)
         engine = create_engine(cstr)
 

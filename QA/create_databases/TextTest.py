@@ -10,7 +10,7 @@ class TextMergeTest(DatabaseTester):
         clm_key = "claims_{year}".format(year=end_date.year)
         ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
-        super().__init__(config, config['PATENTSVIEW_DATABASES']["TEXT"], datetime.date(year=1976, month=1, day=1), end_date)
+        super().__init__(config, config['PATENTSVIEW_DATABASES']["TEXT_DB"], datetime.date(year=1976, month=1, day=1), end_date)
         keep_tables = []
         for i in self.table_config.keys():
             if i in [brf_key, clm_key, ddr_key, ddt_key]:
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     })
     print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
     print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["TEXT"])
+    print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     tmt = TextMergeTest(config)
     tmt.runTests()
     # tut = TextUploadTest(config)
