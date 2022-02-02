@@ -146,7 +146,7 @@ table_creation_operator = SQLTemplatedPythonOperator(
     },
     templates_exts=['.sql'],
     params={
-        'database': config['PATENTSVIEW_DATABASES']['TEXT_DB'],
+        'database': 'patent_text',
         'add_suffix': False
     }
 )
