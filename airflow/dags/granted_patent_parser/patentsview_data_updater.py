@@ -258,3 +258,6 @@ operator_sequence_groups['merge_prepare_text_dependency'] = [qc_database_operato
 for dependency_group in operator_sequence_groups:
     dependency_sequence = operator_sequence_groups[dependency_group]
     chain_operators(dependency_sequence)
+
+qc_merge_operator.set_upstream(merge_new_operator)
+qc_text_merge_operator.set_upstream(merge_text_operator)

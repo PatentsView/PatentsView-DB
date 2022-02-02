@@ -133,20 +133,14 @@ def normalize_exemplary(config):
 
 
 def update_text_data(table, update_config):
-    # connection_string = get_connection_string(update_config, "TEXT_DB")
-    qa_connection_string = get_connection_string(update_config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
-    engine = create_engine(qa_connection_string)
+    connection_string = get_connection_string(update_config, "TEXT_DB")
+    # qa_connection_string = get_connection_string(update_config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
+    engine = create_engine(connection_string)
     query = table["insert"]
     engine.execute(query)
 
 
 def merge_text_data(tables, update_config):
-    print(tables)
-    print(update_config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
-    print(update_config['PATENTSVIEW_DATABASES']["PROD_DB"])
-    print(update_config['PATENTSVIEW_DATABASES']["TEXT_DB"])
-    breakpoint()
-
     for table in tables:
         if 'preprocess' in tables[table]:
             tables[table]['preprocess'](update_config)

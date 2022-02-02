@@ -25,7 +25,7 @@ class DatabaseTester(ABC):
         self.end_date = end_date
 
         # Indicator for Upload/Patents database
-        self.qa_connection_string = get_connection_string(config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
+        self.qa_connection_string = get_connection_string(config, 'QA_DATABASE')
         self.connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                           user=config['DATABASE_SETUP']['USERNAME'],
                                           password=config['DATABASE_SETUP']['PASSWORD'],
