@@ -62,9 +62,9 @@ if __name__ == '__main__':
     # config = get_current_config('pgpubs', **{
     #     "execution_date": datetime.date(2021, 12, 2)
     # })
-    print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
+    # print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
+    # print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
+    # print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     run_id = "scheduled__2021-12-11T09:00:00+00:00"
     mc = MergeTestWeekly(config, run_id)
     mc.runTests()

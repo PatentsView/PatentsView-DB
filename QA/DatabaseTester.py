@@ -10,14 +10,14 @@ import os
 
 from lib.configuration import get_connection_string
 from lib.configuration import get_current_config
-from lib.utilities import with_keys, get_relevant_attributes, class_db_specific_config
+from lib import utilities
 
 class DatabaseTester(ABC):
     def __init__(self, config, database_section, start_date, end_date):
         # super().__init__(config, database_section, start_date, end_date)
         self.project_home = os.environ['PACKAGE_HOME']
         class_called = self.__class__.__name__
-        get_relevant_attributes(self, class_called, database_section, config)
+        utilities.get_relevant_attributes(self, class_called, database_section, config)
 
 
             # Update start and end date
@@ -46,7 +46,7 @@ class DatabaseTester(ABC):
         self.version = self.end_date.strftime("%Y%m%d")
         self.database_type = database_type
 
-        class_db_specific_config(self, self.table_config, class_called)
+        utilities.class_db_specific_config(self, self.table_config, class_called)
 
     def init_qa_dict(self):
         # Place Holder for saving QA counts - keys map to table names in patent_QA

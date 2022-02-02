@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 
 from lib import database_helpers
 from lib.notifications import send_slack_notification
-
+from lib.configuration import get_connection_string
 
 def parse_and_format_sql(parsed_statement):
     query_lines = []
@@ -56,7 +56,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
             config['DATABASE_SETUP']['HOST'],
             config['DATABASE_SETUP']['PORT'],
             "information_schema")
-    db_con = create_engine(cstr)
+    qa_connection_string = get_connection_string(config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
+    # db_con = create_engine(cstr)
+    db_con = create_engine(qa_connection_string)
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
@@ -140,3 +142,5 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
     send_slack_notification(completion_message,
                             config, "*SQL Executor (" + filename + ")*",
                             "success")
+
+
