@@ -24,12 +24,12 @@ class DatabaseSetupTest:
 
 
     def runTests(self):
-        self.test_database_encoding()
+        # self.test_database_encoding()
         self.test_table_encoding()
-        self.test_column_encoding()
-        self.test_table_count()
-        self.test_all_tables()
-        self.test_tmp_tables()
+        # self.test_column_encoding()
+        # self.test_table_count()
+        # self.test_all_tables()
+        # self.test_tmp_tables()
 
     def test_table_count(self):
         print("Checking database encoding for {db}".format(db=self.raw_database))
@@ -89,7 +89,7 @@ class DatabaseSetupTest:
             collation_cursor = engine.execute(i)
             for table_collation_row in collation_cursor:
                 print(f"\tChecking Table {table_collation_row[0]}")
-                if table_collation_row[1] != 'utf8mb4_unicode_ci' and table_collation_row[1] is not None:
+                if table_collation_row[1] and table_collation_row[1] != 'utf8mb4_unicode_ci':
                     raise AssertionError(
                             "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
                                     collation=table_collation_row[1], tbl=table_collation_row[0]))
@@ -121,12 +121,12 @@ class DatabaseSetupTest:
 
 if __name__ == '__main__':
     # pgpubs, granted_patent
-    # config = get_current_config('granted_patent', **{
-    #     "execution_date": datetime.date(2021, 10, 5)
-    # })
-    config = get_current_config('pgpubs', **{
-        "execution_date": datetime.date(2021, 12, 2)
+    config = get_current_config('granted_patent', **{
+        "execution_date": datetime.date(2021, 10, 5)
     })
+    # config = get_current_config('pgpubs', **{
+    #     "execution_date": datetime.date(2021, 12, 2)
+    # })
     print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
     print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
     print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
