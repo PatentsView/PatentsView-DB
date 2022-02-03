@@ -9,18 +9,21 @@ from lib.configuration import get_connection_string, get_current_config
 class DatabaseSetupTest:
     def __init__(self, config):
         self.project_home = os.environ['PACKAGE_HOME']
-        self.raw_database = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+        self.config = config
+        print(self.config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
+        print(self.config['PATENTSVIEW_DATABASES']["PROD_DB"])
+        print(self.config['PATENTSVIEW_DATABASES']["TEXT_DB"])
+        self.raw_database = self.config['PATENTSVIEW_DATABASES']["PROD_DB"]
         if self.raw_database == 'patent':
             resources_file = "{root}/{resources}/raw_db_tables.json".format(root=self.project_home,
-                                                                            resources=config["FOLDERS"]["resources_folder"])
+                                                                            resources=self.config["FOLDERS"]["resources_folder"])
         else:
             resources_file = "{root}/{resources}/pregrant_db_tables.json".format(root=self.project_home,
-                                                                            resources=config["FOLDERS"]["resources_folder"])
+                                                                            resources=self.config["FOLDERS"]["resources_folder"])
         raw_db_table_settings = json.load(open(resources_file))
         self.required_tables = {x: False for x in raw_db_table_settings["table_list"].keys()}
         self.empty_tables = [x for x in raw_db_table_settings["table_list"] if
                              not raw_db_table_settings["table_list"][x]["raw_data"]]
-        self.config = config
 
 
     def runTests(self):
