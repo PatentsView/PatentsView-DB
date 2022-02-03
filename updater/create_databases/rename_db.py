@@ -5,6 +5,9 @@ from lib.configuration import get_today_dict
 def qc_database_granted(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
+    print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
+    print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
+    print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     qc = DatabaseSetupTest(config).runTests()
 
 def qc_database_pgpubs(**kwargs):

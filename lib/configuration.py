@@ -277,12 +277,12 @@ def get_es(config):
 
 if __name__ == '__main__':
     # pgpubs, granted_patent
-    # config = get_current_config('granted_patent', **{
-    #     "execution_date": datetime.date(2021, 11, 4)
-    # })
+    config = get_current_config('granted_patent', **{
+        "execution_date": datetime.date(2021, 11, 4)
+    })
     get_backup_command(**{
         "execution_date": datetime.date(2021, 11, 4)
     })
-    # print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
-    # print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
-    # print(config['PATENTSVIEW_DATABASES']["TEXT"])
+    print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
+    print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
+    print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
