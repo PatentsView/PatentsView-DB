@@ -2,6 +2,7 @@ import datetime
 
 from QA.DatabaseTester import DatabaseTester
 from lib.configuration import get_current_config
+from lib import utilities
 
 class TextMergeTest(DatabaseTester):
     def __init__(self, config):
@@ -15,7 +16,7 @@ class TextMergeTest(DatabaseTester):
         for i in self.table_config.keys():
             if i in [brf_key, clm_key, ddr_key, ddt_key]:
                 keep_tables.append(i)
-        self.table_config = self.with_keys(self.table_config, keep_tables)
+        self.table_config = utilities.with_keys(self.table_config, keep_tables)
         print(f"The following list of tables are run for {self.__class__.__name__}:")
         print(self.table_config.keys())
 
@@ -33,7 +34,7 @@ class TextUploadTest(DatabaseTester):
         for i in self.table_config.keys():
             if i in [brf_key, clm_key, ddr_key, ddt_key]:
                 keep_tables.append(i)
-        self.table_config = self.with_keys(self.table_config, keep_tables)
+        self.table_config = utilities.with_keys(self.table_config, keep_tables)
         print(f"The following list of tables are run for {self.__class__.__name__}:")
         print(self.table_config.keys())
 

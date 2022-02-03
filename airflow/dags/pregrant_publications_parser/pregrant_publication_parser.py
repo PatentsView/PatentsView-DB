@@ -134,14 +134,6 @@ qc_merge_weekly_text_operator = PythonOperator(task_id='qc_text_merge_weekly',
                                          on_failure_callback=airflow_task_failure
                                          )
 
-qc_merge_quarterly_operator = PythonOperator(task_id='merge_database_quarterly',
-                                         python_callable=post_merge_quarterly_pgpubs,
-                                         provide_context=True,
-                                         dag=app_xml_dag,
-                                         on_success_callback=airflow_task_success,
-                                         on_failure_callback=airflow_task_failure
-                                         )
-
 qc_database_operator.set_upstream(create_database_operator)
 parse_xml_operator.set_upstream(qc_database_operator)
 post_processing_operator.set_upstream(parse_xml_operator)
