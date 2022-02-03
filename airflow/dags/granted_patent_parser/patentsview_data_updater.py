@@ -215,11 +215,6 @@ qc_merge_operator = PythonOperator(task_id='qc_merge_db',
                                    python_callable=post_merge_weekly_granted,
                                    **operator_settings
                                    )
-# HOW TO TRIGGER?
-# qc_merge_operator_quarterly = PythonOperator(task_id='qc_merge_db',
-#                                              python_callable=post_merge_quarterly_granted,
-#                                              **operator_settings
-#                                              )
 
 ## Merge Text Data
 merge_text_operator = PythonOperator(task_id='merge_text_db',
