@@ -89,7 +89,10 @@ class DatabaseSetupTest:
             collation_cursor = engine.execute(i)
             for table_collation_row in collation_cursor:
                 print(f"\tChecking Table {table_collation_row[0]}")
-                if table_collation_row[1] and table_collation_row[1] != 'utf8mb4_unicode_ci':
+                if table_collation_row[1] is None:
+                    # print(f"{table_collation_row[0]} is NONE!")
+                    continue
+                elif table_collation_row[1] != 'utf8mb4_unicode_ci':
                     raise AssertionError(
                             "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
                                     collation=table_collation_row[1], tbl=table_collation_row[0]))
