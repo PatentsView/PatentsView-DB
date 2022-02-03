@@ -157,23 +157,24 @@ def begin_merging(**kwargs):
 
 
 def begin_text_merging(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config('granted_patent', **kwargs)
     version = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'].split("_")[1]
+    text_db = config['PATENTSVIEW_DATABASES']['TEXT_DB']
+    temp_db = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB']
+    raw_db = config['PATENTSVIEW_DATABASES']['PROD_DB']
     end_date=datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y%m%d")
     year = int(end_date.strftime('%Y'))
     text_table_config = {
             'brf_sum_text':       {
-                    "insert": """
+                    "insert": f"""
 INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, `text`, version_indicator)
 SELECT uuid, patent_id, text, version_indicator
 from {temp_db}.brf_sum_text_{year}
-                    """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DB'],
-                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
-                               year=year)
+                    """
                     },
             'claim':              {
                     'preprocess': normalize_exemplary,
-                    "insert":     """
+                    "insert":     f"""
 INSERT INTO {text_db}.claims_{year}(uuid, patent_id, num, `text`, `sequence`, dependent, exemplary, 
 version_indicator)
 SELECT c.uuid,
@@ -187,32 +188,24 @@ SELECT c.uuid,
 from {temp_db}.claims_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
                    on tce.patent_id = c.patent_id and tce.exemplary = c.sequence
-                    """.format(
-                            text_db=config['PATENTSVIEW_DATABASES']['TEXT_DB'],
-                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], year=year)
+                    """
                     },
             'draw_desc_text':     {
-                    "insert": """
+                    "insert": f"""
 INSERT INTO {text_db}.draw_desc_text_{year}(uuid, patent_id, text, sequence, version_indicator)
 SELECT uuid, patent_id, text, sequence, version_indicator
 from {temp_db}.draw_desc_text_{year}
-                    """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DB'],
-                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
-                               year=year)
+                    """
                     },
             'detail_desc_text':   {
-                    "insert": """
+                    "insert": f"""
 INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length,version_indicator)
 SELECT uuid, patent_id, text,char_length(text), version_indicator
 from {temp_db}.detail_desc_text_{year}
-                              """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DB'],
-                                         temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
-                                         year=year)
+                              """
                     },
             'detail_desc_length': {
-                    "insert": "INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(text), version_indicator from {temp_db}.detail_desc_text_{year}".format(
-                            raw_db=config['PATENTSVIEW_DATABASES']['PROD_DB'],
-                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], year=year)
+                    "insert": f"INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(text), version_indicator from {temp_db}.detail_desc_text_{year}"
                     }
             }
     merge_text_data(text_table_config, config)
@@ -349,9 +342,9 @@ if __name__ == '__main__':
     #         "execution_date": datetime.date(2020, 12, 1),
     #         "run_id":         "testing"
     #         })
-    post_merge_quarterly_granted( **{
-        "execution_date": datetime.date(2021, 12, 2)
-    })
+    # post_merge_quarterly_granted( **{
+    #     "execution_date": datetime.date(2021, 12, 2)
+    # })
     # begin_text_merging_pgpubs(**{
     #         "execution_date": datetime.date(2021, 12, 2),
     #         })

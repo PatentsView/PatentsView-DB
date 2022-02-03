@@ -24,12 +24,12 @@ class DatabaseSetupTest:
 
 
     def runTests(self):
-        # self.test_database_encoding()
+        self.test_database_encoding()
         self.test_table_encoding()
-        # self.test_column_encoding()
-        # self.test_table_count()
-        # self.test_all_tables()
-        # self.test_tmp_tables()
+        self.test_column_encoding()
+        self.test_table_count()
+        self.test_all_tables()
+        self.test_tmp_tables()
 
     def test_table_count(self):
         print("Checking database encoding for {db}".format(db=self.raw_database))
