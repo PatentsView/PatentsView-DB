@@ -81,7 +81,7 @@ class DatabaseSetupTest:
         print("Checking table encoding for {db}".format(db=self.raw_database))
         connection_string = get_connection_string(self.config, database="PROD_DB")
         engine = create_engine(connection_string)
-        collation_query_table = f"SELECT  TABLE_NAME, TABLE_COLLATION from information_schema.tables where TABLE_SCHEMA='{self.raw_database}'"
+        collation_query_table = f"SELECT  TABLE_NAME, TABLE_COLLATION from information_schema.tables where TABLE_SCHEMA='{self.raw_database}' and TABLE_COLLATION is not null"
         # VIEW COLLATIONS ARE utf8mb4_general_ci but no way to fix on the VIEW level
         # collation_query_view = f"SELECT  TABLE_NAME, COLLATION_CONNECTION from information_schema.views where TABLE_SCHEMA='{self.raw_database}'"
         # for i in [collation_query_table, collation_query_view]:
@@ -89,10 +89,7 @@ class DatabaseSetupTest:
             collation_cursor = engine.execute(i)
             for table_collation_row in collation_cursor:
                 print(f"\tChecking Table {table_collation_row[0]}")
-                if table_collation_row[1] is None:
-                    # print(f"{table_collation_row[0]} is NONE!")
-                    continue
-                elif table_collation_row[1] != 'utf8mb4_unicode_ci':
+                if table_collation_row[1] != 'utf8mb4_unicode_ci':
                     raise AssertionError(
                             "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
                                     collation=table_collation_row[1], tbl=table_collation_row[0]))
