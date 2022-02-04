@@ -753,7 +753,7 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["GovtInterestTester"]
   },
   "inventor": {
     "fields": {
@@ -1856,7 +1856,7 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["GovtInterestTester"]
   },
   "patent_govintorg": {
     "fields": {
@@ -1873,7 +1873,7 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["GovtInterestTester"]
   },
   "patent_inventor": {
     "fields": {

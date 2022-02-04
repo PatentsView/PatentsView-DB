@@ -41,7 +41,7 @@ def class_db_specific_config(self, table_config, class_called):
 
 
 def get_relevant_attributes(self, class_called, database_section, config):
-    if database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload'):
+    if database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload') or class_called=='GovtInterestTester':
         self.exclusion_list = ['assignee',
                                'cpc_group',
                                'cpc_subgroup',
