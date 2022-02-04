@@ -8,82 +8,7 @@ from lib.configuration import get_current_config
 class GovtInterestTester(DatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-        super().__init__(config, 'TEMP_UPLOAD_DB', datetime.date(year=1976, month=1, day=1), end_date)
-        self.table_config = {
-                'patent_contractawardnumber': {
-                        "fields": {
-                                "patent_id":             {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        },
-                                "contract_award_number": {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        }
-                                }
-                        },
-                'patent_govintorg':           {
-                        "fields":           {
-                                "patent_id":       {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        },
-                                "organization_id": {
-                                        "data_type":    "int",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        }
-                                },
-                        "related_entities": [
-                                # {
-                                #         "table":          'government_organization',
-                                #         "source_id":      'organization_id',
-                                #         "destination_id": "organization_id"
-                                #         }
-                            ]
-                        },
-                'government_organization':    {
-                        "fields":           {
-                                "organization_id": {
-                                        "data_type":    "int",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        },
-                                "name":            {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        },
-                                "level_one":       {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        },
-                                "level_two":       {
-                                        "data_type":    "varchar",
-                                        "null_allowed": True,
-                                        "category":     False
-                                        },
-                                "level_three":     {
-                                        "data_type":    "varchar",
-                                        "null_allowed": True,
-                                        "category":     False
-                                        }
-                                },
-                        "related_entities": [
-                                # {
-                                #         "table":          'patent_govintorg',
-                                #         "source_id":      'organization_id',
-                                #         "destination_id": "organization_id"
-                                #         }
-                             ]
-                        }
-                }
-
-        self.patent_exclusion_list.extend(['government_organization'])
+        super().__init__(config, config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"], datetime.date(year=1976, month=1, day=1), end_date)
 
     def init_qa_dict(self):
         super(GovtInterestTester, self).init_qa_dict()
@@ -151,12 +76,6 @@ FROM   `government_interest` gi
                             'organization_id': gov_int_row[2],
                             'organization':    gov_int_row[3]
                             })
-
-    def test_floating_entities(self, table_name):
-        if table_name in ['patent_contractawardnumber', 'patent_govintorg']:
-            pass
-        else:
-            super(GovtInterestTester, self).test_floating_entities(table_name)
 
     def runTests(self):
         super(GovtInterestTester, self).runTests()
