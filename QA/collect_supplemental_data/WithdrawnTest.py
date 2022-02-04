@@ -14,7 +14,7 @@ class WithdrawnTest:
         self.connection = pymysql.connect(host=self.config['DATABASE_SETUP']['HOST'],
                                           user=self.config['DATABASE_SETUP']['USERNAME'],
                                           password=self.config['DATABASE_SETUP']['PASSWORD'],
-                                          db=self.config['PATENTSVIEW_DATABASES']['PROD_DB'],
+                                          db=self.config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
                                           charset='utf8mb4', cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
         self.qa_data = {
                 "DataMonitor_patentwithdrawncount": []
@@ -44,7 +44,7 @@ class WithdrawnTest:
             if any(missing_withdrawn):
                 raise AssertionError(
                         "Some of the patents marked withdrawn in {db} are not in the withdrawn file, count: {cnt}".format(
-                                cnt=sum(missing_withdrawn), db=self.config['PATENTSVIEW_DATABASES']['PROD_DB']))
+                                cnt=sum(missing_withdrawn), db=self.config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB']))
 
             self.qa_data['DataMonitor_patentwithdrawncount'].append(
                     {
