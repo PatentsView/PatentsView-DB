@@ -132,7 +132,8 @@ def get_today_dict(type='granted_patent', from_date=datetime.date.today()):
 
 
 def get_table_config(update_config):
-    resources_file = "{root}/{resources}/raw_db_tables.json".format(root=update_config["FOLDERS"]["project_root"],
+    project_home = os.environ['PACKAGE_HOME']
+    resources_file = "{root}/{resources}/raw_db_tables.json".format(root=project_home,
                                                                     resources=update_config["FOLDERS"][
                                                                         "resources_folder"])
     raw_db_table_settings = json.load(open(resources_file))
@@ -280,9 +281,9 @@ if __name__ == '__main__':
     config = get_current_config('granted_patent', **{
         "execution_date": datetime.date(2021, 11, 4)
     })
-    get_backup_command(**{
-        "execution_date": datetime.date(2021, 11, 4)
-    })
+    # get_backup_command(**{
+    #     "execution_date": datetime.date(2021, 11, 4)
+    # })
     print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
     print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
     print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])

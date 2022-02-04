@@ -6,7 +6,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.create_databases.UploadTest import UploadTest
-from lib.configuration import get_connection_string, get_required_tables
+from lib.configuration import get_connection_string, get_required_tables, get_current_config
 
 
 def upload_table(table_name, filepath, connection_string, version_indicator):
@@ -57,10 +57,13 @@ def setup_database(update_config, drop=True):
         con = engine.connect()
         if drop:
             con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
-        con.execute(
-            "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table))
-        con.close()
-    engine.dispose()
+        if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee']:
+            con.execute("create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211130', table))
+        else:
+            con.execute(
+                "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table))
+            con.close()
+        engine.dispose()
 
 
 def generate_timestamp_uploads(update_config):
@@ -117,3 +120,9 @@ if __name__ == '__main__':
     # post_upload(**{
     #         "execution_date": datetime.date(2020, 12, 1)
     #         })
+    config = get_current_config('granted_patent', **{
+        "execution_date": datetime.date(2020, 12, 14)
+    })
+    setup_database(config, **{
+            "execution_date": datetime.date(2020, 12, 14)
+            })
