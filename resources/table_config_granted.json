@@ -2357,11 +2357,6 @@
         "related_table": "assignee",
         "main_table_id": "assignee_id",
         "related_table_id": "id"
-      },
-      {
-        "related_table": "rawlocation",
-        "main_table_id": "rawlocation_id",
-        "related_table_id": "id"
       }
     ],
     "TestScripts": [
@@ -2475,11 +2470,6 @@
       {
         "related_table": "inventor",
         "main_table_id": "inventor_id",
-        "related_table_id": "id"
-      },
-      {
-        "related_table": "rawlocation",
-        "main_table_id": "rawlocation_id",
         "related_table_id": "id"
       }
     ],
@@ -2975,18 +2965,6 @@
         "location_field": false
       }
     },
-    "related_entities": [
-      {
-        "related_table": "mainclass",
-        "main_table_id": "mainclass_id",
-        "related_table_id": "id"
-      },
-      {
-        "related_table": "subclass",
-        "main_table_id": "subclass_id",
-        "related_table_id": "id"
-      }
-    ],
     "TestScripts": [
       "MergeTestWeekly",
       "UploadTest",
@@ -3026,18 +3004,6 @@
         "location_field": false
       }
     },
-    "related_entities": [
-      {
-        "related_table": "mainclass",
-        "main_table_id": "mainclass_id",
-        "related_table_id": "id"
-      },
-      {
-        "related_table": "subclass",
-        "main_table_id": "subclass_id",
-        "related_table_id": "id"
-      }
-    ],
     "TestScripts": [
       "UploadTest"
     ]
