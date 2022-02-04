@@ -10,7 +10,7 @@ from lib.configuration import get_config, get_connection_string, get_current_con
 class WithdrawnTest:
     def __init__(self, config):
         self.config = config
-        self.qa_connection_string = get_connection_string(self.config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
+        self.qa_connection_string = get_connection_string(self.config, 'QA_DATABASE')
         self.connection = pymysql.connect(host=self.config['DATABASE_SETUP']['HOST'],
                                           user=self.config['DATABASE_SETUP']['USERNAME'],
                                           password=self.config['DATABASE_SETUP']['PASSWORD'],

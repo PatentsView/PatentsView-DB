@@ -56,9 +56,8 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
             config['DATABASE_SETUP']['HOST'],
             config['DATABASE_SETUP']['PORT'],
             "information_schema")
-    qa_connection_string = get_connection_string(config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
-    # db_con = create_engine(cstr)
-    db_con = create_engine(qa_connection_string)
+    # qa_connection_string = get_connection_string(config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
+    db_con = create_engine(cstr)
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
