@@ -39,7 +39,7 @@ def consolidate_cpc_classes(connection_string):
 def setup_database(update_config, drop=True):
     required_tables = get_required_tables(update_config)
     print("Required tables are {tlist}".format(tlist=", ".join(required_tables)))
-    connection_string = get_connection_string(update_config, "PROD_DB")
+    connection_string = get_connection_string(update_config, database="PROD_DB")
     engine = create_engine(connection_string)
     raw_database = update_config["PATENTSVIEW_DATABASES"]["PROD_DB"]
     temp_upload_database = update_config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
