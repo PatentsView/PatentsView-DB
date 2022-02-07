@@ -408,8 +408,7 @@
       "filename": {
         "data_type": "varchar",
         "null_allowed": true,
-        "category": false,:q,
-
+        "category": false,
         "location_field": false
       }
     },
