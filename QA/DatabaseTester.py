@@ -577,38 +577,38 @@ group by 1
         # Skiplist is Used for Testing ONLY, Should remain blank
         # skiplist = []
         for table in self.table_config:
-            if table[0] >= 'r':
-                print(f"Beginning Test for {table} in {self.database_section}")
-                self.load_yearly_count(table, strict=False)
-                self.load_table_row_count(table)
-                self.test_blank_count(table, self.table_config[table])
-                self.load_nulls(table, self.table_config[table])
-                self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
-                self.load_main_floating_entity_count(table, self.table_config[table])
-                self.load_entity_category_counts(table)
-                if table == self.central_entity:
-                    self.test_patent_abstract_null(table)
-                for field in self.table_config[table]["fields"]:
-                    print(f"\tBeginning tests for {field} in {table}")
-                    if "date_field" in self.table_config[table]["fields"][field] and \
-                            self.table_config[table]["fields"][field]["date_field"]:
-                        self.test_zero_dates(table, field)
-                    if "category" in self.table_config[table]["fields"][field] and \
-                            self.table_config[table]["fields"][field]["category"]:
-                        self.load_category_counts(table, field)
-                    if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-                        self.load_text_length(table, field)
-                    if self.table_config[table]["fields"][field]['location_field'] and \
-                            self.table_config[table]["fields"][field]["location_field"]:
-                        self.load_counts_by_location(table, field)
-                    self.test_null_byte(table, field)
-                if self.class_called == "TextMergeTest":
-                    print("No Writing to the DB for Merge Checks")
-                    continue
-                else:
-                    self.save_qa_data()
-                    self.init_qa_dict()
-                print(f"Finished With Table: {table}")
+        # if table[:1] >= 'r':
+            print(f"Beginning Test for {table} in {self.database_section}")
+            self.load_yearly_count(table, strict=False)
+            self.load_table_row_count(table)
+            self.test_blank_count(table, self.table_config[table])
+            self.load_nulls(table, self.table_config[table])
+            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
+            self.load_main_floating_entity_count(table, self.table_config[table])
+            self.load_entity_category_counts(table)
+            if table == self.central_entity:
+                self.test_patent_abstract_null(table)
+            for field in self.table_config[table]["fields"]:
+                print(f"\tBeginning tests for {field} in {table}")
+                if "date_field" in self.table_config[table]["fields"][field] and \
+                        self.table_config[table]["fields"][field]["date_field"]:
+                    self.test_zero_dates(table, field)
+                if "category" in self.table_config[table]["fields"][field] and \
+                        self.table_config[table]["fields"][field]["category"]:
+                    self.load_category_counts(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
+                    self.load_text_length(table, field)
+                if self.table_config[table]["fields"][field]['location_field'] and \
+                        self.table_config[table]["fields"][field]["location_field"]:
+                    self.load_counts_by_location(table, field)
+                self.test_null_byte(table, field)
+            if self.class_called == "TextMergeTest":
+                print("No Writing to the DB for Merge Checks")
+                continue
+            else:
+                self.save_qa_data()
+                self.init_qa_dict()
+            print(f"Finished With Table: {table}")
 
 
 if __name__ == '__main__':
