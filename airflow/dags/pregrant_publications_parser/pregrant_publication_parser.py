@@ -138,9 +138,11 @@ qc_database_operator.set_upstream(create_database_operator)
 parse_xml_operator.set_upstream(qc_database_operator)
 post_processing_operator.set_upstream(parse_xml_operator)
 qc_upload_operator.set_upstream(post_processing_operator)
-qc_text_upload_operator.set_upstream(post_processing_operator)
 merge_database_operator.set_upstream(qc_upload_operator)
-merge_text_database_operator.set_upstream(qc_upload_operator)
 qc_merge_weekly_operator.set_upstream(merge_database_operator)
+
+# TEXT TASK PATH
+qc_text_upload_operator.set_upstream(post_processing_operator)
+merge_text_database_operator.set_upstream(qc_text_upload_operator)
 qc_merge_weekly_text_operator.set_upstream(merge_text_database_operator)
 

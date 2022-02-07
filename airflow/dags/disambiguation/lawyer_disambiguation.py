@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.sensors.external_task import ExternalTaskSensor
 
 from QA.collect_supplemental_data.cpc_parser.CPCCurrentTest import CPCTest
 from lib.configuration import get_current_config, get_today_dict
@@ -47,6 +48,16 @@ disambiguation = DAG(
     schedule_interval='@quarterly',
     template_searchpath=templates_searchpath,
     catchup=True,
+)
+
+quarterly_merge_completed = ExternalTaskSensor(
+    task_id="quarterly_merge_completed",
+    external_dag_id="merge_quarterly_updater",
+    external_task_id="qc_merge_quarterly_pgpubs",
+    timeout=600,
+    allowed_states=['success'],
+    failed_states=['failed', 'skipped'],
+    mode="reschedule",
 )
 
 prepare_rawlawyer_table = PythonOperator(task_id='prepare_rawlawyer_table',
@@ -99,3 +110,5 @@ operator_sequence['lawyer_disambiguation'] = [prepare_rawlawyer_table, clean_raw
 for dependency_group in operator_sequence:
     dependency_sequence = operator_sequence[dependency_group]
     chain_operators(dependency_sequence)
+
+prepare_rawlawyer_table.set_upstream(quarterly_merge_completed)

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.sensors.external_task import ExternalTaskSensor
 
 from lib.configuration import get_today_dict
 # appending a path
@@ -60,6 +61,16 @@ disambiguation = DAG(
     schedule_interval='@quarterly',
     template_searchpath=templates_searchpath,
     catchup=True,
+)
+
+quarterly_merge_completed = ExternalTaskSensor(
+    task_id="quarterly_merge_completed",
+    external_dag_id="merge_quarterly_updater",
+    external_task_id="qc_merge_quarterly_pgpubs",
+    timeout=600,
+    allowed_states=['success'],
+    failed_states=['failed', 'skipped'],
+    mode="reschedule",
 )
 
 inv_build_assignee_features = PythonOperator(task_id='Inventor_Build_Assignee_Features',
@@ -423,3 +434,6 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
 for dependency_group in operator_sequence:
     dependency_sequence = operator_sequence[dependency_group]
     chain_operators(dependency_sequence)
+
+
+inv_build_coinventor_features.set_upstream(quarterly_merge_completed)
