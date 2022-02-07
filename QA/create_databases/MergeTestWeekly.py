@@ -16,7 +16,7 @@ class MergeTestWeekly(DatabaseTester):
         # self.test_merge_status()
         skiplist = ['patent']
         for table in self.table_config:
-            if table[:1] > 'r':
+            if table[:1] >= 'r':
                 print(f"Beginning Test for {table} in {self.database_section}")
                 if table in skiplist:
                     continue
