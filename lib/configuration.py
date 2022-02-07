@@ -205,6 +205,7 @@ def get_current_config(type='granted_patent', supplemental_configs=None, **kwarg
     temp_date = end_date.strftime('%Y%m%d')
 
     config['DATES'] = {
+            "RUN_DATE": datetime.date.today().strftime('%Y%m%d'),
             "START_DATE": start_date.strftime('%Y%m%d'),
             "END_DATE":   end_date.strftime('%Y%m%d')
             }

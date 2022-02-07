@@ -12,6 +12,7 @@ from queue import Queue
 import pandas as pd
 from lxml import etree
 from sqlalchemy import create_engine
+from sqlalchemy.dialects import mysql
 
 from lib.configuration import get_current_config
 from lib.utilities import download_xml_files
@@ -301,16 +302,34 @@ def process_publication_document(patent_app_document, patent_config):
                 sequence += 1
         yield table_name, table_rows
 
+json_to_sql = {
+    'string': mysql.VARCHAR(128),
+    'fulltext': mysql.MEDIUMTEXT, #should be able to define charset/encoding here if necessary
+    'int': mysql.INTEGER,
+    'date': mysql.DATE,
+    'number': mysql.INTEGER,
+}
 
-def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
+def sql_dtype_picker(parsing_config):
+    dtype_dict = {}
+    for table in parsing_config['table_xml_map']:
+        tabdict = {}
+        for column in table['fields']:
+            tabdict[column['field_name']] = json_to_sql[column['data-type']] # could put a try except here with a default dtype
+        dtype_dict[table['table_name']] = tabdict
+    return dtype_dict
+
+def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     """
     Add all data to the MySQL database
     :param dfs: dictionary of dataframes for each table
     :param xml_file_name: name of the file
     :param config: credentials to connect to database
     """
+    foreign_key_config = table_xml_map['foreign_key_config']
     sql_start = time.time()
-    database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+    #database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+    database = 'assignee_reparse' # temporary switch
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -319,14 +338,16 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
     text_output_folder = config['FOLDERS']['TEXT_OUTPUT_FOLDER']
     engine = create_engine(
             'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
+    dtypes = sql_dtype_picker(table_xml_map)
 
     for df in dfs:
+        tabnam = df+'_{}'.format(config['DATES']['RUN_DATE']) # the run date might be redundant with the db name
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         try:
-            dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
+            dfs[df].to_sql(tabnam, con=engine, if_exists='append', index=False, dtype=dtypes[df])
         except Exception as e:
             log_queue.put({
                     "level":   logging.ERROR,
@@ -451,7 +472,7 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                     duration=time.time() - parse_start)
             })
     # Load the generated data frames to database
-    load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map["foreign_key_config"])
+    load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map)
 
     xml_file_duration = round(
             time.time() - xml_file_start, 3)
@@ -496,23 +517,24 @@ def get_filenames_to_parse(config, type='granted_patent'):
     end_date_string = '{}'.format(config['DATES']['END_DATE'])
     end_date = datetime.strptime(end_date_string, '%Y%m%d')
     for file_name in os.listdir(xml_directory):
-        print(file_name)
+        #print(file_name)
         if file_name.endswith(".xml"):
             file_date_string = re.match(".*([0-9]{6}).*", file_name).group(1)
             file_date = datetime.strptime(file_date_string, '%y%m%d')
 
             # file_date = file_name.split("_")[-1].split(".")[0]
             # file_date = file_name[3:-4]
-            print(file_date)
-            print(start_date)
-            print(end_date)
+            #print(file_date)
+            #print(start_date)
+            #print(end_date)
             if start_date <= file_date <= end_date:
                 xml_files.append(xml_directory + "/" + file_name)
-
+                print(f'added to parsing queue: {file_name}')
+    xml_files.sort()
     return xml_files
 
 
-dtd_to_json = {
+tables_dtd_to_json = {
     # to be filled out - we can provide a default
     # granted patents
     'ST32-US-Grant-024.dtd' : None,
@@ -525,15 +547,49 @@ dtd_to_json = {
     'us-patent-grant-v45-2014-04-03.dtd' : None, # is patent_parser.json configured for this version?
     'us-patent-grant-v46-2021-08-30.dtd' : None,
     # pgpubs
-    'pap-v15-2001-01-31.dtd' : 'pgp_xml_map_v1x.json',
-    'pap-v16-2002-01-01.dtd' : 'pgp_xml_map_v1x.json',
-    'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_map_v4_0-2.json',
-    'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_map_v4_0-2.json',
-    'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_map_v4_0-2.json',
-    'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_map_v4_3-5.json',
-    'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_map_v4_3-5.json',
-    'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_map_v4_3-5.json',
+    # 'pap-v15-2001-01-31.dtd' : 'pgp_xml_map_v1x.json',
+    # 'pap-v16-2002-01-01.dtd' : 'pgp_xml_map_v1x.json',
+    # 'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_map_v4_0-2.json',
+    # 'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_map_v4_0-2.json',
+    # 'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_map_v4_0-2.json',
+    # 'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_map_v4_3-5.json',
+    # 'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_map_v4_3-5.json',
+    # 'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_map_v4_3-5.json',
+    # temporary fill-ins:
+    # used to parse pgpubs gi only - December 2021
+    # using now for the rest of pgpubs - Jan 2022
+    'pap-v15-2001-01-31.dtd' : 'pgp_xml_no_gi_v1x.json',
+    'pap-v16-2002-01-01.dtd' : 'pgp_xml_no_gi_v1x.json',
+    'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
+    'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
+    'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
+    'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
+    'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
+    'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
     None : None,
+}
+
+long_text_dtd_to_json = {
+    # granted patents
+    'ST32-US-Grant-024.dtd' : None,
+    'ST32-US-Grant-025xml.dtd' : None,
+    'us-patent-grant-v40-2004-12-02.dtd' : 'text_parser.json',
+    'us-patent-grant-v41-2005-08-25.dtd' : 'text_parser.json',
+    'us-patent-grant-v42-2006-08-23.dtd' : 'text_parser.json',
+    'us-patent-grant-v43-2012-12-04.dtd' : 'text_parser.json',
+    'us-patent-grant-v44-2013-05-16.dtd' : 'text_parser.json',
+    'us-patent-grant-v45-2014-04-03.dtd' : 'text_parser.json', 
+    'us-patent-grant-v46-2021-08-30.dtd' : 'text_parser.json',
+    # pgpubs
+    'pap-v15-2001-01-31.dtd' : None,
+    'pap-v16-2002-01-01.dtd' : None,
+    'us-patent-application-v40-2004-12-02.dtd' : None,
+    'us-patent-application-v41-2005-08-25.dtd' : None,
+    'us-patent-application-v42-2006-08-23.dtd' : None,
+    'us-patent-application-v43-2012-12-04.dtd' : None,
+    'us-patent-application-v44-2014-04-03.dtd' : None,
+    'us-patent-application-v45-2021-08-30.dtd' : None,
+
 }
 
 
@@ -579,15 +635,18 @@ def queue_parsers(config, type='granted_patent'):
             dtd_file = config['XML_PARSING']['default_grant_dtd']
         if dtd_file is None:
             dtd_file = config['XML_PARSING']['default_pgp_dtd']
-        parsing_config_file =  dtd_to_json[dtd_file]
+        if type in ['pgpubs','granted_patent']:
+            parsing_config_file = tables_dtd_to_json[dtd_file]
+        if type == 'long_text':
+            parsing_config_file = long_text_dtd_to_json[dtd_file]
         #this should be unnecessary after the json dictionary is filled in, but provided as a precaution
         if parsing_config_file is None and type == 'granted_patent': 
             parsing_config_file = config['XML_PARSING']['default_grant_parsing_config']
         if parsing_config_file is None:
             parsing_config_file = config['XML_PARSING']['default_pgp_parsing_config']
-        parsing_config_file = '/'.join((config['XML_PARSING']['json_folder'], parsing_config_file))
+        parsing_config_file = '/'.join((config['FOLDERS']['json_folder'], parsing_config_file))
         parsing_config = json.load(open(parsing_config_file))
-        dtd_file = '/'.join((config['XML_PARSING']['dtd_folder'], dtd_file))
+        dtd_file = '/'.join((config['FOLDERS']['dtd_folder'], dtd_file))
         log_queue.put({
                 "level":   logging.INFO,
                 "message": "Starting parsing of {xml_file} using {parsing_config}; Validated by {validator}".format(
@@ -642,5 +701,5 @@ def begin_parsing(**kwargs):
 
 if __name__ == "__main__":
     begin_parsing(**{
-            "execution_date": date(2020, 12, 17)
+            "execution_date": date.today()
             })

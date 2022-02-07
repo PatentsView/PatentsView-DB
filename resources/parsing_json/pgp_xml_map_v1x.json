@@ -72,7 +72,7 @@
           "sequence": false,
           "flag": null,
           "tag": true,
-          "data-type": "date"
+          "data-type": "string"
         }
       ],
       "filename": "publication.tsv"
@@ -263,7 +263,7 @@
           "sequence": false,
           "flag": null,
           "tag": false,
-          "data-type": "string"
+          "data-type": "date"
         },
         {
           "field_name": "foreign_doc_number",

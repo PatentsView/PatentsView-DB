@@ -146,7 +146,7 @@ class TextMergeTest(PatentDatabaseTester):
 
 class TextUploadTest(PatentDatabaseTester):
     def __init__(self, config):
-        start_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+        start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, 'TEMP_UPLOAD_DB', start_date, end_date)
         self.database_type = 'upload'
@@ -217,6 +217,35 @@ class TextUploadTest(PatentDatabaseTester):
                                         "null_allowed": False,
                                         "data_type":    "int",
                                         "category":     False
+                                        }
+                                }
+                        },
+                ddr_key: {
+                        'fields': {
+                                "uuid":              {
+                                        "null_allowed": False,
+                                        "data_type":    "varchar",
+                                        "category":     False
+                                        },
+                                "patent_id":         {
+                                        "null_allowed": False,
+                                        "data_type":    "varchar",
+                                        "category":     False
+                                        },
+                                "text":              {
+                                        "null_allowed": False,
+                                        "data_type":    "mediumtext",
+                                        "category":     False
+                                        },
+                                "sequence":          {
+                                        "null_allowed": False,
+                                        "data_type":    "int",
+                                        "category":     False
+                                        },
+                                "version_indicator": {
+                                        "null_allowed": True,
+                                        "data_type":    "varchar",
+                                        "category":     True
                                         }
                                 }
                         },
