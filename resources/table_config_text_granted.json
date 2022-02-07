@@ -408,7 +408,8 @@
       "filename": {
         "data_type": "varchar",
         "null_allowed": true,
-        "category": false,
+        "category": false,:q,
+
         "location_field": false
       }
     },
@@ -1710,6 +1711,38 @@
     ]
   },
   "brf_sum_text_2021": {
+    "fields": {
+      "uuid": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "text": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "version_indicator": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "TextMergeTest",
+      "TextUploadTest"
+    ]
+  },
+  "brf_sum_text_2022": {
     "fields": {
       "uuid": {
         "data_type": "varchar",
@@ -4543,6 +4576,62 @@
       "TextUploadTest"
     ]
   },
+    "claims_2022": {
+    "fields": {
+      "uuid": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "num": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "text": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "dependent": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "exemplary": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "version_indicator": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "TextMergeTest",
+      "TextUploadTest"
+    ]
+  },
   "detail_desc_text_1976": {
     "fields": {
       "uuid": {
@@ -6518,6 +6607,44 @@
     ]
   },
   "detail_desc_text_2021": {
+    "fields": {
+      "uuid": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "text": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "length": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "version_indicator": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "TextMergeTest",
+      "TextUploadTest"
+    ]
+  },
+  "detail_desc_text_2022": {
     "fields": {
       "uuid": {
         "data_type": "varchar",
@@ -8536,6 +8663,44 @@
     ]
   },
   "draw_desc_text_2021": {
+    "fields": {
+      "uuid": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "text": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "version_indicator": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "TextMergeTest",
+      "TextUploadTest"
+    ]
+  },
+  "draw_desc_text_2022": {
     "fields": {
       "uuid": {
         "data_type": "varchar",
