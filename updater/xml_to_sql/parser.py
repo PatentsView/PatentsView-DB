@@ -6,7 +6,8 @@ import os
 import pprint
 import re
 import time
-from datetime import date, datetime
+# import datetime
+from datetime import datetime, date
 from queue import Queue
 
 import pandas as pd
@@ -427,8 +428,10 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                 # Add the data to the proper dataframe
                 try:
                     for table_name, extracted_data in data:
+                        print(table_name)
                         if len(table_name) > 0:
                             current_data_frame = pd.DataFrame(extracted_data)
+                            print(current_data_frame.head())
                             dfs[table_name] = dfs[table_name].append(current_data_frame)
                         else:
                             continue
@@ -447,6 +450,20 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                     duration=time.time() - parse_start)
             })
     # Load the generated data frames to database
+    # ERROR HERE
+    print("PRINTING DFs")
+    print(dfs)
+    print(" ")
+    print("PRINTING xml_file_name")
+    print(xml_file_name)
+    print(" ")
+    print("PRINTING log_queue")
+    print(log_queue)
+    print(" ")
+    print("PRINTING table_xml_map")
+    print(table_xml_map["foreign_key_config"])
+    print(" ")
+    breakpoint()
     load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map["foreign_key_config"])
 
     xml_file_duration = round(
@@ -591,15 +608,20 @@ if __name__ == "__main__":
     # begin_parsing(**{
     #         "execution_date": date(2020, 12, 17)
     #         })
-    type = 'pgpubs'
-    config = get_current_config(type=type, **{
-        "execution_date": date(2021, 7, 8)
-    })
-    parsing_file_setting = "{prefix}_parsing_config_file".format(prefix=type)
-    dtd_file_setting = "{prefix}_dtd_file".format(prefix=type)
-    dtd_file = '{}'.format(config['XML_PARSING'][dtd_file_setting])
-    parsing_config_file = "/opt/project/rawinventor.json"
-    parsing_config = json.load(open(parsing_config_file))
-    log_queue = Queue()
-    parse_publication_xml("/opt/project/ipa210708.xml", dtd_file='{}'.format(config['XML_PARSING'][dtd_file_setting]),
-                          table_xml_map=parsing_config, config=config, log_queue=log_queue)
+    # type = 'pgpubs'
+    # config = get_current_config(type=type, **{
+    #     "execution_date": date(2021, 7, 8)
+    # })
+    # parsing_file_setting = "{prefix}_parsing_config_file".format(prefix=type)
+    # dtd_file_setting = "{prefix}_dtd_file".format(prefix=type)
+    # dtd_file = '{}'.format(config['XML_PARSING'][dtd_file_setting])
+    # parsing_config_file = "/opt/project/rawinventor.json"
+    # parsing_config = json.load(open(parsing_config_file))
+    # log_queue = Queue()
+    # parse_publication_xml("/opt/project/ipa210708.xml", dtd_file='{}'.format(config['XML_PARSING'][dtd_file_setting]),
+    #                       table_xml_map=parsing_config, config=config, log_queue=log_queue)
+    begin_parsing(
+        **{
+            "execution_date": date(2021, 12, 23)
+        }
+    )
