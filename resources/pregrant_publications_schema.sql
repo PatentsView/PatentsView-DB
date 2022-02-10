@@ -73,6 +73,27 @@ FOR EACH row
 DELIMITER ;;
 DELIMITER ;
 
+CREATE TABLE `brf_sum_text_2022` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `brf_sum_text_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_brf_sum_text_2022 BEFORE INSERT
+ON brf_sum_text_2022
+FOR EACH row
+  SET new.id = uuid();
+
+DELIMITER ;;
+DELIMITER ;
+
+
 CREATE TABLE `brf_sum_text_2021` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `document_number` bigint(16) DEFAULT NULL,
@@ -511,6 +532,30 @@ CREATE TABLE `claim` (
 
 CREATE TRIGGER before_insert_claim BEFORE INSERT
 ON claim
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
+CREATE TABLE `claim_2022` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`,`num`),
+  CONSTRAINT `claim_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_claim_2022 BEFORE INSERT
+ON claim_2022
 FOR EACH row
   SET new.id = uuid();
 
@@ -1074,6 +1119,28 @@ FOR EACH row
 DELIMITER ;;
 DELIMITER ;
 
+CREATE TABLE `detail_desc_text_2022` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  UNIQUE KEY `document_number` (`document_number`),
+  CONSTRAINT `detail_desc_text_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_detail_desc_text_2022 BEFORE INSERT
+ON detail_desc_text_2022
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
 CREATE TABLE `detail_desc_text_2021` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `document_number` bigint(16) DEFAULT NULL,
@@ -1559,6 +1626,29 @@ FOR EACH row
 
 DELIMITER ;;
 DELIMITER ;
+
+CREATE TABLE `draw_desc_text_2022` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `document_number` bigint(16) DEFAULT NULL,
+  `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  KEY `document_number` (`document_number`),
+  CONSTRAINT `draw_desc_text_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TRIGGER before_insert_draw_desc_text_2022 BEFORE INSERT
+ON draw_desc_text_2022
+FOR EACH row
+  SET new.id = uuid();
+
+
+DELIMITER ;;
+DELIMITER ;
+
 
 CREATE TABLE `draw_desc_text_2021` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
