@@ -8,6 +8,8 @@ INSERT INTO pregrant_publications.publication SELECT * FROM `{{source_database}}
 
 INSERT INTO pregrant_publications.application SELECT * FROM `{{source_database}}`application;
 
+INSERT INTO pregrant_publications.brf_sum_text_2022 SELECT * FROM `{{source_database}}`brf_sum_text_2022;
+
 INSERT INTO pregrant_publications.brf_sum_text_2021 SELECT * FROM `{{source_database}}`brf_sum_text_2021;
 
 INSERT INTO pregrant_publications.brf_sum_text_2020 SELECT * FROM `{{source_database}}`brf_sum_text_2020;
@@ -49,6 +51,8 @@ INSERT INTO pregrant_publications.brf_sum_text_2003 SELECT * FROM `{{source_data
 INSERT INTO pregrant_publications.brf_sum_text_2002 SELECT * FROM `{{source_database}}`brf_sum_text_2002;
 
 INSERT INTO pregrant_publications.brf_sum_text_2001 SELECT * FROM `{{source_database}}`brf_sum_text_2001;
+
+INSERT INTO pregrant_publications.claim_2022 SELECT * FROM `{{source_database}}`claim_2022;
 
 INSERT INTO pregrant_publications.claim_2021 SELECT * FROM `{{source_database}}`claim_2021;
 
@@ -94,6 +98,8 @@ INSERT INTO pregrant_publications.claim_2001 SELECT * FROM `{{source_database}}`
 
 INSERT INTO pregrant_publications.cpc SELECT * FROM `{{source_database}}`cpc;
 
+INSERT INTO pregrant_publications.detail_desc_text_2022 SELECT * FROM `{{source_database}}`detail_desc_text_2022;
+
 INSERT INTO pregrant_publications.detail_desc_text_2021 SELECT * FROM `{{source_database}}`detail_desc_text_2021;
 
 INSERT INTO pregrant_publications.detail_desc_text_2020 SELECT * FROM `{{source_database}}`detail_desc_text_2020;
@@ -135,6 +141,8 @@ INSERT INTO pregrant_publications.detail_desc_text_2003 SELECT * FROM `{{source_
 INSERT INTO pregrant_publications.detail_desc_text_2002 SELECT * FROM `{{source_database}}`detail_desc_text_2002;
 
 INSERT INTO pregrant_publications.detail_desc_text_2001 SELECT * FROM `{{source_database}}`detail_desc_text_2001;
+
+INSERT INTO pregrant_publications.draw_desc_text_2022 SELECT * FROM `{{source_database}}`draw_desc_text_2022;
 
 INSERT INTO pregrant_publications.draw_desc_text_2021 SELECT * FROM `{{source_database}}`draw_desc_text_2021;
 
