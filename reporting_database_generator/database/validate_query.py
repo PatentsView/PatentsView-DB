@@ -1,6 +1,7 @@
 import configparser
 import os
 import re
+import datetime
 
 import sqlparse
 from sqlalchemy import create_engine
@@ -8,6 +9,7 @@ from sqlalchemy import create_engine
 from lib import database_helpers
 from lib.notifications import send_slack_notification
 from lib.configuration import get_connection_string
+from lib.configuration import get_section
 
 def parse_and_format_sql(parsed_statement):
     query_lines = []
@@ -21,15 +23,22 @@ def parse_and_format_sql(parsed_statement):
     return single_line_query
 
 
-def db_and_table_as_array(single_line_query):
+def db_and_table_as_array(single_line_query, db_type):
     # Identify all tables used in the query for collation check
     # PatentsView tables
-    table_finder_1 = re.compile("`PatentsView_[0-9]{8}[^`]*`.`[^`]+`")
-    tables_1 = table_finder_1.findall(single_line_query)
-    # patent tables
-    table_finder_2 = re.compile("`patent_[0-9]{8}`.`[^`]+`")
-    tables_2 = table_finder_2.findall(single_line_query)
-    tables = tables_1 + tables_2
+    if db_type == 'granted_patent':
+        table_finder_1 = re.compile("`PatentsView_[0-9]{8}[^`]*`.`[^`]+`")
+        tables_1 = table_finder_1.findall(single_line_query)
+        # patent tables
+        table_finder_2 = re.compile("`patent_[0-9]{8}`.`[^`]+`")
+        tables_2 = table_finder_2.findall(single_line_query)
+        tables = tables_1 + tables_2
+        print(tables)
+    else:
+        table_finder_1 = re.compile("`pgpubs_[0-9]{8}[^`]*`.`[^`]+`")
+        tables_1 = table_finder_1.findall(single_line_query)
+        tables = tables_1
+        print(tables)
     collation_check_parameters = []
     # Split dbname.table_name into parameters array
     for table in tables:
@@ -44,6 +53,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
     ## Schema only run setting
     # schema_only=context["schema_only"]
     ## Initialization from config files
+    db_type = 'granted_patent'
+    if 'pgpubs' in filename.split("_"):
+        db_type = 'pgpubs'
     project_home = os.environ['PACKAGE_HOME']
     config = configparser.ConfigParser()
     config.read(project_home + '/config.ini')
@@ -61,9 +73,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
-    send_slack_notification(
-            "Executing Query File: `" + filename + "`", config, section,
-            "info")
+    # send_slack_notification(
+    #         "Executing Query File: `" + filename + "`", config, section,
+    #         "info")
     # Get processed template file content
     sql_content = context['templates_dict']['source_sql']
     # Extract individual statements from sql file
@@ -94,13 +106,13 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                     message = """
                         Query execution plan involves full table scan: ```{single_line_query} ```
                         """.format(single_line_query=single_line_query)
-                    send_slack_notification(message, config,
-                                            section,
-                                            "warning")
-                    print(message)
+                    # send_slack_notification(message, config,
+                    #                         section,
+                    #                         "warning")
+                    # print(message)
                     # raise Exception(message)
                 #
-                collation_check_parameters = db_and_table_as_array(single_line_query)
+                collation_check_parameters = db_and_table_as_array(single_line_query, db_type)
                 # Check if all text fields in all supplied tables have consistent character set & collation
                 # Stops the process if the collation check fails
                 # This is because joins involving tables with inconsistent collation run forever
@@ -109,9 +121,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                         Character set and/or collation mismatch between tables involved in query :
                             ```{single_line_query}```
                             """.format(single_line_query=single_line_query)
-                    send_slack_notification(message, config,
-                                            section,
-                                            "warning")
+                    # send_slack_notification(message, config,
+                    #                         section,
+                    #                         "warning")
                     raise Exception(message)
 
                 # # Do not run insert statements if it is schema only run
@@ -124,13 +136,13 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
         try:
             db_con.execute(single_line_query)
         except Exception as e:
-            send_slack_notification(
-                    """
-            Execution of Query failed: ```{single_line_query} ```
-                """.format(single_line_query=single_line_query),
-                    config,
-                    section,
-                    "error")
+            # send_slack_notification(
+            #         """
+            # Execution of Query failed: ```{single_line_query} ```
+            #     """.format(single_line_query=single_line_query),
+            #         config,
+            #         section,
+            #         "error")
             raise e
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=1")
@@ -138,8 +150,6 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
     completion_message = """
     Execution for Query file `{filename}` is complete
     """.format(filename=filename)
-    send_slack_notification(completion_message,
-                            config, "*SQL Executor (" + filename + ")*",
-                            "success")
-
-
+    # send_slack_notification(completion_message,
+    #                         config, "*SQL Executor (" + filename + ")*",
+    #                         "success")

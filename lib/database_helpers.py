@@ -20,10 +20,16 @@ def check_encoding_and_collation(db_con, tables_list):
     where_part = "(TABLE_SCHEMA = %s AND TABLE_NAME = %s )"
     count = int(len(tables_list) / 2)
     table_where_string = " OR ".join(count * [where_part])
-    collation_information = db_con.execute(
+    if table_where_string == "":
+        collation_information = db_con.execute(
             "SELECT DISTINCT CHARACTER_SET_NAME, COLLATION_NAME from information_schema.COLUMNS where DATA_TYPE in ("
-            "'varchar') AND ("
-            + table_where_string + ") AND CHARACTER_SET_NAME is not null AND COLLATION_NAME is not null", tables_list)
+            "'varchar') AND CHARACTER_SET_NAME is not null AND COLLATION_NAME is not null", tables_list)
+    else:
+        collation_information = db_con.execute(
+                "SELECT DISTINCT CHARACTER_SET_NAME, COLLATION_NAME from information_schema.COLUMNS where DATA_TYPE in ("
+                "'varchar') AND ("
+                + table_where_string + ") AND CHARACTER_SET_NAME is not null AND COLLATION_NAME is not null", tables_list)
+    print(collation_information)
     collation_data = collation_information.fetchall()
     if len(collation_data) > 1:
         return False
