@@ -20,7 +20,7 @@ from updater.text_data_processor.text_table_parsing import post_text_merge_pgpub
 
 
 default_args = {
-    'owner': 'cdipietro',
+    'owner': 'smadhavan',
     'depends_on_past': False,
     'email': ['contact@patentsview.org'],
     'email_on_failure': False,

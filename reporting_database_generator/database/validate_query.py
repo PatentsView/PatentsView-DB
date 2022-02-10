@@ -35,7 +35,7 @@ def db_and_table_as_array(single_line_query, db_type):
         tables = tables_1 + tables_2
         print(tables)
     else:
-        table_finder_1 = re.compile("`pgpubs_[0-9]{8}[^`]*`.`[^`]+`")
+        table_finder_1 = re.compile("`pgpubs_[0-9]{8}`.`[^`]+`")
         tables_1 = table_finder_1.findall(single_line_query)
         tables = tables_1
         print(tables)
@@ -81,7 +81,6 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
     # Extract individual statements from sql file
     sql_statements = sqlparse.split(sql_content)
     for sql_statement in sql_statements:
-        print(sql_statement)
         # Certain type of sql are not parsed properly by sqlparse,
         # this is the implicit else to forthcoming if
         single_line_query = sql_statement
