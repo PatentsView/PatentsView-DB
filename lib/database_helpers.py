@@ -17,13 +17,12 @@ def check_query_plan(db_con, query):
 
 ## Check if given tables in given schema all have same character set and collation
 def check_encoding_and_collation(db_con, tables_list):
+    print(tables_list)
     where_part = "(TABLE_SCHEMA = %s AND TABLE_NAME = %s )"
     count = int(len(tables_list) / 2)
     table_where_string = " OR ".join(count * [where_part])
     if table_where_string == "":
-        collation_information = db_con.execute(
-            "SELECT DISTINCT CHARACTER_SET_NAME, COLLATION_NAME from information_schema.COLUMNS where DATA_TYPE in ("
-            "'varchar') AND CHARACTER_SET_NAME is not null AND COLLATION_NAME is not null", tables_list)
+        return True
     else:
         collation_information = db_con.execute(
                 "SELECT DISTINCT CHARACTER_SET_NAME, COLLATION_NAME from information_schema.COLUMNS where DATA_TYPE in ("
@@ -33,7 +32,9 @@ def check_encoding_and_collation(db_con, tables_list):
     collation_data = collation_information.fetchall()
     if len(collation_data) > 1:
         return False
-    return True
+    else:
+        return True
+
 
 
 def get_dataframe_from_pymysql_cursor(connection, query):

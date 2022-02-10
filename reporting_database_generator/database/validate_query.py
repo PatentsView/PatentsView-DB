@@ -81,6 +81,7 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
     # Extract individual statements from sql file
     sql_statements = sqlparse.split(sql_content)
     for sql_statement in sql_statements:
+        print(sql_statement)
         # Certain type of sql are not parsed properly by sqlparse,
         # this is the implicit else to forthcoming if
         single_line_query = sql_statement
