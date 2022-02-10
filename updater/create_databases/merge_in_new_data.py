@@ -230,7 +230,6 @@ from {temp_db}.brf_sum_text_{year}
                                year=year)
                     },
             'claim':              {
-                    'preprocess': normalize_exemplary,
                     "insert":     """
 INSERT INTO {text_db}.claim_{year}(id, document_number, `text`, `sequence`, dependent, num, 
 version_indicator)
