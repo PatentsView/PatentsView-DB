@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import os
 
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
@@ -34,6 +35,9 @@ default_args = {
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
+project_home = os.environ['PACKAGE_HOME']
+templates_searchpath = "{home}/resources".format(home=project_home)
+# config = get_current_config(type='pgpubs', supplemental_configs=None, **get_today_dict())
 
 app_xml_dag = DAG(
     dag_id='pregrant_publication_updater',
@@ -41,7 +45,8 @@ app_xml_dag = DAG(
     description='Download and process application patent data and corresponding classifications data',
     start_date=datetime(2021, 1, 7),
     schedule_interval=timedelta(weeks=1),
-    catchup=True
+    catchup=True,
+    template_searchpath=templates_searchpath
     # schedule_interval=None
 )
 

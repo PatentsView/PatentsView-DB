@@ -63,7 +63,7 @@ CREATE TABLE `brf_sum_text` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text BEFORE INSERT
 ON brf_sum_text
@@ -83,7 +83,7 @@ CREATE TABLE `brf_sum_text_2022` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2022 BEFORE INSERT
 ON brf_sum_text_2022
@@ -104,7 +104,7 @@ CREATE TABLE `brf_sum_text_2021` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2021 BEFORE INSERT
 ON brf_sum_text_2021
@@ -124,7 +124,7 @@ CREATE TABLE `brf_sum_text_2020` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2020 BEFORE INSERT
 ON brf_sum_text_2020
@@ -144,7 +144,7 @@ CREATE TABLE `brf_sum_text_2019` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2019 BEFORE INSERT
 ON brf_sum_text_2019
@@ -164,7 +164,7 @@ CREATE TABLE `brf_sum_text_2018` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2018 BEFORE INSERT
 ON brf_sum_text_2018
@@ -184,7 +184,7 @@ CREATE TABLE `brf_sum_text_2017` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2017 BEFORE INSERT
 ON brf_sum_text_2017
@@ -204,7 +204,7 @@ CREATE TABLE `brf_sum_text_2016` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2016 BEFORE INSERT
 ON brf_sum_text_2016
@@ -224,7 +224,7 @@ CREATE TABLE `brf_sum_text_2015` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2015 BEFORE INSERT
 ON brf_sum_text_2015
@@ -244,7 +244,7 @@ CREATE TABLE `brf_sum_text_2014` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2014 BEFORE INSERT
 ON brf_sum_text_2014
@@ -264,7 +264,7 @@ CREATE TABLE `brf_sum_text_2013` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2013 BEFORE INSERT
 ON brf_sum_text_2013
@@ -284,7 +284,7 @@ CREATE TABLE `brf_sum_text_2012` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2012 BEFORE INSERT
 ON brf_sum_text_2012
@@ -304,7 +304,7 @@ CREATE TABLE `brf_sum_text_2011` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2011 BEFORE INSERT
 ON brf_sum_text_2011
@@ -324,7 +324,7 @@ CREATE TABLE `brf_sum_text_2010` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2010 BEFORE INSERT
 ON brf_sum_text_2010
@@ -344,7 +344,7 @@ CREATE TABLE `brf_sum_text_2009` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2009 BEFORE INSERT
 ON brf_sum_text_2009
@@ -364,7 +364,7 @@ CREATE TABLE `brf_sum_text_2008` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2008 BEFORE INSERT
 ON brf_sum_text_2008
@@ -384,7 +384,7 @@ CREATE TABLE `brf_sum_text_2007` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2007 BEFORE INSERT
 ON brf_sum_text_2007
@@ -404,7 +404,7 @@ CREATE TABLE `brf_sum_text_2006` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2006 BEFORE INSERT
 ON brf_sum_text_2006
@@ -424,7 +424,7 @@ CREATE TABLE `brf_sum_text_2005` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2005 BEFORE INSERT
 ON brf_sum_text_2005
@@ -444,7 +444,7 @@ CREATE TABLE `brf_sum_text_2004` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2004 BEFORE INSERT
 ON brf_sum_text_2004
@@ -464,7 +464,7 @@ CREATE TABLE `brf_sum_text_2003` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2003 BEFORE INSERT
 ON brf_sum_text_2003
@@ -484,7 +484,7 @@ CREATE TABLE `brf_sum_text_2002` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2002 BEFORE INSERT
 ON brf_sum_text_2002
@@ -504,7 +504,7 @@ CREATE TABLE `brf_sum_text_2001` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `brf_sum_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_brf_sum_text_2001 BEFORE INSERT
 ON brf_sum_text_2001
@@ -528,7 +528,7 @@ CREATE TABLE `claim` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim BEFORE INSERT
 ON claim
@@ -552,7 +552,7 @@ CREATE TABLE `claim_2022` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2022 BEFORE INSERT
 ON claim_2022
@@ -576,7 +576,7 @@ CREATE TABLE `claim_2021` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2021 BEFORE INSERT
 ON claim_2021
@@ -600,7 +600,7 @@ CREATE TABLE `claim_2020` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2020 BEFORE INSERT
 ON claim_2020
@@ -624,7 +624,7 @@ CREATE TABLE `claim_2019` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2019 BEFORE INSERT
 ON claim_2019
@@ -648,7 +648,7 @@ CREATE TABLE `claim_2018` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2018 BEFORE INSERT
 ON claim_2018
@@ -672,7 +672,7 @@ CREATE TABLE `claim_2017` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2017 BEFORE INSERT
 ON claim_2017
@@ -696,7 +696,7 @@ CREATE TABLE `claim_2016` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2016 BEFORE INSERT
 ON claim_2016
@@ -720,7 +720,7 @@ CREATE TABLE `claim_2015` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2015 BEFORE INSERT
 ON claim_2015
@@ -744,7 +744,7 @@ CREATE TABLE `claim_2014` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2014 BEFORE INSERT
 ON claim_2014
@@ -768,7 +768,7 @@ CREATE TABLE `claim_2013` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2013 BEFORE INSERT
 ON claim_2013
@@ -792,7 +792,7 @@ CREATE TABLE `claim_2012` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2012 BEFORE INSERT
 ON claim_2012
@@ -817,7 +817,7 @@ CREATE TABLE `claim_2011` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2011 BEFORE INSERT
 ON claim_2011
@@ -841,7 +841,7 @@ CREATE TABLE `claim_2010` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2010 BEFORE INSERT
 ON claim_2010
@@ -865,7 +865,7 @@ CREATE TABLE `claim_2009` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2009 BEFORE INSERT
 ON claim_2009
@@ -889,7 +889,7 @@ CREATE TABLE `claim_2008` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2008 BEFORE INSERT
 ON claim_2008
@@ -913,7 +913,7 @@ CREATE TABLE `claim_2007` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2007 BEFORE INSERT
 ON claim_2007
@@ -937,7 +937,7 @@ CREATE TABLE `claim_2006` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2006 BEFORE INSERT
 ON claim_2006
@@ -961,7 +961,7 @@ CREATE TABLE `claim_2005` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2005 BEFORE INSERT
 ON claim_2005
@@ -985,7 +985,7 @@ CREATE TABLE `claim_2004` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2004 BEFORE INSERT
 ON claim_2004
@@ -1009,7 +1009,7 @@ CREATE TABLE `claim_2003` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2003 BEFORE INSERT
 ON claim_2003
@@ -1033,7 +1033,7 @@ CREATE TABLE `claim_2002` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2002 BEFORE INSERT
 ON claim_2002
@@ -1057,7 +1057,7 @@ CREATE TABLE `claim_2001` (
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`,`num`),
   CONSTRAINT `claim_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_claim_2001 BEFORE INSERT
 ON claim_2001
@@ -1108,7 +1108,7 @@ CREATE TABLE `detail_desc_text` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text BEFORE INSERT
 ON detail_desc_text
@@ -1130,7 +1130,7 @@ CREATE TABLE `detail_desc_text_2022` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2022 BEFORE INSERT
 ON detail_desc_text_2022
@@ -1152,7 +1152,7 @@ CREATE TABLE `detail_desc_text_2021` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2021 BEFORE INSERT
 ON detail_desc_text_2021
@@ -1174,7 +1174,7 @@ CREATE TABLE `detail_desc_text_2020` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2020 BEFORE INSERT
 ON detail_desc_text_2020
@@ -1196,7 +1196,7 @@ CREATE TABLE `detail_desc_text_2019` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2019 BEFORE INSERT
 ON detail_desc_text_2019
@@ -1218,7 +1218,7 @@ CREATE TABLE `detail_desc_text_2018` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2018 BEFORE INSERT
 ON detail_desc_text_2018
@@ -1240,7 +1240,7 @@ CREATE TABLE `detail_desc_text_2017` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2017 BEFORE INSERT
 ON detail_desc_text_2017
@@ -1262,7 +1262,7 @@ CREATE TABLE `detail_desc_text_2016` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2016 BEFORE INSERT
 ON detail_desc_text_2016
@@ -1284,7 +1284,7 @@ CREATE TABLE `detail_desc_text_2015` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2015 BEFORE INSERT
 ON detail_desc_text_2015
@@ -1306,7 +1306,7 @@ CREATE TABLE `detail_desc_text_2014` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2014 BEFORE INSERT
 ON detail_desc_text_2014
@@ -1328,7 +1328,7 @@ CREATE TABLE `detail_desc_text_2013` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2013 BEFORE INSERT
 ON detail_desc_text_2013
@@ -1350,7 +1350,7 @@ CREATE TABLE `detail_desc_text_2012` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2012 BEFORE INSERT
 ON detail_desc_text_2012
@@ -1372,7 +1372,7 @@ CREATE TABLE `detail_desc_text_2011` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2011 BEFORE INSERT
 ON detail_desc_text_2011
@@ -1394,7 +1394,7 @@ CREATE TABLE `detail_desc_text_2010` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2010 BEFORE INSERT
 ON detail_desc_text_2010
@@ -1416,7 +1416,7 @@ CREATE TABLE `detail_desc_text_2009` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2009 BEFORE INSERT
 ON detail_desc_text_2009
@@ -1438,7 +1438,7 @@ CREATE TABLE `detail_desc_text_2008` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2008 BEFORE INSERT
 ON detail_desc_text_2008
@@ -1460,7 +1460,7 @@ CREATE TABLE `detail_desc_text_2007` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2007 BEFORE INSERT
 ON detail_desc_text_2007
@@ -1482,7 +1482,7 @@ CREATE TABLE `detail_desc_text_2006` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2006 BEFORE INSERT
 ON detail_desc_text_2006
@@ -1505,7 +1505,7 @@ CREATE TABLE `detail_desc_text_2005` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2005 BEFORE INSERT
 ON detail_desc_text_2005
@@ -1527,7 +1527,7 @@ CREATE TABLE `detail_desc_text_2004` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2004 BEFORE INSERT
 ON detail_desc_text_2004
@@ -1549,7 +1549,7 @@ CREATE TABLE `detail_desc_text_2003` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2003 BEFORE INSERT
 ON detail_desc_text_2003
@@ -1571,7 +1571,7 @@ CREATE TABLE `detail_desc_text_2002` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2002 BEFORE INSERT
 ON detail_desc_text_2002
@@ -1593,7 +1593,7 @@ CREATE TABLE `detail_desc_text_2001` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `detail_desc_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_detail_desc_text_2001 BEFORE INSERT
 ON detail_desc_text_2001
@@ -1616,7 +1616,7 @@ CREATE TABLE `draw_desc_text` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text BEFORE INSERT
 ON draw_desc_text
@@ -1638,7 +1638,7 @@ CREATE TABLE `draw_desc_text_2022` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2022 BEFORE INSERT
 ON draw_desc_text_2022
@@ -1661,7 +1661,7 @@ CREATE TABLE `draw_desc_text_2021` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2021 BEFORE INSERT
 ON draw_desc_text_2021
@@ -1683,7 +1683,7 @@ CREATE TABLE `draw_desc_text_2020` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2020 BEFORE INSERT
 ON draw_desc_text_2020
@@ -1705,7 +1705,7 @@ CREATE TABLE `draw_desc_text_2019` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2019 BEFORE INSERT
 ON draw_desc_text_2019
@@ -1727,7 +1727,7 @@ CREATE TABLE `draw_desc_text_2018` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2018 BEFORE INSERT
 ON draw_desc_text_2018
@@ -1749,7 +1749,7 @@ CREATE TABLE `draw_desc_text_2017` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2017 BEFORE INSERT
 ON draw_desc_text_2017
@@ -1771,7 +1771,7 @@ CREATE TABLE `draw_desc_text_2016` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2016 BEFORE INSERT
 ON draw_desc_text_2016
@@ -1793,7 +1793,7 @@ CREATE TABLE `draw_desc_text_2015` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2015 BEFORE INSERT
 ON draw_desc_text_2015
@@ -1815,7 +1815,7 @@ CREATE TABLE `draw_desc_text_2014` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2014 BEFORE INSERT
 ON draw_desc_text_2014
@@ -1837,7 +1837,7 @@ CREATE TABLE `draw_desc_text_2013` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2013 BEFORE INSERT
 ON draw_desc_text_2013
@@ -1859,7 +1859,7 @@ CREATE TABLE `draw_desc_text_2012` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2012 BEFORE INSERT
 ON draw_desc_text_2012
@@ -1881,7 +1881,7 @@ CREATE TABLE `draw_desc_text_2011` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2011 BEFORE INSERT
 ON draw_desc_text_2011
@@ -1903,7 +1903,7 @@ CREATE TABLE `draw_desc_text_2010` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2010 BEFORE INSERT
 ON draw_desc_text_2010
@@ -1925,7 +1925,7 @@ CREATE TABLE `draw_desc_text_2009` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2009 BEFORE INSERT
 ON draw_desc_text_2009
@@ -1947,7 +1947,7 @@ CREATE TABLE `draw_desc_text_2008` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2008 BEFORE INSERT
 ON draw_desc_text_2008
@@ -1969,7 +1969,7 @@ CREATE TABLE `draw_desc_text_2007` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2007 BEFORE INSERT
 ON draw_desc_text_2007
@@ -1992,7 +1992,7 @@ CREATE TABLE `draw_desc_text_2006` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2006 BEFORE INSERT
 ON draw_desc_text_2006
@@ -2014,7 +2014,7 @@ CREATE TABLE `draw_desc_text_2005` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2005 BEFORE INSERT
 ON draw_desc_text_2005
@@ -2036,7 +2036,7 @@ CREATE TABLE `draw_desc_text_2004` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2004 BEFORE INSERT
 ON draw_desc_text_2004
@@ -2058,7 +2058,7 @@ CREATE TABLE `draw_desc_text_2003` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2003 BEFORE INSERT
 ON draw_desc_text_2003
@@ -2080,7 +2080,7 @@ CREATE TABLE `draw_desc_text_2002` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2002 BEFORE INSERT
 ON draw_desc_text_2002
@@ -2102,7 +2102,7 @@ CREATE TABLE `draw_desc_text_2001` (
   `version_indicator` date DEFAULT NULL,
   KEY `document_number` (`document_number`),
   CONSTRAINT `draw_desc_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_draw_desc_text_2001 BEFORE INSERT
 ON draw_desc_text_2001
@@ -2393,7 +2393,7 @@ CREATE TABLE `rel_app_text` (
   `version_indicator` date DEFAULT NULL,
   UNIQUE KEY `document_number` (`document_number`),
   CONSTRAINT `rel_app_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
 
 CREATE TRIGGER before_insert_rel_app_text BEFORE INSERT
 ON rel_app_text
