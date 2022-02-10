@@ -115,13 +115,13 @@ merge_database_operator = SQLTemplatedPythonOperator(
     }
 )
 
-merge_text_database_operator = PythonOperator(task_id='merge_text_database',
-                                         python_callable=begin_text_merging_pgpubs,
-                                         provide_context=True,
-                                         dag=app_xml_dag,
-                                         on_success_callback=airflow_task_success,
-                                         on_failure_callback=airflow_task_failure
-                                         )
+# merge_text_database_operator = PythonOperator(task_id='merge_text_database',
+#                                          python_callable=begin_text_merging_pgpubs,
+#                                          provide_context=True,
+#                                          dag=app_xml_dag,
+#                                          on_success_callback=airflow_task_success,
+#                                          on_failure_callback=airflow_task_failure
+#                                          )
 
 qc_merge_weekly_operator = PythonOperator(task_id='qc_merge_weekly',
                                          python_callable=post_merge_weekly_pgpubs,
@@ -143,11 +143,9 @@ qc_database_operator.set_upstream(create_database_operator)
 parse_xml_operator.set_upstream(qc_database_operator)
 post_processing_operator.set_upstream(parse_xml_operator)
 qc_upload_operator.set_upstream(post_processing_operator)
-merge_database_operator.set_upstream(qc_upload_operator)
-qc_merge_weekly_operator.set_upstream(merge_database_operator)
-
-# TEXT TASK PATH
 qc_text_upload_operator.set_upstream(post_processing_operator)
-merge_text_database_operator.set_upstream(qc_text_upload_operator)
-qc_merge_weekly_text_operator.set_upstream(merge_text_database_operator)
+merge_database_operator.set_upstream(qc_upload_operator)
+merge_database_operator.set_upstream(qc_text_upload_operator)
+qc_merge_weekly_operator.set_upstream(merge_database_operator)
+qc_merge_weekly_text_operator.set_upstream(merge_database_operator)
 
