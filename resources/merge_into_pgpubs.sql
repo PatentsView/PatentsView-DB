@@ -10,7 +10,7 @@
 
 INSERT INTO pgpubs_text.brf_sum_text_2022 SELECT * FROM `{{source_database}}`.brf_sum_text_2022;
 
-INSERT INTO pgpubs_text.brf_sum_text_2021 SELECT * FROM `{{source_database}}`.brf_sum_text_2021;
+# INSERT INTO pgpubs_text.brf_sum_text_2021 SELECT * FROM `{{source_database}}`.brf_sum_text_2021;
 
 INSERT INTO pgpubs_text.brf_sum_text_2020 SELECT * FROM `{{source_database}}`.brf_sum_text_2020;
 
