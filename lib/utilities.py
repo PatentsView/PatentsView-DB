@@ -325,6 +325,7 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
     if parallelism > 1:
         idx_counter = 0
         for t in p_list:
+            print(t)
             t.get()
 
     idx_counter += 1
