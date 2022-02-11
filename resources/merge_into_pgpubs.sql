@@ -4,9 +4,9 @@
     {% if params.add_suffix %}
     {% set source_database = source_database  +  dbdate.strftime('%Y%m%d')|string  %}
     {% endif %}
-INSERT INTO pregrant_publications.publication SELECT * FROM `{{source_database}}`.publication;
+# INSERT INTO pregrant_publications.publication SELECT * FROM `{{source_database}}`.publication;
 
-INSERT INTO pregrant_publications.application SELECT * FROM `{{source_database}}`.application;
+# INSERT INTO pregrant_publications.application SELECT * FROM `{{source_database}}`.application;
 
 INSERT INTO pgpubs_text.brf_sum_text_2022 SELECT * FROM `{{source_database}}`.brf_sum_text_2022;
 
