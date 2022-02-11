@@ -8,11 +8,15 @@ class TextMergeTest(DatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         print(end_date)
+        super().__init__(config, config['PATENTSVIEW_DATABASES']["TEXT_DB"], datetime.date(year=1976, month=1, day=1), end_date)
         brf_key = "brf_sum_text_{year}".format(year=end_date.year)
-        clm_key = "claims_{year}".format(year=end_date.year)
+        if config['PATENTSVIEW_DATABASES']["TEXT_DB"] == 'patent_text':
+            clm_key = "claims_{year}".format(year=end_date.year)
+        else:
+            clm_key = "claim_{year}".format(year=end_date.year)
         ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
-        super().__init__(config, config['PATENTSVIEW_DATABASES']["TEXT_DB"], datetime.date(year=1976, month=1, day=1), end_date)
+        print(clm_key)
         keep_tables = []
         for i in self.table_config.keys():
             print(i)
@@ -48,10 +52,11 @@ if __name__ == '__main__':
     config = get_current_config('granted_patent', **{
         "execution_date": datetime.date(2021, 12, 2)
     })
+    config = get_current_config('pgpubs', **kwargs)
     print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
     print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
     print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
-    tmt = TextMergeTest(config)
+    tmt = TextUploadTest(config)
     tmt.runTests()
     # tut = TextUploadTest(config)
     # tut.runTests()
