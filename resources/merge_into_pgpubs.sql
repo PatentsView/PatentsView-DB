@@ -54,7 +54,7 @@ INSERT INTO pgpubs_text.brf_sum_text_2001 SELECT * FROM `{{source_database}}`.br
 
 INSERT INTO pgpubs_text.claim_2022 SELECT * FROM `{{source_database}}`.claim_2022;
 
-INSERT INTO pgpubs_text.claim_2021 SELECT * FROM `{{source_database}}`.claim_2021;
+# INSERT INTO pgpubs_text.claim_2021 SELECT * FROM `{{source_database}}`.claim_2021;
 
 INSERT INTO pgpubs_text.claim_2020 SELECT * FROM `{{source_database}}`.claim_2020;
 
@@ -100,7 +100,7 @@ INSERT INTO pregrant_publications.cpc SELECT * FROM `{{source_database}}`.cpc;
 
 INSERT INTO pgpubs_text.detail_desc_text_2022 SELECT * FROM `{{source_database}}`.detail_desc_text_2022;
 
-INSERT INTO pgpubs_text.detail_desc_text_2021 SELECT * FROM `{{source_database}}`.detail_desc_text_2021;
+# INSERT INTO pgpubs_text.detail_desc_text_2021 SELECT * FROM `{{source_database}}`.detail_desc_text_2021;
 
 INSERT INTO pgpubs_text.detail_desc_text_2020 SELECT * FROM `{{source_database}}`.detail_desc_text_2020;
 
@@ -144,7 +144,7 @@ INSERT INTO pgpubs_text.detail_desc_text_2001 SELECT * FROM `{{source_database}}
 
 INSERT INTO pgpubs_text.draw_desc_text_2022 SELECT * FROM `{{source_database}}`.draw_desc_text_2022;
 
-INSERT INTO pgpubs_text.draw_desc_text_2021 SELECT * FROM `{{source_database}}`.draw_desc_text_2021;
+# INSERT INTO pgpubs_text.draw_desc_text_2021 SELECT * FROM `{{source_database}}`.draw_desc_text_2021;
 
 INSERT INTO pgpubs_text.draw_desc_text_2020 SELECT * FROM `{{source_database}}`.draw_desc_text_2020;
 
