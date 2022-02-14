@@ -54,7 +54,7 @@ INSERT INTO pgpubs_text.brf_sum_text_2001 SELECT * FROM `{{source_database}}`.br
 
 # INSERT INTO pgpubs_text.claim_2022 SELECT * FROM `{{source_database}}`.claim_2022;
 
-INSERT INTO pgpubs_text.claim_2021 SELECT * FROM `{{source_database}}`.claim_2021;
+# INSERT INTO pgpubs_text.claim_2021 SELECT * FROM `{{source_database}}`.claim_2021;
 
 INSERT INTO pgpubs_text.claim_2020 SELECT * FROM `{{source_database}}`.claim_2020;
 
