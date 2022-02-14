@@ -922,11 +922,6 @@
         "related_table_id": "document_number"
       },
       {
-        "related_table": "government_interest",
-        "main_table_id": "document_number",
-        "related_table_id": "document_number"
-      },
-      {
         "related_table": "granted_patent_crosswalk",
         "main_table_id": "document_number",
         "related_table_id": "document_number"
