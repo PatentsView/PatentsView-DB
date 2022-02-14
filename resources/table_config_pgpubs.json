@@ -912,11 +912,6 @@
         "related_table_id": "document_number"
       },
       {
-        "related_table": "cpc_current",
-        "main_table_id": "document_number",
-        "related_table_id": "document_number"
-      },
-      {
         "related_table": "foreign_priority",
         "main_table_id": "document_number",
         "related_table_id": "document_number"
