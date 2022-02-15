@@ -4,14 +4,23 @@ import datetime
 
 def qc_database_granted(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
-    print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
-    qc = DatabaseSetupTest(config).runTests()
+    database = config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
+    qc = DatabaseSetupTest(config, database).runTests()
 
 def qc_database_pgpubs(**kwargs):
     config = get_current_config('pgpubs', **kwargs)
-    qc = DatabaseSetupTest(config).runTests()
+    database = config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
+    qc = DatabaseSetupTest(config, database).runTests()
+
+def qc_database_quarterly_granted(**kwargs):
+    config = get_current_config('granted_patent', **kwargs)
+    database = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+    qc = DatabaseSetupTest(config, database).runTests()
+
+def qc_database_quarterly_pgpubs(**kwargs):
+    config = get_current_config('pgpubs', **kwargs)
+    database = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+    qc = DatabaseSetupTest(config, database).runTests()
 
 
 if __name__ == '__main__':
