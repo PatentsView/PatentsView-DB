@@ -16,25 +16,25 @@ class MergeTestWeekly(DatabaseTester):
         # self.test_merge_status()
         skiplist = ['patent']
         for table in self.table_config:
-            if table[:2] >= 'pu':
-                print(f"Beginning Test for {table} in {self.database_section}")
-                if table in skiplist:
-                    continue
-                self.test_blank_count(table, self.table_config[table])
-                self.test_related_floating_entities(table, table_config=self.table_config[table])
-                self.load_nulls(table, self.table_config[table])
-                for field in self.table_config[table]["fields"]:
-                    print(f"\tBeginning tests for {field} in {table}")
-                    self.test_null_byte(table, field)
-                    if "date_field" in self.table_config[table]["fields"][field] and \
-                            self.table_config[table]["fields"][field]["date_field"]:
-                        self.test_zero_dates(table, field)
-                if table == 'patent':
-                    self.test_patent_abstract_null(table)
-                print(f"Finished With Table: {table}")
-            #     self.current_status[str(self.run_id)][table] = 1
-            # with open(self.status_file, 'a', encoding="utf-8") as file:
-            #     json.dump(self.current_status, file)
+            # if table[:2] >= 'pu':
+            print(f"Beginning Test for {table} in {self.database_section}")
+            if table in skiplist:
+                continue
+            self.test_blank_count(table, self.table_config[table])
+            self.test_related_floating_entities(table, table_config=self.table_config[table])
+            self.load_nulls(table, self.table_config[table])
+            for field in self.table_config[table]["fields"]:
+                print(f"\tBeginning tests for {field} in {table}")
+                self.test_null_byte(table, field)
+                if "date_field" in self.table_config[table]["fields"][field] and \
+                        self.table_config[table]["fields"][field]["date_field"]:
+                    self.test_zero_dates(table, field)
+            if table == 'patent':
+                self.test_patent_abstract_null(table)
+            print(f"Finished With Table: {table}")
+        #     self.current_status[str(self.run_id)][table] = 1
+        # with open(self.status_file, 'a', encoding="utf-8") as file:
+        #     json.dump(self.current_status, file)
 
     # def test_merge_status(self):
     #     status_folder = os.path.join(self.project_home, "updater", 'create_databases')

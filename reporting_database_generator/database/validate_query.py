@@ -10,6 +10,8 @@ from lib import database_helpers
 from lib.notifications import send_slack_notification
 from lib.configuration import get_connection_string
 from lib.configuration import get_section
+from lib.configuration import get_current_config, get_today_dict
+import pymysql.cursors
 
 def parse_and_format_sql(parsed_statement):
     query_lines = []
@@ -22,40 +24,53 @@ def parse_and_format_sql(parsed_statement):
     single_line_query = " ".join(query_lines).replace("[\s]+", " ")
     return single_line_query
 
+def nextword(target, source):
+   for i, w in enumerate(source):
+    if w == target:
+      return source[i+1]
 
-def db_and_table_as_array(single_line_query, db_type):
+
+def db_and_table_as_array(single_line_query):
     # Identify all tables used in the query for collation check
-    # PatentsView tables
-    if db_type == 'granted_patent':
-        table_finder_1 = re.compile("`PatentsView_[0-9]{8}[^`]*`.`[^`]+`")
-        tables_1 = table_finder_1.findall(single_line_query)
-        # patent tables
-        table_finder_2 = re.compile("`patent_[0-9]{8}`.`[^`]+`")
-        tables_2 = table_finder_2.findall(single_line_query)
-        tables = tables_1 + tables_2
-        print(tables)
-    else:
-        table_finder_1 = re.compile("`pgpubs_[0-9]{8}`.`[^`]+`")
-        tables_1 = table_finder_1.findall(single_line_query)
-        tables = tables_1
-        print(tables)
-    collation_check_parameters = []
-    # Split dbname.table_name into parameters array
-    for table in tables:
-        collation_check_parameters += [x.replace("`", "") for x in table.split(".")]
-    return collation_check_parameters
+    print(single_line_query)
+    single_line_query_words = single_line_query.split(" ")
+    # print(single_line_query_words)
+    after_into = nextword('INTO', single_line_query_words)
+    after_from = nextword('FROM', single_line_query_words)
+    table_schema_list = "('" + after_into.split(".")[0] + "', " + "'" + after_from.split(".")[0] + "')"
+    print(table_schema_list)
+
+    db_type = 'patent'
+    if 'publication' in single_line_query_words:
+        db_type = 'pgpubs'
+    config = get_current_config(db_type, **{"execution_date": datetime.date(2022, 1, 1)})
+    connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
+                                      user=config['DATABASE_SETUP']['USERNAME'],
+                                      password=config['DATABASE_SETUP']['PASSWORD'],
+                                      # db=config['PATENTSVIEW_DATABASES']["PROD_DB"],
+                                      charset='utf8mb4',
+                                      cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
+    if not connection.open:
+        connection.connect()
+    tables_query = f"""
+select table_schema, table_name 
+from information_schema.tables
+where table_schema in {table_schema_list}
+group by 1,2
+                """
+    with connection.cursor() as cursor:
+        cursor.execute(tables_query)
+        tables_schema = []
+        for item in cursor.fetchall():
+            tables_schema.append((item[0], item[1]))
+        # row = [item[0] for item in cursor.fetchall()]
+        print(tables_schema)
+    return tables_schema
 
 
-def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
-                         fk_check=True, section=None, **context):
+def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk_check=True, section=None, **context):
     print(filename)
     print(schema_only)
-    ## Schema only run setting
-    # schema_only=context["schema_only"]
-    ## Initialization from config files
-    db_type = 'granted_patent'
-    if 'pgpubs' in filename.split("_"):
-        db_type = 'pgpubs'
     project_home = os.environ['PACKAGE_HOME']
     config = configparser.ConfigParser()
     config.read(project_home + '/config.ini')
@@ -68,19 +83,19 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
             config['DATABASE_SETUP']['HOST'],
             config['DATABASE_SETUP']['PORT'],
             "information_schema")
-    # qa_connection_string = get_connection_string(config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
     db_con = create_engine(cstr)
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
-    # send_slack_notification(
-    #         "Executing Query File: `" + filename + "`", config, section,
-    #         "info")
+    send_slack_notification(
+            "Executing Query File: `" + filename + "`", config, section,
+            "info")
     # Get processed template file content
     sql_content = context['templates_dict']['source_sql']
     # Extract individual statements from sql file
     sql_statements = sqlparse.split(sql_content)
     for sql_statement in sql_statements:
+        print(sql_statement)
         # Certain type of sql are not parsed properly by sqlparse,
         # this is the implicit else to forthcoming if
         single_line_query = sql_statement
@@ -106,13 +121,13 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                     message = """
                         Query execution plan involves full table scan: ```{single_line_query} ```
                         """.format(single_line_query=single_line_query)
-                    # send_slack_notification(message, config,
-                    #                         section,
-                    #                         "warning")
-                    # print(message)
+                    send_slack_notification(message, config,
+                                            section,
+                                            "warning")
+                    print(message)
                     # raise Exception(message)
-                #
-                collation_check_parameters = db_and_table_as_array(single_line_query, db_type)
+
+                collation_check_parameters = db_and_table_as_array(single_line_query, db_con)
                 # Check if all text fields in all supplied tables have consistent character set & collation
                 # Stops the process if the collation check fails
                 # This is because joins involving tables with inconsistent collation run forever
@@ -121,12 +136,12 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                         Character set and/or collation mismatch between tables involved in query :
                             ```{single_line_query}```
                             """.format(single_line_query=single_line_query)
-                    # send_slack_notification(message, config,
-                    #                         section,
-                    #                         "warning")
+                    send_slack_notification(message, config,
+                                            section,
+                                            "warning")
                     raise Exception(message)
 
-                # # Do not run insert statements if it is schema only run
+                # Do not run insert statements if it is schema only run
                 if schema_only:
                     continue
 
@@ -134,22 +149,30 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
         if not single_line_query.strip():
             continue
         try:
+            print(" ")
             db_con.execute(single_line_query)
         except Exception as e:
-            # send_slack_notification(
-            #         """
-            # Execution of Query failed: ```{single_line_query} ```
-            #     """.format(single_line_query=single_line_query),
-            #         config,
-            #         section,
-            #         "error")
+            print(" ")
+            send_slack_notification(
+                    """
+            Execution of Query failed: ```{single_line_query} ```
+                """.format(single_line_query=single_line_query),
+                    config,
+                    section,
+                    "error")
             raise e
     if not fk_check:
+        print(" ")
         db_con.execute("SET FOREIGN_KEY_CHECKS=1")
     db_con.dispose()
     completion_message = """
     Execution for Query file `{filename}` is complete
     """.format(filename=filename)
-    # send_slack_notification(completion_message,
-    #                         config, "*SQL Executor (" + filename + ")*",
-    #                         "success")
+    send_slack_notification(completion_message,
+                            config, "*SQL Executor (" + filename + ")*",
+                            "success")
+#
+# if __name__ == '__main__':
+#     db_and_table_as_array("INSERT INTO pregrant_publications.publication SELECT * FROM pgpubs_20050101.publication")
+#
+

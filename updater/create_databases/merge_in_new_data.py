@@ -240,7 +240,7 @@ SELECT c.id,
        c.dependent,
        c.num,
        c.version_indicator
-from {temp_db}.claims_{year} c
+from {temp_db}.claim_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
                    on tce.document_number = c.document_number 
                     """.format(
