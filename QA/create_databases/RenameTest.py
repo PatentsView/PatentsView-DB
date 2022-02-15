@@ -7,14 +7,12 @@ from lib.configuration import get_connection_string, get_current_config
 
 
 class DatabaseSetupTest:
-    def __init__(self, config):
+    def __init__(self, config, database):
         self.project_home = os.environ['PACKAGE_HOME']
         self.config = config
-        print(self.config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
-        print(self.config['PATENTSVIEW_DATABASES']["PROD_DB"])
-        print(self.config['PATENTSVIEW_DATABASES']["TEXT_DB"])
-        self.raw_database = self.config['PATENTSVIEW_DATABASES']["PROD_DB"]
-        if self.raw_database == 'patent':
+        self.database_for_tests = database
+        print(self.database_for_tests)
+        if self.database_for_tests == 'patent':
             resources_file = "{root}/{resources}/raw_db_tables.json".format(root=self.project_home,
                                                                             resources=self.config["FOLDERS"]["resources_folder"])
         else:
@@ -35,10 +33,10 @@ class DatabaseSetupTest:
         self.test_tmp_tables()
 
     def test_table_count(self):
-        print("Checking database encoding for {db}".format(db=self.raw_database))
+        print("Checking database encoding for {db}".format(db=self.database_for_tests))
         connection_string = get_connection_string(self.config, database="PROD_DB")
         engine = create_engine(connection_string)
-        table_query = f"SELECT  TABLE_NAME from information_schema.tables where TABLE_SCHEMA='{self.raw_database}'"
+        table_query = f"SELECT  TABLE_NAME from information_schema.tables where TABLE_SCHEMA='{self.database_for_tests}'"
         table_cursor = engine.execute(table_query)
         for table_name in table_cursor:
             # print(table_name[0])
@@ -56,10 +54,10 @@ class DatabaseSetupTest:
             raise AssertionError("Required tables are missing: {table_list}".format(table_list=", ".join(missing)))
 
     def test_tmp_tables(self):
-        print("Checking database for temporary tables for {db}".format(db=self.raw_database))
+        print("Checking database for temporary tables for {db}".format(db=self.database_for_tests))
         connection_string = get_connection_string(self.config, database="PROD_DB")
         engine = create_engine(connection_string)
-        table_query = f"SELECT  count(*) from information_schema.tables where TABLE_SCHEMA='{self.raw_database}' and (TABLE_NAME like 'tmp%%' or TABLE_NAME like 'temp%%' or TABLE_NAME like '\_%%')"
+        table_query = f"SELECT  count(*) from information_schema.tables where TABLE_SCHEMA='{self.database_for_tests}' and (TABLE_NAME like 'tmp%%' or TABLE_NAME like 'temp%%' or TABLE_NAME like '\_%%')"
         table_cursor = engine.execute(table_query)
         table_count = table_cursor.fetchall()[0][0]
         if table_count > 0:
@@ -67,11 +65,11 @@ class DatabaseSetupTest:
             raise AssertionError("There are {x} temporary tables in the database".format(x=table_count))
 
     def test_database_encoding(self):
-        print("Checking database encoding for {db}".format(db=self.raw_database))
+        print("Checking database encoding for {db}".format(db=self.database_for_tests))
         connection_string = get_connection_string(self.config, database="PROD_DB")
         engine = create_engine(connection_string)
 
-        collation_query = f"SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME from information_schema.schemata where SCHEMA_NAME='{self.raw_database}'"
+        collation_query = f"SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME from information_schema.schemata where SCHEMA_NAME='{self.database_for_tests}'"
         collation_cursor = engine.execute(collation_query)
         cset, collation = collation_cursor.fetchall()[0]
         if cset != 'utf8mb4':
@@ -81,12 +79,12 @@ class DatabaseSetupTest:
                     "Database collation should be utf8mb4_unicode_ci instead found {cset}".format(cset=collation))
 
     def test_table_encoding(self):
-        print("Checking table encoding for {db}".format(db=self.raw_database))
+        print("Checking table encoding for {db}".format(db=self.database_for_tests))
         connection_string = get_connection_string(self.config, database="PROD_DB")
         engine = create_engine(connection_string)
-        collation_query_table = f"SELECT  TABLE_NAME, TABLE_COLLATION from information_schema.tables where TABLE_SCHEMA='{self.raw_database}' and TABLE_COLLATION is not null"
+        collation_query_table = f"SELECT  TABLE_NAME, TABLE_COLLATION from information_schema.tables where TABLE_SCHEMA='{self.database_for_tests}' and TABLE_COLLATION is not null"
         # VIEW COLLATIONS ARE utf8mb4_general_ci but no way to fix on the VIEW level
-        # collation_query_view = f"SELECT  TABLE_NAME, COLLATION_CONNECTION from information_schema.views where TABLE_SCHEMA='{self.raw_database}'"
+        # collation_query_view = f"SELECT  TABLE_NAME, COLLATION_CONNECTION from information_schema.views where TABLE_SCHEMA='{self.database_for_tests}'"
         # for i in [collation_query_table, collation_query_view]:
         for i in [collation_query_table]:
             collation_cursor = engine.execute(i)
@@ -104,7 +102,7 @@ class DatabaseSetupTest:
                         SELECT TABLE_NAME, COLUMN_NAME, character_set_name,
                             collation_name
                         FROM   information_schema.columns
-                        WHERE  table_schema='{self.raw_database}'
+                        WHERE  table_schema='{self.database_for_tests}'
                         AND    data_type IN ('varchar', 'longtext', 'mediumtext', 'text', 'enum', 'char', 'set')
         '''
         collation_cursor = engine.execute(collation_query)
