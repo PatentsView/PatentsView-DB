@@ -4,13 +4,13 @@
     {% if params.add_suffix %}
     {% set source_database = source_database  +  dbdate.strftime('%Y%m%d')|string  %}
     {% endif %}
-# INSERT INTO pregrant_publications.publication SELECT * FROM `{{source_database}}`.publication;
+INSERT INTO pregrant_publications.publication SELECT * FROM `{{source_database}}`.publication;
 
-# INSERT INTO pregrant_publications.application SELECT * FROM `{{source_database}}`.application;
+INSERT INTO pregrant_publications.application SELECT * FROM `{{source_database}}`.application;
 
-# INSERT INTO pgpubs_text.brf_sum_text_2022 SELECT * FROM `{{source_database}}`.brf_sum_text_2022;
+INSERT INTO pgpubs_text.brf_sum_text_2022 SELECT * FROM `{{source_database}}`.brf_sum_text_2022;
 
-# INSERT INTO pgpubs_text.brf_sum_text_2021 SELECT * FROM `{{source_database}}`.brf_sum_text_2021;
+INSERT INTO pgpubs_text.brf_sum_text_2021 SELECT * FROM `{{source_database}}`.brf_sum_text_2021;
 
 INSERT INTO pgpubs_text.brf_sum_text_2020 SELECT * FROM `{{source_database}}`.brf_sum_text_2020;
 
@@ -52,9 +52,9 @@ INSERT INTO pgpubs_text.brf_sum_text_2002 SELECT * FROM `{{source_database}}`.br
 
 INSERT INTO pgpubs_text.brf_sum_text_2001 SELECT * FROM `{{source_database}}`.brf_sum_text_2001;
 
-# INSERT INTO pgpubs_text.claim_2022 SELECT * FROM `{{source_database}}`.claim_2022;
+INSERT INTO pgpubs_text.claim_2022 SELECT * FROM `{{source_database}}`.claim_2022;
 
-# INSERT INTO pgpubs_text.claim_2021 SELECT * FROM `{{source_database}}`.claim_2021;
+INSERT INTO pgpubs_text.claim_2021 SELECT * FROM `{{source_database}}`.claim_2021;
 
 INSERT INTO pgpubs_text.claim_2020 SELECT * FROM `{{source_database}}`.claim_2020;
 
@@ -98,7 +98,7 @@ INSERT INTO pgpubs_text.claim_2001 SELECT * FROM `{{source_database}}`.claim_200
 
 INSERT INTO pregrant_publications.cpc SELECT * FROM `{{source_database}}`.cpc;
 
-# INSERT INTO pgpubs_text.detail_desc_text_2022 SELECT * FROM `{{source_database}}`.detail_desc_text_2022;
+INSERT INTO pgpubs_text.detail_desc_text_2022 SELECT * FROM `{{source_database}}`.detail_desc_text_2022;
 
 INSERT INTO pgpubs_text.detail_desc_text_2021 SELECT * FROM `{{source_database}}`.detail_desc_text_2021;
 
@@ -142,7 +142,7 @@ INSERT INTO pgpubs_text.detail_desc_text_2002 SELECT * FROM `{{source_database}}
 
 INSERT INTO pgpubs_text.detail_desc_text_2001 SELECT * FROM `{{source_database}}`.detail_desc_text_2001;
 
-# INSERT INTO pgpubs_text.draw_desc_text_2022 SELECT * FROM `{{source_database}}`.draw_desc_text_2022;
+INSERT INTO pgpubs_text.draw_desc_text_2022 SELECT * FROM `{{source_database}}`.draw_desc_text_2022;
 
 INSERT INTO pgpubs_text.draw_desc_text_2021 SELECT * FROM `{{source_database}}`.draw_desc_text_2021;
 
@@ -200,13 +200,13 @@ INSERT INTO pregrant_publications.rawassignee (id, document_number, `sequence`, 
 
 INSERT INTO pregrant_publications.rawinventor (id, document_number, name_first, name_last, `sequence`, designation, deceased, rawlocation_id, city, state, country, filename,version_indicator) SELECT id, document_number, name_first, name_last, sequence, designation, deceased, rawlocation_id, city, state, country, filename,version_indicator FROM `{{source_database}}`.rawinventor;
 
-INSERT INTO pregrant_publications.rawlocation (id, city, state, country, latitude, longitude, filename) SELECT id, city, state, country, latitude, longitude, filename FROM `{{source_database}}`.rawlocation;
+INSERT INTO pregrant_publications.rawlocation (id, city, state, country, latitude, longitude, filename, version_indicator) SELECT id, city, state, country, latitude, longitude, filename,version_indicator FROM `{{source_database}}`.rawlocation;
 
 INSERT INTO pregrant_publications.rawuspc SELECT * FROM `{{source_database}}`.rawuspc;
 
 INSERT INTO pregrant_publications.rel_app_text SELECT * FROM `{{source_database}}`.rel_app_text;
 
-INSERT INTO pregrant_publications.us_parties (id, document_number, name_first, name_last, type, designation, sequence, rawlocation_id, city, state, country, filename) SELECT id, document_number, name_first, name_last, type, designation, sequence, rawlocation_id, city, state, country, filename FROM `{{source_database}}`.us_parties;
+INSERT INTO pregrant_publications.us_parties (id, document_number, name_first, name_last, type, designation, sequence, rawlocation_id, city, state, country, filename,version_indicator) SELECT id, document_number, name_first, name_last, type, designation, sequence, rawlocation_id, city, state, country, filename,version_indicator FROM `{{source_database}}`.us_parties;
 
 INSERT INTO pregrant_publications.uspc SELECT * FROM `{{source_database}}`.uspc;
 
