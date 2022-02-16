@@ -12,7 +12,7 @@ class DatabaseSetupTest:
         self.config = config
         self.database_for_tests = database
         print(self.database_for_tests)
-        if self.database_for_tests == 'patent':
+        if self.database_for_tests == 'patent' or self.database_for_tests[:6] == 'upload':
             resources_file = "{root}/{resources}/raw_db_tables.json".format(root=self.project_home,
                                                                             resources=self.config["FOLDERS"]["resources_folder"])
         else:
@@ -33,13 +33,13 @@ class DatabaseSetupTest:
         self.test_tmp_tables()
 
     def test_table_count(self):
-        print("Checking database encoding for {db}".format(db=self.database_for_tests))
+        print("Checking Table Count for {db}".format(db=self.database_for_tests))
         connection_string = get_connection_string(self.config, database="PROD_DB")
         engine = create_engine(connection_string)
         table_query = f"SELECT  TABLE_NAME from information_schema.tables where TABLE_SCHEMA='{self.database_for_tests}'"
         table_cursor = engine.execute(table_query)
         for table_name in table_cursor:
-            # print(table_name[0])
+            print(table_name[0])
             if table_name[0] in self.required_tables:
                 self.required_tables[table_name[0]] = True
                 count_query = f"SELECT count(*) from {table_name[0]}"
@@ -123,7 +123,7 @@ class DatabaseSetupTest:
 if __name__ == '__main__':
     # pgpubs, granted_patent
     config = get_current_config('granted_patent', **{
-        "execution_date": datetime.date(2021, 10, 5)
+        "execution_date": datetime.date(2021, 10, 19)
     })
     # config = get_current_config('pgpubs', **{
     #     "execution_date": datetime.date(2021, 12, 2)
@@ -131,5 +131,5 @@ if __name__ == '__main__':
     print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
     print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
     print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
-    DBSU = DatabaseSetupTest(config)
+    DBSU = DatabaseSetupTest(config, 'upload_20211026')
     DBSU.runTests()
