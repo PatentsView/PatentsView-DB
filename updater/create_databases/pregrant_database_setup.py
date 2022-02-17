@@ -24,7 +24,7 @@ def create_database(**kwargs):
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
 
     conn = pymysql.connect(host=host, user=user, password=password)
-    conn.cursor().execute('CREATE DATABASE {};'.format(database))
+    conn.cursor().execute("CREATE DATABASE {} DEFAULT CHARACTER SET = 'utf8mb4' DEFAULT COLLATE 'utf8mb4_unicode_ci';".format(database))
     sql_path = config["FILES"]['APP_DB_SCHEMA_FILE']
     try:
         subprocess_cmd('mysql --defaults-file=' + defaults_file + ' ' + database + ' < ' + sql_path)
