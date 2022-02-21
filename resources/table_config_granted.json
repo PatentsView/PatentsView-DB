@@ -378,7 +378,7 @@
         "location_field": false
       },
       "title": {
-        "data_type": "varchar",
+        "data_type": "mediumtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
@@ -395,7 +395,7 @@
         "location_field": false
       },
       "title": {
-        "data_type": "varchar",
+        "data_type": "mediumtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
@@ -708,7 +708,7 @@
         "location_field": false
       },
       "gi_statement": {
-        "data_type": "varchar",
+        "data_type": "mediumtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
@@ -1540,7 +1540,7 @@
         "location_field": false
       },
       "text": {
-        "data_type": "varchar",
+        "data_type": "text",
         "null_allowed": true,
         "category": false,
         "location_field": false
@@ -1591,13 +1591,13 @@
         "location_field": false
       },
       "abstract": {
-        "data_type": "varchar",
+        "data_type": "mediumtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
       "title": {
-        "data_type": "varchar",
+        "data_type": "mediumtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
@@ -2594,7 +2594,7 @@
         "location_field": false
       },
       "text": {
-        "data_type": "varchar",
+        "data_type": "mediumtext",
         "null_allowed": false,
         "category": false,
         "location_field": false
