@@ -37,5 +37,5 @@ delete from Patent_QA.DataMonitor_patentyearlycount where update_version = @qavi
 delete from Patent_QA.DataMonitor_prefixedentitycount where update_version = @qavi and database_type = 'pgpubs';
 delete from Patent_QA.DataMonitor_topnentites where update_version = @qavi and database_type = 'pgpubs';
 
-
 SET FOREIGN_KEY_CHECKS=1;
+
