@@ -415,7 +415,7 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
     for current_xml in extract_document(xml_file):
         if len(current_xml) > 0:
             counter += 1
-            if debug and counter > 500:
+            if debug and counter > 250:
                 break
             # Create an etree element for the current document
             parser = etree.XMLParser(load_dtd=True, no_network=False)
@@ -428,10 +428,8 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                 # Add the data to the proper dataframe
                 try:
                     for table_name, extracted_data in data:
-                        print(table_name)
                         if len(table_name) > 0:
                             current_data_frame = pd.DataFrame(extracted_data)
-                            print(current_data_frame.head())
                             dfs[table_name] = dfs[table_name].append(current_data_frame)
                         else:
                             continue
@@ -450,20 +448,6 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                     duration=time.time() - parse_start)
             })
     # Load the generated data frames to database
-    # ERROR HERE
-    print("PRINTING DFs")
-    print(dfs)
-    print(" ")
-    print("PRINTING xml_file_name")
-    print(xml_file_name)
-    print(" ")
-    print("PRINTING log_queue")
-    print(log_queue)
-    print(" ")
-    print("PRINTING table_xml_map")
-    print(table_xml_map["foreign_key_config"])
-    print(" ")
-    breakpoint()
     load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map["foreign_key_config"])
 
     xml_file_duration = round(
@@ -485,6 +469,7 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                     })
     if unlink:
         delete_xml_file(xml_file)
+    print("Finished parse_publication_xml TASK")
 
 
 def chunks(l, n):
@@ -534,7 +519,8 @@ def queue_parsers(config, type='granted_patent'):
     dtd_file_setting = "{prefix}_dtd_file".format(prefix=type)
     dtd_file = '{}'.format(config['XML_PARSING'][dtd_file_setting])
     parsing_config_file = config["XML_PARSING"][parsing_file_setting]
-    parsing_config = json.load(open(parsing_config_file))
+    project_home = os.environ['PACKAGE_HOME']
+    parsing_config = json.load(open("{}".format(project_home + "/" + config["XML_PARSING"][parsing_file_setting])))
     xml_files = get_filenames_to_parse(config, type=type)
     parser_start = time.time()
 
@@ -592,6 +578,7 @@ def queue_parsers(config, type='granted_patent'):
         pool.join()
     else:
         log_writer(log_queue)
+    print("Finished Queue Parser Task")
 
 
 def delete_xml_file(filename):
