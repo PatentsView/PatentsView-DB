@@ -873,7 +873,7 @@
         "table_name": "draw_desc_text",
         "friendly_name": "Drawing Description Text",
         "multi_valued": true,
-        "entity_root_path": "description",
+        "entity_root_path": "description/description-of-drawings/",
         "fields": [{
             "field_name": "text",
             "friendly_name": "Text",

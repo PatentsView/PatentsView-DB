@@ -268,7 +268,7 @@
         {
           "field_name": "foreign_doc_number",
           "friendly_name": "Foreign Document Number",
-          "xml_path": "priority-application-number",
+          "xml_path": "priority-application-number/doc-number",
           "attribute": null,
           "description": null,
           "sequence": false,

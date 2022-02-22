@@ -547,26 +547,26 @@ tables_dtd_to_json = {
     'us-patent-grant-v45-2014-04-03.dtd' : None, # is patent_parser.json configured for this version?
     'us-patent-grant-v46-2021-08-30.dtd' : None,
     # pgpubs
-    # 'pap-v15-2001-01-31.dtd' : 'pgp_xml_map_v1x.json',
-    # 'pap-v16-2002-01-01.dtd' : 'pgp_xml_map_v1x.json',
-    # 'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_map_v4_0-2.json',
-    # 'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_map_v4_0-2.json',
-    # 'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_map_v4_0-2.json',
-    # 'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_map_v4_3-5.json',
-    # 'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_map_v4_3-5.json',
-    # 'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_map_v4_3-5.json',
+    'pap-v15-2001-01-31.dtd' : 'pgp_xml_map_v1x.json',
+    'pap-v16-2002-01-01.dtd' : 'pgp_xml_map_v1x.json',
+    'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_map_v4_0-2.json',
+    'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_map_v4_0-2.json',
+    'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_map_v4_0-2.json',
+    'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_map_v4_3-5.json',
+    'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_map_v4_3-5.json',
+    'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_map_v4_3-5.json',
     # temporary fill-ins:
     # used to parse pgpubs gi only - December 2021
     # using now for the rest of pgpubs - Jan 2022
-    'pap-v15-2001-01-31.dtd' : 'pgp_xml_no_gi_v1x.json',
-    'pap-v16-2002-01-01.dtd' : 'pgp_xml_no_gi_v1x.json',
-    'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
-    'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
-    'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
-    'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
-    'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
-    'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
-    None : None,
+    # 'pap-v15-2001-01-31.dtd' : 'pgp_xml_no_gi_v1x.json',
+    # 'pap-v16-2002-01-01.dtd' : 'pgp_xml_no_gi_v1x.json',
+    # 'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
+    # 'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
+    # 'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
+    # 'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
+    # 'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
+    # 'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
+    # None : None,
 }
 
 long_text_dtd_to_json = {
@@ -631,19 +631,21 @@ def queue_parsers(config, type='granted_patent'):
     for file_name in xml_files:
         dtd_file = dtd_finder(file_name)
         # as a precaution
-        if dtd_file is None and type == 'granted_patent':
-            dtd_file = config['XML_PARSING']['default_grant_dtd']
         if dtd_file is None:
-            dtd_file = config['XML_PARSING']['default_pgp_dtd']
+            if type == 'granted_patent':
+                dtd_file = config['XML_PARSING']['default_grant_dtd']
+            else:
+                dtd_file = config['XML_PARSING']['default_pgp_dtd']
         if type in ['pgpubs','granted_patent']:
             parsing_config_file = tables_dtd_to_json[dtd_file]
         if type == 'long_text':
             parsing_config_file = long_text_dtd_to_json[dtd_file]
         #this should be unnecessary after the json dictionary is filled in, but provided as a precaution
-        if parsing_config_file is None and type == 'granted_patent': 
-            parsing_config_file = config['XML_PARSING']['default_grant_parsing_config']
         if parsing_config_file is None:
-            parsing_config_file = config['XML_PARSING']['default_pgp_parsing_config']
+            if type == 'granted_patent': 
+                parsing_config_file = config['XML_PARSING']['default_grant_parsing_config']
+            else:
+                parsing_config_file = config['XML_PARSING']['default_pgp_parsing_config']
         parsing_config_file = '/'.join((config['FOLDERS']['json_folder'], parsing_config_file))
         parsing_config = json.load(open(parsing_config_file))
         dtd_file = '/'.join((config['FOLDERS']['dtd_folder'], dtd_file))
