@@ -127,7 +127,7 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
                     print(message)
                     # raise Exception(message)
 
-                collation_check_parameters = db_and_table_as_array(single_line_query, db_con)
+                collation_check_parameters = db_and_table_as_array(single_line_query)
                 # Check if all text fields in all supplied tables have consistent character set & collation
                 # Stops the process if the collation check fails
                 # This is because joins involving tables with inconsistent collation run forever
