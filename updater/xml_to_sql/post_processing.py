@@ -23,16 +23,16 @@ def consolidate_uspc(config):
     engine.execute(
             "DELETE  FROM  rawuspc  WHERE  LENGTH(classification) < 3;")
     engine.execute(
-            "INSERT IGNORE INTO uspc (id, document_number, mainclass_id, subclass_id, sequence, filename) SELECT id, document_number, TRIM(SUBSTRING(classification,1,3)), TRIM(CONCAT(SUBSTRING(classification,1,3), '/', TRIM(SUBSTRING(classification,4, LENGTH(classification))))), sequence, filename FROM rawuspc;")
+            "INSERT IGNORE INTO uspc (id, document_number, mainclass_id, subclass_id, sequence, filename, version_indicator) SELECT id, document_number, TRIM(SUBSTRING(classification,1,3)), TRIM(CONCAT(SUBSTRING(classification,1,3), '/', TRIM(SUBSTRING(classification,4, LENGTH(classification))))), sequence, filename, version_indicator FROM rawuspc;")
 
 
 def consolidate_rawlocation(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
-            'INSERT IGNORE INTO rawlocation (id, city, state, country, filename) SELECT rawlocation_id, city, state, country, filename FROM rawassignee;')
+            'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM rawassignee;')
     engine.execute(
-            'INSERT IGNORE INTO rawlocation (id, city, state, country, filename) SELECT rawlocation_id, city, state, country, filename FROM rawinventor;')
+            'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM rawinventor;')
 
 
 def create_country_transformed(config):
