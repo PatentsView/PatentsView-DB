@@ -87,9 +87,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
-    send_slack_notification(
-            "Executing Query File: `" + filename + "`", config, section,
-            "info")
+    # send_slack_notification(
+    #         "Executing Query File: `" + filename + "`", config, section,
+    #         "info")
     # Get processed template file content
     sql_content = context['templates_dict']['source_sql']
     # Extract individual statements from sql file
@@ -121,9 +121,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
                     message = """
                         Query execution plan involves full table scan: ```{single_line_query} ```
                         """.format(single_line_query=single_line_query)
-                    send_slack_notification(message, config,
-                                            section,
-                                            "warning")
+                    # send_slack_notification(message, config,
+                    #                         section,
+                    #                         "warning")
                     print(message)
                     # raise Exception(message)
 
@@ -136,9 +136,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
                         Character set and/or collation mismatch between tables involved in query :
                             ```{single_line_query}```
                             """.format(single_line_query=single_line_query)
-                    send_slack_notification(message, config,
-                                            section,
-                                            "warning")
+                    # send_slack_notification(message, config,
+                    #                         section,
+                    #                         "warning")
                     raise Exception(message)
 
                 # Do not run insert statements if it is schema only run
@@ -153,13 +153,13 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
             db_con.execute(single_line_query)
         except Exception as e:
             print(" ")
-            send_slack_notification(
-                    """
-            Execution of Query failed: ```{single_line_query} ```
-                """.format(single_line_query=single_line_query),
-                    config,
-                    section,
-                    "error")
+            # send_slack_notification(
+            #         """
+            # Execution of Query failed: ```{single_line_query} ```
+            #     """.format(single_line_query=single_line_query),
+            #         config,
+            #         section,
+            #         "error")
             raise e
     if not fk_check:
         print(" ")
@@ -168,9 +168,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
     completion_message = """
     Execution for Query file `{filename}` is complete
     """.format(filename=filename)
-    send_slack_notification(completion_message,
-                            config, "*SQL Executor (" + filename + ")*",
-                            "success")
+    # send_slack_notification(completion_message,
+    #                         config, "*SQL Executor (" + filename + ")*",
+    #                         "success")
 #
 # if __name__ == '__main__':
 #     db_and_table_as_array("INSERT INTO pregrant_publications.publication SELECT * FROM pgpubs_20050101.publication")
