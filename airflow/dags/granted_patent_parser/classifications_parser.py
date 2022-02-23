@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.sensors.external_task import ExternalTaskSensor
 
 from QA.collect_supplemental_data.cpc_parser.CPCCurrentTest import CPCTest
 from lib.configuration import get_current_config, get_today_dict
@@ -52,10 +53,20 @@ cpc_wipo_updater = DAG(
     dag_id='classifications_parser',
     default_args=default_args,
     description='Download and process CPC and WIPO classification data for each update',
-    start_date=datetime(2021, 7, 1),
+    start_date=datetime(2021, 10, 1),
     schedule_interval='@quarterly',
     template_searchpath=templates_searchpath,
     catchup=True
+)
+
+quarterly_merge_completed = ExternalTaskSensor(
+    task_id="quarterly_merge_completed",
+    external_dag_id="merge_quarterly_updater",
+    external_task_id="qc_merge_quarterly_pgpubs",
+    timeout=600,
+    allowed_states=['success'],
+    failed_states=['failed', 'skipped'],
+    mode="reschedule",
 )
 
 download_cpc_operator = PythonOperator(task_id='download_cpc',
