@@ -17,29 +17,15 @@ def subprocess_cmd(command):
 
 def create_database(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
-    end_date = config['DATES']["END_DATE"]
-    qavi = "'" + end_date + "'"
-    vi = "'" + '-'.join([end_date[:4], end_date[4:6], end_date[6:]]) + "'"
     temp_db = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
-    prod_db = '{}'.format(config['PATENTSVIEW_DATABASES']['PROD_DB'])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = int(config['DATABASE_SETUP']['PORT'])
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     sql_path = config["FILES"]['APP_DB_SCHEMA_FILE']
-    sql_delete_path = config["FILES"]['APP_DELETE_FILE']
     conn = pymysql.connect(host=host, user=user, password=password, port=port)
 
-    # DELETE PRIOR DATA IN DESTINATION TABLES (PROD)
-    delete_version_in_destination_tables = 'yes'
-    if delete_version_in_destination_tables == 'yes':
-        bash_command='mysql --defaults-file=' + defaults_file + ' ' + prod_db + ' -e ' + f'"set @dbdate={vi}; set @qadbdate={qavi}; source {sql_delete_path};"' + ' ;'
-        print(bash_command)
-        try:
-            subprocess_cmd(bash_command)
-        except:
-            print('delete bash command failed')
     # CREATE TEMP DB AND LOAD IN TABLES
     conn.cursor().execute(f"Drop database if exists {temp_db};")
     conn.cursor().execute(f"CREATE DATABASE {temp_db} DEFAULT CHARACTER SET = 'utf8mb4' DEFAULT COLLATE 'utf8mb4_unicode_ci';")
@@ -53,10 +39,25 @@ def create_database(**kwargs):
 
 def merge_database(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
+    qavi = "'" + end_date + "'"
+    vi = "'" + '-'.join([end_date[:4], end_date[4:6], end_date[6:]]) + "'"
+    end_date = config['DATES']["END_DATE"]
+    prod_db = '{}'.format(config['PATENTSVIEW_DATABASES']['PROD_DB'])
+    sql_delete_path = config["FILES"]['APP_DELETE_FILE']
 
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     sql_path = config["FILES"]['MERGE_SCHEMA_FILE']
+
+    # DELETE PRIOR DATA IN DESTINATION TABLES (PROD)
+    delete_version_in_destination_tables = 'yes'
+    if delete_version_in_destination_tables == 'yes':
+        bash_command='mysql --defaults-file=' + defaults_file + ' ' + prod_db + ' -e ' + f'"set @dbdate={vi}; set @qadbdate={qavi}; source {sql_delete_path};"' + ' ;'
+        print(bash_command)
+        try:
+            subprocess_cmd(bash_command)
+        except:
+            print('delete bash command failed')
 
     try:
         subprocess_cmd('mysql --defaults-file=' + defaults_file + ' ' + database + ' < ' + sql_path)
