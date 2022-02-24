@@ -21,8 +21,6 @@ from lib.configuration import get_connection_string, get_current_config
 from lib.utilities import log_writer
 
 
-def prepare_tables(config):
-    cstr = get_connection_string(config, 'PROD_DB')
 def prepare_tables(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     cstr = get_connection_string(config, 'PROD_DB')

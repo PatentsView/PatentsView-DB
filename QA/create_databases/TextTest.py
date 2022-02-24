@@ -18,7 +18,6 @@ class TextMergeTest(DatabaseTester):
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
         keep_tables = []
         for i in self.table_config.keys():
-            print(i)
             if i in [brf_key, clm_key, ddr_key, ddt_key]:
                 keep_tables.append(i)
         self.table_config = utilities.with_keys(self.table_config, keep_tables)
@@ -40,7 +39,6 @@ class TextUploadTest(DatabaseTester):
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
         keep_tables = []
         for i in self.table_config.keys():
-            print(i)
             if i in [brf_key, clm_key, ddr_key, ddt_key]:
                 keep_tables.append(i)
         self.table_config = utilities.with_keys(self.table_config, keep_tables)
@@ -56,7 +54,7 @@ if __name__ == '__main__':
         "execution_date": datetime.date(2021, 12, 2)
     })
     # config = get_current_config('pgpubs', **kwargs)
-    tmt = TextMergeTest(config)
+    tmt = TextUploadTest(config)
     tmt.runTests()
     # tut = TextUploadTest(config)
     # tut.runTests()

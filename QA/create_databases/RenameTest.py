@@ -4,6 +4,7 @@ import os
 from sqlalchemy import create_engine
 
 from lib.configuration import get_connection_string, get_current_config
+from lib import utilities
 
 
 class DatabaseSetupTest:
@@ -13,45 +14,33 @@ class DatabaseSetupTest:
         self.database_for_tests = database
         print(self.database_for_tests)
         if self.database_for_tests == 'patent' or self.database_for_tests[:6] == 'upload':
-            resources_file = "{root}/{resources}/raw_db_tables.json".format(root=self.project_home,
-                                                                            resources=self.config["FOLDERS"]["resources_folder"])
+            resources_file = "{root}/{resources}/table_config_granted.json".format(root=self.project_home,
+                                                                                   resources=self.config["FOLDERS"][
+                                                                                       "resources_folder"])
         else:
-            resources_file = "{root}/{resources}/pregrant_db_tables.json".format(root=self.project_home,
-                                                                            resources=self.config["FOLDERS"]["resources_folder"])
+            resources_file = "{root}/{resources}/table_config_pgpubs.json".format(root=self.project_home,
+                                                                                  resources=self.config["FOLDERS"][
+                                                                                      "resources_folder"])
         raw_db_table_settings = json.load(open(resources_file))
-        self.required_tables = {x: False for x in raw_db_table_settings["table_list"].keys()}
-        self.empty_tables = [x for x in raw_db_table_settings["table_list"] if
-                             not raw_db_table_settings["table_list"][x]["raw_data"]]
-
+        utilities.class_db_specific_config(self, raw_db_table_settings, "UploadTest")
+        self.required_tables = self.table_config.keys()
 
     def runTests(self):
         self.test_database_encoding()
         self.test_table_encoding()
         self.test_column_encoding()
-        self.test_table_count()
-        self.test_all_tables()
+        self.test_table_exists()
         self.test_tmp_tables()
 
-    def test_table_count(self):
-        print("Checking Table Count for {db}".format(db=self.database_for_tests))
+    def test_table_exists(self):
+        print(f"Checking Table Counts for in database:  {self.database_for_tests}")
         connection_string = get_connection_string(self.config, database="PROD_DB")
         engine = create_engine(connection_string)
-        table_query = f"SELECT  TABLE_NAME from information_schema.tables where TABLE_SCHEMA='{self.database_for_tests}'"
-        table_cursor = engine.execute(table_query)
-        for table_name in table_cursor:
-            print(table_name[0])
-            if table_name[0] in self.required_tables:
-                self.required_tables[table_name[0]] = True
-                count_query = f"SELECT count(*) from {table_name[0]}"
-                count_cursor = engine.execute(count_query)
-                count_value = count_cursor.fetchall()[0][0]
-                if not count_value > 0 and table_name[0] not in self.empty_tables:
-                   raise AssertionError(f"Table {table_name} should not be empty")
-
-    def test_all_tables(self):
-        missing = [x for x in self.required_tables if not self.required_tables[x]]
-        if len(missing) > 0:
-            raise AssertionError("Required tables are missing: {table_list}".format(table_list=", ".join(missing)))
+        for table in self.required_tables:
+            table_exists_query = f"SELECT count(*) from {self.database_for_tests}.{table}"
+            table_cursor = engine.execute(table_exists_query)
+            count_value = table_cursor.fetchall()[0][0]
+            print(f"There are currently {count_value} rows in the {table} table")
 
     def test_tmp_tables(self):
         print("Checking database for temporary tables for {db}".format(db=self.database_for_tests))
@@ -76,7 +65,7 @@ class DatabaseSetupTest:
             raise AssertionError("Database character set should be utf8mb4 instead found {cset}".format(cset=cset))
         if collation != 'utf8mb4_unicode_ci':
             raise AssertionError(
-                    "Database collation should be utf8mb4_unicode_ci instead found {cset}".format(cset=collation))
+                "Database collation should be utf8mb4_unicode_ci instead found {cset}".format(cset=collation))
 
     def test_table_encoding(self):
         print("Checking table encoding for {db}".format(db=self.database_for_tests))
@@ -92,8 +81,8 @@ class DatabaseSetupTest:
                 print(f"\tChecking Table {table_collation_row[0]}")
                 if table_collation_row[1] != 'utf8mb4_unicode_ci':
                     raise AssertionError(
-                            "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
-                                    collation=table_collation_row[1], tbl=table_collation_row[0]))
+                        "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
+                            collation=table_collation_row[1], tbl=table_collation_row[0]))
 
     def test_column_encoding(self):
         connection_string = get_connection_string(self.config, database="PROD_DB")
@@ -107,18 +96,19 @@ class DatabaseSetupTest:
         '''
         collation_cursor = engine.execute(collation_query)
         for column_collation_name in collation_cursor:
-            print("Checking encoding for column {cl} in table: {tbl}".format(cl=column_collation_name[1],
+            print("Checking column encoding for {tbl}.{cl}".format(cl=column_collation_name[1],
                                                                              tbl=column_collation_name[0]))
             if column_collation_name[2] != 'utf8mb4':
                 raise AssertionError(
-                        "Table character set should be utf8mb4 instead found {cset} for table {tbl}. column name {col}".format(
-                                cset=column_collation_name[2], tbl=column_collation_name[0],
-                                col=column_collation_name[1]))
+                    "Table character set should be utf8mb4 instead found {cset} for table {tbl}. column name {col}".format(
+                        cset=column_collation_name[2], tbl=column_collation_name[0],
+                        col=column_collation_name[1]))
             if column_collation_name[3] != 'utf8mb4_unicode_ci':
                 raise AssertionError(
-                        "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
-                                collation=column_collation_name[3], tbl=column_collation_name[0],
-                                col=column_collation_name[1]))
+                    "Table  collation should be utf8mb4_unicode_ci instead found {collation} for table {tbl}".format(
+                        collation=column_collation_name[3], tbl=column_collation_name[0],
+                        col=column_collation_name[1]))
+
 
 if __name__ == '__main__':
     # pgpubs, granted_patent
@@ -131,5 +121,6 @@ if __name__ == '__main__':
     print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
     print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
     print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
-    DBSU = DatabaseSetupTest(config, 'upload_20211026')
+    # DBSU = DatabaseSetupTest(config, 'upload_20211026')
+    DBSU = DatabaseSetupTest(config, 'pgpubs_20211216')
     DBSU.runTests()

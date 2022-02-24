@@ -6,11 +6,13 @@ import json
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 import datetime
+from time import time
 import os
 
 from lib.configuration import get_connection_string
 from lib.configuration import get_current_config
 from lib import utilities
+
 
 class DatabaseTester(ABC):
     def __init__(self, config, database_section, start_date, end_date):
@@ -18,18 +20,18 @@ class DatabaseTester(ABC):
         self.project_home = os.environ['PACKAGE_HOME']
         class_called = self.__class__.__name__
         utilities.get_relevant_attributes(self, class_called, database_section, config)
-            # Update start and end date
+        # Update start and end date
         self.start_date = start_date
         self.end_date = end_date
 
         # Indicator for Upload/Patents database
         self.qa_connection_string = get_connection_string(config, 'QA_DATABASE')
         self.connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
-                                     user=config['DATABASE_SETUP']['USERNAME'],
-                                     password=config['DATABASE_SETUP']['PASSWORD'],
-                                     db=config['PATENTSVIEW_DATABASES']["PROD_DB"],
-                                     charset='utf8mb4',
-                                     cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
+                                          user=config['DATABASE_SETUP']['USERNAME'],
+                                          password=config['DATABASE_SETUP']['PASSWORD'],
+                                          db=database_section,
+                                          charset='utf8mb4',
+                                          cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
         # self.database_connection_string = get_connection_string(config, database_section)
         self.config = config
         # Place Holder for saving QA counts - keys map to table names in patent_QA
@@ -70,10 +72,13 @@ SELECT count(*) as table_count
 from {table_name}
             """
             with self.connection.cursor() as count_cursor:
+                query_start_time = time()
                 count_cursor.execute(count_query)
+                query_end_time = time()
+                print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                 count_value = count_cursor.fetchall()[0][0]
-                # if count_value < 1:
-                #     raise Exception("Empty table found:{table}".format(table=table_name))
+                if count_value < 1:
+                    raise Exception("Empty table found:{table}".format(table=table_name))
 
                 write_table_name = table_name
                 prefix = "temp_"
@@ -103,7 +108,10 @@ from `{table}`
 where `{field}` = ''
                     """
                     with self.connection.cursor() as count_cursor:
+                        query_start_time = time()
                         count_cursor.execute(count_query)
+                        query_end_time = time()
+                        print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                         count_value = count_cursor.fetchall()[0][0]
                         if count_value != 0:
                             exception_message = """
@@ -132,7 +140,10 @@ from `{table}`
 where INSTR(`{field}`, CHAR(0x00)) > 0
             """
             with self.connection.cursor() as count_cursor:
+                query_start_time = time()
                 count_cursor.execute(nul_byte_query)
+                query_end_time = time()
+                print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                 nul_byte_count = count_cursor.fetchall()[0][0]
                 if nul_byte_count > 1:
                     exception_message = """
@@ -156,7 +167,10 @@ from `{table}`
 group by 1
             """
             with self.connection.cursor() as count_cursor:
+                query_start_time = time()
                 count_cursor.execute(category_count_query)
+                query_end_time = time()
+                print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                 for count_row in count_cursor:
                     value = count_row[0]
                     if value is None:
@@ -191,7 +205,10 @@ group by 1
                     self.connection.connect()
                 count_query = f"SELECT count(*) as null_count from `{table}` where `{field}` is null"
                 with self.connection.cursor() as count_cursor:
+                    query_start_time = time()
                     count_cursor.execute(count_query)
+                    query_end_time = time()
+                    print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                     count_value = count_cursor.fetchall()[0][0]
                     if not table_config["fields"][field]['null_allowed']:
                         if count_value != 0:
@@ -225,12 +242,36 @@ group by 1
             zero_query = f"SELECT count(*) zero_count from `{table}` where `{field}` ='0000-00-00'"
             print(zero_query)
             with self.connection.cursor() as count_cursor:
+                query_start_time = time()
                 count_cursor.execute(zero_query)
+                query_end_time = time()
+                print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value != 0:
                     raise Exception(
                         "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {"
                         "count}".format(
+                            database=self.database_section, table=table, col=field,
+                            count=count_value))
+        finally:
+            if self.connection.open:
+                self.connection.close()
+
+    def test_null_version_indicator(self, table):
+        print(f"\t\tTesting for null version_indicator in {table}")
+        try:
+            if not self.connection.open:
+                self.connection.connect()
+            null_vi_query = f"SELECT count(*) null_count from {table} where version_indicator is null"
+            with self.connection.cursor() as count_cursor:
+                query_start_time = time()
+                count_cursor.execute(null_vi_query)
+                query_end_time = time()
+                print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
+                count_value = count_cursor.fetchall()[0][0]
+                if count_value != 0:
+                    raise Exception(
+                        "Table Has Nulls in Version Indicator".format(
                             database=self.database_section, table=table, col=field,
                             count=count_value))
         finally:
@@ -262,7 +303,10 @@ group by 1
                 print(count_query)
 
                 with self.connection.cursor() as count_cursor:
+                    query_start_time = time()
                     count_cursor.execute(count_query)
+                    query_end_time = time()
+                    print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                     for count_row in count_cursor.fetchall():
                         write_table_name = table_name
                         prefix = "temp_"
@@ -288,7 +332,7 @@ group by 1
                                 f"Year {year} has 0 {self.f_key} in the database {self.database_section}"
                             )
             if self.connection.open:
-                    self.connection.close()
+                self.connection.close()
             # if strict:
             #     self.load_yearly_count()
 
@@ -305,7 +349,10 @@ group by 1
                     related_table_id=related_entity_config["related_table_id"])
                 try:
                     with self.connection.cursor() as check_table_cursor:
+                        query_start_time = time()
                         check_table_cursor.execute(related_table_exists_query)
+                        query_end_time = time()
+                        print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                         related_table_count = check_table_cursor.fetchall()[0][0]
                         if related_table_count == 0:
                             print(
@@ -350,12 +397,13 @@ group by 1
                 finally:
                     self.connection.close()
 
-
     def load_main_floating_entity_count(self, table_name, table_config):
         if table_name not in self.exclusion_list and 'related_entities' in table_config:
             for related_entity_config in table_config['related_entities']:
                 print(" ")
-                print("\t\tTesting floating {f_key} counts for main_table: {table_name} and related_table: {related_table}".format(table_name=table_name, f_key=self.f_key, related_table=related_entity_config["related_table"]))
+                print(
+                    "\t\tTesting floating {f_key} counts for main_table: {table_name} and related_table: {related_table}".format(
+                        table_name=table_name, f_key=self.f_key, related_table=related_entity_config["related_table"]))
                 ###### CHECKING IF THE RELATED TABLE HAS DATA
                 if not self.connection.open:
                     self.connection.connect()
@@ -366,14 +414,22 @@ group by 1
                     related_table_id=related_entity_config["related_table_id"])
                 try:
                     with self.connection.cursor() as check_table_cursor:
+                        query_start_time = time()
                         check_table_cursor.execute(related_table_exists_query)
+                        query_end_time = time()
+                        print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                         related_table_count = check_table_cursor.fetchall()[0][0]
-                        if related_table_count==0:
-                            print("\tSkipping check for {related_table} to {main_table} because {related_table} is empty".format(related_table=related_entity_config["related_table"], main_table=table_name))
+                        if related_table_count == 0:
+                            print(
+                                "\tSkipping check for {related_table} to {main_table} because {related_table} is empty".format(
+                                    related_table=related_entity_config["related_table"], main_table=table_name))
                         else:
                             ###### DYNAMICALLY PICKING THE LASTEST COLUMN FOR CHECKING FLOATING ENTITY COUNT
                             year_columns = []
-                            if (table_name == 'persistent_assignee_disambig' and related_entity_config['related_table'] =='assignee') or (table_name == 'persistent_inventor_disambig' and related_entity_config['related_table'] =='inventor'):
+                            if (table_name == 'persistent_assignee_disambig' and related_entity_config[
+                                'related_table'] == 'assignee') or (
+                                    table_name == 'persistent_inventor_disambig' and related_entity_config[
+                                'related_table'] == 'inventor'):
                                 columns = table_config['fields'].keys()
                                 for i in columns:
                                     words = i.split("_")
@@ -387,7 +443,8 @@ group by 1
                                 related_entity_config["main_table_id"] = winner_column
                                 print(related_entity_config["main_table_id"])
                             additional_where = ""
-                            if 'custom_float_condition' in table_config and table_config['custom_float_condition'] is not None:
+                            if 'custom_float_condition' in table_config and table_config[
+                                'custom_float_condition'] is not None:
                                 additional_where = "and " + table_config['custom_float_condition']
                             float_count_query = """
                                             SELECT count(1) as count
@@ -403,7 +460,10 @@ group by 1
                             print(float_count_query)
                             try:
                                 with self.connection.cursor() as count_cursor:
+                                    query_start_time = time()
                                     count_cursor.execute(float_count_query)
+                                    query_end_time = time()
+                                    print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                                     float_count = count_cursor.fetchall()[0][0]
                                     prefix = "temp_"
                                     if table_name.startswith(prefix):
@@ -446,7 +506,10 @@ group by 1
                     """
                 print(count_query)
                 with self.connection.cursor() as count_cursor:
+                    query_start_time = time()
                     count_cursor.execute(count_query)
+                    query_end_time = time()
+                    print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                     for count_row in count_cursor.fetchall():
                         write_table_name = table_name
                         prefix = "temp_"
@@ -492,7 +555,10 @@ group by 1
             with self.connection.cursor() as count_cursor:
                 count_cursor.execute(row_query)
                 row_count = count_cursor.fetchall()
+                query_start_time = time()
                 count_cursor.execute(location_query)
+                query_end_time = time()
+                print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                 for count_row in count_cursor.fetchall():
                     write_table_name = table
                     prefix = "temp_"
@@ -534,7 +600,11 @@ group by 1
             self.connection.connect()
 
         with self.connection.cursor() as text_cursor:
+            query_start_time = time()
             text_cursor.execute(text_length_query)
+            query_end_time = time()
+            print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
+
             text_length = text_cursor.fetchall()[0][0]
             write_table_name = table_name
             prefix = "temp_"
@@ -565,49 +635,55 @@ group by 1
                 left join application a on p.document_number=a.document_number 
             where invention_abstract is null """
         with self.connection.cursor() as count_cursor:
+            query_start_time = time()
             count_cursor.execute(count_query)
+            query_end_time = time()
+            print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
             count_value = count_cursor.fetchall()[0][0]
             if count_value != 0:
                 raise Exception(
-                        f"NULLs (Non-design patents) encountered in table found:{self.database_section}.{table} column abstract. Count: {count_value}")
+                    f"NULLs (Non-design patents) encountered in table found:{self.database_section}.{table} column abstract. Count: {count_value}")
+
 
     def runTests(self):
         # Skiplist is Used for Testing ONLY, Should remain blank
         # skiplist = []
         for table in self.table_config:
-            if table[:1] >= 'p':
-                print(f"Beginning Test for {table} in {self.database_section}")
-                self.load_yearly_count(table, strict=False)
-                self.load_table_row_count(table)
-                self.test_blank_count(table, self.table_config[table])
-                self.load_nulls(table, self.table_config[table])
-                self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
-                self.load_main_floating_entity_count(table, self.table_config[table])
-                self.load_entity_category_counts(table)
-                if table == self.central_entity:
-                    self.test_patent_abstract_null(table)
-                for field in self.table_config[table]["fields"]:
-                    print(f"\tBeginning tests for {field} in {table}")
-                    if "date_field" in self.table_config[table]["fields"][field] and \
-                            self.table_config[table]["fields"][field]["date_field"]:
-                        self.test_zero_dates(table, field)
-                    if "category" in self.table_config[table]["fields"][field] and \
-                            self.table_config[table]["fields"][field]["category"]:
-                        self.load_category_counts(table, field)
-                    if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-                        self.load_text_length(table, field)
-                    if self.table_config[table]["fields"][field]['location_field'] and \
-                            self.table_config[table]["fields"][field]["location_field"]:
-                        self.load_counts_by_location(table, field)
-                    self.test_null_byte(table, field)
-                if self.class_called == "TextMergeTest":
-                    print("No Writing to the DB for Merge Checks")
-                    continue
-                else:
-                    print(self.class_called)
-                    self.save_qa_data()
-                    self.init_qa_dict()
-                print(f"Finished With Table: {table}")
+            # if table[:1] >= 'p':
+            print(f"Beginning Test for {table} in {self.database_section}")
+            if self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest':
+                self.test_null_version_indicator(table)
+            self.load_yearly_count(table, strict=False)
+            self.load_table_row_count(table)
+            self.test_blank_count(table, self.table_config[table])
+            self.load_nulls(table, self.table_config[table])
+            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
+            self.load_main_floating_entity_count(table, self.table_config[table])
+            self.load_entity_category_counts(table)
+            if table == self.central_entity:
+                self.test_patent_abstract_null(table)
+            for field in self.table_config[table]["fields"]:
+                print(f"\tBeginning tests for {field} in {table}")
+                if "date_field" in self.table_config[table]["fields"][field] and \
+                        self.table_config[table]["fields"][field]["date_field"]:
+                    self.test_zero_dates(table, field)
+                if "category" in self.table_config[table]["fields"][field] and \
+                        self.table_config[table]["fields"][field]["category"]:
+                    self.load_category_counts(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
+                    self.load_text_length(table, field)
+                if self.table_config[table]["fields"][field]['location_field'] and \
+                        self.table_config[table]["fields"][field]["location_field"]:
+                    self.load_counts_by_location(table, field)
+                self.test_null_byte(table, field)
+            if self.class_called == "TextMergeTest":
+                print("No Writing to the DB for Merge Checks")
+                continue
+            else:
+                print(self.class_called)
+                self.save_qa_data()
+                self.init_qa_dict()
+            print(f"Finished With Table: {table}")
 
 
 if __name__ == '__main__':

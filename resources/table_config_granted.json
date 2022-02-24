@@ -1393,75 +1393,6 @@
     },
     "TestScripts": []
   },
-  "nber": {
-    "fields": {
-      "uuid": {
-        "data_type": "varchar",
-        "null_allowed": false,
-        "category": false,
-        "location_field": false
-      },
-      "patent_id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "category_id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "subcategory_id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "TestScripts": [
-      "UploadTest"
-    ]
-  },
-  "nber_category": {
-    "fields": {
-      "id": {
-        "data_type": "varchar",
-        "null_allowed": false,
-        "category": false,
-        "location_field": false
-      },
-      "title": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "TestScripts": [
-      "UploadTest"
-    ]
-  },
-  "nber_subcategory": {
-    "fields": {
-      "id": {
-        "data_type": "varchar",
-        "null_allowed": false,
-        "category": false,
-        "location_field": false
-      },
-      "title": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "TestScripts": [
-      "UploadTest"
-    ]
-  },
   "non_inventor_applicant": {
     "fields": {
       "uuid": {
@@ -2931,43 +2862,6 @@
       "MergeTestWeekly",
       "UploadTest",
       "MergeTestQuarterly"
-    ]
-  },
-  "uspc_current": {
-    "fields": {
-      "uuid": {
-        "data_type": "varchar",
-        "null_allowed": false,
-        "category": false,
-        "location_field": false
-      },
-      "patent_id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "mainclass_id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "subclass_id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "sequence": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "TestScripts": [
-      "UploadTest"
     ]
   },
   "usreldoc": {
