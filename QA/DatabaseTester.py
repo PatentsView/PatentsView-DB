@@ -130,7 +130,7 @@ Blanks encountered in  table found:{database}.{table} column {col}. Count: {coun
         :param table: Table to verify
         :param field: Field to verify
         """
-        print("\t\tTesting for NUL bytes for {field} in {table_name}".format(field=field, table_name=table))
+        print("\t\tTesting for null bytes for {field} in {table_name}".format(field=field, table_name=table))
         try:
             if not self.connection.open:
                 self.connection.connect()
@@ -198,12 +198,13 @@ group by 1
         :param table:
         :param table_config:
         """
-        print("\tTesting NULLs for {table_name}".format(table_name=table))
+        print("\tTesting nulls for {table_name}".format(table_name=table))
         for field in table_config["fields"]:
             try:
                 if not self.connection.open:
                     self.connection.connect()
                 count_query = f"SELECT count(*) as null_count from `{table}` where `{field}` is null"
+                print(count_query)
                 with self.connection.cursor() as count_cursor:
                     query_start_time = time()
                     count_cursor.execute(count_query)
@@ -274,6 +275,27 @@ group by 1
                         "Table Has Nulls in Version Indicator".format(
                             database=self.database_section, table=table, col=field,
                             count=count_value))
+        finally:
+            if self.connection.open:
+                self.connection.close()
+
+    def test_white_space(self, table, field):
+        print(f"\t\tTesting for whitespace in {table}.{field}")
+        try:
+            if not self.connection.open:
+                self.connection.connect()
+            white_space_query = f"SELECT count(*) from {table} WHERE CHAR_LENGTH({field}) != CHAR_LENGTH(TRIM({field}))"
+            with self.connection.cursor() as count_cursor:
+                query_start_time = time()
+                count_cursor.execute(white_space_query)
+                query_end_time = time()
+                print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
+                count_value = count_cursor.fetchall()[0][0]
+                if count_value != 0:
+                    print("THE FOLLOWING QUERY NEEDS ADDRESSING")
+                    print(white_space_query)
+                    # raise Exception(
+                    #     f"print({self.database_section}.{table}.{field} needs trimming")
         finally:
             if self.connection.open:
                 self.connection.close()
@@ -649,8 +671,8 @@ group by 1
         # Skiplist is Used for Testing ONLY, Should remain blank
         # skiplist = []
         for table in self.table_config:
-            # if table[:1] >= 'p':
-            print(f"Beginning Test for {table} in {self.database_section}")
+            # if table[:1] > 'p':
+            print(f"BEGINNING TESTS FOR {self.database_section}.{table}")
             if self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest':
                 self.test_null_version_indicator(table)
             self.load_yearly_count(table, strict=False)
@@ -663,18 +685,17 @@ group by 1
             if table == self.central_entity:
                 self.test_patent_abstract_null(table)
             for field in self.table_config[table]["fields"]:
-                print(f"\tBeginning tests for {field} in {table}")
-                if "date_field" in self.table_config[table]["fields"][field] and \
-                        self.table_config[table]["fields"][field]["date_field"]:
+                print(f"\tTesting {table}.{field}")
+                if self.table_config[table]["fields"][field]["data_type"] == 'date':
                     self.test_zero_dates(table, field)
-                if "category" in self.table_config[table]["fields"][field] and \
-                        self.table_config[table]["fields"][field]["category"]:
+                if self.table_config[table]["fields"][field]["category"]:
                     self.load_category_counts(table, field)
                 if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
                     self.load_text_length(table, field)
-                if self.table_config[table]["fields"][field]['location_field'] and \
-                        self.table_config[table]["fields"][field]["location_field"]:
+                if self.table_config[table]["fields"][field]["location_field"]:
                     self.load_counts_by_location(table, field)
+                # if self.table_config[table]["fields"][field]['data_type'] == 'varchar' and 'id' not in field:
+                #     self.test_white_space(table, field)
                 self.test_null_byte(table, field)
             if self.class_called == "TextMergeTest":
                 print("No Writing to the DB for Merge Checks")
