@@ -1669,22 +1669,12 @@
         "related_table_id": "patent_id"
       },
       {
-        "related_table": "further_cpc",
-        "main_table_id": "id",
-        "related_table_id": "patent_id"
-      },
-      {
         "related_table": "government_interest",
         "main_table_id": "id",
         "related_table_id": "patent_id"
       },
       {
         "related_table": "ipcr",
-        "main_table_id": "id",
-        "related_table_id": "patent_id"
-      },
-      {
-        "related_table": "main_cpc",
         "main_table_id": "id",
         "related_table_id": "patent_id"
       },
