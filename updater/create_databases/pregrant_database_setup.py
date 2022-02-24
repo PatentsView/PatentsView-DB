@@ -52,7 +52,7 @@ def merge_database(**kwargs):
     # DELETE PRIOR DATA IN DESTINATION TABLES (PROD)
     delete_version_in_destination_tables = 'yes'
     if delete_version_in_destination_tables == 'yes':
-        bash_command='mysql --defaults-file=' + defaults_file + ' ' + prod_db + ' -e ' + f'"set @dbdate={vi}; set @qadbdate={qavi}; source {sql_delete_path};"' + ' ;'
+        bash_command='mysql --defaults-file=' + defaults_file + ' ' + prod_db + ' -e ' + f'"set @dbdate={vi}; set @qavi={qavi}; source {sql_delete_path};"' + ' ;'
         print(bash_command)
         try:
             subprocess_cmd(bash_command)
