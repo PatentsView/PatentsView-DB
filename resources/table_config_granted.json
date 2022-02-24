@@ -1679,11 +1679,6 @@
         "related_table_id": "patent_id"
       },
       {
-        "related_table": "main_cpc",
-        "main_table_id": "id",
-        "related_table_id": "patent_id"
-      },
-      {
         "related_table": "nber",
         "main_table_id": "id",
         "related_table_id": "patent_id"
