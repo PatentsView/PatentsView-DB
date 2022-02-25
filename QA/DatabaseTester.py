@@ -77,7 +77,7 @@ from {table_name}
                 query_end_time = time()
                 print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                 count_value = count_cursor.fetchall()[0][0]
-                if count_value < 1:
+                if count_value < 1 and table_name not in ['rawuspc', 'uspc']:
                     raise Exception("Empty table found:{table}".format(table=table_name))
 
                 write_table_name = table_name
