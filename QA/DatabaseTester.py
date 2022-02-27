@@ -39,10 +39,13 @@ class DatabaseTester(ABC):
         self.database_section = database_section
         self.class_called = class_called
 
-        try:
-            database_type = self.database_section.split("_")[0]
-        except IndexError:
-            database_type = self.database_section
+        if self.class_called == 'TextQuarterlyMergeTest' and database_section == 'pgpubs_text':
+            database_type = 'pregrant'
+        else:
+            try:
+                database_type = self.database_section.split("_")[0]
+            except IndexError:
+                database_type = self.database_section
 
         self.version = self.end_date.strftime("%Y%m%d")
         self.database_type = database_type
