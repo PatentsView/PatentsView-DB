@@ -1,11 +1,11 @@
 from QA.create_databases.RenameTest import DatabaseSetupTest
 from lib.configuration import get_current_config, get_today_dict
-from lib.utilities import trim_whitespace
+from lib import utilities
 import datetime
 
 def qc_database_granted(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
-    trim_whitespace(config)
+    utilities.trim_whitespace(config)
     database = config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
     qc = DatabaseSetupTest(config, database).runTests()
 
