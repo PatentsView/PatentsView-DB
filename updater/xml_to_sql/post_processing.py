@@ -1,11 +1,13 @@
 import datetime
+import os
+import json
 
 import pymysql
 from sqlalchemy import create_engine
 
 from QA.text_parser.AppTest import AppUploadTest
 from lib.configuration import get_connection_string, get_current_config
-
+from lib.utilities import trim_whitespace
 
 def pct_data_doc_type(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
@@ -247,6 +249,7 @@ def trim_rawassignee(config):
 
 def begin_post_processing(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
+    trim_whitespace(config)
     trim_rawassignee(config)
     consolidate_rawlocation(config)
     create_country_transformed(config)
@@ -270,5 +273,5 @@ def post_upload_database(**kwargs):
 
 if __name__ == "__main__":
     begin_post_processing(**{
-            "execution_date": datetime.date(2020, 12, 17)
+            "execution_date": datetime.date(2022, 1, 11)
             })
