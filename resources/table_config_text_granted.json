@@ -1706,7 +1706,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "brf_sum_text_2021": {
@@ -1738,7 +1739,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "brf_sum_text_2022": {
@@ -1770,7 +1772,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "claim_exemplary_2020": {
@@ -4516,7 +4519,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "claims_2021": {
@@ -4572,7 +4576,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
     "claims_2022": {
@@ -4628,7 +4633,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "detail_desc_text_1976": {
@@ -6602,7 +6608,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "detail_desc_text_2021": {
@@ -6640,7 +6647,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "detail_desc_text_2022": {
@@ -6678,7 +6686,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "draw_desc_text_1976": {
@@ -8658,7 +8667,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "draw_desc_text_2021": {
@@ -8676,7 +8686,7 @@
         "location_field": false
       },
       "text": {
-        "data_type": "longtext",
+        "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
@@ -8696,7 +8706,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "draw_desc_text_2022": {
@@ -8714,7 +8725,7 @@
         "location_field": false
       },
       "text": {
-        "data_type": "longtext",
+        "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
@@ -8734,7 +8745,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "h_dates": {

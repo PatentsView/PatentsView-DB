@@ -671,40 +671,40 @@ group by 1
         # Skiplist is Used for Testing ONLY, Should remain blank
         # skiplist = []
         for table in self.table_config:
-            if table[:2] >= 'pu':
-                print(f"BEGINNING TESTS FOR {self.database_section}.{table}")
-                if self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest':
-                    self.test_null_version_indicator(table)
-                self.load_yearly_count(table, strict=False)
-                self.load_table_row_count(table)
-                self.test_blank_count(table, self.table_config[table])
-                self.load_nulls(table, self.table_config[table])
-                self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
-                self.load_main_floating_entity_count(table, self.table_config[table])
-                self.load_entity_category_counts(table)
-                if table == self.central_entity:
-                    self.test_patent_abstract_null(table)
-                for field in self.table_config[table]["fields"]:
-                    print(f"\tTesting {table}.{field}")
-                    if self.table_config[table]["fields"][field]["data_type"] == 'date':
-                        self.test_zero_dates(table, field)
-                    if self.table_config[table]["fields"][field]["category"]:
-                        self.load_category_counts(table, field)
-                    if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-                        self.load_text_length(table, field)
-                    if self.table_config[table]["fields"][field]["location_field"]:
-                        self.load_counts_by_location(table, field)
-                    if self.table_config[table]["fields"][field]['data_type'] == 'varchar' and 'id' not in field and (self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest'):
-                        self.test_white_space(table, field)
-                    self.test_null_byte(table, field)
-                if self.class_called == "TextMergeTest":
-                    print("No Writing to the DB for Merge Checks")
-                    continue
-                else:
-                    print(self.class_called)
-                    self.save_qa_data()
-                    self.init_qa_dict()
-                print(f"Finished With Table: {table}")
+            # if table[:2] >= 'pu':
+            print(f"BEGINNING TESTS FOR {self.database_section}.{table}")
+            if self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest':
+                self.test_null_version_indicator(table)
+            self.load_yearly_count(table, strict=False)
+            self.load_table_row_count(table)
+            self.test_blank_count(table, self.table_config[table])
+            self.load_nulls(table, self.table_config[table])
+            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
+            self.load_main_floating_entity_count(table, self.table_config[table])
+            self.load_entity_category_counts(table)
+            if table == self.central_entity:
+                self.test_patent_abstract_null(table)
+            for field in self.table_config[table]["fields"]:
+                print(f"\tTesting {table}.{field}")
+                if self.table_config[table]["fields"][field]["data_type"] == 'date':
+                    self.test_zero_dates(table, field)
+                if self.table_config[table]["fields"][field]["category"]:
+                    self.load_category_counts(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
+                    self.load_text_length(table, field)
+                if self.table_config[table]["fields"][field]["location_field"]:
+                    self.load_counts_by_location(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] == 'varchar' and 'id' not in field and (self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest'):
+                    self.test_white_space(table, field)
+                self.test_null_byte(table, field)
+            if self.class_called == "TextMergeTest":
+                print("No Writing to the DB for Merge Checks")
+                continue
+            else:
+                print(self.class_called)
+                self.save_qa_data()
+                self.init_qa_dict()
+            print(f"Finished With Table: {table}")
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ import datetime
 import os
 import sys
 
-from QA.create_databases.TextTest import TextUploadTest, TextMergeTest
+from QA.create_databases.TextTest import TextUploadTest, TextMergeTest, TextQuarterlyMergeTest
 
 
 def add_text_table_suffx(config, database_date):
@@ -53,6 +53,18 @@ def post_text_merge_pgpubs(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('pgpubs', **kwargs)
     tpt = TextMergeTest(config)
+    tpt.runTests()
+
+def post_text_merge_quarterly_granted(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('granted_patent', **kwargs)
+    tpt = TextQuarterlyMergeTest(config)
+    tpt.runTests()
+
+def post_text_merge_quarterly_pgpubs(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('pgpubs', **kwargs)
+    tpt = TextQuarterlyMergeTest(config)
     tpt.runTests()
 
 

@@ -516,7 +516,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "brf_sum_text_2021": {
@@ -542,7 +543,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "brf_sum_text_2022": {
@@ -568,7 +570,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "claim_2001": {
@@ -1448,7 +1451,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "claim_2021": {
@@ -1492,7 +1496,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "claim_2022": {
@@ -1536,7 +1541,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "detail_desc_text_2001": {
@@ -2176,7 +2182,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "detail_desc_text_2021": {
@@ -2208,7 +2215,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "detail_desc_text_2022": {
@@ -2240,7 +2248,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "draw_desc_text_2002": {
@@ -2848,7 +2857,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
   "draw_desc_text_2021": {
@@ -2880,7 +2890,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   },
     "draw_desc_text_2022": {
@@ -2912,7 +2923,8 @@
     },
     "TestScripts": [
       "TextMergeTest",
-      "TextUploadTest"
+      "TextUploadTest",
+      "TextQuarterlyMergeTest"
     ]
   }
 }
