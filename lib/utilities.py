@@ -103,6 +103,27 @@ def get_relevant_attributes(self, class_called, database_section, config):
         else:
             raise NotImplementedError
 
+def trim_whitespace(config):
+    cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
+    db_type = config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"][:6]
+    engine = create_engine(cstr)
+    print("REMOVING WHITESPACE WHERE IT EXISTS")
+    project_home = os.environ['PACKAGE_HOME']
+    resources_file = "{root}/{resources}/columns_for_whitespace_trim.json".format(root=project_home,
+                                                                           resources=config["FOLDERS"]["resources_folder"])
+    cols_tables_whitespace = json.load(open(resources_file))
+    for table in cols_tables_whitespace.keys():
+        if db_type in cols_tables_whitespace[table]["TestScripts"]:
+            for column in cols_tables_whitespace[table]['fields']:
+                trim_whitespace_query = f"""
+                update {table}
+                set `{column}`= TRIM(`{column}`)
+                where CHAR_LENGTH(`{column}`) != CHAR_LENGTH(TRIM(`{column}`))
+                """
+                print(trim_whitespace_query)
+                engine.execute(trim_whitespace_query)
+
+
 def xstr(s):
     if s is None:
         return ''
