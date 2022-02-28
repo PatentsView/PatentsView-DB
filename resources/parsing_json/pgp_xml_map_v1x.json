@@ -440,17 +440,27 @@
         "table_name": "draw_desc_text",
         "friendly_name": "Drawing Description Text",
         "multi_valued": true,
-        "entity_root_path": "body//patent-application-publication/subdoc-description",
+        "entity_root_path": "body//patent-application-publication/subdoc-description/brief-description-of-drawings/section/",
         "fields": [{
             "field_name": "text",
             "friendly_name": "Text",
-            "xml_path": "brief-description-of-drawings",
+            "xml_path": ".",
             "description": null,
             "sequence": false,
             "attribute": null,
             "flag": null,
             "tag": false,
             "data-type": "fulltext"
+        },{
+            "field_name": "sequence",
+            "friendly_name": "Sequence",
+            "xml_path": ".",
+            "attribute": null,
+            "description": null,
+            "sequence": true,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
         }
       ],
       "filename": "draw_desc_text.tsv"

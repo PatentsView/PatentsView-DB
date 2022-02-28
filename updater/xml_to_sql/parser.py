@@ -101,7 +101,8 @@ def text_extractor(root, level=0):
          on each children to extract all the text data from a text tag
         '''
         if str(type(root.tag)) != '<class \'cython_function_or_method\'>' and root.text and len(root.text.strip()) > 0:
-            partial_strings.append(root.text.strip())
+            if not re.fullmatch("&lsqb;[0-9]{4}&rsqb;",root.text.strip()):
+                partial_strings.append(root.text.strip())
         for text_children in root.getchildren():
             if text_children.tag in newline_tags:
                 partial_strings.append("\n")
@@ -177,7 +178,7 @@ def extract_field_data(field_element, field, attribute, description, flag, tag):
         return parse_description(field_element, description)
     # If the field is a "fulltext" type, extract all the necessary text
     elif field['data-type'] == 'fulltext':
-        partial_string = ''.join(field_element.itertext())
+        partial_string = ' '.join(text_extractor(field_element))
         return partial_string.strip()
     # If this field is determined by an attributes, then extract its value
     elif attribute is not None:
@@ -230,20 +231,22 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                 data_list[field["field_name"]] = seq
             # If we are looking for the text data in the claims table use the text_extractor to get the right data
             # Claims are special cases
-            elif tab['friendly_name'] == 'Claim' and field['field_name'] == 'text':
+            elif tab['friendly_name'] == 'Claim' and field['field_name'] in ['text', 'dependent']: # dependent added to handle minor difference between v1.5 and v1.6. may revert if problematic
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
-                    partial_strings += text_extractor(elem)
+                    partial_strings += extract_text_from_all_children(elem) # adjustment for dependent extraction between versions
                     if elem.tag in newline_tags:
                         partial_strings.append("\n\n")
-                    data_list[field["field_name"]] = ' '.join(partial_strings)
+                    data_list[field["field_name"]] = ' '.join(partial_strings) #may need a little cleaning - replace double spaces, floating commas,
+                    data_list[field["field_name"]] = re.sub(" +(?=[ \.,])","",data_list[field["field_name"]])
             elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'text':
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
                     partial_strings += extract_text_from_all_children(elem)
                     data_list[field["field_name"]] = ' '.join(partial_strings)
+                    data_list[field["field_name"]] = re.sub("&lsqb;[0-9]{4}&rsqb;",'',data_list[field["field_name"]])
             else:
                 # Find all elements in the xml_path for a current field
                 field_elements = patent_doc.findall(path)
@@ -316,6 +319,7 @@ def sql_dtype_picker(parsing_config):
         tabdict = {}
         for column in table['fields']:
             tabdict[column['field_name']] = json_to_sql[column['data-type']] # could put a try except here with a default dtype
+        tabdict['version_indicator'] = mysql.DATE
         dtype_dict[table['table_name']] = tabdict
     return dtype_dict
 
@@ -329,7 +333,7 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     foreign_key_config = table_xml_map['foreign_key_config']
     sql_start = time.time()
     #database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
-    database = 'assignee_reparse' # temporary switch
+    database = 'pgpubs_2001_2004' # temporary switch
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -341,7 +345,7 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     dtypes = sql_dtype_picker(table_xml_map)
 
     for df in dfs:
-        tabnam = df+'_{}'.format(config['DATES']['RUN_DATE']) # the run date might be redundant with the db name
+        tabnam = df+'_{}'.format(config['DATES']['END_DATE']) # the run date might be redundant with the db name
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
@@ -471,6 +475,9 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                     xml_file=xml_file_name,
                     duration=time.time() - parse_start)
             })
+    # drop rows with only Nones (except doc #) - may turn this off if problematic
+    for df in dfs:
+        dfs[df].dropna(inplace=True, thresh=2) # drop any rows that have fewer than 2 non-Null values (i.e. any that have only the doc id)
     # Load the generated data frames to database
     load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map)
 
