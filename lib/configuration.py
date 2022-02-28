@@ -205,10 +205,11 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
                                                                     filename=supplemental_config)
             s_config.read(config_file)
             config.update(s_config)
-    incremental = 1
-    if start_date.month == 1:
-        incremental = 0
+    incremental = 0
+    if end_date.month == 12:
+        incremental = 1
     config['DISAMBIGUATION']['INCREMENTAL'] = str(incremental)
+    print(config['DISAMBIGUATION']['INCREMENTAL'])
     return config
 
 
@@ -278,12 +279,17 @@ def get_es(config):
 
 if __name__ == '__main__':
     # pgpubs, granted_patent
-    config = get_current_config('granted_patent', **{
-        "execution_date": datetime.date(2021, 11, 4)
-    })
+    # config = get_current_config('pgpubs', schedule="quarterly", **{
+    #     "execution_date": datetime.date(2021, 8, 4)
+    # })
     # get_backup_command(**{
     #     "execution_date": datetime.date(2021, 11, 4)
     # })
-    print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
-    print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
+    # print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
+    config = get_disambig_config(type='pgpubs', schedule="quarterly", **{
+        "execution_date": datetime.date(2021, 10, 1)
+    })
+    # print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
+    # print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
+    # print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"][:6])
+    # print(config['DATES']['END_DATE'])

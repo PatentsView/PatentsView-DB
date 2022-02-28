@@ -67,7 +67,8 @@ def archive_results(**kwargs):
     incremental = True if config['DISAMBIGUATION']['INCREMENTAL'] == "1" else False
     folders = [config['DATES']['END_DATE']]
     if incremental:
-            folders.append("full_disambiguation")
+        folders.append("full_disambiguation")
+        print("Running a Full Disambiguation!")
     source_folder = "data/current/inventor"
     targets = ["data/{folder}/inventor/".format(folder=x) for x in folders]
     archive_folder(source_folder, targets)
@@ -86,5 +87,7 @@ if __name__ == '__main__':
                                  **{'execution_date': DateTime(year=2021, month=7, day=1)})
     config = prepare_config(config)
     import pprint
+
+    archive_results(**{'execution_date': DateTime(year=2021, month=7, day=1)})
     pprint.pprint({section: dict(config[section]) for section in config.sections()})
-#    build_title_map(**{'execution_date': DateTime(year=2021, month=7, day=1)})
+    build_title_map(**{'execution_date': DateTime(year=2021, month=7, day=1)})
