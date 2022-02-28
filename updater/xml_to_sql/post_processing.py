@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 
 from QA.text_parser.AppTest import AppUploadTest
 from lib.configuration import get_connection_string, get_current_config
-from lib.utilities import trim_whitespace
+from lib import utilities
 
 def pct_data_doc_type(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
@@ -249,7 +249,7 @@ def trim_rawassignee(config):
 
 def begin_post_processing(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
-    trim_whitespace(config)
+    utilities.trim_whitespace(config)
     trim_rawassignee(config)
     consolidate_rawlocation(config)
     create_country_transformed(config)
