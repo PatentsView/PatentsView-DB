@@ -20,29 +20,29 @@ def assign_existing_location_ids(config, database_section):
 
 def update_rawlocation_for_granted(**kwargs):
     config = get_current_config(schedule='quarterly', type='granted_patent', **kwargs)
-    assign_existing_location_ids(config, 'RAW_DB')
+    assign_existing_location_ids(config, 'PROD_DB')
 
 
 def update_rawlocation_for_pregranted(**kwargs):
     config = get_current_config(schedule='quarterly', type='pgpubs', **kwargs)
-    assign_existing_location_ids(config, 'PGPUBS_DATABASE')
+    assign_existing_location_ids(config, 'PROD_DB')
 
 
 def update_latitude_longitude_for_granted(**kwargs):
     config = get_current_config(schedule='quarterly', type='pgpubs', **kwargs)
-    search_for_lat_lon(config, source='RAW_DB')
+    search_for_lat_lon(config, source='PROD_DB')
 
 
 def update_latitude_longitude_for_pregranted(**kwargs):
     config = get_current_config(schedule='quarterly', type='pgpubs', **kwargs)
-    search_for_lat_lon(config, source='PGPUBS_DATABASE')
+    search_for_lat_lon(config, source='PROD_DB')
 
 
 def find_nearest_neighbor_for_pregranted(**kwargs):
     config = get_current_config(schedule='quarterly', type='granted_patent', **kwargs)
-    find_nearest_neighbor_for_source(config, 'PGPUBS_DATABASE')
+    find_nearest_neighbor_for_source(config, 'PROD_DB')
 
 
 def find_nearest_neighbor_for_granted(**kwargs):
     config = get_current_config(schedule='quarterly', type='granted_patent', **kwargs)
-    find_nearest_neighbor_for_source(config, 'RAW_DB')
+    find_nearest_neighbor_for_source(config, 'PROD_DB')
