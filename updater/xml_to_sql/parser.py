@@ -376,13 +376,16 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
 
 
 def extract_document(xml_file):
-    xml_marker = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    #xml_marker = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml_marker = '<?xml version="1.0"'
     current_document_lines = []
     with open(xml_file, "r") as freader:
         # Loop through all the lines in the file
         for line in freader:
             # Determine the start of a new document
-            if line == xml_marker:
+            # if line == xml_marker:
+            # some of the v1.x documents are delimited by just '<?xml version="1.0"?>' - this caused inadvertent merging of documents
+            if line.startswith(xml_marker): 
                 # Join all lines for a given document
                 current_xml = "".join(current_document_lines)
                 yield current_xml
