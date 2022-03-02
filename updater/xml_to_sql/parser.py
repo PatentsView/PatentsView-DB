@@ -323,6 +323,25 @@ def sql_dtype_picker(parsing_config):
         dtype_dict[table['table_name']] = tabdict
     return dtype_dict
 
+def v1_ipcr_fixer(data, config):
+    newdata = pd.DataFrame()
+    newdata['document_number'] = data['document_number']
+    newdata['sequence'] = data['sequence']
+    newdata['version'] = '20000101'
+    newdata['action_date'] = config['DATES']['START_DATE']
+    newdata[['section', 'class', 'subclass', 'main_group', 'subgroup']] = data['full_code'].str.extract("([A-H])([0-9]{2})([A-Z])([0-9]{1,3})/([0-9]{2,})")
+    dtypes = {
+        'sequence': mysql.INTEGER,
+        'version': mysql.DATE,
+        'section': mysql.VARCHAR(20),
+        'class': mysql.VARCHAR(20),
+        'subclass':mysql.VARCHAR(20),
+        'main_group': mysql.VARCHAR(20),
+        'subgroup': mysql.VARCHAR(20),
+        'action_date': mysql.DATE,
+    }
+    return(newdata, dtypes)
+
 def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     """
     Add all data to the MySQL database
@@ -345,11 +364,13 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     dtypes = sql_dtype_picker(table_xml_map)
 
     for df in dfs:
-        tabnam = df+'_{}'.format(config['DATES']['END_DATE']) # the run date might be redundant with the db name
+        if df == 'ipcr' and xml_file_name.startswith('pa0'): #only 2001-2004 start with pa instead of ipa
+            (dfs[df], dtypes[df]) = v1_ipcr_fixer(dfs[df], config)
+        tabnam = df+'_{}'.format(config['DATES']['START_DATE']) # the run date might be redundant with the db name
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
-        dfs[df]['version_indicator'] = config['DATES']['END_DATE']
+        dfs[df]['version_indicator'] = config['DATES']['START_DATE']
         try:
             dfs[df].to_sql(tabnam, con=engine, if_exists='append', index=False, dtype=dtypes[df])
         except Exception as e:

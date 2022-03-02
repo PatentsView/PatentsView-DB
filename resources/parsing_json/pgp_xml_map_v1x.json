@@ -280,6 +280,37 @@
       "filename": "foreign_priority.tsv"
     },
     {
+      "table_name": "ipcr",
+      "friendly_name": "IPCR",
+      "multi_valued": true,
+      "entity_root_path": "body//patent-application-publication/subdoc-bibliographic-information/technical-information/classification-ipc//ipc",
+      "fields": [
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "full_code",
+          "friendly_name": "concatenated IPC Classification",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "ipcr.tsv"
+    },
+    {
       "table_name": "rawassignee",
       "friendly_name": "Rawassignee",
       "multi_valued": true,
