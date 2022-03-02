@@ -578,8 +578,8 @@ tables_dtd_to_json = {
     'us-patent-grant-v45-2014-04-03.dtd' : None, # is patent_parser.json configured for this version?
     'us-patent-grant-v46-2021-08-30.dtd' : None,
     # pgpubs
-    'pap-v15-2001-01-31.dtd' : 'early_ipc_test.json',
-    'pap-v16-2002-01-01.dtd' : 'early_ipc_test.json',
+    'pap-v15-2001-01-31.dtd' : 'pgp_xml_map_v1x.json',
+    'pap-v16-2002-01-01.dtd' : 'pgp_xml_map_v1x.json',
     'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_map_v4_0-2.json',
     'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_map_v4_0-2.json',
     'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_map_v4_0-2.json',
