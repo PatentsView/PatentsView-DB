@@ -8641,7 +8641,7 @@
         "location_field": false
       },
       "text": {
-        "data_type": "varchar",
+        "data_type": "longtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
@@ -8686,7 +8686,7 @@
         "location_field": false
       },
       "text": {
-        "data_type": "varchar",
+        "data_type": "longtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
@@ -8725,7 +8725,7 @@
         "location_field": false
       },
       "text": {
-        "data_type": "varchar",
+        "data_type": "longtext",
         "null_allowed": true,
         "category": false,
         "location_field": false

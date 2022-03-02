@@ -68,7 +68,7 @@ def archive_results(**kwargs):
     folders = [config['DATES']['END_DATE']]
     if incremental:
         folders.append("full_disambiguation")
-        print("Running a Full Disambiguation!")
+        print("Running Full Disambiguation!")
     source_folder = "data/current/inventor"
     targets = ["data/{folder}/inventor/".format(folder=x) for x in folders]
     archive_folder(source_folder, targets)
