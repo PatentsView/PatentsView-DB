@@ -205,9 +205,9 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
                                                                     filename=supplemental_config)
             s_config.read(config_file)
             config.update(s_config)
-    incremental = 0
+    incremental = 1
     if end_date.month == 12:
-        incremental = 1
+        incremental = 0
     config['DISAMBIGUATION']['INCREMENTAL'] = str(incremental)
     print(config['DISAMBIGUATION']['INCREMENTAL'])
     return config

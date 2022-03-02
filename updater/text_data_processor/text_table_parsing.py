@@ -57,13 +57,13 @@ def post_text_merge_pgpubs(**kwargs):
 
 def post_text_merge_quarterly_granted(**kwargs):
     from lib.configuration import get_current_config
-    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+    config = get_current_config('granted_patent', schedule="quarterly", **kwargs)
     tpt = TextQuarterlyMergeTest(config)
     tpt.runTests()
 
 def post_text_merge_quarterly_pgpubs(**kwargs):
     from lib.configuration import get_current_config
-    config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
+    config = get_current_config('pgpubs', schedule="quarterly", **kwargs)
     tpt = TextQuarterlyMergeTest(config)
     tpt.runTests()
 
