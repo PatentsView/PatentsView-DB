@@ -194,7 +194,7 @@ def extract_field_data(field_element, field, attribute, description, flag, tag):
         return field_element.tag
         # For all other fields get the text value
     else:
-        return field_element.text
+        return field_element.text.strip()
 
 
 def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
@@ -247,6 +247,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                     partial_strings += extract_text_from_all_children(elem)
                     data_list[field["field_name"]] = ' '.join(partial_strings)
                     data_list[field["field_name"]] = re.sub("&lsqb;[0-9]{4}&rsqb;",'',data_list[field["field_name"]])
+                    data_list[field["field_name"]] = data_list[field["field_name"]].strip()
             else:
                 # Find all elements in the xml_path for a current field
                 field_elements = patent_doc.findall(path)
