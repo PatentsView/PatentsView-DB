@@ -80,7 +80,7 @@ from {table_name}
                 query_end_time = time()
                 print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
                 count_value = count_cursor.fetchall()[0][0]
-                if count_value < 1 and table_name not in ['rawuspc', 'uspc']:
+                if count_value < 1 and table_name not in ['rawuspc', 'uspc', 'government_organization']:
                     raise Exception("Empty table found:{table}".format(table=table_name))
 
                 write_table_name = table_name
@@ -275,9 +275,8 @@ group by 1
                 count_value = count_cursor.fetchall()[0][0]
                 if count_value != 0:
                     raise Exception(
-                        "Table Has Nulls in Version Indicator".format(
-                            database=self.database_section, table=table, col=field,
-                            count=count_value))
+                        "Table {database}.{table} Has {count} Nulls in Version Indicator".format(
+                            database=self.database_section, table=table, count=count_value))
         finally:
             if self.connection.open:
                 self.connection.close()
