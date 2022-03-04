@@ -16,7 +16,7 @@ def runyear(year='01'):
         try:
             filedate = '20' + re.search('pa([0-9]{6}).xml', file).group(1)
             config['DATES']['START_DATE'] = filedate
-            config['DATES']['END_DATE'] = (datetime.strptime(filedate, "%Y%m%d") + timedelta(7)).strftime("%Y%m%d")
+            config['DATES']['END_DATE'] = (datetime.strptime(filedate, "%Y%m%d") + timedelta(6)).strftime("%Y%m%d")
             queue_parsers(config,'pgpubs')
         except Exception as e:
             print(e)

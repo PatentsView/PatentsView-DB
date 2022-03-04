@@ -194,13 +194,16 @@ def extract_field_data(field_element, field, attribute, description, flag, tag):
         return field_element.tag
         # For all other fields get the text value
     else:
-        return field_element.text.strip()
+        if field_element.text is not None:
+            return field_element.text.strip()
+        else: return field_element.text
 
 def date_QC(datestring):
-    datestring = datestring.strip()
-    assert(len(datestring)==8)
-    if datestring[4:6] > '12' and datestring[6:8] <= '12':
-        datestring = datestring[:4] + datestring[6:8] + datestring[4:6]
+    if datestring is not None:
+        datestring = datestring.strip()
+        assert(len(datestring)==8)
+        if datestring[4:6] > '12' and datestring[6:8] <= '12':
+            datestring = datestring[:4] + datestring[6:8] + datestring[4:6]
     return datestring
 
 
