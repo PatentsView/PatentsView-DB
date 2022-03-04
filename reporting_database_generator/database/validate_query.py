@@ -142,7 +142,7 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
             
     # insert portion of merge
     # Get processed template file content
-    sql_content = context['templates_dict']['insert_sql']
+    sql_content = context['templates_dict']['source_sql']
     # Extract individual statements from sql file
     sql_statements = sqlparse.split(sql_content)
     for sql_statement in sql_statements:
