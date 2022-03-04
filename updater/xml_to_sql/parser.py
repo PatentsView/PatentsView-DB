@@ -196,6 +196,13 @@ def extract_field_data(field_element, field, attribute, description, flag, tag):
     else:
         return field_element.text.strip()
 
+def date_QC(datestring):
+    datestring = datestring.strip()
+    assert(len(datestring)==8)
+    if datestring[4:6] > '12' and datestring[6:8] <= '12':
+        datestring = datestring[:4] + datestring[6:8] + datestring[4:6]
+    return datestring
+
 
 def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
     """
@@ -260,6 +267,8 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                     multi_value_list = []
                     for field_element in field_elements:
                         extracted_data = extract_field_data(field_element, field, attribute, description, flag, tag)
+                        if field['field_name'] == 'date':
+                            extracted_data = date_QC(extracted_data)
                         multi_value_list.append(extracted_data)
                     if not all([True if x is None else False for x in multi_value_list]):
                         data_list[field["field_name"]] = ", ".join(
