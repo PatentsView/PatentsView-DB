@@ -90,53 +90,54 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
     # send_slack_notification(
     #         "Executing Query File: `" + filename + "`", config, section,
     #         "info")
-    # clear out any existing entries in the prod db to make room for inserts - mostly duplicated from insert section below
-    rm_sql_content = context['templates_dict']['delete_sql']
-    rm_statements = sqlparse.split(rm_sql_content)
-    for sql_statement in rm_statements:
-        print(sql_statement)
-        single_line_query = sql_statement
-        # if the parse is successful we do some sanity checks
-        if len(sqlparse.parse(sql_statement)) > 0:
-            # Parse SQL
-            parsed_statement = sqlparse.parse(sql_statement)[0]
-            single_line_query = parse_and_format_sql(parsed_statement)
-            ## Based on parameter ignore DROP table commands
-            if not drop_existing and parsed_statement.get_type().lower() == 'unknown':
-                if single_line_query.lower().lstrip().startswith("drop"):
-                    continue
-                
-            # Log file output
-            print(single_line_query)
+    # when needed, clear out any existing entries in the prod db to make room for inserts - mostly duplicated from insert section below
+    if 'delete_sql' in context['templates_dict'] and drop_existing:
+        rm_sql_content = context['templates_dict']['delete_sql']
+        rm_statements = sqlparse.split(rm_sql_content)
+        for sql_statement in rm_statements:
+            print(sql_statement)
+            single_line_query = sql_statement
+            # if the parse is successful we do some sanity checks
+            if len(sqlparse.parse(sql_statement)) > 0:
+                # Parse SQL
+                parsed_statement = sqlparse.parse(sql_statement)[0]
+                single_line_query = parse_and_format_sql(parsed_statement)
+                ## Based on parameter ignore DROP table commands
+                if not drop_existing and parsed_statement.get_type().lower() == 'unknown':
+                    if single_line_query.lower().lstrip().startswith("drop"):
+                        continue
+                    
+                # Log file output
+                print(single_line_query)
 
-            if parsed_statement.get_type().lower() == 'insert':
-                # Check if query plan includes full table scan, if it does send an alert
-                query_plan_check = database_helpers.check_query_plan(db_con, single_line_query)
-                if not query_plan_check:
-                    message = """
-                        Query execution plan involves full table scan: ```{single_line_query} ```
-                        """.format(single_line_query=single_line_query)
-                    # send_slack_notification(message, config,
-                    #                         section,
-                    #                         "warning")
-                    print(message)
-                    # raise Exception(message)
+                if parsed_statement.get_type().lower() == 'insert':
+                    # Check if query plan includes full table scan, if it does send an alert
+                    query_plan_check = database_helpers.check_query_plan(db_con, single_line_query)
+                    if not query_plan_check:
+                        message = """
+                            Query execution plan involves full table scan: ```{single_line_query} ```
+                            """.format(single_line_query=single_line_query)
+                        # send_slack_notification(message, config,
+                        #                         section,
+                        #                         "warning")
+                        print(message)
+                        # raise Exception(message)
 
-        if not single_line_query.strip():
-            continue
-        try:
-            print(" ")
-            db_con.execute(single_line_query)
-        except Exception as e:
-            print(" ")
-            # send_slack_notification(
-            #         """
-            # Execution of Query failed: ```{single_line_query} ```
-            #     """.format(single_line_query=single_line_query),
-            #         config,
-            #         section,
-            #         "error")
-            raise e
+            if not single_line_query.strip():
+                continue
+            try:
+                print(" ")
+                db_con.execute(single_line_query)
+            except Exception as e:
+                print(" ")
+                # send_slack_notification(
+                #         """
+                # Execution of Query failed: ```{single_line_query} ```
+                #     """.format(single_line_query=single_line_query),
+                #         config,
+                #         section,
+                #         "error")
+                raise e
 
             
     # insert portion of merge
