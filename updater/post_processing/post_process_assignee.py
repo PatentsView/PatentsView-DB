@@ -216,7 +216,7 @@ def post_process_assignee(**kwargs):
 
 
 def post_process_qc(**kwargs):
-    config = get_current_config(schedule='quarterly',**kwargs)
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     qc = AssigneePostProcessingQC(config)
     qc.runTests()
 

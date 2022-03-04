@@ -38,10 +38,45 @@ def class_db_specific_config(self, table_config, class_called):
         print(f"The following list of tables are run for {class_called}:")
         print(self.table_config.keys())
 
+def load_table_config(config, db='patent'):
+    project_home = os.environ['PACKAGE_HOME']
+    if db == 'patent':
+        table_config = json.load(open("{}".format(project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+                "table_config_granted"]), ))
+    elif db == 'pgpubs':
+        table_config = json.load(open("{}".format(
+            project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+                "table_config_pgpubs"]), ))
+    elif db == 'patent_text':
+        table_config = json.load(open("{}".format(
+            project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+                "table_config_text_granted"]), ))
+    elif db == 'pgpubs_text':
+        table_config = json.load(open("{}".format(
+            project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+                "table_config_text_pgpubs"]), ))
+    return table_config
 
 
 def get_relevant_attributes(self, class_called, database_section, config):
-    if database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload') or class_called=='GovtInterestTester':
+
+    if class_called == "AssigneePostProcessingQC":
+        self.database_section = database_section
+        self.table_config = load_table_config(config, db='patent')
+        self.entity_table = 'rawassignee'
+        self.entity_id = 'uuid'
+        self.disambiguated_id = 'assignee_id'
+        self.disambiguated_table = 'assignee'
+        self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
+        # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
+        # self.add_persistent_table_to_config(database_section)
+        self.category = ""
+        self.p_key = "id"
+        self.f_key = "assignee_id"
+        self.exclusion_list = ['patent_assignee']
+        self.aggregator = 'organization'
+
+    elif database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload') or class_called=='GovtInterestTester':
         self.exclusion_list = ['assignee',
                                'cpc_group',
                                'cpc_subgroup',
@@ -63,11 +98,10 @@ def get_relevant_attributes(self, class_called, database_section, config):
                                'wipo_field']
         self.central_entity = 'patent'
         self.category = 'type'
-        self.table_config = json.load(open("{}".format(
-            self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                "table_config_granted"]), ))
+        self.table_config = load_table_config(config, db='patent')
         self.p_key = "id"
         self.f_key = "patent_id"
+
     elif (database_section == "pregrant_publications") or (
             class_called[:6] == 'Upload' and database_section[:6] == 'pgpubs'):
         # TABLES WITHOUT DOCUMENT_NUMBER ARE EXCLUDED FROM THE TABLE CONFIG
@@ -81,27 +115,50 @@ def get_relevant_attributes(self, class_called, database_section, config):
                                'rawlocation',
                                'rawlocation_geos_missed',
                                'rawlocation_lat_lon']
-        self.table_config = json.load(open("{}".format(
-            self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                "table_config_pgpubs"]), ))
+        self.table_config = load_table_config(config, db='pgpubs')
         self.p_key = "document_number"
         self.f_key = "document_number"
+
     elif class_called[:4] == 'Text':
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
+        self.f_key = ""
         self.exclusion_list = []
 
         if database_section[:6] == 'upload' or database_section == 'patent_text':
-            self.table_config = json.load(open("{}".format(
-                self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                    "table_config_text_granted"]), ))
+            self.table_config = load_table_config(config, db=database_section)
+
         elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
-            self.table_config = json.load(open("{}".format(
-                self.project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                    "table_config_text_pgpubs"]), ))
+            self.table_config = load_table_config(config, db=database_section)
         else:
             raise NotImplementedError
+
+# Moved from AssigneePostProcessing - unused for now
+def add_persistent_table_to_config(self, database_section):
+    columns_query = f"""
+    select COLUMN_NAME,
+        case when DATA_TYPE in ('varchar', 'tinytext', 'text', 'mediumtext', 'longtext') then 'varchar' else 'int' end,                                           data_type,
+        case when COLUMN_KEY = 'PRI' then 'False' else 'True' end as null_allowed, 
+        'False' as category,    
+    from information_schema.COLUMNS
+    where TABLE_NAME = 'persistent_assignee_disambig'
+      and TABLE_SCHEMA = '{database_section}'
+      and column_name not in ('updated_date','created_date', 'version_indicator');
+    """
+    if not self.connection.open:
+        self.connection.connect()
+    with self.connection.cursor() as crsr:
+        crsr.execute(columns_query)
+        column_data = pd.DataFrame.from_records(
+                crsr.fetchall(),
+                columns=['column', 'data_type', 'null_allowed', 'category'])
+        table_config = {
+                'persistent_assignee_disambig': {
+                        'fields': column_data.set_index('column').to_dict(orient='index')
+                        }
+                }
+        self.table_config.update(table_config)
 
 def trim_whitespace(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')

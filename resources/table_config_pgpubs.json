@@ -952,8 +952,8 @@
         "related_table_id": "document_number"
       },
       {
-        "related_table": "rawassignee",
-        "main_table_id": "document_number",
+       "related_table": "rawassignee",
+       "main_table_id": "document_number",
         "related_table_id": "document_number"
       },
       {
