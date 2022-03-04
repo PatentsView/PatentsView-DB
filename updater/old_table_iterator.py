@@ -10,6 +10,7 @@ def runyear(year='01'):
     config = get_current_config('pgpubs', **{"execution_date": date.today()})
     folder_files = os.listdir(config['FOLDERS']['pgpubs_bulk_xml_location'])
     old_xml_files = list(filter( lambda f: re.fullmatch("pa{year}[0-9]{{4}}.xml".format(year=year),f)  , folder_files))
+    old_xml_files.sort()
 
     for file in tqdm(old_xml_files):
         try:
