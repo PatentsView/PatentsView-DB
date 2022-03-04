@@ -1,6 +1,7 @@
 import os
 import re
 from datetime import date, datetime, timedelta
+from tqdm import tqdm
 
 from updater.xml_to_sql.parser import queue_parsers
 from lib.configuration import get_current_config
@@ -10,7 +11,7 @@ def runyear(year='01'):
     folder_files = os.listdir(config['FOLDERS']['pgpubs_bulk_xml_location'])
     old_xml_files = list(filter( lambda f: re.fullmatch("pa{year}[0-9]{{4}}.xml".format(year=year),f)  , folder_files))
 
-    for file in old_xml_files:
+    for file in tqdm(old_xml_files):
         try:
             filedate = '20' + re.search('pa([0-9]{6}).xml', file).group(1)
             config['DATES']['START_DATE'] = filedate
