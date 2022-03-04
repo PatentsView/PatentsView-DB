@@ -95,7 +95,24 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+      "related_entities": [
+          {
+          "related_table": "patent_assignee",
+          "main_table_id": "id",
+          "related_table_id": "assignee_id"
+          },
+        {
+          "related_table": "rawassignee",
+          "main_table_id": "id",
+          "related_table_id": "assignee_id"
+          },
+          {
+          "related_table": "location_assignee",
+          "main_table_id": "id",
+          "related_table_id": "assignee_id"
+          }
+  ],
+    "TestScripts": ["AssigneePostProcessingQC"]
   },
   "assignee_disambiguation_mapping": {
     "fields": {
@@ -1760,7 +1777,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["AssigneePostProcessingQC"]
   },
   "patent_contractawardnumber": {
     "fields": {
@@ -2011,6 +2028,12 @@
         "location_field": false
       },
       "disamb_assignee_id_20210930": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+        "disamb_assignee_id_20211230": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -2276,7 +2299,8 @@
     "TestScripts": [
       "MergeTestWeekly",
       "UploadTest",
-      "MergeTestQuarterly"
+      "MergeTestQuarterly",
+      "AssigneePostProcessingQC"
     ]
   },
   "rawexaminer": {
