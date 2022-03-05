@@ -63,15 +63,15 @@ class DisambiguationTester(DatabaseTester):
 
     def load_top_entities(self, table_name, related_table_config):
         if table_name not in self.exclusion_list:
-            data_fields = ['id'] + self.disambiguated_data_fields
             top_n_data_query = f"""
         SELECT main.{self.aggregator}
                 , count(*)
         FROM  {table_name} main
             JOIN {related_table_config["related_table"]} related ON main.{related_table_config["main_table_id"]} = related.{related_table_config['related_table_id']}
         GROUP  BY 1
-        ORDER  BY Count(*) DESC
+        ORDER  BY 2 DESC
         LIMIT 100"""
+
             print(top_n_data_query)
             if not self.connection.open:
                 self.connection.connect()

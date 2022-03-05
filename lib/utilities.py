@@ -70,11 +70,25 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
         # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
         # self.add_persistent_table_to_config(database_section)
-        self.category = ""
-        self.p_key = "id"
-        self.f_key = "assignee_id"
+        # self.category = ""
+        # self.p_key = "id"
+        # self.f_key = "assignee_id"
         self.exclusion_list = ['patent_assignee']
         self.aggregator = 'organization'
+
+    elif class_called == "InventorPostProcessingQC":
+        self.database_section = database_section
+        self.table_config = load_table_config(config, db='patent')
+        self.entity_table = 'rawinventor'
+        self.entity_id = 'uuid'
+        self.disambiguated_id = 'inventor_id'
+        self.disambiguated_table = 'inventor'
+        self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
+        # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
+        # self.add_persistent_table_to_config(database_section)
+        self.category = ""
+        self.exclusion_list = ['patent_inventor']
+        self.aggregator = {"concat(name_last, ", ", name_first)"}
 
     elif database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload') or class_called=='GovtInterestTester':
         self.exclusion_list = ['assignee',
