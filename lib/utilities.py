@@ -12,6 +12,7 @@ import string
 import zipfile
 from queue import Queue
 from statistics import mean
+import pandas as pd
 
 import boto3
 import requests
@@ -41,17 +42,18 @@ def class_db_specific_config(self, table_config, class_called):
 def load_table_config(config, db='patent'):
     project_home = os.environ['PACKAGE_HOME']
     if db == 'patent':
-        table_config = json.load(open("{}".format(project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
+        table_config = json.load(open("{}".format(
+            project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
                 "table_config_granted"]), ))
     elif db == 'pgpubs':
         table_config = json.load(open("{}".format(
             project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
                 "table_config_pgpubs"]), ))
-    elif db == 'patent_text':
+    elif db == 'patent_text' or db[:6] == 'upload':
         table_config = json.load(open("{}".format(
             project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
                 "table_config_text_granted"]), ))
-    elif db == 'pgpubs_text':
+    elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
         table_config = json.load(open("{}".format(
             project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
                 "table_config_text_pgpubs"]), ))
