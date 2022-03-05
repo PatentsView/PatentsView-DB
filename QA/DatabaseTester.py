@@ -17,7 +17,6 @@ from lib import utilities
 class DatabaseTester(ABC):
     def __init__(self, config, database_section, start_date, end_date):
         # super().__init__(config, database_section, start_date, end_date)
-        self.project_home = os.environ['PACKAGE_HOME']
         class_called = self.__class__.__name__
         utilities.get_relevant_attributes(self, class_called, database_section, config)
         # Update start and end date
