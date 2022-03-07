@@ -8,6 +8,7 @@ import re
 import time
 from datetime import date, datetime
 from queue import Queue
+from uuid import uuid4
 
 import pandas as pd
 from lxml import etree
@@ -248,7 +249,10 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                     partial_strings += extract_text_from_all_children(elem) # adjustment for dependent extraction between versions
                     if elem.tag in newline_tags:
                         partial_strings.append("\n\n")
-                    data_list[field["field_name"]] = ' '.join(partial_strings) #may need a little cleaning - replace double spaces, floating commas,
+                    if field['field_name'] == 'text':
+                        data_list[field["field_name"]] = ' '.join(partial_strings) # text join together simply
+                    else: 
+                        data_list[field["field_name"]] = ', '.join(partial_strings) # dependent needs listed numbers.
                     data_list[field["field_name"]] = re.sub(" +(?=[ \.,])","",data_list[field["field_name"]])
             elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'text':
                 partial_strings = []
@@ -343,17 +347,23 @@ def v1_ipcr_fixer(data, config):
     newdata['version'] = '20000101'
     newdata['action_date'] = config['DATES']['START_DATE']
     newdata[['section', 'class', 'subclass', 'main_group', 'subgroup']] = data['full_code'].str.extract("([A-H])([0-9]{2})([A-Z])([0-9]{1,3})/([0-9]{2,})")
-    dtypes = {
-        'sequence': mysql.INTEGER,
-        'version': mysql.DATE,
-        'section': mysql.VARCHAR(20),
-        'class': mysql.VARCHAR(20),
-        'subclass':mysql.VARCHAR(20),
-        'main_group': mysql.VARCHAR(20),
-        'subgroup': mysql.VARCHAR(20),
-        'action_date': mysql.DATE,
-    }
-    return(newdata, dtypes)
+    # dtypes = {
+    #     'sequence': mysql.INTEGER,
+    #     'version': mysql.DATE,
+    #     'section': mysql.VARCHAR(20),
+    #     'class': mysql.VARCHAR(20),
+    #     'subclass':mysql.VARCHAR(20),
+    #     'main_group': mysql.VARCHAR(20),
+    #     'subgroup': mysql.VARCHAR(20),
+    #     'action_date': mysql.DATE,
+    # }
+    # return(newdata, dtypes)
+    return newdata
+
+def v1_uspc_fixer(data):
+    newdata = data[['document_number', 'sequence',]]
+    newdata['classification'] = data[['mainclass_id', 'subclass_id']].agg(''.join, axis=1)
+    return newdata
 
 def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     """
@@ -373,19 +383,41 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
 
     text_output_folder = config['FOLDERS']['TEXT_OUTPUT_FOLDER']
     engine = create_engine(
-            'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
-    dtypes = sql_dtype_picker(table_xml_map)
+            'mysql+pymysql://{0}:{1}@{2}:{3}?charset=utf8mb4'.format(user, password, host, port))
+    #dtypes = sql_dtype_picker(table_xml_map) # may be redundant now. try commenting.
 
     for df in dfs:
         if df == 'ipcr' and xml_file_name.startswith('pa0'): #only 2001-2004 start with pa instead of ipa
-            (dfs[df], dtypes[df]) = v1_ipcr_fixer(dfs[df], config)
-        tabnam = df+'_{}'.format(config['DATES']['START_DATE']) # the run date might be redundant with the db name
+            # (dfs[df], dtypes[df]) = v1_ipcr_fixer(dfs[df], config)
+            dfs[df] = v1_ipcr_fixer(dfs[df], config)
+        if df == 'rawuspc' and xml_file_name.startswith('pa0'): #only 2001-2004 start with pa instead of ipa
+            dfs[df] = v1_uspc_fixer(dfs[df])
+        year = config['DATES']['START_DATE'][:4]
+        tabnam = df+'_{}'.format(year) # after testing will change this to match final table names, or maybe attach year names
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
         dfs[df]['version_indicator'] = config['DATES']['START_DATE']
+        if ('id' not in dfs[df].columns) and (df != 'government_interest'):
+            dfs[df]['id'] = [uuid4() for i in range(dfs[df].shape[0])] # generate unique ids where other ids absent.
+        if xml_file_name.startswith('pa0') or xml_file_name.startswith('ipa'): #pgpubs file
+            if df in ['claim','brf_sum_text','draw_desc_text','detail_desc_text']: #text type
+                template = 'pgpubs_text'
+                temptable = df+'_'+year
+            else: #regular table 
+                template = 'pregrant_publications'
+                temptable = df
+        else: # patents file
+            if df in ['claims','brf_sum_text','draw_desc_text','detail_desc_text']: #text type
+                template = 'patent_text'
+                temptable = df+'_'+year
+            else:
+                template = 'patent'
+                temptable = df
         try:
-            dfs[df].to_sql(tabnam, con=engine, if_exists='append', index=False, dtype=dtypes[df])
+            engine.execute(f"CREATE TABLE IF NOT EXISTS {database}.{tabnam} LIKE {template}.{temptable};") # create table to match column parameters of main DB - avoid dtype issues
+            # dfs[df].to_sql(tabnam, con=engine, schema=database, if_exists='append', index=False, dtype=dtypes[df])
+            dfs[df].to_sql(tabnam, con=engine, schema=database, if_exists='append', index=False)
         except Exception as e:
             log_queue.put({
                     "level":   logging.ERROR,
