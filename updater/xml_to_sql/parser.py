@@ -383,7 +383,7 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
 
     text_output_folder = config['FOLDERS']['TEXT_OUTPUT_FOLDER']
     engine = create_engine(
-            'mysql+pymysql://{0}:{1}@{2}:{3}?charset=utf8mb4'.format(user, password, host, port))
+            'mysql+pymysql://{0}:{1}@{2}:{3}/?charset=utf8mb4'.format(user, password, host, port))
     #dtypes = sql_dtype_picker(table_xml_map) # may be redundant now. try commenting.
 
     for df in dfs:
