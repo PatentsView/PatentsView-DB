@@ -362,9 +362,8 @@ def v1_ipcr_fixer(data, config):
 
 def v1_uspc_fixer(data):
     data.dropna(how='all',subset=['mainclass_id','subclass_id'], inplace=True)
-    data[['mainclass_id', 'subclass_id']].fillna('', inplace=True)
     newdata = data[['document_number', 'sequence',]]
-    newdata['classification'] = data[['mainclass_id', 'subclass_id']].agg(''.join, axis=1)
+    newdata.loc[:,'classification'] = data['mainclass_id'].fillna('') + data['subclass_id'].fillna('')
     return newdata
 
 def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
