@@ -361,6 +361,8 @@ def v1_ipcr_fixer(data, config):
     return newdata
 
 def v1_uspc_fixer(data):
+    data.dropna(how='all',subset=['mainclass_id','subclass_id'], inplace=True)
+    data[['mainclass_id', 'subclass_id']].fillna('', inplace=True)
     newdata = data[['document_number', 'sequence',]]
     newdata['classification'] = data[['mainclass_id', 'subclass_id']].agg(''.join, axis=1)
     return newdata
