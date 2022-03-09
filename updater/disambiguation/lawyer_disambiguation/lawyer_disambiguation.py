@@ -243,7 +243,7 @@ class LawyerDisambiguator:
                     else:
                         self.lawyer_match(rawlawyers, session, commit=False)
 
-        pickle.dump(self.lawyer_insert_statements, open(self.disambig_folder + f'lawyer_insert_statements_{letter}.pickle', 'wb'))
+        pickle.dump(self.lawyer_insert_statements, open(self.disambig_folder + '/' + f'lawyer_insert_statements_{letter}.pickle', 'wb'))
         pickle.dump(self.patentlawyer_insert_statements, open(self.disambig_folder + '/' + f'patentlawyer_insert_statements_{letter}.pickle', 'wb'))
         pickle.dump(self.update_statements, open(self.disambig_folder + '/' + f'update_statements_{letter}.pickle', 'wb'))
         print(f"Finished Exporting Letter {letter} to pickle", i, datetime.now(), flush=True)
