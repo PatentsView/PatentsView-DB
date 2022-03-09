@@ -246,14 +246,17 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
-                    partial_strings += extract_text_from_all_children(elem) # adjustment for dependent extraction between versions
+                    if field['field_name'] == 'text':
+                        partial_strings += extract_text_from_all_children(elem) # adjustment for dependent extraction between versions
+                    else:
+                        partial_strings += list(elem.itertext)
                     if elem.tag in newline_tags:
                         partial_strings.append("\n\n")
-                    if field['field_name'] == 'text':
-                        data_list[field["field_name"]] = ' '.join(partial_strings) # text join together simply
-                    else: 
-                        data_list[field["field_name"]] = ', '.join(partial_strings) # dependent needs listed numbers.
-                    data_list[field["field_name"]] = re.sub(" +(?=[ \.,])","",data_list[field["field_name"]])
+                if field['field_name'] == 'text':
+                    joinedtext = ' '.join(partial_strings) # text join together simply
+                else: 
+                    joinedtext = ', '.join(partial_strings) # dependent needs listed numbers.
+                data_list[field["field_name"]] = re.sub(" +(?=[ \.,])","",joinedtext)
             elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'text':
                 partial_strings = []
                 field_elements = patent_doc.findall(path)

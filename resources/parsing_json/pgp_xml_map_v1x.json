@@ -572,6 +572,17 @@
           "flag": null,
           "tag": false,
           "data-type": "string"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
         }
       ],
       "filename": "claim.tsv"
