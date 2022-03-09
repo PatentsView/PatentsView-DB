@@ -249,7 +249,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                     if field['field_name'] == 'text':
                         partial_strings += extract_text_from_all_children(elem) # adjustment for dependent extraction between versions
                     else:
-                        partial_strings += list(elem.itertext)
+                        partial_strings += list(elem.itertext())
                     if elem.tag in newline_tags:
                         partial_strings.append("\n\n")
                 if field['field_name'] == 'text':
