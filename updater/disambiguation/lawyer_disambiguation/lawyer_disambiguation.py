@@ -218,6 +218,8 @@ class LawyerDisambiguator:
             print(f"Finished uploading data for letter: {letter}!")
             print(" ")
 
+        session.close_all()
+
     def create_lawyer_table(self, id_map, lawyer_dict, letter):
         """
         Given a list of lawyers and the redis key-value disambiguation,

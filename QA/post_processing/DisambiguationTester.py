@@ -7,12 +7,6 @@ class DisambiguationTester(DatabaseTester):
     def __init__(self, config, database_section, start_date, end_date):
         super().__init__(config, database_section, start_date, end_date)
 
-        # self.entity_table = None
-        # self.entity_id = None
-        # self.disambiguated_id = None
-        # self.disambiguated_table = None
-        self.disambiguated_data_fields = []
-
     def init_qa_dict(self):
         self.qa_data = {
             "DataMonitor_distinctidcount": [],
@@ -62,16 +56,15 @@ class DisambiguationTester(DatabaseTester):
                 self.load_top_entities(table, related_table_config)
 
     def load_top_entities(self, table_name, related_table_config):
-        if table_name not in self.exclusion_list:
+        if 'patent' not in table_name:
             top_n_data_query = f"""
-        SELECT main.{self.aggregator}
+        SELECT {self.aggregator}
                 , count(*)
         FROM  {table_name} main
             JOIN {related_table_config["related_table"]} related ON main.{related_table_config["main_table_id"]} = related.{related_table_config['related_table_id']}
         GROUP  BY 1
         ORDER  BY 2 DESC
         LIMIT 100"""
-
             print(top_n_data_query)
             if not self.connection.open:
                 self.connection.connect()
@@ -94,14 +87,23 @@ class DisambiguationTester(DatabaseTester):
 
     def test_invalid_id(self):
         print(f"\tTesting Invalid Disambiguation IDs {self.disambiguated_table} in {self.database_section}")
-        invalid_query = f"""
-SELECT count(1)
-from {self.disambiguated_table} dt
-    left join {self.entity_table} et on et.{self.disambiguated_id} = dt.id
-    left join {self.config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE']}.{self.entity_table} et2 on et2.{self.disambiguated_id} = dt.id
-where et.{self.disambiguated_id} is null
-    and et2.{self.disambiguated_id} is null;
-        """
+        if self.entity_table == 'rawlawyer':
+            invalid_query = f"""
+            SELECT count(*)
+            from {self.disambiguated_table} dt
+                left join {self.entity_table} eton et.{self.disambiguated_id} = dt.id
+            where et.{self.disambiguated_id} is null;
+                    """
+        else:
+            invalid_query = f"""
+            SELECT count(*)
+            from {self.disambiguated_table} dt
+                left join {self.entity_table} et on et.{self.disambiguated_id} = dt.id
+                left join {self.config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE']}.{self.entity_table} et2 on et2.{self.disambiguated_id} = dt.id
+            where et.{self.disambiguated_id} is null
+                and et2.{self.disambiguated_id} is null;
+            """
+
         if not self.connection.open:
             self.connection.connect()
         with self.connection.cursor() as count_cursor:
