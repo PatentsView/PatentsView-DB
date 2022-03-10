@@ -39,23 +39,22 @@ def class_db_specific_config(self, table_config, class_called):
         print(f"The following list of tables are run for {class_called}:")
         print(self.table_config.keys())
 
+
 def load_table_config(config, db='patent'):
-    resources_file = "{root}/{resources}/".format(root=config["FOLDERS"]["project_root"],
-                                                                    resources=config["FOLDERS"]["resources_folder"])
-    # project_home = os.environ['PACKAGE_HOME']
+    root = config["FOLDERS"]["project_root"]
+    resources = config["FOLDERS"]["resources_folder"]
     if db == 'patent':
-        table_config = json.load(open("{}".format(resources_file + config["FILES"]["table_config_granted"]), ))
+        table_config = json.load(open(f"{root}/{resources}/{config['FILES']['table_config_granted']}"))
     elif db == 'pgpubs':
-        table_config = json.load(open("{}".format(resources_file + config["FILES"]["table_config_pgpubs"]), ))
+        table_config = json.load(open(f"{root}/{resources}/{config['FILES']['table_config_pgpubs']}"))
     elif db == 'patent_text' or db[:6] == 'upload':
-        table_config = json.load(open("{}".format(resources_file + config["FILES"]["table_config_text_granted"]), ))
+        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_granted"]}'))
     elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
-        table_config = json.load(open("{}".format(resources_file + config["FILES"]["table_config_text_pgpubs"]), ))
+        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'))
     return table_config
 
 
 def get_relevant_attributes(self, class_called, database_section, config):
-
     if class_called == "AssigneePostProcessingQC":
         self.database_section = database_section
         self.table_config = load_table_config(config, db='patent')
@@ -96,7 +95,8 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.aggregator = 'case when main.organization is null then concat(main.name_last,", ",main.name_first) else main.organization end'
         self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
 
-    elif database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload') or class_called=='GovtInterestTester':
+    elif database_section == "patent" or (
+            class_called[:6] == 'Upload' and database_section[:6] == 'upload') or class_called == 'GovtInterestTester':
         self.exclusion_list = ['assignee',
                                'cpc_group',
                                'cpc_subgroup',
@@ -154,6 +154,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         else:
             raise NotImplementedError
 
+
 # Moved from AssigneePostProcessing - unused for now
 def add_persistent_table_to_config(self, database_section):
     columns_query = f"""
@@ -171,14 +172,15 @@ def add_persistent_table_to_config(self, database_section):
     with self.connection.cursor() as crsr:
         crsr.execute(columns_query)
         column_data = pd.DataFrame.from_records(
-                crsr.fetchall(),
-                columns=['column', 'data_type', 'null_allowed', 'category'])
+            crsr.fetchall(),
+            columns=['column', 'data_type', 'null_allowed', 'category'])
         table_config = {
-                'persistent_assignee_disambig': {
-                        'fields': column_data.set_index('column').to_dict(orient='index')
-                        }
-                }
+            'persistent_assignee_disambig': {
+                'fields': column_data.set_index('column').to_dict(orient='index')
+            }
+        }
         self.table_config.update(table_config)
+
 
 def trim_whitespace(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
@@ -187,7 +189,8 @@ def trim_whitespace(config):
     print("REMOVING WHITESPACE WHERE IT EXISTS")
     project_home = os.environ['PACKAGE_HOME']
     resources_file = "{root}/{resources}/columns_for_whitespace_trim.json".format(root=project_home,
-                                                                           resources=config["FOLDERS"]["resources_folder"])
+                                                                                  resources=config["FOLDERS"][
+                                                                                      "resources_folder"])
     cols_tables_whitespace = json.load(open(resources_file))
     for table in cols_tables_whitespace.keys():
         if db_type in cols_tables_whitespace[table]["TestScripts"]:
@@ -245,8 +248,8 @@ def chunks(l, n):
 
 def better_title(text):
     title = " ".join(
-            [item if item not in ["Of", "The", "For", "And", "On"] else item.lower() for item in
-             str(text).title().split()])
+        [item if item not in ["Of", "The", "For", "And", "On"] else item.lower() for item in
+         str(text).title().split()])
     return re.sub('[' + string.punctuation + ']', '', title)
 
 
@@ -322,7 +325,7 @@ def mp_csv_writer(write_queue, target_file, header):
                     print(message_data)
                     raise Exception("Header and data length don't match :{header}/{data_ln}".format(header=len(header),
                                                                                                     data_ln=len(
-                                                                                                            message_data)))
+                                                                                                        message_data)))
             filtered_writer.writerow(message_data)
 
 
@@ -333,13 +336,13 @@ def log_writer(log_queue, log_prefix="uspto_parser"):
     logger.setLevel(logging.DEBUG)
 
     EXPANED_LOGFILE = datetime.datetime.now().strftime(
-            '{home_folder}/logs/{prefix}_expanded_log_%Y%m%d_%H%M%S.log'.format(home_folder=home_folder,
-                                                                                prefix=log_prefix))
+        '{home_folder}/logs/{prefix}_expanded_log_%Y%m%d_%H%M%S.log'.format(home_folder=home_folder,
+                                                                            prefix=log_prefix))
     expanded_filehandler = logging.FileHandler(EXPANED_LOGFILE)
     expanded_filehandler.setLevel(logging.DEBUG)
 
     BASIC_LOGFILE = datetime.datetime.now().strftime(
-            '{home_folder}/logs/{prefix}_log_%Y%m%d_%H%M%S.log'.format(home_folder=home_folder, prefix=log_prefix))
+        '{home_folder}/logs/{prefix}_log_%Y%m%d_%H%M%S.log'.format(home_folder=home_folder, prefix=log_prefix))
     filehandler = logging.FileHandler(BASIC_LOGFILE)
     filehandler.setLevel(logging.INFO)
 
@@ -402,8 +405,8 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
                 file_date = datetime.datetime.strptime(href_match.group(1), '%y%m%d')
                 if end_date >= file_date >= start_date:
                     files_to_download.append(
-                            (xml_path_template.format(year=year) + href, href, config["FOLDERS"][xml_download_setting],
-                             idx_counter, log_queue))
+                        (xml_path_template.format(year=year) + href, href, config["FOLDERS"][xml_download_setting],
+                         idx_counter, log_queue))
                 idx_counter += 1
     watcher = None
     pool = None
@@ -428,25 +431,26 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
 
     idx_counter += 1
     log_queue.put({
-            "level":   None,
-            "message": "kill"
-            })
+        "level": None,
+        "message": "kill"
+    })
     if parallelism > 1:
         watcher.get()
         pool.close()
         pool.join()
 
 
-def manage_ec2_instance(config, button='ON',identifier='xml_collector'):
-    instance_id=config['AWS_WORKER'][identifier]
+def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
+    instance_id = config['AWS_WORKER'][identifier]
     ec2 = boto3.client('ec2', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
-                              aws_secret_access_key=config['AWS']['SECRET_KEY'],
-                              region_name='us-east-1')
-    if button=='ON':
-        response=ec2.start_instances(InstanceIds=[instance_id])
+                       aws_secret_access_key=config['AWS']['SECRET_KEY'],
+                       region_name='us-east-1')
+    if button == 'ON':
+        response = ec2.start_instances(InstanceIds=[instance_id])
     else:
-        response=ec2.stop_instances(InstanceIds=[instance_id])
-    return response['ResponseMetadata']['HTTPStatusCode']==200
+        response = ec2.stop_instances(InstanceIds=[instance_id])
+    return response['ResponseMetadata']['HTTPStatusCode'] == 200
+
 
 def rds_free_space(config, identifier):
     cloudwatch = boto3.client('cloudwatch', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
@@ -455,29 +459,29 @@ def rds_free_space(config, identifier):
 
     from datetime import datetime, timedelta
     response = cloudwatch.get_metric_data(
-            MetricDataQueries=[
-                    {
-                            'Id':         'fetching_FreeStorageSpace',
-                            'MetricStat': {
-                                    'Metric': {
-                                            'Namespace':  'AWS/RDS',
-                                            'MetricName': 'FreeStorageSpace',
-                                            'Dimensions': [
-                                                    {
-                                                            "Name":  "DBInstanceIdentifier",
-                                                            "Value": identifier
-                                                            }
-                                                    ]
-                                            },
-                                    'Period': 300,
-                                    'Stat':   'Minimum'
-                                    }
+        MetricDataQueries=[
+            {
+                'Id': 'fetching_FreeStorageSpace',
+                'MetricStat': {
+                    'Metric': {
+                        'Namespace': 'AWS/RDS',
+                        'MetricName': 'FreeStorageSpace',
+                        'Dimensions': [
+                            {
+                                "Name": "DBInstanceIdentifier",
+                                "Value": identifier
                             }
-                    ],
-            StartTime=(datetime.now() - timedelta(seconds=300 * 3)).timestamp(),
-            EndTime=datetime.now().timestamp(),
-            ScanBy='TimestampDescending'
-            )
+                        ]
+                    },
+                    'Period': 300,
+                    'Stat': 'Minimum'
+                }
+            }
+        ],
+        StartTime=(datetime.now() - timedelta(seconds=300 * 3)).timestamp(),
+        EndTime=datetime.now().timestamp(),
+        ScanBy='TimestampDescending'
+    )
     return mean(response['MetricDataResults'][0]['Values'])
 
 
