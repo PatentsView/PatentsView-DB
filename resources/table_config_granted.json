@@ -805,7 +805,24 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+      "related_entities": [
+      {
+        "related_table": "location_inventor",
+        "main_table_id": "id",
+        "related_table_id": "inventor_id"
+      },
+      {
+        "related_table": "patent_inventor",
+        "main_table_id": "id",
+        "related_table_id": "inventor_id"
+      },
+        {
+        "related_table": "rawinventor",
+        "main_table_id": "id",
+        "related_table_id": "inventor_id"
+      }
+    ],
+    "TestScripts": ["InventorPostProcessingQC"]
   },
   "inventor_disambiguation_mapping": {
     "fields": {
@@ -1015,7 +1032,19 @@
         "location_field": true
       }
     },
-    "TestScripts": []
+      "related_entities": [
+      {
+        "related_table": "patent_lawyer",
+        "main_table_id": "id",
+        "related_table_id": "lawyer_id"
+      },
+      {
+        "related_table": "rawlawyer",
+        "main_table_id": "id",
+        "related_table_id": "lawyer_id"
+      }
+    ],
+    "TestScripts": ["LawyerPostProcessingQC"]
   },
   "location": {
     "fields": {
@@ -1852,7 +1881,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["InventorPostProcessingQC"]
   },
   "patent_lawyer": {
     "fields": {
@@ -1882,7 +1911,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["LawyerPostProcessingQC"]
   },
   "pct_data": {
     "fields": {
@@ -2407,7 +2436,8 @@
     "TestScripts": [
       "MergeTestWeekly",
       "UploadTest",
-      "MergeTestQuarterly"
+      "MergeTestQuarterly",
+      "InventorPostProcessingQC"
     ]
   },
   "rawlawyer": {
@@ -2464,7 +2494,8 @@
     "TestScripts": [
       "MergeTestWeekly",
       "UploadTest",
-      "MergeTestQuarterly"
+      "MergeTestQuarterly",
+      "LawyerPostProcessingQC"
     ]
   },
   "rawlocation": {
