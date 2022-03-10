@@ -91,7 +91,7 @@ class DisambiguationTester(DatabaseTester):
             invalid_query = f"""
             SELECT count(*)
             from {self.disambiguated_table} dt
-                left join {self.entity_table} eton et.{self.disambiguated_id} = dt.id
+                left join {self.entity_table} et on et.{self.disambiguated_id} = dt.id
             where et.{self.disambiguated_id} is null;
                     """
         else:

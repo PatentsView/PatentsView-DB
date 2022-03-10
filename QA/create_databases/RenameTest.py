@@ -9,16 +9,15 @@ from lib import utilities
 
 class DatabaseSetupTest:
     def __init__(self, config, database):
-        self.project_home = os.environ['PACKAGE_HOME']
         self.config = config
         self.database_for_tests = database
         print(self.database_for_tests)
         if self.database_for_tests == 'patent' or self.database_for_tests[:6] == 'upload':
-            resources_file = "{root}/{resources}/table_config_granted.json".format(root=self.project_home,
+            resources_file = "{root}/{resources}/table_config_granted.json".format(root=config["FOLDERS"]["project_root"],
                                                                                    resources=self.config["FOLDERS"][
                                                                                        "resources_folder"])
         else:
-            resources_file = "{root}/{resources}/table_config_pgpubs.json".format(root=self.project_home,
+            resources_file = "{root}/{resources}/table_config_pgpubs.json".format(root=config["FOLDERS"]["project_root"],
                                                                                   resources=self.config["FOLDERS"][
                                                                                       "resources_folder"])
         raw_db_table_settings = json.load(open(resources_file))

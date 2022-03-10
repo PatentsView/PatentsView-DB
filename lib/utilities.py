@@ -40,23 +40,17 @@ def class_db_specific_config(self, table_config, class_called):
         print(self.table_config.keys())
 
 def load_table_config(config, db='patent'):
-    project_home = os.environ['PACKAGE_HOME']
+    resources_file = "{root}/{resources}/".format(root=config["FOLDERS"]["project_root"],
+                                                                    resources=config["FOLDERS"]["resources_folder"])
+    # project_home = os.environ['PACKAGE_HOME']
     if db == 'patent':
-        table_config = json.load(open("{}".format(
-            project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                "table_config_granted"]), ))
+        table_config = json.load(open("{}".format(resources_file + config["FILES"]["table_config_granted"]), ))
     elif db == 'pgpubs':
-        table_config = json.load(open("{}".format(
-            project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                "table_config_pgpubs"]), ))
+        table_config = json.load(open("{}".format(resources_file + config["FILES"]["table_config_pgpubs"]), ))
     elif db == 'patent_text' or db[:6] == 'upload':
-        table_config = json.load(open("{}".format(
-            project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                "table_config_text_granted"]), ))
+        table_config = json.load(open("{}".format(resources_file + config["FILES"]["table_config_text_granted"]), ))
     elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
-        table_config = json.load(open("{}".format(
-            project_home + "/" + config["FOLDERS"]["resources_folder"] + "/" + config["FILES"][
-                "table_config_text_pgpubs"]), ))
+        table_config = json.load(open("{}".format(resources_file + config["FILES"]["table_config_text_pgpubs"]), ))
     return table_config
 
 
@@ -101,7 +95,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
         # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
         self.aggregator = 'case when main.organization is null then concat(main.name_last,", ",main.name_first) else main.organization end'
         self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
-
 
     elif database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload') or class_called=='GovtInterestTester':
         self.exclusion_list = ['assignee',
