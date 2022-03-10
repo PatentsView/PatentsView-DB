@@ -75,8 +75,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         # self.category = ""
         # self.p_key = "id"
         # self.f_key = "assignee_id"
-        self.exclusion_list = ['patent_assignee']
-        self.aggregator = 'organization'
+        self.aggregator = 'main.organization'
 
     elif class_called == "InventorPostProcessingQC":
         self.database_section = database_section
@@ -89,8 +88,20 @@ def get_relevant_attributes(self, class_called, database_section, config):
         # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
         # self.add_persistent_table_to_config(database_section)
         self.category = ""
-        self.exclusion_list = ['patent_inventor']
-        self.aggregator = {"concat(name_last, ", ", name_first)"}
+        self.aggregator = "concat(main.name_last, ', ', main.name_first)"
+
+    elif class_called == "LawyerPostProcessingQC":
+        self.database_section = database_section
+        self.table_config = load_table_config(config, db='patent')
+        self.entity_table = 'rawlawyer'
+        self.entity_id = 'uuid'
+        self.disambiguated_id = 'lawyer_id'
+        self.disambiguated_table = 'lawyer'
+        self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
+        # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
+        self.aggregator = 'case when main.organization is null then concat(main.name_last,", ",main.name_first) else main.organization end'
+        self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
+
 
     elif database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload') or class_called=='GovtInterestTester':
         self.exclusion_list = ['assignee',
