@@ -369,6 +369,33 @@ def v1_uspc_fixer(data):
     newdata.loc[:,'classification'] = data['mainclass_id'].fillna('') + data['subclass_id'].fillna('')
     return newdata
 
+def asgn_type_picker(fnam, country):
+    t = '01'
+    if country is not None:
+        if country == 'US':
+            if fnam: t = '04'
+            else: t = '02'
+        else:
+            if fnam: t = '05'
+            else: t = '03'
+    return t
+
+def rawassignee_QC(fulldata):
+    #allow nulls to pass through
+    data = fulldata[pd.notna(fulldata['type'])]
+    #cut out any non-digit characters
+    if any(data['type'].str.contains("\D")): 
+        data.loc[:,'type'] = data['type'].str.replace(pat="\D", repl='', regex=True)
+    # if any too long pick out the last two digits
+    if max(data['type'].str.len()) > 2:
+        data.loc[:,'type'] = data['type'].str[-2:]
+    if not all(data['type'].str.fullmatch("[01]?[1-9]")):
+        temp = data[~data['type'].str.fullmatch("[01]?[1-9]")]
+        temp.loc[:,'type'] = [asgn_type_picker(row['first_name'], row['country']) for index, row in temp.iterrows()]
+        data.loc[~data['type'].str.fullmatch("[01]?[1-9]")] = temp
+    fulldata.loc[pd.notna(fulldata['type'])] = data
+    return fulldata    
+    
 def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     """
     Add all data to the MySQL database
@@ -396,6 +423,8 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
             dfs[df] = v1_ipcr_fixer(dfs[df], config)
         if df == 'rawuspc' and xml_file_name.startswith('pa0'): #only 2001-2004 start with pa instead of ipa
             dfs[df] = v1_uspc_fixer(dfs[df])
+        if df == 'rawassignee':
+            dfs[df] = rawassignee_QC(dfs[df])
         year = config['DATES']['START_DATE'][:4]
         tabnam = df+'_{}'.format(year) # after testing will change this to match final table names, or maybe attach year names
         cols = list(dfs[df].columns)
@@ -455,12 +484,16 @@ def extract_document(xml_file):
             # Determine the start of a new document
             # if line == xml_marker:
             # some of the v1.x documents are delimited by just '<?xml version="1.0"?>' - this caused inadvertent merging of documents
-            if line.startswith(xml_marker): 
+            #if line.startswith(xml_marker): 
+            #some of the v1.6 documents split on the middle of a line -
+            if xml_marker in line:
+                current_document_lines.append(line.split(xml_marker)[0])
                 # Join all lines for a given document
                 current_xml = "".join(current_document_lines)
                 yield current_xml
                 current_document_lines = []
-            current_document_lines.append(line)
+            current_document_lines.append(line.split(xml_marker)[-1])
+            #current_document_lines.append(line)
         current_xml = "".join(current_document_lines)
         yield current_xml
 

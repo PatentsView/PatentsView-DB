@@ -391,7 +391,7 @@
           "sequence": false,
           "flag": null,
           "tag": false,
-          "data-type": "string"
+          "data-type": "int"
         }
       ],
       "filename": "assignee.tsv"
