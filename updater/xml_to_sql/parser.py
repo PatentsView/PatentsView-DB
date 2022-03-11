@@ -391,11 +391,11 @@ def rawassignee_QC(fulldata):
         data.loc[:,'type'] = data['type'].str[-2:]
     if not all(data['type'].str.fullmatch("[01]?[1-9]")):
         temp = data[~data['type'].str.fullmatch("[01]?[1-9]")]
-        temp.loc[:,'type'] = [asgn_type_picker(row['first_name'], row['country']) for index, row in temp.iterrows()]
+        temp.loc[:,'type'] = [asgn_type_picker(row['name_first'], row['country']) for index, row in temp.iterrows()]
         data.loc[~data['type'].str.fullmatch("[01]?[1-9]")] = temp
     fulldata.loc[pd.notna(fulldata['type'])] = data
     return fulldata    
-    
+
 def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     """
     Add all data to the MySQL database
