@@ -380,21 +380,19 @@ def asgn_type_picker(fnam, country):
             else: t = '03'
     return t
 
-def rawassignee_QC(fulldata):
-    #allow nulls to pass through
-    data = fulldata[pd.notna(fulldata['type'])]
+def rawassignee_QC(data):
     #cut out any non-digit characters
     if any(data['type'].str.contains("\D")): 
         data.loc[:,'type'] = data['type'].str.replace(pat="\D", repl='', regex=True)
     # if any too long pick out the last two digits
     if max(data['type'].str.len()) > 2:
         data.loc[:,'type'] = data['type'].str[-2:]
-    if not all(data['type'].str.fullmatch("[01]?[1-9]")):
-        temp = data[~data['type'].str.fullmatch("[01]?[1-9]")]
+    badspots = ~data.loc[pd.notna(data['type']),'type'].str.fullmatch("[01]?[1-9]").fillna(True)
+    if any(badspots):
+        temp = data[badspots]
         temp.loc[:,'type'] = [asgn_type_picker(row['name_first'], row['country']) for index, row in temp.iterrows()]
-        data.loc[~data['type'].str.fullmatch("[01]?[1-9]")] = temp
-    fulldata.loc[pd.notna(fulldata['type'])] = data
-    return fulldata    
+        data.loc[badspots] = temp
+    return data    
 
 def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     """
@@ -418,13 +416,14 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     #dtypes = sql_dtype_picker(table_xml_map) # may be redundant now. try commenting.
 
     for df in dfs:
-        if df == 'ipcr' and xml_file_name.startswith('pa0'): #only 2001-2004 start with pa instead of ipa
-            # (dfs[df], dtypes[df]) = v1_ipcr_fixer(dfs[df], config)
-            dfs[df] = v1_ipcr_fixer(dfs[df], config)
-        if df == 'rawuspc' and xml_file_name.startswith('pa0'): #only 2001-2004 start with pa instead of ipa
-            dfs[df] = v1_uspc_fixer(dfs[df])
-        if df == 'rawassignee':
-            dfs[df] = rawassignee_QC(dfs[df])
+        if xml_file_name.startswith('pa0'):
+            if df == 'ipcr': #only 2001-2004 start with pa instead of ipa
+                # (dfs[df], dtypes[df]) = v1_ipcr_fixer(dfs[df], config)
+                dfs[df] = v1_ipcr_fixer(dfs[df], config)
+            elif df == 'rawuspc': #only 2001-2004 start with pa instead of ipa
+                dfs[df] = v1_uspc_fixer(dfs[df])
+            elif df == 'rawassignee':
+                dfs[df] = rawassignee_QC(dfs[df])
         year = config['DATES']['START_DATE'][:4]
         tabnam = df+'_{}'.format(year) # after testing will change this to match final table names, or maybe attach year names
         cols = list(dfs[df].columns)
