@@ -180,6 +180,7 @@ def get_version_indicator(**kwargs):
 
 def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwargs):
     disambiguation_root = os.environ['DISAMBIGUATION_ROOT']
+    print(disambiguation_root)
     import configparser
 
     config = get_config()
@@ -203,13 +204,17 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
             s_config = configparser.ConfigParser()
             config_file = "{disambiguation_root}/{filename}".format(disambiguation_root=disambiguation_root,
                                                                     filename=supplemental_config)
+            print(config_file)
             s_config.read(config_file)
             config.update(s_config)
     incremental = 1
-    if end_date.month == 12:
-        incremental = 0
+    # if end_date.month == 12:
+    #     incremental = 0
     config['DISAMBIGUATION']['INCREMENTAL'] = str(incremental)
     print(config['DISAMBIGUATION']['INCREMENTAL'])
+    print(config['DATES']['END_DATE'])
+    print(config['DATES']['END_DATE'])
+    print(config['INVENTOR_BUILD_CANOPIES'])
     return config
 
 
