@@ -180,6 +180,17 @@
       "entity_root_path": "body//patent-application-publication/subdoc-bibliographic-information/inventors/",
       "fields": [
         {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
           "field_name": "name_first",
           "friendly_name": "First Name",
           "xml_path": "name/given-name",
@@ -243,6 +254,17 @@
       "multi_valued": true,
       "entity_root_path": "body//patent-application-publication/subdoc-bibliographic-information/foreign-priority-data",
       "fields": [
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
         {
           "field_name": "country",
           "friendly_name": "Country",
@@ -316,6 +338,17 @@
       "multi_valued": true,
       "entity_root_path": "body//patent-application-publication/subdoc-bibliographic-information/assignee",
       "fields": [
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
         {
           "field_name": "name_first",
           "friendly_name": "Name First",
