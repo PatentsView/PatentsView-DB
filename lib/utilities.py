@@ -69,6 +69,10 @@ def get_relevant_attributes(self, class_called, database_section, config):
         # self.p_key = "id"
         # self.f_key = "assignee_id"
         self.aggregator = 'main.organization'
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
 
     elif class_called == "InventorPostProcessingQC":
         self.database_section = database_section
@@ -82,6 +86,10 @@ def get_relevant_attributes(self, class_called, database_section, config):
         # self.add_persistent_table_to_config(database_section)
         self.category = ""
         self.aggregator = "concat(main.name_last, ', ', main.name_first)"
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
 
     elif class_called == "LawyerPostProcessingQC":
         self.database_section = database_section
@@ -94,6 +102,19 @@ def get_relevant_attributes(self, class_called, database_section, config):
         # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
         self.aggregator = 'case when main.organization is null then concat(main.name_last,", ",main.name_first) else main.organization end'
         self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
+
+    elif class_called == "CPCTest":
+        # self.patent_exclusion_list.extend(['cpc_group', 'cpc_subgroup', 'cpc_subsection', 'wipo_field'])
+        self.table_config = load_table_config(config, db='patent')
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
+        self.exclusion_list = []
 
     elif database_section == "patent" or (
             class_called[:6] == 'Upload' and database_section[:6] == 'upload') or class_called == 'GovtInterestTester':

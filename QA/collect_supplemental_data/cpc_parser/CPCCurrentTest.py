@@ -7,153 +7,7 @@ from lib.configuration import get_current_config
 class CPCTest(DatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-        super().__init__(config, 'PROD_DB', datetime.date(year=1976, month=1, day=1), end_date)
-        self.table_config = {
-                'cpc_current':    {
-                        'fields': {
-                                'uuid':          {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                'patent_id':     {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                'sequence':      {
-                                        'data_type':    'int',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                'section_id':    {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     True
-                                        },
-                                'subsection_id': {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     True
-                                        },
-                                'group_id':      {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     True
-                                        },
-                                'subgroup_id':   {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     True
-                                        },
-                                'category':      {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     True
-                                        }
-                                }
-                        },
-                'wipo':           {
-                        'fields': {
-                                'patent_id': {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                'sequence':  {
-                                        'data_type':    'int',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                'field_id':  {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     True
-                                        }
-                                }
-                        },
-
-                'wipo_field':     {
-                        'fields': {
-                                'id':            {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                'sector_title': {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                'field_title':   {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                },
-                        },
-                'cpc_group':      {
-                        'fields':           {
-                                "id":    {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        },
-                                "title": {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        }
-                                },
-                        'related_entities': [
-                                {
-                                        'table':          'cpc_current',
-                                        'source_id':      'id',
-                                        'destination_id': 'group_id'
-                                        }]
-                        },
-                'cpc_subgroup':   {
-                        'fields':           {
-                                "id":    {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        },
-                                "title": {
-                                        "data_type":    "mediumtext",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        }
-                                },
-                        'related_entities': [
-                                {
-                                        'table':          'cpc_current',
-                                        'source_id':      'id',
-                                        'destination_id': 'subgroup_id'
-                                        }]
-                        },
-                'cpc_subsection': {
-                        'fields':           {
-                                "id":    {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        },
-                                "title": {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        }
-                                },
-                        'related_entities': [
-                                {
-                                        'table':          'cpc_current',
-                                        'source_id':      'id',
-                                        'destination_id': 'subsection_id'
-                                        }]
-                        }
-                }
-        self.patent_exclusion_list.extend(['cpc_group', 'cpc_subgroup', 'cpc_subsection','wipo_field'])
+        super().__init__(config, config['PATENTSVIEW_DATABASES']["PROD_DB"], datetime.date(year=1976, month=1, day=1), end_date)
 
     def test_yearly_count(self, table, strict=True):
         start_date = datetime.datetime.strptime(self.config['DATES']['START_DATE'], '%Y%m%d')
@@ -174,11 +28,15 @@ class CPCTest(DatabaseTester):
                     raise AssertionError(
                             "Table doesn't not have new data : {table}, date range '{start_dt}' to '{end_dt}' ".format(
                                     table=table, start_dt=start_date_string, end_dt=end_date_string))
-            super().test_yearly_count(table)
+
+    def runTests(self):
+        for table in self.table_config:
+                self.test_yearly_count(table)
+        super(CPCTest, self).runTests()
 
 
 if __name__ == '__main__':
     qc = CPCTest(get_current_config(**{
-            "execution_date": datetime.date(2020, 12, 29)
+            "execution_date": datetime.date(2021, 10, 1)
             }))
     qc.runTests()

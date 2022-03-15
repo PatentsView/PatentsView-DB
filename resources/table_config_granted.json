@@ -383,7 +383,7 @@
         "location_field": false
       }
     },
-    "TestScripts": [],
+    "TestScripts": ["CPCTest"],
     "custom_float_condition": "p.type='design'"
   },
   "cpc_group": {
@@ -401,7 +401,7 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["CPCTest"]
   },
   "cpc_subgroup": {
     "fields": {
@@ -418,7 +418,7 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["CPCTest"]
   },
   "cpc_subsection": {
     "fields": {
@@ -435,7 +435,7 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["CPCTest"]
   },
   "disambiguated_assignee_ids": {
     "fields": {
@@ -448,9 +448,9 @@
     },
     "related_entities": [
       {
-        "related_table": "assignee",
-        "main_table_id": "assignee_id",
-        "related_table_id": "id"
+        "related_table": "cpc_current",
+        "main_table_id": "id",
+        "related_table_id": "subsection_id"
       }
     ],
     "TestScripts": []
@@ -3009,7 +3009,7 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["CPCTest"]
   },
   "wipo_field": {
     "fields": {
@@ -3032,6 +3032,6 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["CPCTest"]
   }
 }
