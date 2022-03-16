@@ -350,17 +350,6 @@ def v1_ipcr_fixer(data, config):
     newdata['version'] = '20000101'
     newdata['action_date'] = config['DATES']['START_DATE']
     newdata[['section', 'class', 'subclass', 'main_group', 'subgroup']] = data['full_code'].str.extract("([A-H])([0-9]{2})([A-Z])([0-9]{1,3})/([0-9]{2,})")
-    # dtypes = {
-    #     'sequence': mysql.INTEGER,
-    #     'version': mysql.DATE,
-    #     'section': mysql.VARCHAR(20),
-    #     'class': mysql.VARCHAR(20),
-    #     'subclass':mysql.VARCHAR(20),
-    #     'main_group': mysql.VARCHAR(20),
-    #     'subgroup': mysql.VARCHAR(20),
-    #     'action_date': mysql.DATE,
-    # }
-    # return(newdata, dtypes)
     return newdata
 
 def v1_uspc_fixer(data):
@@ -385,9 +374,11 @@ def rawassignee_QC(data):
     if any(data['type'].str.contains("\D")): 
         data.loc[:,'type'] = data['type'].str.replace(pat="\D", repl='', regex=True)
     # if any too long pick out the last two digits
-    if max(data['type'].str.len()) > 2:
-        data.loc[:,'type'] = data['type'].str[-2:]
-    badspots = ~data.loc[pd.notna(data['type']),'type'].str.fullmatch("[01]?[1-9]").fillna(True)
+    maxlen = max(data['type'].str.len())
+    if  maxlen is not None:
+        if (maxlen > 2):
+            data.loc[:,'type'] = data['type'].str[-2:]
+    badspots = ~data['type'].str.fullmatch("[01]?[1-9]").fillna(True)
     if any(badspots):
         temp = data[badspots]
         temp.loc[:,'type'] = [asgn_type_picker(row['name_first'], row['country']) for index, row in temp.iterrows()]
@@ -413,19 +404,17 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     text_output_folder = config['FOLDERS']['TEXT_OUTPUT_FOLDER']
     engine = create_engine(
             'mysql+pymysql://{0}:{1}@{2}:{3}/?charset=utf8mb4'.format(user, password, host, port))
-    #dtypes = sql_dtype_picker(table_xml_map) # may be redundant now. try commenting.
 
     for df in dfs:
-        if xml_file_name.startswith('pa0'):
-            if df == 'ipcr': #only 2001-2004 start with pa instead of ipa
-                # (dfs[df], dtypes[df]) = v1_ipcr_fixer(dfs[df], config)
+        if xml_file_name.startswith('pa0'):#only 2001-2004 start with pa instead of ipa
+            if df == 'ipcr' and dfs[df].size > 0: 
                 dfs[df] = v1_ipcr_fixer(dfs[df], config)
-            elif df == 'rawuspc': #only 2001-2004 start with pa instead of ipa
+            elif df == 'rawuspc' and dfs[df].size > 0: 
                 dfs[df] = v1_uspc_fixer(dfs[df])
-            elif df == 'rawassignee':
+            elif df == 'rawassignee' and dfs[df].size > 0:
                 dfs[df] = rawassignee_QC(dfs[df])
         year = config['DATES']['START_DATE'][:4]
-        tabnam = df+'_{}'.format(year) # after testing will change this to match final table names, or maybe attach year names
+        tabnam = df+'_{}'.format(year) # for early year runs - to remove for weekly or other runs
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
@@ -634,11 +623,6 @@ def get_filenames_to_parse(config, type='granted_patent'):
             file_date_string = re.match(".*([0-9]{6}).*", file_name).group(1)
             file_date = datetime.strptime(file_date_string, '%y%m%d')
 
-            # file_date = file_name.split("_")[-1].split(".")[0]
-            # file_date = file_name[3:-4]
-            #print(file_date)
-            #print(start_date)
-            #print(end_date)
             if start_date <= file_date <= end_date:
                 xml_files.append(xml_directory + "/" + file_name)
                 print(f'added to parsing queue: {file_name}')
@@ -667,18 +651,6 @@ tables_dtd_to_json = {
     'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_map_v4_3-5.json',
     'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_map_v4_3-5.json',
     'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_map_v4_3-5.json',
-    # temporary fill-ins:
-    # used to parse pgpubs gi only - December 2021
-    # using now for the rest of pgpubs - Jan 2022
-    # 'pap-v15-2001-01-31.dtd' : 'pgp_xml_no_gi_v1x.json',
-    # 'pap-v16-2002-01-01.dtd' : 'pgp_xml_no_gi_v1x.json',
-    # 'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
-    # 'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
-    # 'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_no_gi_v4_0-2.json',
-    # 'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
-    # 'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
-    # 'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_no_gi_v4_3-5.json',
-    # None : None,
 }
 
 long_text_dtd_to_json = {
@@ -719,11 +691,6 @@ def queue_parsers(config, type='granted_patent'):
     Multiprocessing call of the parse_publication_xml function
     :param config: config file
     """
-    #parsing_file_setting = "{prefix}_parsing_config_file".format(prefix=type)
-    #dtd_file_setting = "{prefix}_dtd_file".format(prefix=type)
-    #dtd_file = '{}'.format(config['XML_PARSING'][dtd_file_setting])
-    #parsing_config_file = config["XML_PARSING"][parsing_file_setting]
-    #parsing_config = json.load(open(parsing_config_file))
     xml_files = get_filenames_to_parse(config, type=type)
     parser_start = time.time()
 
