@@ -11,6 +11,7 @@ class LawyerPostProcessingQC(DisambiguationTester):
 
     def runTests(self):
         super(LawyerPostProcessingQC, self).runTests()
+        super(DisambiguationTester, self).runTests()
 
 
 if __name__ == '__main__':

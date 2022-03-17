@@ -30,6 +30,7 @@ class AssigneePostProcessingQC(DisambiguationTester):
         for table in self.table_config:
             self.assert_name_or_organization(table)
             super(AssigneePostProcessingQC, self).runTests()
+        super(DisambiguationTester, self).runTests()
 
 
 if __name__ == '__main__':

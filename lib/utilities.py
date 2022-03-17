@@ -107,6 +107,20 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.p_key = ""
         self.f_key = ""
 
+    elif class_called == "LocationPostProcessingQC":
+        self.table_config = load_table_config(config, db='patent')
+        self.disambiguated_data_fields = ['city', 'state', 'country']
+        self.entity_table = 'rawlocation'
+        self.entity_id = 'id'
+        self.disambiguated_id = 'location_id'
+        self.disambiguated_table = 'location'
+        # self.patent_exclusion_list.extend(['location', 'rawlocation','location_assignee','location_inventor'])
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
+        self.exclusion_list = []
+
     elif class_called == "CPCTest":
         # self.patent_exclusion_list.extend(['cpc_group', 'cpc_subgroup', 'cpc_subsection', 'wipo_field'])
         self.table_config = load_table_config(config, db='patent')
