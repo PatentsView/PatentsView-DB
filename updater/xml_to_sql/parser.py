@@ -544,6 +544,9 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                 patent_app_document = etree.XML(current_xml.encode('utf-8'), parser=parser)
             if patent_app_document.tag == 'sequence-cwu':
                 continue
+            # # significant issue with one week specifically - 2002-05-16 - will remove after completed QC of 2002 pgpubs
+            # elif (patent_app_document.findall("body//patent-application-publication/subdoc-bibliographic-information/document-id/doc-number")[0].text == '20020058546' and patent_app_document.findall("body//patent-application-publication/subdoc-bibliographic-information/document-id/kind-code")[0].text == 'A1'):
+            #     continue
             else:
                 # Extract the data fields
                 data = process_publication_document(patent_app_document, table_xml_map)
