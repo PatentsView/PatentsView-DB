@@ -201,7 +201,6 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
     }
     print("Start Date is {start}".format(start=config['DATES']['START_DATE']))
     print("End date is {end}".format(end=config['DATES']['END_DATE']))
-    print(config['INVENTOR_BUILD_CANOPIES'])
     if supplemental_configs is not None:
         for supplemental_config in supplemental_configs:
             s_config = configparser.ConfigParser()
