@@ -6,17 +6,20 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
-from lib.configuration import get_connection_string, get_current_config
+from lib.configuration import get_connection_string, get_current_config, get_disambig_config
 from updater.post_processing.create_lookup import load_lookup_table
 
 
-def update_rawinventor_for_type(update_config, database='RAW_DB', uuid_field='uuid'):
+def update_rawinventor_for_type(update_config, incremental="1", database='RAW_DB', uuid_field='uuid'):
     engine = create_engine(get_connection_string(update_config, database))
+    filter = '1=1'
+    if incremental == "1":
+        filter = 'ri.inventor_id is null'
     update_statement = """
         UPDATE rawinventor ri join inventor_disambiguation_mapping idm
             on idm.uuid =  ri.{uuid_field}
-        set ri.inventor_id=idm.inventor_id where ri.inventor_id is null
-    """.format(uuid_field=uuid_field)
+        set ri.inventor_id=idm.inventor_id where {filter} 
+    """.format(uuid_field=uuid_field, filter=filter)
     print(update_statement)
     engine.execute(update_statement)
 
@@ -177,13 +180,14 @@ def upload_disambig_results(update_config):
 
 
 def update_granted_rawinventor(**kwargs):
-    config = get_current_config(schedule='quarterly', **kwargs)
-    update_rawinventor_for_type(config, database='RAW_DB', uuid_field='uuid')
+    config = get_disambig_config(schedule='quarterly', **kwargs)
+    update_rawinventor_for_type(config, config['DISAMBIGUATION']['INCREMENTAL'], database='RAW_DB', uuid_field='uuid')
 
 
 def update_pregranted_rawinventor(**kwargs):
-    config = get_current_config(schedule='quarterly', **kwargs)
-    update_rawinventor_for_type(config, database='PGPUBS_DATABASE', uuid_field='id')
+    config = get_disambig_config(schedule='quarterly', **kwargs)
+    update_rawinventor_for_type(config, config['DISAMBIGUATION']['INCREMENTAL'], database='PGPUBS_DATABASE',
+                                uuid_field='id')
 
 
 def precache_inventors(**kwargs):
