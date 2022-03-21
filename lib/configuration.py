@@ -181,7 +181,7 @@ def get_version_indicator(**kwargs):
 def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwargs):
     disambiguation_root = os.environ['DISAMBIGUATION_ROOT']
     print(disambiguation_root)
-    import configparser
+    import configparser, pprint
 
     config = get_config()
     execution_date: DateTime = kwargs['execution_date']
@@ -199,6 +199,8 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
         "START_DATE": start_date.strftime('%Y-%m-%d'),
         "END_DATE": end_date.strftime('%Y-%m-%d')
     }
+    print("Start Date is {start}".format(start=config['DATES']['START_DATE']))
+    print("End date is {end}".format(end=config['DATES']['END_DATE']))
     if supplemental_configs is not None:
         for supplemental_config in supplemental_configs:
             s_config = configparser.ConfigParser()
@@ -207,14 +209,14 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
             print(config_file)
             s_config.read(config_file)
             config.update(s_config)
+        print("Canopy Settings are {canopy_setting}".format(
+            canopy_setting=pprint.pformat(config['INVENTOR_BUILD_CANOPIES'])))
+
     incremental = 1
-    # if end_date.month == 12:
-    #     incremental = 0
+    if end_date.month == 12:
+        incremental = 0
     config['DISAMBIGUATION']['INCREMENTAL'] = str(incremental)
-    print(config['DISAMBIGUATION']['INCREMENTAL'])
-    print(config['DATES']['END_DATE'])
-    print(config['DATES']['END_DATE'])
-    print(config['INVENTOR_BUILD_CANOPIES'])
+    print("Incremental Setting is {incremental}".format(incremental=config['DISAMBIGUATION']['INCREMENTAL']))
     return config
 
 

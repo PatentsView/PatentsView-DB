@@ -552,11 +552,17 @@ def archive_folder(source_folder, targets: list):
 
 
 def link_view_to_new_disambiguation_table(connection, table_name, disambiguation_type):
+    from mysql.connector.errors import ProgrammingError
     g_cursor = connection.cursor()
     index_query = 'alter table {table_name} add primary key (uuid)'.format(
         table_name=table_name)
     replace_view_query = """
         CREATE OR REPLACE VIEW {dtype}_disambiguation_mapping as SELECT uuid,{dtype}_id from {table_name}
         """.format(table_name=table_name, dtype=disambiguation_type)
-    g_cursor.execute(index_query)
+    try:
+        g_cursor.execute(index_query)
+    except ProgrammingError as e:
+        from mysql.connector import errorcode
+        if not e.errno == errorcode.ER_MULTIPLE_PRI_KEY:
+            raise
     g_cursor.execute(replace_view_query)

@@ -17,6 +17,9 @@ from updater.create_databases.rename_db import qc_database_pgpubs
 from updater.create_databases.merge_in_new_data import post_merge_weekly_pgpubs, post_merge_quarterly_pgpubs, begin_text_merging_pgpubs
 from updater.text_data_processor.text_table_parsing import post_text_merge_pgpubs, post_text_parsing_pgpubs
 
+import pendulum
+
+local_tz = pendulum.timezone("America/New_York")
 
 
 default_args = {
@@ -43,7 +46,7 @@ app_xml_dag = DAG(
     dag_id='pregrant_publication_updater',
     default_args=default_args,
     description='Download and process application patent data and corresponding classifications data',
-    start_date=datetime(2021, 1, 7),
+    start_date=datetime(2021, 1, 7, hour=5, minute=0, second=0, tzinfo=local_tz),
     schedule_interval=timedelta(weeks=1),
     catchup=True,
     template_searchpath=templates_searchpath
