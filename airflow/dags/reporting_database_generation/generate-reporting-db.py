@@ -50,7 +50,7 @@ default_args = {
         # 'end_date': datetime(2016, 1, 1),
         }
 
-reporting_db_dag = DAG("reporting_database_generation", default_args=default_args, start_date=datetime(2018, 12, 1),
+reporting_db_dag = DAG("reporting_database_generation", default_args=default_args, start_date=datetime(2022, 1, 1),
                        schedule_interval=None, template_searchpath="/project/reporting_database_generator/")
 db_creation = SQLTemplatedPythonOperator(
         task_id='Database_Creation',

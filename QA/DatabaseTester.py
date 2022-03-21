@@ -280,6 +280,28 @@ group by 1
             if self.connection.open:
                 self.connection.close()
 
+    def test_table_updated(self, table):
+        print(f"\t\tTesting for null version_indicator in {table}")
+        vi_date = self.end_date.strftime('%Y-%m-%d')
+        try:
+            if not self.connection.open:
+                self.connection.connect()
+            rows_for_current_version_query = f"SELECT count(*) from {table} where version_indicator = '{vi_date}'"
+            print(rows_for_current_version_query)
+            with self.connection.cursor() as count_cursor:
+                query_start_time = time()
+                count_cursor.execute(rows_for_current_version_query)
+                query_end_time = time()
+                print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
+                count_value = count_cursor.fetchall()[0][0]
+                if count_value == 0:
+                    raise Exception(
+                        "TABLE {database}.{table} HAS NOT BEEN UPDATED".format(
+                            database=self.database_section, table=table, count=count_value))
+        finally:
+            if self.connection.open:
+                self.connection.close()
+
     def test_white_space(self, table, field):
         print(f"\t\tTesting for whitespace in {table}.{field}")
         try:
@@ -419,6 +441,7 @@ group by 1
                     return
                 finally:
                     self.connection.close()
+
 
     def load_main_floating_entity_count(self, table_name, table_config):
         if table_name not in self.exclusion_list and 'related_entities' in table_config:
@@ -674,6 +697,7 @@ group by 1
         for table in self.table_config:
             # if table[:2] >= 'pu':
             print(f"BEGINNING TESTS FOR {self.database_section}.{table}")
+            # self.test_table_updated(table)
             if self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest':
                 self.test_null_version_indicator(table)
             self.load_yearly_count(table, strict=False)
@@ -702,7 +726,6 @@ group by 1
                 print("No Writing to the DB for Merge Checks")
                 continue
             else:
-                print(self.class_called)
                 self.save_qa_data()
                 self.init_qa_dict()
             print(f"Finished With Table: {table}")

@@ -1,4 +1,5 @@
 from abc import ABC
+from time import time
 
 from QA.DatabaseTester import DatabaseTester
 
@@ -7,7 +8,7 @@ class DisambiguationTester(DatabaseTester):
     def __init__(self, config, database_section, start_date, end_date):
         super().__init__(config, database_section, start_date, end_date)
 
-    def init_qa_dict(self):
+    def init_qa_dict_disambig(self):
         self.qa_data = {
             "DataMonitor_distinctidcount": [],
             'DataMonitor_topnentities': []
@@ -16,7 +17,7 @@ class DisambiguationTester(DatabaseTester):
     def save_qa_data(self):
         super(DisambiguationTester, self).save_qa_data()
 
-    def test_floating_entities(self, table_name):
+    def test_floating_entities(self):
         ratio_to_patent = None
         if not self.connection.open:
             self.connection.connect()
@@ -30,8 +31,10 @@ class DisambiguationTester(DatabaseTester):
             count_cursor.execute(entity_row_query)
             entity_rows_value = count_cursor.fetchall()[0][0]
             ratio_to_self = round((entity_rows_value * 1.0) / entity_count_value, 3)
+            if ratio_to_self < 3:
+                raise Exception(f"DISAMBIGUATION MAY HAVE FAILED - Clustered id to raw id ratio is low")
 
-            if "patent_id" in self.table_config[table_name]["fields"]:
+            if "patent_id" in self.table_config[self.entity_table]["fields"]:
                 patent_count_query = "SELECT count(id) from patent"
                 count_cursor.execute(patent_count_query)
                 patent_count_value = count_cursor.fetchall()[0][0]
@@ -117,10 +120,10 @@ class DisambiguationTester(DatabaseTester):
     def runTests(self):
         print("Beginning Disambiguation Specific Tests")
         self.test_invalid_id()
+        self.test_floating_entities()
         for table in self.table_config:
             print(f"\t\tBeginning Tests for {table}")
             self.top_n_generator(table)
-            self.test_floating_entities(table)
             self.save_qa_data()
-            self.init_qa_dict()
+            self.init_qa_dict_disambig()
 
