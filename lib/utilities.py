@@ -90,6 +90,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.central_entity = ""
         self.p_key = ""
         self.f_key = ""
+        self.exclusion_list = []
 
     elif class_called == "LawyerPostProcessingQC":
         self.database_section = database_section
@@ -106,6 +107,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.central_entity = ""
         self.p_key = ""
         self.f_key = ""
+        self.exclusion_list = []
 
     elif class_called == "LocationPostProcessingQC":
         self.table_config = load_table_config(config, db='patent')
@@ -251,7 +253,6 @@ def weekday_count(start_date, end_date):
         day = calendar.day_name[(start_date + datetime.timedelta(days=i)).weekday()]
         week[day] = week[day] + 1 if day in week else 1
     return week
-
 
 def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))

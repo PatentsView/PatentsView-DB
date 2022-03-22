@@ -32,40 +32,45 @@ def nextword(target, source):
 
 def db_and_table_as_array(single_line_query):
     # Identify all tables used in the query for collation check
+    single_line_query = single_line_query.lower()
+    single_line_query = single_line_query.replace('`', '')
     print(single_line_query)
     single_line_query_words = single_line_query.split(" ")
     # print(single_line_query_words)
-    after_into = nextword('INTO', single_line_query_words)
-    after_from = nextword('FROM', single_line_query_words)
-    table_schema_list = "('" + after_into.split(".")[0] + "', " + "'" + after_from.split(".")[0] + "')"
-    print(table_schema_list)
+    after_into = nextword('into', single_line_query_words)
+    after_from = nextword('from', single_line_query_words)
+    if after_into is None or after_from is None:
+        print("Not set up for schema checks")
+    else:
+        table_schema_list = "('" + after_into.split(".")[0] + "', " + "'" + after_from.split(".")[0] + "')"
+        print(table_schema_list)
 
-    db_type = 'patent'
-    if 'publication' in single_line_query_words:
-        db_type = 'pgpubs'
-    config = get_current_config(db_type, **{"execution_date": datetime.date(2022, 1, 1)})
-    connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
-                                      user=config['DATABASE_SETUP']['USERNAME'],
-                                      password=config['DATABASE_SETUP']['PASSWORD'],
-                                      # db=config['PATENTSVIEW_DATABASES']["PROD_DB"],
-                                      charset='utf8mb4',
-                                      cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
-    if not connection.open:
-        connection.connect()
-    tables_query = f"""
-select table_schema, table_name 
-from information_schema.tables
-where table_schema in {table_schema_list}
-group by 1,2
-                """
-    with connection.cursor() as cursor:
-        cursor.execute(tables_query)
-        tables_schema = []
-        for item in cursor.fetchall():
-            tables_schema.append((item[0], item[1]))
-        # row = [item[0] for item in cursor.fetchall()]
-        print(tables_schema)
-    return tables_schema
+        db_type = 'patent'
+        if 'publication' in single_line_query_words:
+            db_type = 'pgpubs'
+        config = get_current_config(db_type, **{"execution_date": datetime.date(2022, 1, 1)})
+        connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
+                                          user=config['DATABASE_SETUP']['USERNAME'],
+                                          password=config['DATABASE_SETUP']['PASSWORD'],
+                                          # db=config['PATENTSVIEW_DATABASES']["PROD_DB"],
+                                          charset='utf8mb4',
+                                          cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
+        if not connection.open:
+            connection.connect()
+        tables_query = f"""
+    select table_schema, table_name 
+    from information_schema.tables
+    where table_schema in {table_schema_list}
+    group by 1,2
+                    """
+        print(tables_query)
+        with connection.cursor() as cursor:
+            cursor.execute(tables_query)
+            tables_schema = []
+            for item in cursor.fetchall():
+                tables_schema.append((item[0], item[1]))
+            # row = [item[0] for item in cursor.fetchall()]
+        return tables_schema
 
 
 def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk_check=True, section=None, **context):
@@ -160,9 +165,6 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
                 if single_line_query.lower().lstrip().startswith("drop"):
                     continue
 
-            # Log file output
-            print(single_line_query)
-
             # Insert statements are usually insert as select
             # We perform sanity checks on those queries
             if parsed_statement.get_type().lower() == 'insert':
@@ -223,7 +225,8 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
     #                         config, "*SQL Executor (" + filename + ")*",
     #                         "success")
 #
-# if __name__ == '__main__':
-#     db_and_table_as_array("INSERT INTO pregrant_publications.publication SELECT * FROM pgpubs_20050101.publication")
-#
+if __name__ == '__main__':
+    q = "insert into `PatentsView_20211230`.`application` (`application_id`, `patent_id`, `type`, `number`, `country`, `date`) select `id_transformed`, `patent_id`, nullif(trim(`type`), ''), nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''), case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end from `patent`.`application` where version_indicator<='2021-12-30';"
+    # db_and_table_as_array("INSERT INTO pregrant_publications.publication SELECT * FROM pgpubs_20050101.publication")
+    db_and_table_as_array(q)
 
