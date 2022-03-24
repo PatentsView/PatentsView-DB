@@ -33,8 +33,6 @@ class DatabaseTester(ABC):
                                           cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
         # self.database_connection_string = get_connection_string(config, database_section)
         self.config = config
-        # Place Holder for saving QA counts - keys map to table names in patent_QA
-        self.init_qa_dict()
         self.database_section = database_section
         self.class_called = class_called
 
@@ -696,7 +694,7 @@ group by 1
         # skiplist = []
         self.init_qa_dict()
         for table in self.table_config:
-            # if table[:2] >= 'pu':
+            # if table[:2] >= 'ba':
             print(f"BEGINNING TESTS FOR {self.database_section}.{table}")
             # self.test_table_updated(table)
             if self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest':

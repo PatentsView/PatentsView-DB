@@ -55,7 +55,7 @@ class DisambiguationTester(DatabaseTester):
         if 'related_entities' in self.table_config[table]:
             related_table_configs = self.table_config[table]["related_entities"]
             for related_table_config in related_table_configs:
-                print(f"\tLoading Top N Entities for {self.database_section}.{self.disambiguated_table} from {related_table_config['related_table']}")
+                print(f"\t\t\tLoading Top N Entities for {self.database_section}.{self.disambiguated_table} from {related_table_config['related_table']}")
                 self.load_top_entities(table, related_table_config)
 
     def load_top_entities(self, table_name, related_table_config):
@@ -119,6 +119,7 @@ class DisambiguationTester(DatabaseTester):
 
     def runTests(self):
         print("Beginning Disambiguation Specific Tests")
+        self.init_qa_dict_disambig()
         self.test_invalid_id()
         self.test_floating_entities()
         for table in self.table_config:

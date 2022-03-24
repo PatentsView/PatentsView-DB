@@ -13,7 +13,7 @@ class AssigneePostProcessingQC(DisambiguationTester):
 
     def assert_name_or_organization(self, table):
         if table not in self.exclusion_list:
-            print(f"\tTesting Table counts for {table} in {self.database_section}")
+            print(f"Testing Table counts for {table} in {self.database_section}")
             query = 'SELECT count(1) from assignee where name_first is null and name_last is null and organization is null'
             if not self.connection.open:
                 self.connection.connect()
@@ -29,13 +29,13 @@ class AssigneePostProcessingQC(DisambiguationTester):
     def runTests(self):
         for table in self.table_config:
             self.assert_name_or_organization(table)
-            super(AssigneePostProcessingQC, self).runTests()
+        super(AssigneePostProcessingQC, self).runTests()
         super(DisambiguationTester, self).runTests()
 
 
 if __name__ == '__main__':
     config = get_current_config('granted_patent', schedule='quarterly', **{
-            "execution_date": datetime.date(2021, 12, 23)
+            "execution_date": datetime.date(2021, 10, 1)
             })
     # print({section: dict(config[section]) for section in config.sections()})
     qc = AssigneePostProcessingQC(config)
