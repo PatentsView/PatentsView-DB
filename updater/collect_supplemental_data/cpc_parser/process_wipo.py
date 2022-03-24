@@ -143,9 +143,10 @@ def process_and_upload_wipo(**kwargs):
     offset = 0
     patent_batches_query = f"select round(count(*)/{limit}) from patent"
     patent_batches = pd.read_sql_query(con=myengine, sql=patent_batches_query)
+    num_batches = patent_batches['round(count(*)/10000)'][0]
     base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
     cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = c.patent_id"
-    for batch in range(patent_batches):
+    for batch in range(num_batches):
         start = time.time()
         base_query = base_query_template.format(limit=limit, offset=offset, vind=version_indicator)
         cpc_join_query = cpc_query_template.format(base_query=base_query)
@@ -153,9 +154,9 @@ def process_and_upload_wipo(**kwargs):
         wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
         offset = offset + limit
         end = time.time()
-        perc_complete = batch/patent_batches
+        perc_complete = batch/num_batches
         chunk_time = str(round(end - start))
-        print(f"We are on batch: {batch} of {patent_batches}, or {perc_complete} complete which took {chunk_time} seconds")
+        print(f"We are on batch: {batch} of {num_batches}, or {perc_complete} complete which took {chunk_time} seconds")
         print(f"For {batch}: {offset}, with {cpc_join_query}, the count is {cpc_current_data.shape[0]}")
     consolidate_wipo(config)
 
