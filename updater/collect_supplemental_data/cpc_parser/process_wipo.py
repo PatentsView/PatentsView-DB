@@ -143,7 +143,7 @@ def process_and_upload_wipo(**kwargs):
     offset = 0
     patent_batches_query = f"select round((count(*)/{limit}),0) from patent"
     patent_batches = pd.read_sql_query(con=myengine, sql=patent_batches_query)
-    num_batches = patent_batches['round(count(*)/10000)'][0]
+    num_batches = patent_batches.iloc[:,0][0]
     base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
     cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = c.patent_id"
     for batch in range(num_batches):
