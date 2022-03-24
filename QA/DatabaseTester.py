@@ -694,6 +694,7 @@ group by 1
     def runTests(self):
         # Skiplist is Used for Testing ONLY, Should remain blank
         # skiplist = []
+        self.init_qa_dict()
         for table in self.table_config:
             # if table[:2] >= 'pu':
             print(f"BEGINNING TESTS FOR {self.database_section}.{table}")
