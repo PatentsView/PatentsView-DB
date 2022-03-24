@@ -114,7 +114,7 @@ wipo_operator = PythonOperator(task_id='wipo_processor',
                                provide_context=True,
                                on_success_callback=airflow_task_success,
                                on_failure_callback=airflow_task_failure,
-                               pool='database_write_iops_contenders')
+                               pool='database_write_iops_contenders', queue='disambiguator')
 
 # # Good
 cpc_class_operator = PythonOperator(task_id='cpc_class_uploader',
