@@ -93,10 +93,10 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
             lambda _df: _df.nlargest(3, 'wipo_count', keep='all')).reset_index(drop=True)
     # Assign Sequence
     wipo_filtered_data_sequenced = wipo_filtered_data.drop(["wipo_count"], axis=1).assign(
-            sequence=wipo_filtered_data.groupby(['patent_id']).cumcount())
+        sequence=wipo_filtered_data.groupby(['patent_id']).cumcount())
     wipo_filtered_data_sequenced = wipo_filtered_data_sequenced.assign(version_indicator=config['DATES']['END_DATE'])
     cstr = get_connection_string(config, "TEMP_UPLOAD_DB")
-    print(cstr)
+    # print(cstr)
     engine = create_engine(cstr)
     with engine.begin() as conn:
         wipo_filtered_data_sequenced.to_sql('wipo', conn, if_exists='append', index=False, method="multi")
@@ -129,8 +129,7 @@ def process_and_upload_wipo(**kwargs):
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                  'wipo_output')
     version_indicator = config['DATES']['END_DATE']
-    if not os.path.exists(wipo_output):
-        os.mkdir(wipo_output)
+    os.makedirs(wipo_output, exist_ok=True)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     ipc_tech_file = '{}/ipc_technology.csv'.format(persistent_files)
     ipc_tech_field_map = get_ipc_tech_code_field_map(ipc_tech_file)
@@ -154,14 +153,14 @@ def process_and_upload_wipo(**kwargs):
         wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
         offset = offset + limit
         end = time.time()
-        print("Chunk Time:" + str(round(end - start)))
-        print(f"For {batch}: {offset}, with {cpc_join_query}, the count is {cpc_current_data.shape[0]}")
         perc_complete = batch/patent_batches
-        print(f"We are on batch: {batch} of {patent_batches}, or {perc_complete} complete")
+        chunk_time = str(round(end - start))
+        print(f"We are on batch: {batch} of {patent_batches}, or {perc_complete} complete which took {chunk_time} seconds")
+        print(f"For {batch}: {offset}, with {cpc_join_query}, the count is {cpc_current_data.shape[0]}")
     consolidate_wipo(config)
 
 
 if __name__ == '__main__':
     process_and_upload_wipo(**{
-            "execution_date": datetime.date(2020, 12,29)
-            })
+        "execution_date": datetime.date(2021, 10, 1)
+    })
