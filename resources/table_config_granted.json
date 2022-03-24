@@ -1150,18 +1150,6 @@
         "location_field": false
       }
     },
-    "related_entities": [
-      {
-        "related_table": "location",
-        "main_table_id": "location_id",
-        "related_table_id": "id"
-      },
-      {
-        "related_table": "assignee",
-        "main_table_id": "assignee_id",
-        "related_table_id": "id"
-      }
-    ],
     "TestScripts": ["LocationPostProcessingQC"]
   },
   "location_by_lat_long": {
@@ -1298,18 +1286,6 @@
         "location_field": false
       }
     },
-    "related_entities": [
-      {
-        "related_table": "inventor",
-        "main_table_id": "inventor_id",
-        "related_table_id": "id"
-      },
-      {
-        "related_table": "location",
-        "main_table_id": "location_id",
-        "related_table_id": "id"
-      }
-    ],
     "TestScripts": ["LocationPostProcessingQC"]
   },
   "location_lat_lon": {

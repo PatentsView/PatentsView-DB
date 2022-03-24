@@ -73,6 +73,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.central_entity = ""
         self.p_key = ""
         self.f_key = ""
+        self.exclusion_list = []
 
     elif class_called == "InventorPostProcessingQC":
         self.database_section = database_section
@@ -112,6 +113,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
     elif class_called == "LocationPostProcessingQC":
         self.table_config = load_table_config(config, db='patent')
         self.disambiguated_data_fields = ['city', 'state', 'country']
+        self.aggregator = "concat(main.city, ', ', main.state, ',', main.country)"
         self.entity_table = 'rawlocation'
         self.entity_id = 'id'
         self.disambiguated_id = 'location_id'
