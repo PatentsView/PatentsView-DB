@@ -4,235 +4,235 @@
 
 ################################################################################################################################################
 
-
-drop table if exists `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`;
-create table `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
-(
-  `patent_id` varchar(20) not null,
-  `assignee_id` int unsigned null,
-  `persistent_assignee_id` varchar(64) null,
-  `location_id` int unsigned null,
-  `persistent_location_id` varchar(128) null,
-  `city` varchar(256) null,
-  `state` varchar(20) null,
-  `country` varchar(10) null,
-  `latitude` float null,
-  `longitude` float null,
-  primary key (`patent_id`)
-)
-engine=InnoDB;
-
-
-# 4,694,651 @ 2:22
-insert into `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
-(
-  `patent_id`, `assignee_id`, `persistent_assignee_id`, `location_id`,
-  `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`
-)
-select
-  p.`id`,
-  ta.`new_assignee_id`,
-  ta.`old_assignee_id`,
-  tl.`new_location_id`,
-  tl.`old_location_id_transformed`,
-  nullif(l.`city`, ''),
-  nullif(l.`state`, ''),
-  nullif(l.`country`, ''),
-  l.`latitude`,
-  l.`longitude`
-from
-  `{{params.raw_database}}`.`patent` p
-  left outer join `{{params.raw_database}}`.`rawassignee` ra on ra.`patent_id` = p.`id` and ra.`sequence` = 0
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_assignee` ta on ta.`old_assignee_id` = ra.`assignee_id`
-  left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
-  left outer join `{{params.raw_database}}`.`location` l on l.`id` = rl.`location_id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on l.`id` =  tl.`old_location_id`
-where
-  (ta.`new_assignee_id` is not null or
-  tl.`new_location_id` is not null) and  p.version_indicator<={{params.version_indicator}};
-
-
-drop table if exists `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`;
-create table `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
-(
-  `patent_id` varchar(20) not null,
-  `inventor_id` int unsigned null,
-  `persistent_inventor_id` varchar(256) null,
-  `location_id` int unsigned null,
-  `persistent_location_id` varchar(128) null,
-  `city` varchar(256) null,
-  `state` varchar(20) null,
-  `country` varchar(10) null,
-  `latitude` float null,
-  `longitude` float null,
-  primary key (`patent_id`)
-)
-engine=InnoDB;
-
-
-# 5,425,008 @ 6:03
-insert into `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
-(
-  `patent_id`, `inventor_id`, `persistent_inventor_id`, `location_id`,
-  `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`
-)
-select
-  p.`id`,
-  ti.`new_inventor_id`,
-  ti.`old_inventor_id`,
-  tli.`new_location_id`,
-  tli.`old_location_id_transformed`,
-  nullif(l.`city`, ''),
-  nullif(l.`state`, ''),
-  nullif(l.`country`, ''),
-  l.`latitude`,
-  l.`longitude`
-from
-  `{{params.raw_database}}`.`patent` p
-  left outer join `{{params.raw_database}}`.`rawinventor` ri on ri.`patent_id` = p.`id` and ri.`sequence` = 0
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_inventor` ti on ti.`old_inventor_id` = ri.`inventor_id`
-  left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
-  left outer join `{{params.raw_database}}`.`location` l on l.`id` = rl.`location_id`
-  left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
-where
-  (ti.`new_inventor_id` is not null or
-  tli.`new_location_id` is not null)and  p.version_indicator<={{params.version_indicator}};
-
-
-drop table if exists `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`;
-create table `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`
-(
-  `patent_id` varchar(20) not null,
-  `num_foreign_documents_cited` int unsigned not null,
-  primary key (`patent_id`)
-)
-engine=InnoDB;
-
-
-# The number of foreign documents cited.
-# 2,751,072 @ 1:52
-insert into `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`
-  (`patent_id`, `num_foreign_documents_cited`)
-select
-  `patent_id`, count(*)
-from
-  `{{params.raw_database}}`.`foreigncitation`  where version_indicator<={{params.version_indicator}}
-group by
-  `patent_id`;
-
-
-drop table if exists `{{params.reporting_database}}`.`temp_num_us_applications_cited`;
-create table `{{params.reporting_database}}`.`temp_num_us_applications_cited`
-(
-  `patent_id` varchar(20) not null,
-  `num_us_applications_cited` int unsigned not null,
-  primary key (`patent_id`)
-)
-engine=InnoDB;
-
-
-# The number of U.S. patent applications cited.
-# 1,534,484 @ 0:21
-insert into `{{params.reporting_database}}`.`temp_num_us_applications_cited`
-  (`patent_id`, `num_us_applications_cited`)
-select
-  `patent_id`, count(*)
-from
-  `{{params.raw_database}}`.`usapplicationcitation`  where version_indicator<={{params.version_indicator}}
-group by
-  `patent_id`;
-
-
-drop table if exists `{{params.reporting_database}}`.`temp_num_us_patents_cited`;
-create table `{{params.reporting_database}}`.`temp_num_us_patents_cited`
-(
-  `patent_id` varchar(20) not null,
-  `num_us_patents_cited` int unsigned not null,
-  primary key (`patent_id`)
-)
-engine=InnoDB;
-
-
-# The number of U.S. patents cited.
-# 5,231,893 @ 7:17
-insert into `{{params.reporting_database}}`.`temp_num_us_patents_cited`
-  (`patent_id`, `num_us_patents_cited`)
-select
-  `patent_id`, count(*)
-from
-  `{{params.raw_database}}`.`uspatentcitation`  where version_indicator<={{params.version_indicator}}
-group by
-  `patent_id`;
-
-
-drop table if exists `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents`;
-create table `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents`
-(
-  `patent_id` varchar(20) not null,
-  `num_times_cited_by_us_patents` int unsigned not null,
-  primary key (`patent_id`)
-)
-engine=InnoDB;
-
-
-# The number of times a U.S. patent was cited.
-# 6,333,277 @ 7:27
-insert into `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents`
-  (`patent_id`, `num_times_cited_by_us_patents`)
-select
-  `citation_id`, count(*)
-from
-  `{{params.raw_database}}`.`uspatentcitation`
-where
-  `citation_id` is not null and `citation_id` != ''  and version_indicator<={{params.version_indicator}}
-group by
-  `citation_id`;
-
-
-drop table if exists `{{params.reporting_database}}`.`temp_patent_aggregations`;
-create table `{{params.reporting_database}}`.`temp_patent_aggregations`
-(
-  `patent_id` varchar(20) not null,
-  `num_foreign_documents_cited` int unsigned not null,
-  `num_us_applications_cited` int unsigned not null,
-  `num_us_patents_cited` int unsigned not null,
-  `num_total_documents_cited` int unsigned not null,
-  `num_times_cited_by_us_patents` int unsigned not null,
-  primary key (`patent_id`)
-)
-engine=InnoDB;
-
-
-# Combine all of our patent aggregations.
-# 5,425,879 @ 2:14
-insert into `{{params.reporting_database}}`.`temp_patent_aggregations`
-(
-  `patent_id`, `num_foreign_documents_cited`, `num_us_applications_cited`,
-  `num_us_patents_cited`, `num_total_documents_cited`, `num_times_cited_by_us_patents`
-)
-select
-  p.`id`,
-  ifnull(t1.num_foreign_documents_cited, 0),
-  ifnull(t2.num_us_applications_cited, 0),
-  ifnull(t3.num_us_patents_cited, 0),
-  ifnull(t1.num_foreign_documents_cited, 0) + ifnull(t2.num_us_applications_cited, 0) + ifnull(t3.num_us_patents_cited, 0),
-  ifnull(t4.num_times_cited_by_us_patents, 0)
-from
-  `{{params.raw_database}}`.`patent` p
-  left outer join `{{params.reporting_database}}`.`temp_num_foreign_documents_cited` t1 on t1.`patent_id` = p.`id`
-  left outer join `{{params.reporting_database}}`.`temp_num_us_applications_cited` t2 on t2.`patent_id` = p.`id`
-  left outer join `{{params.reporting_database}}`.`temp_num_us_patents_cited` t3 on t3.`patent_id` = p.`id`
-  left outer join `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents` t4 on t4.`patent_id` = p.`id`  where version_indicator<={{params.version_indicator}};
-
-
-drop table if exists `{{params.reporting_database}}`.`temp_patent_earliest_application_date`;
-create table `{{params.reporting_database}}`.`temp_patent_earliest_application_date`
-(
-  `patent_id` varchar(20) not null,
-  `earliest_application_date` date not null,
-  primary key (`patent_id`)
-)
-engine=InnoDB;
+--
+-- drop table if exists `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`;
+-- create table `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
+-- (
+--   `patent_id` varchar(20) not null,
+--   `assignee_id` int unsigned null,
+--   `persistent_assignee_id` varchar(64) null,
+--   `location_id` int unsigned null,
+--   `persistent_location_id` varchar(128) null,
+--   `city` varchar(256) null,
+--   `state` varchar(20) null,
+--   `country` varchar(10) null,
+--   `latitude` float null,
+--   `longitude` float null,
+--   primary key (`patent_id`)
+-- )
+-- engine=InnoDB;
+--
+--
+-- # 4,694,651 @ 2:22
+-- insert into `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
+-- (
+--   `patent_id`, `assignee_id`, `persistent_assignee_id`, `location_id`,
+--   `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`
+-- )
+-- select
+--   p.`id`,
+--   ta.`new_assignee_id`,
+--   ta.`old_assignee_id`,
+--   tl.`new_location_id`,
+--   tl.`old_location_id_transformed`,
+--   nullif(l.`city`, ''),
+--   nullif(l.`state`, ''),
+--   nullif(l.`country`, ''),
+--   l.`latitude`,
+--   l.`longitude`
+-- from
+--   `{{params.raw_database}}`.`patent` p
+--   left outer join `{{params.raw_database}}`.`rawassignee` ra on ra.`patent_id` = p.`id` and ra.`sequence` = 0
+--   left outer join `{{params.reporting_database}}`.`temp_id_mapping_assignee` ta on ta.`old_assignee_id` = ra.`assignee_id`
+--   left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
+--   left outer join `{{params.raw_database}}`.`location` l on l.`id` = rl.`location_id`
+--   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on l.`id` =  tl.`old_location_id`
+-- where
+--   (ta.`new_assignee_id` is not null or
+--   tl.`new_location_id` is not null) and  p.version_indicator<={{params.version_indicator}};
+--
+--
+-- drop table if exists `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`;
+-- create table `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
+-- (
+--   `patent_id` varchar(20) not null,
+--   `inventor_id` int unsigned null,
+--   `persistent_inventor_id` varchar(256) null,
+--   `location_id` int unsigned null,
+--   `persistent_location_id` varchar(128) null,
+--   `city` varchar(256) null,
+--   `state` varchar(20) null,
+--   `country` varchar(10) null,
+--   `latitude` float null,
+--   `longitude` float null,
+--   primary key (`patent_id`)
+-- )
+-- engine=InnoDB;
+--
+--
+-- # 5,425,008 @ 6:03
+-- insert into `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
+-- (
+--   `patent_id`, `inventor_id`, `persistent_inventor_id`, `location_id`,
+--   `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`
+-- )
+-- select
+--   p.`id`,
+--   ti.`new_inventor_id`,
+--   ti.`old_inventor_id`,
+--   tli.`new_location_id`,
+--   tli.`old_location_id_transformed`,
+--   nullif(l.`city`, ''),
+--   nullif(l.`state`, ''),
+--   nullif(l.`country`, ''),
+--   l.`latitude`,
+--   l.`longitude`
+-- from
+--   `{{params.raw_database}}`.`patent` p
+--   left outer join `{{params.raw_database}}`.`rawinventor` ri on ri.`patent_id` = p.`id` and ri.`sequence` = 0
+--   left outer join `{{params.reporting_database}}`.`temp_id_mapping_inventor` ti on ti.`old_inventor_id` = ri.`inventor_id`
+--   left outer join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
+--   left outer join `{{params.raw_database}}`.`location` l on l.`id` = rl.`location_id`
+--   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
+-- where
+--   (ti.`new_inventor_id` is not null or
+--   tli.`new_location_id` is not null)and  p.version_indicator<={{params.version_indicator}};
+--
+--
+-- drop table if exists `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`;
+-- create table `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`
+-- (
+--   `patent_id` varchar(20) not null,
+--   `num_foreign_documents_cited` int unsigned not null,
+--   primary key (`patent_id`)
+-- )
+-- engine=InnoDB;
+--
+--
+-- # The number of foreign documents cited.
+-- # 2,751,072 @ 1:52
+-- insert into `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`
+--   (`patent_id`, `num_foreign_documents_cited`)
+-- select
+--   `patent_id`, count(*)
+-- from
+--   `{{params.raw_database}}`.`foreigncitation`  where version_indicator<={{params.version_indicator}}
+-- group by
+--   `patent_id`;
+--
+--
+-- drop table if exists `{{params.reporting_database}}`.`temp_num_us_applications_cited`;
+-- create table `{{params.reporting_database}}`.`temp_num_us_applications_cited`
+-- (
+--   `patent_id` varchar(20) not null,
+--   `num_us_applications_cited` int unsigned not null,
+--   primary key (`patent_id`)
+-- )
+-- engine=InnoDB;
+--
+--
+-- # The number of U.S. patent applications cited.
+-- # 1,534,484 @ 0:21
+-- insert into `{{params.reporting_database}}`.`temp_num_us_applications_cited`
+--   (`patent_id`, `num_us_applications_cited`)
+-- select
+--   `patent_id`, count(*)
+-- from
+--   `{{params.raw_database}}`.`usapplicationcitation`  where version_indicator<={{params.version_indicator}}
+-- group by
+--   `patent_id`;
+--
+--
+-- drop table if exists `{{params.reporting_database}}`.`temp_num_us_patents_cited`;
+-- create table `{{params.reporting_database}}`.`temp_num_us_patents_cited`
+-- (
+--   `patent_id` varchar(20) not null,
+--   `num_us_patents_cited` int unsigned not null,
+--   primary key (`patent_id`)
+-- )
+-- engine=InnoDB;
+--
+--
+-- # The number of U.S. patents cited.
+-- # 5,231,893 @ 7:17
+-- insert into `{{params.reporting_database}}`.`temp_num_us_patents_cited`
+--   (`patent_id`, `num_us_patents_cited`)
+-- select
+--   `patent_id`, count(*)
+-- from
+--   `{{params.raw_database}}`.`uspatentcitation`  where version_indicator<={{params.version_indicator}}
+-- group by
+--   `patent_id`;
+--
+--
+-- drop table if exists `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents`;
+-- create table `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents`
+-- (
+--   `patent_id` varchar(20) not null,
+--   `num_times_cited_by_us_patents` int unsigned not null,
+--   primary key (`patent_id`)
+-- )
+-- engine=InnoDB;
+--
+--
+-- # The number of times a U.S. patent was cited.
+-- # 6,333,277 @ 7:27
+-- insert into `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents`
+--   (`patent_id`, `num_times_cited_by_us_patents`)
+-- select
+--   `citation_id`, count(*)
+-- from
+--   `{{params.raw_database}}`.`uspatentcitation`
+-- where
+--   `citation_id` is not null and `citation_id` != ''  and version_indicator<={{params.version_indicator}}
+-- group by
+--   `citation_id`;
+--
+--
+-- drop table if exists `{{params.reporting_database}}`.`temp_patent_aggregations`;
+-- create table `{{params.reporting_database}}`.`temp_patent_aggregations`
+-- (
+--   `patent_id` varchar(20) not null,
+--   `num_foreign_documents_cited` int unsigned not null,
+--   `num_us_applications_cited` int unsigned not null,
+--   `num_us_patents_cited` int unsigned not null,
+--   `num_total_documents_cited` int unsigned not null,
+--   `num_times_cited_by_us_patents` int unsigned not null,
+--   primary key (`patent_id`)
+-- )
+-- engine=InnoDB;
+--
+--
+-- # Combine all of our patent aggregations.
+-- # 5,425,879 @ 2:14
+-- insert into `{{params.reporting_database}}`.`temp_patent_aggregations`
+-- (
+--   `patent_id`, `num_foreign_documents_cited`, `num_us_applications_cited`,
+--   `num_us_patents_cited`, `num_total_documents_cited`, `num_times_cited_by_us_patents`
+-- )
+-- select
+--   p.`id`,
+--   ifnull(t1.num_foreign_documents_cited, 0),
+--   ifnull(t2.num_us_applications_cited, 0),
+--   ifnull(t3.num_us_patents_cited, 0),
+--   ifnull(t1.num_foreign_documents_cited, 0) + ifnull(t2.num_us_applications_cited, 0) + ifnull(t3.num_us_patents_cited, 0),
+--   ifnull(t4.num_times_cited_by_us_patents, 0)
+-- from
+--   `{{params.raw_database}}`.`patent` p
+--   left outer join `{{params.reporting_database}}`.`temp_num_foreign_documents_cited` t1 on t1.`patent_id` = p.`id`
+--   left outer join `{{params.reporting_database}}`.`temp_num_us_applications_cited` t2 on t2.`patent_id` = p.`id`
+--   left outer join `{{params.reporting_database}}`.`temp_num_us_patents_cited` t3 on t3.`patent_id` = p.`id`
+--   left outer join `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents` t4 on t4.`patent_id` = p.`id`  where version_indicator<={{params.version_indicator}};
+--
+--
+-- drop table if exists `{{params.reporting_database}}`.`temp_patent_earliest_application_date`;
+-- create table `{{params.reporting_database}}`.`temp_patent_earliest_application_date`
+-- (
+--   `patent_id` varchar(20) not null,
+--   `earliest_application_date` date not null,
+--   primary key (`patent_id`)
+-- )
+-- engine=InnoDB;
 
 
 # Find the earliest application date for each patent.
@@ -244,7 +244,7 @@ select
 from
   `{{params.raw_database}}`.`application` a
 where
-  a.`date` is not null and a.`date` > date('1899-12-31') and a.`date` < date_add(current_date, interval 10 year)  and version_indicator<='{{params.version_indicator}}'
+  a.`date` is not null and a.`date` > date('1899-12-31') and a.`date` < date_add(current_date, interval 10 year)  and version_indicator<={{params.version_indicator}}
 group by
   a.`patent_id`;
 
