@@ -154,7 +154,7 @@ def process_and_upload_wipo(**kwargs):
         wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
         offset = offset + limit
         end = time.time()
-        perc_complete = batch/num_batches
+        perc_complete = (batch+1)/num_batches
         chunk_time = str(round(end - start))
         print(f"We are on batch: {batch} of {num_batches}, or {perc_complete} complete which took {chunk_time} seconds")
         print(f"For {batch}: {offset}, with {cpc_join_query}, the count is {cpc_current_data.shape[0]}")
