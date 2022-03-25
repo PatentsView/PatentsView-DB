@@ -117,8 +117,8 @@ def consolidate_wipo(config):
     rename table {upload_db}.wipo to {raw_db}.wipo
     """.format(raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"],
                upload_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
-    # print(rename_raw_statement)
-    # engine.execute(rename_raw_statement)
+    print(rename_raw_statement)
+    engine.execute(rename_raw_statement)
     print(rename_upload_statement)
     engine.execute(rename_upload_statement)
 
@@ -139,9 +139,9 @@ def process_and_upload_wipo(**kwargs):
 
     cpc_ipc_concordance_map = get_ipc_cpc_ipc_concordance_map(concordance_file)
 
-    limit = 10000
+    limit = 30000
     offset = 0
-    patent_batches_query = f"select round((count(*)/{limit}),0) from patent"
+    patent_batches_query = f"select round((count(*)/{limit}),0) from patent where version_indicator <= '{version_indicator}'"
     patent_batches = pd.read_sql_query(con=myengine, sql=patent_batches_query)
     num_batches = int(patent_batches.iloc[:,0][0])
     base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
@@ -151,13 +151,15 @@ def process_and_upload_wipo(**kwargs):
         base_query = base_query_template.format(limit=limit, offset=offset, vind=version_indicator)
         cpc_join_query = cpc_query_template.format(base_query=base_query)
         cpc_current_data = pd.read_sql_query(con=myengine, sql=cpc_join_query)
-        wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
+        print(f"For {batch}: {offset}, with {cpc_join_query}, the count is {cpc_current_data.shape[0]}")
         offset = offset + limit
+        if cpc_current_data.shape[0] < 1:
+            continue
+        wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
         end = time.time()
         perc_complete = (batch+1)/num_batches
         chunk_time = str(round(end - start))
         print(f"We are on batch: {batch} of {num_batches}, or {perc_complete} complete which took {chunk_time} seconds")
-        print(f"For {batch}: {offset}, with {cpc_join_query}, the count is {cpc_current_data.shape[0]}")
     consolidate_wipo(config)
 
 
