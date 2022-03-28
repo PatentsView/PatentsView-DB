@@ -12,6 +12,9 @@ class MergeTestWeekly(DatabaseTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, config['PATENTSVIEW_DATABASES']["PROD_DB"], datetime.date(year=1976, month=1, day=1), end_date)
 
+    def init_qa_dict(self):
+        return super().init_qa_dict()
+
     def runTests(self):
         # self.test_merge_status()
         skiplist = ['patent']
