@@ -17,6 +17,7 @@ class MergeTestWeekly(DatabaseTester):
 
     def runTests(self):
         # self.test_merge_status()
+        self.init_qa_dict()
         skiplist = ['patent']
         for table in self.table_config:
             # if table[:2] >= 'pu':
