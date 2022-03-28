@@ -13,7 +13,7 @@ class MergeTestWeekly(DatabaseTester):
         super().__init__(config, config['PATENTSVIEW_DATABASES']["PROD_DB"], datetime.date(year=1976, month=1, day=1), end_date)
 
     def init_qa_dict(self):
-        return super().init_qa_dict()
+        super().init_qa_dict()
 
     def runTests(self):
         # self.test_merge_status()
