@@ -3,7 +3,7 @@ import json
 import os
 
 from QA.DatabaseTester import DatabaseTester
-from lib.configuration import get_current_config
+from lib.configuration import get_current_config, get_merge_table_candidates
 
 
 class MergeTestWeekly(DatabaseTester):
@@ -18,8 +18,9 @@ class MergeTestWeekly(DatabaseTester):
     def runTests(self):
         # self.test_merge_status()
         self.init_qa_dict()
+        mergetables = get_merge_table_candidates(self.config).keys()
         skiplist = ['patent']
-        for table in self.table_config:
+        for table in mergetables:
             # if table[:2] >= 'pu':
             print(f"Beginning Test for {table} in {self.database_section}")
             if table in skiplist:
