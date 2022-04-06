@@ -730,6 +730,9 @@ def queue_parsers(config, type='granted_patent'):
                 parsing_config_file = config['XML_PARSING']['default_pgp_parsing_config']
         parsing_config_file = '/'.join((config['FOLDERS']['json_folder'], parsing_config_file))
         parsing_config = json.load(open(parsing_config_file))
+        # implement table toggle here
+        # tabletoggle = json.load(open('resources/TableToggle.json'))
+        # parsing_config = { table : parsing_config[table] for table in parsing_config if tabletoggle[table]}
         dtd_file = '/'.join((config['FOLDERS']['dtd_folder'], dtd_file))
         log_queue.put({
                 "level":   logging.INFO,

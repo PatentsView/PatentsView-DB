@@ -1,0 +1,30 @@
+{
+    "granted_patent": {
+        "patent":                true,
+        "rawassignee":           true,
+        "rawinventor":           true
+
+    },
+    "pgpubs": {
+        "application" :          true,
+        "brf_sum_text" :         true,
+        "claim" :                true,
+        "detail_desc_text" :     true,
+        "draw_desc_text" :       true,
+        "foreign_priority" :     true,
+        "further_cpc" :          true,
+        "government_interest":   true,
+        "ipcr" :                 true,
+        "main_cpc" :             true,
+        "pct_data" :             true,
+        "publication" :          true,
+        "rawassignee" :          true,
+        "rawinventor" :          true,
+        "rawuspc" :              true,
+        "rel_app_text" :         true,
+        "us_parties" :           true,
+        "usreldoc_parent_child": true,
+        "usreldoc_related" :     true,
+        "usreldoc_single" :      true
+    }
+}
