@@ -29,7 +29,8 @@ class MergeTestWeekly(DatabaseTester):
             self.load_nulls(table, self.table_config[table])
             for field in self.table_config[table]["fields"]:
                 print(f"\tBeginning tests for {field} in {table}")
-                self.test_null_byte(table, field)
+                if (field != 'uuid') and (self.table_config[table]['fields'][field]['data_type'] in ['varchar', 'text', 'mediumtext', 'longtext']):
+                    self.test_null_byte(table, field)
                 if "date_field" in self.table_config[table]["fields"][field] and \
                         self.table_config[table]["fields"][field]["date_field"]:
                     self.test_zero_dates(table, field)
