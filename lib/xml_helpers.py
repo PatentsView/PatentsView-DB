@@ -1,6 +1,7 @@
 from lxml import etree
 from collections import defaultdict
 import re
+from lib.utilities import id_generator
 
 #####################################
 ### Main Data Processing Functions
@@ -241,6 +242,110 @@ def get_citations(patent):
         return patent_cite_list, non_patent_cite_list
     else:
         return [None, None]
+
+def process_citations(patent_citations, nonpatent_citations, citing_docnum):
+    uspatseq = 0
+    appseq = 0
+    forpatseq = 0
+    otherseq = 0
+    results = {}
+
+    if patent_citations is not None:
+        # citation list can only be empty for plant patents?
+        for citation in patent_citations:
+            cited_doc_num = citation['doc-number']
+
+            is_app = True  # indicator for whether something being cited is a patent application
+
+            if cited_doc_num:
+                # basically if there is anything other than number and digits its an application
+                if re.match(r'^[A-Z]*\.?\s?\d+$', cited_doc_num):
+                    num = re.findall('\d+', cited_doc_num)
+                    num = num[0]  # turns it from list to string
+                    if num[0] == '0':  # drop leading zeros
+                        num = num[1:]
+                    let = re.findall('[a-zA-Z]+', cited_doc_num)
+                    if let:
+                        let = let[0]  # list to string
+                        cited_doc_num = let + num
+                    else:
+                        cited_doc_num = num
+                    is_app = False
+
+            if citation['country'] == "US":
+                if cited_doc_num and not is_app:  # citations without document numbers are otherreferences
+                    cited_doc_num = process_patent_numbers(cited_doc_num)
+                    results['uspatentcitation'].append(
+                            [id_generator(), citing_docnum, cited_doc_num, citation['date'],
+                                citation['name'],
+                                citation['kind'], citation['country'],
+                                citation['category'], str(uspatseq)])
+                    uspatseq += 1
+                if cited_doc_num and is_app:
+                    cit_app_id_transformed = cited_doc_num[:5] + cited_doc_num[:4] + cited_doc_num[5:]
+                    cit_app_number_transformed = cited_doc_num.replace('/', '')
+                    results['usapplicationcitation'].append(
+                            [id_generator(), citing_docnum, cited_doc_num, citation['date'],
+                                citation['name'],
+                                citation['kind'], cited_doc_num, citation['country'], citation['category'],
+                                str(appseq), cit_app_id_transformed, cit_app_number_transformed])
+                    appseq += 1
+            elif cited_doc_num:
+                results['foreigncitation'].append(
+                        [id_generator(), citing_docnum, citation['date'], cited_doc_num,
+                            citation['country'], citation['category'], str(forpatseq)])
+                forpatseq += 1
+    if nonpatent_citations is not None:
+        for citation in nonpatent_citations:
+            results['otherreference'].append(
+                    [id_generator(), citing_docnum, citation['text'].replace("\\", "/"), str(otherseq)])
+            otherseq += 1
+
+    return (results)
+
+v1_cit_type = {'cited-patent-literature': 'patcit', 'cited-non-patent-literature': 'nplcit'}
+
+def v1_get_citations(patent):
+    '''
+    :params patent: the xml object representing a patent
+    :returns a list of default dictionary with code for each citation
+    '''
+    patent_cite_list = []
+    non_patent_cite_list= []
+    citations = patent.findall(".//citation")
+    if citations != []:
+        for citation in citations:
+            cite_data = defaultdict(lambda : None)
+            for element in citation:
+                if element.tag == 'category':
+                    cite_data['category'] = element.text
+                elif element.tag =='classification-cpc-text':
+                    pass
+                else:
+                    if element.tag in ['cited-patent-literature', 'cited-non-patent-literature']:
+                        cite_data['type'] == v1_cit_type[element.tag]
+                    if element.tag=='cited-non-patent-literature':
+                        cite_data['text']= []
+                        for sub_element in element:
+                            cite_data['text'].append(sub_element.text)
+                            for sub_sub_element in sub_element:
+                                cite_data['text'].extend([sub_sub_element.text, sub_sub_element.tail])
+                        cite_data['text'] = " ".join([item for item in cite_data['text'] if item is not None])
+                        non_patent_cite_list.append(cite_data)
+                    elif element.tag in ['classification-us', 'classification-ipc']:
+                        pass
+                    else:
+                        doc_info = element.find('document-id')
+                        for sub_element in doc_info:
+                            cite_data[sub_element.tag] = sub_element.text
+                        for key in cite_data.keys():
+                            if 'date' in key:
+                                cite_data[key] = process_date(cite_data[key])
+                        patent_cite_list.append(cite_data)
+        return patent_cite_list, non_patent_cite_list
+    else:
+        return [None, None]
+
 
 #####################################
 ### Data Processing Helper Functions

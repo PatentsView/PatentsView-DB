@@ -8,7 +8,9 @@
     "pgpubs": {
         "application" :          true,
         "brf_sum_text" :         true,
+        "botanic" :              true,
         "claim" :                true,
+        "citation":              true,
         "detail_desc_text" :     true,
         "draw_desc_text" :       true,
         "foreign_priority" :     true,

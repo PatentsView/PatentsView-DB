@@ -272,6 +272,48 @@
       "filename": "inventors.tsv"
     },
     {
+      "table_name": "botanic",
+      "table_prefix": "botanic",
+      "friendly_name": "Botanic",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "latin_name",
+          "friendly_name": "Latin Name",
+          "xml_path": "us-bibliographic-data-application/us-botanic/latin-name",
+          "description": null,
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "variety",
+          "friendly_name": "Variety",
+          "xml_path": "us-bibliographic-data-application/us-botanic/vairety",
+          "description": null,
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "botanic.tsv"
+    },
+    {
+      "table_name": "citation",
+      "table_prefix": "citation",
+      "friendly_name": "Citation",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/us-references-cited/us-citation",
+      "fields":[
+        {
+        }
+      ]
+    },
+    {
       "table_name": "foreign_priority",
       "friendly_name": "Foreign Priority",
       "multi_valued": true,

@@ -18,6 +18,7 @@ from sqlalchemy.dialects import mysql
 from lib.configuration import get_current_config
 from lib.utilities import download_xml_files
 from lib.utilities import log_writer
+from lib.xml_helpers import get_citations, v1_get_citations, process_citations
 
 newline_tags = ["p", "heading", "br"]
 
@@ -307,22 +308,31 @@ def process_publication_document(patent_app_document, patent_config):
         # Initialize return list and table name
         table_rows = []
         table_name = table['table_name']
-        # If this table has only one value per field extract its data and add to the list
-        if table['multi_valued'] == False:
-            table_rows.append(
-                    extract_table_data(table, patent_app_document, document_number, 0,
-                                       patent_config['foreign_key_config']))
-        # If this table can have multiple values (i.e. multiple inventors per document) loop through these elements to get the data
+        if table_name == 'citation':
+            if ('country' in patent_app_document.attrib) : #added as required attribute of top-level tag in 2005
+                patcitdata, nplcitdata = get_citations(patent_app_document)
+            else:   # v1.x have only 'version' and 'distribution' as attributes, frequently omitted.
+                patcitdata, nplcitdata = v1_get_citations(patent_app_document)
+            citations = process_citations(patcitdata, nplcitdata, document_number)
+            for cittab in citations:
+                yield cittab, citations[cittab]
         else:
-            # This is the start of the path from which the multiple values will exists
-            # i.e. /inventors can contain multiple /inventor tags within it
-            entity_root_path = table['entity_root_path']
-            sequence = 1
-            # extract all data necessary
-            for entity_element in patent_app_document.findall(entity_root_path):
-                table_rows.append(extract_table_data(table, entity_element, document_number, sequence,
-                                                     patent_config['foreign_key_config']))
-                sequence += 1
+            # If this table has only one value per field extract its data and add to the list
+            if table['multi_valued'] == False:
+                table_rows.append(
+                        extract_table_data(table, patent_app_document, document_number, 0,
+                                        patent_config['foreign_key_config']))
+            # If this table can have multiple values (i.e. multiple inventors per document) loop through these elements to get the data
+            else:
+                # This is the start of the path from which the multiple values will exists
+                # i.e. /inventors can contain multiple /inventor tags within it
+                entity_root_path = table['entity_root_path']
+                sequence = 1
+                # extract all data necessary
+                for entity_element in patent_app_document.findall(entity_root_path):
+                    table_rows.append(extract_table_data(table, entity_element, document_number, sequence,
+                                                        patent_config['foreign_key_config']))
+                    sequence += 1
         yield table_name, table_rows
 
 json_to_sql = {
@@ -395,7 +405,7 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     foreign_key_config = table_xml_map['foreign_key_config']
     sql_start = time.time()
     #database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
-    database = 'pgpubs_2001_2004' # temporary switch
+    database = 'pgpubs_table_gaps' # temporary switch
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -730,9 +740,8 @@ def queue_parsers(config, type='granted_patent'):
                 parsing_config_file = config['XML_PARSING']['default_pgp_parsing_config']
         parsing_config_file = '/'.join((config['FOLDERS']['json_folder'], parsing_config_file))
         parsing_config = json.load(open(parsing_config_file))
-        # implement table toggle here
-        # tabletoggle = json.load(open('resources/TableToggle.json'))
-        # parsing_config = { table : parsing_config[table] for table in parsing_config if tabletoggle[table]}
+        tabletoggle = json.load(open(config['XML_PARSING']['table_toggle']))
+        parsing_config = { table : parsing_config[table] for table in parsing_config if tabletoggle[table]}
         dtd_file = '/'.join((config['FOLDERS']['dtd_folder'], dtd_file))
         log_queue.put({
                 "level":   logging.INFO,
