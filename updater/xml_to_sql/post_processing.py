@@ -278,7 +278,7 @@ where id in (select id from temp_rawassignee_org_fixes_nf)
 create table temp_rawassignee_org_fixes_nl (
 SELECT * 
 FROM rawassignee 
-	where name_first is null and name_last is not null and name_last REGEXP 'inc|corporation|ltd|technologies|limited|corp'
+	where name_first is null and name_last is not null and name_last REGEXP 'inc|corporation|ltd|technologies|limited|corp|llc|co.'
 )
         """)
     engine.execute(
@@ -297,21 +297,21 @@ where id in (select id from temp_rawassignee_org_fixes_nl);
 
 def begin_post_processing(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
-    # utilities.trim_whitespace(config)
-    # trim_rawassignee(config)
+    utilities.trim_whitespace(config)
+    trim_rawassignee(config)
     fix_rawassignee_wrong_org(config)
-    # consolidate_rawlocation(config)
-    # create_country_transformed(config)
-    # consolidate_cpc(config)
-    # detail_desc_length(config)
-    # consolidate_uspc(config)
-    # pct_data_doc_type(config)
-    # consolidate_claim(config)
-    # consolidate_usreldoc(config)
-    # yearly_claim(config)
-    # yearly_brf_sum_text(config)
-    # yearly_draw_desc_text(config)
-    # yearly_detail_desc_text(config)
+    consolidate_rawlocation(config)
+    create_country_transformed(config)
+    consolidate_cpc(config)
+    detail_desc_length(config)
+    consolidate_uspc(config)
+    pct_data_doc_type(config)
+    consolidate_claim(config)
+    consolidate_usreldoc(config)
+    yearly_claim(config)
+    yearly_brf_sum_text(config)
+    yearly_draw_desc_text(config)
+    yearly_detail_desc_text(config)
 
 
 def post_upload_database(**kwargs):
