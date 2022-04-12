@@ -23,18 +23,21 @@ from lib.xml_helpers import get_citations, v1_get_citations, process_citations
 newline_tags = ["p", "heading", "br"]
 
 
-def generate_headers(xml_map):
+def generate_headers(xml_map, tabletoggle):
     """
     Generate column names for each dataframe corresponding to each target table
     :param xml_map: Json Table map containing parsing configuration
     :return: dictionary of lists containing header data for each table in the DB
     """
     headers_list = {}
+
     # Loop through the each table in the mapping configuration
     for table in xml_map["table_xml_map"]:
+        table_name = table['table_name']
+        if not tabletoggle[table_name] :
+            continue
         # Create list of column name for each table
         field_list = []
-        table_name = table['table_name']
 
         # Add all field_names to the list
         for fields in table['fields']:
@@ -520,7 +523,12 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
             })
     xml_file_start = time.time()
     # Generate the list of headers and use them to create dataframes for each table
-    header_list = generate_headers(table_xml_map)
+    tabletoggle = json.load(open(config['XML_PARSING']['table_toggle']))
+    if config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'][:6] == 'pgpubs':
+        tabletoggle = tabletoggle['pgpubs']
+    else: 
+        tabletoggle = tabletoggle['granted_patent']
+    header_list = generate_headers(table_xml_map, tabletoggle)
     dfs = generate_dfs(header_list)
     # Set the dtd
     dtd = etree.DTD(open(dtd_file))
@@ -740,8 +748,6 @@ def queue_parsers(config, type='granted_patent'):
                 parsing_config_file = config['XML_PARSING']['default_pgp_parsing_config']
         parsing_config_file = '/'.join((config['FOLDERS']['json_folder'], parsing_config_file))
         parsing_config = json.load(open(parsing_config_file))
-        tabletoggle = json.load(open(config['XML_PARSING']['table_toggle']))
-        parsing_config = { table : parsing_config[table] for table in parsing_config if tabletoggle[table]}
         dtd_file = '/'.join((config['FOLDERS']['dtd_folder'], dtd_file))
         log_queue.put({
                 "level":   logging.INFO,
