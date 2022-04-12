@@ -23,7 +23,7 @@ from lib.xml_helpers import get_citations, v1_get_citations, process_citations
 newline_tags = ["p", "heading", "br"]
 
 
-def generate_headers(xml_map, tabletoggle):
+def generate_headers(xml_map):
     """
     Generate column names for each dataframe corresponding to each target table
     :param xml_map: Json Table map containing parsing configuration
@@ -33,11 +33,9 @@ def generate_headers(xml_map, tabletoggle):
 
     # Loop through the each table in the mapping configuration
     for table in xml_map["table_xml_map"]:
-        table_name = table['table_name']
-        if not tabletoggle[table_name] :
-            continue
         # Create list of column name for each table
         field_list = []
+        table_name = table['table_name']
 
         # Add all field_names to the list
         for fields in table['fields']:
@@ -50,6 +48,19 @@ def generate_headers(xml_map, tabletoggle):
         headers_list[table_name] = field_list
     return headers_list
 
+def toggle_tables(xml_map, tabletoggle):
+    """
+    Filter xml map to include only tables turned on in the table toggle json file
+    :param xml_map: Json Table map containing parsing configuration
+    :param tabletoggle: Json Table mapping each table in xml_map to True(on) or False(off)
+    :return: Json Table map with "table_xml_map" containing only the ON tables.
+    """
+    ontables = []
+    for table in xml_map["table_xml_map"]:
+        if tabletoggle[table['table_name']]:
+            ontables.append(table)
+    xml_map['table_xml_map'] = ontables
+    return xml_map
 
 def generate_dfs(headers):
     """
@@ -493,8 +504,10 @@ def extract_document(xml_file):
                 current_xml = "".join(current_document_lines)
                 yield current_xml
                 current_document_lines = []
-            current_document_lines.append(line.split(xml_marker)[-1])
-            #current_document_lines.append(line)
+                current_document_lines.append(xml_marker)
+                current_document_lines.append(line.split(xml_marker)[-1])
+            else:
+                current_document_lines.append(line)
         current_xml = "".join(current_document_lines)
         yield current_xml
 
@@ -528,7 +541,8 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
         tabletoggle = tabletoggle['pgpubs']
     else: 
         tabletoggle = tabletoggle['granted_patent']
-    header_list = generate_headers(table_xml_map, tabletoggle)
+    table_xml_map = toggle_tables(table_xml_map, tabletoggle)
+    header_list = generate_headers(table_xml_map)
     dfs = generate_dfs(header_list)
     # Set the dtd
     dtd = etree.DTD(open(dtd_file))
