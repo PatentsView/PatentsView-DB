@@ -30,8 +30,12 @@ def with_keys(d, keys):
 def class_db_specific_config(self, table_config, class_called):
     keep_tables = []
     for i in table_config.keys():
-        if class_called in table_config[i]['TestScripts']:
-            keep_tables.append(i)
+        if class_called == 'DatabaseTester':
+            if "UploadTest" in table_config[i]['TestScripts']:
+                keep_tables.append(i)
+        else:
+            if class_called in table_config[i]['TestScripts']:
+                keep_tables.append(i)
     self.table_config = with_keys(table_config, keep_tables)
     if class_called[:4] == 'Text':
         pass

@@ -246,23 +246,72 @@ def trim_rawassignee(config):
         (name_last IS NULL) AND
         (organization IS NULL);""")
 
+def fix_rawassignee_wrong_org(config):
+    cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
+    print(cstr)
+    engine = create_engine(cstr)
+    print("Fixing Wrong Organization Landing")
+    # First Name contains Organization
+    engine.execute(
+        """
+create table temp_rawassignee_org_fixes_nf (
+SELECT * 
+FROM rawassignee 
+	where name_first is not null and name_last is null
+)        
+        """)
+    engine.execute(
+        """
+update rawassignee 
+set organization=name_first, type = 2
+where organization is null and id in (select id from temp_rawassignee_org_fixes_nf);     
+        """)
+    engine.execute(
+        """
+update rawassignee 
+set name_first = null
+where id in (select id from temp_rawassignee_org_fixes_nf)  
+        """)
+    # Last Name contains Organization
+    engine.execute(
+        """
+create table temp_rawassignee_org_fixes_nl (
+SELECT * 
+FROM rawassignee 
+	where name_first is null and name_last is not null and name_last REGEXP 'inc|corporation|ltd|technologies|limited|corp'
+)
+        """)
+    engine.execute(
+        """
+update rawassignee 
+set organization=name_last, type = 2
+where organization is null and id in (select id from temp_rawassignee_org_fixes_nl);
+        """)
+    engine.execute(
+        """
+update rawassignee 
+set name_last = null
+where id in (select id from temp_rawassignee_org_fixes_nl);
+        """)
+
 
 def begin_post_processing(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
-    utilities.trim_whitespace(config)
-    trim_rawassignee(config)
-    consolidate_rawlocation(config)
-    create_country_transformed(config)
-    consolidate_cpc(config)
-    detail_desc_length(config)
-    consolidate_uspc(config)
-    pct_data_doc_type(config)
-    consolidate_claim(config)
-    consolidate_usreldoc(config)
-    yearly_claim(config)
-    yearly_brf_sum_text(config)
-    yearly_draw_desc_text(config)
-    yearly_detail_desc_text(config)
+    # utilities.trim_whitespace(config)
+    # trim_rawassignee(config)
+    fix_rawassignee_wrong_org(config)
+    # consolidate_rawlocation(config)
+    # create_country_transformed(config)
+    # consolidate_cpc(config)
+    # detail_desc_length(config)
+    # consolidate_uspc(config)
+    # pct_data_doc_type(config)
+    # consolidate_claim(config)
+    # consolidate_usreldoc(config)
+    # yearly_claim(config)
+    # yearly_brf_sum_text(config)
+    # yearly_draw_desc_text(config)
+    # yearly_detail_desc_text(config)
 
 
 def post_upload_database(**kwargs):
@@ -273,5 +322,5 @@ def post_upload_database(**kwargs):
 
 if __name__ == "__main__":
     begin_post_processing(**{
-            "execution_date": datetime.date(2022, 1, 11)
+            "execution_date": datetime.date(2022, 1, 13)
             })
