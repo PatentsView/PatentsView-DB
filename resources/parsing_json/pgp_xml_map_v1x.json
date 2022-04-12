@@ -64,6 +64,15 @@
       "entity_root_path": "us-bibliographic-data-application/us-references-cited/us-citation",
       "fields":[
         {
+          "field_name": "citation_dummy",
+          "friendly_name": "citation_dummy",
+          "xml_path": ".",
+          "description": null,
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
         }
       ]
     },
