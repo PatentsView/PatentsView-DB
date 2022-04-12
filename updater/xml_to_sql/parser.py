@@ -443,8 +443,8 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
         dfs[df]['version_indicator'] = config['DATES']['START_DATE']
-        if ('id' not in dfs[df].columns) and (df != 'government_interest'):
-            dfs[df]['id'] = [uuid4() for i in range(dfs[df].shape[0])] # generate unique ids where other ids absent.
+        if ('uuid' not in dfs[df].columns) and (df != 'government_interest'):
+            dfs[df]['uuid'] = [str(uuid4()) for i in range(dfs[df].shape[0])] # generate unique ids where other ids absent.
         if xml_file_name.startswith('pa0') or xml_file_name.startswith('ipa'): #pgpubs file
             if df in ['claim','brf_sum_text','draw_desc_text','detail_desc_text']: #text type
                 template = 'pgpubs_text'
@@ -460,7 +460,8 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
                 template = 'patent'
                 temptable = df
         try:
-            engine.execute(f"CREATE TABLE IF NOT EXISTS {database}.{tabnam} LIKE {template}.{temptable};") # create table to match column parameters of main DB - avoid dtype issues
+            # turned off temporarily for testing pgp botanics
+            # engine.execute(f"CREATE TABLE IF NOT EXISTS {database}.{tabnam} LIKE {template}.{temptable};") # create table to match column parameters of main DB - avoid dtype issues
             # dfs[df].to_sql(tabnam, con=engine, schema=database, if_exists='append', index=False, dtype=dtypes[df])
             dfs[df].to_sql(tabnam, con=engine, schema=database, if_exists='append', index=False)
         except Exception as e:
