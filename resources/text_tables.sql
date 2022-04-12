@@ -20,7 +20,8 @@
         UNIQUE KEY `patent_id` (`patent_id`)
     )
         ENGINE = InnoDB
-        DEFAULT CHARSET = utf8mb4;
+        DEFAULT CHARSET = utf8mb4 
+        COLLATE = utf8mb4_unicode_ci;
     DROP TRIGGER IF EXISTS `{{target_database}}`.before_insert_brf;
     CREATE TRIGGER `{{target_database}}`.before_insert_brf
         BEFORE INSERT
@@ -49,7 +50,8 @@
         UNIQUE KEY `patent_id` (`patent_id`, `num`)
     )
         ENGINE = InnoDB
-        DEFAULT CHARSET = utf8mb4;
+        DEFAULT CHARSET = utf8mb4 
+        COLLATE = utf8mb4_unicode_ci;
     DROP TRIGGER IF EXISTS `{{target_database}}`.before_insert_claim;
     CREATE TRIGGER `{{target_database}}`.before_insert_claim
         BEFORE INSERT
@@ -73,7 +75,8 @@
         UNIQUE KEY `patent_id` (`patent_id`)
     )
         ENGINE = InnoDB
-        DEFAULT CHARSET = utf8mb4;
+        DEFAULT CHARSET = utf8mb4 
+        COLLATE = utf8mb4_unicode_ci;
     DROP TRIGGER IF EXISTS `{{target_database}}`.before_insert_ddt;
     CREATE TRIGGER `{{target_database}}`.before_insert_ddt
         BEFORE INSERT
@@ -97,7 +100,8 @@
         KEY `patent_id` (`patent_id`)
     )
         ENGINE = InnoDB
-        DEFAULT CHARSET = utf8mb4;
+        DEFAULT CHARSET = utf8mb4 
+        COLLATE = utf8mb4_unicode_ci;
     DROP TRIGGER IF EXISTS `{{target_database}}`.before_insert_drawdt;
     CREATE TRIGGER `{{target_database}}`.before_insert_drawdt
         BEFORE INSERT

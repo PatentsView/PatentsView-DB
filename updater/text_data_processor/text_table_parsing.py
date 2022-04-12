@@ -2,7 +2,7 @@ import datetime
 import os
 import sys
 
-from QA.create_databases.TextTest import TextUploadTest
+from QA.create_databases.TextTest import TextUploadTest, TextMergeTest, TextQuarterlyMergeTest
 
 
 def add_text_table_suffx(config, database_date):
@@ -31,10 +31,40 @@ def begin_text_parsing(**kwargs):
     queue_parsers(config, type='long_text')
 
 
-def post_text_parsing(**kwargs):
+def post_text_parsing_granted(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
     tpt = TextUploadTest(config)
+    tpt.runTests()
+
+def post_text_parsing_pgpubs(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('pgpubs', **kwargs)
+    tpt = TextUploadTest(config)
+    tpt.runTests()
+
+def post_text_merge_granted(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('granted_patent', **kwargs)
+    tpt = TextMergeTest(config)
+    tpt.runTests()
+
+def post_text_merge_pgpubs(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('pgpubs', **kwargs)
+    tpt = TextMergeTest(config)
+    tpt.runTests()
+
+def post_text_merge_quarterly_granted(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('granted_patent', schedule="quarterly", **kwargs)
+    tpt = TextQuarterlyMergeTest(config)
+    tpt.runTests()
+
+def post_text_merge_quarterly_pgpubs(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('pgpubs', schedule="quarterly", **kwargs)
+    tpt = TextQuarterlyMergeTest(config)
     tpt.runTests()
 
 

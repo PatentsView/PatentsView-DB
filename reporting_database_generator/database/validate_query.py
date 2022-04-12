@@ -1,13 +1,17 @@
 import configparser
 import os
 import re
+import datetime
 
 import sqlparse
 from sqlalchemy import create_engine
 
 from lib import database_helpers
 from lib.notifications import send_slack_notification
-
+from lib.configuration import get_connection_string
+from lib.configuration import get_section
+from lib.configuration import get_current_config, get_today_dict
+import pymysql.cursors
 
 def parse_and_format_sql(parsed_statement):
     query_lines = []
@@ -20,30 +24,58 @@ def parse_and_format_sql(parsed_statement):
     single_line_query = " ".join(query_lines).replace("[\s]+", " ")
     return single_line_query
 
+def nextword(target, source):
+   for i, w in enumerate(source):
+    if w == target:
+      return source[i+1]
+
 
 def db_and_table_as_array(single_line_query):
     # Identify all tables used in the query for collation check
-    # PatentsView tables
-    table_finder_1 = re.compile("`PatentsView_[0-9]{8}[^`]*`.`[^`]+`")
-    tables_1 = table_finder_1.findall(single_line_query)
-    # patent tables
-    table_finder_2 = re.compile("`patent_[0-9]{8}`.`[^`]+`")
-    tables_2 = table_finder_2.findall(single_line_query)
-    tables = tables_1 + tables_2
-    collation_check_parameters = []
-    # Split dbname.table_name into parameters array
-    for table in tables:
-        collation_check_parameters += [x.replace("`", "") for x in table.split(".")]
-    return collation_check_parameters
+    single_line_query = single_line_query.lower()
+    single_line_query = single_line_query.replace('`', '')
+    print(single_line_query)
+    single_line_query_words = single_line_query.split(" ")
+    # print(single_line_query_words)
+    after_into = nextword('into', single_line_query_words)
+    after_from = nextword('from', single_line_query_words)
+    if after_into is None or after_from is None:
+        print("Not set up for schema checks")
+    else:
+        table_schema_list = "('" + after_into.split(".")[0] + "', " + "'" + after_from.split(".")[0] + "')"
+        print(table_schema_list)
+
+        db_type = 'patent'
+        if 'publication' in single_line_query_words:
+            db_type = 'pgpubs'
+        config = get_current_config(db_type, **{"execution_date": datetime.date(2022, 1, 1)})
+        connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
+                                          user=config['DATABASE_SETUP']['USERNAME'],
+                                          password=config['DATABASE_SETUP']['PASSWORD'],
+                                          # db=config['PATENTSVIEW_DATABASES']["PROD_DB"],
+                                          charset='utf8mb4',
+                                          cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
+        if not connection.open:
+            connection.connect()
+        tables_query = f"""
+    select table_schema, table_name 
+    from information_schema.tables
+    where table_schema in {table_schema_list}
+    group by 1,2
+                    """
+        print(tables_query)
+        with connection.cursor() as cursor:
+            cursor.execute(tables_query)
+            tables_schema = []
+            for item in cursor.fetchall():
+                tables_schema.append((item[0], item[1]))
+            # row = [item[0] for item in cursor.fetchall()]
+        return tables_schema
 
 
-def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
-                         fk_check=True, section=None, **context):
+def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk_check=True, section=None, **context):
     print(filename)
     print(schema_only)
-    ## Schema only run setting
-    # schema_only=context["schema_only"]
-    ## Initialization from config files
     project_home = os.environ['PACKAGE_HOME']
     config = configparser.ConfigParser()
     config.read(project_home + '/config.ini')
@@ -60,14 +92,66 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
-    send_slack_notification(
-            "Executing Query File: `" + filename + "`", config, section,
-            "info")
+    # send_slack_notification(
+    #         "Executing Query File: `" + filename + "`", config, section,
+    #         "info")
+    # when needed, clear out any existing entries in the prod db to make room for inserts - mostly duplicated from insert section below
+    if 'delete_sql' in context['templates_dict'] and drop_existing:
+        rm_sql_content = context['templates_dict']['delete_sql']
+        rm_statements = sqlparse.split(rm_sql_content)
+        for sql_statement in rm_statements:
+            print(sql_statement)
+            single_line_query = sql_statement
+            # if the parse is successful we do some sanity checks
+            if len(sqlparse.parse(sql_statement)) > 0:
+                # Parse SQL
+                parsed_statement = sqlparse.parse(sql_statement)[0]
+                single_line_query = parse_and_format_sql(parsed_statement)
+                ## Based on parameter ignore DROP table commands
+                if not drop_existing and parsed_statement.get_type().lower() == 'unknown':
+                    if single_line_query.lower().lstrip().startswith("drop"):
+                        continue
+                    
+                # Log file output
+                print(single_line_query)
+
+                if parsed_statement.get_type().lower() == 'insert':
+                    # Check if query plan includes full table scan, if it does send an alert
+                    query_plan_check = database_helpers.check_query_plan(db_con, single_line_query)
+                    if not query_plan_check:
+                        message = """
+                            Query execution plan involves full table scan: ```{single_line_query} ```
+                            """.format(single_line_query=single_line_query)
+                        # send_slack_notification(message, config,
+                        #                         section,
+                        #                         "warning")
+                        print(message)
+                        # raise Exception(message)
+
+            if not single_line_query.strip():
+                continue
+            try:
+                print(" ")
+                db_con.execute(single_line_query)
+            except Exception as e:
+                print(" ")
+                # send_slack_notification(
+                #         """
+                # Execution of Query failed: ```{single_line_query} ```
+                #     """.format(single_line_query=single_line_query),
+                #         config,
+                #         section,
+                #         "error")
+                raise e
+
+            
+    # insert portion of merge
     # Get processed template file content
     sql_content = context['templates_dict']['source_sql']
     # Extract individual statements from sql file
     sql_statements = sqlparse.split(sql_content)
     for sql_statement in sql_statements:
+        print(sql_statement)
         # Certain type of sql are not parsed properly by sqlparse,
         # this is the implicit else to forthcoming if
         single_line_query = sql_statement
@@ -81,9 +165,6 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                 if single_line_query.lower().lstrip().startswith("drop"):
                     continue
 
-            # Log file output
-            print(single_line_query)
-
             # Insert statements are usually insert as select
             # We perform sanity checks on those queries
             if parsed_statement.get_type().lower() == 'insert':
@@ -93,12 +174,12 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                     message = """
                         Query execution plan involves full table scan: ```{single_line_query} ```
                         """.format(single_line_query=single_line_query)
-                    send_slack_notification(message, config,
-                                            section,
-                                            "warning")
+                    # send_slack_notification(message, config,
+                    #                         section,
+                    #                         "warning")
                     print(message)
                     # raise Exception(message)
-                #
+
                 collation_check_parameters = db_and_table_as_array(single_line_query)
                 # Check if all text fields in all supplied tables have consistent character set & collation
                 # Stops the process if the collation check fails
@@ -108,12 +189,12 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
                         Character set and/or collation mismatch between tables involved in query :
                             ```{single_line_query}```
                             """.format(single_line_query=single_line_query)
-                    send_slack_notification(message, config,
-                                            section,
-                                            "warning")
+                    # send_slack_notification(message, config,
+                    #                         section,
+                    #                         "warning")
                     raise Exception(message)
 
-                # # Do not run insert statements if it is schema only run
+                # Do not run insert statements if it is schema only run
                 if schema_only:
                     continue
 
@@ -121,22 +202,31 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,
         if not single_line_query.strip():
             continue
         try:
+            print(" ")
             db_con.execute(single_line_query)
         except Exception as e:
-            send_slack_notification(
-                    """
-            Execution of Query failed: ```{single_line_query} ```
-                """.format(single_line_query=single_line_query),
-                    config,
-                    section,
-                    "error")
+            print(" ")
+            # send_slack_notification(
+            #         """
+            # Execution of Query failed: ```{single_line_query} ```
+            #     """.format(single_line_query=single_line_query),
+            #         config,
+            #         section,
+            #         "error")
             raise e
     if not fk_check:
+        print(" ")
         db_con.execute("SET FOREIGN_KEY_CHECKS=1")
     db_con.dispose()
     completion_message = """
     Execution for Query file `{filename}` is complete
     """.format(filename=filename)
-    send_slack_notification(completion_message,
-                            config, "*SQL Executor (" + filename + ")*",
-                            "success")
+    # send_slack_notification(completion_message,
+    #                         config, "*SQL Executor (" + filename + ")*",
+    #                         "success")
+#
+if __name__ == '__main__':
+    q = "insert into `PatentsView_20211230`.`application` (`application_id`, `patent_id`, `type`, `number`, `country`, `date`) select `id_transformed`, `patent_id`, nullif(trim(`type`), ''), nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''), case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end from `patent`.`application` where version_indicator<='2021-12-30';"
+    # db_and_table_as_array("INSERT INTO pregrant_publications.publication SELECT * FROM pgpubs_20050101.publication")
+    db_and_table_as_array(q)
+

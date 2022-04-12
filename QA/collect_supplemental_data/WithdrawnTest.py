@@ -1,9 +1,10 @@
 import pandas as pd
+import datetime
 import pymysql
 from sqlalchemy import create_engine
 
 from lib import xml_helpers
-from lib.configuration import get_config, get_connection_string
+from lib.configuration import get_config, get_connection_string, get_current_config
 
 
 class WithdrawnTest:
@@ -13,7 +14,7 @@ class WithdrawnTest:
         self.connection = pymysql.connect(host=self.config['DATABASE_SETUP']['HOST'],
                                           user=self.config['DATABASE_SETUP']['USERNAME'],
                                           password=self.config['DATABASE_SETUP']['PASSWORD'],
-                                          db=self.config['PATENTSVIEW_DATABASES']['RAW_DB'],
+                                          db=self.config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
                                           charset='utf8mb4', cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
         self.qa_data = {
                 "DataMonitor_patentwithdrawncount": []
@@ -43,7 +44,7 @@ class WithdrawnTest:
             if any(missing_withdrawn):
                 raise AssertionError(
                         "Some of the patents marked withdrawn in {db} are not in the withdrawn file, count: {cnt}".format(
-                                cnt=sum(missing_withdrawn), db=self.config["PATENTSVIEW_DATABASES"]["NEW_DB"]))
+                                cnt=sum(missing_withdrawn), db=self.config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB']))
 
             self.qa_data['DataMonitor_patentwithdrawncount'].append(
                     {
@@ -61,6 +62,9 @@ class WithdrawnTest:
 
 
 if __name__ == '__main__':
-    config = get_config()
+    # config = get_config()
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+            })
     qc = WithdrawnTest(config)
     qc.runTests()

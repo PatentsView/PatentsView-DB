@@ -411,7 +411,7 @@ class LocationPostProcessor():
         city = clean_loc(row['city'])
         state = clean_loc(row['state'])
         country = clean_loc(row['country'])
-        engine = create_engine(get_connection_string(config, "RAW_DB"))
+        engine = create_engine(get_connection_string(config, 'PROD_DB'))
         query = self.build_location_query(city, state, country)
         if query is not None:
             results = pd.read_sql_query(sql=query, con=engine)
@@ -458,15 +458,6 @@ def clean_loc(loc):
         cleaned_loc = None
     return cleaned_loc
 
-
-def lookup_fips(city, state, country, lookup_dict):
-    result = None
-    if lookup_type == 'city':
-        if country == 'US' and (state, city) in lookup_dict:
-            result = lookup_dict[(state, city)]
-    elif country == 'US' and state in lookup_dict:
-        result = lookup_dict[state]
-    return result
 
 
 def update_rawlocation(update_config, database='RAW_DB', uuid_field='id'):

@@ -13,18 +13,20 @@ def send_slack_notification(message, config, section="DB Update", level="info"):
     :param level: Message level (error, warning, success or info)
     :return: API Response from Slack
     """
-    from slackclient import SlackClient
+    from slack_sdk import WebClient
+    from slack_sdk.errors import SlackApiError
+
     # Init
     color_map = {"info": "#6699cc", "success": "#aad922", "warning": "#FFFF00", "error": "#d62828"}
 
     # Connect to slack
     slack_token = config["SLACK"]["API_TOKEN"]
-    slack_client = SlackClient(slack_token)
+    slack_client = WebClient(slack_token)
     slack_channel = config["SLACK"]["CHANNEL"]
-
-    # Post the message
-    return slack_client.api_call(
-        "chat.postMessage",
+    client = WebClient(token=slack_token)
+    client = WebClient(token=slack_token)
+    try:
+        response=slack_client.chat_postMessage(
         channel=slack_channel,
         text=section,
         attachments=[
@@ -34,3 +36,6 @@ def send_slack_notification(message, config, section="DB Update", level="info"):
             }
         ]
     )
+    except SlackApiError as e:
+        print(e)
+    return response.status_code

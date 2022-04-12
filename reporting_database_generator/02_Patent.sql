@@ -244,7 +244,7 @@ select
 from
   `{{params.raw_database}}`.`application` a
 where
-  a.`date` is not null and a.`date` > date('1899-12-31') and a.`date` < date_add(current_date, interval 10 year)  and version_indicator<='{{params.version_indicator}}'
+  a.`date` is not null and a.`date` > date('1899-12-31') and a.`date` < date_add(current_date, interval 10 year)  and version_indicator<={{params.version_indicator}}
 group by
   a.`patent_id`;
 

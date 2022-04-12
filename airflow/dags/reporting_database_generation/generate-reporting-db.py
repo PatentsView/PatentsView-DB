@@ -4,14 +4,16 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
-from slackclient import SlackClient
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
 
 project_home = os.environ['PACKAGE_HOME']
 config = configparser.ConfigParser()
 config.read(project_home + '/config.ini')
 
 slack_token = config["SLACK"]["API_TOKEN"]
-slack_client = SlackClient(slack_token)
+slack_client = WebClient(slack_token)
 slack_channel = config["SLACK"]["CHANNEL"]
 schema_only = config["REPORTING_DATABASE_OPTIONS"]["SCHEMA_ONLY"]
 if schema_only == "TRUE":
@@ -48,8 +50,12 @@ default_args = {
         # 'end_date': datetime(2016, 1, 1),
         }
 
-reporting_db_dag = DAG("reporting_database_generation", default_args=default_args, start_date=datetime(2018, 12, 1),
-                       schedule_interval=None, template_searchpath="/project/reporting_database_generator/")
+reporting_db_dag = DAG("reporting_database_generation"
+                       , default_args=default_args
+                       , start_date=datetime(2022, 3, 1)
+                       , schedule_interval=None
+                       , template_searchpath="/project/reporting_database_generator/")
+
 db_creation = SQLTemplatedPythonOperator(
         task_id='Database_Creation',
         provide_context=True,

@@ -1,0 +1,1359 @@
+{
+  "foreign_key_config": {
+    "field_name": "document_number",
+    "friendly_name": "Document Number",
+    "xml_path": "us-bibliographic-data-application/publication-reference/document-id/doc-number",
+    "data-type": "string"
+  },
+  "table_xml_map": [
+    {
+      "table_name": "government_interest",
+      "table_prefix": "government_interest",
+      "friendly_name": "Government Interest",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "gi_statement",
+          "friendly_name": "GI Text",
+          "xml_path": "description",
+          "description": "Federal Research Statement",
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "gi.tsv"
+    },
+    {
+      "table_name": "publication",
+      "friendly_name": "Publication",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "us-bibliographic-data-application/publication-reference/document-id/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "us-bibliographic-data-application/publication-reference/document-id/country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "kind",
+          "friendly_name": "Kind",
+          "xml_path": "us-bibliographic-data-application/publication-reference/document-id/kind",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "filing_type",
+          "friendly_name": "Filing Type",
+          "xml_path": "us-bibliographic-data-application/us-publication-filing-type/",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": true,
+          "data-type": "string"
+        }
+      ],
+      "filename": "publication.tsv"
+    },
+    {
+      "table_name": "application",
+      "friendly_name": "Application",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "application_number",
+          "friendly_name": "Application Number",
+          "xml_path": "us-bibliographic-data-application/application-reference/document-id/doc-number",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "number"
+        },
+        {
+          "field_name": "rule_47_flag",
+          "friendly_name": "Rule 47 Flag",
+          "xml_path": "us-bibliographic-data-application/.",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": "rule-47-flag",
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "us-bibliographic-data-application/application-reference/document-id/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "us-bibliographic-data-application/application-reference/document-id/country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "series_code",
+          "friendly_name": "Series Code",
+          "xml_path": "us-bibliographic-data-application/us-application-series-code",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "type",
+          "friendly_name": "Type",
+          "xml_path": "us-bibliographic-data-application/application-reference",
+          "attribute": "appl-type",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "invention_title",
+          "friendly_name": "Invention Title",
+          "xml_path": "us-bibliographic-data-application/invention-title",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        },
+        {
+          "field_name": "invention_abstract",
+          "friendly_name": "Invention Abstract",
+          "xml_path": "abstract",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "application.tsv"
+    },
+    {
+      "table_name": "rawinventor",
+      "friendly_name": "Rawinventor",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/us-parties/inventors/",
+      "fields": [
+        {
+          "field_name": "name_first",
+          "friendly_name": "First Name",
+          "xml_path": "addressbook/first-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "name_last",
+          "friendly_name": "Last Name",
+          "xml_path": "addressbook/last-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "city",
+          "friendly_name": "City",
+          "xml_path": "addressbook/address/city",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "state",
+          "friendly_name": "State",
+          "xml_path": "addressbook/address/state",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "addressbook/address/country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": "sequence",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "designation",
+          "friendly_name": "Designation",
+          "xml_path": ".",
+          "attribute": "designation",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "deceased",
+          "friendly_name": "Deceased",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "tag": false,
+          "flag": "deceased-inventor",
+          "data-type": "string"
+        }
+      ],
+      "filename": "inventors.tsv"
+    },
+    {
+      "table_name": "foreign_priority",
+      "friendly_name": "Foreign Priority",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/priority-claims/",
+      "fields": [
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "foreign_doc_number",
+          "friendly_name": "Foreign Document Number",
+          "xml_path": "doc-number",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "kind",
+          "friendly_name": "Kind",
+          "xml_path": ".",
+          "attribute": "kind",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "foreign_priority.tsv"
+    },
+    {
+      "table_name": "ipcr",
+      "friendly_name": "IPCR",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/classifications-ipcr/",
+      "fields": [
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "version",
+          "friendly_name": "IPC Version",
+          "xml_path": "ipc-version-indicator/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "class_level",
+          "friendly_name": "IPC Classification Level",
+          "xml_path": "classification-level",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "section",
+          "friendly_name": "Section",
+          "xml_path": "section",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "class",
+          "friendly_name": "Class",
+          "xml_path": "class",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subclass",
+          "friendly_name": "Subclass",
+          "xml_path": "subclass",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "main_group",
+          "friendly_name": "Main Group",
+          "xml_path": "main-group",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subgroup",
+          "friendly_name": "Subgroup",
+          "xml_path": "subgroup",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "symbol_position",
+          "friendly_name": "Symbol Position",
+          "xml_path": "symbol-position",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "class_value",
+          "friendly_name": "Classification Value",
+          "xml_path": "classification-value",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "action_date",
+          "friendly_name": "Action Date",
+          "xml_path": "action-date/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "class_status",
+          "friendly_name": "Classification Status",
+          "xml_path": "classification-status",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "class_data_source",
+          "friendly_name": "Classification Data Source",
+          "xml_path": "classification-data-source",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "ipcr.tsv"
+    },
+    {
+      "table_name": "main_cpc",
+      "friendly_name": "Main CPC",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/classifications-cpc/main-cpc/",
+      "fields": [
+        {
+          "field_name": "version",
+          "friendly_name": "Version Indicator",
+          "xml_path": "cpc-version-indicator/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": "sequence",
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "section",
+          "friendly_name": "Section",
+          "xml_path": "section",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "class",
+          "friendly_name": "Class",
+          "xml_path": "class",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subclass",
+          "friendly_name": "Subclass",
+          "xml_path": "subclass",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "main_group",
+          "friendly_name": "Main Group",
+          "xml_path": "main-group",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subgroup",
+          "friendly_name": "Subgroup",
+          "xml_path": "subgroup",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "symbol_position",
+          "friendly_name": "Symbol Position",
+          "xml_path": "symbol-position",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "value",
+          "friendly_name": "Value",
+          "xml_path": "classification-value",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "action_date",
+          "friendly_name": "Action Date",
+          "xml_path": "action-date/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        }
+      ],
+      "filename": "main_cpc.tsv"
+    },
+    {
+      "table_name": "further_cpc",
+      "friendly_name": "Further CPC",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/classifications-cpc/further-cpc/",
+      "fields": [
+        {
+          "field_name": "version",
+          "friendly_name": "Version Indicator",
+          "xml_path": "cpc-version-indicator/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": "sequence",
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "section",
+          "friendly_name": "Section",
+          "xml_path": "section",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "class",
+          "friendly_name": "Class",
+          "xml_path": "class",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subclass",
+          "friendly_name": "Subclass",
+          "xml_path": "subclass",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "main_group",
+          "friendly_name": "Main Group",
+          "xml_path": "main-group",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subgroup",
+          "friendly_name": "Subgroup",
+          "xml_path": "subgroup",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "symbol_position",
+          "friendly_name": "Symbol Position",
+          "xml_path": "symbol-position",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "value",
+          "friendly_name": "Value",
+          "xml_path": "classification-value",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "action_date",
+          "friendly_name": "Action Date",
+          "xml_path": "action-date/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        }
+      ],
+      "filename": "further_cpc.tsv"
+    },
+    {
+      "table_name": "rawassignee",
+      "friendly_name": "Rawassignee",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/assignees/",
+      "fields": [
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "name_first",
+          "friendly_name": "Name First",
+          "xml_path": "addressbook/first-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "name_first",
+          "friendly_name": "Name First",
+          "xml_path": "first-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "name_last",
+          "friendly_name": "Name Last",
+          "xml_path": "addressbook/last-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "name_last",
+          "friendly_name": "Name Last",
+          "xml_path": "last-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "organization",
+          "friendly_name": "Organization",
+          "xml_path": "addressbook/orgname",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "organization",
+          "friendly_name": "Organization",
+          "xml_path": "orgname",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "city",
+          "friendly_name": "City",
+          "xml_path": "addressbook/address/city",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "state",
+          "friendly_name": "State",
+          "xml_path": "addressbook/address/state",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "addressbook/address/country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "type",
+          "friendly_name": "Type",
+          "xml_path": "addressbook/role",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "assignee.tsv"
+    },
+    {
+      "table_name": "usreldoc_related",
+      "friendly_name": "US Related Documents",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/us-related-documents/related-publication/",
+      "fields": [
+        {
+          "field_name": "related_doc_number",
+          "friendly_name": "Related Doc Number",
+          "xml_path": "doc-number",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "doc_type",
+          "friendly_name": "Document Type",
+          "xml_path": "..",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": true,
+          "data-type": "string"
+        },
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        }
+      ],
+      "filename": "usreldoc.tsv"
+    },
+    {
+      "table_name": "usreldoc_single",
+      "friendly_name": "US Related Documents",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/us-related-documents/",
+      "fields": [
+        {
+          "field_name": "related_doc_number",
+          "friendly_name": "Related fDoc Number",
+          "xml_path": "document-id/doc-number",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "document-id/country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "doc_type",
+          "friendly_name": "Document Type",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": true,
+          "data-type": "string"
+        },
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "document-id/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        }
+      ],
+      "filename": "usreldoc.tsv"
+    },
+    {
+      "table_name": "usreldoc_parent_child",
+      "friendly_name": "US Related Documents Parent Child",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/us-related-documents//relation/",
+      "fields": [
+        {
+          "field_name": "related_doc_number",
+          "friendly_name": "Related Doc Number",
+          "xml_path": "document-id/doc-number",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "document-id/country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "relkind",
+          "friendly_name": "Relationship Kind",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": true,
+          "data-type": "string"
+        },
+        {
+          "field_name": "doc_type",
+          "friendly_name": "Document Type",
+          "xml_path": "....",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": true,
+          "data-type": "string"
+        },
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "document-id/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        }
+      ],
+      "filename": "usreldoc_parent_child.tsv"
+     },
+    {
+      "table_name": "pct_data",
+      "friendly_name": "PCT Data",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "pct_doc_number",
+          "friendly_name": "PCT Doc Number",
+          "xml_path": "us-bibliographic-data-application/pct-or-regional-filing-data/document-id/doc-number",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "us-bibliographic-data-application/pct-or-regional-filing-data/document-id/country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "date",
+          "friendly_name": "Date",
+          "xml_path": "us-bibliographic-data-application/pct-or-regional-filing-data/document-id/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "kind",
+          "friendly_name": "Kind",
+          "xml_path": "us-bibliographic-data-application/pct-or-regional-filing-data/document-id/kind",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "us_371c124_date",
+          "friendly_name": "US-371c124 Date",
+          "xml_path": "us-bibliographic-data-application/pct-or-regional-filing-data/us-371c124-date/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "us_371c12_date",
+          "friendly_name": "US-371c12 Date",
+          "xml_path": "us-bibliographic-data-application/pct-or-regional-filing-data/us-371c12-date/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        }
+      ],
+      "filename": "pct_data.tsv"
+    },
+    {
+      "table_name": "brf_sum_text",
+      "friendly_name": "Brief Summary Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "description",
+          "description": "Summary of Invention",
+          "attribute": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "brf_sum_text.tsv"
+    },
+    {
+        "table_name": "draw_desc_text",
+        "friendly_name": "Drawing Description Text",
+        "multi_valued": true,
+        "entity_root_path": "description/description-of-drawings/",
+        "fields": [{
+            "field_name": "text",
+            "friendly_name": "Text",
+            "xml_path": ".",
+            "description": "Brief Description of Drawings",
+            "sequence": false,
+            "attribute": null,
+            "flag": null,
+            "tag": false,
+            "data-type": "fulltext"
+        },{
+            "field_name": "sequence",
+            "friendly_name": "Sequence",
+            "xml_path": ".",
+            "attribute": null,
+            "description": null,
+            "sequence": true,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+        }
+      ],
+      "filename": "draw_desc_text.tsv"
+    },
+    {
+      "table_name": "detail_desc_text",
+      "friendly_name": "Detailed Description Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "description",
+          "description": "Detailed Description",
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "detail_desc_text.tsv"
+    },
+    {
+      "table_name": "rel_app_text",
+      "friendly_name": "Related Application Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "description",
+          "description": "Cross Reference To Related Applications",
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "rel_app_text.tsv"
+    },
+{
+      "table_name": "claim",
+      "friendly_name": "Claim",
+      "multi_valued": true,
+      "entity_root_path": "claims/",
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "claim-text",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "num",
+          "friendly_name": "num",
+          "xml_path": ".",
+          "attribute": "num",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "dependent",
+          "friendly_name": "Dependent",
+          "xml_path": "./claim-text/claim-ref",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "claim.tsv"
+    },
+    {
+      "table_name": "rawuspc",
+      "friendly_name": "Raw USPC",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/classification-national/",
+      "fields": [
+        {
+          "field_name": "classification",
+          "friendly_name": "Classification",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+        "filename": "rawuspc.tsv"
+      },
+      {
+      "table_name": "us_parties",
+      "friendly_name": "US Parties",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/us-parties/us-applicants/",
+      "fields": [
+        {
+          "field_name": "name_first",
+          "friendly_name": "Name first",
+          "xml_path": "addressbook/first-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },    
+        {
+          "field_name": "name_last",
+          "friendly_name": "Name Last",
+          "xml_path": "addressbook/last-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "designation",
+          "friendly_name": "Designation",
+          "xml_path": ".",
+          "attribute": "designation",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "type",
+          "friendly_name": "Type",
+          "xml_path": ".",
+          "attribute": "app-type",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+            "field_name": "city",
+            "friendly_name": "City",
+            "xml_path": "addressbook/address/city",
+            "attribute": null,
+            "description": null,
+            "sequence": false,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+        }, 
+        {
+            "field_name": "state",
+            "friendly_name": "State",
+            "xml_path": "addressbook/address/state",
+            "attribute": null,
+            "description": null,
+            "sequence": false,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+        }, 
+        {
+            "field_name": "country",
+            "friendly_name": "Country",
+            "xml_path": "addressbook/address/country",
+            "attribute": null,
+            "description": null,
+            "sequence": false,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+        }, 
+        {
+            "field_name": "sequence",
+            "friendly_name": "Sequence",
+            "xml_path": ".",
+            "attribute": "sequence",
+            "description": null,
+            "sequence": true,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+        }
+      ],
+        "filename": "us_parties.tsv"
+    }
+  ]
+}

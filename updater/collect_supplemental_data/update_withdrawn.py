@@ -66,7 +66,7 @@ def update_withdrawn(update_config):
     update_query = """
 UPDATE patent p join `{temp_upload_db}`.`withdrawn_patents` twp on twp.patent_id = p.id set p.withdrawn = 1;
     """.format(temp_upload_db=update_config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
-    engine = create_engine(get_connection_string(update_config, "RAW_DB"))
+    engine = create_engine(get_connection_string(update_config, "PROD_DB"))
     engine.execute(update_query)
 
 

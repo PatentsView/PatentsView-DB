@@ -88,7 +88,7 @@ def bulk_commit_updates(update_key, update_statements, table, commit_frequency=1
 
     session.rollback()
 
-    session.execute('truncate temporary_update;')
+    session.execute('truncate lawyer_disambiguation_results;')
 
     if dbtype == 'grant':
         commit_inserts(session, update_statements, temporary_update, 10000)
@@ -98,10 +98,10 @@ def bulk_commit_updates(update_key, update_statements, table, commit_frequency=1
     primary_key = table.primary_key.columns.values()[0]
     update_key = table.columns[update_key]
     session.execute(
-        "UPDATE {0} join temporary_update ON temporary_update.pk = {1} SET {2} = temporary_update.update;".format(
+        "UPDATE {0} join lawyer_disambiguation_results ON lawyer_disambiguation_results.pk = {1} SET {2} = lawyer_disambiguation_results.update;".format(
             table.name, primary_key.name, update_key.name))
     session.commit()
 
-    session.execute('truncate temporary_update;')
+    session.execute('truncate lawyer_disambiguation_results;')
 
     session.commit()

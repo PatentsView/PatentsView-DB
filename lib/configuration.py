@@ -2,6 +2,9 @@ import datetime
 import json
 import os
 
+from elasticsearch import Elasticsearch
+from pendulum import DateTime
+
 
 def get_config():
     import os
@@ -59,12 +62,12 @@ def get_section(dag_id, task_id):
     return section
 
 
-def get_connection_string(config, database='TEMP_UPLOAD_DB'):
+def get_connection_string(config, database='TEMP_UPLOAD_DB', connection='DATABASE_SETUP'):
     database = '{}'.format(config['PATENTSVIEW_DATABASES'][database])
-    host = '{}'.format(config['DATABASE_SETUP']['HOST'])
-    user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
-    password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
-    port = '{}'.format(config['DATABASE_SETUP']['PORT'])
+    host = '{}'.format(config[connection]['HOST'])
+    user = '{}'.format(config[connection]['USERNAME'])
+    password = '{}'.format(config[connection]['PASSWORD'])
+    port = '{}'.format(config[connection]['PORT'])
     return 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database)
 
 
@@ -73,8 +76,8 @@ def get_backup_command(**kwargs):
     config = get_current_config(**kwargs)
     conf_parameter = config['DATABASE_SETUP']['CONFIG_FILE']
     directory_parameter = "{datahome}/{database}_backup".format(datahome=config["FOLDERS"]["WORKING_FOLDER"],
-                                                                database=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
-    database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
+                                                                database=config["PATENTSVIEW_DATABASES"]["PROD_DB"])
+    database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["PROD_DB"])
     verbosity = 3
     thread = 6
 
@@ -91,8 +94,8 @@ def get_loader_command(config, project_home):
     script = "{home}/lib/loader/index_optimized_loader".format(home=project_home)
     conf_parameter = "{home}/resources/sql.conf".format(home=project_home)
     directory_parameter = "{datahome}/{database}_backup".format(datahome=config["FOLDERS"]["WORKING_FOLDER"],
-                                                                database=config["PATENTSVIEW_DATABASES"]["OLD_DB"])
-    database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["RAW_DB"])
+                                                                database=config["PATENTSVIEW_DATABASES"]["PROD_DB"])
+    database_parameter = "{database}".format(database=config["PATENTSVIEW_DATABASES"]["PROD_DB"])
     verbosity = 3
     thread = 6
 
@@ -129,7 +132,8 @@ def get_today_dict(type='granted_patent', from_date=datetime.date.today()):
 
 
 def get_table_config(update_config):
-    resources_file = "{root}/{resources}/raw_db_tables.json".format(root=update_config["FOLDERS"]["project_root"],
+    project_home = os.environ['PACKAGE_HOME']
+    resources_file = "{root}/{resources}/raw_db_tables.json".format(root=project_home,
                                                                     resources=update_config["FOLDERS"][
                                                                         "resources_folder"])
     raw_db_table_settings = json.load(open(resources_file))
@@ -174,7 +178,49 @@ def get_version_indicator(**kwargs):
     return execution_date.strftime('%Y%m%d')
 
 
-def get_current_config(type='granted_patent', supplemental_configs=None, **kwargs):
+def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwargs):
+    disambiguation_root = os.environ['DISAMBIGUATION_ROOT']
+    print(disambiguation_root)
+    import configparser, pprint
+
+    config = get_config()
+    execution_date: DateTime = kwargs['execution_date']
+    if schedule == 'weekly':
+        current_week_start = datetime.timedelta(days=1)
+        current_week_end = datetime.timedelta(days=7)
+        start_date = (execution_date + current_week_start)
+        end_date = (execution_date + current_week_end)
+    else:
+        from lib.is_it_update_time import get_update_range
+        start_date, end_date = get_update_range(execution_date)
+    temp_date = end_date.strftime('%Y%m%d')
+
+    config['DATES'] = {
+        "START_DATE": start_date.strftime('%Y-%m-%d'),
+        "END_DATE": end_date.strftime('%Y-%m-%d')
+    }
+    print("Start Date is {start}".format(start=config['DATES']['START_DATE']))
+    print("End date is {end}".format(end=config['DATES']['END_DATE']))
+    if supplemental_configs is not None:
+        for supplemental_config in supplemental_configs:
+            s_config = configparser.ConfigParser()
+            config_file = "{disambiguation_root}/{filename}".format(disambiguation_root=disambiguation_root,
+                                                                    filename=supplemental_config)
+            print(config_file)
+            s_config.read(config_file)
+            config.update(s_config)
+        print("Canopy Settings are {canopy_setting}".format(
+            canopy_setting=pprint.pformat(config['INVENTOR_BUILD_CANOPIES'])))
+
+    incremental = 1
+    if end_date.month == 12:
+        incremental = 0
+    config['DISAMBIGUATION']['INCREMENTAL'] = str(incremental)
+    print("Incremental Setting is {incremental}".format(incremental=config['DISAMBIGUATION']['INCREMENTAL']))
+    return config
+
+
+def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     """
     Update config file start and end date to first and last day of the supplied week
     :param supplemental_configs:
@@ -189,50 +235,68 @@ def get_current_config(type='granted_patent', supplemental_configs=None, **kwarg
     :param cfg: config to update
     :return: updated config
     """
-    project_home = os.environ['PACKAGE_HOME']
-    import configparser
 
     config = get_config()
     config_prefix = "upload_"
 
     if type == 'pgpubs':
         config_prefix = 'pgpubs_'
-    execution_date = kwargs['execution_date']
-    current_week_start = datetime.timedelta(days=1)
-    current_week_end = datetime.timedelta(days=7)
-    start_date = (execution_date + current_week_start)
-    end_date = (execution_date + current_week_end)
+    execution_date: DateTime = kwargs['execution_date']
+    if schedule == 'weekly':
+        current_week_start = datetime.timedelta(days=1)
+        current_week_end = datetime.timedelta(days=7)
+        start_date = (execution_date + current_week_start)
+        end_date = (execution_date + current_week_end)
+    else:
+        from lib.is_it_update_time import get_update_range
+        start_date, end_date = get_update_range(execution_date)
     temp_date = end_date.strftime('%Y%m%d')
 
     config['DATES'] = {
-            "START_DATE": start_date.strftime('%Y%m%d'),
-            "END_DATE":   end_date.strftime('%Y%m%d')
-            }
+        "START_DATE": start_date.strftime('%Y%m%d'),
+        "END_DATE": end_date.strftime('%Y%m%d')
+    }
     prefixed_string = "{prfx}{date}".format(prfx=config_prefix, date=temp_date)
     config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"] = prefixed_string
+    config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'pregrant_publications'
+    config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'pgpubs_text'
     config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(
-            prefix=prefixed_string,
-            data_root=config['FOLDERS']['data_root'])
+        prefix=prefixed_string,
+        data_root=config['FOLDERS']['data_root'])
     if type == 'granted_patent':
         config['FOLDERS']['granted_patent_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
-                working_folder=config['FOLDERS']['WORKING_FOLDER'])
+            working_folder=config['FOLDERS']['WORKING_FOLDER'])
         config['FOLDERS']['long_text_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
-                working_folder=config['FOLDERS']['WORKING_FOLDER'])
+            working_folder=config['FOLDERS']['WORKING_FOLDER'])
+        config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'patent'
+        config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'patent_text'
 
     latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
     latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
 
-    config['DISAMBIGUATION']['granted_patent_database'] = "{type}{dt}".format(
-            type=config['PATENTSVIEW_DATABASES']['granted_patent_upload_db'],
-            dt=latest_tuesday['execution_date'].strftime("%Y%m%d"))
-    config['DISAMBIGUATION']['pregrant_database'] = "{type}{dt}".format(
-            type=config['PATENTSVIEW_DATABASES']['pgpubs_upload_db'],
-            dt=latest_thursday['execution_date'].strftime("%Y%m%d"))
-    if supplemental_configs is not None:
-        for supplemental_config in supplemental_configs:
-            s_config = configparser.ConfigParser()
-            config_file = "{home}/{filename}".format(home=project_home, filename=supplemental_config)
-            s_config.read(config_file)
-            config.update(s_config)
-
     return config
+
+
+def get_es(config):
+    es_hostname = config['ELASTICSEARCH']['HOST']
+    username = config['ELASTICSEARCH']['USER']
+    password = config['ELASTICSEARCH']['PASSWORD']
+    es = Elasticsearch(hosts=es_hostname, http_auth=(username, password))
+    return es
+
+if __name__ == '__main__':
+    # pgpubs, granted_patent
+    # config = get_current_config('pgpubs', schedule="quarterly", **{
+    #     "execution_date": datetime.date(2021, 8, 4)
+    # })
+    # get_backup_command(**{
+    #     "execution_date": datetime.date(2021, 11, 4)
+    # })
+    # print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"])
+    config = get_disambig_config(type='pgpubs', schedule="quarterly", **{
+        "execution_date": datetime.date(2021, 10, 1)
+    })
+    # print(config['PATENTSVIEW_DATABASES']["PROD_DB"])
+    # print(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
+    # print(config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"][:6])
+    # print(config['DATES']['END_DATE'])

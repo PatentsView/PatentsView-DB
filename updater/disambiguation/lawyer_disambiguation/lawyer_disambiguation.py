@@ -1,4 +1,5 @@
 import csv
+import logging
 import pickle as pickle
 import re
 import time
@@ -8,8 +9,7 @@ from datetime import date, datetime
 from hashlib import md5
 from pathlib import Path
 from string import ascii_lowercase as alphabet
-
-import tqdm
+import multiprocessing as mp
 from sqlalchemy import create_engine
 from textdistance import jaro_winkler
 from tqdm import tqdm
@@ -18,10 +18,12 @@ from unidecode import unidecode
 
 from QA.post_processing.LawyerPostProcessing import LawyerPostProcessingQC
 from lib.configuration import get_connection_string, get_current_config
+from lib.utilities import log_writer
 
 
-def prepare_tables(config):
-    cstr = get_connection_string(config, 'RAW_DB')
+def prepare_tables(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr + "&local_infile=1")
     timestamp = str(int(time.time()))
     with engine.connect() as connection:
@@ -33,24 +35,25 @@ def prepare_tables(config):
 
     with engine.connect() as connection:
         connection.execute(
-                "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;")
+            "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;")
         connection.execute(
-                "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE "
-                "rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;")
+            "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE "
+            "rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;")
         connection.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_lawyer_id IS NULL;")
 
 
-def clean_rawlawyer(config):
-    cstr = get_connection_string(config, 'RAW_DB')
+def clean_rawlawyer(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr + "&local_infile=1")
     nodigits = re.compile(r'[^\d]+')
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
     Path(disambig_folder).mkdir(parents=True, exist_ok=True)
     outfile = csv.writer(open(disambig_folder + '/rawlawyer_cleanalphaids.tsv', 'w'), delimiter='\t')
     outfile.writerow(
-            ['uuid', 'lawyer_id', 'patent_id', 'name_first', 'name_last', 'organization', 'cleaned_alpha_lawyer_id',
-             'country',
-             'sequence'])
+        ['uuid', 'lawyer_id', 'patent_id', 'name_first', 'name_last', 'organization', 'cleaned_alpha_lawyer_id',
+         'country',
+         'sequence'])
 
     stoplist = ['the', 'of', 'and', 'a', 'an', 'at']
 
@@ -64,9 +67,9 @@ def clean_rawlawyer(config):
         counter = 0
         with engine.connect() as db_con:
             rawlaw_chunk = db_con.execute(
-                    'SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset))
+                'SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset))
 
-            for lawyer in tqdm.tqdm(rawlaw_chunk, total=limit,
+            for lawyer in tqdm(rawlaw_chunk, total=limit,
                                     desc="rawlawyer processing - batch:" + str(batch_counter)):
                 uuid_match = lawyer[0]
                 law_id = lawyer[1]
@@ -96,20 +99,21 @@ def clean_rawlawyer(config):
             print("processed batch: ", str(batch_counter))
 
 
-def load_clean_rawlawyer(config):
-    cstr = get_connection_string(config, 'RAW_DB')
+def load_clean_rawlawyer(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr + "&local_infile=1")
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
     engine.execute("ALTER TABLE rawlawyer RENAME TO temp_rawlawyer_predisambig;")
     engine.execute("CREATE TABLE rawlawyer LIKE temp_rawlawyer_predisambig;")
     engine.execute(
-            """
+        """
 LOAD DATA LOCAL INFILE '{}' INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\r\n' IGNORE 1 LINES 
 (uuid, @vlawyer_id, @vpatent_id, @vname_first, @vname_last, @vorganization, @valpha_lawyer_id, @vcountry, @vsequence) 
 SET lawyer_id = NULLIF(@vlawyer_id,''),patent_id = NULLIF(@vpatent_id,''),name_first = NULLIF(@vname_first,''),
 name_last = NULLIF(@vname_last,''),organization = NULLIF(@vorganization,''),alpha_lawyer_id = NULLIF(
 @valpha_lawyer_id,''),country = NULLIF(@vcountry,''),sequence= CAST(@vsequence AS UNSIGNED);
-            """.format(disambig_folder + '/rawlawyer_cleanalphaids.tsv'))
+        """.format(disambig_folder + '/rawlawyer_cleanalphaids.tsv'))
 
 
 class LawyerDisambiguator:
@@ -190,15 +194,39 @@ class LawyerDisambiguator:
                 'update': param['id']
                 } for x in tmpids])
 
-    def create_lawyer_table(self, id_map, lawyer_dict):
+    def load_lawyer_to_db(self):
+        # from os import listdir
+        # from os.path import isfile, join
+        from updater.disambiguation.lawyer_disambiguation.alchemy.schema import RawLawyer, Lawyer, patentlawyer
+        from updater.disambiguation.lawyer_disambiguation.tasks import bulk_commit_inserts, bulk_commit_updates
+        from updater.disambiguation.lawyer_disambiguation import alchemy
+        session = alchemy.fetch_session(dbtype=self.doctype)
+        session.execute('set foreign_key_checks = 0;')
+        session.commit()
+
+        # pickle_files = [f for f in listdir(self.disambig_folder) if isfile(join(self.disambig_folder, f))]
+        # for letter in ['u','q']:
+        for letter in alphabet:
+            self.lawyer_insert_statements = pickle.load(open(self.disambig_folder + '/' + f'lawyer_insert_statements_{letter}.pickle', 'rb'))
+            t1 = bulk_commit_inserts(self.lawyer_insert_statements, Lawyer.__table__, 20000, 'grant')
+
+            self.patentlawyer_insert_statements = pickle.load(open(self.disambig_folder + '/' + f'patentlawyer_insert_statements_{letter}.pickle', 'rb'))
+            t2 = bulk_commit_inserts(self.patentlawyer_insert_statements, patentlawyer, 20000)
+
+            self.update_statements = pickle.load(open(self.disambig_folder + '/' + f'update_statements_{letter}.pickle', 'rb'))
+            t3 = bulk_commit_updates('lawyer_id', self.update_statements, RawLawyer.__table__, 20000)
+            print(f"Finished uploading data for letter: {letter}!")
+            print(" ")
+
+        session.close_all()
+
+    def create_lawyer_table(self, id_map, lawyer_dict, letter):
         """
         Given a list of lawyers and the redis key-value disambiguation,
         populates the lawyer table in the database
         """
-        from updater.disambiguation.lawyer_disambiguation import alchemy
-        from updater.disambiguation.lawyer_disambiguation.alchemy.schema import RawLawyer, Lawyer, patentlawyer
-        from updater.disambiguation.lawyer_disambiguation.tasks import bulk_commit_inserts, bulk_commit_updates
         print('Disambiguating lawyers...', flush=True)
+        from updater.disambiguation.lawyer_disambiguation import alchemy
         session = alchemy.fetch_session(dbtype=self.doctype)
         session.execute('set foreign_key_checks = 0;')
         session.commit()
@@ -216,14 +244,11 @@ class LawyerDisambiguator:
                         self.lawyer_match(rawlawyers, session, commit=True)
                     else:
                         self.lawyer_match(rawlawyers, session, commit=False)
-        t1 = bulk_commit_inserts(self.lawyer_insert_statements, Lawyer.__table__, 20000, 'grant')
-        t2 = bulk_commit_inserts(self.patentlawyer_insert_statements, patentlawyer, 20000)
-        t3 = bulk_commit_updates('lawyer_id', self.update_statements, RawLawyer.__table__, 20000)
-        # t1.get()
-        # t2.get()
-        # t3.get()
-        # session.commit()
-        print(i, datetime.now(), flush=True)
+
+        pickle.dump(self.lawyer_insert_statements, open(self.disambig_folder + '/' + f'lawyer_insert_statements_{letter}.pickle', 'wb'))
+        pickle.dump(self.patentlawyer_insert_statements, open(self.disambig_folder + '/' + f'patentlawyer_insert_statements_{letter}.pickle', 'wb'))
+        pickle.dump(self.update_statements, open(self.disambig_folder + '/' + f'update_statements_{letter}.pickle', 'wb'))
+        print(f"Finished Exporting Letter {letter} to pickle", i, datetime.now(), flush=True)
 
     def create_jw_blocks(self, list_of_lawyers):
         """
@@ -248,11 +273,35 @@ class LawyerDisambiguator:
                     consumed[secondary] = 1
                     self.blocks[primary].append(secondary)
         pickle.dump(self.blocks, open(self.disambig_folder + '/' + 'lawyer.pickle', 'wb'))
-        print('lawyer blocks created!', flush=True)
+        print(f'lawyer blocks created for letter: {list_of_lawyers[0][0]}!', flush=True)
 
-    def run_disambiguation(self):
+    def process_alphabet(self, letter, log_queue):
         from updater.disambiguation.lawyer_disambiguation import alchemy
         from updater.disambiguation.lawyer_disambiguation.alchemy.schema import RawLawyer
+        # track memory usage by letter
+        log_queue.put({
+            "level": logging.INFO,
+            "message": "STARTING LETTER: {letter} at {t}".format(letter=letter, t=datetime.now())})
+        # bookkeeping
+        id_map = defaultdict(list)
+        lawyer_dict = {}
+        letterblock = []
+        # query by letter
+        session = alchemy.fetch_session(dbtype=self.doctype)
+        lawyers_object = session.query(RawLawyer).filter(RawLawyer.alpha_lawyer_id.like(letter + '%'))
+        print("query returned")
+        for lawyer in tqdm(lawyers_object):
+            lawyer_dict[lawyer.uuid] = lawyer
+            id_map[lawyer.alpha_lawyer_id].append(lawyer.uuid)
+            letterblock.append(lawyer.alpha_lawyer_id)
+        session.close_all()
+        print(letterblock[0:3])
+        print(" ")
+        self.create_jw_blocks(letterblock)
+        self.create_lawyer_table(id_map, lawyer_dict, letter)
+        print(f"Finished with Letter:{letter}!")
+
+    def run_disambiguation(self):
 
         # get all lawyers in database
         print("running")
@@ -261,51 +310,60 @@ class LawyerDisambiguator:
         # global patentlawyer_insert_statements
         # global update_statements
         #
-        completed_alphabets=[]
-        print("going through alphabet")
+        completed_alphabets = []
+        parallelism = int(self.config["PARALLELISM"]["parallelism"])
+        manager = mp.Manager()
+        log_queue = manager.Queue()
+
+        parser_start = time.time()
+        pool = mp.Pool(parallelism)
+        watcher = pool.apply_async(log_writer, (log_queue, "lawyer_disambiguation"))
+        p_list = []
+        # process_cpc_file(cpc_xml_file, list(xml_file_name_generator)[-1], config, log_queue, csv_queue)
+        # for letter in ['q','u']:
         for letter in alphabet:
-            if letter in completed_alphabets:
-                continue
-            # track memory usage by letter
-            print("letter is: ", letter, datetime.now(), flush=True)
-            # bookkeeping
-            id_map = defaultdict(list)
-            lawyer_dict = {}
-            letterblock = []
-            # query by letter
-            session = alchemy.fetch_session(dbtype=self.doctype)
-            lawyers_object = session.query(RawLawyer).filter(RawLawyer.alpha_lawyer_id.like(letter + '%'))
-            print("query returned")
-            for lawyer in tqdm(lawyers_object):
-                lawyer_dict[lawyer.uuid] = lawyer
-                id_map[lawyer.alpha_lawyer_id].append(lawyer.uuid)
-                letterblock.append(lawyer.alpha_lawyer_id)
-            session.close_all()
-            print(letterblock[0:5])
-            self.create_jw_blocks(letterblock)
-            self.create_lawyer_table(id_map, lawyer_dict)
+            p = pool.apply_async(self.process_alphabet, (letter, log_queue))
+            p_list.append(p)
+
+        for t in p_list:
+            t.get()
+
+        log_queue.put({
+            "level": logging.INFO,
+            "message": "Total disambiguation time {parser_duration}".format(
+                parser_duration=round(time.time() - parser_start, 3))
+        })
+        log_queue.put({
+            "level": None,
+            "message": "kill"
+        })
+        watcher.get()
+        pool.close()
+        pool.join()
 
 
-def start_lawyer_disambiguation(config):
-    prepare_tables(config)
-    clean_rawlawyer(config)
-    load_clean_rawlawyer(config)
-    disambiguator = LawyerDisambiguator(config)
-    disambiguator.run_disambiguation()
-    cstr = get_connection_string(config, 'RAW_DB')
+def rawlawyer_postprocesing(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr + "&local_infile=1")
-
     engine.execute("ALTER TABLE rawlawyer DROP alpha_lawyer_id")
     engine.dispose()
 
 
-def post_process_qc(config):
+def start_lawyer_disambiguation(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    disambiguator = LawyerDisambiguator(config)
+    disambiguator.run_disambiguation()
+    disambiguator.load_lawyer_to_db()
+
+def post_process_qc(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
     qc = LawyerPostProcessingQC(config)
     qc.runTests()
 
 
 if __name__ == '__main__':
-    config = get_current_config(**{
-            "execution_date": date(2021, 3, 23)
-            })
-    start_lawyer_disambiguation(config)
+    start_lawyer_disambiguation(**{
+        "execution_date": date(2021, 10, 1)
+    })
+

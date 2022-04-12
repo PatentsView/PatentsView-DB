@@ -331,7 +331,7 @@ def process_patent_numbers(raw_patent_num):
         clean_patent_num = num
     return clean_patent_num
 
-def process_date(date): 
+def process_date(date, as_string=False):
     '''
     Takes a date formated as 6 numbers and returns it with dashes and days that are 00 replaced with 01
     :params date: a date object formatted as 6 numbers
@@ -342,6 +342,9 @@ def process_date(date):
             date = date[:4]+'-'+date[4:6]+'-'+date[6:]
         else:
             date = date[:4]+'-'+date[4:6]+'-'+'01'
+    if as_string:
+        date = "'"+date+"'"
+    print(date)
     return date
 
 def process_uspc_class_sub(classification):
@@ -364,3 +367,8 @@ def clean_country(country):
         return country[:2]
     else:
         return country
+
+
+if __name__ == '__main__':
+    # config = get_config()
+    process_date('20211004', as_string=True)

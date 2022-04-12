@@ -5,7 +5,8 @@ import time
 
 from sqlalchemy import create_engine
 
-from QA.create_databases.MergeTest import MergeTest
+from QA.create_databases.MergeTestQuarterly import MergeTestQuarterly
+from QA.create_databases.MergeTestWeekly import MergeTestWeekly
 from QA.create_databases.TextTest import TextMergeTest
 from lib.configuration import get_connection_string, get_current_config, get_lookup_tables, get_merge_table_candidates
 
@@ -37,9 +38,9 @@ def update_table_data(table_name, config, lookup=False):
     insert_clause = "INSERT"
     if lookup:
         insert_clause = "INSERT IGNORE"
-    connection_string = get_connection_string(config, "RAW_DB")
+    connection_string = get_connection_string(config, "PROD_DB")
     upload_db = config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
-    raw_db = config["PATENTSVIEW_DATABASES"]["RAW_DB"]
+    raw_db = config["PATENTSVIEW_DATABASES"]["PROD_DB"]
     engine = create_engine(connection_string)
     order_by_cursor = engine.execute(
             "SELECT GROUP_CONCAT(s.COLUMN_NAME SEPARATOR ', ' ) from information_schema.tables t left join information_schema.statistics s on t.TABLE_NAME=s.TABLE_NAME where INDEX_NAME='PRIMARY' and t.TABLE_SCHEMA=s.TABLE_SCHEMA and t.TABLE_SCHEMA ='" + upload_db + "' and s.TABLE_NAME ='" + table_name + "' GROUP BY t.TABLE_NAME;")
@@ -132,7 +133,8 @@ def normalize_exemplary(config):
 
 
 def update_text_data(table, update_config):
-    connection_string = get_connection_string(update_config, "TEXT_DATABASE")
+    connection_string = get_connection_string(update_config, "TEXT_DB")
+    # qa_connection_string = get_connection_string(update_config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
     engine = create_engine(connection_string)
     query = table["insert"]
     engine.execute(query)
@@ -155,23 +157,24 @@ def begin_merging(**kwargs):
 
 
 def begin_text_merging(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config('granted_patent', **kwargs)
     version = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'].split("_")[1]
-    end_date=datetime.datetime.strptime(config['DATES']['END_DATE'],"%Y%m%d")
+    text_db = config['PATENTSVIEW_DATABASES']['TEXT_DB']
+    temp_db = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB']
+    raw_db = config['PATENTSVIEW_DATABASES']['PROD_DB']
+    end_date=datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y%m%d")
     year = int(end_date.strftime('%Y'))
     text_table_config = {
             'brf_sum_text':       {
-                    "insert": """
+                    "insert": f"""
 INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, `text`, version_indicator)
 SELECT uuid, patent_id, text, version_indicator
 from {temp_db}.brf_sum_text_{year}
-                    """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
-                               year=year)
+                    """
                     },
             'claim':              {
                     'preprocess': normalize_exemplary,
-                    "insert":     """
+                    "insert":     f"""
 INSERT INTO {text_db}.claims_{year}(uuid, patent_id, num, `text`, `sequence`, dependent, exemplary, 
 version_indicator)
 SELECT c.uuid,
@@ -185,63 +188,164 @@ SELECT c.uuid,
 from {temp_db}.claims_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
                    on tce.patent_id = c.patent_id and tce.exemplary = c.sequence
-                    """.format(
-                            text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], year=year)
+                    """
                     },
             'draw_desc_text':     {
-                    "insert": """
+                    "insert": f"""
 INSERT INTO {text_db}.draw_desc_text_{year}(uuid, patent_id, text, sequence, version_indicator)
 SELECT uuid, patent_id, text, sequence, version_indicator
 from {temp_db}.draw_desc_text_{year}
-                    """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                               temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
-                               year=year)
+                    """
                     },
             'detail_desc_text':   {
-                    "insert": """
+                    "insert": f"""
 INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length,version_indicator)
 SELECT uuid, patent_id, text,char_length(text), version_indicator
 from {temp_db}.detail_desc_text_{year}
-                              """.format(text_db=config['PATENTSVIEW_DATABASES']['TEXT_DATABASE'],
-                                         temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'],
-                                         year=year)
+                              """
                     },
             'detail_desc_length': {
-                    "insert": "INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(text), version_indicator from {temp_db}.detail_desc_text_{year}".format(
-                            raw_db=config['PATENTSVIEW_DATABASES']['RAW_DB'],
-                            temp_db=config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], year=year)
+                    "insert": f"INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(text), version_indicator from {temp_db}.detail_desc_text_{year}"
                     }
             }
     merge_text_data(text_table_config, config)
 
 
-def post_merge(**kwargs):
+def begin_text_merging_pgpubs(**kwargs):
+    config = get_current_config('pgpubs', **kwargs)
+    version = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'].split("_")[1]
+    temp_db = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB']
+    text_db = config['PATENTSVIEW_DATABASES']['TEXT_DB']
+    prod_db = config['PATENTSVIEW_DATABASES']['PROD_DB']
+    end_date=datetime.datetime.strptime(config['DATES']['END_DATE'], "%Y%m%d")
+    year = int(end_date.strftime('%Y'))
+    text_table_config = {
+            'brf_sum_text':       {
+                    "insert": """
+INSERT INTO {text_db}.brf_sum_text_{year}(id, document_number, `text`, version_indicator)
+SELECT id, document_number, text, version_indicator
+from {temp_db}.brf_sum_text_{year}
+                    """.format(text_db=text_db,
+                               temp_db=temp_db,
+                               year=year)
+                    },
+            'claim':              {
+                    "insert":     """
+INSERT INTO {text_db}.claim_{year}(id, document_number, `text`, `sequence`, dependent, num, 
+version_indicator)
+SELECT c.id,
+       c.document_number,
+       c.text,
+       c.sequence - 1,
+       c.dependent,
+       c.num,
+       c.version_indicator
+from {temp_db}.claim_{year} c
+         left join {temp_db}.temp_normalized_claim_exemplary tce
+                   on tce.document_number = c.document_number 
+                    """.format(
+                            text_db=text_db,
+                            temp_db=temp_db, year=year)
+                    },
+            'draw_desc_text':     {
+                    "insert": """
+INSERT INTO {text_db}.draw_desc_text_{year}(id, document_number, text, sequence, version_indicator)
+SELECT id, document_number, text, sequence, version_indicator
+from {temp_db}.draw_desc_text_{year}
+                    """.format(text_db=text_db,
+                               temp_db=temp_db,
+                               year=year)
+                    },
+            'detail_desc_text':   {
+                    "insert": """
+INSERT INTO {text_db}.detail_desc_text_{year}(id, document_number, text, length, version_indicator)
+SELECT id, document_number, text, char_length(text), version_indicator
+from {temp_db}.detail_desc_text_{year}
+                              """.format(text_db=text_db,
+                                         temp_db=temp_db,
+                                         year=year)
+                    },
+            'detail_desc_length': {
+                    "insert": "INSERT INTO {raw_db}.detail_desc_length( document_number, detail_desc_length, version_indicator) SELECT  document_number, CHAR_LENGTH(text), version_indicator from {temp_db}.detail_desc_text_{year}".format(
+                            raw_db=prod_db,
+                            temp_db=temp_db, year=year)
+                    }
+            }
+    merge_text_data(text_table_config, config)
+
+
+
+def post_merge_weekly_granted(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
     run_id = kwargs.get('run_id')
-    if run_id.startswith("backfill"):
-        print("Skipping QC")
-    else:
-        qc = MergeTest(config, run_id=kwargs['run_id'])
-        qc.runTests()
+    # if run_id.startswith("backfill"):
+    #     print("Skipping QC")
+    # else:
+    qc = MergeTestWeekly(config, run_id=kwargs['run_id'])
+    qc.runTests()
+
+def post_merge_quarterly_granted(**kwargs):
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+    run_id = kwargs.get('run_id')
+    # if run_id.startswith("backfill"):
+    #     print("Skipping QC")
+    # else:
+    qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
+    qc.runTests()
+
+def post_merge_weekly_pgpubs(**kwargs):
+    config = get_current_config('pgpubs', **kwargs)
+    run_id = kwargs.get('run_id')
+    # if run_id.startswith("backfill"):
+    #     print("Skipping QC")
+    # else:
+    qc = MergeTestWeekly(config, run_id=kwargs['run_id'])
+    qc.runTests()
+
+def post_merge_quarterly_pgpubs(**kwargs):
+    config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
+    run_id = kwargs.get('run_id')
+    # if run_id.startswith("backfill"):
+    #     print("Skipping QC")
+    # else:
+    qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
+    qc.runTests()
 
 
 def post_text_merge(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
     run_id = kwargs.get('run_id')
-    if run_id.startswith("backfill"):
-        print("Skipping QC")
-    else:
-        qc = TextMergeTest(config)
-        qc.runTests()
+    # if run_id.startswith("backfill"):
+    #     print("Skipping QC")
+    # else:
+    qc = TextMergeTest(config)
+    qc.runTests()
 
 
 if __name__ == '__main__':
+    # config = get_current_config('granted_patent', **{
+    #     "execution_date": datetime.date(2021, 11, 4)
+    # })
+    # config = get_current_config('pgpubs', **{
+    #     "execution_date": datetime.date(2021, 12, 2)
+    # })
     # begin_merging(**{
     #         "execution_date": datetime.date(2020, 12, 1),
     #         "run_id":         1
     #         }, )
-    post_merge(**{
-            "execution_date": datetime.date(2020, 12, 1),
-            "run_id":         1
-            })
+    # post_merge_weekly(**{
+    #         "execution_date": datetime.date(2020, 12, 1),
+    #         "run_id":         "testing"
+    #         })
+    # begin_text_merging(**{
+    #         "execution_date": datetime.date(2020, 12, 1),
+    #         "run_id":         "testing"
+    #         })
+    # post_merge_quarterly_granted( **{
+    #     "execution_date": datetime.date(2021, 12, 2)
+    # })
+    # begin_text_merging_pgpubs(**{
+    #         "execution_date": datetime.date(2021, 12, 2),
+    #         })
+    # update_table_data("application", config)
+    print("TESTING POST MERGE")

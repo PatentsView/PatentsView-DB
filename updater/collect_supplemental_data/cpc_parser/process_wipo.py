@@ -93,10 +93,10 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
             lambda _df: _df.nlargest(3, 'wipo_count', keep='all')).reset_index(drop=True)
     # Assign Sequence
     wipo_filtered_data_sequenced = wipo_filtered_data.drop(["wipo_count"], axis=1).assign(
-            sequence=wipo_filtered_data.groupby(['patent_id']).cumcount())
+        sequence=wipo_filtered_data.groupby(['patent_id']).cumcount())
     wipo_filtered_data_sequenced = wipo_filtered_data_sequenced.assign(version_indicator=config['DATES']['END_DATE'])
     cstr = get_connection_string(config, "TEMP_UPLOAD_DB")
-    print(cstr)
+    # print(cstr)
     engine = create_engine(cstr)
     with engine.begin() as conn:
         wipo_filtered_data_sequenced.to_sql('wipo', conn, if_exists='append', index=False, method="multi")
@@ -107,24 +107,29 @@ def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordan
 
 
 def consolidate_wipo(config):
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
-    upsert_query = """
-INSERT INTO wipo (patent_id, field_id, sequence, version_indicator) SELECT patent_id, field_id, sequence, version_indicator from {temp_db}.wipo ON DUPLICATE KEY UPDATE patent_id = VALUES(patent_id),
-                        field_id = VALUES(field_id),
-                        `sequence` = VALUES(`sequence`),
-                        version_indicator = VALUES(version_indicator);
-""".format(
-            temp_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
-    engine.execute(upsert_query)
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
+    start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
+    suffix = (start_date - datetime.timedelta(days=1)).strftime('%Y%m%d')
+    rename_raw_statement = """
+    rename table {raw_db}.wipo to {raw_db}.wipo_{suffix}
+    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"], suffix=suffix)
+    rename_upload_statement = """
+    rename table {upload_db}.wipo to {raw_db}.wipo
+    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"],
+               upload_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
+    print(rename_raw_statement)
+    engine.execute(rename_raw_statement)
+    print(rename_upload_statement)
+    engine.execute(rename_upload_statement)
 
 
 def process_and_upload_wipo(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
-    myengine = create_engine(get_connection_string(config, "RAW_DB"))
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+    myengine = create_engine(get_connection_string(config, "PROD_DB"))
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                  'wipo_output')
-    if not os.path.exists(wipo_output):
-        os.mkdir(wipo_output)
+    version_indicator = config['DATES']['END_DATE']
+    os.makedirs(wipo_output, exist_ok=True)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     ipc_tech_file = '{}/ipc_technology.csv'.format(persistent_files)
     ipc_tech_field_map = get_ipc_tech_code_field_map(ipc_tech_file)
@@ -134,27 +139,31 @@ def process_and_upload_wipo(**kwargs):
 
     cpc_ipc_concordance_map = get_ipc_cpc_ipc_concordance_map(concordance_file)
 
-    limit = 10000
+    limit = 30000
     offset = 0
-    batch_counter = 0
-    base_query_template = "SELECT id from patent order by id limit {limit} offset {offset}"
+    patent_batches_query = f"select round((count(*)/{limit}),0) from patent where version_indicator <= '{version_indicator}'"
+    patent_batches = pd.read_sql_query(con=myengine, sql=patent_batches_query)
+    num_batches = int(patent_batches.iloc[:,0][0])
+    base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
     cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = c.patent_id"
-    while True:
+    for batch in range(num_batches):
         start = time.time()
-        batch_counter += 1
-        base_query = base_query_template.format(limit=limit, offset=offset)
+        base_query = base_query_template.format(limit=limit, offset=offset, vind=version_indicator)
         cpc_join_query = cpc_query_template.format(base_query=base_query)
         cpc_current_data = pd.read_sql_query(con=myengine, sql=cpc_join_query)
-        if cpc_current_data.shape[0] < 1:
-            break
-        wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
+        print(f"For {batch}: {offset}, with {cpc_join_query}, the count is {cpc_current_data.shape[0]}")
         offset = offset + limit
+        if cpc_current_data.shape[0] < 1:
+            continue
+        wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
         end = time.time()
-        print("Chunk Time:" + str(round(end - start)))
+        perc_complete = (batch+1)/num_batches
+        chunk_time = str(round(end - start))
+        print(f"We are on batch: {batch} of {num_batches}, or {perc_complete} complete which took {chunk_time} seconds")
     consolidate_wipo(config)
 
 
 if __name__ == '__main__':
     process_and_upload_wipo(**{
-            "execution_date": datetime.date(2020, 12,29)
-            })
+        "execution_date": datetime.date(2021, 10, 1)
+    })

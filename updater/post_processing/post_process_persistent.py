@@ -11,10 +11,10 @@ import pymysql
 from sqlalchemy import create_engine
 
 from lib.configuration import get_config, get_connection_string, get_current_config
-
+from lib.xml_helpers import process_date
 
 def update_long_entity(entity, database_type='granted_patent', **kwargs):
-    config = get_current_config(type=database_type, **kwargs)
+    config = get_current_config(schedule='quarterly',type=database_type, **kwargs)
     section = get_database_section(database_type)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
@@ -23,16 +23,17 @@ def update_long_entity(entity, database_type='granted_patent', **kwargs):
                                  charset='utf8mb4',
                                  cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
     update_version = config['DATES']['END_DATE']
+    version_indicator = process_date(update_version, as_string=True)
     source_entity_table = '{entity}_disambiguation_mapping'.format(entity=entity)
     source_entity_field = '{entity}_id'.format(entity=entity)
 
     target_persistent_table = 'persistent_{entity}_disambig_long'.format(entity=entity)
 
     entity_update_query = """
-    INSERT INTO {target_table} (uuid, database_update, {entity_id}) SELECT uuid, {db_version},{entity_id} from {source_table}
+    INSERT INTO {target_table} (uuid, database_update, {entity_id}, version_indicator) SELECT uuid, {db_version},{entity_id}, {version_indicator} from {source_table}
     """.format(
             target_table=target_persistent_table, source_table=source_entity_table, entity_id=source_entity_field,
-            db_version=update_version)
+            db_version=update_version, version_indicator=version_indicator)
     print(entity_update_query)
     if not connection.open:
         connection.connect()
@@ -74,7 +75,7 @@ def get_database_section(database_type='granted_patent'):
 
 
 def prepare_wide_table(entity, database_type='granted_patent', **kwargs):
-    config = get_current_config(type=database_type, **kwargs)
+    config = get_current_config(schedule='quarterly',type=database_type, **kwargs)
     section = get_database_section(database_type)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
@@ -92,11 +93,11 @@ def prepare_wide_table(entity, database_type='granted_patent', **kwargs):
         wide_pid_df = generate_wide_header(connection, entity, config,section)
 
         alter_stmt = 'alter table {0}.{1} add column disamb_{2}_id_{3} varchar(256) null after {4} '.format(
-                RAW_DB,
-                wide_table_name,
-                entity,
-                update_version,
-                wide_pid_df.columns[-1])
+            RAW_DB,
+            wide_table_name,
+            entity,
+            update_version,
+            wide_pid_df.columns[-1])
         # create_with_columns = get_create_syntax(entity, pid_cols, create_stmt)
         # primary_key_stmt = 'PRIMARY KEY (`{current_rawentity}`));'.format(current_rawentity=current_rawentity)
         #
@@ -105,7 +106,7 @@ def prepare_wide_table(entity, database_type='granted_patent', **kwargs):
 
 
 def write_wide_table(entity, database_type='granted_patent', **kwargs):
-    config = get_current_config(type=database_type, **kwargs)
+    config = get_current_config(schedule='quarterly',type=database_type, **kwargs)
     section = get_database_section(database_type=database_type)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
@@ -122,10 +123,10 @@ def write_wide_table(entity, database_type='granted_patent', **kwargs):
     persistent_wide_table = 'persistent_{0}_disambig'.format(entity)
     id_col = '{0}_id'.format(entity)
     upsert_query = """
-    INSERT INTO {wide_table} ({current_id},{disambig_id}) select uuid,{entity_id} from {source_entity} ON DUPLICATE  
+    INSERT INTO {wide_table} ({current_id},{disambig_id},version_indicator) select uuid,{entity_id},'{version_indicator}' from {source_entity} ON DUPLICATE  
     KEY UPDATE {disambig_id} = VALUES({disambig_id})
     """.format(wide_table=persistent_wide_table, current_id=current_rawentity, disambig_id=disamb_col, entity_id=id_col,
-               source_entity=source_entity_table)
+               source_entity=source_entity_table, version_indicator=update_version)
     # fixed
 
     cstr = get_connection_string(config, database=section)
@@ -136,6 +137,9 @@ def write_wide_table(entity, database_type='granted_patent', **kwargs):
 
 if __name__ == '__main__':
     config = get_config()
-    write_wide_table('assignee', **{
-            "execution_date": datetime.date(2021, 3, 23)
+    # write_wide_table('assignee', **{
+    #         "execution_date": datetime.date(2021, 3, 23)
+    #         })
+    update_long_entity(entity='assignee', database_type='granted_patent', **{
+            "execution_date": datetime.date(2021, 10, 1)
             })

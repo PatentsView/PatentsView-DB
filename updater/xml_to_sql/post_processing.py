@@ -1,11 +1,13 @@
 import datetime
+import os
+import json
 
 import pymysql
 from sqlalchemy import create_engine
 
 from QA.text_parser.AppTest import AppUploadTest
 from lib.configuration import get_connection_string, get_current_config
-
+from lib import utilities
 
 def pct_data_doc_type(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
@@ -23,16 +25,16 @@ def consolidate_uspc(config):
     engine.execute(
             "DELETE  FROM  rawuspc  WHERE  LENGTH(classification) < 3;")
     engine.execute(
-            "INSERT IGNORE INTO uspc (id, document_number, mainclass_id, subclass_id, sequence, filename) SELECT id, document_number, TRIM(SUBSTRING(classification,1,3)), TRIM(CONCAT(SUBSTRING(classification,1,3), '/', TRIM(SUBSTRING(classification,4, LENGTH(classification))))), sequence, filename FROM rawuspc;")
+            "INSERT IGNORE INTO uspc (id, document_number, mainclass_id, subclass_id, sequence, filename, version_indicator) SELECT id, document_number, TRIM(SUBSTRING(classification,1,3)), TRIM(CONCAT(SUBSTRING(classification,1,3), '/', TRIM(SUBSTRING(classification,4, LENGTH(classification))))), sequence, filename, version_indicator FROM rawuspc;")
 
 
 def consolidate_rawlocation(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
-            'INSERT IGNORE INTO rawlocation (id, city, state, country, filename) SELECT rawlocation_id, city, state, country, filename FROM rawassignee;')
+            'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM rawassignee;')
     engine.execute(
-            'INSERT IGNORE INTO rawlocation (id, city, state, country, filename) SELECT rawlocation_id, city, state, country, filename FROM rawinventor;')
+            'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM rawinventor;')
 
 
 def create_country_transformed(config):
@@ -47,9 +49,9 @@ def consolidate_cpc(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
-            "INSERT IGNORE INTO cpc (id,document_number,sequence,version,section_id,subsection_id,group_id,subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date) SELECT id,document_number,sequence,version,section as section_id,concat(section, class) as subsection_id,concat(section, class, subclass) as group_id,concat(section, class, subclass, main_group, '/', subgroup) as subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date from main_cpc;")
+            "INSERT IGNORE INTO cpc (id,document_number,sequence,version,section_id,subsection_id,group_id,subgroup_id,symbol_position,`value`,action_date,filename,version_indicator,created_date,updated_date) SELECT id,document_number,sequence,version,section as section_id,concat(section, class) as subsection_id,concat(section, class, subclass) as group_id,concat(section, class, subclass, main_group, '/', subgroup) as subgroup_id,symbol_position,`value`,action_date,filename,version_indicator,created_date,updated_date from main_cpc;")
     engine.execute(
-            "INSERT IGNORE INTO cpc (id,document_number,sequence,version,section_id,subsection_id,group_id,subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date) SELECT id,document_number,(sequence+1),version,section as section_id,concat(section, class) as subsection_id,concat(section, class, subclass) as group_id,concat(section, class, subclass, main_group, '/', subgroup) as subgroup_id,symbol_position,`value`,action_date,filename,created_date,updated_date from further_cpc;")
+            "INSERT IGNORE INTO cpc (id,document_number,sequence,version,section_id,subsection_id,group_id,subgroup_id,symbol_position,`value`,action_date,filename,version_indicator,created_date,updated_date) SELECT id,document_number,(sequence+1),version,section as section_id,concat(section, class) as subsection_id,concat(section, class, subclass) as group_id,concat(section, class, subclass, main_group, '/', subgroup) as subgroup_id,symbol_position,`value`,action_date,filename,version_indicator,created_date,updated_date from further_cpc;")
     engine.execute(
             "UPDATE cpc SET category = 'inventional' WHERE value = 'I';")
     engine.execute(
@@ -247,6 +249,7 @@ def trim_rawassignee(config):
 
 def begin_post_processing(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
+    utilities.trim_whitespace(config)
     trim_rawassignee(config)
     consolidate_rawlocation(config)
     create_country_transformed(config)
@@ -270,5 +273,5 @@ def post_upload_database(**kwargs):
 
 if __name__ == "__main__":
     begin_post_processing(**{
-            "execution_date": datetime.date(2020, 12, 17)
+            "execution_date": datetime.date(2022, 1, 11)
             })

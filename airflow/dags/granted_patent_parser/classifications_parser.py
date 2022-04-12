@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.sensors.external_task import ExternalTaskSensor
 
 from QA.collect_supplemental_data.cpc_parser.CPCCurrentTest import CPCTest
 from lib.configuration import get_current_config, get_today_dict
@@ -20,8 +21,9 @@ class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
 
-def post_cpc_wipo(config):
-    qc = CPCTest(config)
+def post_cpc_wipo(**kwargs):
+    current_config = get_current_config(type='granted_patent', schedule='quarterly', **kwargs)
+    qc = CPCTest(current_config)
     qc.runTests()
 
 
@@ -32,28 +34,40 @@ config = get_current_config(type='config.ini', supplemental_configs=None, **get_
 print(config)
 
 default_args = {
-        'owner':            'smadhavan',
-        'depends_on_past':  False,
-        'email':            ['contact@patentsview.org'],
-        'email_on_failure': False,
-        'email_on_retry':   False,
-        'retries':          3,
-        'retry_delay':      timedelta(minutes=120),
-        'concurrency':      40
-        # 'queue': 'bash_queue',
-        # 'pool': 'backfill',
-        # 'priority_weight': 10,
-        # 'end_date': datetime(2016, 1, 1),
-        }
+    'owner': 'smadhavan',
+    'depends_on_past': False,
+    'email': ['contact@patentsview.org'],
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 3,
+    'retry_delay': timedelta(minutes=120),
+    'concurrency': 40,
+    'queue': 'data_collector'
+    # 'queue': 'bash_queue',
+    # 'pool': 'backfill',
+    # 'priority_weight': 10,
+    # 'end_date': datetime(2016, 1, 1),
+}
 
 cpc_wipo_updater = DAG(
-        dag_id='classifications_parser',
-        default_args=default_args,
-        description='Download and process CPC and WIPO classifification data for each update',
-        start_date=datetime(2021, 2, 1),
-        schedule_interval=None,
-        template_searchpath=templates_searchpath,
-        )
+    dag_id='classifications_parser',
+    default_args=default_args,
+    description='Download and process CPC and WIPO classification data for each update',
+    start_date=datetime(2021, 10, 1),
+    schedule_interval='@quarterly',
+    template_searchpath=templates_searchpath,
+    catchup=True
+)
+
+quarterly_merge_completed = ExternalTaskSensor(
+    task_id="quarterly_merge_completed",
+    external_dag_id="merge_quarterly_updater",
+    external_task_id="qc_text_merge_quarterly_pgpubs",
+    timeout=600,
+    allowed_states=['success'],
+    failed_states=['failed', 'skipped'],
+    mode="reschedule",
+)
 
 download_cpc_operator = PythonOperator(task_id='download_cpc',
                                        python_callable=collect_cpc_data,
@@ -65,34 +79,48 @@ download_cpc_operator = PythonOperator(task_id='download_cpc',
 qc_download_cpc_operator = PythonOperator(task_id='qc_download_cpc',
                                           dag=cpc_wipo_updater,
                                           python_callable=post_download,
-                                          provide_context=True, on_success_callback=airflow_task_success,
+                                          provide_context=True,
+                                          on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure)
 
-cpc_class_parser_operator = PythonOperator(task_id='cpc_class_parser', python_callable=process_cpc_class_parser,
-                                           dag=cpc_wipo_updater, provide_context=True,
+cpc_class_parser_operator = PythonOperator(task_id='cpc_class_parser',
+                                           python_callable=process_cpc_class_parser,
+                                           dag=cpc_wipo_updater,
+                                           provide_context=True,
                                            on_success_callback=airflow_task_success,
                                            on_failure_callback=airflow_task_failure)
 #
 # # Good
-qc_cpc_class_parser_operator = PythonOperator(task_id='qc_cpc_class_parser', python_callable=post_class_parser,
-                                              dag=cpc_wipo_updater, provide_context=True,
+qc_cpc_class_parser_operator = PythonOperator(task_id='qc_cpc_class_parser',
+                                              python_callable=post_class_parser,
+                                              dag=cpc_wipo_updater,
+                                              provide_context=True,
                                               on_success_callback=airflow_task_success,
                                               on_failure_callback=airflow_task_failure)
 #
 # # consolidate_cpc_data changed {raw_db}.cpc_current to {raw_db}.temp_cpc_current
-cpc_current_operator = PythonOperator(task_id='cpc_current_processor', python_callable=process_and_upload_cpc_current,
-                                      dag=cpc_wipo_updater, provide_context=True,
+cpc_current_operator = PythonOperator(task_id='cpc_current_processor',
+                                      python_callable=process_and_upload_cpc_current,
+                                      dag=cpc_wipo_updater,
+                                      provide_context=True,
                                       on_success_callback=airflow_task_success,
-                                      on_failure_callback=airflow_task_failure)
+                                      on_failure_callback=airflow_task_failure,
+                                      pool='database_write_iops_contenders')
 #
 # # consolidate_wipo changed INSERT INTO wipo to INSERT INTO temp_wipo
-wipo_operator = PythonOperator(task_id='wipo_processor', python_callable=process_and_upload_wipo, dag=cpc_wipo_updater,
-                               provide_context=True, on_success_callback=airflow_task_success,
-                               on_failure_callback=airflow_task_failure)
+wipo_operator = PythonOperator(task_id='wipo_processor',
+                               python_callable=process_and_upload_wipo,
+                               dag=cpc_wipo_updater,
+                               provide_context=True,
+                               on_success_callback=airflow_task_success,
+                               on_failure_callback=airflow_task_failure,
+                               pool='database_write_iops_contenders', queue='disambiguator')
 
 # # Good
-cpc_class_operator = PythonOperator(task_id='cpc_class_uploader', python_callable=upload_cpc_classes,
-                                    dag=cpc_wipo_updater, on_success_callback=airflow_task_success,
+cpc_class_operator = PythonOperator(task_id='cpc_class_uploader',
+                                    python_callable=upload_cpc_classes,
+                                    dag=cpc_wipo_updater,
+                                    on_success_callback=airflow_task_success,
                                     on_failure_callback=airflow_task_failure)
 
 qc_cpc_current_wipo_operator = PythonOperator(task_id='qc_cpc_current_wipo',

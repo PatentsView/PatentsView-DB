@@ -22,7 +22,7 @@ def parser_report(update_config):
 
 
 def rename_report(update_config):
-    message = "New database created:{db_name}".format(db_name=update_config["PATENTSVIEW_DATABASES"]["RAW_DB"])
+    message = "New database created:{db_name}".format(db_name=update_config["PATENTSVIEW_DATABASES"]["PROD_DB"])
     return message
 
 
@@ -46,7 +46,7 @@ def restore_report(update_config):
     directory_parameter = "{datahome}/{database}_backup".format(datahome=update_config["FOLDERS"]["WORKING_FOLDER"],
                                                                 database=update_config["PATENTSVIEW_DATABASES"][
                                                                     "TEMP_UPLOAD_DB"])
-    database_parameter = "{database}".format(database=update_config["PATENTSVIEW_DATABASES"]["RAW_DB"])
+    database_parameter = "{database}".format(database=update_config["PATENTSVIEW_DATABASES"]["PROD_DB"])
     message = "Database restored from {dir_param} to {db}".format(dir_param=directory_parameter, db=database_parameter)
     return message
 
