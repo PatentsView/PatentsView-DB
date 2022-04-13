@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from slack_sdk import WebClient
+
+from airflow.dags.granted_patent_parser.patentsview_data_updater import operator_settings
+from reporting_database_generator.other_miscellaneous_tasks.other_misc_tasks import qa_granted_patent_crosswalk, create_granted_patent_crosswalk
 from slack_sdk.errors import SlackApiError
 
 
@@ -49,6 +52,8 @@ default_args = {
         # 'priority_weight': 10,
         # 'end_date': datetime(2016, 1, 1),
         }
+
+# REPORTING DB
 
 reporting_db_dag = DAG("reporting_database_generation"
                        , default_args=default_args
@@ -577,11 +582,23 @@ rep_tbl_2 = SQLTemplatedPythonOperator(
 #     params=database_name_config
 # )
 
+# OTHER MISC TASKS TO BE RUN
+create_granted_patent_crosswalk = PythonOperator(task_id='create_granted_patent_crosswalk',
+                                        python_callable=create_granted_patent_crosswalk)
+
+qa_granted_patent_crosswalk = PythonOperator(task_id='qa_granted_patent_crosswalk',
+                                        python_callable=qa_granted_patent_crosswalk)
+
+
+# MAPPING DEPENDENCY
+
 govt_interest.set_upstream(db_creation)
 # claims.set_upstream(db_creation)
 id_mappings.set_upstream(db_creation)
 application.set_upstream(db_creation)
 wipo.set_upstream(db_creation)
+create_granted_patent_crosswalk.set_upstream(db_creation)
+qa_granted_patent_crosswalk.set_upstream(create_granted_patent_crosswalk)
 
 patent.set_upstream(id_mappings)
 
