@@ -46,7 +46,7 @@
         {
           "field_name": "variety",
           "friendly_name": "Variety",
-          "xml_path": "us-bibliographic-data-application/us-botanic/vairety",
+          "xml_path": "us-bibliographic-data-application/us-botanic/variety",
           "description": null,
           "sequence": false,
           "attribute": null,
