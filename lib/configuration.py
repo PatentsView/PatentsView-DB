@@ -62,8 +62,11 @@ def get_section(dag_id, task_id):
     return section
 
 
-def get_connection_string(config, database='TEMP_UPLOAD_DB', connection='DATABASE_SETUP'):
-    database = '{}'.format(config['PATENTSVIEW_DATABASES'][database])
+def get_connection_string(config, database='TEMP_UPLOAD_DB', connection='DATABASE_SETUP', db_real_value_passed=False):
+    if db_real_value_passed==True:
+        database = '{}'.format(database)
+    else:
+        database = '{}'.format(config['PATENTSVIEW_DATABASES'][database])
     host = '{}'.format(config[connection]['HOST'])
     user = '{}'.format(config[connection]['USERNAME'])
     password = '{}'.format(config[connection]['PASSWORD'])
