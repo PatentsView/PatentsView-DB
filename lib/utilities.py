@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 from clint.textui import progress
 from sqlalchemy import create_engine
 
-from lib.configuration import get_connection_string
+from lib.configuration import get_connection_string, get_current_config
 
 
 def with_keys(d, keys):
@@ -56,6 +56,7 @@ def load_table_config(config, db='patent'):
     elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
         table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'))
     return table_config
+
 
 
 def get_relevant_attributes(self, class_called, database_section, config):
@@ -196,6 +197,27 @@ def get_relevant_attributes(self, class_called, database_section, config):
             self.table_config = load_table_config(config, db=database_section)
         else:
             raise NotImplementedError
+
+def update_to_granular_version_indicator(table, db):
+    config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
+    cstr = get_connection_string(config, 'PROD_DB')
+    engine = create_engine(cstr)
+    if db == 'granted_patent':
+        id = 'id'
+        fk = 'patent_id'
+        fact_table = 'patent'
+    else:
+        id = 'document_number'
+        fk = 'document_number'
+        fact_table = 'publications'
+    query = f"""
+update {table} update_table 
+	inner join {fact_table} p on update_table.{fk}=p.{id}
+set update_table.version_indicator=p.version_indicator     
+    """
+    print(query)
+    engine.execute(query)
+
 
 
 # Moved from AssigneePostProcessing - unused for now
