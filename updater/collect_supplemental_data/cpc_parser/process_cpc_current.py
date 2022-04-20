@@ -7,7 +7,6 @@ import time
 import uuid
 import zipfile
 
-from time import time
 from lxml import etree
 from sqlalchemy import create_engine
 from tqdm import tqdm
