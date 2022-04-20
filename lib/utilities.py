@@ -13,6 +13,7 @@ import zipfile
 from queue import Queue
 from statistics import mean
 import pandas as pd
+import time
 
 import boto3
 import requests
@@ -20,7 +21,8 @@ from bs4 import BeautifulSoup
 from clint.textui import progress
 from sqlalchemy import create_engine
 
-from lib.configuration import get_connection_string, get_current_config
+# from lib.configuration import get_connection_string, get_current_config
+from lib.configuration import get_connection_string
 
 
 def with_keys(d, keys):
@@ -56,7 +58,6 @@ def load_table_config(config, db='patent'):
     elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
         table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'))
     return table_config
-
 
 
 def get_relevant_attributes(self, class_called, database_section, config):
@@ -198,6 +199,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         else:
             raise NotImplementedError
 
+
 def update_to_granular_version_indicator(table, db):
     config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
     cstr = get_connection_string(config, 'PROD_DB')
@@ -216,8 +218,10 @@ update {table} update_table
 set update_table.version_indicator=p.version_indicator     
     """
     print(query)
+    query_start_time = time()
     engine.execute(query)
-
+    query_end_time = time()
+    print("This query took:", query_end_time - query_start_time, "seconds")
 
 
 # Moved from AssigneePostProcessing - unused for now
@@ -281,6 +285,7 @@ def weekday_count(start_date, end_date):
         day = calendar.day_name[(start_date + datetime.timedelta(days=i)).weekday()]
         week[day] = week[day] + 1 if day in week else 1
     return week
+
 
 def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -594,3 +599,7 @@ def link_view_to_new_disambiguation_table(connection, table_name, disambiguation
         if not e.errno == errorcode.ER_MULTIPLE_PRI_KEY:
             raise
     g_cursor.execute(replace_view_query)
+
+
+if __name__ == "__main__":
+    update_to_granular_version_indicator('wipo', 'granted_patent')
