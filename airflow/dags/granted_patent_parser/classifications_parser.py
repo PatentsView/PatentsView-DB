@@ -10,9 +10,9 @@ from QA.generic_tests import qa_test_table_updated
 
 from lib.configuration import get_current_config, get_today_dict
 # appending a path
-from lib.utilities import chain_operators
+from lib.utilities import chain_operators, update_to_granular_version_indicator
 from updater.callbacks import airflow_task_failure, airflow_task_success
-from updater.collect_supplemental_data.cpc_parser.cpc_class_parser import post_class_parser, process_cpc_class_parser, update_to_granular_version_indicator
+from updater.collect_supplemental_data.cpc_parser.cpc_class_parser import post_class_parser, process_cpc_class_parser
 from updater.collect_supplemental_data.cpc_parser.download_cpc import collect_cpc_data, post_download
 from updater.collect_supplemental_data.cpc_parser.process_cpc_current import process_and_upload_cpc_current
 from updater.collect_supplemental_data.cpc_parser.process_wipo import process_and_upload_wipo
@@ -108,7 +108,8 @@ patent_cpc_current_operator = PythonOperator(task_id='patent_cpc_current_process
                                       provide_context=True,
                                       on_success_callback=airflow_task_success,
                                       on_failure_callback=airflow_task_failure,
-                                      pool='database_write_iops_contenders')
+                                      pool='database_write_iops_contenders',
+                                      op_kwargs={'table': 'cpc_current', 'db':'granted_patent'})
 
 patent_cpc_current_update_vi = PythonOperator(task_id='patent_cpc_current_update_vi',
                                        python_callable=update_to_granular_version_indicator,

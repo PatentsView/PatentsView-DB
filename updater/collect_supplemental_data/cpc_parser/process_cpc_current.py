@@ -27,7 +27,7 @@ def prepare_cpc_table(config, drop_indexes):
         engine.execute(drop_statement[0])
 
 
-def consolidate_cpc_data(cpc_file, config, add_indexes):
+def consolidate_cpc_data(cpc_file, config, add_indexes, db):
     """
     Finalize CPC Current table by removing patents not in patent database and re-adding indexes
     :param config: Consolidate_cpc_dataonfig file containing variour runtime paramters
@@ -39,12 +39,15 @@ def consolidate_cpc_data(cpc_file, config, add_indexes):
     start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
     suffix = (start_date - datetime.timedelta(days=1)).strftime('%Y%m%d')
     end_date = config['DATES']['END_DATE']
-    start = time.time()
     for cpc_chunk in tqdm(cpc_csv_file_chunks):
         with engine.connect() as conn:
             cpc_chunk.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
-    delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null or p.version_indicator >'{vind}'".format(
+    if db == 'granted_patent':
+        delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null or p.version_indicator >'{vind}'".format(
         raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], vind=end_date)
+    else:
+        delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.publication p on p.document_number = cpc.document_number WHERE p.document_number is null or p.version_indicator >'{vind}'".format(
+        raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"], vind=end_date)
     engine.execute(delete_query)
     for add_statement in add_indexes:
         engine.execute(add_statement[0])
@@ -195,15 +198,23 @@ def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue, writer):
             xml_file=cpc_xml_file)
     })
 
-
-def process_and_upload_patent_cpc_current(db='granted_patent', **kwargs):
+# process_and_upload_patent_cpc_current
+def process_and_upload_cpc_current(db='granted_patent', **kwargs):
     config = get_current_config(db, schedule='quarterly', **kwargs)
     setup_database(config, drop=False)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     cpc_output_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
+    if db=='granted_patent':
+        file_name = "CPC_grant_mcf"
+        header = ["patent_id", "sequence", "version_indicator", "uuid", "section_id", "subsection_id", "group_id",
+                  "subgroup_id", "category"]
+    else:
+        file_name = "CPC_pgpub_mcf"
+        header = ["document_number", "sequence", "version_indicator", "id", "section_id", "subsection_id", "group_id",
+                  "subgroup_id", "category"]
     cpc_xml_file = None
     for filename in os.listdir(cpc_folder):
-        if (filename.startswith('CPC_grant_mcf') and filename.endswith('.zip')):
+        if (filename.startswith(file_name) and filename.endswith('.zip')):
             cpc_xml_file = "{cpc_folder}/{cpc_file}".format(cpc_folder=cpc_folder, cpc_file=filename)
 
     if cpc_xml_file:
@@ -222,8 +233,6 @@ def process_and_upload_patent_cpc_current(db='granted_patent', **kwargs):
         pool = mp.Pool(parallelism)
         cpc_file = "{data_folder}/cpc_current.csv".format(data_folder=cpc_output_folder)
         watcher = pool.apply_async(log_writer, (log_queue, "cpc_parser"))
-        header = ["patent_id", "sequence", "version_indicator", "uuid", "section_id", "subsection_id", "group_id",
-                  "subgroup_id", "category"]
         writer = pool.apply_async(mp_csv_writer, (
             csv_queue,
             cpc_file, header))
@@ -251,13 +260,13 @@ def process_and_upload_patent_cpc_current(db='granted_patent', **kwargs):
         pool.close()
         pool.join()
 
-        consolidate_cpc_data(cpc_file, config, add_index)
+        consolidate_cpc_data(cpc_file, config, add_index, db)
     else:
         print("Could not find CPC Zip XML file under {cpc_input}".format(cpc_input=cpc_folder))
         exit(1)
 
 
 if __name__ == '__main__':
-    process_and_upload_cpc_current(**{
+    process_and_upload_cpc_current(db='pgpubs', *{
         "execution_date": datetime.date(2020, 12, 29)
     })

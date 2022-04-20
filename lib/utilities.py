@@ -13,7 +13,7 @@ import zipfile
 from queue import Queue
 from statistics import mean
 import pandas as pd
-import time
+from time import time
 
 import boto3
 import requests
@@ -195,11 +195,9 @@ def get_relevant_attributes(self, class_called, database_section, config):
         else:
             raise NotImplementedError
 
-
 def update_to_granular_version_indicator(table, db):
-    from lib.configuration import get_current_config
+    from lib.configuration import get_current_config, get_connection_string
     config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
-    from lib.configuration import get_connection_string
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
     if db == 'granted_patent':
@@ -220,7 +218,6 @@ set update_table.version_indicator=p.version_indicator
     engine.execute(query)
     query_end_time = time()
     print("This query took:", query_end_time - query_start_time, "seconds")
-
 
 # Moved from AssigneePostProcessing - unused for now
 def add_persistent_table_to_config(self, database_section):
@@ -602,4 +599,4 @@ def link_view_to_new_disambiguation_table(connection, table_name, disambiguation
 
 
 if __name__ == "__main__":
-    update_to_granular_version_indicator('wipo', 'granted_patent')
+    update_to_granular_version_indicator('uspc_current', 'granted_patent')
