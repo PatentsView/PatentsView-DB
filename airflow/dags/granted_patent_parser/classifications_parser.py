@@ -10,8 +10,7 @@ from QA.generic_tests import qa_test_table_updated
 
 from lib.configuration import get_current_config, get_today_dict
 # appending a path
-# from lib.utilities import chain_operators, update_to_granular_version_indicator
-from lib import utilities
+from lib.utilities import chain_operators, update_to_granular_version_indicator
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.collect_supplemental_data.cpc_parser.cpc_class_parser import post_class_parser, process_cpc_class_parser
 from updater.collect_supplemental_data.cpc_parser.download_cpc import collect_cpc_data, post_download
@@ -112,7 +111,7 @@ patent_cpc_current_operator = PythonOperator(task_id='patent_cpc_current_process
                                       pool='database_write_iops_contenders')
 
 patent_cpc_current_update_vi = PythonOperator(task_id='patent_cpc_current_update_vi',
-                                       python_callable=utilities.update_to_granular_version_indicator,
+                                       python_callable=update_to_granular_version_indicator,
                                        dag=cpc_wipo_updater,
                                        provide_context=True,
                                        on_success_callback=airflow_task_success,
@@ -221,4 +220,4 @@ operator_sequence['cpc_current_pgpubs_sequence'] = [qc_download_cpc_operator,
 
 for dependency_group in operator_sequence:
     dependency_sequence = operator_sequence[dependency_group]
-    utilities.chain_operators(dependency_sequence)
+    chain_operators(dependency_sequence)
