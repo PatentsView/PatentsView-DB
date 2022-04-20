@@ -23,7 +23,7 @@ def prepare_cpc_table(config, temp_db_cpc, drop_indexes):
     :param config: Config file containing variour runtime paramters
     :param drop_indexes: List of Drop Index Statements
     """
-    engine = create_engine(get_connection_string(config, temp_db_cpc, db_real_value_passed=False))
+    engine = create_engine(get_connection_string(config, temp_db_cpc, db_real_value_passed=True))
     for drop_statement in drop_indexes:
         engine.execute(drop_statement[0])
 
@@ -36,7 +36,7 @@ def consolidate_cpc_data(cpc_file, config, add_indexes, temp_db_cpc):
     """
     import pandas as pd
     cpc_csv_file_chunks = pd.read_csv(cpc_file, sep=",", quoting=csv.QUOTE_NONNUMERIC, chunksize=100000)
-    engine = create_engine(get_connection_string(config, temp_db_cpc, db_real_value_passed=False))
+    engine = create_engine(get_connection_string(config, temp_db_cpc, db_real_value_passed=True))
     start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
     # suffix = (start_date - datetime.timedelta(days=1)).strftime('%Y%m%d')
     # end_date = config['DATES']['END_DATE']
