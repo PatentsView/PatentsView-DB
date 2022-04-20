@@ -14,7 +14,7 @@ from lib.utilities import chain_operators
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.collect_supplemental_data.cpc_parser.cpc_class_parser import post_class_parser, process_cpc_class_parser, update_to_granular_version_indicator
 from updater.collect_supplemental_data.cpc_parser.download_cpc import collect_cpc_data, post_download
-from updater.collect_supplemental_data.cpc_parser.process_cpc_current import process_and_upload_patent_cpc_current
+from updater.collect_supplemental_data.cpc_parser.process_cpc_current import process_and_upload_cpc_current
 from updater.collect_supplemental_data.cpc_parser.process_wipo import process_and_upload_wipo
 from updater.collect_supplemental_data.cpc_parser.upload_cpc_classes import upload_cpc_classes
 from updater.collect_supplemental_data.cpc_parser.pgpubs_cpc_parser import parse_pgpub_file
@@ -103,7 +103,7 @@ qc_cpc_class_parser_operator = PythonOperator(task_id='qc_cpc_class_parser',
 #
 # # consolidate_cpc_data changed {raw_db}.cpc_current to {raw_db}.temp_cpc_current
 patent_cpc_current_operator = PythonOperator(task_id='patent_cpc_current_processor',
-                                      python_callable=process_and_upload_patent_cpc_current,
+                                      python_callable=process_and_upload_cpc_current,
                                       dag=cpc_wipo_updater,
                                       provide_context=True,
                                       on_success_callback=airflow_task_success,
@@ -130,12 +130,13 @@ qa_patent_cpc_updated = PythonOperator(task_id='qa_patent_cpc_current',
                                 op_kwargs={'table':'cpc_current', 'db':'granted_patent'})
 
 pgpubs_cpc_current_operator = PythonOperator(task_id='pgpubs_cpc_current_processor',
-                                      python_callable=parse_pgpub_file,
+                                      python_callable=process_and_upload_cpc_current,
                                       dag=cpc_wipo_updater,
                                       provide_context=True,
                                       on_success_callback=airflow_task_success,
                                       on_failure_callback=airflow_task_failure,
-                                      pool='database_write_iops_contenders')
+                                      pool='database_write_iops_contenders',
+                                      op_kwargs={'table':'cpc_current', 'db':'pgpubs'})
 
 pgpubs_cpc_current_update_vi = PythonOperator(task_id='pgpubs_cpc_current_update_vi',
                                        python_callable=update_to_granular_version_indicator,

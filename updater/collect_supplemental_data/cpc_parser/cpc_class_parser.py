@@ -2,11 +2,13 @@ import datetime
 import re
 import os
 from bs4 import BeautifulSoup as bs
+from sqlalchemy import create_engine
 import sys
 
 from QA.collect_supplemental_data.cpc_parser.CPCClassParserTest import CPCClassParserTest
 from lib.configuration import get_config, get_current_config
 from lib.utilities import write_csv
+from time import time
 
 
 def parse_and_write_cpc_class(inputdir, outputdir):
