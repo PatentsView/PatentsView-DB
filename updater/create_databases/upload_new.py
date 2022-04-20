@@ -36,29 +36,30 @@ def consolidate_cpc_classes(connection_string):
         engine.dispose()
 
 
-def setup_database(update_config, drop=True):
-    required_tables = get_required_tables(update_config)
+def setup_database(update_config, temp_db_cpc, drop=True):
+    # required_tables = get_required_tables(update_config)
+    required_tables = ['cpc', 'main_cpc', 'further_cpc', 'cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_subsection']
     print("Required tables are {tlist}".format(tlist=", ".join(required_tables)))
     connection_string = get_connection_string(update_config, database="PROD_DB")
     engine = create_engine(connection_string)
     raw_database = update_config["PATENTSVIEW_DATABASES"]["PROD_DB"]
-    temp_upload_database = update_config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
+    temp_upload_database = temp_db_cpc
+    print(temp_upload_database)
     if drop:
-        engine.execute("""
+        engine.execute(f"""
             DROP DATABASE if exists {temp_upload_database}
-        """.format(temp_upload_database=temp_upload_database))
-    engine.execute("""
+        """)
+    engine.execute(f"""
             create database if not exists {temp_upload_database} default character set=utf8mb4
              default collate=utf8mb4_unicode_ci
-        """.format(
-        temp_upload_database=temp_upload_database))
+        """)
     for table in required_tables:
         print("Creating Table : {tbl}".format(tbl=table))
         con = engine.connect()
         if drop:
             con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
-        if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee']:
-            con.execute("create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211130', table))
+        # if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee']:
+        #     con.execute("create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211130', table))
         else:
             con.execute(
                 "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table))

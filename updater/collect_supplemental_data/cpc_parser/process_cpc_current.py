@@ -28,7 +28,7 @@ def prepare_cpc_table(config, drop_indexes):
         engine.execute(drop_statement[0])
 
 
-def consolidate_cpc_data(cpc_file, config, add_indexes, db):
+def consolidate_cpc_data(cpc_file, config, add_indexes, temp_db_cpc):
     """
     Finalize CPC Current table by removing patents not in patent database and re-adding indexes
     :param config: Consolidate_cpc_dataonfig file containing variour runtime paramters
@@ -36,34 +36,34 @@ def consolidate_cpc_data(cpc_file, config, add_indexes, db):
     """
     import pandas as pd
     cpc_csv_file_chunks = pd.read_csv(cpc_file, sep=",", quoting=csv.QUOTE_NONNUMERIC, chunksize=100000)
-    engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
+    engine = create_engine(get_connection_string(config, temp_db_cpc))
     start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
-    suffix = (start_date - datetime.timedelta(days=1)).strftime('%Y%m%d')
-    end_date = config['DATES']['END_DATE']
+    # suffix = (start_date - datetime.timedelta(days=1)).strftime('%Y%m%d')
+    # end_date = config['DATES']['END_DATE']
     for cpc_chunk in tqdm(cpc_csv_file_chunks):
         with engine.connect() as conn:
             cpc_chunk.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
-    if db == 'granted_patent':
-        delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null or p.version_indicator >'{vind}'".format(
-        raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], vind=end_date)
-    else:
-        delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.publication p on p.document_number = cpc.document_number WHERE p.document_number is null or p.version_indicator >'{vind}'".format(
-        raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"], vind=end_date)
-    engine.execute(delete_query)
-    for add_statement in add_indexes:
-        engine.execute(add_statement[0])
-
-    rename_raw_statement = """
-    rename table {raw_db}.cpc_current to {raw_db}.cpc_current_{suffix}
-    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], suffix=suffix)
-    rename_upload_statement = """
-    rename table {upload_db}.cpc_current to {raw_db}.cpc_current
-    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"],
-               upload_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
-    print(rename_raw_statement)
-    engine.execute(rename_raw_statement)
-    print(rename_upload_statement)
-    engine.execute(rename_upload_statement)
+    # if db == 'granted_patent':
+    #     delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null or p.version_indicator >'{vind}'".format(
+    #     raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], vind=end_date)
+    # else:
+    #     delete_query = "DELETE cpc FROM cpc_current cpc LEFT JOIN {raw_db}.publication p on p.document_number = cpc.document_number WHERE p.document_number is null or p.version_indicator >'{vind}'".format(
+    #     raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"], vind=end_date)
+    # engine.execute(delete_query)
+    # for add_statement in add_indexes:
+    #     engine.execute(add_statement[0])
+    #
+    # rename_raw_statement = """
+    # rename table {raw_db}.cpc_current to {raw_db}.cpc_current_{suffix}
+    # """.format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], suffix=suffix)
+    # rename_upload_statement = """
+    # rename table {upload_db}.cpc_current to {raw_db}.cpc_current
+    # """.format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"],
+    #            upload_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
+    # print(rename_raw_statement)
+    # engine.execute(rename_raw_statement)
+    # print(rename_upload_statement)
+    # engine.execute(rename_upload_statement)
 
 
 def generate_file_list(zipfilepath, extension='.xml'):
@@ -202,7 +202,9 @@ def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue, writer):
 # process_and_upload_patent_cpc_current
 def process_and_upload_cpc_current(db='granted_patent', **kwargs):
     config = get_current_config(db, schedule='quarterly', **kwargs)
-    setup_database(config, drop=False)
+    temp_db_cpc = config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"] + '_cpc'
+    print(temp_db_cpc)
+    setup_database(config, temp_db_cpc, drop=False)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     cpc_output_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
     if db=='granted_patent':
@@ -220,7 +222,7 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
 
     if cpc_xml_file:
         print(cpc_xml_file)
-        add_index, drop_index = generate_index_statements(config, "TEMP_UPLOAD_DB", "cpc_current")
+        add_index, drop_index = generate_index_statements(config, temp_db_cpc, "cpc_current")
 
         prepare_cpc_table(config, drop_index)
         xml_file_name_generator = generate_file_list(cpc_xml_file)
@@ -261,7 +263,7 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
         pool.close()
         pool.join()
 
-        consolidate_cpc_data(cpc_file, config, add_index, db)
+        consolidate_cpc_data(cpc_file, config, add_index, temp_db_cpc)
     else:
         print("Could not find CPC Zip XML file under {cpc_input}".format(cpc_input=cpc_folder))
         exit(1)
