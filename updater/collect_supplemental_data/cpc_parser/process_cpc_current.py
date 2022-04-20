@@ -17,13 +17,13 @@ from lib.utilities import generate_index_statements, log_writer, mp_csv_writer, 
 from updater.create_databases.upload_new import setup_database
 
 
-def prepare_cpc_table(config, drop_indexes):
+def prepare_cpc_table(config, temp_db_cpc, drop_indexes):
     """
     Prepare the CPC Current table by dropping Indexes
     :param config: Config file containing variour runtime paramters
     :param drop_indexes: List of Drop Index Statements
     """
-    engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
+    engine = create_engine(get_connection_string(config, temp_db_cpc, db_real_value_passed=False))
     for drop_statement in drop_indexes:
         engine.execute(drop_statement[0])
 
@@ -36,7 +36,7 @@ def consolidate_cpc_data(cpc_file, config, add_indexes, temp_db_cpc):
     """
     import pandas as pd
     cpc_csv_file_chunks = pd.read_csv(cpc_file, sep=",", quoting=csv.QUOTE_NONNUMERIC, chunksize=100000)
-    engine = create_engine(get_connection_string(config, temp_db_cpc))
+    engine = create_engine(get_connection_string(config, temp_db_cpc, db_real_value_passed=False))
     start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
     # suffix = (start_date - datetime.timedelta(days=1)).strftime('%Y%m%d')
     # end_date = config['DATES']['END_DATE']
@@ -224,7 +224,7 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
         print(cpc_xml_file)
         add_index, drop_index = generate_index_statements(config, temp_db_cpc, "cpc_current")
 
-        prepare_cpc_table(config, drop_index)
+        prepare_cpc_table(config, temp_db_cpc, drop_index)
         xml_file_name_generator = generate_file_list(cpc_xml_file)
 
         parallelism = int(config["PARALLELISM"]["parallelism"])
