@@ -25,17 +25,17 @@ class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
 
-def post_cpc_wipo(**kwargs):
-    current_config = get_current_config(type='granted_patent', schedule='quarterly', **kwargs)
-    qc = CPCTest(current_config)
-    qc.runTests()
+# def post_cpc_wipo(**kwargs):
+#     current_config = get_current_config(type='granted_patent', schedule='quarterly', **kwargs)
+#     qc = CPCTest(current_config)
+#     qc.runTests()
 
 
 project_home = os.environ['PACKAGE_HOME']
 templates_searchpath = "{home}/resources".format(home=project_home)
-config = get_current_config(type='config.ini', supplemental_configs=None, **get_today_dict())
-
-print(config)
+# config = get_current_config(type='config.ini', supplemental_configs=None, **get_today_dict())
+#
+# print(config)
 
 default_args = {
     'owner': 'smadhavan',

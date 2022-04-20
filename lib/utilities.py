@@ -21,10 +21,6 @@ from bs4 import BeautifulSoup
 from clint.textui import progress
 from sqlalchemy import create_engine
 
-# from lib.configuration import get_connection_string, get_current_config
-from lib.configuration import get_connection_string
-
-
 def with_keys(d, keys):
     return {x: d[x] for x in d if x in keys}
 
@@ -201,7 +197,9 @@ def get_relevant_attributes(self, class_called, database_section, config):
 
 
 def update_to_granular_version_indicator(table, db):
+    from lib.configuration import get_current_config
     config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
+    from lib.configuration import get_connection_string
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
     if db == 'granted_patent':
@@ -252,6 +250,7 @@ def add_persistent_table_to_config(self, database_section):
 
 
 def trim_whitespace(config):
+    from lib.configuration import get_connection_string
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     db_type = config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"][:6]
     engine = create_engine(cstr)
@@ -331,6 +330,7 @@ def write_csv(rows, outputdir, filename):
 
 
 def generate_index_statements(config, database_section, table):
+    from lib.configuration import get_connection_string
     engine = create_engine(get_connection_string(config, database_section))
     db = config["PATENTSVIEW_DATABASES"][database_section]
     add_indexes_fetcher = engine.execute(
