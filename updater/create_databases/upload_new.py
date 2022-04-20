@@ -38,7 +38,7 @@ def consolidate_cpc_classes(connection_string):
 
 def setup_database(update_config, temp_db_cpc, drop=True):
     # required_tables = get_required_tables(update_config)
-    required_tables = ['cpc', 'main_cpc', 'further_cpc', 'cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_subsection']
+    required_tables = ['cpc', 'main_cpc', 'further_cpc', 'cpc_current']
     print("Required tables are {tlist}".format(tlist=", ".join(required_tables)))
     connection_string = get_connection_string(update_config, database="PROD_DB")
     engine = create_engine(connection_string)
