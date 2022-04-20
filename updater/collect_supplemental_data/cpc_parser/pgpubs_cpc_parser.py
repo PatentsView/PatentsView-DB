@@ -32,7 +32,7 @@ def parse_and_write_cpc(**kwargs):
                     'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
             df.to_sql('cpc_current', con=engine, if_exists='append', index=False)
 
-def parse_pgpub_file(filepath):
+def parse_pgpub_file():
     """ Extract CPC classification from ~35 million applications """
     config = get_current_config('pgpubs', schedule='quarterly')
     filepath = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
