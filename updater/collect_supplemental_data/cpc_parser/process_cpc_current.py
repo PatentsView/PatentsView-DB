@@ -7,6 +7,7 @@ import time
 import uuid
 import zipfile
 
+from time import time
 from lxml import etree
 from sqlalchemy import create_engine
 from tqdm import tqdm
@@ -265,6 +266,30 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
         print("Could not find CPC Zip XML file under {cpc_input}".format(cpc_input=cpc_folder))
         exit(1)
 
+
+def update_to_granular_version_indicator(table, db):
+    from lib.configuration import get_current_config, get_connection_string
+    config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
+    cstr = get_connection_string(config, 'PROD_DB')
+    engine = create_engine(cstr)
+    if db == 'granted_patent':
+        id = 'id'
+        fk = 'patent_id'
+        fact_table = 'patent'
+    else:
+        id = 'document_number'
+        fk = 'document_number'
+        fact_table = 'publications'
+    query = f"""
+update {table} update_table 
+	inner join {fact_table} p on update_table.{fk}=p.{id}
+set update_table.version_indicator=p.version_indicator     
+    """
+    print(query)
+    query_start_time = time()
+    engine.execute(query)
+    query_end_time = time()
+    print("This query took:", query_end_time - query_start_time, "seconds")
 
 if __name__ == '__main__':
     process_and_upload_cpc_current(db='pgpubs', *{
