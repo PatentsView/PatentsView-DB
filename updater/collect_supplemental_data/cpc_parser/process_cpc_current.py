@@ -196,15 +196,14 @@ def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue, writer):
     })
 
 
-def process_and_upload_cpc_current(**kwargs):
-    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+def process_and_upload_patent_cpc_current(db='granted_patent', **kwargs):
+    config = get_current_config(db, schedule='quarterly', **kwargs)
     setup_database(config, drop=False)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     cpc_output_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
     cpc_xml_file = None
     for filename in os.listdir(cpc_folder):
-        if (filename.startswith('CPC_grant_mcf') and
-                filename.endswith('.zip')):
+        if (filename.startswith('CPC_grant_mcf') and filename.endswith('.zip')):
             cpc_xml_file = "{cpc_folder}/{cpc_file}".format(cpc_folder=cpc_folder, cpc_file=filename)
 
     if cpc_xml_file:
@@ -222,9 +221,9 @@ def process_and_upload_cpc_current(**kwargs):
         parser_start = time.time()
         pool = mp.Pool(parallelism)
         cpc_file = "{data_folder}/cpc_current.csv".format(data_folder=cpc_output_folder)
+        watcher = pool.apply_async(log_writer, (log_queue, "cpc_parser"))
         header = ["patent_id", "sequence", "version_indicator", "uuid", "section_id", "subsection_id", "group_id",
                   "subgroup_id", "category"]
-        watcher = pool.apply_async(log_writer, (log_queue, "cpc_parser"))
         writer = pool.apply_async(mp_csv_writer, (
             csv_queue,
             cpc_file, header))
