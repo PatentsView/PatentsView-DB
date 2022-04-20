@@ -34,6 +34,8 @@ def parse_and_write_cpc(**kwargs):
 
 def parse_pgpub_file(filepath):
     """ Extract CPC classification from ~35 million applications """
+    config = get_current_config('pgpubs', schedule='quarterly')
+    filepath = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     with open(filepath) as f:
         input_rows = f.readlines()
         print("Parsing app file: {}; rows: {}".format(filepath, len(input_rows)))
