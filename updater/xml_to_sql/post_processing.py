@@ -263,8 +263,8 @@ FROM rawassignee
     engine.execute(
         """
 update rawassignee 
-set organization=name_first, type = 2
-where organization is null and id in (select id from temp_rawassignee_org_fixes_nf);     
+set organization=name_first, type = (CASE WHEN country = 'US' THEN 2 ELSE 3 END)
+where organization is null and id in (select id from temp_rawassignee_org_fixes_nf);
         """)
     engine.execute(
         """
@@ -278,13 +278,13 @@ where id in (select id from temp_rawassignee_org_fixes_nf)
 create table temp_rawassignee_org_fixes_nl (
 SELECT * 
 FROM rawassignee 
-	where name_first is null and name_last is not null and name_last REGEXP 'inc|corporation|ltd|technologies|limited|corp|llc|co.'
+	where name_first is null and name_last is not null and name_last REGEXP 'inc|ltd|technologies|limited|corp|llc|co.'
 )
         """)
     engine.execute(
         """
 update rawassignee 
-set organization=name_last, type = 2
+set organization=name_last, type = (CASE WHEN country = 'US' THEN 2 ELSE 3 END), 
 where organization is null and id in (select id from temp_rawassignee_org_fixes_nl);
         """)
     engine.execute(
@@ -293,6 +293,22 @@ update rawassignee
 set name_last = null
 where id in (select id from temp_rawassignee_org_fixes_nl);
         """)
+
+    fixcheck = engine.execute(
+            """
+SELECT COUNT(*) FROM rawassignee
+WHERE (name_first IS NULL
+AND name_last IS NOT NULL
+AND name_last REGEXP 'inc|ltd|technologies|limited|corp|llc|co.')
+OR (name_first IS NOT NULL 
+AND name_last IS NULL)
+            """
+    )
+    missedcount = fixcheck.first()[0]
+    if missedcount > 0:
+        raise Exception(
+                f"{missedcount} entries with only one name remain after adjustment"
+        )
 
 
 def begin_post_processing(**kwargs):
