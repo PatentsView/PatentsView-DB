@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from lib.configuration import get_config, get_current_config
 from lib.xml_helpers import process_date
 # from helpers import general_helpers
-
+import uuid
 
 def parse_and_write_cpc(inputdir, **kwargs):
     """ Parse CPC Classifications """
@@ -21,7 +21,8 @@ def parse_and_write_cpc(inputdir, **kwargs):
 
             df['category'] = None
             df['category'] = np.select([df['value'] == 'I',df['value'] == 'A'],['inventional','additional'],df['category'])
-            df['version_indicator']=process_date( config['DATES']['END_DATE'], as_string=True)
+            df['version_indicator']=process_date( config['DATES']['END_DATE'], as_string=False)
+            df['id'] = [uuid.uuid4() for _ in range(len(df.index))]
 
             database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
             host = '{}'.format(config['DATABASE_SETUP']['HOST'])

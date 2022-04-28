@@ -182,16 +182,10 @@ def find_ipc_url_test():
 
 
 def collect_cpc_data(**kwargs):
-    config = get_current_config('granted_patent', schedule='quarterly', **{
-        "execution_date": kwargs["execution_date"],
-        "add_one_to_execution_date": True
-    })
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     destination_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
 
-    pgpubs_config = get_current_config('pgpubs', schedule='quarterly', **{
-        "execution_date": kwargs["execution_date"],
-        "add_one_to_execution_date": True
-    })
+    pgpubs_config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     pgpubs_cpc_folder = '{}/{}'.format(pgpubs_config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
 
     if not os.path.exists(destination_folder):
@@ -204,14 +198,8 @@ def collect_cpc_data(**kwargs):
 
 
 def post_download(**kwargs):
-    config = get_current_config('granted_patent', schedule='quarterly', **{
-        "execution_date": kwargs["execution_date"],
-        "add_one_to_execution_date": True
-    })
-    pgpubs_config = get_current_config('pgpubs', schedule='quarterly', **{
-        "execution_date": kwargs["execution_date"],
-        "add_one_to_execution_date": True
-    })
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+    pgpubs_config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     qc = CPCDownloadTest(config, pgpubs_config)
     qc.runTests()
 

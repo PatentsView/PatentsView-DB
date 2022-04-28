@@ -44,11 +44,7 @@ def setup_database(update_config, drop=True):
     if raw_database == 'patent':
         required_tables = get_required_tables(update_config)
     else:
-        required_tables_staging = load_table_config(update_config, db='pgpubs')
-        required_tables = []
-        for i in required_tables_staging.keys():
-            if "UploadTest" in required_tables_staging[i]['TestScripts']:
-                    required_tables.append(i)
+        required_tables = ['cpc_current']
     print("Required tables are {tlist}".format(tlist=", ".join(required_tables)))
     connection_string = get_connection_string(update_config, database="PROD_DB")
     engine = create_engine(connection_string)
@@ -67,10 +63,13 @@ def setup_database(update_config, drop=True):
         if drop:
             con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
         if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee'] and raw_database=='patent':
-            con.execute("create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211230', table))
+            query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211230', table)
+            print(query)
+            con.execute(query)
         else:
-            con.execute(
-                "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table))
+            query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
+            print(query)
+            con.execute(query)
             con.close()
         engine.dispose()
 

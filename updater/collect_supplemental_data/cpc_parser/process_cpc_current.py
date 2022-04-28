@@ -204,11 +204,7 @@ def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue, writer):
 
 # process_and_upload_patent_cpc_current
 def process_and_upload_cpc_current(db='granted_patent', **kwargs):
-    # ADDING 1 DATE FOR CONSISTENCY IN PGPUBS & GRANTEDPATENT QUARTERLY DB CREATION
-    config = get_current_config(db, schedule='quarterly', **{
-        "execution_date": kwargs["execution_date"],
-        "add_one_to_execution_date": True
-    })
+    config = get_current_config(db, schedule='quarterly', **kwargs)
     setup_database(config, drop=False)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     cpc_output_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
