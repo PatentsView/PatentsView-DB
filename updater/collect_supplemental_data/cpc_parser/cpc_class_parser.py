@@ -229,8 +229,8 @@ def post_class_parser(**kwargs):
 
 if __name__ == '__main__':
     process_cpc_class_parser(**{
-            "execution_date": datetime.date(2020, 12, 15)
+            "execution_date": datetime.date(2021, 12, 30)
             })
-    post_class_parser(**{
-            "execution_date": datetime.date(2020, 12, 15)
-            })
+    # post_class_parser(**{
+    #         "execution_date": datetime.date(2020, 12, 15)
+    #         })

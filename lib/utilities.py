@@ -294,12 +294,17 @@ def download(url, filepath):
     r = requests.get(url, stream=True)
 
     with open(filepath, 'wb') as f:
-        content_length = int(r.headers.get('content-length'))
-        for chunk in progress.bar(r.iter_content(chunk_size=1024),
-                                  expected_size=(content_length / 1024) + 1):
-            if chunk:
-                f.write(chunk)
-                f.flush()
+        # print(r.headers.get('content-length'))
+        content_length = r.headers.get('content-length')
+        if not content_length:
+            print("/tNo Content Length Attached")
+        else:
+            content_length = int(content_length)
+            for chunk in progress.bar(r.iter_content(chunk_size=1024),
+                                      expected_size=(content_length / 1024) + 1):
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
 
 
 def chunks(l, n):
@@ -328,43 +333,34 @@ def write_csv(rows, outputdir, filename):
 
 def generate_index_statements(config, database_section, table):
     from lib.configuration import get_connection_string
-    engine = create_engine(get_connection_string(config, database=database_section, db_real_value_passed=True))
-    add_indexes_fetcher = engine.execute(
-        f"""
-        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', 'ADD ', IF(NON_UNIQUE = 1, CASE UPPER(INDEX_TYPE)
-                                                                                        WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX'
-                                                                                        WHEN 'SPATIAL' THEN 'SPATIAL INDEX'
-                                                                                        ELSE CONCAT('INDEX `', INDEX_NAME,
-                                                                                            '` USING ', INDEX_TYPE) END,
-                                                                    IF(UPPER(INDEX_NAME) = 'PRIMARY',
-                                                                       CONCAT('PRIMARY KEY USING ', INDEX_TYPE),
-                                                                       CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ',
-                                                                           INDEX_TYPE))),
-                      '(', GROUP_CONCAT(DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', '),
-                      ');') AS 'Show_Add_Indexes'
+    engine = create_engine(get_connection_string(config, database_section))
+    db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+    add_indexes_query = f"""
+        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', 'ADD ', IF(NON_UNIQUE = 1, 
+        CASE UPPER(INDEX_TYPE) WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME,'` USING ', INDEX_TYPE) END,
+        IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE))),
+        '(', GROUP_CONCAT(DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', '), ');') AS 'Show_Add_Indexes'
         FROM information_schema.STATISTICS
-        WHERE TABLE_SCHEMA = '{database_section}'
+        WHERE TABLE_SCHEMA = '{db}'
           AND TABLE_NAME = '{table}'
           and UPPER(INDEX_NAME) <> 'PRIMARY'
         GROUP BY TABLE_NAME, INDEX_NAME, NON_UNIQUE, INDEX_TYPE
         ORDER BY TABLE_NAME ASC, INDEX_NAME ASC;
-""")
+"""
+    print(add_indexes_query)
+    add_indexes_fetcher = engine.execute(add_indexes_query)
     add_indexes = add_indexes_fetcher.fetchall()
-    drop_indexes_fetcher = engine.execute(
-        f"""
-        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT(DISTINCT CONCAT('DROP ',
-                                                                                      IF(UPPER(INDEX_NAME) = 'PRIMARY',
-                                                                                         'PRIMARY KEY',
-                                                                                         CONCAT('INDEX `', INDEX_NAME, '`')))
-                                                                      SEPARATOR ',
-                    '), ';')
+    drop_indexes_query = f"""
+        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT(DISTINCT CONCAT('DROP ', IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`'))) SEPARATOR ', '), ';')
         FROM information_schema.STATISTICS
-        WHERE TABLE_SCHEMA = '{database_section}'
+        WHERE TABLE_SCHEMA = '{db}'
           AND TABLE_NAME = '{table}'
           and UPPER(INDEX_NAME) <> 'PRIMARY'
         GROUP BY TABLE_NAME
         ORDER BY TABLE_NAME ASC
-            """)
+            """
+    print(drop_indexes_query)
+    drop_indexes_fetcher = engine.execute(drop_indexes_query)
     drop_indexes = drop_indexes_fetcher.fetchall()
     print(add_indexes)
     print(drop_indexes)

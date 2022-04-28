@@ -14,11 +14,12 @@ from lib.utilities import chain_operators
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.collect_supplemental_data.cpc_parser.cpc_class_parser import post_class_parser, process_cpc_class_parser
 from updater.collect_supplemental_data.cpc_parser.download_cpc import collect_cpc_data, post_download
-from updater.collect_supplemental_data.cpc_parser.process_cpc_current import process_and_upload_cpc_current, update_to_granular_version_indicator
+from updater.collect_supplemental_data.cpc_parser.process_cpc_current import process_and_upload_cpc_current
 from updater.collect_supplemental_data.cpc_parser.process_wipo import process_and_upload_wipo
 from updater.collect_supplemental_data.cpc_parser.upload_cpc_classes import upload_cpc_classes
 from updater.collect_supplemental_data.cpc_parser.pgpubs_cpc_parser import parse_pgpub_file
 
+from QA.generic_tests import update_to_granular_version_indicator
 
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
@@ -80,8 +81,8 @@ download_cpc_operator = PythonOperator(task_id='download_cpc',
                                        on_failure_callback=airflow_task_failure)
 
 qc_download_cpc_operator = PythonOperator(task_id='qc_download_cpc',
-                                          dag=cpc_wipo_updater,
                                           python_callable=post_download,
+                                          dag=cpc_wipo_updater,
                                           provide_context=True,
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure)
@@ -100,6 +101,13 @@ qc_cpc_class_parser_operator = PythonOperator(task_id='qc_cpc_class_parser',
                                               provide_context=True,
                                               on_success_callback=airflow_task_success,
                                               on_failure_callback=airflow_task_failure)
+
+# # Good
+cpc_class_operator = PythonOperator(task_id='cpc_class_uploader',
+                                    python_callable=upload_cpc_classes,
+                                    dag=cpc_wipo_updater,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure)
 #
 # # consolidate_cpc_data changed {raw_db}.cpc_current to {raw_db}.temp_cpc_current
 patent_cpc_current_operator = PythonOperator(task_id='patent_cpc_current_processor',
@@ -109,7 +117,7 @@ patent_cpc_current_operator = PythonOperator(task_id='patent_cpc_current_process
                                       on_success_callback=airflow_task_success,
                                       on_failure_callback=airflow_task_failure,
                                       pool='database_write_iops_contenders',
-                                      op_kwargs={'table': 'cpc_current', 'db':'granted_patent'})
+                                      op_kwargs={'db':'granted_patent'})
 
 patent_cpc_current_update_vi = PythonOperator(task_id='patent_cpc_current_update_vi',
                                        python_callable=update_to_granular_version_indicator,
@@ -137,7 +145,7 @@ pgpubs_cpc_current_operator = PythonOperator(task_id='pgpubs_cpc_current_process
                                       on_success_callback=airflow_task_success,
                                       on_failure_callback=airflow_task_failure,
                                       pool='database_write_iops_contenders',
-                                      op_kwargs={'table':'cpc_current', 'db':'pgpubs'})
+                                      op_kwargs={'db':'pgpubs'})
 
 pgpubs_cpc_current_update_vi = PythonOperator(task_id='pgpubs_cpc_current_update_vi',
                                        python_callable=update_to_granular_version_indicator,
@@ -186,13 +194,6 @@ qa_wipo_updated = PythonOperator(task_id='qa_wipo_updated',
                                 on_failure_callback=airflow_task_failure,
                                 pool='database_write_iops_contenders',
                                 op_kwargs={'table':'wipo', 'db':'granted_patent'})
-
-# # Good
-cpc_class_operator = PythonOperator(task_id='cpc_class_uploader',
-                                    python_callable=upload_cpc_classes,
-                                    dag=cpc_wipo_updater,
-                                    on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure)
 
 # qc_cpc_current_wipo_operator = PythonOperator(task_id='qc_cpc_current_wipo',
 #                                               python_callable=post_cpc_wipo,

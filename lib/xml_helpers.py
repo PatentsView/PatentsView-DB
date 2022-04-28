@@ -344,7 +344,6 @@ def process_date(date, as_string=False):
             date = date[:4]+'-'+date[4:6]+'-'+'01'
     if as_string:
         date = "'"+date+"'"
-    print(date)
     return date
 
 def process_uspc_class_sub(classification):

@@ -5,22 +5,23 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
 from lib.configuration import get_config, get_current_config
+from lib.xml_helpers import process_date
 # from helpers import general_helpers
 
 
-def parse_and_write_cpc(**kwargs):
+def parse_and_write_cpc(inputdir, **kwargs):
     """ Parse CPC Classifications """
-    config = get_current_config(db, schedule='quarterly', **kwargs)
-    inputdir = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+    config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     for filename in os.listdir(inputdir):
         if (filename.startswith('US_PGPub_CPC_MCF_') and filename.endswith('.txt')):
-            df_list = parse_pgpub_file(inputdir +'/'+filename)
+            df_list = parse_pgpub_file((inputdir +'/'+ filename))
             
             df = pd.DataFrame(df_list, columns = ['document_number', 'sequence', 'version', 'section_id', 'subsection_id', 'group_id', 
                     'subgroup_id', 'symbol_position', 'value'])
 
             df['category'] = None
             df['category'] = np.select([df['value'] == 'I',df['value'] == 'A'],['inventional','additional'],df['category'])
+            df['version_indicator']=process_date( config['DATES']['END_DATE'], as_string=True)
 
             database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
             host = '{}'.format(config['DATABASE_SETUP']['HOST'])
@@ -32,14 +33,12 @@ def parse_and_write_cpc(**kwargs):
                     'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
             df.to_sql('cpc_current', con=engine, if_exists='append', index=False)
 
-def parse_pgpub_file(**kwargs):
+def parse_pgpub_file(cpc_input_path):
     """ Extract CPC classification from ~35 million applications """
-    config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
-    cpc_input_path = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
-    filepath = cpc_input_path + '/' + "CPC_pgpub_mcf.zip"
-    with open(filepath) as f:
+    # filepath = cpc_input_path + '/' + "CPC_pgpub_mcf.zip"
+    with open(cpc_input_path) as f:
         input_rows = f.readlines()
-        print("Parsing app file: {}; rows: {}".format(filepath, len(input_rows)))
+        print("Parsing app file: {}; rows: {}".format(cpc_input_path, len(input_rows)))
 
     # Since applications are already sorted by app_number, we can check if the
     # current application has the same number as the last one seen.

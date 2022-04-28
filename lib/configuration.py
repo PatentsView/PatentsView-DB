@@ -253,7 +253,10 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     else:
         from lib.is_it_update_time import get_update_range
         start_date, end_date = get_update_range(execution_date)
-    temp_date = end_date.strftime('%Y%m%d')
+    if 'add_one_to_execution_date' in kwargs.keys():
+        temp_date = (kwargs["execution_date"] + datetime.timedelta(days=1)).strftime('%Y%m%d')
+    else:
+        temp_date = end_date.strftime('%Y%m%d')
 
     config['DATES'] = {
         "START_DATE": start_date.strftime('%Y%m%d'),

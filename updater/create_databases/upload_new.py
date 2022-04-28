@@ -1,5 +1,7 @@
 import datetime
 import os
+import sys
+
 
 import pandas as pd
 # get a list of table names in the database we want to copy in
@@ -7,7 +9,7 @@ from sqlalchemy import create_engine
 
 from QA.create_databases.UploadTest import UploadTest
 from lib.configuration import get_connection_string, get_required_tables, get_current_config
-
+from lib.utilities import load_table_config, class_db_specific_config
 
 def upload_table(table_name, filepath, connection_string, version_indicator):
     engine = create_engine(connection_string)
@@ -30,20 +32,26 @@ def upload_from_timestamp_folder(timestamp_folder, connection_string, version_in
 def consolidate_cpc_classes(connection_string):
     for table_name in ['mainclass', 'subclass']:
         engine = create_engine(connection_string)
-        insert_statement = "INSERT IGNORE INTO {table_name} (id) SELECT id from temp_{table_name};".format(
+        insert_statement = "INSERT IGNORE INTO {table_name} (id, version_indicator) SELECT id, version_indicator from temp_{table_name};".format(
             table_name=table_name)
         engine.execute(insert_statement)
         engine.dispose()
 
 
-def setup_database(update_config, temp_db_cpc, drop=True):
-    # required_tables = get_required_tables(update_config)
-    required_tables = ['cpc', 'main_cpc', 'further_cpc', 'cpc_current']
+def setup_database(update_config, drop=True):
+    raw_database = update_config["PATENTSVIEW_DATABASES"]["PROD_DB"]
+    temp_upload_database = update_config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
+    if raw_database == 'patent':
+        required_tables = get_required_tables(update_config)
+    else:
+        required_tables_staging = load_table_config(update_config, db='pgpubs')
+        required_tables = []
+        for i in required_tables_staging.keys():
+            if "UploadTest" in required_tables_staging[i]['TestScripts']:
+                    required_tables.append(i)
     print("Required tables are {tlist}".format(tlist=", ".join(required_tables)))
     connection_string = get_connection_string(update_config, database="PROD_DB")
     engine = create_engine(connection_string)
-    raw_database = update_config["PATENTSVIEW_DATABASES"]["PROD_DB"]
-    temp_upload_database = temp_db_cpc
     print(temp_upload_database)
     if drop:
         engine.execute(f"""
@@ -58,8 +66,8 @@ def setup_database(update_config, temp_db_cpc, drop=True):
         con = engine.connect()
         if drop:
             con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
-        # if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee']:
-        #     con.execute("create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211130', table))
+        if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee'] and raw_database=='patent':
+            con.execute("create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211230', table))
         else:
             con.execute(
                 "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table))
@@ -112,9 +120,9 @@ def post_upload_pgpubs(**kwargs):
     qc.runTests()
 
 if __name__ == '__main__':
-    begin_database_setup(**{
-            "execution_date": datetime.date(2021, 2, 5)
-            })
+    # begin_database_setup(**{
+    #         "execution_date": datetime.date(2021, 2, 5)
+    #         })
     # upload_current_data(**{
     #         "execution_date": datetime.date(2020, 12, 1)
     #         })
@@ -122,8 +130,10 @@ if __name__ == '__main__':
     #         "execution_date": datetime.date(2020, 12, 1)
     #         })
     config = get_current_config('granted_patent', **{
-        "execution_date": datetime.date(2020, 12, 14)
+        "execution_date": datetime.date(2021, 12, 1)
     })
-    setup_database(config, **{
-            "execution_date": datetime.date(2020, 12, 14)
-            })
+    # setup_database(config, **{
+    #         "execution_date": datetime.date(2020, 12, 14)
+    #         })
+    # generate_timestamp_uploads(config)
+    setup_database(config)
