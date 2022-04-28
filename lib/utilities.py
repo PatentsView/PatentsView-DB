@@ -297,7 +297,7 @@ def download(url, filepath):
         # print(r.headers.get('content-length'))
         content_length = r.headers.get('content-length')
         if not content_length:
-            print("/tNo Content Length Attached")
+            print("\tNo Content Length Attached")
         else:
             content_length = int(content_length)
             for chunk in progress.bar(r.iter_content(chunk_size=1024),
