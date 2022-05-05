@@ -284,7 +284,7 @@ FROM rawassignee
     engine.execute(
         """
 update rawassignee 
-set organization=name_last, type = (CASE WHEN country = 'US' THEN 2 ELSE 3 END), 
+set organization=name_last, type = (CASE WHEN country = 'US' THEN 2 ELSE 3 END) 
 where organization is null and id in (select id from temp_rawassignee_org_fixes_nl);
         """)
     engine.execute(
