@@ -15,7 +15,9 @@ from updater.xml_to_sql.post_processing import begin_post_processing
 from updater.create_databases.upload_new import post_upload_pgpubs
 from updater.create_databases.rename_db import qc_database_pgpubs
 from updater.create_databases.merge_in_new_data import post_merge_weekly_pgpubs, post_merge_quarterly_pgpubs, begin_text_merging_pgpubs
+from updater.create_databases.other_misc_tasks import create_granted_patent_crosswalk
 from updater.text_data_processor.text_table_parsing import post_text_merge_pgpubs, post_text_parsing_pgpubs
+from QA.generic_tests import qa_test_table_updated
 
 import pendulum
 
@@ -142,6 +144,16 @@ qc_merge_weekly_text_operator = PythonOperator(task_id='qc_text_merge_weekly',
                                          on_success_callback=airflow_task_success,
                                          on_failure_callback=airflow_task_failure
                                          )
+
+# OTHER MISC TASKS TO BE RUN
+create_granted_patent_crosswalk = PythonOperator(task_id='create_granted_patent_crosswalk',
+                                                 python_callable=create_granted_patent_crosswalk)
+
+
+qa_granted_patent_crosswalk = PythonOperator(task_id='qa_granted_patent_crosswalk',
+                                             python_callable=qa_test_table_updated,
+                                             op_kwargs={'table': 'granted_patent_crosswalk', 'db': 'pgpubs'})
+
 
 qc_database_operator.set_upstream(create_database_operator)
 parse_xml_operator.set_upstream(qc_database_operator)

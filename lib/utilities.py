@@ -20,6 +20,7 @@ import requests
 from bs4 import BeautifulSoup
 from clint.textui import progress
 from sqlalchemy import create_engine
+from lib.xml_helpers import process_date
 
 def with_keys(d, keys):
     return {x: d[x] for x in d if x in keys}
@@ -590,6 +591,46 @@ def link_view_to_new_disambiguation_table(connection, table_name, disambiguation
         if not e.errno == errorcode.ER_MULTIPLE_PRI_KEY:
             raise
     g_cursor.execute(replace_view_query)
+
+def update_to_granular_version_indicator(table, db):
+    from lib.configuration import get_current_config, get_connection_string
+    config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
+    cstr = get_connection_string(config, 'PROD_DB')
+    engine = create_engine(cstr)
+    if db == 'granted_patent':
+        id = 'id'
+        fk = 'patent_id'
+        fact_table = 'patent'
+    else:
+        id = 'document_number'
+        fk = 'document_number'
+        fact_table = 'publication'
+    query = f"""
+update {table} update_table 
+	inner join {fact_table} p on update_table.{fk}=p.{id}
+set update_table.version_indicator=p.version_indicator     
+    """
+    print(query)
+    query_start_time = time()
+    engine.execute(query)
+    query_end_time = time()
+    print("This query took:", query_end_time - query_start_time, "seconds")
+
+def update_version_indicator(table, db, **kwargs):
+    from lib.configuration import get_current_config, get_connection_string
+    config = get_current_config(type=db, schedule="quarterly", **kwargs)
+    ed = process_date(config['DATES']["end_date"], as_string=True)
+    cstr = get_connection_string(config, 'PROD_DB')
+    engine = create_engine(cstr)
+    query = f"""
+update {table} update_table 
+set update_table.version_indicator={ed} 
+    """
+    print(query)
+    query_start_time = time()
+    engine.execute(query)
+    query_end_time = time()
+    print("This query took:", query_end_time - query_start_time, "seconds")
 
 
 if __name__ == "__main__":

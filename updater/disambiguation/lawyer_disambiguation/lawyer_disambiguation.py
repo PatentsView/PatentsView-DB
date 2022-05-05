@@ -17,9 +17,8 @@ from tqdm import tqdm
 from unidecode import unidecode
 
 from QA.post_processing.LawyerPostProcessing import LawyerPostProcessingQC
-from QA.generic_tests import update_version_indicator, update_to_granular_version_indicator
 from lib.configuration import get_connection_string, get_current_config
-from lib.utilities import log_writer
+from lib.utilities import log_writer, update_version_indicator, update_to_granular_version_indicator
 
 
 def prepare_tables(**kwargs):

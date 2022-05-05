@@ -7,8 +7,6 @@ from airflow.operators.python_operator import PythonOperator
 from slack_sdk import WebClient
 
 from airflow.dags.granted_patent_parser.patentsview_data_updater import operator_settings
-from reporting_database_generator.other_miscellaneous_tasks.other_misc_tasks import create_granted_patent_crosswalk
-from QA.generic_tests import qa_test_table_updated
 from slack_sdk.errors import SlackApiError
 
 project_home = os.environ['PACKAGE_HOME']
@@ -597,8 +595,6 @@ govt_interest.set_upstream(db_creation)
 id_mappings.set_upstream(db_creation)
 application.set_upstream(db_creation)
 wipo.set_upstream(db_creation)
-create_granted_patent_crosswalk.set_upstream(db_creation)
-qa_granted_patent_crosswalk.set_upstream(create_granted_patent_crosswalk)
 
 patent.set_upstream(id_mappings)
 

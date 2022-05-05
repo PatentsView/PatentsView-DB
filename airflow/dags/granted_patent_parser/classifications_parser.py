@@ -10,7 +10,7 @@ from QA.generic_tests import qa_test_table_updated
 
 from lib.configuration import get_current_config, get_today_dict
 # appending a path
-from lib.utilities import chain_operators
+from lib.utilities import chain_operators, update_to_granular_version_indicator
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.collect_supplemental_data.cpc_parser.cpc_class_parser import post_class_parser, process_cpc_class_parser
 from updater.collect_supplemental_data.cpc_parser.download_cpc import collect_cpc_data, post_download
@@ -18,8 +18,6 @@ from updater.collect_supplemental_data.cpc_parser.process_cpc_current import pro
 from updater.collect_supplemental_data.cpc_parser.process_wipo import process_and_upload_wipo
 from updater.collect_supplemental_data.cpc_parser.upload_cpc_classes import upload_cpc_classes
 from updater.collect_supplemental_data.cpc_parser.pgpubs_cpc_parser import parse_pgpub_file
-
-from QA.generic_tests import update_to_granular_version_indicator
 
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
