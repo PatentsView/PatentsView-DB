@@ -580,14 +580,6 @@ rep_tbl_2 = SQLTemplatedPythonOperator(
 #     params=database_name_config
 # )
 
-# OTHER MISC TASKS TO BE RUN
-create_granted_patent_crosswalk = PythonOperator(task_id='create_granted_patent_crosswalk',
-                                                 python_callable=create_granted_patent_crosswalk)
-
-qa_granted_patent_crosswalk = PythonOperator(task_id='qa_granted_patent_crosswalk',
-                                             python_callable=qa_test_table_updated,
-                                             op_kwargs={'table': 'granted_patent_crosswalk', 'db': 'pgpubs'})
-
 # MAPPING DEPENDENCY
 
 govt_interest.set_upstream(db_creation)
