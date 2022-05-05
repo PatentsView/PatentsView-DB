@@ -95,7 +95,7 @@
         {
           "field_name": "country",
           "friendly_name": "Country",
-          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/correspondence-address/address/country/country-code",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/document-id/country-code",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -169,7 +169,7 @@
         {
           "field_name": "country",
           "friendly_name": "Country",
-          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/correspondence-address/address/country/country-code",
+          "xml_path": "body//patent-application-publication/subdoc-bibliographic-information/document-id/country-code",
           "attribute": null,
           "description": null,
           "sequence": false,
