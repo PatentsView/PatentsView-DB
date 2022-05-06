@@ -109,59 +109,6 @@
     },
     "TestScripts": []
   },
-  "clean_rawlocation": {
-    "fields": {
-      "id": {
-        "data_type": "varchar",
-        "null_allowed": false,
-        "category": false,
-        "location_field": false
-      },
-      "location_id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "city": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "state": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "country": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": true
-      },
-      "latitude": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "longitude": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "filename": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "TestScripts": []
-  },
   "cpc": {
     "fields": {
       "id": {

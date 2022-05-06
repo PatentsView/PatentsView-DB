@@ -17,6 +17,7 @@ from updater.disambiguation.inventor_disambiguation.inventor_disambiguator impor
     run_hierarchical_clustering as run_inventor_hierarchical_clustering, \
     finalize_disambiguation, upload_results as upload_inventor_results
 from updater.disambiguation.location_disambiguation.location_disambiguator import *
+from updater.post_processing.post_process_location import post_process_location, post_process_qc
 from updater.post_processing.post_process_assignee import post_process_qc as qc_post_process_assignee, \
     update_granted_rawassignee, update_pregranted_rawassignee, \
     precache_assignees, create_canonical_assignees, load_granted_lookup as load_granted_assignee_lookup, \
@@ -217,6 +218,36 @@ post_process_load_pregranted_lookup = PythonOperator(task_id='Inventor_load_preg
                                                      on_failure_callback=airflow_task_failure,
                                                      queue='data_collector', pool='database_write_iops_contenders')
 
+update_granted_persistent_long_inventor = PythonOperator(
+    task_id='update_granted_persistent_long_inventor',
+    python_callable=update_long_entity,
+    op_kwargs={
+        'entity': 'inventor',
+        'database_type': 'granted_patent'
+    },
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
+)
+
+prepare_grant_persistent_wide_inventor = PythonOperator(
+    task_id='prepare_pregrant_persistent_wide_inventor',
+    python_callable=prepare_wide_table,
+    op_kwargs={
+        'entity': 'inventor',
+        'database_type': 'granted_patent'
+    },
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
+)
+
+create_granted_persistent_wide_inventor = PythonOperator(
+    task_id='create_granted_persistent_wide_inventor',
+    python_callable=write_wide_table,
+    op_kwargs={
+        'entity': 'inventor',
+        'database_type': 'granted_patent'
+    },
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
+)
+
 qc_post_process_inventor_operator = PythonOperator(task_id='qc_post_process_inventor',
                                                    python_callable=qc_inventor_post_processing,
                                                    dag=disambiguation,
@@ -380,6 +411,18 @@ location_pregranted_nearest_neighbor = PythonOperator(task_id='Location_Pregrant
                                                       on_failure_callback=airflow_task_failure,
                                                       queue='disambiguator')
 
+post_process_location_operator = PythonOperator(task_id='post_process_location',
+                                                python_callable=post_process_location,
+                                                dag=disambiguation,
+                                                on_success_callback=airflow_task_success,
+                                                on_failure_callback=airflow_task_failure)
+
+qc_post_process_location_operator = PythonOperator(task_id='qc_post_process_location',
+                                                   python_callable=post_process_qc,
+                                                   dag=disambiguation,
+                                                   on_success_callback=airflow_task_success,
+                                                   on_failure_callback=airflow_task_failure)
+
 operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clustering],
                      'coinventor_feat': [inv_build_coinventor_features, inv_run_clustering],
                      'title_feat': [inv_build_titles, inv_run_clustering],
@@ -390,6 +433,9 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                                              post_process_create_canonical_inventors],
                      'inventor_post_processing_1': [post_process_create_canonical_inventors,
                                                     post_process_load_granted_lookup,
+                                                    update_granted_persistent_long_inventor,
+                                                    prepare_pregrant_persistent_wide_assignee,
+                                                    create_granted_persistent_wide_inventor,
                                                     qc_post_process_inventor_operator],
                      'inventor_post_processing_2': [post_process_create_canonical_inventors,
                                                     post_process_load_pregranted_lookup,
@@ -422,13 +468,16 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                      'pregranted_location': [location_assign_existing_pregranted_locations,
                                              location_search_pregranted_geo,
                                              location_pregranted_nearest_neighbor],
-                     'location_assignee_granted_link': [location_granted_nearest_neighbor,
+                     'location_post_processing_granted_link': [location_granted_nearest_neighbor, post_process_location_operator],
+                     'location_post_processing_pregranted_link': [location_pregranted_nearest_neighbor, post_process_location_operator],
+                     'location_post_processing': [post_process_location_operator, qc_post_process_location_operator],
+                     'location_assignee_granted_link': [qc_post_process_location_operator,
                                                         post_process_load_assignee_granted_lookup],
-                     'location_assignee_pregranted_link': [location_pregranted_nearest_neighbor,
+                     'location_assignee_pregranted_link': [qc_post_process_location_operator,
                                                            post_process_load_assignee_pregranted_lookup],
-                     'location_inventor_granted_link': [location_granted_nearest_neighbor,
+                     'location_inventor_granted_link': [qc_post_process_location_operator,
                                                         post_process_load_granted_lookup],
-                     'location_inventor_pregranted_link': [location_pregranted_nearest_neighbor,
+                     'location_inventor_pregranted_link': [qc_post_process_location_operator,
                                                            post_process_load_pregranted_lookup]}
 
 for dependency_group in operator_sequence:

@@ -315,8 +315,32 @@ group by 1
                 if count_value != 0:
                     print("THE FOLLOWING QUERY NEEDS ADDRESSING")
                     print(white_space_query)
-                    # raise Exception(
-                    #     f"print({self.database_section}.{table}.{field} needs trimming")
+                    raise Exception(
+                        f"print({self.database_section}.{table}.{field} needs trimming")
+        finally:
+            if self.connection.open:
+                self.connection.close()
+
+    def test_rawassignee_org(self, table):
+        print(f"\t\tTesting for organizations in name_first column of rawassignee")
+        try:
+            if not self.connection.open:
+                self.connection.connect()
+            rawassignee_q = """
+SELECT count(*) 
+FROM rawassignee 
+where name_first is not null and name_last is null"""
+            with self.connection.cursor() as count_cursor:
+                query_start_time = time()
+                count_cursor.execute(rawassignee_q)
+                query_end_time = time()
+                print("\t\t\tThis query took:", query_end_time - query_start_time, "seconds")
+                count_value = count_cursor.fetchall()[0][0]
+                if count_value != 0:
+                    print("THE FOLLOWING QUERY NEEDS ADDRESSING")
+                    print(rawassignee_q)
+                    raise Exception(
+                        f"print({self.database_section}.{table} Has Wrong Organization values")
         finally:
             if self.connection.open:
                 self.connection.close()
@@ -696,9 +720,11 @@ group by 1
         for table in self.table_config:
             # if table[:2] >= 'ba':
             print(f"BEGINNING TESTS FOR {self.database_section}.{table}")
-            # self.test_table_updated(table)
+            self.test_table_updated(table)
             if self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest':
                 self.test_null_version_indicator(table)
+            if table in 'rawassignee':
+                self.test_rawassignee_org(table)
             self.load_yearly_count(table, strict=False)
             self.load_table_row_count(table)
             self.test_blank_count(table, self.table_config[table])

@@ -13,15 +13,14 @@ import zipfile
 from queue import Queue
 from statistics import mean
 import pandas as pd
+from time import time
 
 import boto3
 import requests
 from bs4 import BeautifulSoup
 from clint.textui import progress
 from sqlalchemy import create_engine
-
-from lib.configuration import get_connection_string
-
+from lib.xml_helpers import process_date
 
 def with_keys(d, keys):
     return {x: d[x] for x in d if x in keys}
@@ -30,8 +29,12 @@ def with_keys(d, keys):
 def class_db_specific_config(self, table_config, class_called):
     keep_tables = []
     for i in table_config.keys():
-        if class_called in table_config[i]['TestScripts']:
-            keep_tables.append(i)
+        if class_called == 'DatabaseTester':
+            if "UploadTest" in table_config[i]['TestScripts']:
+                keep_tables.append(i)
+        else:
+            if class_called in table_config[i]['TestScripts']:
+                keep_tables.append(i)
     self.table_config = with_keys(table_config, keep_tables)
     if class_called[:4] == 'Text':
         pass
@@ -193,6 +196,29 @@ def get_relevant_attributes(self, class_called, database_section, config):
         else:
             raise NotImplementedError
 
+def update_to_granular_version_indicator(table, db):
+    from lib.configuration import get_current_config, get_connection_string
+    config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
+    cstr = get_connection_string(config, 'PROD_DB')
+    engine = create_engine(cstr)
+    if db == 'granted_patent':
+        id = 'id'
+        fk = 'patent_id'
+        fact_table = 'patent'
+    else:
+        id = 'document_number'
+        fk = 'document_number'
+        fact_table = 'publications'
+    query = f"""
+update {table} update_table 
+	inner join {fact_table} p on update_table.{fk}=p.{id}
+set update_table.version_indicator=p.version_indicator     
+    """
+    print(query)
+    query_start_time = time()
+    engine.execute(query)
+    query_end_time = time()
+    print("This query took:", query_end_time - query_start_time, "seconds")
 
 # Moved from AssigneePostProcessing - unused for now
 def add_persistent_table_to_config(self, database_section):
@@ -222,6 +248,7 @@ def add_persistent_table_to_config(self, database_section):
 
 
 def trim_whitespace(config):
+    from lib.configuration import get_connection_string
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     db_type = config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"][:6]
     engine = create_engine(cstr)
@@ -256,6 +283,7 @@ def weekday_count(start_date, end_date):
         week[day] = week[day] + 1 if day in week else 1
     return week
 
+
 def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
@@ -267,12 +295,17 @@ def download(url, filepath):
     r = requests.get(url, stream=True)
 
     with open(filepath, 'wb') as f:
-        content_length = int(r.headers.get('content-length'))
-        for chunk in progress.bar(r.iter_content(chunk_size=1024),
-                                  expected_size=(content_length / 1024) + 1):
-            if chunk:
-                f.write(chunk)
-                f.flush()
+        # print(r.headers.get('content-length'))
+        content_length = r.headers.get('content-length')
+        if not content_length:
+            print("\tNo Content Length Attached")
+        else:
+            content_length = int(content_length)
+            for chunk in progress.bar(r.iter_content(chunk_size=1024),
+                                      expected_size=(content_length / 1024) + 1):
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
 
 
 def chunks(l, n):
@@ -300,45 +333,35 @@ def write_csv(rows, outputdir, filename):
 
 
 def generate_index_statements(config, database_section, table):
+    from lib.configuration import get_connection_string
     engine = create_engine(get_connection_string(config, database_section))
-    db = config["PATENTSVIEW_DATABASES"][database_section]
-    add_indexes_fetcher = engine.execute(
-        """
-        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', 'ADD ', IF(NON_UNIQUE = 1, CASE UPPER(INDEX_TYPE)
-                                                                                        WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX'
-                                                                                        WHEN 'SPATIAL' THEN 'SPATIAL INDEX'
-                                                                                        ELSE CONCAT('INDEX `', INDEX_NAME,
-                                                                                            '` USING ', INDEX_TYPE) END,
-                                                                    IF(UPPER(INDEX_NAME) = 'PRIMARY',
-                                                                       CONCAT('PRIMARY KEY USING ', INDEX_TYPE),
-                                                                       CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ',
-                                                                           INDEX_TYPE))),
-                      '(', GROUP_CONCAT(DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', '),
-                      ');') AS 'Show_Add_Indexes'
+    db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+    add_indexes_query = f"""
+        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', 'ADD ', IF(NON_UNIQUE = 1, 
+        CASE UPPER(INDEX_TYPE) WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME,'` USING ', INDEX_TYPE) END,
+        IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE))),
+        '(', GROUP_CONCAT(DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', '), ');') AS 'Show_Add_Indexes'
         FROM information_schema.STATISTICS
         WHERE TABLE_SCHEMA = '{db}'
           AND TABLE_NAME = '{table}'
           and UPPER(INDEX_NAME) <> 'PRIMARY'
         GROUP BY TABLE_NAME, INDEX_NAME, NON_UNIQUE, INDEX_TYPE
         ORDER BY TABLE_NAME ASC, INDEX_NAME ASC;
-""".format(db=db, table=table))
+"""
+    print(add_indexes_query)
+    add_indexes_fetcher = engine.execute(add_indexes_query)
     add_indexes = add_indexes_fetcher.fetchall()
-
-    drop_indexes_fetcher = engine.execute(
-        """
-        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT(DISTINCT CONCAT('DROP ',
-                                                                                      IF(UPPER(INDEX_NAME) = 'PRIMARY',
-                                                                                         'PRIMARY KEY',
-                                                                                         CONCAT('INDEX `', INDEX_NAME, '`')))
-                                                                      SEPARATOR ',
-                    '), ';')
+    drop_indexes_query = f"""
+        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT(DISTINCT CONCAT('DROP ', IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`'))) SEPARATOR ', '), ';')
         FROM information_schema.STATISTICS
         WHERE TABLE_SCHEMA = '{db}'
           AND TABLE_NAME = '{table}'
           and UPPER(INDEX_NAME) <> 'PRIMARY'
         GROUP BY TABLE_NAME
         ORDER BY TABLE_NAME ASC
-            """.format(db=db, table=table))
+            """
+    print(drop_indexes_query)
+    drop_indexes_fetcher = engine.execute(drop_indexes_query)
     drop_indexes = drop_indexes_fetcher.fetchall()
     print(add_indexes)
     print(drop_indexes)
@@ -568,3 +591,47 @@ def link_view_to_new_disambiguation_table(connection, table_name, disambiguation
         if not e.errno == errorcode.ER_MULTIPLE_PRI_KEY:
             raise
     g_cursor.execute(replace_view_query)
+
+def update_to_granular_version_indicator(table, db):
+    from lib.configuration import get_current_config, get_connection_string
+    config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
+    cstr = get_connection_string(config, 'PROD_DB')
+    engine = create_engine(cstr)
+    if db == 'granted_patent':
+        id = 'id'
+        fk = 'patent_id'
+        fact_table = 'patent'
+    else:
+        id = 'document_number'
+        fk = 'document_number'
+        fact_table = 'publication'
+    query = f"""
+update {table} update_table 
+	inner join {fact_table} p on update_table.{fk}=p.{id}
+set update_table.version_indicator=p.version_indicator     
+    """
+    print(query)
+    query_start_time = time()
+    engine.execute(query)
+    query_end_time = time()
+    print("This query took:", query_end_time - query_start_time, "seconds")
+
+def update_version_indicator(table, db, **kwargs):
+    from lib.configuration import get_current_config, get_connection_string
+    config = get_current_config(type=db, schedule="quarterly", **kwargs)
+    ed = process_date(config['DATES']["end_date"], as_string=True)
+    cstr = get_connection_string(config, 'PROD_DB')
+    engine = create_engine(cstr)
+    query = f"""
+update {table} update_table 
+set update_table.version_indicator={ed} 
+    """
+    print(query)
+    query_start_time = time()
+    engine.execute(query)
+    query_end_time = time()
+    print("This query took:", query_end_time - query_start_time, "seconds")
+
+
+if __name__ == "__main__":
+    update_to_granular_version_indicator('uspc_current', 'granted_patent')

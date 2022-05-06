@@ -246,11 +246,93 @@ def trim_rawassignee(config):
         (name_last IS NULL) AND
         (organization IS NULL);""")
 
+def fix_rawassignee_wrong_org(config):
+    cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
+    print(cstr)
+    engine = create_engine(cstr)
+    print("Fixing Wrong Organization Landing")
+    # First Name contains Organization
+    engine.execute(
+        """
+create table temp_rawassignee_org_fixes_nf (
+SELECT * 
+FROM rawassignee 
+	where name_first is not null and name_last is null
+)        
+        """)
+    engine.execute(
+        """
+update rawassignee 
+set organization=name_first, type = (CASE WHEN country = 'US' THEN 2 ELSE 3 END)
+where organization is null and id in (select id from temp_rawassignee_org_fixes_nf);
+        """)
+    engine.execute(
+        """
+update rawassignee 
+set name_first = null
+where id in (select id from temp_rawassignee_org_fixes_nf)  
+        """)
+    # Last Name contains Organization
+    engine.execute(
+        """
+create table temp_rawassignee_org_fixes_nl (
+SELECT * 
+FROM rawassignee 
+	where name_first is null and name_last is not null and name_last REGEXP 'inc|ltd|technologies|limited|corp|llc|co.'
+)
+        """)
+    engine.execute(
+        """
+update rawassignee 
+set organization=name_last, type = (CASE WHEN country = 'US' THEN 2 ELSE 3 END) 
+where organization is null and id in (select id from temp_rawassignee_org_fixes_nl);
+        """)
+    engine.execute(
+        """
+update rawassignee 
+set name_last = null
+where id in (select id from temp_rawassignee_org_fixes_nl);
+        """)
+    engine.execute(
+        """
+insert into patent.pv_data_change_log (db, t_name, unique_key_name, unique_key_value, lookup_key_name, lookup_key_value, c_name, original_column_value, new_column_value, version_indicator, pipeline_changed)
+select 'pgpubs', 'rawassignee', 'id', id, 'document_number', document_number, 'organization', null, name_first, version_indicator, 'weekly_pgpubs_parser'
+from temp_rawassignee_org_fixes_nf;
+        """)
+    engine.execute(
+        """
+insert into patent.pv_data_change_log (db, t_name, unique_key_name, unique_key_value, lookup_key_name, lookup_key_value, c_name, original_column_value, new_column_value, version_indicator, pipeline_changed)
+select 'pgpubs', 'rawassignee', 'id', id, 'document_number', document_number, 'organization', null, name_last, version_indicator, 'weekly_pgpubs_parser'
+from temp_rawassignee_org_fixes_nl;
+        """)
+    fixcheck = engine.execute(
+            """
+SELECT COUNT(*) FROM rawassignee
+WHERE (name_first IS NULL
+AND name_last IS NOT NULL
+AND name_last REGEXP 'inc|ltd|technologies|limited|corp|llc|co.')
+OR (name_first IS NOT NULL 
+AND name_last IS NULL)
+            """
+    )
+    missedcount = fixcheck.first()[0]
+    if missedcount > 0:
+        raise Exception(
+                f"{missedcount} entries with only one name remain after adjustment"
+        )
+# Make sure that the new table patent.pv_data_change_log works and then we can enable dropping the temp tables
+#     engine.execute(
+#         """
+# drop table temp_rawassignee_org_fixes_nf;
+# drop table temp_rawassignee_org_fixes_nl;
+#         """)
+
 
 def begin_post_processing(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
     utilities.trim_whitespace(config)
     trim_rawassignee(config)
+    fix_rawassignee_wrong_org(config)
     consolidate_rawlocation(config)
     create_country_transformed(config)
     consolidate_cpc(config)
@@ -273,5 +355,5 @@ def post_upload_database(**kwargs):
 
 if __name__ == "__main__":
     begin_post_processing(**{
-            "execution_date": datetime.date(2022, 1, 11)
+            "execution_date": datetime.date(2022, 1, 13)
             })

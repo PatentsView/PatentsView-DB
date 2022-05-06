@@ -691,7 +691,7 @@ def update_fips(config):
 
 def post_process_location(**kwargs):
     config = get_current_config(**kwargs)
-    version_indicator = config['DATES']['END_DATE']
+    # version_indicator = config['DATES']['END_DATE']
     update_rawlocation(config)
     update_rawlocation(config, database='PGPUBS_DATABASE')
     precache_locations(config)
@@ -699,10 +699,10 @@ def post_process_location(**kwargs):
     update_fips(config)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
                       parent_entity_id=None, entity='assignee', include_location=True,
-                      location_strict=True, version_indicator=version_indicator)
+                      location_strict=True)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
                       parent_entity_id=None, entity="inventor", include_location=True,
-                      location_strict=True, version_indicator=version_indicator)
+                      location_strict=True)
 
 
 def post_process_qc(**kwargs):
@@ -715,6 +715,6 @@ if __name__ == '__main__':
     post_process_location(**{
             "execution_date": datetime.date(2021, 6, 22)
             })
-    post_process_qc(**{
-            "execution_date": datetime.date(2021, 6, 22)
-            })
+    # post_process_qc(**{
+    #         "execution_date": datetime.date(2021, 6, 22)
+    #         })
