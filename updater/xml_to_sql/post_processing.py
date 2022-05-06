@@ -293,7 +293,18 @@ update rawassignee
 set name_last = null
 where id in (select id from temp_rawassignee_org_fixes_nl);
         """)
-
+    engine.execute(
+        """
+insert into patent.pv_data_change_log (db, t_name, unique_key_name, unique_key_value, lookup_key_name, lookup_key_value, c_name, original_column_value, new_column_value, version_indicator, pipeline_changed)
+select 'pgpubs', 'rawassignee', 'id', id, 'document_number', document_number, 'organization', null, name_first, version_indicator, 'weekly_pgpubs_parser'
+from temp_rawassignee_org_fixes_nf;
+        """)
+    engine.execute(
+        """
+insert into patent.pv_data_change_log (db, t_name, unique_key_name, unique_key_value, lookup_key_name, lookup_key_value, c_name, original_column_value, new_column_value, version_indicator, pipeline_changed)
+select 'pgpubs', 'rawassignee', 'id', id, 'document_number', document_number, 'organization', null, name_last, version_indicator, 'weekly_pgpubs_parser'
+from temp_rawassignee_org_fixes_nl;
+        """)
     fixcheck = engine.execute(
             """
 SELECT COUNT(*) FROM rawassignee
@@ -309,6 +320,12 @@ AND name_last IS NULL)
         raise Exception(
                 f"{missedcount} entries with only one name remain after adjustment"
         )
+# Make sure that the new table patent.pv_data_change_log works and then we can enable dropping the temp tables
+#     engine.execute(
+#         """
+# drop table temp_rawassignee_org_fixes_nf;
+# drop table temp_rawassignee_org_fixes_nl;
+#         """)
 
 
 def begin_post_processing(**kwargs):
