@@ -49,7 +49,7 @@ def consolidate_cpc_data(config, add_indexes, db='granted_patent', cpc_file=None
         raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], vind=end_date)
 
     else:
-        delete_query = "DELETE cpc FROM cpc_current cpc Inner JOIN {raw_db}.publication p on p.document_number = cpc.document_number WHERE p.document_number is null or p.version_indicator >'{vind}'".format(
+        delete_query = "DELETE cpc FROM {raw_db}.cpc_current cpc Inner JOIN {raw_db}.publication p on p.document_number = cpc.document_number WHERE p.document_number is null or p.version_indicator >'{vind}'".format(
         raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"], vind=end_date)
     print(delete_query)
     engine.execute(delete_query)
@@ -58,10 +58,10 @@ def consolidate_cpc_data(config, add_indexes, db='granted_patent', cpc_file=None
         engine.execute(add_statement[0])
     rename_raw_statement = """
     rename table {raw_db}.cpc_current to {raw_db}.cpc_current_{suffix}
-    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], suffix=suffix)
+    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"], suffix=suffix)
     rename_upload_statement = """
     rename table {upload_db}.cpc_current to {raw_db}.cpc_current
-    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"],
+    """.format(raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"],
                upload_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
     print(rename_raw_statement)
     engine.execute(rename_raw_statement)
