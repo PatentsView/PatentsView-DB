@@ -503,7 +503,8 @@ def extract_document(xml_file):
                 current_document_lines.append(line.split(xml_marker)[0])
                 # Join all lines for a given document
                 current_xml = "".join(current_document_lines)
-                yield current_xml
+                if current_xml.strip() != '':
+                    yield current_xml
                 current_document_lines = []
                 current_document_lines.append(xml_marker)
                 current_document_lines.append(line.split(xml_marker)[-1])
