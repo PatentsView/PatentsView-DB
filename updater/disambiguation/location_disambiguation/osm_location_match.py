@@ -181,7 +181,7 @@ def make_results_db(week_db):
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
     engine.execute(create_sql)
-    matched_data[['id','matched_name','latitude','longitude']].to_sql(name='matched_rawlocation' ,schema=week_db ,con=engine, if_exists='append')
+    matched_data[['id','matched_name','latitude','longitude']].to_sql(name='matched_rawlocation' ,schema=week_db ,con=engine, if_exists='append', index=False)
 
     update_sql = """
     UPDATE TABLE `rawlocation` r 
