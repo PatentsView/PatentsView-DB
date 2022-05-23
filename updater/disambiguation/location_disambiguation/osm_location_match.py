@@ -160,15 +160,15 @@ def match_locations(locations_to_search, chunksize = 100):
     hitframe = pd.concat((unique_locations, hitframe),axis=1)
 
     # merge deduplicated ES results with parse results (many to one)
-    return(locations_to_search.merge(hitframe, on=['city','state','country']))
+    return(locations_to_search.merge(hitframe, on=['city','state','country'], how='left'))
 
 
-def make_results_db(week_db):
+def create_location_match_table(database):
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
-    engine = create_engine('mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, week_db))
+    engine = create_engine('mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
     locations_to_search = pd.read_sql(f"SELECT id, city, state, country FROM rawlocation", con=engine)
     matched_data = match_locations(locations_to_search)
@@ -181,15 +181,15 @@ def make_results_db(week_db):
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
     engine.execute(create_sql)
-    matched_data[['id','matched_name','latitude','longitude']].to_sql(name='matched_rawlocation' ,schema=week_db ,con=engine, if_exists='append', index=False)
+    matched_data[['id','matched_name','latitude','longitude']].to_sql(name='matched_rawlocation' ,schema=database ,con=engine, if_exists='append', index=False)
 
     update_sql = """
-    UPDATE TABLE `rawlocation` r 
-    JOIN TABLE `matched_rawlocation` mr ON (r.id = mr.id)
+    UPDATE `rawlocation` r 
+    LEFT JOIN `matched_rawlocation` mr ON (r.id = mr.id)
     SET r.latitude = mr.latitude,
     r.longitude = mr.longitude,
     r.location_id_transformed = CONCAT(mr.latitude,'|',mr.longitude) 
-    WHERE mr.latitude is not null
+    WHERE mr.latitude IS NOT NULL
     """
     engine.execute(update_sql)
 
