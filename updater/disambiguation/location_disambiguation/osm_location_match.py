@@ -24,7 +24,7 @@ with open(f'{project_home}/resources/location_references/state_abr_to_name.csv',
 iso_csv = pd.read_csv(f'{project_home}/resources/location_references/iso-country-codes.csv',keep_default_na=False)
 # co_ab_to_nm = {row['Alpha-2 code']: row['English short name lower case'] for i,row in iso_csv.iterrows()} #ISO-2 codes and names - replaced by OSM equivalents
 iso3_to_iso2 = {row['Alpha-3 code']: row['Alpha-2 code'] for i,row in iso_csv.iterrows()}
-osm_codes_names = {row['ISO-2']: row['name'] for i,row in pd.read_csv('OSM-country-codes.csv',keep_default_na=False).iterrows()}
+osm_codes_names = {row['ISO-2']: row['name'] for i,row in pd.read_csv(f'{project_home}/resources/location_references/OSM-country-codes.csv',keep_default_na=False).iterrows()}
 
 
 def generate_es_query(row):
