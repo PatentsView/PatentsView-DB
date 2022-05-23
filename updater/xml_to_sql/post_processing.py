@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 from QA.text_parser.AppTest import AppUploadTest
 from lib.configuration import get_connection_string, get_current_config
 from lib import utilities
+from updater.disambiguation.location_disambiguation.osm_location_match import create_location_match_table
 
 def pct_data_doc_type(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
@@ -345,6 +346,7 @@ def begin_post_processing(**kwargs):
     yearly_brf_sum_text(config)
     yearly_draw_desc_text(config)
     yearly_detail_desc_text(config)
+    create_location_match_table(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
 
 
 def post_upload_database(**kwargs):
