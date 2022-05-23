@@ -381,21 +381,22 @@ location_assign_existing_pregranted_locations = PythonOperator(task_id='Location
                                                                queue='data_collector',
                                                                pool='database_write_iops_contenders')
 
-location_search_granted_geo = PythonOperator(task_id='Location_Search_Granted_Geo',
-                                             python_callable=update_latitude_longitude_for_granted,
-                                             provide_context=True,
-                                             dag=disambiguation,
-                                             on_success_callback=airflow_task_success,
-                                             on_failure_callback=airflow_task_failure,
-                                             queue='data_collector', pool='database_write_iops_contenders')
+# location_search_granted_geo = PythonOperator(task_id='Location_Search_Granted_Geo',
+#                                              python_callable=update_latitude_longitude_for_granted,
+#                                              provide_context=True,
+#                                              dag=disambiguation,
+#                                              on_success_callback=airflow_task_success,
+#                                              on_failure_callback=airflow_task_failure,
+#                                              queue='data_collector', pool='database_write_iops_contenders')
 
-location_search_pregranted_geo = PythonOperator(task_id='Location_Search_Pregranted_Geo',
-                                                python_callable=update_latitude_longitude_for_pregranted,
-                                                provide_context=True,
-                                                dag=disambiguation,
-                                                on_success_callback=airflow_task_success,
-                                                on_failure_callback=airflow_task_failure,
-                                                queue='data_collector', pool='database_write_iops_contenders')
+# location_search_pregranted_geo = PythonOperator(task_id='Location_Search_Pregranted_Geo',
+#                                                 python_callable=update_latitude_longitude_for_pregranted,
+#                                                 provide_context=True,
+#                                                 dag=disambiguation,
+#                                                 on_success_callback=airflow_task_success,
+#                                                 on_failure_callback=airflow_task_failure,
+#                                                 queue='data_collector', pool='database_write_iops_contenders')
+
 location_granted_nearest_neighbor = PythonOperator(task_id='Location_Granted_NN',
                                                    python_callable=find_nearest_neighbor_for_granted,
                                                    provide_context=True,
@@ -463,10 +464,10 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                          create_pregrant_persistent_wide_assignee,
                          qc_post_process_assignee_operator
                      ],
-                     'granted_location': [location_assign_existing_granted_locations, location_search_granted_geo,
+                     'granted_location': [location_assign_existing_granted_locations, #location_search_granted_geo,
                                           location_granted_nearest_neighbor],
                      'pregranted_location': [location_assign_existing_pregranted_locations,
-                                             location_search_pregranted_geo,
+                                            #  location_search_pregranted_geo,
                                              location_pregranted_nearest_neighbor],
                      'location_post_processing_granted_link': [location_granted_nearest_neighbor, post_process_location_operator],
                      'location_post_processing_pregranted_link': [location_pregranted_nearest_neighbor, post_process_location_operator],
