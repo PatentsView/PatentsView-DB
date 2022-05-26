@@ -4,19 +4,9 @@ import csv
 from math import ceil
 from elasticsearch import Elasticsearch
 from sqlalchemy import create_engine
-from tqdm import tqdm
-
-from lib.configuration import get_current_config, get_today_dict
-
-config = get_current_config(type='config.ini', supplemental_configs=None, **get_today_dict())
+# from tqdm import tqdm
 
 project_home = os.environ['PACKAGE_HOME']
-
-es_hostname = config['ELASTICSEARCH']['HOST']
-es_username = config['ELASTICSEARCH']['USER']
-es_password = config['ELASTICSEARCH']['PASSWORD']
-es = Elasticsearch(hosts=es_hostname, http_auth=(es_username, es_password))
-
 
 with open(f'{project_home}/resources/location_references/state_abr_to_name.csv', mode='r', encoding='utf-8-sig') as f:
     r = csv.DictReader(f)
@@ -75,7 +65,7 @@ def generate_es_query(row):
 
     return esqry
 
-def match_locations(locations_to_search, chunksize = 100):
+def match_locations(locations_to_search, es_con, chunksize = 100):
     unique_locations = locations_to_search[['city','state','country']].drop_duplicates(ignore_index=True)
     unique_locations['query'] = unique_locations.apply(generate_es_query, axis=1)
     unique_locations.dropna(subset=['query'], inplace=True) # don't bother searching null queries
@@ -85,7 +75,7 @@ def match_locations(locations_to_search, chunksize = 100):
     if chunksize in [0,1,None]:
         tophits = []
         for qry in unique_locations['query']:
-            res = es.search(index='locations', body=qry)
+            res = es_con.search(index='locations', body=qry)
             if res['hits']['total']['value'] > 0:
                 tophits.append({'matched_name': res['hits']['hits'][0]['_source']['name'], 
                                 # 'OSM_ID': res['hits']['hits'][0]['_id'], 
@@ -98,14 +88,14 @@ def match_locations(locations_to_search, chunksize = 100):
 
         hitframe = pd.DataFrame.from_records(tophits)
         
-    # search all records at once (fast but potentially high memory for large sets):    
+    # search all records at once (fast but potentially high memory or timeout for large sets):    
     elif chunksize == -1:
         search_bodies = []
         for qry in unique_locations['query']:
             search_bodies.append({"index": "locations"})
             search_bodies.append(qry)
 
-        results = es.msearch(body=search_bodies)['responses']
+        results = es_con.msearch(body=search_bodies)['responses']
 
         hitframe = pd.DataFrame.from_records([{'matched_name': res['hits']['hits'][0]['_source']['name'], 
                                                 # 'OSM_ID': res['hits']['hits'][0]['_id'], 
@@ -125,15 +115,15 @@ def match_locations(locations_to_search, chunksize = 100):
         divs = [chunksize * n for n in range(ceil(unique_locations.shape[0]/chunksize))]
         divs.append(unique_locations.shape[0])
         hitframe = pd.DataFrame()
-        for i in tqdm(range(len(divs)-1)):
-        # for i in range(len(divs)-1):
+        # for i in tqdm(range(len(divs)-1)):
+        for i in range(len(divs)-1):
             chunk = unique_locations[divs[i]:divs[i+1]]
             search_bodies = []
             for qry in chunk['query']:
                 search_bodies.append({"index": "locations"})
                 search_bodies.append(qry)
 
-            results = es.msearch(body=search_bodies)['responses']
+            results = es_con.msearch(body=search_bodies)['responses']
 
             hit_temp = pd.DataFrame.from_records([{'matched_name': res['hits']['hits'][0]['_source']['name'], 
                                                     # 'OSM_ID': res['hits']['hits'][0]['_id'], 
@@ -163,15 +153,22 @@ def match_locations(locations_to_search, chunksize = 100):
     return(locations_to_search.merge(hitframe, on=['city','state','country'], how='left'))
 
 
-def create_location_match_table(database):
+def create_location_match_table(config):
+    database = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB']
+
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
     engine = create_engine('mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
+    es_hostname = config['ELASTICSEARCH']['HOST']
+    es_username = config['ELASTICSEARCH']['USER']
+    es_password = config['ELASTICSEARCH']['PASSWORD']
+    es_con = Elasticsearch(hosts=es_hostname, http_auth=(es_username, es_password))
+
     locations_to_search = pd.read_sql(f"SELECT id, city, state, country FROM rawlocation", con=engine)
-    matched_data = match_locations(locations_to_search)
+    matched_data = match_locations(locations_to_search, es_con)
     create_sql = """
     CREATE TABLE IF NOT EXISTS `matched_rawlocation` (
   `id`  varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -193,3 +190,12 @@ def create_location_match_table(database):
     """
     engine.execute(update_sql)
 
+def geocode_by_osm(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('granted_patent', **kwargs)
+    create_location_match_table(config)
+
+if __name__ == '__main__':
+    from lib.configuration import get_current_config, get_today_dict
+    config = get_current_config(type='config.ini', supplemental_configs=None, **get_today_dict())
+    create_location_match_table(config)

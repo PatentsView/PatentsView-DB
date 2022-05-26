@@ -13,6 +13,7 @@ from updater.create_databases.merge_in_new_data import begin_merging, begin_text
     post_merge_quarterly_granted
 from updater.create_databases.rename_db import qc_database_granted
 from updater.create_databases.upload_new import begin_database_setup, post_upload_granted, upload_current_data
+from updater.disambiguation.location_disambiguation.osm_location_match import geocode_by_osm
 from updater.government_interest.NER import begin_NER_processing
 from updater.government_interest.NER_to_manual import process_ner_to_manual
 from updater.government_interest.post_manual import process_post_manual, qc_gi
@@ -117,6 +118,11 @@ patent_sql_operator = PythonOperator(task_id='parse_xml_to_sql', python_callable
 qc_upload_operator = PythonOperator(task_id='qc_upload_new', python_callable=post_upload_granted,
                                     **operator_settings
                                     )
+### new OSM ElasticSearch geocoding
+OSM_geocode_operator = PythonOperator(task_id='geocode_rawlocations', python_callable=geocode_by_osm,
+                                    **operator_settings
+                                    )
+
 ### GI Processing
 gi_NER = PythonOperator(task_id='gi_NER', python_callable=begin_NER_processing,
                         **operator_settings)
@@ -237,7 +243,7 @@ qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_
 operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,
                                             parse_xml_operator, upload_new_operator,
                                             upload_trigger_operator, patent_sql_operator,
-                                            patent_id_fix_operator, qc_upload_operator,
+                                            patent_id_fix_operator, qc_upload_operator, OSM_geocode_operator,
                                             gi_NER, gi_postprocess_NER, manual_simulation_operator,
                                             post_manual_operator, gi_qc_operator, withdrawn_operator,
                                             qc_withdrawn_operator, merge_new_operator]

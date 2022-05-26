@@ -336,6 +336,7 @@ def begin_post_processing(**kwargs):
     fix_rawassignee_wrong_org(config)
     consolidate_rawlocation(config)
     create_country_transformed(config)
+    create_location_match_table(config)
     consolidate_cpc(config)
     detail_desc_length(config)
     consolidate_uspc(config)
@@ -346,7 +347,6 @@ def begin_post_processing(**kwargs):
     yearly_brf_sum_text(config)
     yearly_draw_desc_text(config)
     yearly_detail_desc_text(config)
-    create_location_match_table(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
 
 
 def post_upload_database(**kwargs):
