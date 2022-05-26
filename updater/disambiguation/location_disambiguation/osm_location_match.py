@@ -184,8 +184,7 @@ def create_location_match_table(config):
     UPDATE `rawlocation` r 
     LEFT JOIN `matched_rawlocation` mr ON (r.id = mr.id)
     SET r.latitude = mr.latitude,
-    r.longitude = mr.longitude,
-    r.location_id_transformed = CONCAT(mr.latitude,'|',mr.longitude) 
+    r.longitude = mr.longitude
     WHERE mr.latitude IS NOT NULL
     """
     engine.execute(update_sql)
