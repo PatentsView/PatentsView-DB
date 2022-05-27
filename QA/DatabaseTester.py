@@ -720,13 +720,13 @@ where name_first is not null and name_last is null"""
         for table in self.table_config:
             # if table[:2] >= 'ba':
             print(f"BEGINNING TESTS FOR {self.database_section}.{table}")
-            self.test_table_updated(table)
+            # self.test_table_updated(table)
+            self.load_table_row_count(table)
             if self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest':
                 self.test_null_version_indicator(table)
             if table in 'rawassignee':
                 self.test_rawassignee_org(table)
             self.load_yearly_count(table, strict=False)
-            self.load_table_row_count(table)
             self.test_blank_count(table, self.table_config[table])
             self.load_nulls(table, self.table_config[table])
             self.test_related_floating_entities(table_name=table, table_config=self.table_config[table])
