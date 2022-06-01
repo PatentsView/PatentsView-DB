@@ -482,7 +482,7 @@ def get_results(patents, field_dictionary):
             results['pct_data'].append(
                     [id_generator(), patent_id, pct_pub_data['document-id-doc-number'],
                      pct_pub_data['document-id-date'], None,
-                     pct_pub_data['document-id-country'], pct_pub_data['document-id-kind'].strip(),
+                     pct_pub_data['document-id-country'], pct_pub_data['document-id-kind'],
                      "wo_grant", None])
     return results, error_log
 

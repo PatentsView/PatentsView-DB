@@ -1,25 +1,17 @@
 from QA.create_databases.RenameTest import DatabaseSetupTest
-from lib.configuration import get_current_config
+from lib.configuration import get_current_config, get_today_dict
+from lib import utilities
 import datetime
 
 def qc_database_granted(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
+    utilities.trim_whitespace(config)
     database = config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
-    qc = DatabaseSetupTest(config, database).runTests()
-
-def check_patent_prod_integrity(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
-    database = config['PATENTSVIEW_DATABASES']["PROD_DB"]
     qc = DatabaseSetupTest(config, database).runTests()
 
 def qc_database_pgpubs(**kwargs):
     config = get_current_config('pgpubs', **kwargs)
     database = config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
-    qc = DatabaseSetupTest(config, database).runTests()
-
-def check_pgpubs_prod_integrity(**kwargs):
-    config = get_current_config('pgpubs', **kwargs)
-    database = config['PATENTSVIEW_DATABASES']["PROD_DB"]
     qc = DatabaseSetupTest(config, database).runTests()
 
 def qc_database_quarterly_granted(**kwargs):
