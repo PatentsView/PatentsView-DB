@@ -13,7 +13,7 @@ from updater.xml_to_sql.post_processing import begin_post_processing
 
 # QA STEPS
 from updater.create_databases.upload_new import post_upload_pgpubs
-from updater.create_databases.rename_db import qc_database_pgpubs
+from updater.create_databases.rename_db import check_pgpubs_prod_integrity, qc_database_pgpubs
 from updater.create_databases.merge_in_new_data import post_merge_weekly_pgpubs, post_merge_quarterly_pgpubs, begin_text_merging_pgpubs
 from updater.create_databases.other_misc_tasks import create_granted_patent_crosswalk
 from updater.text_data_processor.text_table_parsing import post_text_merge_pgpubs, post_text_parsing_pgpubs
@@ -99,6 +99,13 @@ qc_text_upload_operator = PythonOperator(task_id='qc_text_upload_new',
                                     on_failure_callback=airflow_task_failure
                                     )
 
+integrity_check_operator = PythonOperator(task_id='check_prod_integrity',
+                                    python_callable=check_pgpubs_prod_integrity,
+                                    dag=app_xml_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure
+                                    )
+
 merge_database_operator = SQLTemplatedPythonOperator(
     task_id='merge_database',
     provide_context=True,
@@ -160,8 +167,9 @@ parse_xml_operator.set_upstream(qc_database_operator)
 post_processing_operator.set_upstream(parse_xml_operator)
 qc_upload_operator.set_upstream(post_processing_operator)
 qc_text_upload_operator.set_upstream(post_processing_operator)
-merge_database_operator.set_upstream(qc_upload_operator)
-merge_database_operator.set_upstream(qc_text_upload_operator)
+integrity_check_operator.set_upstream(qc_upload_operator)
+integrity_check_operator.set_upstream(qc_text_upload_operator)
+merge_database_operator.set_upstream(integrity_check_operator)
 qc_merge_weekly_operator.set_upstream(merge_database_operator)
 qc_merge_weekly_text_operator.set_upstream(merge_database_operator)
 
