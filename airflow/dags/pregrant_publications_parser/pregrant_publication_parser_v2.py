@@ -11,6 +11,9 @@ from updater.create_databases.pregrant_database_setup import create_database
 from updater.xml_to_sql.parser import begin_parsing
 from updater.xml_to_sql.post_processing import begin_post_processing
 
+from updater.disambiguation.location_disambiguation.generate_locationID import run_location_disambiguation, run_location_disambiguation_tests
+
+
 # QA STEPS
 from updater.create_databases.upload_new import post_upload_pgpubs
 from updater.create_databases.rename_db import check_pgpubs_prod_integrity, qc_database_pgpubs
@@ -106,6 +109,22 @@ integrity_check_operator = PythonOperator(task_id='check_prod_integrity',
                                     on_failure_callback=airflow_task_failure
                                     )
 
+loc_disambiguation = PythonOperator(task_id='loc_disambiguation',
+                                    python_callable=run_location_disambiguation,
+                                    op_kwargs={'dbtype': 'pgpubs'},
+                                    dag=app_xml_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure
+                                    )
+
+loc_disambiguation_qc = PythonOperator(task_id='loc_disambiguation',
+                                    python_callable=run_location_disambiguation_tests,
+                                    op_kwargs={'dbtype': 'pgpubs'},
+                                    dag=app_xml_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure
+                                    )
+
 merge_database_operator = SQLTemplatedPythonOperator(
     task_id='merge_database',
     provide_context=True,
@@ -169,7 +188,9 @@ qc_upload_operator.set_upstream(post_processing_operator)
 qc_text_upload_operator.set_upstream(post_processing_operator)
 integrity_check_operator.set_upstream(qc_upload_operator)
 integrity_check_operator.set_upstream(qc_text_upload_operator)
-merge_database_operator.set_upstream(integrity_check_operator)
+loc_disambiguation.set_upsteam(integrity_check_operator)
+loc_disambiguation_qc.set_upsteam(loc_disambiguation)
+merge_database_operator.set_upstream(loc_disambiguation_qc)
 qc_merge_weekly_operator.set_upstream(merge_database_operator)
 qc_merge_weekly_text_operator.set_upstream(merge_database_operator)
 
