@@ -95,7 +95,7 @@ where a.country is not null and b.id is not null;""")
             min_lat_diff = df['lat_diff'].min()
             max_long_diff = df['long_diff'].max()
             min_long_diff = df['long_diff'].min()
-            print(f"LAT DIFF RANGE {min_lat_diff}- {max_lat_diff} --/-- LONG DIFF RANGE {min_long_diff}- {max_long_diff}")
+            print(f"LAT DIFF RANGE {min_lat_diff}, {max_lat_diff} --/-- LONG DIFF RANGE {min_long_diff}, {max_long_diff}")
             if (max_lat_diff > 5) or (min_lat_diff < -5) or (max_long_diff > 5) or (min_long_diff < -5):
                 raise Exception("LAT OR LONG LOOKS WRONG")
 

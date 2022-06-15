@@ -117,7 +117,7 @@ loc_disambiguation = PythonOperator(task_id='loc_disambiguation',
                                     on_failure_callback=airflow_task_failure
                                     )
 
-loc_disambiguation_qc = PythonOperator(task_id='loc_disambiguation',
+loc_disambiguation_qc = PythonOperator(task_id='loc_disambiguation_qc',
                                     python_callable=run_location_disambiguation_tests,
                                     op_kwargs={'dbtype': 'pgpubs'},
                                     dag=app_xml_dag,
