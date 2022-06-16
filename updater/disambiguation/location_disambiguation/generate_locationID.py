@@ -26,17 +26,11 @@ def generate_US_locationID_exactmatch(config):
                 and b.`country` = c.name and a.state = d.Abbreviation
         inner join 
                 (
-                    select location_name, b.state, b.country, count(*)
-                    from {db}.rawlocation a
-                    inner join geo_data.curated_locations b on a.city=b.location_name
-                    inner join patent.state_codes d on b.state=d.`State/Possession`
-                    inner join patent.country_codes c on a.`country_transformed`=c.`alpha-2`
-                          and b.`country` = c.name and a.state = d.Abbreviation
-                    where place= '{loc}'
-                        and location_id is null
-                        and a.`country_transformed`='US' 
+                    select location_name, `state`, b.country, count(*)
+                    from geo_data.curated_locations b 
+                    where place= '{loc}' and b.`country`='United States of America' 
                     group by 1, 2, 3
-                    having count(*)=1                
+                    having count(*)=1                 
                 ) as dedup on b.location_name=dedup.location_name and b.state=dedup.state and b.country=dedup.country
         set location_id= b.id
         
@@ -318,11 +312,11 @@ if __name__ == "__main__":
     # tests = LocationUploadTest(config)
     # tests.runTests()
 
-    run_location_disambiguation(dbtype='pgpubs', **{
-        "execution_date": datetime.date(2022, 6, 2)
+    run_location_disambiguation(dbtype='granted_patent', **{
+        "execution_date": datetime.date(2022, 5, 24)
     })
-    run_location_disambiguation_tests(dbtype='pgpubs', **{
-        "execution_date": datetime.date(2022, 6, 2)
+    run_location_disambiguation_tests(dbtype='granted_patent', **{
+        "execution_date": datetime.date(2022, 5, 24)
     })
     # HOW TO "UNDO" THIS CODE --- CAREFUL
     # drop table patent_QA.DataMonitor_LocDisambig;
