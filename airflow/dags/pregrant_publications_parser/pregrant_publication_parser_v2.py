@@ -173,10 +173,18 @@ qc_merge_weekly_text_operator = PythonOperator(task_id='qc_text_merge_weekly',
 
 # OTHER MISC TASKS TO BE RUN
 create_granted_patent_crosswalk = PythonOperator(task_id='create_granted_patent_crosswalk',
+                                                 dag=app_xml_dag,
+                                                 provide_context=True,
+                                                 on_success_callback=airflow_task_success,
+                                                 on_failure_callback=airflow_task_failure,
                                                  python_callable=create_granted_patent_crosswalk)
 
 
 qa_granted_patent_crosswalk = PythonOperator(task_id='qa_granted_patent_crosswalk',
+                                             dag=app_xml_dag,
+                                             provide_context=True,
+                                             osn_success_callback=airflow_task_success,
+                                             on_failure_callback=airflow_task_failure,
                                              python_callable=qa_test_table_updated,
                                              op_kwargs={'table': 'granted_patent_crosswalk', 'db': 'pgpubs'})
 
