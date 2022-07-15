@@ -1,0 +1,53 @@
+import os
+import re
+from datetime import date, datetime, timedelta
+from tqdm import tqdm
+
+from updater.xml_to_sql.parser import queue_parsers
+from lib.configuration import get_current_config
+
+def reparse(start, end, clearfirst = True, pubtype = 'pgpubs'):
+    start = re.sub('[^\d]','', start)[-6:] #remove non-digits and get 6 digits
+    end = re.sub('[^\d]','', end)[-6:] #remove non-digits and get 6 digits
+    assert re.fullmatch('[0-9]{6}', start) and re.fullmatch('[0-9]{6}',end), 'enter start and end dates as "yymmdd" (punctuation separators allowed)'
+
+    config = get_current_config(pubtype, **{"execution_date": date.today()})
+    folder_files = os.listdir(config['FOLDERS'][f'{pubtype}_bulk_xml_location'])
+
+    usefiles = [fnam for fnam in folder_files if 
+                        re.fullmatch("i?p[ag]([0-9]{6}).xml",fnam) is not None          and
+                        re.fullmatch("i?p[ag]([0-9]{6}).xml",fnam).group(1) <= end      and
+                        re.fullmatch("i?p[ag]([0-9]{6}).xml",fnam).group(1) >= start]
+    usefiles.sort()
+
+    if clearfirst:
+        import json
+        from sqlalchemy import create_engine
+        host = '{}'.format(config['DATABASE_SETUP']['HOST'])
+        user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
+        password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
+        port = '{}'.format(config['DATABASE_SETUP']['PORT'])
+
+        engine = create_engine('mysql+pymysql://{0}:{1}@{2}:{3}/?charset=utf8mb4'.format(user, password, host, port))
+
+
+        tabletoggle = json.load(open(config['XML_PARSING']['table_toggle']))
+        if pubtype == 'pgpubs':
+            tabletoggle = tabletoggle['pgpubs']
+        else: 
+            tabletoggle = tabletoggle['granted_patent']
+        cleartables = [table for table in tabletoggle if tabletoggle[table]]
+        prefix = config['PATENTSVIEW_DATABASES'][f'{pubtype}_upload_db']
+
+    for file in tqdm(usefiles):
+        filedate = '20' + re.fullmatch('i?p[ag]([0-9]{6}).xml', file).group(1)
+        config['DATES']['START_DATE'] = filedate
+        config['DATES']['END_DATE'] = (datetime.strptime(filedate, "%Y%m%d") + timedelta(6)).strftime("%Y%m%d")
+        try:
+            if clearfirst:
+                for table in cleartables:
+                    # remove data from weekly temp db in corresponding tables
+                    engine.execute(f"DELETE FROM {prefix}{filedate}.{table} WHERE version_indicator = '{filedate}'")
+            queue_parsers(config, pubtype)
+        except Exception as e:
+            print(e)

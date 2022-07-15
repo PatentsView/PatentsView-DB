@@ -1338,6 +1338,17 @@
           "data-type": "string"
         },
         {
+          "field_name": "organization",
+          "friendly_name": "Organization",
+          "xml_path": "addressbook/orgname",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
           "field_name": "designation",
           "friendly_name": "Designation",
           "xml_path": ".",
