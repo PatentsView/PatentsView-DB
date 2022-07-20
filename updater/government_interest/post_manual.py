@@ -169,7 +169,7 @@ def process_post_manual(**kwargs):
     full_db_engine = create_engine(get_connection_string(config, 'RAW_DB'))
     # upload the new government organization we manually identified
     # upload_new_orgs(post_manual, engine)
-    version_indicator = get_version_indicator(**kwargs)
+    version_indicator = config['DATES']['END_DATE']
 
     # make and update the dictionary mapping original to clean org name
     dict_clean_org = create_dict(pre_manual, post_manual, persistent_files)
