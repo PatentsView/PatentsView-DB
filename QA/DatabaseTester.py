@@ -235,8 +235,7 @@ where name_first is not null and name_last is null"""
         if count_value != 0:
             print("THE FOLLOWING QUERY NEEDS ADDRESSING")
             print(rawassignee_q)
-            raise Exception(
-                f"print({self.database_section}.{table} Has Wrong Organization values")
+            raise Exception(print(f"{self.database_section}.{table} Has Wrong Organization values"))
 
 
     def test_related_floating_entities(self, table_name, table_config, where_vi=False):
