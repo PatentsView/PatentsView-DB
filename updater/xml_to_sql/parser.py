@@ -438,7 +438,10 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
             elif df == 'rawassignee' and dfs[df].size > 0:
                 dfs[df] = rawassignee_QC(dfs[df])
         year = config['DATES']['START_DATE'][:4]
-        tabnam = df+'_{}'.format(year) # for early year runs - to remove for weekly or other runs
+        if df in ['claim','brf_sum_text','draw_desc_text','detail_desc_text']: # text tables - can add override for year-specific reparse to temp tables
+            tabnam = df+'_{}'.format(year)
+        else:
+            tabnam = df
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
