@@ -248,6 +248,26 @@ create_granted_persistent_wide_inventor = PythonOperator(
     dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 )
 
+prepare_pregranted_persistent_wide_inventor = PythonOperator(
+    task_id='prepare_granted_persistent_wide_inventor',
+    python_callable=prepare_wide_table,
+    op_kwargs={
+        'entity': 'inventor',
+        'database_type': 'pgpubs'
+    },
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
+)
+
+create_pregranted_persistent_wide_inventor = PythonOperator(
+    task_id='create_granted_persistent_wide_inventor',
+    python_callable=write_wide_table,
+    op_kwargs={
+        'entity': 'inventor',
+        'database_type': 'pgpubs'
+    },
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
+)
+
 qc_post_process_inventor_operator = PythonOperator(task_id='qc_post_process_inventor',
                                                    python_callable=qc_inventor_post_processing,
                                                    dag=disambiguation,
@@ -440,6 +460,8 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                                                     qc_post_process_inventor_operator],
                      'inventor_post_processing_2': [post_process_create_canonical_inventors,
                                                     post_process_load_pregranted_lookup,
+                                                    prepare_pregranted_persistent_wide_inventor,
+                                                    create_pregranted_persistent_wide_inventor,
                                                     qc_post_process_inventor_operator],
                      'assignee_mention': [assignee_build_assignee_features, assignee_run_clustering],
                      'cross_link_1': [inv_build_coinventor_features, assignee_run_clustering],
