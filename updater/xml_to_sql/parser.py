@@ -461,8 +461,7 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
                 temptable = df
         try:
             # turned off temporarily for testing pgp botanics
-            # engine.execute(f"CREATE TABLE IF NOT EXISTS {database}.{tabnam} LIKE {template}.{temptable};") # create table to match column parameters of main DB - avoid dtype issues
-            # dfs[df].to_sql(tabnam, con=engine, schema=database, if_exists='append', index=False, dtype=dtypes[df])
+            engine.execute(f"CREATE TABLE IF NOT EXISTS {database}.{tabnam} LIKE {template}.{temptable};") # create table to match column parameters of main DB - avoid dtype issues
             dfs[df].to_sql(tabnam, con=engine, schema=database, if_exists='append', index=False)
         except Exception as e:
             log_queue.put({

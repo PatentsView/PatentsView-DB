@@ -9,7 +9,7 @@ from lib.configuration import get_current_config
 def reparse(start, end, clearfirst = True, pubtype = 'pgpubs'):
     start = re.sub('[^\d]','', start)[-6:] #remove non-digits and get 6 digits
     end = re.sub('[^\d]','', end)[-6:] #remove non-digits and get 6 digits
-    assert re.fullmatch('[0-9]{6}', start) and re.fullmatch('[0-9]{6}',end), 'enter start and end dates as "yymmdd" (punctuation separators allowed)'
+    assert re.fullmatch('[0-9]{6}', start) and re.fullmatch('[0-9]{6}',end), 'enter start and end dates as "yymmdd" or "yyyymmdd" (punctuation separators allowed)'
 
     config = get_current_config(pubtype, **{"execution_date": date.today()})
     folder_files = os.listdir(config['FOLDERS'][f'{pubtype}_bulk_xml_location'])
