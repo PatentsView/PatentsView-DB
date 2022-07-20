@@ -249,7 +249,7 @@ create_granted_persistent_wide_inventor = PythonOperator(
 )
 
 prepare_pregranted_persistent_wide_inventor = PythonOperator(
-    task_id='prepare_granted_persistent_wide_inventor',
+    task_id='prepare_pregranted_persistent_wide_inventor',
     python_callable=prepare_wide_table,
     op_kwargs={
         'entity': 'inventor',
@@ -259,7 +259,7 @@ prepare_pregranted_persistent_wide_inventor = PythonOperator(
 )
 
 create_pregranted_persistent_wide_inventor = PythonOperator(
-    task_id='create_granted_persistent_wide_inventor',
+    task_id='create_pregranted_persistent_wide_inventor',
     python_callable=write_wide_table,
     op_kwargs={
         'entity': 'inventor',
