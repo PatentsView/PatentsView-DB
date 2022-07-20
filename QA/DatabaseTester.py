@@ -422,44 +422,44 @@ where invention_abstract is null """
         # skiplist = []
         self.init_qa_dict()
         for table in self.table_config:
-            if table[:2] >= 'pu':
-                print(" -------------------------------------------------- ")
-                print(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table}")
-                print(" -------------------------------------------------- ")
-                self.test_null_version_indicator(table)
-                self.load_table_row_count(table, where_vi=False)
-                if table in 'rawassignee':
-                    self.test_rawassignee_org(table, where_vi=False)
-                self.test_blank_count(table, self.table_config[table], where_vi=False)
-                self.load_nulls(table, self.table_config[table], where_vi=False)
-                self.test_related_floating_entities(table_name=table, table_config=self.table_config[table], where_vi=False)
-                self.load_main_floating_entity_count(table, self.table_config[table])
-                self.load_entity_category_counts(table)
-                if table == self.central_entity:
-                    self.test_patent_abstract_null(table)
-                for field in self.table_config[table]["fields"]:
-                    print(" -------------------------------------------------- ")
-                    print(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
-                    print(" -------------------------------------------------- ")
-                    if self.table_config[table]["fields"][field]["data_type"] == 'date':
-                        self.test_zero_dates(table, field, where_vi=False)
-                    if self.table_config[table]["fields"][field]["category"]:
-                        self.load_category_counts(table, field)
-                    if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-                        self.load_text_length(table, field)
-                    if self.table_config[table]["fields"][field]["location_field"]:
-                        self.load_counts_by_location(table, field)
-                    if self.table_config[table]["fields"][field]['data_type'] == 'varchar' and 'id' not in field and (self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest'):
-                        self.test_white_space(table, field)
-                    self.test_null_byte(table, field, where_vi=False)
-                if self.class_called == "TextMergeTest":
-                    continue
-                else:
-                    self.save_qa_data()
-                    self.init_qa_dict()
-                print(" -------------------------------------------------- ")
-                print(f"FINISHED WITH TABLE: {table}")
-                print(" -------------------------------------------------- ")
+        # if table[:2] >= 'pu':
+            print(" -------------------------------------------------- ")
+            print(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table}")
+            print(" -------------------------------------------------- ")
+            self.test_null_version_indicator(table)
+            self.load_table_row_count(table, where_vi=False)
+            if table in 'rawassignee':
+                self.test_rawassignee_org(table, where_vi=False)
+            self.test_blank_count(table, self.table_config[table], where_vi=False)
+            self.load_nulls(table, self.table_config[table], where_vi=False)
+            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table], where_vi=False)
+            self.load_main_floating_entity_count(table, self.table_config[table])
+            self.load_entity_category_counts(table)
+            if table == self.central_entity:
+                self.test_patent_abstract_null(table)
+            for field in self.table_config[table]["fields"]:
+                print("\t -------------------------------------------------- ")
+                print(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
+                print("\t -------------------------------------------------- ")
+                if self.table_config[table]["fields"][field]["data_type"] == 'date':
+                    self.test_zero_dates(table, field, where_vi=False)
+                if self.table_config[table]["fields"][field]["category"]:
+                    self.load_category_counts(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
+                    self.load_text_length(table, field)
+                if self.table_config[table]["fields"][field]["location_field"]:
+                    self.load_counts_by_location(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] == 'varchar' and 'id' not in field and (self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest'):
+                    self.test_white_space(table, field)
+                self.test_null_byte(table, field, where_vi=False)
+            if self.class_called == "TextMergeTest":
+                continue
+            else:
+                self.save_qa_data()
+                self.init_qa_dict()
+            print(" -------------------------------------------------- ")
+            print(f"FINISHED WITH TABLE: {table}")
+            print(" -------------------------------------------------- ")
 
 
 if __name__ == '__main__':
