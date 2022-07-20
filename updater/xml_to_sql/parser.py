@@ -690,6 +690,7 @@ tables_dtd_to_json = {
     'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_map_v4_3-5.json',
     'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_map_v4_3-5.json',
     'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_map_v4_3-5.json',
+    'us-patent-application-v46-2022-02-17.dtd' : 'pgp_xml_map_v4_3-5.json'
 }
 
 long_text_dtd_to_json = {
