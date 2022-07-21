@@ -28,6 +28,7 @@ class TextMergeTest(DatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         print(end_date)
+        super().__init__(config, config['PATENTSVIEW_DATABASES']["TEXT_DB"], datetime.date(year=1976, month=1, day=1), end_date)
         brf_key = "brf_sum_text_{year}".format(year=end_date.year)
         if config['PATENTSVIEW_DATABASES']["TEXT_DB"] == 'patent_text':
             clm_key = "claims_{year}".format(year=end_date.year)
