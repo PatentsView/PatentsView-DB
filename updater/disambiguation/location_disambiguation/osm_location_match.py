@@ -22,7 +22,7 @@ def generate_es_query(row):
     shoulds = []
     search_string = None
     
-    if row['country'] is not None and len(row['country'].strip()) > 0 and row['country'].strip().lower() != 'unknown':
+    if row['country'] is not None and len(row['country'].strip()) > 0 and row['country'].strip().lower() not in ('unknown','omitted'):
         if len(row['country'].strip()) > 2:
             try:
                 row['country'] = iso3_to_iso2[row['country']]
@@ -37,13 +37,20 @@ def generate_es_query(row):
             search_string = osm_codes_names[row['country']]
 
     if row['state'] is not None and len(row['state'].strip()) > 0:        
+        if row['country'] is None and row['state'].strip().upper() in st_ab_to_nm: #in US or Canada but country omitted
+            if row['state'].strip().upper() in ['ON', 'QC','NS','NB','MB','BC','PE','SK','AB','NL']: #Canada
+                row['country'] = 'CA'
+                musts.append({'match': {'country_code': {'query': 'CA'}}})
+            else: # US
+                row['country'] = 'US'
+                musts.append({'match': {'country_code': {'query': 'US'}}})
         try:
             if row['country'].strip().upper() in ['US','CA']:
                 musts.append({'match': {'state': {'query': st_ab_to_nm[row['state']]}}})
                 search_string = st_ab_to_nm[row['state']]
         except KeyError: # if state is invalid
             pass
-        except AttributeError: # if country is None
+        except AttributeError: # if country is None and no US/Canadian state
             pass
 
     if row['city'] is not None and len(row['city'].strip()) > 0:
