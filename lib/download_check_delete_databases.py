@@ -51,7 +51,11 @@ def subprocess_cmd(command):
 
 def backup_db(config, db):
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-    bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {db}_backup.sql --debug"
+    if db[:6] == 'upload':
+        output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pregrant_publications"
+    else:
+        output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/UploadBackups'
+    bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
     print(bash_command1)
     try:
         subprocess_cmd(bash_command1)
@@ -64,8 +68,7 @@ def upload_db_for_testing(config, db):
     engine = create_engine(cstr)
     q =  f"create database archive_check_{db}"
     print(q)
-    # engine.execute(q)
-    project = config['FOLDERS']['project_root']
+    engine.execute(q)
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     bash_command = f"mysql --defaults-file={defaults_file} -f archive_check_{db} < {db}_backup.sql"
     print(bash_command)
