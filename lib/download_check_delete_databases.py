@@ -108,11 +108,13 @@ def upload_tables_for_testing(config, db, table_list):
         output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
     for table in table_list.split(","):
         # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-        bash_command1 = f"gunzip -d {output_path}/{table}-schema.sql.gz"
-        bash_command2 = f"gunzip -d {output_path}/{table}.sql.gz"
+        bash_command1 = f"gunzip -d {output_path}/{db}.{table}-schema.sql.gz"
+        bash_command2 = f"gunzip -d {output_path}/{db}.{table}.sql.gz"
         bash_command3 = f"mysql archive_db < {output_path}/{table}-schema.sql"
         bash_command4 = f"mysql archive_db < {output_path}/{table}.sql"
-        for i in [bash_command1, bash_command2, bash_command3, bash_command4]:
+        bash_command5 = f"gzip {output_path}/{db}.{table}.sql"
+        bash_command6 = f"gunzip {output_path}/{db}.{table}-schema.sql"
+        for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
             print(i)
         try:
             subprocess_cmd(i)
