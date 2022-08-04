@@ -237,25 +237,25 @@ def run_table_archive(config):
     table_list = "assignee_20201229_v2,wipo_20210330,inventor_gender_2021_03_11"
     # backup_tables(db, table_list)
     # table_list remains the same if you want to review all tables
-    upload_tables_for_testing(config, db, table_list)
+    # upload_tables_for_testing(config, db, table_list)
     # # Compare archived DB to Original
     prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
-    prod_count_df = get_count_for_all_tables(prod_connection_string, table_list)
-
-    backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{db}", connection='DATABASE_SETUP')
-    backup_count_df = get_count_for_all_tables(backup_connection_string, table_list)
-
-    compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
-    print("PRINT A COMPARISON DATAFRAME")
-    print(compare_df)
-    print("--------------------------------------------------------------")
-    final = compare_df[compare_df['count(*)_x'] != compare_df['count(*)_y']]
-    print("PRINTING A DF THAT SHOWS WHERE THE TWO DATASOURCES DIFFER -- EXPECTING A BLANK DF")
-    print(final)
-    if not final.empty:
-        raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
-    else:
-        print("The archived DB is identical to the current production DB -- YAY --- :D")
+    # prod_count_df = get_count_for_all_tables(prod_connection_string, table_list)
+    #
+    # backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{db}", connection='DATABASE_SETUP')
+    # backup_count_df = get_count_for_all_tables(backup_connection_string, table_list)
+    #
+    # compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
+    # print("PRINT A COMPARISON DATAFRAME")
+    # print(compare_df)
+    # print("--------------------------------------------------------------")
+    # final = compare_df[compare_df['count(*)_x'] != compare_df['count(*)_y']]
+    # print("PRINTING A DF THAT SHOWS WHERE THE TWO DATASOURCES DIFFER -- EXPECTING A BLANK DF")
+    # print(final)
+    # if not final.empty:
+    #     raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
+    # else:
+    #     print("The archived DB is identical to the current production DB -- YAY --- :D")
 
     delete_tables(prod_connection_string, db, table_list)
 
