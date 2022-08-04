@@ -106,11 +106,11 @@ def upload_tables_for_testing(config, db, table_list):
     elif db == 'pregrant_publications':
         output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
     for table in table_list.split(","):
-        # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+        defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
         bash_command1 = f"gunzip -d {output_path}/{db}.{table}-schema.sql.gz"
         bash_command2 = f"gunzip -d {output_path}/{db}.{table}.sql.gz"
-        bash_command3 = f"mysql -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
-        bash_command4 = f"mysql -f {archive_db} < {output_path}/{db}.{table}.sql"
+        bash_command3 = f"mysql --defaults-file {defaults_file} -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
+        bash_command4 = f"mysql --defaults-file {defaults_file} -f {archive_db} < {output_path}/{db}.{table}.sql"
         bash_command5 = f"gzip {output_path}/{db}.{table}.sql"
         bash_command6 = f"gzip {output_path}/{db}.{table}-schema.sql"
         for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
@@ -235,7 +235,7 @@ def run_table_archive(config):
     db = 'patent'
     # db = 'pregrant_publications'
     # NO SPACES ALLOWED IN TABLE_LIST
-    table_list = "inventor_disambiguation_mapping_20210629_full,inventor_20201229,inventor_20210331,inventor_20210629,gender_20210629,disambiguated_inventor_ids_20210629,disambiguated_assignee_ids_20210629,disambiguated_assignee_ids_update_20220630_1,disambiguated_assignee_ids_update_20220630,disambiguated_assignee_ids_baseline,cpc_current_20210330,cpc_current_20210628,assignee_disambiguation_mapping_20201229,assignee_disambiguation_mapping_20210330,assignee_disambiguation_mapping_20210629,assignee_20210330,assignee_20210629,assignee_archive,lawyer_20210330,location_20210330,location_20210330_v2,location_inventor_20210330,location_inventor_20210629,patent_assignee_20210330,patent_lawyer_20210330,wipo_20210629"
+    table_list = "assignee_20210330,assignee_20210629,assignee_archive,lawyer_20210330"
     # backup_tables(db, table_list)
     # table_list remains the same if you want to review all tables
     upload_tables_for_testing(config, db, table_list)
