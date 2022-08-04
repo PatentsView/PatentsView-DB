@@ -176,7 +176,7 @@ order by 2 desc;
 def delete_tables(connection_string, db, table_list):
     engine = create_engine(connection_string)
     total_size_freed = 0
-    for table in table_list:
+    for table in table_list.split(","):
         q = f"""
         SELECT table_name AS "t_name"
         , ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) AS "Size (GB)" 
@@ -185,12 +185,11 @@ def delete_tables(connection_string, db, table_list):
     GROUP BY table_schema
     order by 2 desc; """
         table_data_raw = pd.read_sql_query(sql=q, con=engine)
-        table_data_raw['delete_query'] = "drop table " + f"{db}.{table};"
+        delete_query = "drop table " + f"{db}.{table};"
         print(f"DELETING Table {db}.{table}, Freeing-Up {table_data_raw['Size (GB)']} GB")
         total_size_freed = total_size_freed+table_data_raw['Size (GB)']
-        delete_table_query = table_data_raw['delete_query'][0]
-        print(delete_table_query)
-        engine.execute(delete_table_query)
+        print(delete_query)
+        engine.execute(delete_query)
     delete_archive_db = f"drop database "f"archive_check_{db}"
     print(delete_archive_db)
     engine.execute(delete_archive_db)
