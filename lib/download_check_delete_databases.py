@@ -185,7 +185,7 @@ def delete_tables(connection_string, db, table_list):
     GROUP BY table_schema
     order by 2 desc; """
         table_data_raw = pd.read_sql_query(sql=q, con=engine)
-        table_data_raw['delete_query'] = "drop table " + f"{db}".table_data_raw['t_name'] + ";"
+        table_data_raw['delete_query'] = "drop table " + f"{db}.{table};"
         print(f"DELETING Table {db}.{table}, Freeing-Up {table_data_raw['Size (GB)']} GB")
         total_size_freed = total_size_freed+table_data_raw['Size (GB)']
         delete_table_query = table_data_raw['delete_query'][0]
