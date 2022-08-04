@@ -47,8 +47,6 @@ def subprocess_cmd(command):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     proc_stdout = process.communicate()[0].strip()
     print(proc_stdout)
-    new_value = process.wait(timeout=120)
-
 
 def backup_db(config, db):
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
@@ -175,45 +173,68 @@ order by 2 desc;
         engine.execute(query)
 
 
-# def run_database_archive(type):
+def delete_tables(connection_string, db, table_list):
+    engine = create_engine(connection_string)
+    total_size_freed = 0
+    for table in table_list:
+        q = f"""
+        SELECT table_name AS "t_name"
+        , ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) AS "Size (GB)" 
+    FROM information_schema.tables 
+    where table_schema = '{db}' and table_name = '{table}'
+    GROUP BY table_schema
+    order by 2 desc; """
+        table_data_raw = pd.read_sql_query(sql=q, con=engine)
+        table_data_raw['delete_query'] = "drop table " + {db}.table_data_raw['t_name'] + ";"
+        print(f"DELETING Table {db}.{table}, Freeing-Up {table_data_raw['Size (GB)']} GB")
+        total_size_freed = total_size_freed+table_data_raw['Size (GB)']
+        delete_table_query = table_data_raw['delete_query'][0]
+        print(delete_table_query)
+        engine.execute(delete_table_query)
+    delete_archive_db = f"drop database "f"archive_check_{db}"
+    print(delete_archive_db)
+    engine.execute(delete_archive_db)
+    print(f"TOTAL FREED SPACE {total_size_freed} GB!")
+
+def run_database_archive(type):
     # LOOPING THROUGH MANY
     # for i in range(0, 16):
     #     print(f"We are on Iteration {i} of 16 or {i/16} %")
 
     # Create Archive SQL FILE
-    # old_db = get_oldest_databases(config, db_type=type)
-    # backup_db(config, old_db)
-    # upload_db_for_testing(config, old_db)
-    #
-    # # Compare archived DB to Original
-    # prod_connection_string = get_unique_connection_string(config, database=f"{old_db}", connection='DATABASE_SETUP')
-    # prod_data = query_for_all_tables_in_db(prod_connection_string, old_db)
-    # prod_count_df = get_count_for_all_tables(prod_connection_string, prod_data)
-    #
-    # backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{old_db}", connection='DATABASE_SETUP')
-    # backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_check_{old_db}")
-    # backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
-    #
-    # compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
-    # print("PRINT A COMPARISON DATAFRAME")
-    # print(compare_df)
-    # print("--------------------------------------------------------------")
-    # final = compare_df[compare_df['count(*)_x'] != compare_df['count(*)_y']]
-    # print("PRINTING A DF THAT SHOWS WHERE THE TWO DATASOURCES DIFFER -- EXPECTING A BLANK DF")
-    # print(final)
-    # if not final.empty:
-    #     raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
-    # else:
-    #     print("The archived DB is identical to the current production DB -- YAY --- :D")
+    old_db = get_oldest_databases(config, db_type=type)
+    backup_db(config, old_db)
+    upload_db_for_testing(config, old_db)
+
+    # Compare archived DB to Original
+    prod_connection_string = get_unique_connection_string(config, database=f"{old_db}", connection='DATABASE_SETUP')
+    prod_data = query_for_all_tables_in_db(prod_connection_string, old_db)
+    prod_count_df = get_count_for_all_tables(prod_connection_string, prod_data)
+
+    backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{old_db}", connection='DATABASE_SETUP')
+    backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_check_{old_db}")
+    backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
+
+    compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
+    print("PRINT A COMPARISON DATAFRAME")
+    print(compare_df)
+    print("--------------------------------------------------------------")
+    final = compare_df[compare_df['count(*)_x'] != compare_df['count(*)_y']]
+    print("PRINTING A DF THAT SHOWS WHERE THE TWO DATASOURCES DIFFER -- EXPECTING A BLANK DF")
+    print(final)
+    if not final.empty:
+        raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
+    else:
+        print("The archived DB is identical to the current production DB -- YAY --- :D")
 
     # DELETE DB
-    # delete_databases(prod_connection_string, old_db)
+    delete_databases(prod_connection_string, old_db)
 
 
 def run_table_archive(config):
     db = 'patent'
     # db = 'pregrant_publications'
-    table_list = "inventor_disambiguation_mapping_20211230"
+    table_list = "assignee_20201229_v2, wipo_20210330, inventor_gender_2021_03_11"
     # backup_tables(db, table_list)
     # table_list remains the same if you want to review all tables
     upload_tables_for_testing(config, db, table_list)
@@ -235,6 +256,8 @@ def run_table_archive(config):
         raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
     else:
         print("The archived DB is identical to the current production DB -- YAY --- :D")
+
+    delete_tables(prod_connection_string, db, table_list)
 
 
 if __name__ == '__main__':
