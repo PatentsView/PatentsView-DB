@@ -102,7 +102,7 @@ def upload_tables_for_testing(config, db, table_list):
     q = f"create database {archive_db}"
     print(q)
     engine.execute(q)
-    for table in table_list:
+    for table in table_list.split(","):
         # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
         bash_command1 = f"gunzip -d {table}-schema.sql.gz"
         bash_command2 = f"gunzip -d {table}.sql.gz"
@@ -210,7 +210,7 @@ def run_table_archive(config):
     db = 'patent'
     # db = 'pregrant_publications'
     table_list = "inventor_disambiguation_mapping_20211230"
-    backup_tables(db, table_list)
+    # backup_tables(db, table_list)
     # table_list remains the same if you want to review all tables
     upload_tables_for_testing(config, db, table_list)
     # # Compare archived DB to Original
