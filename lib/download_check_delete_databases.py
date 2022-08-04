@@ -102,12 +102,16 @@ def upload_tables_for_testing(config, db, table_list):
     q = f"create database {archive_db}"
     print(q)
     engine.execute(q)
+    if db == 'patent':
+        output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'
+    elif db == 'pregrant_publications':
+        output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
     for table in table_list.split(","):
         # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-        bash_command1 = f"gunzip -d {table}-schema.sql.gz"
-        bash_command2 = f"gunzip -d {table}.sql.gz"
-        bash_command3 = f"mysql archive_db < {table}-schema.sql"
-        bash_command4 = f"mysql archive_db < {table}.sql"
+        bash_command1 = f"gunzip -d {output_path}/{table}-schema.sql.gz"
+        bash_command2 = f"gunzip -d {output_path}/{table}.sql.gz"
+        bash_command3 = f"mysql archive_db < {output_path}/{table}-schema.sql"
+        bash_command4 = f"mysql archive_db < {output_path}/{table}.sql"
         for i in [bash_command1, bash_command2, bash_command3, bash_command4]:
             print(i)
         try:
