@@ -116,10 +116,7 @@ def upload_tables_for_testing(config, db, table_list):
         bash_command6 = f"gzip {output_path}/{db}.{table}-schema.sql"
         for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
             print(i)
-        try:
-            subprocess_cmd(i)
-        except:
-            print('archive bash command failed')
+        subprocess_cmd(i)
 
 
 def query_for_all_tables_in_db(connection_string, temp):
