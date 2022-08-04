@@ -234,7 +234,7 @@ def run_database_archive(type):
 def run_table_archive(config):
     db = 'patent'
     # db = 'pregrant_publications'
-    table_list = "assignee_20201229_v2, wipo_20210330, inventor_gender_2021_03_11"
+    table_list = "assignee_20201229_v2,wipo_20210330,inventor_gender_2021_03_11"
     # backup_tables(db, table_list)
     # table_list remains the same if you want to review all tables
     upload_tables_for_testing(config, db, table_list)
