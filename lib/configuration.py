@@ -70,6 +70,13 @@ def get_connection_string(config, database='TEMP_UPLOAD_DB', connection='DATABAS
     port = '{}'.format(config[connection]['PORT'])
     return 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database)
 
+def get_unique_connection_string(config, connection='DATABASE_SETUP', database='unique_name'):
+    database = f'{database}'
+    host = '{}'.format(config[connection]['HOST'])
+    user = '{}'.format(config[connection]['USERNAME'])
+    password = '{}'.format(config[connection]['PASSWORD'])
+    port = '{}'.format(config[connection]['PORT'])
+    return 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database)
 
 def get_backup_command(**kwargs):
     command = "mydumper"
@@ -212,9 +219,9 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
         print("Canopy Settings are {canopy_setting}".format(
             canopy_setting=pprint.pformat(config['INVENTOR_BUILD_CANOPIES'])))
 
-    incremental = 1
-    if end_date.month == 12:
-        incremental = 0
+    incremental = 0
+    # if end_date.month == 12:
+    #     incremental = 0
     config['DISAMBIGUATION']['INCREMENTAL'] = str(incremental)
     print("Incremental Setting is {incremental}".format(incremental=config['DISAMBIGUATION']['INCREMENTAL']))
     return config
