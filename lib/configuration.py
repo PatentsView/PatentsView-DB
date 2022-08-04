@@ -288,7 +288,7 @@ def get_es(config):
     es_hostname = config['ELASTICSEARCH']['HOST']
     username = config['ELASTICSEARCH']['USER']
     password = config['ELASTICSEARCH']['PASSWORD']
-    es = Elasticsearch(hosts=es_hostname, http_auth=(username, password))
+    es = Elasticsearch(hosts=es_hostname, http_auth=(username, password),timeout=1200)
     return es
 
 if __name__ == '__main__':
