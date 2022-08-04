@@ -52,10 +52,27 @@ def subprocess_cmd(command):
 def backup_db(config, db):
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     if db[:6] == 'upload':
-        output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pregrant_publications"
-    else:
         output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/UploadBackups'
+    else:
+        output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pregrant_publications"
     bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
+    print(bash_command1)
+    try:
+        subprocess_cmd(bash_command1)
+    except:
+        print('archive bash command failed')
+
+
+def backup_tables(db, table_list):
+    # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+    if db == 'patent':
+        output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'
+    elif db == 'pregrant_publications':
+        output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
+    else:
+        Exception("Database Not Configured")
+
+    bash_command1 = f"mydumper -B {db} -T {table_list} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
     try:
         subprocess_cmd(bash_command1)
@@ -66,7 +83,7 @@ def backup_db(config, db):
 def upload_db_for_testing(config, db):
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
-    q =  f"create database archive_check_{db}"
+    q = f"create database archive_check_{db}"
     print(q)
     engine.execute(q)
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
@@ -78,21 +95,46 @@ def upload_db_for_testing(config, db):
         print('archive bash command failed')
 
 
+def upload_tables_for_testing(config, db, table_list):
+    cstr = get_connection_string(config, 'PROD_DB')
+    engine = create_engine(cstr)
+    archive_db = f"archive_check_{db}"
+    q = f"create database {archive_db}"
+    print(q)
+    engine.execute(q)
+    for table in table_list:
+        # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+        bash_command1 = f"gunzip -d {table}-schema.sql.gz"
+        bash_command2 = f"gunzip -d {table}.sql.gz"
+        bash_command3 = f"mysql archive_db < {table}-schema.sql"
+        bash_command4 = f"mysql archive_db < {table}.sql"
+        for i in [bash_command1, bash_command2, bash_command3, bash_command4]:
+            print(i)
+        try:
+            subprocess_cmd(i)
+        except:
+            print('archive bash command failed')
+
+
 def query_for_all_tables_in_db(connection_string, temp):
-    engine=create_engine(connection_string)
+    engine = create_engine(connection_string)
     q = f"""
     select TABLE_NAME
     from information_schema.tables
     where TABLE_SCHEMA = '{temp}';
     """
     print(q)
-    table_data_raw=pd.read_sql_query(sql=q, con=engine)
+    table_data_raw = pd.read_sql_query(sql=q, con=engine)
     return table_data_raw
 
 
 def get_count_for_all_tables(connection_string, df):
-    all_tables = list(set(df['TABLE_NAME']))
-    engine=create_engine(connection_string)
+    if type(df)==str:
+        all_tables = df.split(",")
+    else:
+        all_tables = list(set(df['TABLE_NAME']))
+    print(all_tables)
+    engine = create_engine(connection_string)
     final_dataset_local = pd.DataFrame({})
     total = len(all_tables)
     counter = 1
@@ -102,15 +144,15 @@ def get_count_for_all_tables(connection_string, df):
     from {t};
     """
         print(read_q)
-        table_vi=pd.read_sql_query(sql=read_q, con=engine)
-        final_dataset_local = pd.concat([final_dataset_local,table_vi])
-        print(f"We are {counter/total} % Done with the Queries for this DB")
-        counter = counter+1
+        table_vi = pd.read_sql_query(sql=read_q, con=engine)
+        final_dataset_local = pd.concat([final_dataset_local, table_vi])
+        print(f"We are {counter / total} % Done with the Queries for this DB")
+        counter = counter + 1
     return final_dataset_local
 
 
 def delete_databases(connection_string, db):
-    engine=create_engine(connection_string)
+    engine = create_engine(connection_string)
     q = f"""
     SELECT table_schema AS "Database"
 	, ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) AS "Size (GB)" 
@@ -119,37 +161,64 @@ where table_schema = '{db}'
 GROUP BY table_schema
 order by 2 desc; 
 """
-    table_data_raw=pd.read_sql_query(sql=q, con=engine)
+    table_data_raw = pd.read_sql_query(sql=q, con=engine)
     table_data_raw['delete_query'] = "drop database " + table_data_raw['Database'] + ";"
     print(f"DELETING DATABASE {db}, Freeing-Up {table_data_raw['Size (GB)']} ")
     delete_db = table_data_raw['delete_query'][0]
-    delete_archive_db = f"drop database "f"archive_check_{old_db}"
+    delete_archive_db = f"drop database "f"archive_check_{db}"
     for query in [delete_db, delete_archive_db]:
         print(query)
         engine.execute(query)
 
 
-if __name__ == '__main__':
-
+# def run_database_archive(type):
     # LOOPING THROUGH MANY
     # for i in range(0, 16):
     #     print(f"We are on Iteration {i} of 16 or {i/16} %")
 
     # Create Archive SQL FILE
-    type = 'patent'
-    config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
-    old_db = get_oldest_databases(config, db_type=type)
-    backup_db(config, old_db)
-    upload_db_for_testing(config, old_db)
+    # old_db = get_oldest_databases(config, db_type=type)
+    # backup_db(config, old_db)
+    # upload_db_for_testing(config, old_db)
+    #
+    # # Compare archived DB to Original
+    # prod_connection_string = get_unique_connection_string(config, database=f"{old_db}", connection='DATABASE_SETUP')
+    # prod_data = query_for_all_tables_in_db(prod_connection_string, old_db)
+    # prod_count_df = get_count_for_all_tables(prod_connection_string, prod_data)
+    #
+    # backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{old_db}", connection='DATABASE_SETUP')
+    # backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_check_{old_db}")
+    # backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
+    #
+    # compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
+    # print("PRINT A COMPARISON DATAFRAME")
+    # print(compare_df)
+    # print("--------------------------------------------------------------")
+    # final = compare_df[compare_df['count(*)_x'] != compare_df['count(*)_y']]
+    # print("PRINTING A DF THAT SHOWS WHERE THE TWO DATASOURCES DIFFER -- EXPECTING A BLANK DF")
+    # print(final)
+    # if not final.empty:
+    #     raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
+    # else:
+    #     print("The archived DB is identical to the current production DB -- YAY --- :D")
 
-    # Compare archived DB to Original
-    prod_connection_string = get_unique_connection_string(config, database=f"{old_db}", connection='DATABASE_SETUP')
-    prod_data = query_for_all_tables_in_db(prod_connection_string, old_db)
-    prod_count_df = get_count_for_all_tables(prod_connection_string, prod_data)
+    # DELETE DB
+    # delete_databases(prod_connection_string, old_db)
 
-    backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{old_db}", connection='DATABASE_SETUP')
-    backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_check_{old_db}")
-    backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
+
+def run_table_archive(config):
+    db = 'patent'
+    # db = 'pregrant_publications'
+    table_list = "inventor_disambiguation_mapping_20211230"
+    backup_tables(db, table_list)
+    # table_list remains the same if you want to review all tables
+    upload_tables_for_testing(config, db, table_list)
+    # # Compare archived DB to Original
+    prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
+    prod_count_df = get_count_for_all_tables(prod_connection_string, table_list)
+
+    backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{db}", connection='DATABASE_SETUP')
+    backup_count_df = get_count_for_all_tables(backup_connection_string, table_list)
 
     compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
     print("PRINT A COMPARISON DATAFRAME")
@@ -163,12 +232,8 @@ if __name__ == '__main__':
     else:
         print("The archived DB is identical to the current production DB -- YAY --- :D")
 
-    # DELETE DB
-    # delete_databases(prod_connection_string, old_db)
 
-
-
-
-
-
-
+if __name__ == '__main__':
+    config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
+    # run_database_archive(config, type='patent')
+    run_table_archive(config)
