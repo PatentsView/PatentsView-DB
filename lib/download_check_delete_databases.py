@@ -188,12 +188,13 @@ def delete_tables(connection_string, db, table_list):
         delete_query = "drop table " + f"{db}.{table};"
         print(f"DELETING Table {db}.{table}, Freeing-Up {table_data_raw['Size (GB)']} GB")
         total_size_freed = total_size_freed+table_data_raw['Size (GB)']
-        print(delete_query)
         engine.execute(delete_query)
     delete_archive_db = f"drop database "f"archive_check_{db}"
     print(delete_archive_db)
     engine.execute(delete_archive_db)
+    print("----------------------------------------")
     print(f"TOTAL FREED SPACE {total_size_freed} GB!")
+    print("----------------------------------------")
 
 def run_database_archive(type):
     # LOOPING THROUGH MANY
@@ -233,29 +234,33 @@ def run_database_archive(type):
 def run_table_archive(config):
     db = 'patent'
     # db = 'pregrant_publications'
-    table_list = "assignee_20201229_v2,wipo_20210330,inventor_gender_2021_03_11"
+    # NO SPACES ALLOWED IN TABLE_LIST
+    table_list = "inventor_disambiguation_mapping_20210629_full,inventor_20201229,inventor_20210331,inventor_20210629,gender_20210629,disambiguated_inventor_ids_20210629,disambiguated_assignee_ids_20210629,disambiguated_assignee_ids_update_20220630_1,disambiguated_assignee_ids_update_20220630,disambiguated_assignee_ids_baseline,cpc_current_20210330,cpc_current_20210628,assignee_disambiguation_mapping_20201229,assignee_disambiguation_mapping_20210330,assignee_disambiguation_mapping_20210629,assignee_20210330,assignee_20210629,assignee_archive,lawyer_20210330,location_20210330,location_20210330_v2,location_inventor_20210330,location_inventor_20210629,patent_assignee_20210330,patent_lawyer_20210330,wipo_20210629"
     # backup_tables(db, table_list)
     # table_list remains the same if you want to review all tables
-    # upload_tables_for_testing(config, db, table_list)
-    # # Compare archived DB to Original
+    upload_tables_for_testing(config, db, table_list)
+    # Compare archived DB to Original
     prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
-    # prod_count_df = get_count_for_all_tables(prod_connection_string, table_list)
-    #
-    # backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{db}", connection='DATABASE_SETUP')
-    # backup_count_df = get_count_for_all_tables(backup_connection_string, table_list)
-    #
-    # compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
-    # print("PRINT A COMPARISON DATAFRAME")
-    # print(compare_df)
-    # print("--------------------------------------------------------------")
-    # final = compare_df[compare_df['count(*)_x'] != compare_df['count(*)_y']]
-    # print("PRINTING A DF THAT SHOWS WHERE THE TWO DATASOURCES DIFFER -- EXPECTING A BLANK DF")
-    # print(final)
-    # if not final.empty:
-    #     raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
-    # else:
-    #     print("The archived DB is identical to the current production DB -- YAY --- :D")
+    prod_count_df = get_count_for_all_tables(prod_connection_string, table_list)
 
+    backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{db}", connection='DATABASE_SETUP')
+    backup_count_df = get_count_for_all_tables(backup_connection_string, table_list)
+
+    compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
+    print("--------------------------------------------------------------")
+    print("PRINT A COMPARISON DATAFRAME")
+    print("--------------------------------------------------------------")
+    print(compare_df)
+    print("--------------------------------------------------------------")
+    final = compare_df[compare_df['count(*)_x'] != compare_df['count(*)_y']]
+    print("PRINTING A DF THAT SHOWS WHERE THE TWO DATASOURCES DIFFER -- EXPECTING A BLANK DF")
+    print("--------------------------------------------------------------")
+    print(final)
+    print("--------------------------------------------------------------")
+    if not final.empty:
+        raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
+    else:
+        print("The archived DB is identical to the current production DB -- YAY --- :D")
     delete_tables(prod_connection_string, db, table_list)
 
 
