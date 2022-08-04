@@ -47,7 +47,7 @@ def subprocess_cmd(command):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     proc_stdout = process.communicate()[0].strip()
     print(proc_stdout)
-    process.wait(timeout=120)
+    new_value = process.wait(timeout=120)
 
 
 def backup_db(config, db):
@@ -117,7 +117,7 @@ def upload_tables_for_testing(config, db, table_list):
         bash_command6 = f"gzip {output_path}/{db}.{table}-schema.sql"
         for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
             print(i)
-        subprocess_cmd(i)
+            subprocess_cmd(i)
 
 
 def query_for_all_tables_in_db(connection_string, temp):
