@@ -27,19 +27,25 @@ def prepare_tables(**kwargs):
     engine = create_engine(cstr + "&local_infile=1")
     timestamp = str(int(time.time()))
     with engine.connect() as connection:
-        connection.execute("CREATE TABLE rawlawyer_copy_backup_{} LIKE rawlawyer;".format(timestamp))
-        connection.execute("INSERT INTO rawlawyer_copy_backup_{} SELECT * FROM rawlawyer".format(timestamp))
+        q = f"CREATE TABLE rawlawyer_copy_backup_{timestamp} LIKE rawlawyer;"
+        print(q)
+        connection.execute(q)
+        q = "INSERT INTO rawlawyer_copy_backup_{} SELECT * FROM rawlawyer".format(timestamp)
+        print(q)
+        connection.execute(q)
 
     with engine.connect() as connection:
-        connection.execute("ALTER TABLE rawlawyer ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;")
+        q = "ALTER TABLE rawlawyer ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;"
+        print(q)
+        connection.execute(q)
 
     with engine.connect() as connection:
-        connection.execute(
-            "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;")
-        connection.execute(
-            "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE "
-            "rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;")
-        connection.execute("UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_lawyer_id IS NULL;")
+        q_list = ["UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = rc.organization WHERE rc.organization IS NOT NULL;"
+                , "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = concat(rc.name_first, '|', rc.name_last) WHERE rc.name_first IS NOT NULL AND rc.name_last IS NOT NULL;"
+                , "UPDATE rawlawyer rc SET rc.alpha_lawyer_id  = '' WHERE rc.alpha_lawyer_id IS NULL;"]
+        for query in q_list:
+            print(query)
+            connection.execute(query)
 
 
 def clean_rawlawyer(**kwargs):
@@ -66,11 +72,11 @@ def clean_rawlawyer(**kwargs):
         batch_counter += 1
         counter = 0
         with engine.connect() as db_con:
-            rawlaw_chunk = db_con.execute(
-                'SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset))
+            q = 'SELECT * from rawlawyer order by uuid limit {} offset {}'.format(limit, offset)
+            print(q)
+            rawlaw_chunk = db_con.execute(q)
 
-            for lawyer in tqdm(rawlaw_chunk, total=limit,
-                                    desc="rawlawyer processing - batch:" + str(batch_counter)):
+            for lawyer in tqdm(rawlaw_chunk, total=limit, desc="rawlawyer processing - batch:" + str(batch_counter)):
                 uuid_match = lawyer[0]
                 law_id = lawyer[1]
                 pat_id = lawyer[2]
@@ -104,8 +110,12 @@ def load_clean_rawlawyer(**kwargs):
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr + "&local_infile=1")
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
-    engine.execute("ALTER TABLE rawlawyer RENAME TO temp_rawlawyer_predisambig;")
-    engine.execute("CREATE TABLE rawlawyer LIKE temp_rawlawyer_predisambig;")
+    q1 = "ALTER TABLE rawlawyer RENAME TO temp_rawlawyer_predisambig;"
+    print(q1)
+    engine.execute(q1)
+    q2 = "CREATE TABLE rawlawyer LIKE temp_rawlawyer_predisambig;"
+    print(q2)
+    engine.execute(q2)
     engine.execute(
         """
 LOAD DATA LOCAL INFILE '{}' INTO TABLE rawlawyer FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\r\n' IGNORE 1 LINES 
@@ -346,7 +356,9 @@ def rawlawyer_postprocesing(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr + "&local_infile=1")
-    engine.execute("ALTER TABLE rawlawyer DROP alpha_lawyer_id")
+    q = "ALTER TABLE rawlawyer DROP alpha_lawyer_id"
+    print(q)
+    engine.execute(q)
     engine.dispose()
     update_version_indicator('lawyer', 'granted_patent', **kwargs)
     # update_to_granular_version_indicator('rawlawyer', 'granted_patent')

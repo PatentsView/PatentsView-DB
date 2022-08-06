@@ -65,7 +65,7 @@ disambiguation = DAG(
 )
 
 quarterly_merge_completed = ExternalTaskSensor(
-    task_id="quarterly_merge_completed",
+    task_id="qc_text_merge_quarterly_pgpubs",
     external_dag_id="merge_quarterly_updater",
     external_task_id="qc_text_merge_quarterly_pgpubs",
     timeout=600,
