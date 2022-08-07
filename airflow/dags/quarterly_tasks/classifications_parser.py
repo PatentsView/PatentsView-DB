@@ -250,7 +250,10 @@ operator_sequence['cpc_current_sequence'] = [qc_download_cpc_operator,
 operator_sequence['cpc_current_pgpubs_sequence'] = [qc_download_cpc_operator,
                                                     pgpubs_cpc_current_operator,
                                                     pgpubs_cpc_current_update_vi,
-                                                    qa_pgpubs_cpc_updated]
+                                                    qa_pgpubs_cpc_updated,
+                                                    pgpubs_wipo_operator,
+                                                    pgpubs_wipo_update_vi,
+                                                    pgpubs_qa_wipo_updated]
 
 for dependency_group in operator_sequence:
     dependency_sequence = operator_sequence[dependency_group]
