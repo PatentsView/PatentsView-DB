@@ -568,11 +568,15 @@ def chain_operators(chain):
 def archive_folder(source_folder, targets: list):
     files = os.listdir(source_folder)
     for target_folder in targets[0:-1]:
+        print(target_folder)
         os.makedirs(target_folder, exist_ok=True)
         for file_name in files:
+            print(file_name)
             shutil.copy(os.path.join(source_folder, file_name), target_folder)
+    print(targets[-1])
     os.makedirs(targets[-1], exist_ok=True)
     for file_name in files:
+        print(file_name)
         shutil.copy(os.path.join(source_folder, file_name), targets[-1])
 
 
