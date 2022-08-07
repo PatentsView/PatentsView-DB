@@ -38,13 +38,13 @@ def consolidate_cpc_classes(connection_string):
         engine.dispose()
 
 
-def setup_database(update_config, drop=True):
+def setup_database(update_config, drop=True, cpc_only=False):
     raw_database = update_config["PATENTSVIEW_DATABASES"]["PROD_DB"]
     temp_upload_database = update_config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
-    if raw_database == 'patent':
-        required_tables = get_required_tables(update_config)
-    else:
+    if cpc_only:
         required_tables = ['cpc_current']
+    else:
+        required_tables = get_required_tables(update_config)
     print("Required tables are {tlist}".format(tlist=", ".join(required_tables)))
     connection_string = get_connection_string(update_config, database="PROD_DB")
     engine = create_engine(connection_string)
@@ -128,11 +128,20 @@ if __name__ == '__main__':
     # post_upload(**{
     #         "execution_date": datetime.date(2020, 12, 1)
     #         })
-    config = get_current_config('granted_patent', **{
-        "execution_date": datetime.date(2021, 12, 1)
-    })
+    # config = get_current_config('pgpubs', **{
+    #     "execution_date": datetime.date(2022, 6, 2)
+    # })
     # setup_database(config, **{
     #         "execution_date": datetime.date(2020, 12, 14)
     #         })
     # generate_timestamp_uploads(config)
-    setup_database(config)
+    for month, day in [
+(3, 24),
+(1, 27),
+(1, 20),
+(1, 13)
+    ]:
+        post_upload_pgpubs(**{
+            "execution_date": datetime.date(2022, month, day)
+        })
+

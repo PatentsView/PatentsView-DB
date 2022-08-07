@@ -90,7 +90,7 @@ def upload_cpc_classes(**kwargs):
     cstr = get_connection_string(config, "TEMP_UPLOAD_DB")
     db_con = create_engine(cstr)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
-    setup_database(config, drop=False)
+    setup_database(config, drop=False, cpc_only=True)
     upload_cpc_small_tables(db_con, config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], cpc_folder,
                             config['DATES']['END_DATE'])
     upload_cpc_subgroup(db_con, config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], cpc_folder,
