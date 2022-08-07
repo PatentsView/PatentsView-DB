@@ -214,63 +214,64 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
     else:
         file_name = "CPC_pgpub_mcf"
 
-        cpc_xml_file = None
-        for filename in os.listdir(cpc_folder):
-            if (filename.startswith(file_name) and filename.endswith('.zip')):
-                cpc_xml_file = "{cpc_folder}/{cpc_file}".format(cpc_folder=cpc_folder, cpc_file=filename)
+    cpc_xml_file = None
+    for filename in os.listdir(cpc_folder):
+        if (filename.startswith(file_name) and filename.endswith('.zip')):
+            cpc_xml_file = "{cpc_folder}/{cpc_file}".format(cpc_folder=cpc_folder, cpc_file=filename)
+            print(cpc_xml_file)
 
-        if cpc_xml_file:
-            add_index, drop_index = generate_index_statements(config, "PROD_DB", "cpc_current")
-            prepare_cpc_table(config, drop_index)
+    if cpc_xml_file:
+        add_index, drop_index = generate_index_statements(config, "PROD_DB", "cpc_current")
+        prepare_cpc_table(config, drop_index)
 
-            if db == 'granted_patent':
-                xml_file_name_generator = generate_file_list(cpc_xml_file)
+        if db == 'granted_patent':
+            xml_file_name_generator = generate_file_list(cpc_xml_file)
 
-                parallelism = int(config["PARALLELISM"]["parallelism"])
-                manager = mp.Manager()
-                log_queue = manager.Queue()
-                csv_queue = manager.Queue()
+            parallelism = int(config["PARALLELISM"]["parallelism"])
+            manager = mp.Manager()
+            log_queue = manager.Queue()
+            csv_queue = manager.Queue()
 
-                parser_start = time.time()
-                pool = mp.Pool(parallelism)
-                cpc_file = "{data_folder}/cpc_current.csv".format(data_folder=cpc_output_folder)
-                header = ["patent_id", "sequence", "version_indicator", "uuid", "section_id", "subsection_id",
-                          "group_id",
-                          "subgroup_id", "category"]
-                watcher = pool.apply_async(log_writer, (log_queue, "cpc_parser"))
-                writer = pool.apply_async(mp_csv_writer, (
-                    csv_queue,
-                    cpc_file, header))
-                p_list = []
-                # process_cpc_file(cpc_xml_file, list(xml_file_name_generator)[-1], config, log_queue, csv_queue)
-                for xml_file_name in xml_file_name_generator:
-                    p = pool.apply_async(process_cpc_file, (cpc_xml_file, xml_file_name, config, log_queue, csv_queue))
-                    p_list.append(p)
+            parser_start = time.time()
+            pool = mp.Pool(parallelism)
+            cpc_file = "{data_folder}/cpc_current.csv".format(data_folder=cpc_output_folder)
+            header = ["patent_id", "sequence", "version_indicator", "uuid", "section_id", "subsection_id",
+                      "group_id",
+                      "subgroup_id", "category"]
+            watcher = pool.apply_async(log_writer, (log_queue, "cpc_parser"))
+            writer = pool.apply_async(mp_csv_writer, (
+                csv_queue,
+                cpc_file, header))
+            p_list = []
+            # process_cpc_file(cpc_xml_file, list(xml_file_name_generator)[-1], config, log_queue, csv_queue)
+            for xml_file_name in xml_file_name_generator:
+                p = pool.apply_async(process_cpc_file, (cpc_xml_file, xml_file_name, config, log_queue, csv_queue))
+                p_list.append(p)
 
-                for t in p_list:
-                    t.get()
+            for t in p_list:
+                t.get()
 
-                log_queue.put({
-                    "level": logging.INFO,
-                    "message": "Total parsing time {parser_duration}".format(
-                        parser_duration=round(time.time() - parser_start, 3))
-                })
-                log_queue.put({
-                    "level": None,
-                    "message": "kill"
-                })
-                csv_queue.put(['kill'])
-                watcher.get()
-                writer.get()
-                pool.close()
-                pool.join()
-                consolidate_cpc_data(config, add_index, db, cpc_file)
-            else:
-                parse_and_write_cpc(cpc_folder, **kwargs)
-                consolidate_cpc_data(config, add_index, db)
+            log_queue.put({
+                "level": logging.INFO,
+                "message": "Total parsing time {parser_duration}".format(
+                    parser_duration=round(time.time() - parser_start, 3))
+            })
+            log_queue.put({
+                "level": None,
+                "message": "kill"
+            })
+            csv_queue.put(['kill'])
+            watcher.get()
+            writer.get()
+            pool.close()
+            pool.join()
+            consolidate_cpc_data(config, add_index, db, cpc_file)
         else:
-            print("Could not find CPC Zip XML file under {cpc_input}".format(cpc_input=cpc_folder))
-            exit(1)
+            parse_and_write_cpc(cpc_folder, **kwargs)
+            consolidate_cpc_data(config, add_index, db)
+    else:
+        print("Could not find CPC Zip XML file under {cpc_input}".format(cpc_input=cpc_folder))
+        exit(1)
 
 
 
