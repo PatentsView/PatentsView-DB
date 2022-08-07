@@ -166,15 +166,17 @@ qa_pgpubs_cpc_updated = PythonOperator(task_id='qa_pgpubs_cpc_current',
 
 #
 # # consolidate_wipo changed INSERT INTO wipo to INSERT INTO temp_wipo
-wipo_operator = PythonOperator(task_id='wipo_processor',
+patent_wipo_operator = PythonOperator(task_id='patent_wipo_processor',
                                python_callable=process_and_upload_wipo,
                                dag=cpc_wipo_updater,
                                provide_context=True,
                                on_success_callback=airflow_task_success,
                                on_failure_callback=airflow_task_failure,
-                               pool='database_write_iops_contenders', queue='disambiguator')
+                               pool='database_write_iops_contenders',
+                               queue='disambiguator',
+                               op_kwargs={'db':'granted_patent'})
 
-wipo_update_vi = PythonOperator(task_id='wipo_update_vi',
+patent_wipo_update_vi = PythonOperator(task_id='patent_wipo_update_vi',
                                        python_callable=update_to_granular_version_indicator,
                                        dag=cpc_wipo_updater,
                                        provide_context=True,
@@ -184,7 +186,7 @@ wipo_update_vi = PythonOperator(task_id='wipo_update_vi',
                                        op_kwargs={'table': 'wipo', 'db':'granted_patent'}
                                        )
 
-qa_wipo_updated = PythonOperator(task_id='qa_wipo_updated',
+patent_qa_wipo_updated = PythonOperator(task_id='patent_qa_wipo_updated',
                                 python_callable=qa_test_table_updated,
                                 dag=cpc_wipo_updater,
                                 provide_context=True,
@@ -192,6 +194,37 @@ qa_wipo_updated = PythonOperator(task_id='qa_wipo_updated',
                                 on_failure_callback=airflow_task_failure,
                                 pool='database_write_iops_contenders',
                                 op_kwargs={'table':'wipo', 'db':'granted_patent'})
+
+
+
+pgpubs_wipo_operator = PythonOperator(task_id='pgpubs_wipo_processor',
+                               python_callable=process_and_upload_wipo,
+                               dag=cpc_wipo_updater,
+                               provide_context=True,
+                               on_success_callback=airflow_task_success,
+                               on_failure_callback=airflow_task_failure,
+                               pool='database_write_iops_contenders',
+                               queue='disambiguator',
+                               op_kwargs={'db':'pgpubs'})
+
+pgpubs_wipo_update_vi = PythonOperator(task_id='pgpubs_wipo_update_vi',
+                                       python_callable=update_to_granular_version_indicator,
+                                       dag=cpc_wipo_updater,
+                                       provide_context=True,
+                                       on_success_callback=airflow_task_success,
+                                       on_failure_callback=airflow_task_failure,
+                                       pool='database_write_iops_contenders',
+                                       op_kwargs={'table': 'wipo', 'db':'pgpubs'}
+                                       )
+
+pgpubs_qa_wipo_updated = PythonOperator(task_id='pgpubs_qa_wipo_updated',
+                                python_callable=qa_test_table_updated,
+                                dag=cpc_wipo_updater,
+                                provide_context=True,
+                                on_success_callback=airflow_task_success,
+                                on_failure_callback=airflow_task_failure,
+                                pool='database_write_iops_contenders',
+                                op_kwargs={'table':'wipo', 'db':'pgpubs'})
 
 # qc_cpc_current_wipo_operator = PythonOperator(task_id='qc_cpc_current_wipo',
 #                                               python_callable=post_cpc_wipo,
@@ -210,9 +243,9 @@ operator_sequence['cpc_current_sequence'] = [qc_download_cpc_operator,
                                              patent_cpc_current_operator,
                                              patent_cpc_current_update_vi,
                                              qa_patent_cpc_updated,
-                                             wipo_operator,
-                                             wipo_update_vi,
-                                             qa_wipo_updated]
+                                             patent_wipo_operator,
+                                             patent_wipo_update_vi,
+                                             patent_qa_wipo_updated]
 
 operator_sequence['cpc_current_pgpubs_sequence'] = [qc_download_cpc_operator,
                                                     pgpubs_cpc_current_operator,

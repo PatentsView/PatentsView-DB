@@ -27,6 +27,7 @@ def upload_cpc_small_tables(db_con, db, folder, version_indicator):
                                                                                                               towrite[
                                                                                                                   1],
                                                                                                               version_indicator)
+        print(query)
         db_con.execute(query)
 
     # Upload CPC group data
@@ -40,6 +41,7 @@ def upload_cpc_small_tables(db_con, db, folder, version_indicator):
                                                                                                              towrite[0],
                                                                                                              towrite[1],
                                                                                                              version_indicator)
+            print(query)
             db_con.execute(query)
 
 

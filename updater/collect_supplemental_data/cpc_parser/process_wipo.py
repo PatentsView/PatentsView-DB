@@ -123,8 +123,8 @@ def consolidate_wipo(config):
     engine.execute(rename_upload_statement)
 
 
-def process_and_upload_wipo(**kwargs):
-    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+def process_and_upload_wipo(db='granted_patent', **kwargs):
+    config = get_current_config(db, schedule='quarterly', **kwargs)
     myengine = create_engine(get_connection_string(config, "PROD_DB"))
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                  'wipo_output')
@@ -144,8 +144,14 @@ def process_and_upload_wipo(**kwargs):
     patent_batches_query = f"select round((count(*)/{limit}),0) from patent where version_indicator <= '{version_indicator}'"
     patent_batches = pd.read_sql_query(con=myengine, sql=patent_batches_query)
     num_batches = int(patent_batches.iloc[:,0][0])
-    base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
-    cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = c.patent_id"
+    if db=='patent':
+        base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
+        cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = c.patent_id"
+    elif db == 'pgpubs':
+        base_query_template = "SELECT document_number from pregrant_publications where version_indicator <= '{vind}' order by document_number limit {limit} offset {offset} "
+        cpc_query_template = "SELECT c.document_number, c.subgroup_id from cpc_current c join ({base_query}) p on p.document_number = c.document_number"
+    else:
+        raise Exception("Wrong DB")
     for batch in range(num_batches):
         start = time.time()
         base_query = base_query_template.format(limit=limit, offset=offset, vind=version_indicator)
@@ -164,6 +170,6 @@ def process_and_upload_wipo(**kwargs):
 
 
 if __name__ == '__main__':
-    process_and_upload_wipo(**{
+    process_and_upload_wipo(db="pregrant_publications", **{
         "execution_date": datetime.date(2021, 10, 1)
     })
