@@ -204,7 +204,7 @@ pgpubs_wipo_operator = PythonOperator(task_id='pgpubs_wipo_processor',
                                on_success_callback=airflow_task_success,
                                on_failure_callback=airflow_task_failure,
                                pool='database_write_iops_contenders',
-                               queue='database_write_iops_contenders',
+                               queue='disambiguator',
                                op_kwargs={'db':'pgpubs'})
 
 pgpubs_wipo_update_vi = PythonOperator(task_id='pgpubs_wipo_update_vi',
