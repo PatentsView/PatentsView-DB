@@ -129,6 +129,7 @@ def process_and_upload_wipo(db='granted_patent', **kwargs):
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                  'wipo_output')
     version_indicator = config['DATES']['END_DATE']
+    print(version_indicator)
     os.makedirs(wipo_output, exist_ok=True)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     ipc_tech_file = '{}/ipc_technology.csv'.format(persistent_files)
@@ -136,6 +137,7 @@ def process_and_upload_wipo(db='granted_patent', **kwargs):
 
     concordance_file = '{}/{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                          'cpc_input', 'ipc_concordance.txt')
+    print(concordance_file)
 
     cpc_ipc_concordance_map = get_ipc_cpc_ipc_concordance_map(concordance_file)
 
