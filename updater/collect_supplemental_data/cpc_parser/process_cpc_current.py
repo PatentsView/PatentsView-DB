@@ -22,7 +22,7 @@ def prepare_cpc_table(config, drop_indexes):
     :param config: Config file containing variour runtime paramters
     :param drop_indexes: List of Drop Index Statements
     """
-    engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
+    engine = create_engine(get_connection_string(config, "PROD"))
     for drop_statement in drop_indexes:
         engine.execute(drop_statement[0])
 
@@ -226,6 +226,7 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
 
         if db == 'granted_patent':
             xml_file_name_generator = generate_file_list(cpc_xml_file)
+            print(xml_file_name_generator)
 
             parallelism = int(config["PARALLELISM"]["parallelism"])
             manager = mp.Manager()
@@ -245,6 +246,7 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
             p_list = []
             # process_cpc_file(cpc_xml_file, list(xml_file_name_generator)[-1], config, log_queue, csv_queue)
             for xml_file_name in xml_file_name_generator:
+                print(xml_file_name)
                 p = pool.apply_async(process_cpc_file, (cpc_xml_file, xml_file_name, config, log_queue, csv_queue))
                 p_list.append(p)
 
