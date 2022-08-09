@@ -22,7 +22,7 @@ def prepare_cpc_table(config, drop_indexes):
     :param config: Config file containing variour runtime paramters
     :param drop_indexes: List of Drop Index Statements
     """
-    engine = create_engine(get_connection_string(config, "PROD"))
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
     for drop_statement in drop_indexes:
         engine.execute(drop_statement[0])
 
