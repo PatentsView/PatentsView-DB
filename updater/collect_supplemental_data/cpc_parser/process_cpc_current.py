@@ -226,32 +226,33 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
 
         if db == 'granted_patent':
             xml_file_name_generator = generate_file_list(cpc_xml_file)
-            print(xml_file_name_generator)
 
-            parallelism = int(config["PARALLELISM"]["parallelism"])
+            # parallelism = int(config["PARALLELISM"]["parallelism"])
             manager = mp.Manager()
             log_queue = manager.Queue()
             csv_queue = manager.Queue()
 
             parser_start = time.time()
-            pool = mp.Pool(parallelism)
+            # pool = mp.Pool(parallelism)
             cpc_file = "{data_folder}/cpc_current.csv".format(data_folder=cpc_output_folder)
             header = ["patent_id", "sequence", "version_indicator", "uuid", "section_id", "subsection_id",
                       "group_id",
                       "subgroup_id", "category"]
-            watcher = pool.apply_async(log_writer, (log_queue, "cpc_parser"))
-            writer = pool.apply_async(mp_csv_writer, (
-                csv_queue,
-                cpc_file, header))
-            p_list = []
+            # watcher = pool.apply_async(log_writer, (log_queue, "cpc_parser"))
+            # writer = pool.apply_async(mp_csv_writer, (
+            #     csv_queue,
+            #     cpc_file, header))
+            log_writer(log_queue, "cpc_parser")
+            mp_csv_writer(csv_queue, cpc_file, header)
+            # p_list = []
             # process_cpc_file(cpc_xml_file, list(xml_file_name_generator)[-1], config, log_queue, csv_queue)
             for xml_file_name in xml_file_name_generator:
-                print(xml_file_name)
-                p = pool.apply_async(process_cpc_file, (cpc_xml_file, xml_file_name, config, log_queue, csv_queue))
-                p_list.append(p)
+                process_cpc_file(cpc_xml_file, xml_file_name, config, log_queue, csv_queue)
+                # p = pool.apply_async(process_cpc_file, (cpc_xml_file, xml_file_name, config, log_queue, csv_queue))
+                # p_list.append(p)
 
-            for t in p_list:
-                t.get()
+            # for t in p_list:
+            #     t.get()
 
             log_queue.put({
                 "level": logging.INFO,
@@ -263,10 +264,10 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
                 "message": "kill"
             })
             csv_queue.put(['kill'])
-            watcher.get()
-            writer.get()
-            pool.close()
-            pool.join()
+            # watcher.get()
+            # writer.get()
+            # pool.close()
+            # pool.join()
             consolidate_cpc_data(config, add_index, db, cpc_file)
         else:
             parse_and_write_cpc(cpc_folder, **kwargs)
