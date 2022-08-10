@@ -125,6 +125,7 @@ def consolidate_wipo(config):
 
 
 def process_and_upload_wipo(db, **kwargs):
+    print(db)
     config = get_current_config(db, schedule='quarterly', **kwargs)
     myengine = create_engine(get_connection_string(config, "PROD_DB"))
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
@@ -154,7 +155,7 @@ def process_and_upload_wipo(db, **kwargs):
         base_query_template = "SELECT document_number from pregrant_publications where version_indicator <= '{vind}' order by document_number limit {limit} offset {offset} "
         cpc_query_template = "SELECT c.document_number, c.subgroup_id from cpc_current c join ({base_query}) p on p.document_number = c.document_number"
 
-        pgpubs_batches_query = f"select round((count(*)/{limit}),0) from pregrant_publications where version_indicator <= '{version_indicator}'"
+        pgpubs_batches_query = f"select round((count(*)/{limit}),0) from publication where version_indicator <= '{version_indicator}'"
         pgpubs_batches = pd.read_sql_query(con=myengine, sql=pgpubs_batches_query)
         num_batches = int(pgpubs_batches.iloc[:, 0][0])
     else:
@@ -177,6 +178,6 @@ def process_and_upload_wipo(db, **kwargs):
 
 
 if __name__ == '__main__':
-    process_and_upload_wipo(db="pregrant_publications", **{
+    process_and_upload_wipo(db="pgpubs", **{
         "execution_date": datetime.date(2022, 6, 1)
     })
