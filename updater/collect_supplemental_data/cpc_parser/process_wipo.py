@@ -38,7 +38,6 @@ def get_ipc_cpc_ipc_concordance_map(concordance_file):
     cpc_ipc_known_data = cpc_ipc_concordance_data.drop(['unknown_column_1', 'unknown_column_2', 'unknown_column_3'],
                                                        axis=1)
     cpc_ipc_concordance_map = cpc_ipc_known_data.set_index('cpc_code').to_dict()["ipc_code"]
-    print(cpc_ipc_concordance_map.head())
     return cpc_ipc_concordance_map
 
 
