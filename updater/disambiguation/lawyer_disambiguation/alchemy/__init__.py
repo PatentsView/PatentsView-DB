@@ -202,7 +202,7 @@ def fetch_session(dbtype='grant'):
     #         config['DATABASE']['HOST'],
     #         config['DATABASE'][read_database], echo=echo))
 
-    schema.GrantBase.metadata.create_all(engine)
+    schema.GrantBase.metadata.create_all(engine, checkfirst=True)
 
     Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
     session = Session()
