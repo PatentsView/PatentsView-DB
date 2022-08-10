@@ -137,21 +137,25 @@ def process_and_upload_wipo(db='granted_patent', **kwargs):
 
     concordance_file = '{}/{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                          'cpc_input', 'ipc_concordance.txt')
-    print(concordance_file)
 
     cpc_ipc_concordance_map = get_ipc_cpc_ipc_concordance_map(concordance_file)
 
     limit = 30000
     offset = 0
-    patent_batches_query = f"select round((count(*)/{limit}),0) from patent where version_indicator <= '{version_indicator}'"
-    patent_batches = pd.read_sql_query(con=myengine, sql=patent_batches_query)
-    num_batches = int(patent_batches.iloc[:,0][0])
     if db=='patent':
         base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
         cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = c.patent_id"
+
+        patent_batches_query = f"select round((count(*)/{limit}),0) from patent where version_indicator <= '{version_indicator}'"
+        patent_batches = pd.read_sql_query(con=myengine, sql=patent_batches_query)
+        num_batches = int(patent_batches.iloc[:, 0][0])
     elif db == 'pgpubs':
         base_query_template = "SELECT document_number from pregrant_publications where version_indicator <= '{vind}' order by document_number limit {limit} offset {offset} "
         cpc_query_template = "SELECT c.document_number, c.subgroup_id from cpc_current c join ({base_query}) p on p.document_number = c.document_number"
+
+        pgpubs_batches_query = f"select round((count(*)/{limit}),0) from pregrant_publications where version_indicator <= '{version_indicator}'"
+        pgpubs_batches = pd.read_sql_query(con=myengine, sql=pgpubs_batches_query)
+        num_batches = int(pgpubs_batches.iloc[:, 0][0])
     else:
         raise Exception("Wrong DB")
     for batch in range(num_batches):
@@ -173,5 +177,5 @@ def process_and_upload_wipo(db='granted_patent', **kwargs):
 
 if __name__ == '__main__':
     process_and_upload_wipo(db="pregrant_publications", **{
-        "execution_date": datetime.date(2021, 10, 1)
+        "execution_date": datetime.date(2022, 6, 1)
     })
