@@ -151,7 +151,7 @@ def process_and_upload_wipo(db, **kwargs):
         patent_batches = pd.read_sql_query(con=myengine, sql=patent_batches_query)
         num_batches = int(patent_batches.iloc[:, 0][0])
     elif db == 'pgpubs':
-        base_query_template = "SELECT document_number from pregrant_publications where version_indicator <= '{vind}' order by document_number limit {limit} offset {offset} "
+        base_query_template = "SELECT document_number from publication where version_indicator <= '{vind}' order by document_number limit {limit} offset {offset} "
         cpc_query_template = "SELECT c.document_number, c.subgroup_id from cpc_current c join ({base_query}) p on p.document_number = c.document_number"
 
         pgpubs_batches_query = f"select round((count(*)/{limit}),0) from publication where version_indicator <= '{version_indicator}'"
