@@ -115,6 +115,7 @@ patent_cpc_current_operator = PythonOperator(task_id='patent_cpc_current_process
                                       on_success_callback=airflow_task_success,
                                       on_failure_callback=airflow_task_failure,
                                       pool='database_write_iops_contenders',
+                                      queue='disambiguator',
                                       op_kwargs={'db':'granted_patent'})
 
 patent_cpc_current_update_vi = PythonOperator(task_id='patent_cpc_current_update_vi',
@@ -124,6 +125,7 @@ patent_cpc_current_update_vi = PythonOperator(task_id='patent_cpc_current_update
                                        on_success_callback=airflow_task_success,
                                        on_failure_callback=airflow_task_failure,
                                        pool='database_write_iops_contenders',
+                                       queue='disambiguator',
                                        op_kwargs={'table': 'cpc_current', 'db':'granted_patent'}
                                        )
 
@@ -183,6 +185,7 @@ patent_wipo_update_vi = PythonOperator(task_id='patent_wipo_update_vi',
                                        on_success_callback=airflow_task_success,
                                        on_failure_callback=airflow_task_failure,
                                        pool='database_write_iops_contenders',
+                                       queue='disambiguator',
                                        op_kwargs={'table': 'wipo', 'db':'granted_patent'}
                                        )
 
