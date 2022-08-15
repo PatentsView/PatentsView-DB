@@ -7,6 +7,7 @@ import pandas as pd
 
 
 def get_oldest_databases(config, db_type='patent'):
+    print(f"Running {db_type}")
     if db_type == 'patent':
         q = """
 select  min(table_schema)
@@ -54,7 +55,8 @@ def backup_db(config, db):
         output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/UploadBackups'
     else:
         output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pregrant_publications"
-    bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
+    # bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
+    bash_command1 = f"mydumper -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
     try:
         subprocess_cmd(bash_command1)
@@ -196,7 +198,7 @@ def delete_tables(connection_string, db, table_list):
     print(f"TOTAL FREED SPACE {total_size_freed} GB!")
     print("----------------------------------------")
 
-def run_database_archive(type):
+def run_database_archive(config, type):
     # LOOPING THROUGH MANY
     # for i in range(0, 16):
     #     print(f"We are on Iteration {i} of 16 or {i/16} %")
@@ -265,6 +267,6 @@ def run_table_archive(config):
 
 
 if __name__ == '__main__':
-    config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
-    # run_database_archive(config, type='patent')
-    run_table_archive(config)
+    config = get_current_config('patent', **{"execution_date": datetime.date(2022, 1, 1)})
+    run_database_archive(config, type='patent')
+    # run_table_archive(config)
