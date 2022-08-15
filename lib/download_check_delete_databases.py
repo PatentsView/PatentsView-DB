@@ -38,10 +38,20 @@ where left(table_schema, 6) ='upload'
             print("--------------------------------")
             print(f"Found Database {db} To Archive!")
             print("--------------------------------")
+            q2 = f"""
+select table_name 
+from information_schema.tables
+where table_schema = '{db}'
+            """
+        print(q2)
+        with connection.cursor() as generic_cursor2:
+            generic_cursor2.execute(q2)
+            table_list = generic_cursor2.fetchall()
+
     finally:
         if connection.open:
             connection.close()
-    return db
+    return db, table_list
 
 
 def subprocess_cmd(command):
@@ -52,12 +62,12 @@ def subprocess_cmd(command):
 def backup_db(config, db):
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     if db[:6] == 'upload':
-        output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/UploadBackups'
-        # output_path = '/Users/bcard/db_backups'
+        # output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/UploadBackups'
+        output_path = '/Users/bcard/db_backups'
     else:
         output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pregrant_publications"
-    bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
-    # bash_command1 = f"mydumper -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
+    # bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
+    bash_command1 = f"mydumper --defaults-file={defaults_file} -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
     subprocess_cmd(bash_command1)
 
@@ -75,17 +85,16 @@ def backup_tables(db, table_list):
     print(bash_command1)
     subprocess_cmd(bash_command1)
 
-
-def upload_db_for_testing(config, db):
-    cstr = get_connection_string(config, 'PROD_DB')
-    engine = create_engine(cstr)
-    q = f"create database archive_check_{db}"
-    print(q)
-    engine.execute(q)
-    defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-    bash_command = f"mysql --defaults-file={defaults_file} -f archive_check_{db} < {db}_backup.sql"
-    print(bash_command)
-    subprocess_cmd(bash_command)
+# def upload_db_for_testing(config, db):
+#     cstr = get_connection_string(config, 'PROD_DB')
+#     engine = create_engine(cstr)
+#     q = f"create database archive_check_{db}"
+#     print(q)
+#     engine.execute(q)
+#     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+#     bash_command = f"mysql --defaults-file={defaults_file} -f archive_check_{db} < {db}_backup.sql"
+#     print(bash_command)
+#     subprocess_cmd(bash_command)
 
 
 def upload_tables_for_testing(config, db, table_list):
@@ -95,21 +104,36 @@ def upload_tables_for_testing(config, db, table_list):
     q = f"create database {archive_db}"
     print(q)
     engine.execute(q)
-    if db == 'patent':
+    if db == 'patent' or db[:6] == 'upload':
         output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'
-    elif db == 'pregrant_publications':
+    elif db == 'pregrant_publications' or db[:6] == 'pgpubs':
         output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
-    for table in table_list.split(","):
-        # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-        bash_command1 = f"gunzip -d {output_path}/{db}.{table}-schema.sql.gz"
-        bash_command2 = f"gunzip -d {output_path}/{db}.{table}.sql.gz"
-        bash_command3 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
-        bash_command4 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table}.sql"
-        bash_command5 = f"gzip {output_path}/{db}.{table}.sql"
-        bash_command6 = f"gzip {output_path}/{db}.{table}-schema.sql"
-        for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
-            print(i)
-            subprocess_cmd(i)
+    else:
+        raise NotImplementedError
+
+    if type(table_list) == str:
+        for table in table_list.split(","):
+            # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+            bash_command1 = f"gunzip -d {output_path}/{db}.{table}-schema.sql.gz"
+            bash_command2 = f"gunzip -d {output_path}/{db}.{table}.sql.gz"
+            bash_command3 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
+            bash_command4 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table}.sql"
+            bash_command5 = f"gzip {output_path}/{db}.{table}.sql"
+            bash_command6 = f"gzip {output_path}/{db}.{table}-schema.sql"
+            for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
+                print(i)
+                subprocess_cmd(i)
+    else:
+        for table in table_list:
+            bash_command1 = f"gunzip -d {output_path}/{db}.{table[0][0]}-schema.sql.gz"
+            bash_command2 = f"gunzip -d {output_path}/{db}.{table[0][0]}.sql.gz"
+            bash_command3 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table[0][0]}-schema.sql"
+            bash_command4 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table[0][0]}.sql"
+            bash_command5 = f"gzip {output_path}/{db}.{table[0][0]}.sql"
+            bash_command6 = f"gzip {output_path}/{db}.{table[0][0]}-schema.sql"
+            for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
+                print(i)
+                subprocess_cmd(i)
 
 
 def query_for_all_tables_in_db(connection_string, temp):
@@ -196,9 +220,9 @@ def run_database_archive(config, type):
     #     print(f"We are on Iteration {i} of 16 or {i/16} %")
 
     # Create Archive SQL FILE
-    old_db = get_oldest_databases(config, db_type=type)
+    old_db, table_list = get_oldest_databases(config, db_type=type)
     backup_db(config, old_db)
-    upload_db_for_testing(config, old_db)
+    upload_tables_for_testing(config, old_db, table_list)
 
     # Compare archived DB to Original
     prod_connection_string = get_unique_connection_string(config, database=f"{old_db}", connection='DATABASE_SETUP')
@@ -208,7 +232,6 @@ def run_database_archive(config, type):
     backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{old_db}", connection='DATABASE_SETUP')
     backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_check_{old_db}")
     backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
-    breakpoint()
     compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
     print("PRINT A COMPARISON DATAFRAME")
     print(compare_df)
