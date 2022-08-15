@@ -92,7 +92,6 @@ def upload_tables_for_testing(config, db, output_path, table_list):
     q = f"create database {archive_db}"
     print(q)
     engine.execute(q)
-    breakpoint()
     if type(table_list) == str:
         for table in table_list.split(","):
             # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
@@ -107,15 +106,16 @@ def upload_tables_for_testing(config, db, output_path, table_list):
                 subprocess_cmd(i)
     else:
         for table in table_list:
-            bash_command1 = f"gunzip -d {output_path}/{db}.{table[0]}-schema.sql.gz"
-            bash_command2 = f"gunzip -d {output_path}/{db}.{table[0]}.sql.gz"
-            bash_command3 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table[0][0]}-schema.sql"
-            bash_command4 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table[0][0]}.sql"
-            bash_command5 = f"gzip {output_path}/{db}.{table[0]}.sql"
-            bash_command6 = f"gzip {output_path}/{db}.{table[0]}-schema.sql"
-            for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
-                print(i)
-                subprocess_cmd(i)
+            if table != None:
+                bash_command1 = f"gunzip -d {output_path}/{db}.{table[0]}-schema.sql.gz"
+                bash_command2 = f"gunzip -d {output_path}/{db}.{table[0]}.sql.gz"
+                bash_command3 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table[0]}-schema.sql"
+                bash_command4 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table[0]}.sql"
+                bash_command5 = f"gzip {output_path}/{db}.{table[0]}.sql"
+                bash_command6 = f"gzip {output_path}/{db}.{table[0]}-schema.sql"
+                for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
+                    print(i)
+                    subprocess_cmd(i)
 
 
 def query_for_all_tables_in_db(connection_string, temp):
