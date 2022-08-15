@@ -72,15 +72,8 @@ def backup_db(config, db):
     subprocess_cmd(bash_command1)
 
 
-def backup_tables(db, table_list):
+def backup_tables(db, output_path, table_list):
     # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-    if db == 'patent':
-        output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'
-    elif db == 'pregrant_publications':
-        output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
-    else:
-        Exception("Database Not Configured")
-
     bash_command1 = f"mydumper -B {db} -T {table_list} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
     subprocess_cmd(bash_command1)
@@ -97,20 +90,13 @@ def backup_tables(db, table_list):
 #     subprocess_cmd(bash_command)
 
 
-def upload_tables_for_testing(config, db, table_list):
+def upload_tables_for_testing(config, db, output_path, table_list):
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
     archive_db = f"archive_check_{db}"
     q = f"create database {archive_db}"
     print(q)
     engine.execute(q)
-    if db == 'patent' or db[:6] == 'upload':
-        output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'
-    elif db == 'pregrant_publications' or db[:6] == 'pgpubs':
-        output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
-    else:
-        raise NotImplementedError
-
     if type(table_list) == str:
         for table in table_list.split(","):
             # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
@@ -218,11 +204,18 @@ def run_database_archive(config, type):
     # LOOPING THROUGH MANY
     # for i in range(0, 16):
     #     print(f"We are on Iteration {i} of 16 or {i/16} %")
+    # if type == 'patent' or type[:6] == 'upload':
+    #     output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'
+    # elif type == 'pregrant_publications' or type[:6] == 'pgpubs':
+    #     output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
+    # else:
+    #     raise NotImplementedError
+    output_path = '/data-volume'
 
     # Create Archive SQL FILE
     old_db, table_list = get_oldest_databases(config, db_type=type)
-    backup_db(config, old_db)
-    upload_tables_for_testing(config, old_db, table_list)
+    backup_db(config, output_path, old_db)
+    upload_tables_for_testing(config, old_db, output_path, table_list)
 
     # Compare archived DB to Original
     prod_connection_string = get_unique_connection_string(config, database=f"{old_db}", connection='DATABASE_SETUP')
@@ -253,9 +246,15 @@ def run_table_archive(config):
     # db = 'pregrant_publications'
     # NO SPACES ALLOWED IN TABLE_LIST
     table_list = "assignee_20210330,assignee_20210629,assignee_archive,lawyer_20210330"
-    # backup_tables(db, table_list)
+    if db == 'patent' or db[:6] == 'upload':
+        output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'
+    elif db == 'pregrant_publications' or db[:6] == 'pgpubs':
+        output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
+    else:
+        raise NotImplementedError
+    # backup_tables(db,output_path, table_list)
     # table_list remains the same if you want to review all tables
-    upload_tables_for_testing(config, db, table_list)
+    upload_tables_for_testing(config, db, output_path, table_list)
     # Compare archived DB to Original
     prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
     prod_count_df = get_count_for_all_tables(prod_connection_string, table_list)
