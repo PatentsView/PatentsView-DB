@@ -59,13 +59,8 @@ def subprocess_cmd(command):
     proc_stdout = process.communicate()[0].strip()
     print(proc_stdout)
 
-def backup_db(config, db):
+def backup_db(config, output_path, db):
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-    if db[:6] == 'upload':
-        # output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/UploadBackups'
-        output_path = '/Users/bcard/db_backups'
-    else:
-        output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pregrant_publications"
     # bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
     bash_command1 = f"mydumper --defaults-file={defaults_file} -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
