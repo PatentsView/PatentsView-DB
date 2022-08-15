@@ -53,15 +53,13 @@ def backup_db(config, db):
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     if db[:6] == 'upload':
         output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/UploadBackups'
+        # output_path = '/Users/bcard/db_backups'
     else:
         output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pregrant_publications"
-    # bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
-    bash_command1 = f"mydumper -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
+    bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
+    # bash_command1 = f"mydumper -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
-    try:
-        subprocess_cmd(bash_command1)
-    except:
-        print('archive bash command failed')
+    subprocess_cmd(bash_command1)
 
 
 def backup_tables(db, table_list):
@@ -75,10 +73,7 @@ def backup_tables(db, table_list):
 
     bash_command1 = f"mydumper -B {db} -T {table_list} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
-    try:
-        subprocess_cmd(bash_command1)
-    except:
-        print('archive bash command failed')
+    subprocess_cmd(bash_command1)
 
 
 def upload_db_for_testing(config, db):
@@ -90,10 +85,7 @@ def upload_db_for_testing(config, db):
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     bash_command = f"mysql --defaults-file={defaults_file} -f archive_check_{db} < {db}_backup.sql"
     print(bash_command)
-    try:
-        subprocess_cmd(bash_command)
-    except:
-        print('archive bash command failed')
+    subprocess_cmd(bash_command)
 
 
 def upload_tables_for_testing(config, db, table_list):
@@ -216,7 +208,7 @@ def run_database_archive(config, type):
     backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{old_db}", connection='DATABASE_SETUP')
     backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_check_{old_db}")
     backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
-
+    breakpoint()
     compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
     print("PRINT A COMPARISON DATAFRAME")
     print(compare_df)
