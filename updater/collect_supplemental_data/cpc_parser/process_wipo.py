@@ -44,6 +44,7 @@ def get_ipc_cpc_ipc_concordance_map(concordance_file):
 # @profile()
 def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
     # Obtain IPC Concordance for each patent based on cpc subgrou ID
+    cpc_chunk = pd.DataFrame(cpc_chunk)
     cpc_current_with_concordance = cpc_chunk.merge(right=cpc_ipc_concordance,
                                                    how='left',
                                                    left_on='subgroup_id',
