@@ -45,11 +45,12 @@ def get_ipc_cpc_ipc_concordance_map(concordance_file):
 def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
     # Obtain IPC Concordance for each patent based on cpc subgrou ID
     cpc_chunk = pd.DataFrame(cpc_chunk)
+    cpc_ipc_concordance = pd.DataFrame(cpc_ipc_concordance)
     cpc_current_with_concordance = cpc_chunk.merge(right=cpc_ipc_concordance,
                                                    how='left',
                                                    left_on='subgroup_id',
-                                                   right_on='cpc_code').drop(
-        "cpc_code", axis=1)
+                                                   right_on='cpc_code').drop("cpc_code", axis=1)
+    print(cpc_current_with_concordance.head())
     # If concordance does not exist, use subgroup id as IPC code
     cpc_current_with_concordance.ipc_code.fillna(
         cpc_current_with_concordance.subgroup_id, inplace=True)
@@ -144,7 +145,7 @@ def process_and_upload_wipo(db, **kwargs):
 
     limit = 30000
     offset = 0
-    if db == 'patent':
+    if db == 'granted_patent':
         base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
         cpc_query_template = "SELECT c.patent_id, c.subgroup_id from cpc_current c join ({base_query}) p on p.id = c.patent_id"
 
