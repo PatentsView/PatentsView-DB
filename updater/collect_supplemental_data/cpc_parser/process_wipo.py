@@ -43,7 +43,8 @@ def get_ipc_cpc_ipc_concordance_map(concordance_file):
 
 # @profile()
 def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
-    # Obtain IPC Concordance for each patent based on cpc subgrou ID
+    cpc_ipc_concordance = pd.DataFrame(cpc_ipc_concordance, index=['i',])
+    # Obtain IPC Concordance for each patent based on cpc subgroup ID
     cpc_current_with_concordance = cpc_chunk.merge(right=cpc_ipc_concordance,
                                                    how='left',
                                                    left_on='subgroup_id',
@@ -129,7 +130,6 @@ def process_and_upload_wipo(db, **kwargs):
     wipo_output = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                  'wipo_output')
     version_indicator = config['DATES']['END_DATE']
-    print(version_indicator)
     os.makedirs(wipo_output, exist_ok=True)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     ipc_tech_file = '{}/ipc_technology.csv'.format(persistent_files)
@@ -167,10 +167,6 @@ def process_and_upload_wipo(db, **kwargs):
         offset = offset + limit
         if cpc_current_data.shape[0] < 1:
             continue
-        print(type(cpc_current_data))
-        print(type(cpc_ipc_concordance_map))
-        print(cpc_current_data.head())
-        print(cpc_ipc_concordance_map.head())
         wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
         end = time.time()
         perc_complete = (batch + 1) / num_batches
