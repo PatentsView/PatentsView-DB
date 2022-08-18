@@ -42,15 +42,7 @@ def get_ipc_cpc_ipc_concordance_map(concordance_file):
 
 
 # @profile()
-def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
-    # cpc_group = cpc_ipc_concordance.keys()
-    # ipc_group = cpc_ipc_concordance.values()
-    # cpc_ipc_concordance = pd.DataFrame(
-    #     {'cpc_code': cpc_group,
-    #      'ipc_code': ipc_group
-    #      })
-    # print(cpc_ipc_concordance)
-    # print(cpc_ipc_concordance.shape)
+def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config, unique_id):
     # Obtain IPC Concordance for each patent based on cpc subgroup ID
     cpc_current_with_concordance = cpc_chunk.merge(right=cpc_ipc_concordance,
                                                    how='left',
@@ -92,15 +84,15 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
         ],
         axis=1)
     # Counter for Each Field ID for each patent
-    wipo_count = wipo_data.groupby(["patent_id",
+    wipo_count = wipo_data.groupby([unique_id,
                                     "field_id"]).size().to_frame('wipo_count')
     wipo_count = wipo_count.reset_index()
     # Retain Top 3 most frequent Wipo field IDs
-    wipo_filtered_data = wipo_count.groupby("patent_id").apply(
+    wipo_filtered_data = wipo_count.groupby(unique_id).apply(
         lambda _df: _df.nlargest(3, 'wipo_count', keep='all')).reset_index(drop=True)
     # Assign Sequence
     wipo_filtered_data_sequenced = wipo_filtered_data.drop(["wipo_count"], axis=1).assign(
-        sequence=wipo_filtered_data.groupby(['patent_id']).cumcount())
+        sequence=wipo_filtered_data.groupby([unique_id]).cumcount())
     wipo_filtered_data_sequenced = wipo_filtered_data_sequenced.assign(version_indicator=config['DATES']['END_DATE'])
     cstr = get_connection_string(config, "TEMP_UPLOAD_DB")
     # print(cstr)
@@ -109,8 +101,8 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
         wipo_filtered_data_sequenced.to_sql('wipo', conn, if_exists='append', index=False, method="multi")
 
 
-def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config):
-    extract_wipo_data(cpc_current_data, cpc_ipc_concordance_map, ipc_tech_field_map, config)
+def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config, unique_id):
+    extract_wipo_data(cpc_current_data, cpc_ipc_concordance_map, ipc_tech_field_map, config, unique_id)
 
 
 def consolidate_wipo(config):
@@ -156,6 +148,7 @@ def process_and_upload_wipo(db, **kwargs):
         patent_batches_query = f"select round((count(*)/{limit}),0) from patent where version_indicator <= '{version_indicator}'"
         patent_batches = pd.read_sql_query(con=myengine, sql=patent_batches_query)
         num_batches = int(patent_batches.iloc[:, 0][0])
+        unique_id = 'patent_id'
     elif db == 'pgpubs':
         base_query_template = "SELECT document_number from publication where version_indicator <= '{vind}' order by document_number limit {limit} offset {offset} "
         cpc_query_template = "SELECT c.document_number, c.subgroup_id from cpc_current c join ({base_query}) p on p.document_number = c.document_number"
@@ -163,6 +156,7 @@ def process_and_upload_wipo(db, **kwargs):
         pgpubs_batches_query = f"select round((count(*)/{limit}),0) from publication where version_indicator <= '{version_indicator}'"
         pgpubs_batches = pd.read_sql_query(con=myengine, sql=pgpubs_batches_query)
         num_batches = int(pgpubs_batches.iloc[:, 0][0])
+        unique_id = 'document_number'
     else:
         raise Exception("Wrong DB")
     for batch in range(num_batches):
@@ -174,7 +168,7 @@ def process_and_upload_wipo(db, **kwargs):
         offset = offset + limit
         if cpc_current_data.shape[0] < 1:
             continue
-        wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
+        wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config, unique_id)
         end = time.time()
         perc_complete = (batch + 1) / num_batches
         chunk_time = str(round(end - start))
