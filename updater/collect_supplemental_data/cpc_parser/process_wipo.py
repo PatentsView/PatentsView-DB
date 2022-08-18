@@ -43,9 +43,14 @@ def get_ipc_cpc_ipc_concordance_map(concordance_file):
 
 # @profile()
 def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
+    cpc_group = cpc_ipc_concordance.keys()
+    ipc_group = cpc_ipc_concordance.values()
+    cpc_ipc_concordance = pd.DataFrame(
+        {'cpc_group': cpc_group,
+         'ipc_group': ipc_group
+         })
     print(cpc_ipc_concordance)
-    cpc_ipc_concordance = pd.DataFrame(cpc_ipc_concordance, index=['i',])
-    print(cpc_ipc_concordance)
+    print(cpc_ipc_concordance.shape)
     # Obtain IPC Concordance for each patent based on cpc subgroup ID
     cpc_current_with_concordance = cpc_chunk.merge(right=cpc_ipc_concordance,
                                                    how='left',
@@ -139,7 +144,7 @@ def process_and_upload_wipo(db, **kwargs):
 
     concordance_file = '{}/{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'],
                                          'cpc_input', 'ipc_concordance.txt')
-
+    print(concordance_file)
     cpc_ipc_concordance_map = get_ipc_cpc_ipc_concordance_map(concordance_file)
 
     limit = 30000
