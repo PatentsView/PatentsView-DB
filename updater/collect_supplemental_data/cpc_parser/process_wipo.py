@@ -37,20 +37,20 @@ def get_ipc_cpc_ipc_concordance_map(concordance_file):
     ]
     cpc_ipc_known_data = cpc_ipc_concordance_data.drop(['unknown_column_1', 'unknown_column_2', 'unknown_column_3'],
                                                        axis=1)
-    cpc_ipc_concordance_map = cpc_ipc_known_data.set_index('cpc_code').to_dict()["ipc_code"]
-    return cpc_ipc_concordance_map
+    # cpc_ipc_concordance_map = cpc_ipc_known_data.set_index('cpc_code').to_dict()["ipc_code"]
+    return cpc_ipc_known_data
 
 
 # @profile()
 def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
-    cpc_group = cpc_ipc_concordance.keys()
-    ipc_group = cpc_ipc_concordance.values()
-    cpc_ipc_concordance = pd.DataFrame(
-        {'cpc_code': cpc_group,
-         'ipc_code': ipc_group
-         })
-    print(cpc_ipc_concordance)
-    print(cpc_ipc_concordance.shape)
+    # cpc_group = cpc_ipc_concordance.keys()
+    # ipc_group = cpc_ipc_concordance.values()
+    # cpc_ipc_concordance = pd.DataFrame(
+    #     {'cpc_code': cpc_group,
+    #      'ipc_code': ipc_group
+    #      })
+    # print(cpc_ipc_concordance)
+    # print(cpc_ipc_concordance.shape)
     # Obtain IPC Concordance for each patent based on cpc subgroup ID
     cpc_current_with_concordance = cpc_chunk.merge(right=cpc_ipc_concordance,
                                                    how='left',
