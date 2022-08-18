@@ -44,13 +44,10 @@ def get_ipc_cpc_ipc_concordance_map(concordance_file):
 # @profile()
 def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
     # Obtain IPC Concordance for each patent based on cpc subgrou ID
-    cpc_chunk = pd.DataFrame(cpc_chunk)
-    cpc_ipc_concordance = pd.DataFrame(cpc_ipc_concordance)
     cpc_current_with_concordance = cpc_chunk.merge(right=cpc_ipc_concordance,
                                                    how='left',
                                                    left_on='subgroup_id',
                                                    right_on='cpc_code').drop("cpc_code", axis=1)
-    print(cpc_current_with_concordance.head())
     # If concordance does not exist, use subgroup id as IPC code
     cpc_current_with_concordance.ipc_code.fillna(
         cpc_current_with_concordance.subgroup_id, inplace=True)
@@ -170,6 +167,10 @@ def process_and_upload_wipo(db, **kwargs):
         offset = offset + limit
         if cpc_current_data.shape[0] < 1:
             continue
+        print(type(cpc_current_data))
+        print(type(cpc_ipc_concordance_map))
+        print(cpc_current_data.head())
+        print(cpc_ipc_concordance_map.head())
         wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config)
         end = time.time()
         perc_complete = (batch + 1) / num_batches
