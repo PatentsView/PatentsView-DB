@@ -46,8 +46,8 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config):
     cpc_group = cpc_ipc_concordance.keys()
     ipc_group = cpc_ipc_concordance.values()
     cpc_ipc_concordance = pd.DataFrame(
-        {'cpc_group': cpc_group,
-         'ipc_group': ipc_group
+        {'cpc_code': cpc_group,
+         'ipc_code': ipc_group
          })
     print(cpc_ipc_concordance)
     print(cpc_ipc_concordance.shape)
