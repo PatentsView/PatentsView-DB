@@ -196,7 +196,26 @@ def delete_tables(connection_string, db, table_list):
     print(f"TOTAL FREED SPACE {total_size_freed} GB!")
     print("----------------------------------------")
 
-def run_database_archive(config, type):
+
+def compare_results_dfs(prod_count_df, backup_count_df):
+    compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
+    print("--------------------------------------------------------------")
+    print("PRINT A COMPARISON DATAFRAME")
+    print("--------------------------------------------------------------")
+    print(compare_df)
+    print("--------------------------------------------------------------")
+    final = compare_df[compare_df['count(*)_x'] != compare_df['count(*)_y']]
+    print("PRINTING A DF THAT SHOWS WHERE THE TWO DATASOURCES DIFFER -- EXPECTING A BLANK DF")
+    print("--------------------------------------------------------------")
+    print(final)
+    print("--------------------------------------------------------------")
+    if not final.empty:
+        raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
+    else:
+        print("The archived DB is identical to the current production DB -- YAY --- :D")
+
+
+def run_database_archive(config, type, output_path):
     # LOOPING THROUGH MANY
     # for i in range(0, 16):
     #     print(f"We are on Iteration {i} of 16 or {i/16} %")
@@ -206,14 +225,13 @@ def run_database_archive(config, type):
     #     output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
     # else:
     #     raise NotImplementedError
-    output_path = '/data-volume'
 
     # Create Archive SQL FILE
     old_db, table_list = get_oldest_databases(config, db_type=type)
     backup_db(config, output_path, old_db)
     upload_tables_for_testing(config, old_db, output_path, table_list)
 
-    # Compare archived DB to Original
+    # QA Backup
     prod_connection_string = get_unique_connection_string(config, database=f"{old_db}", connection='DATABASE_SETUP')
     prod_data = query_for_all_tables_in_db(prod_connection_string, old_db)
     prod_count_df = get_count_for_all_tables(prod_connection_string, prod_data)
@@ -221,33 +239,18 @@ def run_database_archive(config, type):
     backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{old_db}", connection='DATABASE_SETUP')
     backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_check_{old_db}")
     backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
-    compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
-    print("PRINT A COMPARISON DATAFRAME")
-    print(compare_df)
-    print("--------------------------------------------------------------")
-    final = compare_df[compare_df['count(*)_x'] != compare_df['count(*)_y']]
-    print("PRINTING A DF THAT SHOWS WHERE THE TWO DATASOURCES DIFFER -- EXPECTING A BLANK DF")
-    print(final)
-    if not final.empty:
-        raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
-    else:
-        print("The archived DB is identical to the current production DB -- YAY --- :D")
+
+    compare_results_dfs(prod_count_df, backup_count_df)
 
     # DELETE DB
     delete_databases(prod_connection_string, old_db)
 
 
-def run_table_archive(config):
-    db = 'patent'
+def run_table_archive(config, db, table_list, output_path):
     # db = 'pregrant_publications'
     # NO SPACES ALLOWED IN TABLE_LIST
-    table_list = "assignee_20210330,assignee_20210629,assignee_archive,lawyer_20210330"
-    if db == 'patent' or db[:6] == 'upload':
-        output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'
-    elif db == 'pregrant_publications' or db[:6] == 'pgpubs':
-        output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
-    else:
-        raise NotImplementedError
+    if table_list.isempty():
+        raise Exception("Add Table List to DAG")
     # backup_tables(db,output_path, table_list)
     # table_list remains the same if you want to review all tables
     upload_tables_for_testing(config, db, output_path, table_list)
@@ -257,22 +260,7 @@ def run_table_archive(config):
 
     backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{db}", connection='DATABASE_SETUP')
     backup_count_df = get_count_for_all_tables(backup_connection_string, table_list)
-
-    compare_df = pd.merge(prod_count_df, backup_count_df, on='tn')
-    print("--------------------------------------------------------------")
-    print("PRINT A COMPARISON DATAFRAME")
-    print("--------------------------------------------------------------")
-    print(compare_df)
-    print("--------------------------------------------------------------")
-    final = compare_df[compare_df['count(*)_x'] != compare_df['count(*)_y']]
-    print("PRINTING A DF THAT SHOWS WHERE THE TWO DATASOURCES DIFFER -- EXPECTING A BLANK DF")
-    print("--------------------------------------------------------------")
-    print(final)
-    print("--------------------------------------------------------------")
-    if not final.empty:
-        raise Exception("SOMETHING IS WRONG WITH THE BACKUP FILE !!!")
-    else:
-        print("The archived DB is identical to the current production DB -- YAY --- :D")
+    compare_results_dfs(prod_count_df, backup_count_df)
     delete_tables(prod_connection_string, db, table_list)
 
 
