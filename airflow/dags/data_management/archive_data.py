@@ -39,7 +39,7 @@ archive_data_dag = DAG(
     start_date=datetime(2021, 1, 7, hour=5, minute=0, second=0, tzinfo=local_tz),
     catchup=False,
     template_searchpath=templates_searchpath,
-    schedule_interval=None
+    schedule_interval=timedelta(weeks=1)
 )
 
 # BACKUP TABLES
