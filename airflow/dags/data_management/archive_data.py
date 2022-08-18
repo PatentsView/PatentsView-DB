@@ -37,10 +37,9 @@ archive_data_dag = DAG(
     default_args=default_args,
     description='Create data backup, upload and compare it to the original, and delete the original data in the production DB',
     start_date=datetime(2021, 1, 7, hour=5, minute=0, second=0, tzinfo=local_tz),
-    # schedule_interval=timedelta(weeks=12),
     catchup=False,
-    template_searchpath=templates_searchpath
-    # schedule_interval=None
+    template_searchpath=templates_searchpath,
+    schedule_interval=None
 )
 
 # BACKUP TABLES
