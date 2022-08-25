@@ -225,7 +225,7 @@ def run_database_archive(type, output_path):
     #     output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
     # else:
     #     raise NotImplementedError
-    config = get_current_config(type=type)
+    config = get_current_config(type=type, **{"execution_date": datetime.date(2022, 1, 1)})
 
     # Create Archive SQL FILE
     old_db, table_list = get_oldest_databases(config, db_type=type)
@@ -250,7 +250,7 @@ def run_database_archive(type, output_path):
 def run_table_archive(config_db, table_list, output_path):
     # db = 'pregrant_publications'
     # NO SPACES ALLOWED IN TABLE_LIST
-    config = get_current_config(type=config_db)
+    config = get_current_config(type=config_db, **{"execution_date": datetime.date(2022, 1, 1)})
     db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
 
     if table_list.isempty():
