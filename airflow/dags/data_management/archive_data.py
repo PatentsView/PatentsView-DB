@@ -53,7 +53,7 @@ run_table_archive_patent = PythonOperator(task_id='run_table_archive_patent',
                                           on_failure_callback=airflow_task_failure,
                                           op_kwargs={'db': 'granted_patent',
                                                      'tablelist': [],
-                                                     'output_path': '/PipelineData/DatabaseBackups/RawDatabase/patent_db_tables'}
+                                                     'output_path': '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'}
                                           )
 
 run_table_archive_pgpubs = PythonOperator(task_id='run_table_archive_pgpubs',
@@ -63,7 +63,7 @@ run_table_archive_pgpubs = PythonOperator(task_id='run_table_archive_pgpubs',
                                           on_failure_callback=airflow_task_failure,
                                           op_kwargs={'db': 'pregrant_publications',
                                                      'tablelist': [],
-                                                     'output_path': '/PipelineData/DatabaseBackups/PregrantPublications/pgpubs_db_tables'}
+                                                     'output_path': '/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables'}
                                           )
 
 run_oldest_upload_db_archive = PythonOperator(task_id='run_oldest_upload_db',
@@ -72,7 +72,7 @@ run_oldest_upload_db_archive = PythonOperator(task_id='run_oldest_upload_db',
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure,
                                           op_kwargs={'type': 'granted_patent',
-                                                     'output_path': '/PipelineData/DatabaseBackups/RawDatabase'}
+                                                     'output_path': '/PatentDataVolume/DatabaseBackups/RawDatabase'}
                                           )
 
 run_oldest_pgpubs_db_archive = PythonOperator(task_id='run_oldest_pgpubs_db',
@@ -81,7 +81,7 @@ run_oldest_pgpubs_db_archive = PythonOperator(task_id='run_oldest_pgpubs_db',
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure,
                                           op_kwargs={'type': 'pgpubs',
-                                                     'output_path': '/PipelineData/DatabaseBackups/PregrantPublications'}
+                                                     'output_path': '/PatentDataVolume/DatabaseBackups/PregrantPublications'}
                                           )
 
 # archive_data_dag.set_upstream(create_database_operator)
