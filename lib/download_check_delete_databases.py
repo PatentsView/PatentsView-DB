@@ -35,9 +35,9 @@ where left(table_schema, 6) ='upload'
         with connection.cursor() as generic_cursor:
             generic_cursor.execute(q)
             db = generic_cursor.fetchall()[0][0]
-            print("--------------------------------")
+            print("--------------------------------------------------------------")
             print(f"Found Database {db} To Archive!")
-            print("--------------------------------")
+            print("--------------------------------------------------------------")
             q2 = f"""
 select table_name 
 from information_schema.tables
@@ -192,9 +192,9 @@ def delete_tables(connection_string, db, table_list):
     delete_archive_db = f"drop database "f"archive_check_{db}"
     print(delete_archive_db)
     engine.execute(delete_archive_db)
-    print("----------------------------------------")
+    print("--------------------------------------------------------------")
     print(f"TOTAL FREED SPACE {total_size_freed} GB!")
-    print("----------------------------------------")
+    print("--------------------------------------------------------------")
 
 
 def compare_results_dfs(prod_count_df, backup_count_df):
