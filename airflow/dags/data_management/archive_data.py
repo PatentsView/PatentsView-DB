@@ -51,7 +51,7 @@ run_table_archive_patent = PythonOperator(task_id='run_table_archive_patent',
                                           dag=archive_data_dag,
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure,
-                                          op_kwargs={'db': 'patent',
+                                          op_kwargs={'db': 'granted_patent',
                                                      'tablelist': [],
                                                      'output_path': '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'}
                                           )
@@ -71,7 +71,7 @@ run_oldest_upload_db_archive = PythonOperator(task_id='run_oldest_upload_db',
                                           dag=archive_data_dag,
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure,
-                                          op_kwargs={'type': 'patent',
+                                          op_kwargs={'type': 'granted_patent',
                                                      'output_path': '/PatentDataVolume/DatabaseBackups/RawDatabase'}
                                           )
 

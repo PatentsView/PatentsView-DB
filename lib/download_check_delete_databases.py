@@ -6,9 +6,9 @@ from sqlalchemy import create_engine
 import pandas as pd
 
 
-def get_oldest_databases(config, db_type='patent'):
+def get_oldest_databases(config, db_type='granted_patent'):
     print(f"Running {db_type}")
-    if db_type == 'patent':
+    if db_type == 'granted_patent':
         q = """
 select  min(table_schema)
 from information_schema.tables
@@ -215,7 +215,7 @@ def compare_results_dfs(prod_count_df, backup_count_df):
         print("The archived DB is identical to the current production DB -- YAY --- :D")
 
 
-def run_database_archive(config, type, output_path):
+def run_database_archive(type, output_path):
     # LOOPING THROUGH MANY
     # for i in range(0, 16):
     #     print(f"We are on Iteration {i} of 16 or {i/16} %")
@@ -225,6 +225,7 @@ def run_database_archive(config, type, output_path):
     #     output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
     # else:
     #     raise NotImplementedError
+    config = get_current_config(type=type)
 
     # Create Archive SQL FILE
     old_db, table_list = get_oldest_databases(config, db_type=type)
@@ -246,9 +247,12 @@ def run_database_archive(config, type, output_path):
     delete_databases(prod_connection_string, old_db)
 
 
-def run_table_archive(config, db, table_list, output_path):
+def run_table_archive(config_db, table_list, output_path):
     # db = 'pregrant_publications'
     # NO SPACES ALLOWED IN TABLE_LIST
+    config = get_current_config(type=config_db)
+    db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+
     if table_list.isempty():
         raise Exception("Add Table List to DAG")
     # backup_tables(db,output_path, table_list)
