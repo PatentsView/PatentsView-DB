@@ -116,10 +116,16 @@ def consolidate_wipo(config):
     rename table {upload_db}.wipo to {raw_db}.wipo
     """.format(raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"],
                upload_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
+    add_vi_index_statement = """
+    alter table wipo add index version_indicator_index (version_indicator)
+    """
     print(rename_raw_statement)
     engine.execute(rename_raw_statement)
     print(rename_upload_statement)
     engine.execute(rename_upload_statement)
+    print(add_vi_index_statement)
+    engine.execute(add_vi_index_statement)
+
 
 
 def process_and_upload_wipo(db, **kwargs):
