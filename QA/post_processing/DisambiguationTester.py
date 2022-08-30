@@ -26,8 +26,10 @@ class DisambiguationTester(DatabaseTester):
                 disambiguated_id=self.disambiguated_id, entity_table=self.entity_table)
             entity_row_query = "SELECT count(*) from {entity_table} et".format(
                 entity_id=self.disambiguated_id, entity_table=self.entity_table)
+            print(entity_count_query)
             count_cursor.execute(entity_count_query)
             entity_count_value = count_cursor.fetchall()[0][0]
+            print(entity_row_query)
             count_cursor.execute(entity_row_query)
             entity_rows_value = count_cursor.fetchall()[0][0]
             ratio_to_self = round((entity_rows_value * 1.0) / entity_count_value, 3)
