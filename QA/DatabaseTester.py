@@ -63,18 +63,20 @@ class DatabaseTester(ABC):
             'DataMonitor_locationcount': [],
         }
 
-    def query_runner(self, query, single_value_return=True, where_vi=False):
+    def query_runner(self, query, single_value_return=True, where_vi=False, vi_comparison = '='):
+        vi_comparison = vi_comparison.strip()
+        assert vi_comparison in ['=', '<', '>', '<=', '>=', '<>', '!=']
         try:
             if not self.connection.open:
                 self.connection.connect()
             if where_vi:
                 vi_date = self.end_date.strftime('%Y-%m-%d')
                 if 'where' and 'main_table' in query:
-                    where_statement = f" and main_table.version_indicator = '{vi_date}'"
+                    where_statement = f" and main_table.version_indicator {vi_comparison} '{vi_date}'"
                 elif 'where' in query:
-                    where_statement = f" and version_indicator = '{vi_date}'"
+                    where_statement = f" and version_indicator {vi_comparison} '{vi_date}'"
                 else:
-                    where_statement = f" where version_indicator = '{vi_date}'"
+                    where_statement = f" where version_indicator {vi_comparison} '{vi_date}'"
                 q = query+where_statement
             else:
                 q = query
@@ -251,7 +253,6 @@ SELECT count(1)
 from {related_table} related_table 
 left join {main_table} main_table on main_table.{main_table_id}= related_table.{related_table_id} 
 where main_table.{main_table_id} is null and related_table.{related_table_id} is not null
-AND main_table.version_indicator <= '{cutoff}' AND related_table.version_indicator <= '{cutoff}'
                     """.format(
                         main_table=table_name,
                         related_table=related_entity_config['related_table'],

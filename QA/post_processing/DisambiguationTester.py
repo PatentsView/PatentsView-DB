@@ -131,13 +131,11 @@ SELECT count(1)
 from {related_table} related_table 
 left join {main_table} main_table on main_table.{main_table_id}= related_table.{related_table_id} 
 where main_table.{main_table_id} is null and related_table.{related_table_id} is not null 
-AND main_table.version_indicator <= '{cutoff}' AND related_table.version_indicator <= '{cutoff}'
                     """.format(
                         main_table=table_name,
                         related_table=related_entity_config['related_table'],
                         main_table_id=related_entity_config['main_table_id'],
-                        related_table_id=related_entity_config['related_table_id'],
-                        cutoff = self.end_date)
+                        related_table_id=related_entity_config['related_table_id'])
                     related_count = self.query_runner(related_query, single_value_return=True, where_vi=where_vi)
                     if related_count > 0:
                         raise Exception(
