@@ -251,6 +251,7 @@ SELECT count(1)
 from {related_table} related_table 
 left join {main_table} main_table on main_table.{main_table_id}= related_table.{related_table_id} 
 where main_table.{main_table_id} is null and related_table.{related_table_id} is not null
+AND main_table.version_indicator <= '{cutoff}' AND related_table.version_indicator <= '{cutoff}'
                     """.format(
                         main_table=table_name,
                         related_table=related_entity_config['related_table'],
