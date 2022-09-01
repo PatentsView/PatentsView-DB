@@ -240,7 +240,7 @@ where name_first is not null and name_last is null"""
             raise Exception(print(f"{self.database_section}.{table} Has Wrong Organization values"))
 
 
-    def test_related_floating_entities(self, table_name, table_config, where_vi=False):
+    def test_related_floating_entities(self, table_name, table_config, where_vi=False, vi_comparison = '='):
         if table_name not in self.exclusion_list and 'related_entities' in table_config:
             for related_entity_config in table_config['related_entities']:
                 exists_query = f"""SHOW TABLES LIKE '{related_entity_config["related_table"]}'; """
@@ -258,7 +258,7 @@ where main_table.{main_table_id} is null and related_table.{related_table_id} is
                         related_table=related_entity_config['related_table'],
                         main_table_id=related_entity_config['main_table_id'],
                         related_table_id=related_entity_config['related_table_id'])
-                    related_count = self.query_runner(related_query, single_value_return=True, where_vi=where_vi)
+                    related_count = self.query_runner(related_query, single_value_return=True, where_vi=where_vi, vi_comparison=vi_comparison)
                     if related_count > 0:
                         raise Exception(
                             "There are rows for the id: {related_table_id} in {related_table} that do not have corresponding rows for the id: {"
@@ -434,7 +434,9 @@ where invention_abstract is null """
                 self.test_rawassignee_org(table, where_vi=False)
             self.test_blank_count(table, self.table_config[table], where_vi=False)
             self.load_nulls(table, self.table_config[table], where_vi=False)
-            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table], where_vi=False)
+            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table], 
+                        where_vi=(True if self.class_called == 'DisambiguationTester' else False),
+                        vi_comparison=('<=' if self.class_called == 'DisambiguationTester' else '='))
             self.load_main_floating_entity_count(table, self.table_config[table])
             self.load_entity_category_counts(table)
             if table == self.central_entity:

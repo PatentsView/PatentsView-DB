@@ -118,36 +118,6 @@ class DisambiguationTester(DatabaseTester):
                 print(invalid_query)
                 raise Exception(f"There are {self.disambiguated_id} in {self.disambiguated_table} table that are not in {self.entity_table}")
 
-    def test_related_floating_entities(self, table_name, table_config, where_vi=False):
-        if table_name not in self.exclusion_list and 'related_entities' in table_config:
-            for related_entity_config in table_config['related_entities']:
-                exists_query = f"""SHOW TABLES LIKE '{related_entity_config["related_table"]}'; """
-                exists_table_count = self.query_runner(exists_query, single_value_return=False, where_vi=False)
-                if not exists_table_count:
-                    continue
-                else:
-                    related_query = """
-SELECT count(1) 
-from {related_table} related_table 
-left join {main_table} main_table on main_table.{main_table_id}= related_table.{related_table_id} 
-where main_table.{main_table_id} is null and related_table.{related_table_id} is not null 
-                    """.format(
-                        main_table=table_name,
-                        related_table=related_entity_config['related_table'],
-                        main_table_id=related_entity_config['main_table_id'],
-                        related_table_id=related_entity_config['related_table_id'])
-                    related_count = self.query_runner(related_query, single_value_return=True, where_vi=where_vi)
-                    if related_count > 0:
-                        raise Exception(
-                            "There are rows for the id: {related_table_id} in {related_table} that do not have corresponding rows for the id: {"
-                            "main_table_id} in {main_table} for {db}".format(
-                                main_table=table_name,
-                                related_table=related_entity_config['related_table'],
-                                main_table_id=related_entity_config['main_table_id'],
-                                related_table_id=related_entity_config['related_table_id'],
-                                db=self.database_section)
-                        )
-
     def runTests(self):
         print("Beginning Disambiguation Specific Tests")
         self.init_qa_dict_disambig()
