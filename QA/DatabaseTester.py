@@ -434,9 +434,10 @@ where invention_abstract is null """
                 self.test_rawassignee_org(table, where_vi=False)
             self.test_blank_count(table, self.table_config[table], where_vi=False)
             self.load_nulls(table, self.table_config[table], where_vi=False)
+            vi_cutoff_classes = ['DisambiguationTester', 'LawyerPostProcessingQC']
             self.test_related_floating_entities(table_name=table, table_config=self.table_config[table], 
-                        where_vi=(True if self.class_called == 'DisambiguationTester' else False),
-                        vi_comparison=('<=' if self.class_called == 'DisambiguationTester' else '='))
+                        where_vi=(True if self.class_called in vi_cutoff_classes else False),
+                        vi_comparison=('<=' if self.class_called in vi_cutoff_classes else '='))
             self.load_main_floating_entity_count(table, self.table_config[table])
             self.load_entity_category_counts(table)
             if table == self.central_entity:
