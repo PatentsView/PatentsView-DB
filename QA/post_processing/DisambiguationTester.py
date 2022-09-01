@@ -118,7 +118,6 @@ class DisambiguationTester(DatabaseTester):
                 print(invalid_query)
                 raise Exception(f"There are {self.disambiguated_id} in {self.disambiguated_table} table that are not in {self.entity_table}")
 
-
     def runTests(self):
         print("Beginning Disambiguation Specific Tests")
         self.init_qa_dict_disambig()

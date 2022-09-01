@@ -31,11 +31,14 @@ def consolidate_uspc(config):
 
 def consolidate_rawlocation(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
+    applicant_table = 'non_inventor_applicant' if config['PATENTSVIEW_DATABASES']['PROD_DB'] == 'patent' else 'us_parties'
     engine = create_engine(cstr)
     engine.execute(
             'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM rawassignee;')
     engine.execute(
             'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM rawinventor;')
+    engine.execute(
+            f'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM {applicant_table};')
 
 
 def create_country_transformed(config):
