@@ -39,11 +39,13 @@ def db_and_table_as_array(single_line_query):
     # print(single_line_query_words)
     after_into = nextword('into', single_line_query_words)
     after_from = nextword('from', single_line_query_words)
+    if '(' in after_from:
+        after_from = nextword('join', single_line_query_words)
     if after_into is None or after_from is None:
         print("Not set up for schema checks")
+        tables_schema = []
     else:
         table_schema_list = "('" + after_into.split(".")[0] + "', " + "'" + after_from.split(".")[0] + "')"
-        print(table_schema_list)
         table_list = "('" + after_into.split(".")[1] + "', " + "'" + after_from.split(".")[1] + "')"
 
         db_type = 'patent'
@@ -71,7 +73,7 @@ def db_and_table_as_array(single_line_query):
             for item in cursor.fetchall():
                 tables_schema.append((item[0], item[1]))
             # row = [item[0] for item in cursor.fetchall()]
-        return tables_schema
+    return tables_schema
 
 
 def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk_check=True, section=None, **context):
@@ -228,6 +230,39 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
 #
 if __name__ == '__main__':
     q = "insert into `PatentsView_20220630`.`application` (`application_id`, `patent_id`, `type`, `number`, `country`, `date`) select `id_transformed`, `patent_id`, nullif(trim(`type`), ''), nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''), case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end from `patent`.`application` where version_indicator<='2021-12-30';"
+    q = """insert into `PatentsView_20220630`.`temp_assignee_lastknown_location`
+(`assignee_id`, `location_id`, `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`)
+select lastknown.`assignee_id`,
+       tl.`new_location_id`,
+       tl.`old_location_id_transformed`,
+       nullif(trim(l.`city`), ''),
+       nullif(trim(l.`state`), ''),
+       nullif(trim(l.`country`), ''),
+       l.`latitude`,
+       l.`longitude`
+from (
+         select srw.`assignee_id`,
+                srw.`location_id`
+         from (select ROW_NUMBER() OVER (PARTITION BY rw.assignee_id ORDER BY rw.`date` desc) AS rownum,
+                      rw.`assignee_id`,
+                      rw.`location_id`
+               from (
+                        select ra.`assignee_id`,
+                               rl.`location_id`,
+                               p.`date`,
+                               p.`id`
+                        from `patent`.`rawassignee` ra
+                                 inner join `patent`.`patent` p on p.`id` = ra.`patent_id`
+                                 inner join `patent`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
+                          and ra.`assignee_id` is not null and ra.version_indicator <='2022-06-30'
+                        order by ra.`assignee_id`,
+                                 p.`date` desc,
+                                 p.`id` desc
+                    ) rw) srw
+         where rownum = 1) lastknown
+         left join `patent`.`location` l on l.`id` = lastknown.`location_id`
+         left join `PatentsView_20220630`.`temp_id_mapping_location` tl
+                   on tl.`old_location_id` = lastknown.`location_id`;"""
     # db_and_table_as_array("INSERT INTO pregrant_publications.publication SELECT * FROM pgpubs_20050101.publication")
     # db_and_table_as_array(q)
     # validate_and_execute(filename='01_04_Application', fk_check=False, source_sql='01_04_Application.sql', **{
