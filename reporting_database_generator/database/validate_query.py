@@ -44,6 +44,7 @@ def db_and_table_as_array(single_line_query):
     else:
         table_schema_list = "('" + after_into.split(".")[0] + "', " + "'" + after_from.split(".")[0] + "')"
         print(table_schema_list)
+        table_list = "('" + after_into.split(".")[1] + "', " + "'" + after_from.split(".")[1] + "')"
 
         db_type = 'patent'
         if 'publication' in single_line_query_words:
@@ -60,7 +61,7 @@ def db_and_table_as_array(single_line_query):
         tables_query = f"""
     select table_schema, table_name 
     from information_schema.tables
-    where table_schema in {table_schema_list}
+    where table_schema in {table_schema_list} and table_name in {table_list}
     group by 1,2
                     """
         print(tables_query)
@@ -187,7 +188,7 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
                 if not database_helpers.check_encoding_and_collation(db_con, collation_check_parameters):
                     message = """
                         Character set and/or collation mismatch between tables involved in query :
-                            ```{single_line_query}```
+                            {single_line_query}
                             """.format(single_line_query=single_line_query)
                     # send_slack_notification(message, config,
                     #                         section,
@@ -226,7 +227,38 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
     #                         "success")
 #
 if __name__ == '__main__':
-    q = "insert into `PatentsView_20211230`.`application` (`application_id`, `patent_id`, `type`, `number`, `country`, `date`) select `id_transformed`, `patent_id`, nullif(trim(`type`), ''), nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''), case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end from `patent`.`application` where version_indicator<='2021-12-30';"
+    q = "insert into `PatentsView_20220630`.`application` (`application_id`, `patent_id`, `type`, `number`, `country`, `date`) select `id_transformed`, `patent_id`, nullif(trim(`type`), ''), nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''), case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end from `patent`.`application` where version_indicator<='2021-12-30';"
     # db_and_table_as_array("INSERT INTO pregrant_publications.publication SELECT * FROM pgpubs_20050101.publication")
-    db_and_table_as_array(q)
+    # db_and_table_as_array(q)
+    # validate_and_execute(filename='01_04_Application', fk_check=False, source_sql='01_04_Application.sql', **{
+    #     "source_sql": "01_04_Application.sql"
+    # })
+    # from lib.configuration import get_current_config, get_today_dict
+    config = get_current_config("granted_patent", **{
+        "execution_date": datetime.date(2022, 6, 30)
+    })
+    # database_name_config = {
+    #     'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
+    #     'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME'],
+    #     'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR']
+    # }
+    # schema_only = config["REPORTING_DATABASE_OPTIONS"]["SCHEMA_ONLY"]
+    # if schema_only == "TRUE":
+    #     schema_only = True
+    # else:
+    #     schema_only = False
+    # validate_and_execute(filename='01_04_Application', fk_check=False, source_sql='01_04_Application.sql',templates_exts=[".sql"],
+    # params=database_name_config, schema_only=schema_only, templates_dict={
+    #     'source_sql': '01_04_Application.sql'
+    # })
+
+    collation_check_parameters = db_and_table_as_array(q)
+    cstr = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(
+            config['DATABASE_SETUP']['USERNAME'],
+            config['DATABASE_SETUP']['PASSWORD'],
+            config['DATABASE_SETUP']['HOST'],
+            config['DATABASE_SETUP']['PORT'],
+            "information_schema")
+    # db_con = create_engine(cstr)
+    # database_helpers.check_encoding_and_collation(db_con, collation_check_parameters)
 
