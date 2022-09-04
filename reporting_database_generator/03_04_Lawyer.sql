@@ -113,7 +113,7 @@ create table `{{params.reporting_database}}`.`patent_lawyer`
 engine=InnoDB;
 
 create table `{{params.reporting_database}}`.`patent_lawyer_unique` (
-select patent_id, lawyer_id, min(sequence) sequence
+select p.patent_id, lawyer_id, min(sequence) sequence
 from `patent`.`rawlawyer` rl
 	left join patent p on rl.patent_id=p.patent_id
 group by 1,2
