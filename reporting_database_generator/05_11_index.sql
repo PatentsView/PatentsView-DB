@@ -18,9 +18,9 @@
 -- alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_firstnamed_assignee_location_id` (`firstnamed_assignee_location_id`);
 -- alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_firstnamed_assignee_persistent_location_id`(`firstnamed_assignee_persistent_location_id`);
 -- alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_firstnamed_assignee_persistent_id` (`firstnamed_assignee_persistent_id`);
--- alter table `{{params.reporting_database}}`.`patent` add fulltext index `fti_patent_title` (`title`);
-alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_firstnamed_inventor_id` (`firstnamed_inventor_id`);
-alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_firstnamed_assignee_id` (`firstnamed_assignee_id`);
-alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_num_claims` (`num_claims`);
-alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_country` (`country`);
-alter table `{{params.reporting_database}}`.`patent` add fulltext index `fti_patent_abstract` (`abstract`);
+alter table `{{params.reporting_database}}`.`patent` add fulltext index `fti_patent_title` (`title`);
+-- alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_firstnamed_inventor_id` (`firstnamed_inventor_id`);
+-- alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_firstnamed_assignee_id` (`firstnamed_assignee_id`);
+-- alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_num_claims` (`num_claims`);
+-- alter table `{{params.reporting_database}}`.`patent` add index `ix_patent_country` (`country`);
+-- alter table `{{params.reporting_database}}`.`patent` add fulltext index `fti_patent_abstract` (`abstract`);
