@@ -143,8 +143,8 @@ def get_orgs(db_con, manual_inputs):
     raw.to_csv(manual_inputs + "/government_organization.csv", index=False)
 
 
-def process_ner_to_manual(**kwargs):
-    config = get_current_config('granted_patent',**kwargs)
+def process_ner_to_manual(doctype='granted_patent',database='RAW_DB', **kwargs):
+    config = get_current_config(type=doctype, **kwargs)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     manual_inputs = '{}/government_interest/manual_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])
@@ -155,7 +155,7 @@ def process_ner_to_manual(**kwargs):
 
     existing_lookup, govt_acc_dict, organizations = get_data(persistent_files, pre_manual)
     perform_lookups(existing_lookup, govt_acc_dict, organizations, manual_inputs)
-    engine = create_engine(get_connection_string(config, 'RAW_DB'))
+    engine = create_engine(get_connection_string(config, database=database))
     get_orgs(engine, manual_inputs)
 
 
