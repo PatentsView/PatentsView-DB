@@ -57,3 +57,30 @@ def update_create_view_json(config):
 def read_create_view_dictionary(config):
 	with open(f"{config['FOLDERS']['project_root']}/{config['FOLDERS']['resources_folder']}/create_export_views.json",'r') as f:
 		return(json.load(f))
+
+
+def update_view_date_ranges(config):
+	host = '{}'.format(config['DATABASE_SETUP']['HOST'])
+	user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
+	password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
+	port = '{}'.format(config['DATABASE_SETUP']['PORT'])
+	engine = sqla.create_engine(f'mysql+pymysql://{user}:{password}@{host}:{port}?charset=utf8mb4')
+
+	view_creations = read_create_view_dictionary(config)
+
+	failed_updates = []
+	successful_updates = []
+	for view in view_creations:
+		try :
+			sql = view_creations[view].format(datestring = config['DATES']['END_DATE'])
+			print(f'UPDATING VIEW {view}')
+			print(sql)
+			engine.execute(sql)
+			successful_updates.append(view)
+		except Exception as e:
+			print('update unsuccessful')
+			print(e)
+			failed_updates.append(view)
+	
+	if len(failed_updates) > 0:
+		raise Exception(f"view creation/update failed for {len(failed_updates)} views:\n{'\n'.join(failed_updates)}")
