@@ -61,7 +61,7 @@ def subprocess_cmd(command):
 
 def backup_db(config, output_path, db):
     # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-    defaults_file = "resources/sql.conf"
+    defaults_file = "/airflow/PatentsView-DB/resources/sql.conf"
     # bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
     bash_command1 = f"mydumper --defaults-file={defaults_file} -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
