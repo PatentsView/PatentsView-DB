@@ -237,9 +237,9 @@ def run_database_archive(type):
     old_db, table_list = get_oldest_databases(config, db_type=type)
 
     if type == 'pgpubs':
-        output_path = '/archive/PregrantPublications/pregrant_publications/'
+        output_path = '/archive/PregrantPublications/pregrant_publications'
     else:
-        output_path = '/archive/patent_/'
+        output_path = '/archive/patent_'
 
     backup_db(config, output_path, old_db)
     upload_tables_for_testing(config, old_db, output_path, table_list)
