@@ -92,7 +92,7 @@ def upload_tables_for_testing(config, db, output_path, table_list):
     q = f"create database {archive_db}"
     print(q)
     engine.execute(q)
-    if type(table_list) == str:
+    if isinstance(table_list, str):
         for table in table_list.split(","):
             # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
             bash_command1 = f"gunzip -d {output_path}/{db}.{table}-schema.sql.gz"
@@ -237,9 +237,9 @@ def run_database_archive(type):
     old_db, table_list = get_oldest_databases(config, db_type=type)
 
     if type == 'pgpubs':
-        output_path = '/archive/PregrantPublications/pregrant_publications/'
+        output_path = '/archive/PregrantPublications/pregrant_publications'
     else:
-        output_path = '/archive/patent_/'
+        output_path = '/archive/patent_'
 
     backup_db(config, output_path, old_db)
     upload_tables_for_testing(config, old_db, output_path, table_list)
