@@ -131,7 +131,7 @@ def query_for_all_tables_in_db(connection_string, temp):
     return table_data_raw
 
 
-def get_count_for_all_tables(connection_string, df):
+def get_count_for_all_tables(connection_string, df, raise_exception=False):
     if type(df)==str:
         all_tables = df.split(",")
     else:
@@ -148,9 +148,15 @@ def get_count_for_all_tables(connection_string, df):
     """
         print(read_q)
         table_vi = pd.read_sql_query(sql=read_q, con=engine)
+        if raise_exception:
+            num_rows = table_vi['count(*)'][0]
+            print(f"{t} Has {num_rows} Rows")
+            if num_rows == 0 or table_vi.empty == True:
+                raise Exception(f"{t} IS EMPTY!!!! ")
         final_dataset_local = pd.concat([final_dataset_local, table_vi])
         print(f"We are {counter / total} % Done with the Queries for this DB")
         counter = counter + 1
+    print(final_dataset_local)
     return final_dataset_local
 
 

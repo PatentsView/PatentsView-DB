@@ -23,6 +23,7 @@ else:
     schema_only = False
 
 from reporting_database_generator.database import validate_query
+from QA.post_processing.reporting_db_qa import check_reporting_db_row_count
 
 template_extension_config = [".sql"]
 database_name_config = {
@@ -568,6 +569,12 @@ rep_tbl_2 = SQLTemplatedPythonOperator(
     params=database_name_config
 )
 
+check_empty_table = PythonOperator(task_id='QA_check_empty_tables',
+                                          python_callable=check_reporting_db_row_count,
+                                          dag=reporting_db_dag
+                                          )
+
+
 # half_join_table = SQLTemplatedPythonOperator(
 #     task_id='half_join_table',
 #     provide_context=True,
@@ -644,3 +651,5 @@ idx_9.set_downstream(rep_tbl_2)
 idx_10.set_downstream(rep_tbl_2)
 idx_11.set_downstream(rep_tbl_2)
 idx_12.set_downstream(rep_tbl_2)
+
+check_empty_table.set_upstream(rep_tbl_2)
