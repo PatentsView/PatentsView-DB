@@ -55,7 +55,7 @@ default_args = {
 
 reporting_db_dag = DAG("reporting_database_generation"
                        , default_args=default_args
-                       , start_date=datetime(2022, 3, 1)
+                       , start_date=datetime(2022, 6, 30)
                        , schedule_interval=None
                        , template_searchpath="/project/reporting_database_generator/")
 

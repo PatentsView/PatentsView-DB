@@ -113,10 +113,9 @@ create table `{{params.reporting_database}}`.`patent_lawyer`
 engine=InnoDB;
 
 create table `{{params.reporting_database}}`.`patent_lawyer_unique` (
-select patent_id, lawyer_id, min(sequence) sequence
+select rl.patent_id, lawyer_id, min(sequence) sequence
 from `patent`.`rawlawyer` rl
-	left join patent p on rl.patent_id=p.id
-where p.version_indicator <= {{ params.version_indicator }}
+	left join patent p on rl.patent_id=p.patent_id
 group by 1,2
 );
 
@@ -127,7 +126,7 @@ insert into `{{params.reporting_database}}`.`patent_lawyer`
   `patent_id`, `lawyer_id`, `sequence`
 )
 select distinct
-  pii.`patent_id`, t.`new_lawyer_id`, ri.`sequence`
+  pii.`patent_id`, t.`new_lawyer_id`, u.`sequence`
 from
   `{{params.raw_database}}`.`patent_lawyer` pii
   inner join `{{params.reporting_database}}`.`temp_id_mapping_lawyer` t on t.`old_lawyer_id` = pii.`lawyer_id`
