@@ -96,9 +96,9 @@ select `a`.`id` AS `cpc_subclass`,
 `b`.`title` AS `cpc_group_title`,
 `c`.`id` AS `cpc_class`,
 `c`.`title` AS `cpc_class_title` 
-from ((`patent`.`cpc_group` `a` join `patent`.`cpc_subgroup` `b` on(`a`.`id` = left(`b`.`id`,
-4))) join `patent`.`cpc_subsection` `c` on(left(`b`.`id`,
-3) = `c`.`id`));
+from ((`patent`.`cpc_group` `a` 
+join `patent`.`cpc_subgroup` `b` on(`a`.`id` = left(`b`.`id`, 4))) 
+join `patent`.`cpc_subsection` `c` on(left(`b`.`id`, 3) = `c`.`id`));
 
 CREATE OR REPLACE VIEW `patentsview_exports_granted`.`examiner_not_disambiguated` AS 
 select `patent`.`rawexaminer`.`patent_id` AS `patent_id`,
