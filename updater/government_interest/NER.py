@@ -28,14 +28,14 @@ def get_heading(gi_statement):
     return ''
 
 
-def prepare_input_files(connection_string, merged_csv_output):
+def prepare_input_files(connection_string, merged_csv_output, doc_id = 'patent_id'):
     engine = create_engine(connection_string)
     all_gi_data = pd.read_sql_table(table_name='government_interest', con=engine)
     # reset index after appending all data together
     all_gi_data.reset_index(inplace=True)
     all_gi_data['heading'] = all_gi_data['gi_statement'].apply(get_heading)
     all_gi_data['gi_statement'] = all_gi_data.apply(lambda row: row['gi_statement'][len(row['heading']):], axis=1)
-    all_gi_data = all_gi_data[['patent_id', 'heading', 'gi_statement']]
+    all_gi_data = all_gi_data[[doc_id, 'heading', 'gi_statement']]
 
     # eliminate rows that have not applicable in the gi statement
     idx_rm_na = all_gi_data[all_gi_data['gi_statement'].str.contains('Not applicable', flags=re.IGNORECASE,
@@ -363,8 +363,8 @@ def test_dataframe(df, rw, col):
     return
 
 
-def begin_NER_processing(**kwargs):
-    config = get_current_config(type='granted_patent', **kwargs)
+def begin_NER_processing(doctype='granted_patent',database='TEMP_UPLOAD_DB', **kwargs):
+    config = get_current_config(type=doctype, **kwargs)
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
 
     # Set up vars + directories
@@ -380,9 +380,9 @@ def begin_NER_processing(**kwargs):
     ner_classif_dirs = ['out-3class', 'out-4class', 'out-7class']
 
     final_output_dir = pre_manual
-    connection_string = get_connection_string(config)
+    connection_string = get_connection_string(config, database=database)
     # 1. Merge csvs together and read in the input file
-    merged_df = prepare_input_files(connection_string, merged_csv)
+    merged_df = prepare_input_files(connection_string, merged_csv, doc_id=('patent_id' if doctype =='granted_patent' else 'document_number'))
 
     # # 2. run NER
     run_NER(ner_dir, ner_txt_indir, ner_txt_outdir, merged_df, classifiers, ner_classif_dirs)
@@ -401,6 +401,6 @@ if __name__ == '__main__':
     # config = get_current_config('granted_patent', **{
     #         "execution_date": datetime.date(2020, 12, 29)
     #         })
-    begin_NER_processing(**{
+    begin_NER_processing(doctype='granted_patent', database='TEMP_UPLOAD_DB', **{
             "execution_date": datetime.date(2020, 12, 22)
             })
