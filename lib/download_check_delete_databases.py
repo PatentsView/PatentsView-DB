@@ -276,6 +276,8 @@ def run_table_archive(config_db, table_list, output_path):
 
 
 if __name__ == '__main__':
-    config = get_current_config('patent', **{"execution_date": datetime.date(2022, 1, 1)})
-    run_database_archive(config, type='patent')
+    type = 'pgpubs'
+    output_path ='/PatentDataVolume/DatabaseBackups/PregrantPublications'
+    config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
+    run_database_archive(type=type, output_path=output_path)
     # run_table_archive(config)
