@@ -298,5 +298,9 @@ if __name__ == '__main__':
     type = 'pgpubs'
     # output_path ='/PatentDataVolume/DatabaseBackups/PregrantPublications'
     config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
-    run_database_archive(type=type)
-    # run_table_archive(config)
+    for i in range(1, 24):
+        print("--------------------------------------------------------------")
+        print(f"RUNNING ITERATION: {i}")
+        print("--------------------------------------------------------------")
+        run_database_archive(type=type)
+        # run_table_archive(config)
