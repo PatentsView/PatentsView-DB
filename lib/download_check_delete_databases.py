@@ -226,8 +226,11 @@ def compare_results_dfs(prod_count_df, backup_count_df):
 
 
 def clean_up_backups(db, output_path):
+    print("--------------------------------------------------------------")
+    print(f"CLEANING UP {output_path} DIRECTORY")
+    print("--------------------------------------------------------------")
     bash_command1 = f"mkdir {output_path}/{db}"
-    bash_command2 = f"mv {db}* {output_path}/{db}"
+    bash_command2 = f"mv {output_path}/{db}* {output_path}/{db}"
     for i in [bash_command1, bash_command2]:
         print(i)
         subprocess_cmd(i)
