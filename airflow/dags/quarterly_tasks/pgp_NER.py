@@ -6,6 +6,7 @@ from airflow.operators.python_operator import PythonOperator
 
 from lib.utilities import chain_operators
 
+from lib.configuration import get_current_config, get_today_dict
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.government_interest.NER import begin_NER_processing
 from updater.government_interest.NER_to_manual import process_ner_to_manual
@@ -14,6 +15,7 @@ from updater.government_interest.simulate_manual import simulate_manual
 
 project_home = os.environ['PACKAGE_HOME']
 templates_searchpath = "{home}/resources".format(home=project_home)
+config = get_current_config(type='granted_patent', supplemental_configs=None, **get_today_dict())
 
 default_args = {
     'owner': 'smadhavan',
