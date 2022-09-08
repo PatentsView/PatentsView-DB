@@ -88,17 +88,18 @@ def backup_tables(db, output_path, table_list):
 def upload_tables_for_testing(config, db, output_path, table_list):
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
-    archive_db = f"archive_check_{db}"
+    archive_db = f"archive_temp_{db}"
     q = f"create database {archive_db}"
     print(q)
     engine.execute(q)
+    defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     if isinstance(table_list, str):
         for table in table_list.split(","):
             # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
             bash_command1 = f"gunzip -d {output_path}/{db}.{table}-schema.sql.gz"
             bash_command2 = f"gunzip -d {output_path}/{db}.{table}.sql.gz"
-            bash_command3 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
-            bash_command4 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table}.sql"
+            bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
+            bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table}.sql"
             bash_command5 = f"gzip {output_path}/{db}.{table}.sql"
             bash_command6 = f"gzip {output_path}/{db}.{table}-schema.sql"
             for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
@@ -109,8 +110,8 @@ def upload_tables_for_testing(config, db, output_path, table_list):
             if table != None:
                 bash_command1 = f"gunzip -d {output_path}/{db}.{table[0]}-schema.sql.gz"
                 bash_command2 = f"gunzip -d {output_path}/{db}.{table[0]}.sql.gz"
-                bash_command3 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table[0]}-schema.sql"
-                bash_command4 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table[0]}.sql"
+                bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table[0]}-schema.sql"
+                bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table[0]}.sql"
                 bash_command5 = f"gzip {output_path}/{db}.{table[0]}.sql"
                 bash_command6 = f"gzip {output_path}/{db}.{table[0]}-schema.sql"
                 for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
@@ -173,7 +174,7 @@ order by 2 desc;
     table_data_raw['delete_query'] = "drop database " + table_data_raw['Database'] + ";"
     print(f"DELETING DATABASE {db}, Freeing-Up {table_data_raw['Size (GB)']} ")
     delete_db = table_data_raw['delete_query'][0]
-    delete_archive_db = f"drop database "f"archive_check_{db}"
+    delete_archive_db = f"drop database archive_temp_{db}"
     for query in [delete_db, delete_archive_db]:
         print(query)
         engine.execute(query)
