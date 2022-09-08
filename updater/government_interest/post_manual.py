@@ -120,9 +120,9 @@ def readOrgs(db_cursor):
     return org_dict
 
 
-def push_orgs(looked_up_data, org_id_mapping, config, version_indicator):
+def push_orgs(looked_up_data, org_id_mapping, config, version_indicator,database='TEMP_UPLOAD_DB'):
     missed = {}
-    engine = create_engine(get_connection_string(config, 'TEMP_UPLOAD_DB'))
+    engine = create_engine(get_connection_string(config, database=database))
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     engine.execute('set foreign_key_checks=0')
     for idx, row in looked_up_data.iterrows():
@@ -160,12 +160,12 @@ def push_orgs(looked_up_data, org_id_mapping, config, version_indicator):
     total_missed_orgs.to_csv('{}/incorrect_clean_orgs.csv'.format(post_manual))
 
 
-def process_post_manual(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
+def process_post_manual(doctype='granted_patent',database='TEMP_UPLOAD_DB', **kwargs):
+    config = get_current_config(type=doctype, **kwargs)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
-    engine = create_engine(get_connection_string(config, 'TEMP_UPLOAD_DB'))
+    # engine = create_engine(get_connection_string(config, database=database))
     full_db_engine = create_engine(get_connection_string(config, 'RAW_DB'))
     # upload the new government organization we manually identified
     # upload_new_orgs(post_manual, engine)
@@ -182,11 +182,11 @@ def process_post_manual(**kwargs):
     org_id_mapping = readOrgs(full_db_engine)
 
     # push the mappings into the db
-    push_orgs(looked_up, org_id_mapping, config, version_indicator)
+    push_orgs(looked_up, org_id_mapping, config, version_indicator, database=database)
 
 
-def qc_gi(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
+def qc_gi(doctype='granted_patent',**kwargs):
+    config = get_current_config(type=doctype, **kwargs)
     qc = GovtInterestTester(config)
     qc.runTests()
 

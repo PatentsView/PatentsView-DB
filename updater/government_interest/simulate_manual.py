@@ -6,8 +6,8 @@ import pandas as pd
 from lib.configuration import get_current_config
 
 
-def simulate_manual(**kwargs):
-    config = get_current_config(type='granted_patent', **kwargs)
+def simulate_manual(doctype='granted_patent', **kwargs):
+    config = get_current_config(type=doctype, **kwargs)
     manual_inputs = '{}/government_interest/manual_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     files_to_copy = {
