@@ -63,7 +63,8 @@ def backup_db(config, output_path, db):
     print("--------------------------------------------------------------")
     print("DUMPING DATABASE BACKUP")
     print("--------------------------------------------------------------")
-    defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+    # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+    defaults_file = "resources/sql.conf"
     # bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
     bash_command1 = f"mydumper --defaults-file={defaults_file} -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
@@ -134,7 +135,7 @@ def get_count_for_all_tables(connection_string, df, raise_exception=False):
     print("--------------------------------------------------------------")
     print("GETTING ROW COUNT FOR ALL TABLES")
     print("--------------------------------------------------------------")
-    if type(df)==str:
+    if isinstance(df, str):
         all_tables = df.split(",")
     else:
         all_tables = list(set(df['TABLE_NAME']))
