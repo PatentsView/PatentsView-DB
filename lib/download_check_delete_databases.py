@@ -60,7 +60,11 @@ def subprocess_cmd(command):
     print(proc_stdout)
 
 def backup_db(config, output_path, db):
-    defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+    print("--------------------------------------------------------------")
+    print("DUMPING DATABASE BACKUP")
+    print("--------------------------------------------------------------")
+    # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+    defaults_file = "resources/sql.conf"
     # bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
     bash_command1 = f"mydumper --defaults-file={defaults_file} -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
@@ -73,32 +77,26 @@ def backup_tables(db, output_path, table_list):
     print(bash_command1)
     subprocess_cmd(bash_command1)
 
-# def upload_db_for_testing(config, db):
-#     cstr = get_connection_string(config, 'PROD_DB')
-#     engine = create_engine(cstr)
-#     q = f"create database archive_check_{db}"
-#     print(q)
-#     engine.execute(q)
-#     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-#     bash_command = f"mysql --defaults-file={defaults_file} -f archive_check_{db} < {db}_backup.sql"
-#     print(bash_command)
-#     subprocess_cmd(bash_command)
-
 
 def upload_tables_for_testing(config, db, output_path, table_list):
+    print("--------------------------------------------------------------")
+    print("UPLOADING DATABASE BACKUPS FOR QA")
+    print("--------------------------------------------------------------")
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
-    archive_db = f"archive_check_{db}"
+    archive_db = f"archive_temp_{db}"
     q = f"create database {archive_db}"
     print(q)
     engine.execute(q)
+    # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+    defaults_file = "resources/sql.conf"
     if isinstance(table_list, str):
         for table in table_list.split(","):
             # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
             bash_command1 = f"gunzip -d {output_path}/{db}.{table}-schema.sql.gz"
             bash_command2 = f"gunzip -d {output_path}/{db}.{table}.sql.gz"
-            bash_command3 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
-            bash_command4 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table}.sql"
+            bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
+            bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table}.sql"
             bash_command5 = f"gzip {output_path}/{db}.{table}.sql"
             bash_command6 = f"gzip {output_path}/{db}.{table}-schema.sql"
             for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
@@ -109,8 +107,8 @@ def upload_tables_for_testing(config, db, output_path, table_list):
             if table != None:
                 bash_command1 = f"gunzip -d {output_path}/{db}.{table[0]}-schema.sql.gz"
                 bash_command2 = f"gunzip -d {output_path}/{db}.{table[0]}.sql.gz"
-                bash_command3 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table[0]}-schema.sql"
-                bash_command4 = f"mysql --defaults-file=resources/sql.conf -f {archive_db} < {output_path}/{db}.{table[0]}.sql"
+                bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table[0]}-schema.sql"
+                bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table[0]}.sql"
                 bash_command5 = f"gzip {output_path}/{db}.{table[0]}.sql"
                 bash_command6 = f"gzip {output_path}/{db}.{table[0]}-schema.sql"
                 for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
@@ -119,6 +117,9 @@ def upload_tables_for_testing(config, db, output_path, table_list):
 
 
 def query_for_all_tables_in_db(connection_string, temp):
+    print("--------------------------------------------------------------")
+    print("GETTING A LIST OF ALL TABLES")
+    print("--------------------------------------------------------------")
     engine = create_engine(connection_string)
     q = f"""
     select TABLE_NAME
@@ -131,7 +132,10 @@ def query_for_all_tables_in_db(connection_string, temp):
 
 
 def get_count_for_all_tables(connection_string, df, raise_exception=False):
-    if type(df)==str:
+    print("--------------------------------------------------------------")
+    print("GETTING ROW COUNT FOR ALL TABLES")
+    print("--------------------------------------------------------------")
+    if isinstance(df, str):
         all_tables = df.split(",")
     else:
         all_tables = list(set(df['TABLE_NAME']))
@@ -173,7 +177,7 @@ order by 2 desc;
     table_data_raw['delete_query'] = "drop database " + table_data_raw['Database'] + ";"
     print(f"DELETING DATABASE {db}, Freeing-Up {table_data_raw['Size (GB)']} ")
     delete_db = table_data_raw['delete_query'][0]
-    delete_archive_db = f"drop database "f"archive_check_{db}"
+    delete_archive_db = f"drop database archive_temp_{db}"
     for query in [delete_db, delete_archive_db]:
         print(query)
         engine.execute(query)
@@ -195,7 +199,7 @@ def delete_tables(connection_string, db, table_list):
         print(f"DELETING Table {db}.{table}, Freeing-Up {table_data_raw['Size (GB)']} GB")
         total_size_freed = total_size_freed+table_data_raw['Size (GB)']
         engine.execute(delete_query)
-    delete_archive_db = f"drop database "f"archive_check_{db}"
+    delete_archive_db = f"drop database "f"archive_temp_{db}"
     print(delete_archive_db)
     engine.execute(delete_archive_db)
     print("--------------------------------------------------------------")
@@ -220,6 +224,16 @@ def compare_results_dfs(prod_count_df, backup_count_df):
     else:
         print("The archived DB is identical to the current production DB -- YAY --- :D")
 
+
+def clean_up_backups(db, output_path):
+    print("--------------------------------------------------------------")
+    print(f"CLEANING UP {output_path} DIRECTORY")
+    print("--------------------------------------------------------------")
+    bash_command1 = f"mkdir {output_path}/{db}"
+    bash_command2 = f"mv {output_path}/{db}* {output_path}/{db}"
+    for i in [bash_command1, bash_command2]:
+        print(i)
+        subprocess_cmd(i)
 
 def run_database_archive(type):
     # LOOPING THROUGH MANY
@@ -249,15 +263,15 @@ def run_database_archive(type):
     prod_data = query_for_all_tables_in_db(prod_connection_string, old_db)
     prod_count_df = get_count_for_all_tables(prod_connection_string, prod_data)
 
-    backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{old_db}", connection='DATABASE_SETUP')
-    backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_check_{old_db}")
+    backup_connection_string = get_unique_connection_string(config, database= f"archive_temp_{old_db}", connection='DATABASE_SETUP')
+    backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_temp_{old_db}")
     backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
 
     compare_results_dfs(prod_count_df, backup_count_df)
 
     # DELETE DB
     delete_databases(prod_connection_string, old_db)
-
+    clean_up_backups(old_db, output_path)
 
 def run_table_archive(config_db, table_list, output_path):
     # db = 'pregrant_publications'
@@ -274,7 +288,7 @@ def run_table_archive(config_db, table_list, output_path):
     prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
     prod_count_df = get_count_for_all_tables(prod_connection_string, table_list)
 
-    backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{db}", connection='DATABASE_SETUP')
+    backup_connection_string = get_unique_connection_string(config, database= f"archive_temp_{db}", connection='DATABASE_SETUP')
     backup_count_df = get_count_for_all_tables(backup_connection_string, table_list)
     compare_results_dfs(prod_count_df, backup_count_df)
     delete_tables(prod_connection_string, db, table_list)
@@ -284,5 +298,9 @@ if __name__ == '__main__':
     type = 'pgpubs'
     # output_path ='/PatentDataVolume/DatabaseBackups/PregrantPublications'
     config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
-    run_database_archive(type=type)
-    # run_table_archive(config)
+    for i in range(1, 24):
+        print("--------------------------------------------------------------")
+        print(f"RUNNING ITERATION: {i}")
+        print("--------------------------------------------------------------")
+        run_database_archive(type=type)
+        # run_table_archive(config)
