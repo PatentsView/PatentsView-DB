@@ -60,6 +60,9 @@ def subprocess_cmd(command):
     print(proc_stdout)
 
 def backup_db(config, output_path, db):
+    print("--------------------------------------------------------------")
+    print("DUMPING DATABASE BACKUP")
+    print("--------------------------------------------------------------")
     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     # bash_command1 = f"mysqldump --defaults-file={defaults_file} --column-statistics=0  {db} > {output_path}/{db}_backup.sql"
     bash_command1 = f"mydumper --defaults-file={defaults_file} -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
@@ -73,19 +76,11 @@ def backup_tables(db, output_path, table_list):
     print(bash_command1)
     subprocess_cmd(bash_command1)
 
-# def upload_db_for_testing(config, db):
-#     cstr = get_connection_string(config, 'PROD_DB')
-#     engine = create_engine(cstr)
-#     q = f"create database archive_check_{db}"
-#     print(q)
-#     engine.execute(q)
-#     defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-#     bash_command = f"mysql --defaults-file={defaults_file} -f archive_check_{db} < {db}_backup.sql"
-#     print(bash_command)
-#     subprocess_cmd(bash_command)
-
 
 def upload_tables_for_testing(config, db, output_path, table_list):
+    print("--------------------------------------------------------------")
+    print("UPLOADING DATABASE BACKUPS FOR QA")
+    print("--------------------------------------------------------------")
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
     archive_db = f"archive_temp_{db}"
@@ -121,6 +116,9 @@ def upload_tables_for_testing(config, db, output_path, table_list):
 
 
 def query_for_all_tables_in_db(connection_string, temp):
+    print("--------------------------------------------------------------")
+    print("GETTING A LIST OF ALL TABLES")
+    print("--------------------------------------------------------------")
     engine = create_engine(connection_string)
     q = f"""
     select TABLE_NAME
@@ -133,6 +131,9 @@ def query_for_all_tables_in_db(connection_string, temp):
 
 
 def get_count_for_all_tables(connection_string, df, raise_exception=False):
+    print("--------------------------------------------------------------")
+    print("GETTING ROW COUNT FOR ALL TABLES")
+    print("--------------------------------------------------------------")
     if type(df)==str:
         all_tables = df.split(",")
     else:
@@ -197,7 +198,7 @@ def delete_tables(connection_string, db, table_list):
         print(f"DELETING Table {db}.{table}, Freeing-Up {table_data_raw['Size (GB)']} GB")
         total_size_freed = total_size_freed+table_data_raw['Size (GB)']
         engine.execute(delete_query)
-    delete_archive_db = f"drop database "f"archive_check_{db}"
+    delete_archive_db = f"drop database "f"archive_temp_{db}"
     print(delete_archive_db)
     engine.execute(delete_archive_db)
     print("--------------------------------------------------------------")
@@ -225,7 +226,7 @@ def compare_results_dfs(prod_count_df, backup_count_df):
 
 def clean_up_backups(db, output_path):
     bash_command1 = f"mkdir {output_path}/{db}"
-    bash_command2 = f"mv {db}.* {output_path}/{db}"
+    bash_command2 = f"mv {db}* {output_path}/{db}"
     for i in [bash_command1, bash_command2]:
         print(i)
         subprocess_cmd(i)
@@ -258,8 +259,8 @@ def run_database_archive(type):
     prod_data = query_for_all_tables_in_db(prod_connection_string, old_db)
     prod_count_df = get_count_for_all_tables(prod_connection_string, prod_data)
 
-    backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{old_db}", connection='DATABASE_SETUP')
-    backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_check_{old_db}")
+    backup_connection_string = get_unique_connection_string(config, database= f"archive_temp_{old_db}", connection='DATABASE_SETUP')
+    backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_temp_{old_db}")
     backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
 
     compare_results_dfs(prod_count_df, backup_count_df)
@@ -283,7 +284,7 @@ def run_table_archive(config_db, table_list, output_path):
     prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
     prod_count_df = get_count_for_all_tables(prod_connection_string, table_list)
 
-    backup_connection_string = get_unique_connection_string(config, database= f"archive_check_{db}", connection='DATABASE_SETUP')
+    backup_connection_string = get_unique_connection_string(config, database= f"archive_temp_{db}", connection='DATABASE_SETUP')
     backup_count_df = get_count_for_all_tables(backup_connection_string, table_list)
     compare_results_dfs(prod_count_df, backup_count_df)
     delete_tables(prod_connection_string, db, table_list)
