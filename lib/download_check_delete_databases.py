@@ -92,7 +92,8 @@ def upload_tables_for_testing(config, db, output_path, table_list):
     q = f"create database {archive_db}"
     print(q)
     engine.execute(q)
-    defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+    # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+    defaults_file = "resources/sql.conf"
     if isinstance(table_list, str):
         for table in table_list.split(","):
             # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
@@ -222,6 +223,13 @@ def compare_results_dfs(prod_count_df, backup_count_df):
         print("The archived DB is identical to the current production DB -- YAY --- :D")
 
 
+def clean_up_backups(db, output_path):
+    bash_command1 = f"mkdir {output_path}/{db}"
+    bash_command2 = f"mv {db}.* {output_path}/{db}"
+    for i in [bash_command1, bash_command2]:
+        print(i)
+        subprocess_cmd(i)
+
 def run_database_archive(type):
     # LOOPING THROUGH MANY
     # for i in range(0, 16):
@@ -258,7 +266,7 @@ def run_database_archive(type):
 
     # DELETE DB
     delete_databases(prod_connection_string, old_db)
-
+    clean_up_backups(old_db, output_path)
 
 def run_table_archive(config_db, table_list, output_path):
     # db = 'pregrant_publications'
