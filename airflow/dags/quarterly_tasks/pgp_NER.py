@@ -15,7 +15,7 @@ from updater.government_interest.simulate_manual import simulate_manual
 
 project_home = os.environ['PACKAGE_HOME']
 templates_searchpath = "{home}/resources".format(home=project_home)
-config = get_current_config(type='granted_patent', supplemental_configs=None, **get_today_dict())
+config = get_current_config(type='pgpubs', supplemental_configs=None, **get_today_dict())
 
 default_args = {
     'owner': 'smadhavan',
@@ -45,28 +45,26 @@ operator_settings = {
     'on_retry_callback': airflow_task_failure
 }
 
-## TODO: update operator arguments 
-db_args = {'doctype':'granted_patent','database':'PGPUBS_DATABASE'}
 
 ### GI Processing
 gi_NER = PythonOperator(task_id='gi_NER', python_callable=begin_NER_processing, 
-                        op_kwargs = {'doctype':'granted_patent','database':'PGPUBS_DATABASE'}, 
+                        op_kwargs = {'doctype':'pgpubs','database':'PGPUBS_DATABASE'}, 
                         **operator_settings)
                         
 gi_postprocess_NER = PythonOperator(task_id='postprocess_NER', python_callable=process_ner_to_manual,
-                                    op_kwargs = {'doctype':'granted_patent','database':'PGPUBS_DATABASE'}, 
+                                    op_kwargs = {'doctype':'pgpubs','database':'PGPUBS_DATABASE'}, 
                                     **operator_settings)
 
 manual_simulation_operator = PythonOperator(task_id='simulate_manual_task', python_callable=simulate_manual,
-                                            op_kwargs = {'doctype':'granted_patent'}, 
+                                            op_kwargs = {'doctype':'pgpubs'}, 
                                             **operator_settings)
 
 post_manual_operator = PythonOperator(task_id='post_manual', python_callable=process_post_manual,
-                                      op_kwargs = {'doctype':'granted_patent','database':'PGPUBS_DATABASE'}, 
+                                      op_kwargs = {'doctype':'pgpubs','database':'PGPUBS_DATABASE'}, 
                                       **operator_settings)
 
 gi_qc_operator = PythonOperator(task_id='GI_QC', python_callable=qc_gi,
-                                op_kwargs = {'doctype':'granted_patent'}, 
+                                op_kwargs = {'doctype':'pgpubs'}, 
                                 **operator_settings)
 
 chain_operators([gi_NER, gi_postprocess_NER, manual_simulation_operator, post_manual_operator, gi_qc_operator])
