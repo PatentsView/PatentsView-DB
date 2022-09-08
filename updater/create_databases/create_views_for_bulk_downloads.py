@@ -83,4 +83,4 @@ def update_view_date_ranges(config):
 			failed_updates.append(view)
 	
 	if len(failed_updates) > 0:
-		raise Exception(f"view creation/update failed for {len(failed_updates)} views:\n{'\n'.join(failed_updates)}")
+		raise Exception("view creation/update failed for {0} views:\n{1}".format(len(failed_updates), '\n'.join(failed_updates)))
