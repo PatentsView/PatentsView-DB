@@ -137,8 +137,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.f_key = ""
         self.exclusion_list = []
 
-    elif database_section == "patent" or (
-            class_called[:6] == 'Upload' and database_section[:6] == 'upload') or class_called == 'GovtInterestTester':
+    elif database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload'):
         self.exclusion_list = ['assignee',
                                'cpc_group',
                                'cpc_subgroup',
@@ -164,13 +163,13 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.p_key = "id"
         self.f_key = "patent_id"
 
-    elif (database_section == "pregrant_publications") or (
-            class_called[:6] == 'Upload' and database_section[:6] == 'pgpubs'):
+    elif (database_section == "pregrant_publications") or (class_called[:6] == 'Upload' and database_section[:6] == 'pgpubs'):
         # TABLES WITHOUT DOCUMENT_NUMBER ARE EXCLUDED FROM THE TABLE CONFIG
         self.central_entity = "publication"
         self.category = 'kind'
         self.exclusion_list = ['assignee',
                                'clean_rawlocation',
+                               'government_organization',
                                'inventor',
                                'location_assignee',
                                'location_inventor',
