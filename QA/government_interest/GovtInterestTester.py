@@ -50,7 +50,7 @@ FROM   `government_interest` gi
        LEFT JOIN {raw_db}.government_organization go
          ON go.`organization_id` = pg.organization_id
            inner join 
-           		(select {base_id} 
+           		(select p.{base_id} 
            		from {table_prefix} p
            		       Join `government_interest` gi on p.{base_id}=gi.{id_type}
            			   LEFT JOIN `{table_prefix}_govintorg` pg ON pg.{id_type} = p.{base_id}
