@@ -30,7 +30,7 @@ class GovtInterestTester(DatabaseTester):
         organization_wheres = {
                 "All Patents":     "go.`name` NOT LIKE '%United States Government%' and go.`name` is not null",
                 "US Govt Patents": "go.`name` LIKE '%United States Government%'",
-                "No Organization": "pg.`{id_type}` is null"
+                "No Organization": f"pg.`{self.id_type}` is null"
                 }
 
         where_combinations = itertools.product(date_where, organization_wheres.keys())
