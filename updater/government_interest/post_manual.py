@@ -189,7 +189,7 @@ def process_post_manual(doctype='granted_patent',database='TEMP_UPLOAD_DB', **kw
 
 def qc_gi(doctype='granted_patent', database='TEMP_UPLOAD_DB',**kwargs):
     config = get_current_config(type=doctype, **kwargs)
-    qc = GovtInterestTester(config, database=database)
+    qc = GovtInterestTester(config, database=database, id_type=('patent_id' if doctype =='granted_patent' else 'document_number'))
     qc.runTests()
 
 

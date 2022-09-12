@@ -30,7 +30,7 @@ class GovtInterestTester(DatabaseTester):
         organization_wheres = {
                 "All Patents":     "go.`name` NOT LIKE '%United States Government%' and go.`name` is not null",
                 "US Govt Patents": "go.`name` LIKE '%United States Government%'",
-                "No Organization": "pg.`patent_id` is null"
+                "No Organization": f"pg.`{self.id_type}` is null"
                 }
 
         where_combinations = itertools.product(date_where, organization_wheres.keys())
@@ -50,7 +50,7 @@ FROM   `government_interest` gi
        LEFT JOIN {raw_db}.government_organization go
          ON go.`organization_id` = pg.organization_id
            inner join 
-           		(select {base_id} 
+           		(select p.{base_id} 
            		from {table_prefix} p
            		       Join `government_interest` gi on p.{base_id}=gi.{id_type}
            			   LEFT JOIN `{table_prefix}_govintorg` pg ON pg.{id_type} = p.{base_id}
@@ -70,15 +70,16 @@ FROM   `government_interest` gi
                   id_type = self.id_type,
                   base_id = base_id)
             with self.connection.cursor() as gov_int_cursor:
+                print(sampler_query)
                 gov_int_cursor.execute(sampler_query)
                 for gov_int_row in gov_int_cursor:
                     self.qa_data['DataMonitor_govtinterestsampler'].append({
                             'sample_type':     where_combination_type,
                             "database_type":   self.database_type,
                             'update_version':  self.version,
-                            'patent_id':       gov_int_row[0],
+                            self.id_type:       gov_int_row[0],
                             'gov_int_stmt':    gov_int_row[1],
-                            'patent_contract_award_number':
+                            f'{table_prefix}_contract_award_number':
                                                gov_int_row[
                                                    4],
                             'organization_id': gov_int_row[2],
