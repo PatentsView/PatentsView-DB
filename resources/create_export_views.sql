@@ -497,6 +497,18 @@ select `pregrant_publications`.`government_interest`.`document_number` AS `docum
 from `pregrant_publications`.`government_interest` 
 where `pregrant_publications`.`government_interest`.`version_indicator` <= '{{datestring}}';
 
+CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`govinterest_contracts` AS 
+select `pc`.`document_number` AS `document_number`,
+`pc`.`contract_award_number` AS `contract_award_number` 
+from `pregrant_publications`.`publication_contractawardnumber` `pc` 
+where `pc`.`version_indicator` <= '{{datestring}}';
+
+CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`govinterest_org` AS 
+select `pg`.`document_number` AS `document_number`,
+`pg`.`organization_id` AS `organization_id` 
+from `pregrant_publications`.`publication_govintorg` `pg` 
+where `pg`.`version_indicator` <= '{{datestring}}';
+
 CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`granted_patent_crosswalk` AS 
 select `pregrant_publications`.`granted_patent_crosswalk`.`document_number` AS `document_number`,
 `pregrant_publications`.`granted_patent_crosswalk`.`patent_number` AS `patent_id`,
