@@ -9,6 +9,9 @@ from slack_sdk import WebClient
 from airflow.dags.granted_patent_parser.patentsview_data_updater import operator_settings
 from slack_sdk.errors import SlackApiError
 
+from reporting_database_generator.database import validate_query
+from QA.post_processing.ReportingDBTester import run_reporting_db_qa
+
 project_home = os.environ['PACKAGE_HOME']
 config = configparser.ConfigParser()
 config.read(project_home + '/config.ini')
@@ -22,8 +25,7 @@ if schema_only == "TRUE":
 else:
     schema_only = False
 
-from reporting_database_generator.database import validate_query
-from QA.post_processing.reporting_db_qa import check_reporting_db_row_count
+
 
 template_extension_config = [".sql"]
 database_name_config = {
@@ -569,8 +571,8 @@ rep_tbl_2 = SQLTemplatedPythonOperator(
     params=database_name_config
 )
 
-check_empty_table = PythonOperator(task_id='QA_check_empty_tables',
-                                          python_callable=check_reporting_db_row_count,
+reporting_db_qa = PythonOperator(task_id='reporting_DB_QA',
+                                          python_callable=run_reporting_db_qa,
                                           dag=reporting_db_dag
                                           )
 
@@ -652,4 +654,4 @@ idx_10.set_downstream(rep_tbl_2)
 idx_11.set_downstream(rep_tbl_2)
 idx_12.set_downstream(rep_tbl_2)
 
-check_empty_table.set_upstream(rep_tbl_2)
+reporting_db_qa.set_upstream(rep_tbl_2)

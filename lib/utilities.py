@@ -54,6 +54,8 @@ def load_table_config(config, db='patent'):
         table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_granted"]}'))
     elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
         table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'))
+    elif db == 'Reporting_DB':
+        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'))
     return table_config
 
 
@@ -187,13 +189,21 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.f_key = ""
         self.exclusion_list = []
 
+    elif class_called == 'ReportingDBTester':
+        self.table_config = load_table_config(config, db='Reporting_DB')
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
+        self.exclusion_list = []
+
         if database_section[:6] == 'upload' or database_section == 'patent_text':
             self.table_config = load_table_config(config, db=database_section)
 
         elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
             self.table_config = load_table_config(config, db=database_section)
-        else:
-            raise NotImplementedError
+    else:
+        raise NotImplementedError
 
 def update_to_granular_version_indicator(table, db):
     from lib.configuration import get_current_config, get_connection_string

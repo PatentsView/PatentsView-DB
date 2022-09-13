@@ -9,6 +9,8 @@ from lib.configuration import get_current_config, get_today_dict
 
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.create_databases.create_views_for_bulk_downloads import update_view_date_ranges
+from QA.post_processing.BulkDownloadsTesterGranted import run_bulk_downloads_qa
+from QA.post_processing.BulkDownloadsTesterPgpubs import run_bulk_downloads_qa as run_pgpubs_bulk_downloads_qa
 
 default_args = {
     'owner': 'smadhavan',
@@ -42,7 +44,14 @@ operator_settings = {
     'on_retry_callback': airflow_task_failure
 }
 
-update_max_vi = PythonOperator(task_id='update_max_vi', python_callable=update_view_date_ranges,
+update_max_vi = PythonOperator(task_id='update_bulk_downloads_views', python_callable=update_view_date_ranges,
                         **operator_settings)
 
-chain_operators([update_max_vi])
+qa_granted_bulk_downloads = PythonOperator(task_id='qa_bulk_downloads', python_callable=run_bulk_downloads_qa,
+                        **operator_settings)
+
+qa_pgpubs_bulk_downloads = PythonOperator(task_id='qa_bulk_downloads', python_callable=run_pgpubs_bulk_downloads_qa,
+                        **operator_settings)
+
+qa_granted_bulk_downloads.set_upstream(update_max_vi)
+qa_pgpubs_bulk_downloads.set_upstream(update_max_vi)

@@ -1,0 +1,954 @@
+{
+  "inventor_not_disambiguated": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "inventor_sequence": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "inventor_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "inventor_name_first": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "inventor_name_last": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "deceased_flag": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "rawlocation_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": 
+        ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "wipo": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "wipo_field_sequence": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "wipo_field_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "wipo_sector_title": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "wipo_field_title": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": 
+        ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "foreign_priority": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "priority_claim_sequence": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "priority_claim_kind": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "foreign_application_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "filing_date": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "foreign_country_filed": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "govinterest_org": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "varchar",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "organization_id": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "cpc_current": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_sequence": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_section": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_class": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_subclass": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_group": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_type": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_version_indicator": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_symbol_position": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_action_date": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "applicant_not_disambiguated": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "applicant_sequence": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "applicant_name_first": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "applicant_name_last": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "applicant_organization": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "applicant_type": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "applicant_designation": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "rawlocation_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "uspc_at_issue": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "uspc_sequence": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "uspc_mainclass_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "uspc_mainclass_title": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "uspc_subclass_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "uspc_subclass_title": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "granted_patent_crosswalk": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "patent_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "application_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "assignee_disambiguated": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_sequence": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_individual_name_first": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_individual_name_last": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_organization": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_type": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "location_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "ipcr": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "ipc_sequence": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "classification_level": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "section": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "ipc_class": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "subclass": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "main_group": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "subgroup": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "symbol_position": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "classification_value": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "classification_status": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "classification_data_source": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "action_date": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "ipc_version_indicator": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "assignee_not_disambiguated": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_sequence": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_individual_name_first": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_individual_name_last": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_organization": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "assignee_type": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "rawlocation_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "cpc_at_issue": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_sequence": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_version_indicator": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_section": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_class": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_subclass": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_group": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_symbol_position": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_type": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "cpc_action_date": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "inventor_disambiguated": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "inventor_sequence": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "inventor_id": {
+          "data_type": "varchar",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "inventor_name_first": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "inventor_name_last": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "male_flag": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "attribution_status": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "location_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "us_rel_doc": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "related_doc_number": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "published_country": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "related_doc_type": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "related_doc_kind": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "related_doc_published_date": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "related_doc_status": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "related_doc_sequence": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "wipo_kind": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "location_not_disambiguated": 
+    {
+      "fields": {
+        "rawlocation_id": {
+          "data_type": "varchar",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "location_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "city": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "state": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "country": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": true
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "rel_app_text": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "rel_app_text": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "govinterest_contracts": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "varchar",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "contract_award_number": {
+          "data_type": "varchar",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "govinterest": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "gi_statement": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "pct_data": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "published_filed_date": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "pct_371_date": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "pct_102_date": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "filed_country": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "application_kind": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "pct_doc_number": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "pct_doc_type": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "application": 
+    {
+      "fields": {
+        "document_number": {
+          "data_type": "int",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "application_id": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "filing_date": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "patent_type": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "filing_type": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "published_date": {
+          "data_type": "date",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "wipo_kind": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "series_code": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "application_title": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "application_abstract": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "rule_47_flag": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "filename": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  
+}
