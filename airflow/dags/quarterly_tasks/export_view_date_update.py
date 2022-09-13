@@ -29,7 +29,7 @@ templates_searchpath = "{home}/resources".format(home=project_home)
 config = get_current_config(type='granted_patent', supplemental_configs=None, **get_today_dict())
 
 view_date_updater = DAG(
-    dag_id='export_view_date_update',
+    dag_id='regenerate_bulk_downloads',
     default_args=default_args,
     description='update the maximum version indicator for the download export views',
     start_date=datetime(2022, 6, 30),
@@ -47,10 +47,10 @@ operator_settings = {
 update_max_vi = PythonOperator(task_id='update_bulk_downloads_views', python_callable=update_view_date_ranges,
                         **operator_settings)
 
-qa_granted_bulk_downloads = PythonOperator(task_id='qa_bulk_downloads', python_callable=run_bulk_downloads_qa,
+qa_granted_bulk_downloads = PythonOperator(task_id='qa_granted_bulk_downloads', python_callable=run_bulk_downloads_qa,
                         **operator_settings)
 
-qa_pgpubs_bulk_downloads = PythonOperator(task_id='qa_bulk_downloads', python_callable=run_pgpubs_bulk_downloads_qa,
+qa_pgpubs_bulk_downloads = PythonOperator(task_id='qa_pgpubs_bulk_downloads', python_callable=run_pgpubs_bulk_downloads_qa,
                         **operator_settings)
 
 qa_granted_bulk_downloads.set_upstream(update_max_vi)
