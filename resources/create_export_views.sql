@@ -50,6 +50,7 @@ where `a`.`version_indicator` <= '{{datestring}}';
 CREATE OR REPLACE VIEW `patentsview_exports_granted`.`attorney_disambiguated` AS 
 select `a`.`patent_id` AS `patent_id`,
 `a`.`sequence` AS `attorney_sequence`,
+`a`.`lawyer_id` as `attorney_id`,
 `b`.`name_first` AS `attorney_name_first`,
 `b`.`name_last` AS `attorney_name_last`,
 `b`.`organization` AS `attorney_organization`,
@@ -136,19 +137,19 @@ select `a`.`patent_id` AS `patent_id`,
 from `patent`.`foreign_priority` `a` 
 where `a`.`version_indicator` <= '{{datestring}}';
 
-CREATE OR REPLACE VIEW `patentsview_exports_granted`.`govinterest` AS 
+CREATE OR REPLACE VIEW `patentsview_exports_granted`.`gov_interest` AS 
 select `patent`.`government_interest`.`patent_id` AS `patent_id`,
 `patent`.`government_interest`.`gi_statement` AS `gi_statement` 
 from `patent`.`government_interest` 
 where `patent`.`government_interest`.`version_indicator` <= '{{datestring}}';
 
-CREATE OR REPLACE VIEW `patentsview_exports_granted`.`govinterest_contracts` AS 
+CREATE OR REPLACE VIEW `patentsview_exports_granted`.`gov_interest_contracts` AS 
 select `patent`.`patent_contractawardnumber`.`patent_id` AS `patent_id`,
 `patent`.`patent_contractawardnumber`.`contract_award_number` AS `contract_award_number` 
 from `patent`.`patent_contractawardnumber` 
 where `patent`.`patent_contractawardnumber`.`version_indicator` <= '{{datestring}}';
 
-CREATE OR REPLACE VIEW `patentsview_exports_granted`.`govinterest_org` AS 
+CREATE OR REPLACE VIEW `patentsview_exports_granted`.`gov_interest_org` AS 
 select `a`.`patent_id` AS `patent_id`,
 `a`.`organization_id` AS `gi_organization_id`,
 `b`.`name` AS `fedagency_name`,
@@ -491,23 +492,27 @@ row_number() over ( partition by `a`.`document_number` order by `a`.`date`) AS `
 from `pregrant_publications`.`foreign_priority` `a` 
 where `a`.`version_indicator` <= '{{datestring}}';
 
-CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`govinterest` AS 
+CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`gov_interest` AS 
 select `pregrant_publications`.`government_interest`.`document_number` AS `document_number`,
 `pregrant_publications`.`government_interest`.`gi_statement` AS `gi_statement` 
 from `pregrant_publications`.`government_interest` 
 where `pregrant_publications`.`government_interest`.`version_indicator` <= '{{datestring}}';
 
-CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`govinterest_contracts` AS 
+CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`gov_interest_contracts` AS 
 select `pc`.`document_number` AS `document_number`,
 `pc`.`contract_award_number` AS `contract_award_number` 
 from `pregrant_publications`.`publication_contractawardnumber` `pc` 
 where `pc`.`version_indicator` <= '{{datestring}}';
 
-CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`govinterest_org` AS 
-select `pg`.`document_number` AS `document_number`,
-`pg`.`organization_id` AS `organization_id` 
-from `pregrant_publications`.`publication_govintorg` `pg` 
-where `pg`.`version_indicator` <= '{{datestring}}';
+CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`gov_interest_org` AS 
+select    `pg`.`document_number` AS `document_number`,
+`pg`.`organization_id` AS `gi_organization_id`,
+`go`.`name` AS `fedagency_name`,
+`go`.`level_one` AS `level_one`,
+`go`.`level_two` AS `level_two`,
+`go`.`level_three` AS `level_three`
+FROM (`pregrant_publications`.`publication_govintorg` `pg` left join `patent`.`government_organization` `go` on(`pg`.`organization_id` = `go`.`organization_id`)) 
+where `pg`.`version_indicator` <= '2022-06-30';
 
 CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`granted_patent_crosswalk` AS 
 select `pregrant_publications`.`granted_patent_crosswalk`.`document_number` AS `document_number`,
