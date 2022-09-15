@@ -15,7 +15,7 @@ def run_bulk_downloads_qa():
     config = get_current_config('granted_patent', **{
                     "execution_date": datetime.date(2022, 6, 30)
                                 })
-    qc = BulkDownloadsTesterPgpubs(config)
+    qc = BulkDownloadsTesterGranted(config)
     qc.runTests()
 
 
