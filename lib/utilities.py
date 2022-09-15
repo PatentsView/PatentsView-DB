@@ -56,6 +56,10 @@ def load_table_config(config, db='patent'):
         table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'))
     elif db == 'Reporting_DB':
         table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'))
+    elif db == 'bulk_exp_granted':
+        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'))
+    elif db == 'bulk_exp_pgpubs':
+        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'))
     return table_config
 
 
@@ -197,11 +201,24 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.f_key = ""
         self.exclusion_list = []
 
+    elif class_called[:19] == 'BulkDownloadsTester':
+        if 'granted' in database_section:
+            self.table_config = load_table_config(config, db='bulk_exp_granted')
+        else:
+            self.table_config = load_table_config(config, db='bulk_exp_pgpubs')
+
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
+        self.exclusion_list = []
+
         if database_section[:6] == 'upload' or database_section == 'patent_text':
             self.table_config = load_table_config(config, db=database_section)
 
         elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
             self.table_config = load_table_config(config, db=database_section)
+
     else:
         raise NotImplementedError
 
