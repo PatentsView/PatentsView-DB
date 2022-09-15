@@ -476,9 +476,8 @@ select `pregrant_publications`.`cpc_current`.`document_number` AS `document_numb
 `pregrant_publications`.`cpc_current`.`group_id` AS `cpc_subclass`,
 `pregrant_publications`.`cpc_current`.`subgroup_id` AS `cpc_group`,
 `pregrant_publications`.`cpc_current`.`category` AS `cpc_type`,
-`pregrant_publications`.`cpc_current`.`version_indicator` AS `cpc_version_indicator`,
-`pregrant_publications`.`cpc_current`.`symbol_position` AS `cpc_symbol_position`,
-`pregrant_publications`.`cpc_current`.`version` AS `cpc_action_date` 
+`pregrant_publications`.`cpc_current`.`version` AS `cpc_version_indicator`,
+`pregrant_publications`.`cpc_current`.`symbol_position` AS `cpc_symbol_position`
 from `pregrant_publications`.`cpc_current` 
 where `pregrant_publications`.`cpc_current`.`version_indicator` <= '{{datestring}}';
 
