@@ -422,41 +422,6 @@
     },
     "TestScripts": ["GovtInterestTester"]
   },
-  "government_organization": {
-    "fields": {
-      "organization_id": {
-        "data_type": "int",
-        "null_allowed": false,
-        "category": false,
-        "location_field": false
-      },
-      "name": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "level_one": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "level_two": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "level_three": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "TestScripts": ["GovtInterestTester"]
-  },
   "publication_contractawardnumber": {
     "fields": {
       "document_number": {

@@ -211,3 +211,9 @@ INSERT INTO pregrant_publications.us_parties (id, document_number, name_first, n
 INSERT INTO pregrant_publications.uspc SELECT * FROM `{{source_database}}`.uspc;
 
 INSERT INTO pregrant_publications.usreldoc SELECT * FROM `{{source_database}}`.usreldoc;
+
+INSERT INTO pregrant_publications.government_interest SELECT * FROM `{{source_database}}`.government_interest;
+
+INSERT INTO pregrant_publications.publication_govintorg SELECT * FROM `{{source_database}}`.publication_govintorg;
+
+INSERT INTO pregrant_publications.publication_contractawardnumber SELECT * FROM `{{source_database}}`.publication_contractawardnumber;
