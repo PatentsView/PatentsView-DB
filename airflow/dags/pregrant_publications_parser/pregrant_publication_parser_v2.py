@@ -12,6 +12,10 @@ from updater.xml_to_sql.parser import begin_parsing
 from updater.xml_to_sql.post_processing import begin_post_processing
 
 from updater.disambiguation.location_disambiguation.generate_locationID import run_location_disambiguation, run_location_disambiguation_tests
+from updater.government_interest.NER import begin_NER_processing
+from updater.government_interest.NER_to_manual import process_ner_to_manual
+from updater.government_interest.post_manual import process_post_manual, qc_gi
+from updater.government_interest.simulate_manual import simulate_manual
 
 
 # QA STEPS
@@ -125,6 +129,43 @@ loc_disambiguation_qc = PythonOperator(task_id='loc_disambiguation_qc',
                                     on_failure_callback=airflow_task_failure
                                     )
 
+### GI Processing
+gi_NER = PythonOperator(task_id='gi_NER', 
+                        python_callable=begin_NER_processing,
+                        op_kwargs={'dbtype': 'pgpubs'},
+                        dag=app_xml_dag,
+                        on_success_callback=airflow_task_success,
+                        on_failure_callback=airflow_task_failure)
+
+gi_postprocess_NER = PythonOperator(task_id='postprocess_NER', 
+                                    python_callable=process_ner_to_manual,
+                                    op_kwargs={'dbtype': 'pgpubs'},
+                                    dag=app_xml_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure)
+
+manual_simulation_operator = PythonOperator(task_id='simulate_manual_task', 
+                                            python_callable=simulate_manual,
+                                            op_kwargs={'dbtype': 'pgpubs'},
+                                            dag=app_xml_dag,
+                                            on_success_callback=airflow_task_success,
+                                            on_failure_callback=airflow_task_failure)
+
+post_manual_operator = PythonOperator(task_id='post_manual', 
+                                    python_callable=process_post_manual,
+                                    op_kwargs={'dbtype': 'pgpubs'},
+                                    dag=app_xml_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure)
+
+gi_qc_operator = PythonOperator(task_id='GI_QC', 
+                                python_callable=qc_gi,
+                                op_kwargs={'dbtype': 'pgpubs'},
+                                dag=app_xml_dag,
+                                on_success_callback=airflow_task_success,
+                                on_failure_callback=airflow_task_failure)
+                                
+
 merge_database_operator = SQLTemplatedPythonOperator(
     task_id='merge_database',
     provide_context=True,
@@ -172,7 +213,7 @@ qc_merge_weekly_text_operator = PythonOperator(task_id='qc_text_merge_weekly',
                                          )
 
 # OTHER MISC TASKS TO BE RUN
-create_granted_patent_crosswalk = PythonOperator(task_id='create_granted_patent_crosswalk',
+create_crosswalk = PythonOperator(task_id='create_granted_patent_crosswalk',
                                                  dag=app_xml_dag,
                                                  provide_context=True,
                                                  on_success_callback=airflow_task_success,
@@ -201,7 +242,7 @@ loc_disambiguation_qc.set_upstream(loc_disambiguation)
 merge_database_operator.set_upstream(loc_disambiguation_qc)
 qc_merge_weekly_operator.set_upstream(merge_database_operator)
 qc_merge_weekly_text_operator.set_upstream(merge_database_operator)
-create_granted_patent_crosswalk.set_upstream(qc_merge_weekly_operator)
-create_granted_patent_crosswalk.set_upstream(qc_merge_weekly_text_operator)
-qa_granted_patent_crosswalk.set_upstream(create_granted_patent_crosswalk)
+create_crosswalk.set_upstream(qc_merge_weekly_operator)
+create_crosswalk.set_upstream(qc_merge_weekly_text_operator)
+qa_granted_patent_crosswalk.set_upstream(create_crosswalk)
 

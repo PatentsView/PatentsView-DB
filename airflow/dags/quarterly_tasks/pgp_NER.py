@@ -48,23 +48,23 @@ operator_settings = {
 
 ### GI Processing
 gi_NER = PythonOperator(task_id='gi_NER', python_callable=begin_NER_processing, 
-                        op_kwargs = {'doctype':'pgpubs','database':'PGPUBS_DATABASE'}, 
+                        op_kwargs = {'dbtype':'pgpubs','database':'PGPUBS_DATABASE'}, 
                         **operator_settings)
                         
 gi_postprocess_NER = PythonOperator(task_id='postprocess_NER', python_callable=process_ner_to_manual,
-                                    op_kwargs = {'doctype':'pgpubs'}, 
+                                    op_kwargs = {'dbtype':'pgpubs'}, 
                                     **operator_settings)
 
 manual_simulation_operator = PythonOperator(task_id='simulate_manual_task', python_callable=simulate_manual,
-                                            op_kwargs = {'doctype':'pgpubs'}, 
+                                            op_kwargs = {'dbtype':'pgpubs'}, 
                                             **operator_settings)
 
 post_manual_operator = PythonOperator(task_id='post_manual', python_callable=process_post_manual,
-                                      op_kwargs = {'doctype':'pgpubs','database':'PGPUBS_DATABASE'}, 
+                                      op_kwargs = {'dbtype':'pgpubs','database':'PGPUBS_DATABASE'}, 
                                       **operator_settings)
 
 gi_qc_operator = PythonOperator(task_id='GI_QC', python_callable=qc_gi,
-                                op_kwargs = {'doctype':'pgpubs','database':'PGPUBS_DATABASE'}, 
+                                op_kwargs = {'dbtype':'pgpubs','database':'PGPUBS_DATABASE'}, 
                                 **operator_settings)
 
 chain_operators([gi_NER, gi_postprocess_NER, manual_simulation_operator, post_manual_operator, gi_qc_operator])
