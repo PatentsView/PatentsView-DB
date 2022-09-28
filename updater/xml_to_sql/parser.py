@@ -5,6 +5,7 @@ import multiprocessing as mp
 import os
 import pprint
 import re
+from textwrap import indent
 import time
 # import datetime
 from datetime import datetime, date
@@ -265,6 +266,8 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                     if tab['table_name'] == 'usreldoc_single' and field_element.tag == 'related-publication':
                         data_list = {}
                         break
+            if field['field_name'] == 'gi_statement' and data_list[field["field_name"]] is not None and len(data_list[field["field_name"]]) > 0:
+                data_list[field["field_name"]] = re.sub('[\n\r]',' ',data_list[field["field_name"]])
     return data_list
 
 
@@ -428,11 +431,14 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                 # Add the data to the proper dataframe
                 try:
                     for table_name, extracted_data in data:
-                        if len(table_name) > 0:
-                            current_data_frame = pd.DataFrame(extracted_data)
-                            dfs[table_name] = dfs[table_name].append(current_data_frame)
-                        else:
+                        if not len(table_name) > 0:
                             continue
+                        else:
+                            current_data_frame = pd.DataFrame(extracted_data)
+                            if table_name == 'government_interest':
+                                narows = current_data_frame['gi_statement'].str.contains(pat='not applicable', case=False)
+                                current_data_frame.drop(index=narows, inplace=True)
+                            dfs[table_name] = dfs[table_name].append(current_data_frame)
                 except IndexError as e:
                     log_queue.put(
                             {
