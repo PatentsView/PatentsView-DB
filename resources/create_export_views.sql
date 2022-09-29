@@ -15,7 +15,7 @@ select `a`.`id` AS `application_id`,
 `a`.`patent_id` AS `patent_id`,
 `a`.`type` AS `patent_application_type`,
 `a`.`date` AS `filing_date`,
-NULL AS `series_code`,
+`a`.`series_code_transformed_from_type` AS `series_code`,
 `b`.`rule_47_flag` AS `rule_47_flag` 
 from (`patent`.`application` `a` left join (select `patent`.`rawinventor`.`patent_id` AS `patent_id`,
 max(case when `patent`.`rawinventor`.`rule_47` in ('1','TRUE') then 1 else 0 end) AS `rule_47_flag` 
@@ -120,7 +120,7 @@ where `patent`.`figures`.`version_indicator` <= '{{datestring}}';
 CREATE OR REPLACE VIEW `patentsview_exports_granted`.`foreign_citation` AS 
 select `patent`.`foreigncitation`.`patent_id` AS `patent_id`,
 `patent`.`foreigncitation`.`sequence` AS `citation_sequence`,
-`patent`.`foreigncitation`.`number` AS `citation_application_id`,
+`patent`.`foreigncitation`.`number` AS `citation_number`,
 `patent`.`foreigncitation`.`date` AS `citation_date`,
 `patent`.`foreigncitation`.`category` AS `citation_category`,
 `patent`.`foreigncitation`.`country` AS `citation_country` 
@@ -244,7 +244,7 @@ where `patent`.`patent`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE VIEW `patentsview_exports_granted`.`pct_data` AS 
 select `a`.`patent_id` AS `patent_id`,
-`a`.`date` AS `published_filed_date`,
+`a`.`date` AS `published_or_filed_date`,
 `a`.`371_date` AS `pct_371_date`,
 `a`.`102_date` AS `pct_102_date`,
 `a`.`country` AS `filed_country`,
@@ -572,7 +572,7 @@ where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`pct_data` AS 
 select `a`.`document_number` AS `document_number`,
-`a`.`date` AS `published_filed_date`,
+`a`.`date` AS `published_or_filed_date`,
 `a`.`us_371c124_date` AS `pct_371_date`,
 `a`.`us_371c12_date` AS `pct_102_date`,
 `a`.`country` AS `filed_country`,
