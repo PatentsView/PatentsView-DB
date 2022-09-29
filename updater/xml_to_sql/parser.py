@@ -500,18 +500,19 @@ def get_filenames_to_parse(config, type='granted_patent'):
     end_date_string = '{}'.format(config['DATES']['END_DATE'])
     end_date = datetime.strptime(end_date_string, '%Y%m%d')
     for file_name in os.listdir(xml_directory):
-        print(file_name)
+        # print(file_name)
         if file_name.endswith(".xml"):
             file_date_string = re.match(".*([0-9]{6}).*", file_name).group(1)
             file_date = datetime.strptime(file_date_string, '%y%m%d')
 
             # file_date = file_name.split("_")[-1].split(".")[0]
             # file_date = file_name[3:-4]
-            print(file_date)
-            print(start_date)
-            print(end_date)
+            # print(file_date)
+            # print(start_date)
+            # print(end_date)
             if start_date <= file_date <= end_date:
                 xml_files.append(xml_directory + "/" + file_name)
+    print(f"files identified for parsing: {xml_files}")
 
     return xml_files
 
