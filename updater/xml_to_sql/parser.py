@@ -328,6 +328,9 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
+        if df == 'government_interest':
+            narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
+            dfs[df].drop(index=narows, inplace=True)
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         try:
             dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
@@ -435,9 +438,6 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                             continue
                         else:
                             current_data_frame = pd.DataFrame(extracted_data)
-                            if table_name == 'government_interest':
-                                narows = current_data_frame['gi_statement'].str.contains(pat='not applicable', case=False)
-                                current_data_frame.drop(index=narows, inplace=True)
                             dfs[table_name] = dfs[table_name].append(current_data_frame)
                 except IndexError as e:
                     log_queue.put(
