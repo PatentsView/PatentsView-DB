@@ -164,7 +164,7 @@ gi_qc_operator = PythonOperator(task_id='GI_QC',
                                 dag=app_xml_dag,
                                 on_success_callback=airflow_task_success,
                                 on_failure_callback=airflow_task_failure)
-                                
+
 
 merge_database_operator = SQLTemplatedPythonOperator(
     task_id='merge_database',
@@ -239,7 +239,12 @@ integrity_check_operator.set_upstream(qc_upload_operator)
 integrity_check_operator.set_upstream(qc_text_upload_operator)
 loc_disambiguation.set_upstream(integrity_check_operator)
 loc_disambiguation_qc.set_upstream(loc_disambiguation)
-merge_database_operator.set_upstream(loc_disambiguation_qc)
+gi_NER.set_upstream(loc_disambiguation_qc)
+gi_postprocess_NER.set_upstream(gi_NER)
+manual_simulation_operator.set_upstream(gi_postprocess_NER)
+post_manual_operator.set_upstream(manual_simulation_operator)
+gi_qc_operator.set_upstream(post_manual_operator)
+merge_database_operator.set_upstream(gi_qc_operator)
 qc_merge_weekly_operator.set_upstream(merge_database_operator)
 qc_merge_weekly_text_operator.set_upstream(merge_database_operator)
 create_crosswalk.set_upstream(qc_merge_weekly_operator)
