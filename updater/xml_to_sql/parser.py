@@ -331,6 +331,7 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
         if df == 'government_interest':
             narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
             dfs[df].drop(index=narows, inplace=True)
+            dfs[df]['gi_statement'] = dfs[df]['gi_statement'].str.strip()
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         try:
             dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
