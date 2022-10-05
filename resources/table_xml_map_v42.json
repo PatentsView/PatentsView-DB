@@ -1155,8 +1155,8 @@
       "filename": "rel_app_text.tsv"
     },
 {
-      "table_name": "claim",
-      "friendly_name": "Claim",
+      "table_name": "claims",
+      "friendly_name": "Claims",
       "multi_valued": true,
       "entity_root_path": "claims/",
       "fields": [
