@@ -172,7 +172,7 @@ def create_location_match_table(config):
     es_hostname = config['ELASTICSEARCH']['HOST']
     es_username = config['ELASTICSEARCH']['USER']
     es_password = config['ELASTICSEARCH']['PASSWORD']
-    es_con = Elasticsearch(hosts=es_hostname, http_auth=(es_username, es_password))
+    es_con = Elasticsearch(hosts=es_hostname, http_auth=(es_username, es_password), timeout=15)
 
     locations_to_search = pd.read_sql(f"SELECT id, city, state, country FROM rawlocation", con=engine)
     matched_data = match_locations(locations_to_search, es_con)
