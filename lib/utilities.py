@@ -64,6 +64,7 @@ def load_table_config(config, db='patent'):
 
 
 def get_relevant_attributes(self, class_called, database_section, config):
+    print(f"assigning class variables based on class {class_called} and database section {database_section}.")
     if class_called == "AssigneePostProcessingQC":
         self.database_section = database_section
         self.table_config = load_table_config(config, db='patent')
@@ -200,6 +201,12 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.p_key = ""
         self.f_key = ""
         self.exclusion_list = []
+        if database_section[:6] == 'upload' or database_section == 'patent_text':
+            self.table_config = load_table_config(config, db=database_section)
+        elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
+            self.table_config = load_table_config(config, db=database_section)
+        else:
+            raise NotImplementedError
 
     elif class_called[:19] == 'BulkDownloadsTester':
         if 'granted' in database_section:
@@ -212,12 +219,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.p_key = ""
         self.f_key = ""
         self.exclusion_list = []
-
-        if database_section[:6] == 'upload' or database_section == 'patent_text':
-            self.table_config = load_table_config(config, db=database_section)
-
-        elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
-            self.table_config = load_table_config(config, db=database_section)
 
     else:
         raise NotImplementedError
