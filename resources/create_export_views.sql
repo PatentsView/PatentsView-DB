@@ -1,9 +1,9 @@
 CREATE OR REPLACE VIEW `patentsview_exports_granted`.`g_applicant_not_disambiguated` AS 
 select `a`.`patent_id` AS `patent_id`,
 `a`.`sequence` AS `applicant_sequence`,
-`a`.`fname` AS `applicant_name_first`,
-`a`.`lname` AS `applicant_name_last`,
-`a`.`organization` AS `applicant_organization`,
+`a`.`fname` AS `raw_applicant_name_first`,
+`a`.`lname` AS `raw_applicant_name_last`,
+`a`.`organization` AS `raw_applicant_organization`,
 `a`.`applicant_type` AS `applicant_type`,
 `a`.`designation` AS `applicant_designation`,
 `a`.`rawlocation_id` AS `rawlocation_id` 
@@ -28,9 +28,9 @@ CREATE OR REPLACE VIEW `patentsview_exports_granted`.`g_assignee_disambiguated` 
 select `a`.`patent_id` AS `patent_id`,
 `a`.`sequence` AS `assignee_sequence`,
 `a`.`assignee_id` AS `assignee_id`,
-`b`.`name_first` AS `assignee_individual_name_first`,
-`b`.`name_last` AS `assignee_individual_name_last`,
-`b`.`organization` AS `assignee_organization`,
+`b`.`name_first` AS `disambig_assignee_individual_name_first`,
+`b`.`name_last` AS `disambig_assignee_individual_name_last`,
+`b`.`organization` AS `disambig_assignee_organization`,
 `b`.`type` AS `assignee_type`,
 `c`.`location_id` AS `location_id` 
 from ((`patent`.`rawassignee` `a` 
@@ -42,9 +42,9 @@ CREATE OR REPLACE VIEW `patentsview_exports_granted`.`g_assignee_not_disambiguat
 select `a`.`patent_id` AS `patent_id`,
 `a`.`sequence` AS `assignee_sequence`,
 `a`.`assignee_id` AS `assignee_id`,
-`a`.`name_first` AS `assignee_individual_name_first`,
-`a`.`name_last` AS `assignee_individual_name_last`,
-`a`.`organization` AS `assignee_organization`,
+`a`.`name_first` AS `raw_assignee_individual_name_first`,
+`a`.`name_last` AS `raw_assignee_individual_name_last`,
+`a`.`organization` AS `raw_assignee_organization`,
 `a`.`type` AS `assignee_type`,
 `a`.`rawlocation_id` AS `rawlocation_id` 
 from `patent`.`rawassignee` `a` 
@@ -54,9 +54,9 @@ CREATE OR REPLACE VIEW `patentsview_exports_granted`.`g_attorney_disambiguated` 
 select `a`.`patent_id` AS `patent_id`,
 `a`.`sequence` AS `attorney_sequence`,
 `a`.`lawyer_id` AS `attorney_id`,
-`b`.`name_first` AS `attorney_name_first`,
-`b`.`name_last` AS `attorney_name_last`,
-`b`.`organization` AS `attorney_organization`,
+`b`.`name_first` AS `disambig_attorney_name_first`,
+`b`.`name_last` AS `disambig_attorney_name_last`,
+`b`.`organization` AS `disambig_attorney_organization`,
 `b`.`country` AS `attorney_country` 
 from (`patent`.`patent_lawyer` `a` 
 join `patent`.`lawyer` `b` on(`a`.`lawyer_id` = `b`.`id`)) 
@@ -66,9 +66,9 @@ CREATE OR REPLACE VIEW `patentsview_exports_granted`.`g_attorney_not_disambiguat
 select `patent`.`rawlawyer`.`lawyer_id` AS `attorney_id`,
 `patent`.`rawlawyer`.`sequence` AS `attorney_sequence`,
 `patent`.`rawlawyer`.`patent_id` AS `patent_id`,
-`patent`.`rawlawyer`.`name_first` AS `attorney_name_first`,
-`patent`.`rawlawyer`.`name_last` AS `attorney_name_last`,
-`patent`.`rawlawyer`.`organization` AS `attorney_organization`,
+`patent`.`rawlawyer`.`name_first` AS `raw_attorney_name_first`,
+`patent`.`rawlawyer`.`name_last` AS `raw_attorney_name_last`,
+`patent`.`rawlawyer`.`organization` AS `raw_attorney_organization`,
 `patent`.`rawlawyer`.`country` AS `attorney_country` 
 from `patent`.`rawlawyer` 
 where `patent`.`rawlawyer`.`version_indicator` <= '{{datestring}}';
@@ -105,8 +105,8 @@ join `patent`.`cpc_subsection` `c` on(left(`b`.`id`, 3) = `c`.`id`));
 
 CREATE OR REPLACE VIEW `patentsview_exports_granted`.`g_examiner_not_disambiguated` AS 
 select `patent`.`rawexaminer`.`patent_id` AS `patent_id`,
-`patent`.`rawexaminer`.`name_first` AS `examiner_name_first`,
-`patent`.`rawexaminer`.`name_last` AS `examiner_name_last`,
+`patent`.`rawexaminer`.`name_first` AS `raw_examiner_name_first`,
+`patent`.`rawexaminer`.`name_last` AS `raw_examiner_name_last`,
 `patent`.`rawexaminer`.`role` AS `examiner_role`,
 `patent`.`rawexaminer`.`group` AS `art_group` 
 from `patent`.`rawexaminer` 
@@ -206,9 +206,9 @@ where `patent`.`ipcr`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE VIEW `patentsview_exports_granted`.`g_location_disambiguated` AS 
 select `location`.`id` AS `location_id`,
-`location`.`city` AS `city`,
-`location`.`state` AS `state`,
-`location`.`country` AS `country`,
+`location`.`city` AS `disambig_city`,
+`location`.`state` AS `disambig_state`,
+`location`.`country` AS `disambig_country`,
 `location`.`latitude` AS `latitude`,
 `location`.`longitude` AS `longitude`,
 `location`.`county` AS `county`,
@@ -220,9 +220,9 @@ where `location`.`version_indicator` <= '{{datestring}}';
 CREATE OR REPLACE VIEW `patentsview_exports_granted`.`g_location_not_disambiguated` AS 
 select `a`.`id` AS `rawlocation_id`,
 `a`.`location_id` AS `location_id`,
-`a`.`city` AS `city`,
-`a`.`state` AS `state`,
-`a`.`country` AS `country` 
+`a`.`city` AS `raw_city`,
+`a`.`state` AS `raw_state`,
+`a`.`country` AS `raw_country` 
 from `patent`.`rawlocation` `a` 
 where `a`.`version_indicator` <= '{{datestring}}';
 
@@ -414,9 +414,9 @@ where `a`.`version_indicator` <= '{{datestring}}';
 CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`pg_applicant_not_disambiguated` AS 
 select `a`.`document_number` AS `pgpub_id`,
 `a`.`sequence` AS `applicant_sequence`,
-`a`.`name_first` AS `applicant_name_first`,
-`a`.`name_last` AS `applicant_name_last`,
-`a`.`organization` AS `applicant_organization`,
+`a`.`name_first` AS `raw_applicant_name_first`,
+`a`.`name_last` AS `raw_applicant_name_last`,
+`a`.`organization` AS `raw_applicant_organization`,
 `a`.`type` AS `applicant_type`,
 `a`.`designation` AS `applicant_designation`,
 `a`.`rawlocation_id` AS `rawlocation_id` 
@@ -427,9 +427,9 @@ CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`pg_assignee_disambiguated
 select `a`.`document_number` AS `pgpub_id`,
 `a`.`sequence` AS `assignee_sequence`,
 `a`.`assignee_id` AS `assignee_id`,
-`b`.`name_first` AS `assignee_individual_name_first`,
-`b`.`name_last` AS `assignee_individual_name_last`,
-`b`.`organization` AS `assignee_organization`,
+`b`.`name_first` AS `disambig_assignee_individual_name_first`,
+`b`.`name_last` AS `disambig_assignee_individual_name_last`,
+`b`.`organization` AS `disambig_assignee_organization`,
 `b`.`type` AS `assignee_type`,
 `c`.`location_id` AS `location_id` 
 from ((`pregrant_publications`.`rawassignee` `a` 
@@ -441,9 +441,9 @@ CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`pg_assignee_not_disambigu
 select `a`.`document_number` AS `pgpub_id`,
 `a`.`sequence` AS `assignee_sequence`,
 `a`.`assignee_id` AS `assignee_id`,
-`a`.`name_first` AS `assignee_individual_name_first`,
-`a`.`name_last` AS `assignee_individual_name_last`,
-`a`.`organization` AS `assignee_organization`,
+`a`.`name_first` AS `raw_assignee_individual_name_first`,
+`a`.`name_last` AS `raw_assignee_individual_name_last`,
+`a`.`organization` AS `raw_assignee_organization`,
 `a`.`type` AS `assignee_type`,
 `a`.`rawlocation_id` AS `rawlocation_id` 
 from `pregrant_publications`.`rawassignee` `a` 
@@ -561,9 +561,9 @@ where `pregrant_publications`.`ipcr`.`version_indicator` <= '{{datestring}}';
 CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`pg_location_not_disambiguated` AS 
 select `a`.`id` AS `rawlocation_id`,
 `a`.`location_id` AS `location_id`,
-`a`.`city` AS `city`,
-`a`.`state` AS `state`,
-`a`.`country` AS `country` 
+`a`.`city` AS `raw_city`,
+`a`.`state` AS `raw_state`,
+`a`.`country` AS `raw_country` 
 from `pregrant_publications`.`rawlocation` `a` 
 where `a`.`version_indicator` <= '{{datestring}}';
 
