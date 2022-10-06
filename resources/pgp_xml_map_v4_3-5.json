@@ -8,7 +8,6 @@
   "table_xml_map": [
     {
       "table_name": "government_interest",
-      "table_prefix": "government_interest",
       "friendly_name": "Government Interest",
       "multi_valued": false,
       "fields": [
