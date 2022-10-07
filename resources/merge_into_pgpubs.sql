@@ -300,8 +300,11 @@ INSERT INTO pregrant_publications.uspc SELECT * FROM `{{source_database}}`.uspc;
 
 INSERT INTO pregrant_publications.usreldoc SELECT * FROM `{{source_database}}`.usreldoc;
 
-INSERT INTO pregrant_publications.government_interest SELECT * FROM `{{source_database}}`.government_interest;
+INSERT INTO pregrant_publications.government_interest (`document_number`,`gi_statement`,`version_indicator`,`created_date`,`updated_date`) 
+    SELECT `document_number`,`gi_statement`,`version_indicator`,`created_date`,`updated_date` FROM `{{source_database}}`.government_interest;
 
-INSERT INTO pregrant_publications.publication_govintorg SELECT * FROM `{{source_database}}`.publication_govintorg;
+INSERT INTO pregrant_publications.publication_govintorg (`document_number`,`organization_id`,`version_indicator`,`created_date`,`updated_date`) 
+    SELECT `document_number`,`organization_id`,`version_indicator`,`created_date`,`updated_date` FROM `{{source_database}}`.publication_govintorg;
 
-INSERT INTO pregrant_publications.publication_contractawardnumber SELECT * FROM `{{source_database}}`.publication_contractawardnumber;
+INSERT INTO pregrant_publications.publication_contractawardnumber (`document_number`,`contract_award_number`,`version_indicator`,`created_date`,`updated_date`) 
+    SELECT `document_number`,`contract_award_number`,`version_indicator`,`created_date`,`updated_date` FROM `{{source_database}}`.publication_contractawardnumber;
