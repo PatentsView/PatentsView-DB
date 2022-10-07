@@ -52,49 +52,49 @@ INSERT INTO pgpubs_text.brf_sum_text_2002 SELECT * FROM `{{source_database}}`.br
 
 INSERT INTO pgpubs_text.brf_sum_text_2001 SELECT * FROM `{{source_database}}`.brf_sum_text_2001;
 
-INSERT INTO pgpubs_text.claim_2022 SELECT * FROM `{{source_database}}`.claim_2022;
+INSERT INTO pgpubs_text.claims_2022 SELECT * FROM `{{source_database}}`.claims_2022;
 
-INSERT INTO pgpubs_text.claim_2021 (id, document_number, text, sequence, dependent, filename, version_indicator, num) SELECT id, document_number, text, sequence, dependent, filename, version_indicator, num FROM `{{source_database}}`.claim_2021;
+INSERT INTO pgpubs_text.claims_2021 (id, document_number, text, sequence, dependent, filename, version_indicator, num) SELECT id, document_number, text, sequence, dependent, filename, version_indicator, num FROM `{{source_database}}`.claims_2021;
 
-INSERT INTO pgpubs_text.claim_2020 SELECT * FROM `{{source_database}}`.claim_2020;
+INSERT INTO pgpubs_text.claims_2020 SELECT * FROM `{{source_database}}`.claims_2020;
 
-INSERT INTO pgpubs_text.claim_2019 SELECT * FROM `{{source_database}}`.claim_2019;
+INSERT INTO pgpubs_text.claims_2019 SELECT * FROM `{{source_database}}`.claims_2019;
 
-INSERT INTO pgpubs_text.claim_2018 SELECT * FROM `{{source_database}}`.claim_2018;
+INSERT INTO pgpubs_text.claims_2018 SELECT * FROM `{{source_database}}`.claims_2018;
 
-INSERT INTO pgpubs_text.claim_2017 SELECT * FROM `{{source_database}}`.claim_2017;
+INSERT INTO pgpubs_text.claims_2017 SELECT * FROM `{{source_database}}`.claims_2017;
 
-INSERT INTO pgpubs_text.claim_2016 SELECT * FROM `{{source_database}}`.claim_2016;
+INSERT INTO pgpubs_text.claims_2016 SELECT * FROM `{{source_database}}`.claims_2016;
 
-INSERT INTO pgpubs_text.claim_2015 SELECT * FROM `{{source_database}}`.claim_2015;
+INSERT INTO pgpubs_text.claims_2015 SELECT * FROM `{{source_database}}`.claims_2015;
 
-INSERT INTO pgpubs_text.claim_2014 SELECT * FROM `{{source_database}}`.claim_2014;
+INSERT INTO pgpubs_text.claims_2014 SELECT * FROM `{{source_database}}`.claims_2014;
 
-INSERT INTO pgpubs_text.claim_2013 SELECT * FROM `{{source_database}}`.claim_2013;
+INSERT INTO pgpubs_text.claims_2013 SELECT * FROM `{{source_database}}`.claims_2013;
 
-INSERT INTO pgpubs_text.claim_2012 SELECT * FROM `{{source_database}}`.claim_2012;
+INSERT INTO pgpubs_text.claims_2012 SELECT * FROM `{{source_database}}`.claims_2012;
 
-INSERT INTO pgpubs_text.claim_2011 SELECT * FROM `{{source_database}}`.claim_2011;
+INSERT INTO pgpubs_text.claims_2011 SELECT * FROM `{{source_database}}`.claims_2011;
 
-INSERT INTO pgpubs_text.claim_2010 SELECT * FROM `{{source_database}}`.claim_2010;
+INSERT INTO pgpubs_text.claims_2010 SELECT * FROM `{{source_database}}`.claims_2010;
 
-INSERT INTO pgpubs_text.claim_2009 SELECT * FROM `{{source_database}}`.claim_2009;
+INSERT INTO pgpubs_text.claims_2009 SELECT * FROM `{{source_database}}`.claims_2009;
 
-INSERT INTO pgpubs_text.claim_2008 SELECT * FROM `{{source_database}}`.claim_2008;
+INSERT INTO pgpubs_text.claims_2008 SELECT * FROM `{{source_database}}`.claims_2008;
 
-INSERT INTO pgpubs_text.claim_2007 SELECT * FROM `{{source_database}}`.claim_2007;
+INSERT INTO pgpubs_text.claims_2007 SELECT * FROM `{{source_database}}`.claims_2007;
 
-INSERT INTO pgpubs_text.claim_2006 SELECT * FROM `{{source_database}}`.claim_2006;
+INSERT INTO pgpubs_text.claims_2006 SELECT * FROM `{{source_database}}`.claims_2006;
 
-INSERT INTO pgpubs_text.claim_2005 SELECT * FROM `{{source_database}}`.claim_2005;
+INSERT INTO pgpubs_text.claims_2005 SELECT * FROM `{{source_database}}`.claims_2005;
 
-INSERT INTO pgpubs_text.claim_2004 SELECT * FROM `{{source_database}}`.claim_2004;
+INSERT INTO pgpubs_text.claims_2004 SELECT * FROM `{{source_database}}`.claims_2004;
 
-INSERT INTO pgpubs_text.claim_2003 SELECT * FROM `{{source_database}}`.claim_2003;
+INSERT INTO pgpubs_text.claims_2003 SELECT * FROM `{{source_database}}`.claims_2003;
 
-INSERT INTO pgpubs_text.claim_2002 SELECT * FROM `{{source_database}}`.claim_2002;
+INSERT INTO pgpubs_text.claims_2002 SELECT * FROM `{{source_database}}`.claims_2002;
 
-INSERT INTO pgpubs_text.claim_2001 SELECT * FROM `{{source_database}}`.claim_2001;
+INSERT INTO pgpubs_text.claims_2001 SELECT * FROM `{{source_database}}`.claims_2001;
 
 INSERT INTO pregrant_publications.cpc SELECT * FROM `{{source_database}}`.cpc;
 
