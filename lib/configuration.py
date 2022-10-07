@@ -140,9 +140,10 @@ def get_today_dict(type='granted_patent', from_date=datetime.date.today()):
 
 def get_table_config(update_config):
     project_home = os.environ['PACKAGE_HOME']
-    resources_file = "{root}/{resources}/raw_db_tables.json".format(root=project_home,
-                                                                    resources=update_config["FOLDERS"][
-                                                                        "resources_folder"])
+    dbtype = 'pgpubs' if update_config["PATENTSVIEW_DATABASES"]['PROD_DB']=='pregrant_publications' else 'patent'
+    resources_file = "{root}/{resources}/raw_db_tables_{dbtype}.json".format(root=project_home,
+                                                                    resources=update_config["FOLDERS"]["resources_folder"],
+                                                                    dbtype=dbtype)
     raw_db_table_settings = json.load(open(resources_file))
     return raw_db_table_settings
 

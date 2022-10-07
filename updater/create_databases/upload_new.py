@@ -62,15 +62,15 @@ def setup_database(update_config, drop=True, cpc_only=False):
         con = engine.connect()
         if drop:
             con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
-        if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee'] and raw_database=='patent':
-            query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211230', table)
-            print(query)
-            con.execute(query)
-        else:
-            query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
-            print(query)
-            con.execute(query)
-            con.close()
+        # if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee'] and raw_database=='patent':
+        #     query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211230', table)
+        #     print(query)
+        #     con.execute(query)
+        # else:
+        query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
+        print(query)
+        con.execute(query)
+        con.close()
         engine.dispose()
 
 
@@ -87,9 +87,9 @@ def generate_timestamp_uploads(update_config):
                                      version_indicator=update_config['DATES']['END_DATE'])
 
 
-def begin_database_setup(**kwargs):
+def begin_database_setup(dbtype='granted_patent' , **kwargs):
     from lib.configuration import get_current_config
-    config = get_current_config('granted_patent', **kwargs)
+    config = get_current_config(dbtype, **kwargs)
     setup_database(config)
 
 

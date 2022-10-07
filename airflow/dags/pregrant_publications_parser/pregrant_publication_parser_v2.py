@@ -19,7 +19,7 @@ from updater.government_interest.simulate_manual import simulate_manual
 
 
 # QA STEPS
-from updater.create_databases.upload_new import post_upload_pgpubs
+from updater.create_databases.upload_new import begin_database_setup, post_upload_pgpubs
 from updater.create_databases.rename_db import check_pgpubs_prod_integrity, qc_database_pgpubs
 from updater.create_databases.merge_in_new_data import post_merge_weekly_pgpubs, post_merge_quarterly_pgpubs, begin_text_merging_pgpubs
 from updater.create_databases.other_misc_tasks import create_granted_patent_crosswalk
@@ -62,8 +62,15 @@ app_xml_dag = DAG(
     # schedule_interval=None
 )
 
+# create_database_operator = PythonOperator(task_id='create_pgpubs_database',
+#                                           python_callable=create_database,
+#                                           dag=app_xml_dag,
+#                                           on_success_callback=airflow_task_success,
+#                                           on_failure_callback=airflow_task_failure
+#                                           )
 create_database_operator = PythonOperator(task_id='create_pgpubs_database',
-                                          python_callable=create_database,
+                                          python_callable=begin_database_setup,
+                                          op_kwargs={'dbtype': 'pgpubs'},
                                           dag=app_xml_dag,
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure
