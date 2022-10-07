@@ -62,19 +62,19 @@ app_xml_dag = DAG(
     # schedule_interval=None
 )
 
-# create_database_operator = PythonOperator(task_id='create_pgpubs_database',
-#                                           python_callable=create_database,
-#                                           dag=app_xml_dag,
-#                                           on_success_callback=airflow_task_success,
-#                                           on_failure_callback=airflow_task_failure
-#                                           )
 create_database_operator = PythonOperator(task_id='create_pgpubs_database',
-                                          python_callable=begin_database_setup,
-                                          op_kwargs={'dbtype': 'pgpubs'},
+                                          python_callable=create_database,
                                           dag=app_xml_dag,
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure
                                           )
+# create_database_operator = PythonOperator(task_id='create_pgpubs_database',
+#                                           python_callable=begin_database_setup,
+#                                           op_kwargs={'dbtype': 'pgpubs'},
+#                                           dag=app_xml_dag,
+#                                           on_success_callback=airflow_task_success,
+#                                           on_failure_callback=airflow_task_failure
+#                                           )
 
 qc_database_operator = PythonOperator(task_id='qc_database_setup',
                                       python_callable=qc_database_pgpubs,

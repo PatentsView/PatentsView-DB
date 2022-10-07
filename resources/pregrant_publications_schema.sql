@@ -2114,6 +2114,48 @@ DELIMITER ;;
 DELIMITER ;
 
 
+CREATE TABLE `government_interest` (
+  `document_number` bigint(16) DEFAULT NULL,
+  `gi_statement` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  PRIMARY KEY (`document_number`),
+  KEY `government_interest_version_indicator_index` (`version_indicator`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
+
+DELIMITER ;;
+DELIMITER ;
+
+
+CREATE TABLE `publication_govintorg` (
+  `document_number` bigint(16) DEFAULT NULL,
+  `organization_id` int(11) NOT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  PRIMARY KEY (`document_number`,`organization_id`),
+  KEY `patent_govintorg_version_indicator_index` (`version_indicator`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
+
+DELIMITER ;;
+DELIMITER ;
+
+
+CREATE TABLE `publication_contractawardnumber` (
+  `document_number` bigint(16) DEFAULT NULL,
+  `contract_award_number` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  PRIMARY KEY (`document_number`,`contract_award_number`),
+  KEY `patent_contractawardnumber_version_indicator_index` (`version_indicator`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
+
+DELIMITER ;;
+DELIMITER ;
+
+
 CREATE TABLE `foreign_priority` (
   `id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `document_number` bigint(16) NOT NULL,
