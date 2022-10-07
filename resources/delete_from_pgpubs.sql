@@ -27,6 +27,9 @@ delete from pgpubs_text.detail_desc_text_2022 where version_indicator = '{{dbdat
 delete from pgpubs_text.detail_desc_text_2021 where version_indicator = '{{dbdate}}';
 delete from pgpubs_text.draw_desc_text_2021 where version_indicator = '{{dbdate}}';
 delete from pgpubs_text.draw_desc_text_2022 where version_indicator = '{{dbdate}}';
+delete from pgpubs_text.government_interest where version_indicator = '{{dbdate}}';
+delete from pgpubs_text.publication_govintorg where version_indicator = '{{dbdate}}';
+delete from pgpubs_text.publication_contractawardnumber where version_indicator = '{{dbdate}}';
 
 delete from patent_QA.DataMonitor_categorycount where update_version = '{{qavi}}' and database_type = 'pgpubs';
 delete from patent_QA.DataMonitor_count where update_version = '{{qavi}}' and database_type = 'pgpubs';
