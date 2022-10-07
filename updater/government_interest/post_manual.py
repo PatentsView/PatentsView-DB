@@ -161,8 +161,8 @@ def push_orgs(looked_up_data, org_id_mapping, config, version_indicator,database
     total_missed_orgs.to_csv('{}/incorrect_clean_orgs.csv'.format(post_manual))
 
 
-def process_post_manual(doctype='granted_patent',database='TEMP_UPLOAD_DB', **kwargs):
-    config = get_current_config(type=doctype, **kwargs)
+def process_post_manual(dbtype='granted_patent',database='TEMP_UPLOAD_DB', **kwargs):
+    config = get_current_config(type=dbtype, **kwargs)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
@@ -183,13 +183,13 @@ def process_post_manual(doctype='granted_patent',database='TEMP_UPLOAD_DB', **kw
     org_id_mapping = readOrgs(full_db_engine)
 
     # push the mappings into the db
-    id_type=('patent_id' if doctype =='granted_patent' else 'document_number')
+    id_type=('patent_id' if dbtype =='granted_patent' else 'document_number')
     push_orgs(looked_up, org_id_mapping, config, version_indicator, database=database, id_type=id_type)
 
 
-def qc_gi(doctype='granted_patent', database='TEMP_UPLOAD_DB',**kwargs):
-    config = get_current_config(type=doctype, **kwargs)
-    qc = GovtInterestTester(config, database=database, id_type=('patent_id' if doctype =='granted_patent' else 'document_number'))
+def qc_gi(dbtype='granted_patent', database='TEMP_UPLOAD_DB',**kwargs):
+    config = get_current_config(type=dbtype, **kwargs)
+    qc = GovtInterestTester(config, database=database, id_type=('patent_id' if dbtype =='granted_patent' else 'document_number'))
     qc.runTests()
 
 
