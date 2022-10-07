@@ -79,22 +79,22 @@ def consolidate_claim(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
-            "UPDATE claim SET dependent = replace(dependent, 'claim ', '');")
+            "UPDATE claims SET dependent = replace(dependent, 'claim ', '');")
 
     engine.execute(
-            "UPDATE claim SET dependent = replace(dependent, 'Claim ', '');")
+            "UPDATE claims SET dependent = replace(dependent, 'Claim ', '');")
 
     engine.execute(
-            "UPDATE claim SET dependent = replace(dependent, 'claims ', '');")
+            "UPDATE claims SET dependent = replace(dependent, 'claims ', '');")
 
     engine.execute(
-            "UPDATE claim SET dependent = replace(dependent, 'Claims ', '');")
+            "UPDATE claims SET dependent = replace(dependent, 'Claims ', '');")
 
     engine.execute(
-            "UPDATE claim SET dependent = concat('claim ', dependent) WHERE dependent NOT LIKE '%%,%%';")
+            "UPDATE claims SET dependent = concat('claim ', dependent) WHERE dependent NOT LIKE '%%,%%';")
 
     engine.execute(
-            "UPDATE claim SET dependent = concat('claims ', dependent) WHERE dependent LIKE '%%,%%';")
+            "UPDATE claims SET dependent = concat('claims ', dependent) WHERE dependent LIKE '%%,%%';")
 
 
 def detail_desc_length(config):
@@ -114,7 +114,7 @@ def yearly_claim(config):
     con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
-        cur.execute("SELECT DISTINCT SUBSTRING(c.document_number, 1, 4) FROM claim c")
+        cur.execute("SELECT DISTINCT SUBSTRING(c.document_number, 1, 4) FROM claims c")
 
         rows = cur.fetchall()
 
@@ -125,7 +125,7 @@ def yearly_claim(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into claim_{} select * from claim c where substring(c.document_number, 1, 4) = '{}';".format(
+                "insert into claims_{} select * from claims c where substring(c.document_number, 1, 4) = '{}';".format(
                         year,
                         year))
 
