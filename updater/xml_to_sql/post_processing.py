@@ -255,6 +255,9 @@ def fix_rawassignee_wrong_org(config):
     print(cstr)
     engine = create_engine(cstr)
     print("Fixing Wrong Organization Landing")
+    # remove tables first in event of rerun.
+    engine.execute("DROP TABLE IF EXISTS temp_rawassignee_org_fixes_nf;")
+    engine.execute("DROP TABLE IF EXISTS temp_rawassignee_org_fixes_nl;")
     # First Name contains Organization
     engine.execute(
         """
