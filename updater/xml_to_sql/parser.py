@@ -329,12 +329,11 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
         if df == 'government_interest':
-            print(f'g_i shape before n/a drop: {dfs[df].shape}')
             narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
             dfs[df] = dfs[df][~narows]
-            print(f'g_i shape after n/a drop: {dfs[df].shape}')
             dfs[df]['gi_statement'] = dfs[df]['gi_statement'].str.strip()
-            print(f'g_i shape after strip: {dfs[df].shape}')
+        elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
+            dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         try:
             dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
