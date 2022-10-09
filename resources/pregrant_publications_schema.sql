@@ -49,14 +49,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text BEFORE INSERT
@@ -67,14 +67,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2022` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2022_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2022 BEFORE INSERT
@@ -85,14 +85,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2021` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2021_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2021 BEFORE INSERT
@@ -103,14 +103,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2020` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2020_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2020 BEFORE INSERT
@@ -121,14 +121,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2019` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2019_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2019 BEFORE INSERT
@@ -139,14 +139,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2018` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2018_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2018 BEFORE INSERT
@@ -157,14 +157,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2017` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2017_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2017 BEFORE INSERT
@@ -175,14 +175,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2016` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2016_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2016 BEFORE INSERT
@@ -193,14 +193,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2015` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2015_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2015 BEFORE INSERT
@@ -211,14 +211,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2014` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2014_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2014 BEFORE INSERT
@@ -229,14 +229,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2013` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2013_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2013 BEFORE INSERT
@@ -247,14 +247,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2012` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2012_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2012 BEFORE INSERT
@@ -265,14 +265,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2011` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2011_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2011 BEFORE INSERT
@@ -283,14 +283,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2010` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2010_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2010 BEFORE INSERT
@@ -301,14 +301,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2009` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2009_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2009 BEFORE INSERT
@@ -319,14 +319,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2008` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2008_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2008 BEFORE INSERT
@@ -337,14 +337,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2007` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2007_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2007 BEFORE INSERT
@@ -355,14 +355,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2006` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2006_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2006 BEFORE INSERT
@@ -373,14 +373,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2005` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2005_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2005 BEFORE INSERT
@@ -391,14 +391,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2004` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2004_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2004 BEFORE INSERT
@@ -409,14 +409,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2003` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2003_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2003 BEFORE INSERT
@@ -427,14 +427,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2002` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2002_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2002 BEFORE INSERT
@@ -445,14 +445,14 @@ FOR EACH row
 
 CREATE TABLE `brf_sum_text_2001` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `brf_sum_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2001_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_brf_sum_text_2001 BEFORE INSERT
@@ -463,7 +463,7 @@ FOR EACH row
 
 CREATE TABLE `claims` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -472,8 +472,8 @@ CREATE TABLE `claims` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims BEFORE INSERT
@@ -484,7 +484,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2022` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -493,8 +493,8 @@ CREATE TABLE `claims_2022` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2022_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2022 BEFORE INSERT
@@ -505,7 +505,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2021` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -514,8 +514,8 @@ CREATE TABLE `claims_2021` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2021_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2021 BEFORE INSERT
@@ -526,7 +526,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2020` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -535,8 +535,8 @@ CREATE TABLE `claims_2020` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2020_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2020 BEFORE INSERT
@@ -547,7 +547,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2019` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -556,8 +556,8 @@ CREATE TABLE `claims_2019` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2019_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2019 BEFORE INSERT
@@ -568,7 +568,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2018` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -577,8 +577,8 @@ CREATE TABLE `claims_2018` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2018_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2018 BEFORE INSERT
@@ -589,7 +589,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2017` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -598,8 +598,8 @@ CREATE TABLE `claims_2017` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2017_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2017 BEFORE INSERT
@@ -610,7 +610,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2016` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -619,8 +619,8 @@ CREATE TABLE `claims_2016` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2016_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2016 BEFORE INSERT
@@ -631,7 +631,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2015` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -640,8 +640,8 @@ CREATE TABLE `claims_2015` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2015_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2015 BEFORE INSERT
@@ -652,7 +652,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2014` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -661,8 +661,8 @@ CREATE TABLE `claims_2014` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2014_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2014 BEFORE INSERT
@@ -673,7 +673,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2013` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -682,8 +682,8 @@ CREATE TABLE `claims_2013` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2013_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2013 BEFORE INSERT
@@ -694,7 +694,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2012` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -703,8 +703,8 @@ CREATE TABLE `claims_2012` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2012_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2012 BEFORE INSERT
@@ -715,7 +715,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2011` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -724,8 +724,8 @@ CREATE TABLE `claims_2011` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2011_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2011 BEFORE INSERT
@@ -736,7 +736,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2010` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -745,8 +745,8 @@ CREATE TABLE `claims_2010` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2010_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2010 BEFORE INSERT
@@ -757,7 +757,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2009` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -766,8 +766,8 @@ CREATE TABLE `claims_2009` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2009_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2009 BEFORE INSERT
@@ -778,7 +778,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2008` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -787,8 +787,8 @@ CREATE TABLE `claims_2008` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2008_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2008 BEFORE INSERT
@@ -799,7 +799,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2007` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -808,8 +808,8 @@ CREATE TABLE `claims_2007` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2007_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2007 BEFORE INSERT
@@ -820,7 +820,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2006` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -829,8 +829,8 @@ CREATE TABLE `claims_2006` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2006_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2006 BEFORE INSERT
@@ -841,7 +841,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2005` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -850,8 +850,8 @@ CREATE TABLE `claims_2005` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2005_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2005 BEFORE INSERT
@@ -862,7 +862,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2004` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -871,8 +871,8 @@ CREATE TABLE `claims_2004` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2004_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2004 BEFORE INSERT
@@ -883,7 +883,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2003` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -892,8 +892,8 @@ CREATE TABLE `claims_2003` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2003_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2003 BEFORE INSERT
@@ -904,7 +904,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2002` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -913,8 +913,8 @@ CREATE TABLE `claims_2002` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2002_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2002 BEFORE INSERT
@@ -925,7 +925,7 @@ FOR EACH row
 
 CREATE TABLE `claims_2001` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -934,8 +934,8 @@ CREATE TABLE `claims_2001` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`,`num`),
-  CONSTRAINT `claims_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  CONSTRAINT `claims_2001_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_claims_2001 BEFORE INSERT
@@ -974,15 +974,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text BEFORE INSERT
@@ -993,15 +993,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2022` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2022_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2022 BEFORE INSERT
@@ -1012,15 +1012,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2021` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2021_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2021 BEFORE INSERT
@@ -1031,15 +1031,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2020` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2020_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2020 BEFORE INSERT
@@ -1050,15 +1050,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2019` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2019_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2019 BEFORE INSERT
@@ -1069,15 +1069,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2018` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2018_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2018 BEFORE INSERT
@@ -1088,15 +1088,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2017` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2017_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2017 BEFORE INSERT
@@ -1107,15 +1107,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2016` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2016_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2016 BEFORE INSERT
@@ -1126,15 +1126,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2015` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2015_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2015 BEFORE INSERT
@@ -1145,15 +1145,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2014` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2014_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2014 BEFORE INSERT
@@ -1164,15 +1164,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2013` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2013_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2013 BEFORE INSERT
@@ -1183,15 +1183,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2012` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2012_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2012 BEFORE INSERT
@@ -1202,15 +1202,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2011` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2011_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2011 BEFORE INSERT
@@ -1221,15 +1221,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2010` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2010_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2010 BEFORE INSERT
@@ -1240,15 +1240,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2009` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2009_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2009 BEFORE INSERT
@@ -1259,15 +1259,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2008` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2008_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2008 BEFORE INSERT
@@ -1278,15 +1278,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2007` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2007_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2007 BEFORE INSERT
@@ -1297,15 +1297,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2006` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2006_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2006 BEFORE INSERT
@@ -1316,15 +1316,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2005` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2005_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2005 BEFORE INSERT
@@ -1335,15 +1335,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2004` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2004_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2004 BEFORE INSERT
@@ -1354,15 +1354,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2003` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2003_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2003 BEFORE INSERT
@@ -1373,15 +1373,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2002` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2002_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2002 BEFORE INSERT
@@ -1392,15 +1392,15 @@ FOR EACH row
 
 CREATE TABLE `detail_desc_text_2001` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `length` bigint(16) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  UNIQUE KEY `document_number` (`document_number`),
-  CONSTRAINT `detail_desc_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2001_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_detail_desc_text_2001 BEFORE INSERT
@@ -1411,15 +1411,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text BEFORE INSERT
@@ -1430,15 +1430,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2022` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2022_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2022_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2022 BEFORE INSERT
@@ -1449,15 +1449,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2021` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2021_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2021_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2021 BEFORE INSERT
@@ -1468,15 +1468,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2020` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2020_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2020_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2020 BEFORE INSERT
@@ -1487,15 +1487,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2019` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2019_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2019_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2019 BEFORE INSERT
@@ -1506,15 +1506,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2018` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2018_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2018_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2018 BEFORE INSERT
@@ -1525,15 +1525,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2017` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2017_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2017_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2017 BEFORE INSERT
@@ -1544,15 +1544,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2016` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2016_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2016_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2016 BEFORE INSERT
@@ -1563,15 +1563,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2015` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2015_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2015_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2015 BEFORE INSERT
@@ -1582,15 +1582,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2014` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2014_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2014_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2014 BEFORE INSERT
@@ -1601,15 +1601,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2013` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2013_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2013_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2013 BEFORE INSERT
@@ -1620,15 +1620,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2012` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2012_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2012_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2012 BEFORE INSERT
@@ -1639,15 +1639,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2011` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2011_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2011_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2011 BEFORE INSERT
@@ -1658,15 +1658,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2010` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2010_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2010_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2010 BEFORE INSERT
@@ -1677,15 +1677,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2009` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2009_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2009_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2009 BEFORE INSERT
@@ -1696,15 +1696,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2008` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2008_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2008_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2008 BEFORE INSERT
@@ -1715,15 +1715,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2007` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2007_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2007_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2007 BEFORE INSERT
@@ -1734,15 +1734,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2006` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2006_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2006_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2006 BEFORE INSERT
@@ -1753,15 +1753,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2005` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2005_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2005_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2005 BEFORE INSERT
@@ -1772,15 +1772,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2004` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2004_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2004_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2004 BEFORE INSERT
@@ -1791,15 +1791,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2003` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2003_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2003_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2003 BEFORE INSERT
@@ -1810,15 +1810,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2002` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2002_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2002_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2002 BEFORE INSERT
@@ -1829,15 +1829,15 @@ FOR EACH row
 
 CREATE TABLE `draw_desc_text_2001` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `document_number` bigint(16) DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
   `text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  KEY `document_number` (`document_number`),
-  CONSTRAINT `draw_desc_text_2001_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `publication` (`document_number`)
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2001_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TRIGGER before_insert_draw_desc_text_2001 BEFORE INSERT
