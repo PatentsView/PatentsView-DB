@@ -109,7 +109,7 @@ def detail_desc_length(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
-            'UPDATE detail_desc_text d SET `length` = LENGTH(d.`text`);')
+            'UPDATE detail_desc_text d SET `description_length` = LENGTH(d.`description_text`);')
 
 
 def yearly_claim(config):
