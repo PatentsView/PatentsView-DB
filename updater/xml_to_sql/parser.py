@@ -231,7 +231,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                 data_list[field["field_name"]] = seq
             # If we are looking for the text data in the claims table use the text_extractor to get the right data
             # Claims are special cases
-            elif tab['friendly_name'] == 'Claims' and field['field_name'] == 'text':
+            elif tab['friendly_name'] == 'Claims' and field['field_name'] == 'claim_text':
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
@@ -239,7 +239,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                     if elem.tag in newline_tags:
                         partial_strings.append("\n\n")
                     data_list[field["field_name"]] = ' '.join(partial_strings)
-            elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'text':
+            elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'draw_desc_text':
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
