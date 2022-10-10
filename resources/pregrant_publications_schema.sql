@@ -471,8 +471,8 @@ CREATE TABLE `claims` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -492,8 +492,8 @@ CREATE TABLE `claims_2022` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2022_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -513,8 +513,8 @@ CREATE TABLE `claims_2021` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2021_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -534,8 +534,8 @@ CREATE TABLE `claims_2020` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2020_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -555,8 +555,8 @@ CREATE TABLE `claims_2019` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2019_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -576,8 +576,8 @@ CREATE TABLE `claims_2018` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2018_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -597,8 +597,8 @@ CREATE TABLE `claims_2017` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2017_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -618,8 +618,8 @@ CREATE TABLE `claims_2016` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2016_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -639,8 +639,8 @@ CREATE TABLE `claims_2015` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2015_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -660,8 +660,8 @@ CREATE TABLE `claims_2014` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2014_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -681,8 +681,8 @@ CREATE TABLE `claims_2013` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2013_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -702,8 +702,8 @@ CREATE TABLE `claims_2012` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2012_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -723,8 +723,8 @@ CREATE TABLE `claims_2011` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2011_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -744,8 +744,8 @@ CREATE TABLE `claims_2010` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2010_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -765,8 +765,8 @@ CREATE TABLE `claims_2009` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2009_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -786,8 +786,8 @@ CREATE TABLE `claims_2008` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2008_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -807,8 +807,8 @@ CREATE TABLE `claims_2007` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2007_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -828,8 +828,8 @@ CREATE TABLE `claims_2006` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2006_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -849,8 +849,8 @@ CREATE TABLE `claims_2005` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2005_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -870,8 +870,8 @@ CREATE TABLE `claims_2004` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2004_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -891,8 +891,8 @@ CREATE TABLE `claims_2003` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2003_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -912,8 +912,8 @@ CREATE TABLE `claims_2002` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2002_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -933,8 +933,8 @@ CREATE TABLE `claims_2001` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  `num` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `pgpub_id` (`pgpub_id`,`num`),
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
   CONSTRAINT `claims_2001_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
