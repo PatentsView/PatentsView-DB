@@ -5,6 +5,7 @@ import multiprocessing as mp
 import os
 import pprint
 import re
+from textwrap import indent
 import time
 # import datetime
 from datetime import datetime, date
@@ -131,7 +132,7 @@ def extract_text_from_all_children(element):
 
 def parse_description(patent_doc, text_type):
     """
-    Parse and extract data from "description" fields (i.e. brf_sum_text, claim, draw_desc_text)
+    Parse and extract data from "description" fields (i.e. brf_sum_text, claims, draw_desc_text)
     :param patent_doc: XML element containing text data
     :param text_type: Data Field for which text is to be extracted
     :return: Text data from each element
@@ -230,7 +231,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                 data_list[field["field_name"]] = seq
             # If we are looking for the text data in the claims table use the text_extractor to get the right data
             # Claims are special cases
-            elif tab['friendly_name'] == 'Claim' and field['field_name'] == 'text':
+            elif tab['friendly_name'] == 'Claims' and field['field_name'] == 'claim_text':
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
@@ -238,7 +239,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                     if elem.tag in newline_tags:
                         partial_strings.append("\n\n")
                     data_list[field["field_name"]] = ' '.join(partial_strings)
-            elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'text':
+            elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'draw_desc_text':
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
@@ -265,6 +266,8 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                     if tab['table_name'] == 'usreldoc_single' and field_element.tag == 'related-publication':
                         data_list = {}
                         break
+            if field['field_name'] == 'gi_statement' and data_list[field["field_name"]] is not None and len(data_list[field["field_name"]]) > 0:
+                data_list[field["field_name"]] = re.sub('[\n\r]',' ',data_list[field["field_name"]])
     return data_list
 
 
@@ -325,6 +328,12 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
+        if df == 'government_interest':
+            narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
+            dfs[df] = dfs[df][~narows]
+            dfs[df]['gi_statement'] = dfs[df]['gi_statement'].str.strip()
+        elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
+            dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         try:
             dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
@@ -428,11 +437,11 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                 # Add the data to the proper dataframe
                 try:
                     for table_name, extracted_data in data:
-                        if len(table_name) > 0:
+                        if not len(table_name) > 0:
+                            continue
+                        else:
                             current_data_frame = pd.DataFrame(extracted_data)
                             dfs[table_name] = dfs[table_name].append(current_data_frame)
-                        else:
-                            continue
                 except IndexError as e:
                     log_queue.put(
                             {
@@ -494,18 +503,19 @@ def get_filenames_to_parse(config, type='granted_patent'):
     end_date_string = '{}'.format(config['DATES']['END_DATE'])
     end_date = datetime.strptime(end_date_string, '%Y%m%d')
     for file_name in os.listdir(xml_directory):
-        print(file_name)
+        # print(file_name)
         if file_name.endswith(".xml"):
             file_date_string = re.match(".*([0-9]{6}).*", file_name).group(1)
             file_date = datetime.strptime(file_date_string, '%y%m%d')
 
             # file_date = file_name.split("_")[-1].split(".")[0]
             # file_date = file_name[3:-4]
-            print(file_date)
-            print(start_date)
-            print(end_date)
+            # print(file_date)
+            # print(start_date)
+            # print(end_date)
             if start_date <= file_date <= end_date:
                 xml_files.append(xml_directory + "/" + file_name)
+    print(f"files identified for parsing: {xml_files}")
 
     return xml_files
 

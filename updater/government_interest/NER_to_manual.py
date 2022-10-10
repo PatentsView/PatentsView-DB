@@ -143,8 +143,8 @@ def get_orgs(db_con, manual_inputs):
     raw.to_csv(manual_inputs + "/government_organization.csv", index=False)
 
 
-def process_ner_to_manual(doctype='granted_patent', **kwargs):
-    config = get_current_config(type=doctype, **kwargs)
+def process_ner_to_manual(dbtype='granted_patent', **kwargs):
+    config = get_current_config(type=dbtype, **kwargs)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     manual_inputs = '{}/government_interest/manual_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])

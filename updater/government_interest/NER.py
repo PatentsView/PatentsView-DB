@@ -363,8 +363,8 @@ def test_dataframe(df, rw, col):
     return
 
 
-def begin_NER_processing(doctype='granted_patent',database='TEMP_UPLOAD_DB', **kwargs):
-    config = get_current_config(type=doctype, **kwargs)
+def begin_NER_processing(dbtype='granted_patent',database='TEMP_UPLOAD_DB', **kwargs):
+    config = get_current_config(type=dbtype, **kwargs)
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
 
     # Set up vars + directories
@@ -382,7 +382,7 @@ def begin_NER_processing(doctype='granted_patent',database='TEMP_UPLOAD_DB', **k
     final_output_dir = pre_manual
     connection_string = get_connection_string(config, database=database)
     # 1. Merge csvs together and read in the input file
-    merged_df = prepare_input_files(connection_string, merged_csv, id_type=('patent_id' if doctype =='granted_patent' else 'document_number'))
+    merged_df = prepare_input_files(connection_string, merged_csv, id_type=('patent_id' if dbtype =='granted_patent' else 'document_number'))
 
     # # 2. run NER
     run_NER(ner_dir, ner_txt_indir, ner_txt_outdir, merged_df, classifiers, ner_classif_dirs)
@@ -401,6 +401,6 @@ if __name__ == '__main__':
     # config = get_current_config('granted_patent', **{
     #         "execution_date": datetime.date(2020, 12, 29)
     #         })
-    begin_NER_processing(doctype='granted_patent', database='TEMP_UPLOAD_DB', **{
+    begin_NER_processing(dbtype='granted_patent', database='TEMP_UPLOAD_DB', **{
             "execution_date": datetime.date(2020, 12, 22)
             })
