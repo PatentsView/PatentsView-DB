@@ -206,7 +206,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
             self.table_config = load_table_config(config, db='bulk_exp_granted')
         else:
             self.table_config = load_table_config(config, db='bulk_exp_pgpubs')
-
+        
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
