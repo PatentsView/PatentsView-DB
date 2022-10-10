@@ -75,70 +75,70 @@ INSERT INTO pgpubs_text.brf_sum_text_2001 (`id`, `pgpub_id`, `summary_text`, `fi
     SELECT `id`, `pgpub_id`, `summary_text`, `filename`, `version_indicator` FROM `{{source_database}}`.brf_sum_text_2001;
 
 INSERT INTO pgpubs_text.claims_2022 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2022;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2022;
 
 INSERT INTO pgpubs_text.claims_2021 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2021;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2021;
 
 INSERT INTO pgpubs_text.claims_2020 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2020;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2020;
 
 INSERT INTO pgpubs_text.claims_2019 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2019;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2019;
 
 INSERT INTO pgpubs_text.claims_2018 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2018;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2018;
 
 INSERT INTO pgpubs_text.claims_2017 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2017;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2017;
 
 INSERT INTO pgpubs_text.claims_2016 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2016;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2016;
 
 INSERT INTO pgpubs_text.claims_2015 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2015;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2015;
 
 INSERT INTO pgpubs_text.claims_2014 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2014;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2014;
 
 INSERT INTO pgpubs_text.claims_2013 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2013;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2013;
 
 INSERT INTO pgpubs_text.claims_2012 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2012;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2012;
 
 INSERT INTO pgpubs_text.claims_2011 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2011;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2011;
 
 INSERT INTO pgpubs_text.claims_2010 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2010;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2010;
 
 INSERT INTO pgpubs_text.claims_2009 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2009;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2009;
 
 INSERT INTO pgpubs_text.claims_2008 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2008;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2008;
 
 INSERT INTO pgpubs_text.claims_2007 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2007;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2007;
 
 INSERT INTO pgpubs_text.claims_2006 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2006;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2006;
 
 INSERT INTO pgpubs_text.claims_2005 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2005;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2005;
 
 INSERT INTO pgpubs_text.claims_2004 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2004;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2004;
 
 INSERT INTO pgpubs_text.claims_2003 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2003;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2003;
 
 INSERT INTO pgpubs_text.claims_2002 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2002;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2002;
 
 INSERT INTO pgpubs_text.claims_2001 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `num` FROM `{{source_database}}`.claims_2001;
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2001;
 
 INSERT INTO pregrant_publications.cpc SELECT * FROM `{{source_database}}`.cpc;
 
