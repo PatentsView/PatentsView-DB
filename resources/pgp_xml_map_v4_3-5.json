@@ -1122,7 +1122,7 @@
             "tag": false,
             "data-type": "fulltext"
         },{
-            "field_name": "draw_desc sequence",
+            "field_name": "draw_desc_sequence",
             "friendly_name": "Drawing Description Sequence",
             "xml_path": ".",
             "attribute": null,
