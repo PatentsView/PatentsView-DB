@@ -568,15 +568,15 @@ from `pregrant_publications`.`rawlocation` `a`
 where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`pg_pct_data` AS 
-select `a`.`patent_id` AS `patent_id`,
+select `a`.`document_number` AS `pgpub_id`,
 `a`.`date` AS `published_or_filed_date`,
-`a`.`371_date` AS `pct_371_date`,
-`a`.`102_date` AS `pct_102_date`,
+`a`.`us_371c124_date` AS `pct_371_date`,
+`a`.`us_371c12_date` AS `pct_102_date`,
 `a`.`country` AS `filed_country`,
 `a`.`kind` AS `application_kind`,
-`a`.`rel_id` AS `pct_doc_number`,
-`a`.`doc_type` AS `pct_doc_type` 
-from `patent`.`pct_data` `a` 
+`a`.`pct_doc_number` AS `pct_doc_number`,
+`a`.`doc_type` AS `pct_doc_type`
+from `pregrant_publications`.`pct_data` `a`
 where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE VIEW `patentsview_exports_pregrant`.`pg_published_application` AS 
