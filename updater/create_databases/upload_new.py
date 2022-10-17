@@ -62,12 +62,13 @@ def setup_database(update_config, drop=True, cpc_only=False):
         con = engine.connect()
         if drop:
             con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
-        # if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee'] and raw_database=='patent':
-        #     query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211230', table)
-        #     print(query)
-        #     con.execute(query)
-        # else:
-        query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
+        if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee'] and raw_database=='patent':
+            # tables with version-specific base tables (will need quarterly updating)
+            query = "create table if not exists {0}.{2} like {1}.{2}_{3}".format(temp_upload_database, raw_database, table, '20220630') 
+            print(query)
+            con.execute(query)
+        else:
+            query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
         print(query)
         con.execute(query)
         con.close()
