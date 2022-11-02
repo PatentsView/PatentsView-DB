@@ -45,7 +45,16 @@ class DatabaseTester(ABC):
             except IndexError:
                 database_type = self.database_section
 
-        self.version = self.end_date.strftime("%Y%m%d")
+        self.version = self.end_date.strftime("%Y-%m-%d")
+
+        # Add Quarter Variable
+        df = pd.DataFrame(columns=['date'])
+        df.loc[0] = [self.version]
+        df['quarter'] = pd.to_datetime(df.date).dt.to_period('Q')
+        quarter = str(df['quarter'][0])
+        self.quarter = quarter[5]
+        #####
+
         self.database_type = database_type
 
         utilities.class_db_specific_config(self, self.table_config, class_called)
@@ -110,7 +119,8 @@ from {table_name}"""
                 "database_type": self.database_type,
                 'table_name': table_name,
                 'update_version': self.version,
-                'table_row_count': count_value
+                'table_row_count': count_value,
+                'quarter': self.quarter
             })
 
 
@@ -161,7 +171,8 @@ group by 1"""
                     "column_name": field,
                     'update_version': self.version,
                     'value': value,
-                    'count': count_row[1]
+                    'count': count_row[1],
+                    'quarter': self.quarter
                 })
 
 
@@ -186,7 +197,8 @@ from `{table}` where `{field}` is null
                     'table_name': table,
                     "column_name": field,
                     'update_version': self.version,
-                    'null_count': count_value
+                    'null_count': count_value,
+                    'quarter': self.quarter
                 })
 
 
@@ -318,7 +330,8 @@ where related.{related_table_id} is null {additional_where}
                         'update_version': self.version,
                         'main_table': table_name,
                         'related_table': related_entity_config["related_table"],
-                        'floating_count': related_table_count
+                        'floating_count': related_table_count,
+                        'quarter': self.quarter
                     })
 
     def load_entity_category_counts(self, table_name):
@@ -343,7 +356,8 @@ group by 1
                         'update_version': self.version,
                         'patent_type': count_row[0],
                         'table_name': table_name,
-                        'patent_count': count_row[1]
+                        'patent_count': count_row[1],
+                        'quarter': self.quarter
                     })
 
     def load_counts_by_location(self, table, field):
@@ -372,7 +386,8 @@ group by t.`{field}`"""
                     'table_name': table,
                     'table_row_count': row_count,
                     'patent_id_count': count_row[1],
-                    'location': count_row[0]
+                    'location': count_row[0],
+                    'quarter': self.quarter
                 })
 
     def save_qa_data(self):
@@ -396,7 +411,8 @@ f"from `{table_name}`;"
             'update_version': self.version,
             'table_name': table_name,
             'column_name': field_name,
-            'max_text_length': text_length
+            'max_text_length': text_length,
+            'quarter': self.quarter
         })
 
     def test_patent_abstract_null(self, table, where_vi=False):
@@ -432,7 +448,6 @@ where invention_abstract is null """
                 print(" -------------------------------------------------- ")
                 if self.class_called != "ReportingDBTester":
                     self.test_null_version_indicator(table)
-
                 self.load_table_row_count(table, where_vi=False)
                 if table in 'rawassignee':
                     self.test_rawassignee_org(table, where_vi=False)
