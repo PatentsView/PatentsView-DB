@@ -60,6 +60,23 @@ class DisambiguationTester(DatabaseTester):
                 print(f"\t\t\tLoading Top N Entities for {self.database_section}.{self.disambiguated_table} from {related_table_config['related_table']}")
                 self.load_top_entities(table, related_table_config)
 
+    def test_entity_id_updated(self):
+        if {self.entity_table} in ['assignee','inventor']:
+            for db, id in [['pregrant_publications', 'id'], ['patent', 'uuid']]:
+                test_entity_id_updated_query = f"""
+select count(*)
+from {db}.{self.entity_table} a
+    inner join {db}.{self.disambiguated_table}_disambiguation_mapping_20220630 b on a.{id}=b.uuid 
+where a.inventor_id != b.inventor_id;"""
+                print(test_entity_id_updated_query)
+                if not self.connection.open:
+                    self.connection.connect()
+                with self.connection.cursor() as g_cursor:
+                    g_cursor.execute(test_entity_id_updated_query)
+                    count_not_updated = g_cursor.fetchall()[0][0]
+                    if count_not_updated > 0:
+                        raise Exception(f"ENTITY NOT UPDATED IN THE RAW TABLE")
+
     def load_top_entities(self, table_name, related_table_config):
         if 'patent' not in table_name:
             top_n_data_query = f"""
@@ -87,6 +104,7 @@ class DisambiguationTester(DatabaseTester):
                             'entity_value': top_n_data_row[0],
                             'related_entity_count': top_n_data_row[-1]
                         })
+                    print(self.qa_data['DataMonitor_topnentities'])
                     rank += 1
 
 
@@ -120,12 +138,14 @@ class DisambiguationTester(DatabaseTester):
 
     def runTests(self):
         print("Beginning Disambiguation Specific Tests")
-        self.init_qa_dict_disambig()
-        self.test_invalid_id()
-        self.test_floating_entities()
-        for table in self.table_config:
-            print(f"\t\tBeginning Tests for {table}")
-            self.top_n_generator(table)
-            self.save_qa_data()
-            self.init_qa_dict_disambig()
+        self.test_entity_id_updated()
+        # self.init_qa_dict_disambig()
+        # self.test_invalid_id()
+        # self.test_floating_entities()
+        # for table in self.table_config:
+        #     print(f"\t\tBeginning Tests for {table}")
+        #     self.top_n_generator(table)
+        #     self.save_qa_data()
+        #     self.init_qa_dict_disambig()
+
 
