@@ -13,7 +13,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -51,7 +51,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -89,7 +89,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -127,7 +127,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -165,7 +165,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -203,7 +203,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -241,7 +241,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -279,7 +279,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -317,7 +317,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -355,7 +355,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -393,7 +393,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -431,7 +431,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -469,7 +469,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -507,7 +507,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -545,7 +545,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -583,7 +583,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -621,7 +621,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -659,7 +659,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -697,7 +697,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -735,7 +735,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -773,7 +773,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -811,7 +811,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -849,7 +849,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -887,7 +887,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -925,7 +925,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -963,7 +963,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1001,7 +1001,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1039,7 +1039,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1077,7 +1077,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1115,7 +1115,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1153,7 +1153,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1191,7 +1191,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1229,7 +1229,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1267,7 +1267,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1305,7 +1305,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1343,7 +1343,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1381,7 +1381,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1419,7 +1419,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1457,7 +1457,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1495,7 +1495,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1533,7 +1533,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1571,7 +1571,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1609,7 +1609,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1647,7 +1647,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1685,7 +1685,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
@@ -1724,7 +1724,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "longtext",
         "null_allowed": true,
         "category": false,
@@ -1757,7 +1757,7 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "summary_text": {
         "data_type": "longtext",
         "null_allowed": true,
         "category": false,
@@ -1836,19 +1836,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -1898,19 +1898,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -1960,19 +1960,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2022,19 +2022,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2084,19 +2084,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2146,19 +2146,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2208,19 +2208,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2270,19 +2270,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2332,19 +2332,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2394,19 +2394,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2456,19 +2456,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2518,19 +2518,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2580,19 +2580,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2642,19 +2642,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2704,19 +2704,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2766,19 +2766,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2828,19 +2828,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2890,19 +2890,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -2952,19 +2952,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3014,19 +3014,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3076,19 +3076,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3138,19 +3138,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3200,19 +3200,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3262,19 +3262,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3324,19 +3324,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3386,19 +3386,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3448,19 +3448,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3510,19 +3510,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3572,19 +3572,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3634,19 +3634,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3690,19 +3690,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3746,19 +3746,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3802,19 +3802,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3858,19 +3858,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3914,19 +3914,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -3970,19 +3970,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4026,19 +4026,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4082,19 +4082,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4138,19 +4138,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4194,19 +4194,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4250,19 +4250,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4306,19 +4306,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4362,19 +4362,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4418,19 +4418,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4474,19 +4474,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4537,19 +4537,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "longtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4594,19 +4594,19 @@
         "category": false,
         "location_field": false
       },
-      "num": {
+      "claim_number": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "text": {
+      "claim_text": {
         "data_type": "longtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "claim_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4651,13 +4651,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4689,13 +4689,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4733,13 +4733,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4777,13 +4777,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4821,13 +4821,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4865,13 +4865,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4909,13 +4909,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4953,13 +4953,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -4997,13 +4997,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5041,13 +5041,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5085,13 +5085,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5129,13 +5129,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5173,13 +5173,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5217,13 +5217,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5261,13 +5261,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5305,13 +5305,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5349,13 +5349,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5393,13 +5393,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5437,13 +5437,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5481,13 +5481,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5525,13 +5525,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5569,13 +5569,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5613,13 +5613,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5657,13 +5657,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5701,13 +5701,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5745,13 +5745,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5789,13 +5789,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5833,13 +5833,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5877,13 +5877,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5921,13 +5921,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -5965,13 +5965,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6009,13 +6009,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6053,13 +6053,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6097,13 +6097,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6141,13 +6141,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6185,13 +6185,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6229,13 +6229,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6273,13 +6273,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6317,13 +6317,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6361,13 +6361,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6405,13 +6405,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6449,13 +6449,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6493,13 +6493,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6537,13 +6537,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6581,13 +6581,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6626,13 +6626,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "longtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6665,13 +6665,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "description_text": {
         "data_type": "longtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "length": {
+      "description_length": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6704,13 +6704,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6748,13 +6748,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6792,13 +6792,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6836,13 +6836,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6880,13 +6880,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6924,13 +6924,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -6968,13 +6968,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7012,13 +7012,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7056,13 +7056,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7100,13 +7100,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7144,13 +7144,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7188,13 +7188,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7232,13 +7232,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7276,13 +7276,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7320,13 +7320,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7364,13 +7364,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7408,13 +7408,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7452,13 +7452,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7496,13 +7496,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7540,13 +7540,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7584,13 +7584,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7628,13 +7628,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7672,13 +7672,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7716,13 +7716,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7760,13 +7760,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7804,13 +7804,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7848,13 +7848,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7892,13 +7892,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7936,13 +7936,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -7980,13 +7980,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8024,13 +8024,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8068,13 +8068,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8112,13 +8112,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8156,13 +8156,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8200,13 +8200,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8244,13 +8244,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8288,13 +8288,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8332,13 +8332,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8376,13 +8376,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8420,13 +8420,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8464,13 +8464,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8508,13 +8508,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8552,13 +8552,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8596,13 +8596,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8640,13 +8640,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "longtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8685,13 +8685,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "longtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
@@ -8724,13 +8724,13 @@
         "category": false,
         "location_field": false
       },
-      "text": {
+      "draw_desc_text": {
         "data_type": "longtext",
         "null_allowed": true,
         "category": false,
         "location_field": false
       },
-      "sequence": {
+      "draw_desc_sequence": {
         "data_type": "int",
         "null_allowed": true,
         "category": false,
