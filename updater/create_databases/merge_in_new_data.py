@@ -137,6 +137,7 @@ def update_text_data(table, update_config):
     # qa_connection_string = get_connection_string(update_config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
     engine = create_engine(connection_string)
     query = table["insert"]
+    print(query)
     engine.execute(query)
 
 
@@ -208,7 +209,7 @@ from {temp_db}.detail_desc_text_{year}
                     },
 
             'detail_desc_length': {
-                    "insert": f"INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(detail_desc_text), version_indicator from {temp_db}.detail_desc_text_{year}"
+                    "insert": f"INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(description_text), version_indicator from {temp_db}.detail_desc_text_{year}"
                     }
             }
     merge_text_data(text_table_config, config)

@@ -24,14 +24,14 @@ class LocationUploadTest:
             """
 select count(*)
 from rawlocation a
-        left join geo_data.curated_locations b on a.location_id=b.id
+        left join geo_data.curated_locations b on a.location_id=b.uuid
         left join patent.country_codes c on b.`country`=c.`name`
 where a.country is not null and a.country <> `alpha-2`;"""
             ,
             "State": """
 select count(*)
 from rawlocation a
-        left join geo_data.curated_locations b on a.location_id=b.id
+        left join geo_data.curated_locations b on a.location_id=b.uuid
         inner join patent.state_codes d on b.state=d.`State/Possession`
         left join patent.country_codes c on b.`country`=c.`name`
 where a.country is not null and a.state <> `Abbreviation`;"""
@@ -72,10 +72,10 @@ where a.country is not null and location_id is null;""")
             connection.execute(" drop table if exists rawlocation_disambig_compare ;")
             rows = connection.execute(f"""
 create table rawlocation_disambig_compare 
-select a.id as rawlocation_id, b.id as curated_location_id, a.version_indicator, latitude, longitude,  lat, lon, (latitude-lat) as lat_diff, (longitude-lon) as long_diff
+select a.id as rawlocation_id, b.uuid as curated_location_id, a.version_indicator, latitude, longitude,  lat, lon, (latitude-lat) as lat_diff, (longitude-lon) as long_diff
 from rawlocation a
-        left join geo_data.curated_locations b on a.location_id=b.id
-where a.country is not null and b.id is not null;""")
+        left join geo_data.curated_locations b on a.location_id=b.uuid
+where a.country is not null and b.uuid is not null;""")
             df = pd.read_sql("select * from rawlocation_disambig_compare", con=connection)
 
             # Create Histogram of Lat and Long differences between Rawlocation and our Curated Locations table
