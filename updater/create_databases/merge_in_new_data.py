@@ -187,7 +187,7 @@ SELECT c.uuid,
        c.version_indicator
 from {temp_db}.claims_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
-                   on tce.patent_id = c.patent_id and tce.exemplary = c.sequence
+                   on tce.patent_id = c.patent_id and tce.exemplary = c.claim_sequence
                     """
                     },
 
