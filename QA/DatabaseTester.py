@@ -442,7 +442,7 @@ where invention_abstract is null """
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()
         for table in self.table_config:
-            if table[:2] > 'cp':
+            # if table[:2] > 'cp': # debugging control - comment when not in use
                 print(" -------------------------------------------------- ")
                 print(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table}")
                 print(" -------------------------------------------------- ")
