@@ -47,19 +47,23 @@ def load_table_config(config, db='patent'):
     root = config["FOLDERS"]["project_root"]
     resources = config["FOLDERS"]["resources_folder"]
     if db == 'patent':
-        table_config = json.load(open(f"{root}/{resources}/{config['FILES']['table_config_granted']}"))
+        config_file = f"{root}/{resources}/{config['FILES']['table_config_granted']}"
     elif db == 'pgpubs':
-        table_config = json.load(open(f"{root}/{resources}/{config['FILES']['table_config_pgpubs']}"))
+        config_file = f"{root}/{resources}/{config['FILES']['table_config_pgpubs']}"
     elif db == 'patent_text' or db[:6] == 'upload':
-        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_granted"]}'))
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_granted"]}'
     elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
-        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'))
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'
     elif db == 'Reporting_DB':
-        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'))
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'
     elif db == 'bulk_exp_granted':
-        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'))
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'
     elif db == 'bulk_exp_pgpubs':
-        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'))
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'
+
+    print(f"reading table config from {config_file}")
+    with open(config_file) as file:
+        table_config = json.load(file)
     return table_config
 
 
