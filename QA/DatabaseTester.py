@@ -52,7 +52,6 @@ class DatabaseTester(ABC):
         df.loc[0] = [self.version]
         df['quarter'] = pd.to_datetime(df.date).dt.to_period('Q')
         quarter = str(df['quarter'][0])
-        breakpoint()
         self.quarter = quarter[:4] + "-" + quarter[5]
         #####
 
