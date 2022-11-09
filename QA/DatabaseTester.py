@@ -25,7 +25,7 @@ class DatabaseTester(ABC):
         self.end_date = end_date
 
         # Indicator for Upload/Patents database
-        self.qa_connection_string = get_connection_string(config, 'QA_DATABASE')
+        self.qa_connection_string = get_connection_string(config, database='QA_DATABASE', connection='APP_DATABASE_SETUP')
         self.connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                           user=config['DATABASE_SETUP']['USERNAME'],
                                           password=config['DATABASE_SETUP']['PASSWORD'],
@@ -486,6 +486,7 @@ where invention_abstract is null """
             print(f"FINISHED WITH TABLE: {table}")
             print(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
             print(" -------------------------------------------------- ")
+
 
 
 if __name__ == '__main__':

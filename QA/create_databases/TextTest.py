@@ -48,10 +48,7 @@ class TextUploadTest(DatabaseTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"], start_date, end_date)
         brf_key = "brf_sum_text_{year}".format(year=end_date.year)
-        if config['PATENTSVIEW_DATABASES']["TEXT_DB"] == 'patent_text':
-            clm_key = "claims_{year}".format(year=end_date.year)
-        else:
-            clm_key = "claim_{year}".format(year=end_date.year)
+        clm_key = "claims_{year}".format(year=end_date.year)
         ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
         keep_tables = []
