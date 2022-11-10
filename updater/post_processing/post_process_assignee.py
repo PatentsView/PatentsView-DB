@@ -1,9 +1,21 @@
 import csv
 import datetime
 import time
-
 import pandas as pd
 from sqlalchemy import create_engine
+
+from tqdm.notebook import tqdm
+tqdm.pandas()
+from thefuzz import fuzz
+import  multiprocess as mp
+from multiprocess import Pool
+import pymysql.cursors
+
+import pickle
+# from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
+import numpy as np
+from itertools import combinations
 
 from QA.post_processing.AssigneePostProcessing import AssigneePostProcessingQC
 from lib.configuration import get_connection_string, get_current_config
@@ -137,7 +149,7 @@ def create_assignee(update_config):
 
 
 def precache_assignees_ids(config):
-    suffix =  config['DATES']['END_DATE']
+    suffix = config['DATES']['END_DATE']
     create_query = """
         CREATE TABLE disambiguated_assignee_ids_{suffix} (assignee_id varchar(256),  PRIMARY KEY (`assignee_id`))
         """.format(suffix=suffix)
@@ -191,6 +203,153 @@ def create_canonical_assignees(**kwargs):
     config = get_current_config(schedule='quarterly',**kwargs)
     create_assignee(config)
 
+"""
+Archive
+# assignee_data = pd.read_sql_table(assignee_table, con=engine)
+# assignee_data = assignee_data.assign(gp=assignee_data.organization.str.lower().str[0:4])
+# gp_all_distances = assignee_data.groupby('gp').progress_apply(generate_combinations)
+# gp_all_distances = pd.concat(pool.map_async(generate_combinations, data_split))
+# connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
+#                              user=config['DATABASE_SETUP']['USERNAME'],
+#                              password=config['DATABASE_SETUP']['PASSWORD'],
+#                              db=config['PATENTSVIEW_DATABASES']["PROD_DB"],
+#                              charset='utf8mb4',
+#                              cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
+# q = f'select distinct lower(left(organization,4)) as org from {assignee_table};'
+# try:
+#     if not connection.open:
+#         connection.connect()
+#     with connection.cursor() as generic_cursor:
+#         generic_cursor.execute(q)
+#         assignee_org_list = generic_cursor.fetchall()
+# finally:
+#     if connection.open:
+#         connection.close()
+#     assignee_data = pd.DataFrame(assignee_org_list, columns=["gp"])
+# data_split = np.array_split(assignee_data_gp, 4)
+# pool = mp.Pool(4)
+# p_list = []
+# for data in data_split:
+#     print(data)
+#     print(type(data))
+#     data =pd.DataFrame(data)
+#     print(data.head())
+#     p = data.progress_apply(generate_combinations)
+#     p_list.append(p)
+#
+# gp_all_distances_t = []
+# for t in p_list:
+#     gp_all_distances_t.append(t.get())
+#
+# pool.close()
+# pool.join()
+"""
+
+def additional_post_processing(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    suffix = config['DATES']['END_DATE']
+    assignee_table = f"assignee_{suffix}"
+    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    assignee_data = pd.read_sql_table(assignee_table, con=engine)
+    assignee_data = assignee_data.assign(gp=assignee_data.organization.str.lower().str[0:4])
+    # assignee_data.gp.value_counts()
+    unique_assignees = assignee_data.gp.unique()
+    gp_all_distances_t = []
+    for ass in unique_assignees:
+        temp_data = assignee_data[assignee_data['gp']==ass]
+        temp = temp_data.progress_apply(generate_combinations)
+        gp_all_distances_t.append(temp)
+
+    # FOR TESTING
+    # assignee_data = assignee_data.sample(frac=0.2, replace=True, random_state=1)
+    # assignee_data_gp = assignee_data.groupby('gp').count()
+    # assignee_data_gp = assignee_data[['organization', 'gp']].groupby('gp').value_counts()
+    # assignee_data_gp = assignee_data.gp.value_counts()
+
+    # NEEDS SPEED IMPROVEMENT
+    # gp_all_distances = assignee_data_gp.progress_apply(generate_combinations)
+    documents = collect_training(gp_all_distances)
+    tfidf_vectorizer = CountVectorizer(ngram_range=(2, 10), lowercase=True, analyzer='char_wb')
+    tfidf_model = tfidf_vectorizer.fit(documents)
+    remapping(gp_all_distances, tfidf_model)
+    connections = build_network_graph(remapping)
+    clusters = build_clusters(connections)
+    melted_assignment = pd.DataFrame.from_dict(clusters, orient='index').reset_index().melt(id_vars='index')
+    final_assignment = melted_assignment[~melted_assignment.value.isna()]
+    final_assignment['value'].str.len().max()
+    final_assignment.to_sql(name='assignee_reassignment_final', con=engine)
+
+
+
+def build_network_graph(remapping):
+    import networkx as nx
+    G = nx.Graph()
+    G.add_edges_from(remapping)
+    print(len(G.nodes))
+    return nx.connected_components(G)
+
+def build_clusters(connections):
+    clusters = {}
+    for component in connections:
+        top_org = None
+        for node in component:
+            if top_org is None:
+                top_org = node
+                clusters[top_org] = []
+            else:
+                clusters[top_org].append(node)
+    return clusters
+
+def remapping(gp_all_distances, tfidf_model):
+    remapping = []
+    import scipy
+    for record in tqdm(gp_all_distances):
+        for top_org_idx in record:
+            # remapping[top_org_idx] = []
+            for comparison in record[top_org_idx]['comparison']:
+                X = tfidf_model.transform([str(record[top_org_idx]['org']).lower(),
+                                           str(comparison['org']).lower()])
+
+                # print(X.toarray())
+                rowsum = X.sum(axis=1)
+                ratio = rowsum[0, 0] / rowsum[1, 0]
+                if 0.85 < ratio < 1.15:
+                    remapping.append([str(record[top_org_idx]['org']), str(comparison['org'])])
+                    # {'org': comparison['org'], 'comparison_idx': comparison['comparison_idx'], 'measure': ratio})
+                # print(rowsum[[[0]]])
+                # print((rowsum[0][0] / rowsum[1][0])[[0]])
+                # print(np.nansum())
+                # print(sum(X[0] / sum(X[1])))
+            # print(X[0].multiply(X[1]).sum(axis=1) / len(tfidf_model.get_feature_names_out()))
+    return remapping
+
+def collect_training(gp_all_distances):
+    documents = []
+    for record in gp_all_distances:
+        for top_org_idx in record:
+            for comparison in record[top_org_idx]['comparison']:
+                documents.append(str(record[top_org_idx]['org']))
+                documents.append(str(comparison['org']))
+    return documents
+
+def generate_combinations(gp):
+    distances = {}
+    # print(gp.gp)
+    if gp.shape[0] > 5000 or gp.shape[0] < 2:
+        return distances
+    x = combinations(gp.index, 2)
+    l = len([y for y in x])
+    for a, b in tqdm(x, total=l):
+        top_org = gp.loc[a, 'organization']
+        comparison_org = gp.loc[b, 'organization']
+        overlap = fuzz.token_set_ratio(str(top_org).lower(), str(comparison_org).lower())
+        breakpoint()
+        if overlap > 95:
+            if a not in distances:
+                distances[a] = {'org': top_org, 'comparison': []}
+            else:
+                distances[a]['comparison'].append({'org': comparison_org, 'comparison_idx': b, 'overlap': overlap})
+    return distances
 
 def load_granted_lookup(**kwargs):
     config = get_current_config(schedule='quarterly',**kwargs)
@@ -207,12 +366,13 @@ def load_pregranted_lookup(**kwargs):
 
 
 def post_process_assignee(**kwargs):
-    update_granted_rawassignee(**kwargs)
-    update_pregranted_rawassignee(**kwargs)
-    precache_assignees(**kwargs)
-    create_canonical_assignees(**kwargs)
-    load_granted_lookup(**kwargs)
-    load_pregranted_lookup(**kwargs)
+    # update_granted_rawassignee(**kwargs)
+    # update_pregranted_rawassignee(**kwargs)
+    # precache_assignees(**kwargs)
+    # create_canonical_assignees(**kwargs)
+    additional_post_processing(**kwargs)
+    # load_granted_lookup(**kwargs)
+    # load_pregranted_lookup(**kwargs)
 
 
 def post_process_qc(**kwargs):
@@ -222,8 +382,7 @@ def post_process_qc(**kwargs):
 
 
 if __name__ == '__main__':
-    config = get_current_config(schedule='quarterly',**{
-        "execution_date": datetime.date(2020, 12, 29)
+    date = datetime.date(2022, 6, 30)
+    post_process_assignee(**{
+        "execution_date": date
     })
-    # post_process_assignee(config)
-    post_process_qc(config)
