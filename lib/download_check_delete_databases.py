@@ -119,8 +119,6 @@ def upload_tsv_backup_files(config, db, output_path, table_list):
     print("--------------------------------------------------------------")
     print("UPLOADING DATABASE BACKUPS FOR QA")
     print("--------------------------------------------------------------")
-    cstr = get_connection_string(config, 'PROD_DB')
-    engine = create_engine(cstr)
     defaults_file = "resources/sql.conf"
     if db == 'patent_text':
         pre = 'g_'
@@ -129,9 +127,9 @@ def upload_tsv_backup_files(config, db, output_path, table_list):
     if isinstance(table_list, str):
         for table in table_list.split(","):
             # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-            bash_command1 = f"unzip -d {output_path}/{db}.{pre}{table}.tsv.zip"
-            bash_command2 = f"mysql --defaults-file={defaults_file} --local-infile  -f {db} < {output_path}/{db}.{pre}{table}.tsv"
-            bash_command3 = f"LOAD DATA LOCAL INFILE '{output_path}{pre}{table}.tsv' INTO TABLE {table} FIELDS TERMINATED BY '\t' ENCLOSED BY '' LINES TERMINATED BY '\n' IGNORE 1 LINES;"
+            bash_command1 = f"unzip {output_path}/{db}.{pre}{table}.tsv.zip"
+            bash_command2 = f"mysql --defaults-file={defaults_file} --local-infile=1"
+            bash_command3 = f"LOAD DATA LOCAL INFILE '{output_path}{pre}{table}.tsv' INTO TABLE {db}.{table} FIELDS TERMINATED BY '\t' ENCLOSED BY '' LINES TERMINATED BY '\n' IGNORE 1 LINES;"
             bash_command4 = f"gzip {output_path}/{db}.{pre}{table}.sql"
             for i in [bash_command1, bash_command2, bash_command3, bash_command4]:
                 print(i)
@@ -344,7 +342,12 @@ if __name__ == '__main__':
         temp = f'detail_desc_text_{i}'
         de_list.append(temp)
     tab_list = b_list + dr_list + c_list + de_list
-    type = 'granted_patnet'
-    output_path = "/PatentDataVolume/DatabaseBackups/DataDelivery/20220630/patent/download"
+    type = 'granted_patent'
+    output_path = "/text_output/20220630/patent/download/"
     config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
-    upload_tsv_backup_files(config, output_path, 'patent_text', tab_list)
+    # upload_tsv_backup_files(config, output_path, 'patent_text', tab_list)
+    upload_tsv_backup_files(config, output_path, 'patent_text', ['brf_sum_text_2022', 'draw_desc_text_2022', 'claims_2022', 'detail_desc_text_2022'])
+
+
+
+
