@@ -115,14 +115,13 @@ def upload_tables_for_testing(config, db, output_path, table_list):
                     print(i)
                     subprocess_cmd(i)
 
-def upload_tsv_backup_files(config, db, table_list):
+def upload_tsv_backup_files(config, db, output_path, table_list):
     print("--------------------------------------------------------------")
     print("UPLOADING DATABASE BACKUPS FOR QA")
     print("--------------------------------------------------------------")
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
     defaults_file = "resources/sql.conf"
-    output_path = "/PatentDataVolume/DatabaseBackups/DataDelivery/20220630/patent/download"
     if db == 'patent_text':
         pre = 'g_'
     else:
@@ -345,3 +344,7 @@ if __name__ == '__main__':
         temp = f'detail_desc_text_{i}'
         de_list.append(temp)
     tab_list = b_list + dr_list + c_list + de_list
+    type = 'granted_patnet'
+    output_path = "/PatentDataVolume/DatabaseBackups/DataDelivery/20220630/patent/download"
+    config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
+    upload_tsv_backup_files(config, output_path, 'patent_text', tab_list)
