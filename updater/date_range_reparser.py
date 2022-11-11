@@ -10,6 +10,7 @@ def reparse(start, end, clearfirst = True, pubtype = 'pgpubs'):
     start = re.sub('[^\d]','', start)[-6:] #remove non-digits and get 6 digits
     end = re.sub('[^\d]','', end)[-6:] #remove non-digits and get 6 digits
     assert re.fullmatch('[0-9]{6}', start) and re.fullmatch('[0-9]{6}',end), 'enter start and end dates as "yymmdd" or "yyyymmdd" (punctuation separators allowed)'
+    assert pubtype in ('pgpubs','granted_patent'), f"pubtype must be either 'pgpubs'(default) or 'granted_patent'; {pubtype} provided" 
 
     config = get_current_config(pubtype, **{"execution_date": date.today()})
     folder_files = os.listdir(config['FOLDERS'][f'{pubtype}_bulk_xml_location'])
@@ -41,8 +42,8 @@ def reparse(start, end, clearfirst = True, pubtype = 'pgpubs'):
 
     for file in tqdm(usefiles):
         filedate = '20' + re.fullmatch('i?p[ag]([0-9]{6}).xml', file).group(1)
-        config['DATES']['START_DATE'] = filedate
-        config['DATES']['END_DATE'] = (datetime.strptime(filedate, "%Y%m%d") + timedelta(6)).strftime("%Y%m%d")
+        config['DATES']['END_DATE'] = filedate
+        config['DATES']['START_DATE'] = (datetime.strptime(filedate, "%Y%m%d") + timedelta(-6)).strftime("%Y%m%d")
         try:
             if clearfirst:
                 for table in cleartables:

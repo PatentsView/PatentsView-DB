@@ -372,7 +372,7 @@ def v1_ipcr_fixer(data, config):
     newdata['document_number'] = data['document_number']
     newdata['sequence'] = data['sequence']
     newdata['version'] = '20000101'
-    newdata['action_date'] = config['DATES']['START_DATE']
+    newdata['action_date'] = config['DATES']['END_DATE']
     newdata[['section', 'class', 'subclass', 'main_group', 'subgroup']] = data['full_code'].str.extract("([A-H])([0-9]{2})([A-Z])([0-9]{1,3})/([0-9]{2,})")
     return newdata
 
@@ -437,7 +437,7 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
                 dfs[df] = v1_uspc_fixer(dfs[df])
             elif df == 'rawassignee' and dfs[df].size > 0:
                 dfs[df] = rawassignee_QC(dfs[df])
-        year = config['DATES']['START_DATE'][:4]
+        year = config['DATES']['END_DATE'][:4]
         if df in ['claim','brf_sum_text','draw_desc_text','detail_desc_text']: # text tables - can add override for year-specific reparse to temp tables
             tabnam = df+'_{}'.format(year)
         else:
@@ -445,7 +445,7 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
-        dfs[df]['version_indicator'] = config['DATES']['START_DATE']
+        dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         if ('id' not in dfs[df].columns) and (df != 'government_interest'):
             dfs[df]['id'] = [str(uuid4()) for i in range(dfs[df].shape[0])] # generate unique ids where other ids absent.
         if xml_file_name.startswith('pa0') or xml_file_name.startswith('ipa'): #pgpubs file
