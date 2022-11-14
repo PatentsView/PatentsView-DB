@@ -1745,12 +1745,6 @@
   },
   "brf_sum_text_2022": {
     "fields": {
-      "uuid": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
       "patent_id": {
         "data_type": "varchar",
         "null_allowed": true,
@@ -4582,12 +4576,6 @@
   },
     "claims_2022": {
     "fields": {
-      "uuid": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
       "patent_id": {
         "data_type": "varchar",
         "null_allowed": true,
@@ -6653,12 +6641,6 @@
   },
   "detail_desc_text_2022": {
     "fields": {
-      "uuid": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
       "patent_id": {
         "data_type": "varchar",
         "null_allowed": true,
@@ -8712,12 +8694,6 @@
   },
   "draw_desc_text_2022": {
     "fields": {
-      "uuid": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
       "patent_id": {
         "data_type": "varchar",
         "null_allowed": true,

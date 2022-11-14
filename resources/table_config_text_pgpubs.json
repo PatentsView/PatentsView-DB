@@ -549,12 +549,6 @@
   },
   "brf_sum_text_2022": {
     "fields": {
-      "id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
       "pgpub_id": {
         "data_type": "int",
         "null_allowed": true,
@@ -1502,12 +1496,6 @@
   },
   "claims_2022": {
     "fields": {
-      "id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
       "pgpub_id": {
         "data_type": "int",
         "null_allowed": true,
@@ -2221,12 +2209,6 @@
   },
   "detail_desc_text_2022": {
     "fields": {
-      "id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
       "pgpub_id": {
         "data_type": "int",
         "null_allowed": true,
@@ -2928,12 +2910,6 @@
   },
     "draw_desc_text_2022": {
     "fields": {
-      "id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
       "pgpub_id": {
         "data_type": "int",
         "null_allowed": true,
