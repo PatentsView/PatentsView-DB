@@ -23,14 +23,15 @@ def reparse(start, end, clearfirst = True, pubtype = 'pgpubs'):
 
     if clearfirst:
         import json
-        from sqlalchemy import create_engine
+        from sqlalchemy import create_engine, inspect
         host = '{}'.format(config['DATABASE_SETUP']['HOST'])
         user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
         password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
         port = '{}'.format(config['DATABASE_SETUP']['PORT'])
+        database = '{}'.format(config['PATENTSVIEW_DATABASES']['REPARSE'])
 
         engine = create_engine('mysql+pymysql://{0}:{1}@{2}:{3}/?charset=utf8mb4'.format(user, password, host, port))
-
+        inspector = inspect(engine)
 
         tabletoggle = json.load(open(config['XML_PARSING']['table_toggle']))
         if pubtype == 'pgpubs':
@@ -38,7 +39,6 @@ def reparse(start, end, clearfirst = True, pubtype = 'pgpubs'):
         else: 
             tabletoggle = tabletoggle['granted_patent']
         cleartables = [table for table in tabletoggle if tabletoggle[table]]
-        prefix = config['PATENTSVIEW_DATABASES'][f'{pubtype}_upload_db']
 
     for file in tqdm(usefiles):
         filedate = '20' + re.fullmatch('i?p[ag]([0-9]{6}).xml', file).group(1)
@@ -46,9 +46,11 @@ def reparse(start, end, clearfirst = True, pubtype = 'pgpubs'):
         config['DATES']['START_DATE'] = (datetime.strptime(filedate, "%Y%m%d") + timedelta(-6)).strftime("%Y%m%d")
         try:
             if clearfirst:
+                existing_tables = inspector.get_table_names(database)
                 for table in cleartables:
-                    # remove data from weekly temp db in corresponding tables
-                    engine.execute(f"DELETE FROM {prefix}{filedate}.{table} WHERE version_indicator = '{filedate}'")
-            queue_parsers(config, pubtype)
+                    if table in existing_tables:
+                        # remove data from weekly temp db in corresponding tables
+                        engine.execute(f"DELETE FROM {database}.{table} WHERE version_indicator = '{filedate}'")
+            queue_parsers(config, pubtype, destination = 'REPARSE')
         except Exception as e:
             print(e)

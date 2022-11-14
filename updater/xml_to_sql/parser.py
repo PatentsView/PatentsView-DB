@@ -409,7 +409,7 @@ def rawassignee_QC(data):
         data.loc[badspots] = temp
     return data    
 
-def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
+def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destination='TEMP_UPLOAD_DB'):
     """
     Add all data to the MySQL database
     :param dfs: dictionary of dataframes for each table
@@ -418,8 +418,7 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map):
     """
     foreign_key_config = table_xml_map['foreign_key_config']
     sql_start = time.time()
-    #database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
-    database = 'pgpubs_table_gaps' # temporary switch
+    database = '{}'.format(config['PATENTSVIEW_DATABASES'][destination])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -516,7 +515,7 @@ def extract_document(xml_file):
         yield current_xml
 
 
-def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, unlink=False):
+def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, unlink=False, destination='TEMP_UPLOAD_DB'):
     """
     Parse all data from a single XML file into dataframe for each table
     :param xml_file: XML file with pgpubs data
@@ -612,7 +611,7 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
     for df in dfs:
         dfs[df].dropna(inplace=True, thresh=2) # drop any rows that have fewer than 2 non-Null values (i.e. any that have only the doc id)
     # Load the generated data frames to database
-    load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map)
+    load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destination=destination)
 
     xml_file_duration = round(
             time.time() - xml_file_start, 3)
@@ -727,7 +726,7 @@ def dtd_finder(xml_file):
     return None
 
 
-def queue_parsers(config, type='granted_patent'):
+def queue_parsers(config, type='granted_patent', destination='TEMP_UPLOAD_DB'):
     """
     Multiprocessing call of the parse_publication_xml function
     :param config: config file
@@ -778,10 +777,10 @@ def queue_parsers(config, type='granted_patent'):
                 })
         # break
         if parallelism > 1:
-            p = pool.apply_async(parse_publication_xml, (file_name, dtd_file, parsing_config, config, log_queue))
+            p = pool.apply_async(parse_publication_xml, (file_name, dtd_file, parsing_config, config, log_queue), {'destination':destination})
             p_list.append(p)
         else:
-            parse_publication_xml(file_name, dtd_file, parsing_config, config, log_queue)
+            parse_publication_xml(file_name, dtd_file, parsing_config, config, log_queue, destination=destination)
     if parallelism > 1:
         idx_counter = 0
         for t in p_list:
