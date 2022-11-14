@@ -210,9 +210,10 @@ class LawyerDisambiguator:
         from updater.disambiguation.lawyer_disambiguation.alchemy.schema import RawLawyer, Lawyer, patentlawyer
         from updater.disambiguation.lawyer_disambiguation.tasks import bulk_commit_inserts, bulk_commit_updates
         from updater.disambiguation.lawyer_disambiguation import alchemy
-        session = alchemy.fetch_session(dbtype=self.doctype)
-        session.execute('set foreign_key_checks = 0;')
-        session.commit()
+        # session = alchemy.fetch_session(dbtype=self.doctype)
+        with alchemy.fetch_session(dbtype=self.doctype) as session:
+            session.execute('set foreign_key_checks = 0;')
+            session.commit()
 
         # pickle_files = [f for f in listdir(self.disambig_folder) if isfile(join(self.disambig_folder, f))]
         # for letter in ['u','q']:
@@ -228,7 +229,7 @@ class LawyerDisambiguator:
             print(f"Finished uploading data for letter: {letter}!")
             print(" ")
 
-        session.close_all()
+        # session.close_all()
 
     def create_lawyer_table(self, id_map, lawyer_dict, letter):
         """
