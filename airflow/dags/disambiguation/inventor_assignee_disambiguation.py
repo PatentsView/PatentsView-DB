@@ -309,12 +309,12 @@ post_process_create_canonical_assignees = PythonOperator(task_id='assignee_creat
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
                                                          queue='data_collector', pool='database_write_iops_contenders')
-post_process_assignees = PythonOperator(task_id='assignee_post_processing',
-                                                         python_callable=additional_post_processing_assignee,
-                                                         dag=disambiguation,
-                                                         on_success_callback=airflow_task_success,
-                                                         on_failure_callback=airflow_task_failure,
-                                                         queue='data_collector', pool='database_write_iops_contenders')
+# post_process_assignees = PythonOperator(task_id='assignee_post_processing',
+#                                                          python_callable=additional_post_processing_assignee,
+#                                                          dag=disambiguation,
+#                                                          on_success_callback=airflow_task_success,
+#                                                          on_failure_callback=airflow_task_failure,
+#                                                          queue='data_collector', pool='database_write_iops_contenders')
 post_process_load_assignee_granted_lookup = PythonOperator(task_id='assignee_load_granted_lookup',
                                                            python_callable=load_granted_assignee_lookup,
                                                            dag=disambiguation,
@@ -440,10 +440,10 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                                              assignee_finalize_results, assignee_upload_results,
                                              assignee_archive_results, post_process_update_pregranted_rawassignee,
                                              post_process_update_granted_rawassignee, post_process_precache_assignees,
-                                             post_process_create_canonical_assignees,
-                                             post_process_assignees
+                                             post_process_create_canonical_assignees
+                                             # post_process_assignees
                                              ],
-                     'granted_persistent': [post_process_assignees,
+                     'granted_persistent': [ #post_process_assignees,
                                             post_process_create_canonical_assignees,
                                             post_process_load_assignee_granted_lookup,
                                             prepare_granted_persistent_wide_assignee,
@@ -452,7 +452,7 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                                             qc_post_process_assignee_operator
                                             ],
                      'pgpubs_persistent': [
-                         post_process_assignees,
+                         # post_process_assignees,
                          post_process_create_canonical_assignees,
                          post_process_load_assignee_pregranted_lookup,
                          prepare_pregrant_persistent_wide_assignee,
