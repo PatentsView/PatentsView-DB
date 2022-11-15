@@ -377,13 +377,13 @@ def load_pregranted_lookup(**kwargs):
                       include_location=True)
 
 
-def post_process_assignee(**kwargs):
-    update_granted_rawassignee(**kwargs)
-    update_pregranted_rawassignee(**kwargs)
-    precache_assignees(**kwargs)
-    create_canonical_assignees(**kwargs)
-    load_granted_lookup(**kwargs)
-    load_pregranted_lookup(**kwargs)
+# def post_process_assignee(**kwargs):
+#     update_granted_rawassignee(**kwargs)
+#     update_pregranted_rawassignee(**kwargs)
+#     precache_assignees(**kwargs)
+#     create_canonical_assignees(**kwargs)
+#     load_granted_lookup(**kwargs)
+#     load_pregranted_lookup(**kwargs)
 
 
 def additional_post_processing_assignee(**kwargs):
