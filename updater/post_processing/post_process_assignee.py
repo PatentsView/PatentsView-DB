@@ -200,7 +200,7 @@ def precache_assignees(**kwargs):
 
 
 def create_canonical_assignees(**kwargs):
-    config = get_current_config(schedule='quarterly',**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     create_assignee(config)
 
 """
@@ -250,36 +250,57 @@ def additional_post_processing(**kwargs):
     suffix = config['DATES']['END_DATE']
     assignee_table = f"assignee_{suffix}"
     engine = create_engine(get_connection_string(config, "RAW_DB"))
+    engine.execute("Drop table if exists assignee_reassignment_final")
     assignee_data = pd.read_sql_table(assignee_table, con=engine)
-    assignee_data = assignee_data.assign(gp=assignee_data.organization.str.lower().str[0:4])
-    # assignee_data.gp.value_counts()
-    unique_assignees = assignee_data.gp.unique()
-    gp_all_distances_t = []
-    for ass in unique_assignees:
-        temp_data = assignee_data[assignee_data['gp']==ass]
-        temp = temp_data.progress_apply(generate_combinations)
-        gp_all_distances_t.append(temp)
-
-    # FOR TESTING
     # assignee_data = assignee_data.sample(frac=0.2, replace=True, random_state=1)
-    # assignee_data_gp = assignee_data.groupby('gp').count()
-    # assignee_data_gp = assignee_data[['organization', 'gp']].groupby('gp').value_counts()
-    # assignee_data_gp = assignee_data.gp.value_counts()
+    assignee_data = assignee_data.assign(gp=assignee_data.organization.str.lower().str[0:4])
+    unique_assignees = assignee_data.gp.unique()
+    gp_all_distances = []
+    for ass in unique_assignees:
+        print(ass)
+        temp_raw_data = assignee_data[assignee_data['gp']==ass]
+        unique_orgs = temp_raw_data.organization.unique()
+        new_dataframe_for_combos = pd.DataFrame(unique_orgs, columns=["organization"])
+        temp = generate_combinations(new_dataframe_for_combos)
+        gp_all_distances.append(temp)
 
-    # NEEDS SPEED IMPROVEMENT
-    # gp_all_distances = assignee_data_gp.progress_apply(generate_combinations)
     documents = collect_training(gp_all_distances)
     tfidf_vectorizer = CountVectorizer(ngram_range=(2, 10), lowercase=True, analyzer='char_wb')
     tfidf_model = tfidf_vectorizer.fit(documents)
-    remapping(gp_all_distances, tfidf_model)
-    connections = build_network_graph(remapping)
+    remap = remapping(gp_all_distances, tfidf_model)
+    connections = build_network_graph(remap)
     clusters = build_clusters(connections)
     melted_assignment = pd.DataFrame.from_dict(clusters, orient='index').reset_index().melt(id_vars='index')
     final_assignment = melted_assignment[~melted_assignment.value.isna()]
     final_assignment['value'].str.len().max()
     final_assignment.to_sql(name='assignee_reassignment_final', con=engine)
 
-
+def additional_post_processing_update_queries(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    suffix = config['DATES']['END_DATE']
+    adm_table = f"assignee_disambiguation_mapping_{suffix}"
+    query_list = []
+    db_list = ["patent", "pregrant_publications"]
+    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    for db in db_list:
+        query_1 = f"""
+        update {db}.{adm_table} adm
+            join patent.assignee a on a.id = adm.assignee_id
+            join patent.assignee_reassignment_final arr on arr.`index` collate utf8mb4_bin = a.organization
+            join patent.assignee a2 on arr.`value` collate utf8mb4_bin = a2.organization
+        set adm.assignee_id=a2.id;
+        """
+        query_list.append(query_1)
+        query_2 = f"""
+        update {db}.rawassignee r
+            join patent.assignee_reassignment_final arr on arr.`index` collate utf8mb4_bin = r.organization
+            join patent.assignee a2 on arr.`value` collate utf8mb4_bin = a2.organization
+        set adm.assignee_id=a2.id;
+            """
+        query_list.append(query_2)
+    for q in query_list:
+        print(q)
+        engine.execute(q)
 
 def build_network_graph(remapping):
     import networkx as nx
@@ -305,22 +326,14 @@ def remapping(gp_all_distances, tfidf_model):
     import scipy
     for record in tqdm(gp_all_distances):
         for top_org_idx in record:
-            # remapping[top_org_idx] = []
             for comparison in record[top_org_idx]['comparison']:
                 X = tfidf_model.transform([str(record[top_org_idx]['org']).lower(),
                                            str(comparison['org']).lower()])
 
-                # print(X.toarray())
                 rowsum = X.sum(axis=1)
                 ratio = rowsum[0, 0] / rowsum[1, 0]
                 if 0.85 < ratio < 1.15:
                     remapping.append([str(record[top_org_idx]['org']), str(comparison['org'])])
-                    # {'org': comparison['org'], 'comparison_idx': comparison['comparison_idx'], 'measure': ratio})
-                # print(rowsum[[[0]]])
-                # print((rowsum[0][0] / rowsum[1][0])[[0]])
-                # print(np.nansum())
-                # print(sum(X[0] / sum(X[1])))
-            # print(X[0].multiply(X[1]).sum(axis=1) / len(tfidf_model.get_feature_names_out()))
     return remapping
 
 def collect_training(gp_all_distances):
@@ -337,13 +350,12 @@ def generate_combinations(gp):
     # print(gp.gp)
     if gp.shape[0] > 5000 or gp.shape[0] < 2:
         return distances
-    x = combinations(gp.index, 2)
+    x = list(combinations(gp.index, 2))
     l = len([y for y in x])
     for a, b in tqdm(x, total=l):
         top_org = gp.loc[a, 'organization']
         comparison_org = gp.loc[b, 'organization']
         overlap = fuzz.token_set_ratio(str(top_org).lower(), str(comparison_org).lower())
-        breakpoint()
         if overlap > 95:
             if a not in distances:
                 distances[a] = {'org': top_org, 'comparison': []}
@@ -352,27 +364,33 @@ def generate_combinations(gp):
     return distances
 
 def load_granted_lookup(**kwargs):
-    config = get_current_config(schedule='quarterly',**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
                       parent_entity_id='patent_id', entity='assignee',
                       include_location=True, location_strict=False)
 
 
 def load_pregranted_lookup(**kwargs):
-    config = get_current_config(schedule='quarterly',**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
                       parent_entity_id='document_number', entity="assignee",
                       include_location=True)
 
 
 def post_process_assignee(**kwargs):
-    # update_granted_rawassignee(**kwargs)
-    # update_pregranted_rawassignee(**kwargs)
-    # precache_assignees(**kwargs)
-    # create_canonical_assignees(**kwargs)
+    update_granted_rawassignee(**kwargs)
+    update_pregranted_rawassignee(**kwargs)
+    precache_assignees(**kwargs)
+    create_canonical_assignees(**kwargs)
+    load_granted_lookup(**kwargs)
+    load_pregranted_lookup(**kwargs)
+
+
+def additional_post_processing_assignee(**kwargs):
     additional_post_processing(**kwargs)
-    # load_granted_lookup(**kwargs)
-    # load_pregranted_lookup(**kwargs)
+    additional_post_processing_update_queries(**kwargs)
+    precache_assignees(**kwargs)
+    create_canonical_assignees(**kwargs)
 
 
 def post_process_qc(**kwargs):
@@ -383,6 +401,6 @@ def post_process_qc(**kwargs):
 
 if __name__ == '__main__':
     date = datetime.date(2022, 6, 30)
-    post_process_assignee(**{
+    additional_post_processing_assignee(**{
         "execution_date": date
     })
