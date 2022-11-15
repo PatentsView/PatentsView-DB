@@ -318,7 +318,7 @@ post_process_create_canonical_assignees = PythonOperator(task_id='assignee_creat
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
                                                          queue='data_collector', pool='database_write_iops_contenders')
-post_process_assignees = PythonOperator(task_id='assignee_post_processing',
+post_process_assignees = PythonOperator(task_id='assignee_additional_post_processing',
                                                          python_callable=additional_post_processing_assignee,
                                                          dag=disambiguation,
                                                          on_success_callback=airflow_task_success,
