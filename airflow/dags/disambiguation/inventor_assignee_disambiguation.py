@@ -224,6 +224,15 @@ create_pregranted_persistent_wide_inventor = PythonOperator(
     },
     dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 )
+update_pregranted_persistent_long_inventor = PythonOperator(
+    task_id='update_pregranted_persistent_long_inventor',
+    python_callable=update_long_entity,
+    op_kwargs={
+        'entity': 'inventor',
+        'database_type': 'pgpubs'
+    },
+    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
+)
 
 qc_post_process_inventor_operator = PythonOperator(task_id='qc_post_process_inventor',
                                                    python_callable=qc_inventor_post_processing,
@@ -309,12 +318,12 @@ post_process_create_canonical_assignees = PythonOperator(task_id='assignee_creat
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
                                                          queue='data_collector', pool='database_write_iops_contenders')
-# post_process_assignees = PythonOperator(task_id='assignee_post_processing',
-#                                                          python_callable=additional_post_processing_assignee,
-#                                                          dag=disambiguation,
-#                                                          on_success_callback=airflow_task_success,
-#                                                          on_failure_callback=airflow_task_failure,
-#                                                          queue='data_collector', pool='database_write_iops_contenders')
+post_process_assignees = PythonOperator(task_id='assignee_post_processing',
+                                                         python_callable=additional_post_processing_assignee,
+                                                         dag=disambiguation,
+                                                         on_success_callback=airflow_task_success,
+                                                         on_failure_callback=airflow_task_failure,
+                                                         queue='data_collector', pool='database_write_iops_contenders')
 post_process_load_assignee_granted_lookup = PythonOperator(task_id='assignee_load_granted_lookup',
                                                            python_callable=load_granted_assignee_lookup,
                                                            dag=disambiguation,
@@ -423,14 +432,15 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                                              post_process_create_canonical_inventors],
                      'inventor_post_processing_1': [post_process_create_canonical_inventors,
                                                     post_process_load_granted_lookup,
-                                                    update_granted_persistent_long_inventor,
                                                     prepare_granted_persistent_wide_inventor,
                                                     create_granted_persistent_wide_inventor,
+                                                    update_granted_persistent_long_inventor,
                                                     qc_post_process_inventor_operator],
                      'inventor_post_processing_2': [post_process_create_canonical_inventors,
                                                     post_process_load_pregranted_lookup,
                                                     prepare_pregranted_persistent_wide_inventor,
                                                     create_pregranted_persistent_wide_inventor,
+                                                    update_pregranted_persistent_long_inventor,
                                                     qc_post_process_inventor_operator],
                      'assignee_mention': [assignee_build_assignee_features, assignee_run_clustering],
                      'cross_link_1': [inv_build_coinventor_features, assignee_run_clustering],
@@ -440,24 +450,24 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                                              assignee_finalize_results, assignee_upload_results,
                                              assignee_archive_results, post_process_update_pregranted_rawassignee,
                                              post_process_update_granted_rawassignee, post_process_precache_assignees,
-                                             post_process_create_canonical_assignees
-                                             # post_process_assignees
+                                             post_process_create_canonical_assignees,
+                                             post_process_assignees
                                              ],
-                     'granted_persistent': [ #post_process_assignees,
+                     'granted_persistent': [ post_process_assignees,
                                             post_process_create_canonical_assignees,
                                             post_process_load_assignee_granted_lookup,
                                             prepare_granted_persistent_wide_assignee,
-                                            update_granted_persistent_long_assignee,
                                             create_granted_persistent_wide_assignee,
+                                            update_granted_persistent_long_assignee,
                                             qc_post_process_assignee_operator
                                             ],
                      'pgpubs_persistent': [
-                         # post_process_assignees,
+                         post_process_assignees,
                          post_process_create_canonical_assignees,
                          post_process_load_assignee_pregranted_lookup,
                          prepare_pregrant_persistent_wide_assignee,
-                         update_pregrant_persistent_long_assignee,
                          create_pregrant_persistent_wide_assignee,
+                         update_pregrant_persistent_long_assignee,
                          qc_post_process_assignee_operator
                      ],
                      'location_post_processing': [post_process_location_operator, qc_post_process_location_operator],
