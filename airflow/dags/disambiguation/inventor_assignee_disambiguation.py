@@ -453,8 +453,7 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                                              post_process_create_canonical_assignees,
                                              post_process_assignees
                                              ],
-                     'granted_persistent': [ post_process_assignees,
-                                            post_process_create_canonical_assignees,
+                     'granted_persistent': [post_process_assignees,
                                             post_process_load_assignee_granted_lookup,
                                             prepare_granted_persistent_wide_assignee,
                                             create_granted_persistent_wide_assignee,
@@ -463,7 +462,6 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                                             ],
                      'pgpubs_persistent': [
                          post_process_assignees,
-                         post_process_create_canonical_assignees,
                          post_process_load_assignee_pregranted_lookup,
                          prepare_pregrant_persistent_wide_assignee,
                          create_pregrant_persistent_wide_assignee,
