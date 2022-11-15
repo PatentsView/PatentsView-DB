@@ -389,8 +389,8 @@ def post_process_assignee(**kwargs):
 def additional_post_processing_assignee(**kwargs):
     additional_post_processing(**kwargs)
     additional_post_processing_update_queries(**kwargs)
-    precache_assignees(**kwargs)
-    create_canonical_assignees(**kwargs)
+    # precache_assignees(**kwargs)
+    # create_canonical_assignees(**kwargs)
 
 
 def post_process_qc(**kwargs):
