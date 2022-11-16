@@ -148,7 +148,7 @@ def extract_text_from_all_children(element):
 
 def parse_description(patent_doc, text_type):
     """
-    Parse and extract data from "description" fields (i.e. brf_sum_text, claim, draw_desc_text)
+    Parse and extract data from "description" fields (i.e. brf_sum_text, claims, draw_desc_text)
     :param patent_doc: XML element containing text data
     :param text_type: Data Field for which text is to be extracted
     :return: Text data from each element
@@ -257,7 +257,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                 data_list[field["field_name"]] = seq
             # If we are looking for the text data in the claims table use the text_extractor to get the right data
             # Claims are special cases
-            elif tab['friendly_name'] == 'Claim' and field['field_name'] in ['text', 'dependent']: # dependent added to handle minor difference between v1.5 and v1.6. may revert if problematic
+            elif tab['friendly_name'] == 'Claims' and field['field_name'] in ['claim_text', 'dependent']: # dependent added to handle minor difference between v1.5 and v1.6. may revert if problematic
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
@@ -272,7 +272,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                 else: 
                     joinedtext = ', '.join(partial_strings) # dependent needs listed numbers.
                 data_list[field["field_name"]] = re.sub(" +(?=[ \.,])","",joinedtext)
-            elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'text':
+            elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'draw_desc_text':
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
@@ -437,18 +437,24 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destina
             elif df == 'rawassignee' and dfs[df].size > 0:
                 dfs[df] = rawassignee_QC(dfs[df])
         year = config['DATES']['END_DATE'][:4]
-        if df in ['claim','brf_sum_text','draw_desc_text','detail_desc_text']: # text tables - can add override for year-specific reparse to temp tables
+        if df in ['claims','brf_sum_text','draw_desc_text','detail_desc_text']: # text tables - can add override for year-specific reparse to temp tables
             tabnam = df+'_{}'.format(year)
         else:
             tabnam = df
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
+        if df == 'government_interest':
+            narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
+            dfs[df] = dfs[df][~narows]
+            dfs[df]['gi_statement'] = dfs[df]['gi_statement'].str.strip()
+        elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
+            dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
-        if ('id' not in dfs[df].columns) and (df != 'government_interest'):
-            dfs[df]['id'] = [str(uuid4()) for i in range(dfs[df].shape[0])] # generate unique ids where other ids absent.
+        if ('id' not in dfs[df].columns) and ('uuid' not in dfs[df].columns) and (df != 'government_interest'):
+            dfs[df]['uuid'] = [str(uuid4()) for i in range(dfs[df].shape[0])] # generate unique ids where other ids absent.
         if xml_file_name.startswith('pa0') or xml_file_name.startswith('ipa'): #pgpubs file
-            if df in ['claim','brf_sum_text','draw_desc_text','detail_desc_text']: #text type
+            if df in ['claims','brf_sum_text','draw_desc_text','detail_desc_text']: #text type
                 template = 'pgpubs_text'
                 temptable = df+'_'+year
             else: #regular table 
