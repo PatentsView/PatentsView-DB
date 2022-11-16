@@ -1145,8 +1145,8 @@
       "multi_valued": false,
       "fields": [
         {
-          "field_name": "text",
-          "friendly_name": "Text",
+          "field_name": "summary_text",
+          "friendly_name": "Summary Text",
           "xml_path": "description",
           "description": "Summary of Invention",
           "attribute": null,
@@ -1164,8 +1164,8 @@
         "multi_valued": true,
         "entity_root_path": "description/description-of-drawings/",
         "fields": [{
-            "field_name": "text",
-            "friendly_name": "Text",
+            "field_name": "draw_desc_text",
+            "friendly_name": "Drawing Description Text",
             "xml_path": ".",
             "description": "Brief Description of Drawings",
             "sequence": false,
@@ -1174,8 +1174,8 @@
             "tag": false,
             "data-type": "fulltext"
         },{
-            "field_name": "sequence",
-            "friendly_name": "Sequence",
+            "field_name": "draw_desc_sequence",
+            "friendly_name": "Drawing Description Sequence",
             "xml_path": ".",
             "attribute": null,
             "description": null,
@@ -1193,8 +1193,8 @@
       "multi_valued": false,
       "fields": [
         {
-          "field_name": "text",
-          "friendly_name": "Text",
+          "field_name": "description_text",
+          "friendly_name": "Description Text",
           "xml_path": "description",
           "description": "Detailed Description",
           "sequence": false,
@@ -1226,14 +1226,14 @@
       "filename": "rel_app_text.tsv"
     },
 {
-      "table_name": "claim",
-      "friendly_name": "Claim",
+      "table_name": "claims",
+      "friendly_name": "Claims",
       "multi_valued": true,
       "entity_root_path": "claims/",
       "fields": [
         {
-          "field_name": "text",
-          "friendly_name": "Text",
+          "field_name": "claim_text",
+          "friendly_name": "Claim Text",
           "xml_path": "claim-text",
           "attribute": null,
           "description": null,
@@ -1243,8 +1243,8 @@
           "data-type": "fulltext"
         },
         {
-          "field_name": "sequence",
-          "friendly_name": "Sequence",
+          "field_name": "claim_sequence",
+          "friendly_name": "Claim Sequence",
           "xml_path": ".",
           "attribute": null,
           "description": null,
@@ -1254,8 +1254,8 @@
           "data-type": "string"
         },
         {
-          "field_name": "num",
-          "friendly_name": "num",
+          "field_name": "claim_number",
+          "friendly_name": "Claim Number",
           "xml_path": ".",
           "attribute": "num",
           "description": null,
