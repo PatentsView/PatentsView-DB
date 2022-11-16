@@ -12,7 +12,7 @@ from uuid import uuid4
 
 import pandas as pd
 from lxml import etree
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 from sqlalchemy.dialects import mysql
 
 from lib.configuration import get_current_config
@@ -427,6 +427,7 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destina
     text_output_folder = config['FOLDERS']['TEXT_OUTPUT_FOLDER']
     engine = create_engine(
             'mysql+pymysql://{0}:{1}@{2}:{3}/?charset=utf8mb4'.format(user, password, host, port))
+    inspector = inspect(engine)
 
     for df in dfs:
         if xml_file_name.startswith('pa0'):#only 2001-2004 start with pa instead of ipa
@@ -451,8 +452,6 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destina
         elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
             dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
-        if ('id' not in dfs[df].columns) and ('uuid' not in dfs[df].columns) and (df != 'government_interest'):
-            dfs[df]['uuid'] = [str(uuid4()) for i in range(dfs[df].shape[0])] # generate unique ids where other ids absent.
         if xml_file_name.startswith('pa0') or xml_file_name.startswith('ipa'): #pgpubs file
             if df in ['claims','brf_sum_text','draw_desc_text','detail_desc_text']: #text type
                 template = 'pgpubs_text'
@@ -470,6 +469,11 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destina
         try:
             # turned off temporarily for testing pgp botanics
             engine.execute(f"CREATE TABLE IF NOT EXISTS {database}.{tabnam} LIKE {template}.{temptable};") # create table to match column parameters of main DB - avoid dtype issues
+            dbcols = [col['name'] for col in inspector.get_columns(tabnam, database)]
+            if ('id' in dbcols) and ('id' not in dfs[df].columns):
+                dfs[df]['id'] = [str(uuid4()) for i in range(dfs[df].shape[0])] # generate unique ids where other ids absent.
+            if ('uuid' in dbcols) and ('uuid' not in dfs[df].columns):
+                dfs[df]['uuid'] = [str(uuid4()) for i in range(dfs[df].shape[0])] # generate unique ids where other ids absent.
             dfs[df].to_sql(tabnam, con=engine, schema=database, if_exists='append', index=False)
         except Exception as e:
             log_queue.put({
