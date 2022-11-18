@@ -122,7 +122,7 @@ where `patent`.`figures`.`version_indicator` <= '{{datestring}}';
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_exports_granted`.`g_foreign_citation` AS 
 select `patent`.`foreigncitation`.`patent_id` AS `patent_id`,
 `patent`.`foreigncitation`.`sequence` AS `citation_sequence`,
-`patent`.`foreigncitation`.`number` AS `citation_number`,
+`patent`.`foreigncitation`.`number` AS `citation_application_id`,
 `patent`.`foreigncitation`.`date` AS `citation_date`,
 `patent`.`foreigncitation`.`category` AS `citation_category`,
 `patent`.`foreigncitation`.`country` AS `citation_country` 
