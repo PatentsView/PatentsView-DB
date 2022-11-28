@@ -1,5 +1,5 @@
 {
-  "foreign_citation": 
+  "g_foreign_citation": 
     {
       "fields": {
         "patent_id": {
@@ -43,7 +43,7 @@
         ["BulkDownloadsTesterGranted"]
     }
   ,
-  "inventor_not_disambiguated": 
+  "g_inventor_not_disambiguated": 
     {
       "fields": {
         "patent_id": {
@@ -64,13 +64,13 @@
           "category": false,
           "location_field": false
         },
-        "inventor_name_first": {
+        "raw_inventor_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "inventor_name_last": {
+        "raw_inventor_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -92,12 +92,18 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "persistent_assignee": 
+  "g_persistent_assignee": 
     {
       "fields": {
-        "rawassignee_uuid": {
+        "patent_id": {
           "data_type": "varchar",
-          "null_allowed": false,
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "sequence": {
+          "data_type": "int",
+          "null_allowed": true,
           "category": false,
           "location_field": false
         },
@@ -184,12 +190,18 @@
           "null_allowed": true,
           "category": false,
           "location_field": false
+        },
+        "disamb_assignee_id_20220630": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
         }
       },
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "wipo": 
+  "g_wipo_technology": 
     {
       "fields": {
         "patent_id": {
@@ -226,7 +238,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "cpc_title": 
+  "g_cpc_title": 
     {
       "fields": {
         "cpc_subclass": {
@@ -269,7 +281,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "foreign_priority": 
+  "g_foreign_priority": 
     {
       "fields": {
         "patent_id": {
@@ -312,7 +324,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "us_patent_citation": 
+  "g_us_patent_citation": 
     {
       "fields": {
         "patent_id": {
@@ -361,7 +373,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "govinterest_org": 
+  "g_gov_interest_org": 
     {
       "fields": {
         "patent_id": {
@@ -404,7 +416,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "other_reference": 
+  "g_other_reference": 
     {
       "fields": {
         "patent_id": {
@@ -429,7 +441,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "us_citation": 
+  "g_us_citation": 
     {
       "fields": {
         "patent_id": {
@@ -508,7 +520,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "attorney_not_disambiguated": 
+  "g_attorney_not_disambiguated": 
     {
       "fields": {
         "attorney_id": {
@@ -529,19 +541,19 @@
           "category": false,
           "location_field": false
         },
-        "attorney_name_first": {
+        "raw_attorney_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "attorney_name_last": {
+        "raw_attorney_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "attorney_organization": {
+        "raw_attorney_organization": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -557,12 +569,18 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "persistent_inventor": 
+  "g_persistent_inventor": 
     {
       "fields": {
-        "rawinventor_uuid": {
+        "patent_id": {
           "data_type": "varchar",
-          "null_allowed": false,
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "sequence": {
+          "data_type": "int",
+          "null_allowed": true,
           "category": false,
           "location_field": false
         },
@@ -649,12 +667,18 @@
           "null_allowed": true,
           "category": false,
           "location_field": false
+        },
+        "disamb_inventor_id_20220630": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
         }
       },
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "examiner_not_disambiguated": 
+  "g_examiner_not_disambiguated": 
     {
       "fields": {
         "patent_id": {
@@ -663,13 +687,13 @@
           "category": false,
           "location_field": false
         },
-        "examiner_name_first": {
+        "raw_examiner_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "examiner_name_last": {
+        "raw_examiner_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -691,7 +715,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "cpc_current": 
+  "g_cpc_current": 
     {
       "fields": {
         "patent_id": {
@@ -746,7 +770,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "applicant_not_disambiguated": 
+  "g_applicant_not_disambiguated": 
     {
       "fields": {
         "patent_id": {
@@ -761,19 +785,19 @@
           "category": false,
           "location_field": false
         },
-        "applicant_name_first": {
+        "raw_applicant_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "applicant_name_last": {
+        "raw_applicant_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "applicant_organization": {
+        "raw_applicant_organization": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -801,7 +825,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "uspc_at_issue": 
+  "g_uspc_at_issue": 
     {
       "fields": {
         "patent_id": {
@@ -844,7 +868,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "location_disambiguated": 
+  "g_location_disambiguated": 
     {
       "fields": {
         "location_id": {
@@ -853,19 +877,19 @@
           "category": false,
           "location_field": false
         },
-        "city": {
+        "disambig_city": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "state": {
+        "disambig_state": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": true,
           "location_field": false
         },
-        "country": {
+        "disambig_country": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -905,7 +929,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "attorney_disambiguated": 
+  "g_attorney_disambiguated": 
     {
       "fields": {
         "patent_id": {
@@ -920,19 +944,25 @@
           "category": false,
           "location_field": false
         },
-        "attorney_name_first": {
+        "attorney_id": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "attorney_name_last": {
+        "disambig_attorney_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "attorney_organization": {
+        "disambig_attorney_name_last": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "disambig_attorney_organization": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -948,7 +978,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "assignee_disambiguated": 
+  "g_assignee_disambiguated": 
     {
       "fields": {
         "patent_id": {
@@ -969,19 +999,19 @@
           "category": false,
           "location_field": false
         },
-        "assignee_individual_name_first": {
+        "disambig_assignee_individual_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "assignee_individual_name_last": {
+        "disambig_assignee_individual_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "assignee_organization": {
+        "disambig_assignee_organization": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -1003,7 +1033,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "ipcr": 
+  "g_ipc_at_issue": 
     {
       "fields": {
         "patent_id": {
@@ -1094,7 +1124,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "assignee_not_disambiguated": 
+  "g_assignee_not_disambiguated": 
     {
       "fields": {
         "patent_id": {
@@ -1115,19 +1145,19 @@
           "category": false,
           "location_field": false
         },
-        "assignee_individual_name_first": {
+        "raw_assignee_individual_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "assignee_individual_name_last": {
+        "raw_assignee_individual_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "assignee_organization": {
+        "raw_assignee_organization": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -1149,7 +1179,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "us_term_of_grant": 
+  "g_us_term_of_grant": 
     {
       "fields": {
         "patent_id": {
@@ -1186,7 +1216,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "application": 
+  "g_application": 
     {
       "fields": {
         "application_id": {
@@ -1229,7 +1259,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "patent": 
+  "g_patent": 
     {
       "fields": {
         "patent_id": {
@@ -1290,7 +1320,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "inventor_disambiguated": 
+  "g_inventor_disambiguated": 
     {
       "fields": {
         "patent_id": {
@@ -1311,13 +1341,13 @@
           "category": false,
           "location_field": false
         },
-        "inventor_name_first": {
+        "disambig_inventor_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "inventor_name_last": {
+        "disambig_inventor_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -1345,7 +1375,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "us_application_citation": 
+  "g_us_application_citation": 
     {
       "fields": {
         "patent_id": {
@@ -1394,7 +1424,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "us_rel_doc": 
+  "g_us_rel_doc": 
     {
       "fields": {
         "patent_id": {
@@ -1455,7 +1485,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "figures": 
+  "g_figures": 
     {
       "fields": {
         "patent_id": {
@@ -1480,7 +1510,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "location_not_disambiguated": 
+  "g_location_not_disambiguated": 
     {
       "fields": {
         "rawlocation_id": {
@@ -1495,19 +1525,19 @@
           "category": false,
           "location_field": false
         },
-        "city": {
+        "raw_city": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "state": {
+        "raw_state": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": true,
           "location_field": false
         },
-        "country": {
+        "raw_country": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -1517,7 +1547,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "rel_app_text": 
+  "g_rel_app_text": 
     {
       "fields": {
         "patent_id": {
@@ -1536,7 +1566,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "govinterest_contracts": 
+  "g_gov_interest_contracts": 
     {
       "fields": {
         "patent_id": {
@@ -1555,7 +1585,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "govinterest": 
+  "g_gov_interest": 
     {
       "fields": {
         "patent_id": {
@@ -1574,7 +1604,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "pct_data": 
+  "g_pct_data": 
     {
       "fields": {
         "patent_id": {
@@ -1583,7 +1613,7 @@
           "category": false,
           "location_field": false
         },
-        "published_filed_date": {
+        "published_or_filed_date": {
           "data_type": "date",
           "null_allowed": true,
           "category": false,
@@ -1629,7 +1659,7 @@
       "TestScripts": ["BulkDownloadsTesterGranted"]
     }
   ,
-  "botanic": 
+  "g_botanic": 
     {
       "fields": {
         "patent_id": {

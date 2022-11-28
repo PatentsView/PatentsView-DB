@@ -1,8 +1,8 @@
 {
-  "inventor_not_disambiguated": 
+  "pg_inventor_not_disambiguated": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -20,13 +20,13 @@
           "category": false,
           "location_field": false
         },
-        "inventor_name_first": {
+        "raw_inventor_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "inventor_name_last": {
+        "raw_inventor_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -49,10 +49,10 @@
         ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "wipo": 
+  "pg_wipo_technology": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": true,
           "category": false,
@@ -87,10 +87,10 @@
         ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "foreign_priority": 
+  "pg_foreign_priority": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -130,18 +130,42 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "govinterest_org": 
+  "pg_gov_interest_org": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "varchar",
           "null_allowed": false,
           "category": false,
           "location_field": false
         },
-        "organization_id": {
+        "gi_organization_id": {
           "data_type": "int",
           "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "fedagency_name": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "level_one": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "level_two": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "level_three": {
+          "data_type": "varchar",
+          "null_allowed": true,
           "category": false,
           "location_field": false
         }
@@ -149,10 +173,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "cpc_current": 
+  "pg_cpc_current": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -216,10 +240,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "applicant_not_disambiguated": 
+  "pg_applicant_not_disambiguated": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -231,19 +255,19 @@
           "category": false,
           "location_field": false
         },
-        "applicant_name_first": {
+        "raw_applicant_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "applicant_name_last": {
+        "raw_applicant_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "applicant_organization": {
+        "raw_applicant_organization": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -271,10 +295,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "uspc_at_issue": 
+  "pg_uspc_at_issue": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -314,10 +338,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "granted_patent_crosswalk": 
+  "pg_granted_patent_crosswalk": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -339,10 +363,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "assignee_disambiguated": 
+  "pg_assignee_disambiguated": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -360,19 +384,19 @@
           "category": false,
           "location_field": false
         },
-        "assignee_individual_name_first": {
+        "disambig_assignee_individual_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "assignee_individual_name_last": {
+        "disambig_assignee_individual_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "assignee_organization": {
+        "disambig_assignee_organization": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -394,10 +418,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "ipcr": 
+  "pg_ipc_at_issue": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -485,10 +509,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "assignee_not_disambiguated": 
+  "pg_assignee_not_disambiguated": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -506,19 +530,19 @@
           "category": false,
           "location_field": false
         },
-        "assignee_individual_name_first": {
+        "raw_assignee_individual_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "assignee_individual_name_last": {
+        "raw_assignee_individual_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "assignee_organization": {
+        "raw_assignee_organization": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -540,10 +564,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "cpc_at_issue": 
+  "pg_cpc_at_issue": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -607,10 +631,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "inventor_disambiguated": 
+  "pg_inventor_disambiguated": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -628,13 +652,13 @@
           "category": false,
           "location_field": false
         },
-        "inventor_name_first": {
+        "disambig_inventor_name_first": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "inventor_name_last": {
+        "disambig_inventor_name_last": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -662,10 +686,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "us_rel_doc": 
+  "pg_us_rel_doc": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -723,7 +747,68 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "location_not_disambiguated": 
+  "g_location_disambiguated": 
+    {
+      "fields": {
+        "location_id": {
+          "data_type": "varchar",
+          "null_allowed": false,
+          "category": false,
+          "location_field": false
+        },
+        "disambig_city": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "disambig_state": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": true,
+          "location_field": false
+        },
+        "disambig_country": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": true
+        },
+        "latitude": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "longitude": {
+          "data_type": "int",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "county": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "state_fips": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        },
+        "county_fips": {
+          "data_type": "varchar",
+          "null_allowed": true,
+          "category": false,
+          "location_field": false
+        }
+      },
+      "TestScripts": ["BulkDownloadsTesterPgpubs"]
+    }
+  ,
+  "pg_location_not_disambiguated": 
     {
       "fields": {
         "rawlocation_id": {
@@ -738,19 +823,19 @@
           "category": false,
           "location_field": false
         },
-        "city": {
+        "raw_city": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false
         },
-        "state": {
+        "raw_state": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": true,
           "location_field": false
         },
-        "country": {
+        "raw_country": {
           "data_type": "varchar",
           "null_allowed": true,
           "category": false,
@@ -760,10 +845,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "rel_app_text": 
+  "pg_rel_app_text": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": true,
           "category": false,
@@ -779,10 +864,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "govinterest_contracts": 
+  "pg_gov_interest_contracts": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "varchar",
           "null_allowed": false,
           "category": false,
@@ -798,10 +883,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "govinterest": 
+  "pg_gov_interest": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
@@ -817,16 +902,16 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "pct_data": 
+  "pg_pct_data": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
           "location_field": false
         },
-        "published_filed_date": {
+        "published_or_filed_date": {
           "data_type": "date",
           "null_allowed": true,
           "category": false,
@@ -872,10 +957,10 @@
       "TestScripts": ["BulkDownloadsTesterPgpubs"]
     }
   ,
-  "application": 
+  "pg_published_application": 
     {
       "fields": {
-        "document_number": {
+        "pgpub_id": {
           "data_type": "int",
           "null_allowed": false,
           "category": false,
