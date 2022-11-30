@@ -1,12 +1,13 @@
 import os
 import re
+import traceback
 from datetime import date, datetime, timedelta
 from tqdm import tqdm
 
 from updater.xml_to_sql.parser import queue_parsers
 from lib.configuration import get_current_config
 
-def reparse(start, end, clearfirst = True, pubtype = 'pgpubs'):
+def reparse(start, end, clearfirst = True, pubtype = 'pgpubs', raisefail=True):
     start = re.sub('[^\d]','', start)[-6:] #remove non-digits and get 6 digits
     end = re.sub('[^\d]','', end)[-6:] #remove non-digits and get 6 digits
     assert re.fullmatch('[0-9]{6}', start) and re.fullmatch('[0-9]{6}',end), 'enter start and end dates as "yymmdd" or "yyyymmdd" (punctuation separators allowed)'
@@ -53,4 +54,8 @@ def reparse(start, end, clearfirst = True, pubtype = 'pgpubs'):
                         engine.execute(f"DELETE FROM {database}.{table} WHERE version_indicator = '{filedate}'")
             queue_parsers(config, pubtype, destination = 'REPARSE')
         except Exception as e:
-            print(e)
+            if raisefail:
+                raise
+            else:
+                print(f"{type(e).__name__}: {e}")
+                print(traceback.format_exc())
