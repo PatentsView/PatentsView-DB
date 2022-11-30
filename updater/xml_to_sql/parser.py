@@ -198,7 +198,7 @@ def extract_field_data(field_element, field, attribute, description, flag, tag):
         return partial_string.strip()
     # If this field is determined by an attributes, then extract its value
     elif attribute is not None:
-        return field_element.attrib[attribute]
+        return field_element.attrib.get(attribute)
     # If this field is a flag determine its truth value
     elif flag is not None:
         if field_element.tag == flag:
