@@ -6,8 +6,7 @@ from lib.configuration import get_config, get_connection_string
 @pytest.fixture()
 def config():
     config = get_config()
-    config["DATABASE"]["NEW_DB"] = 'sarvo_test_db'
-    config["DATABASE"]["PGPUBS_DATABASE"] = 'pgpub_sarvo_test_db'
+    config["PATENTSVIEW_DATABASES"]["NEW_DB"] = 'sarvo_test_db'
     yield config
 
 
@@ -15,7 +14,7 @@ def config():
 def clean_data():
     yield
     config = get_config()
-    config["DATABASE"]["NEW_DB"] = 'sarvo_test_db'
+    config["PATENTSVIEW_DATABASES"]["NEW_DB"] = 'sarvo_test_db'
     from sqlalchemy import create_engine
     engine = create_engine(get_connection_string(config, "NEW_DB"))
     engine.execute("TRUNCATE TABLE inventor;")
@@ -88,8 +87,8 @@ class TestPostProcessInventor:
         SELECT count(1) as `rows` from disambiguated_inventor_ids;
         """
         distinct_count_query = """
-        SELECT count(distinct inventor_id) distinct_inventor_ids from (SELECT inventor_id from rawinventor UNION SELECT inventor_id from {pgpubs_database}.rawinventor)x;
-        """.format(pgpubs_database=config['DATABASE']['PGPUBS_DATABASE'])
+        SELECT count(distinct inventor_id) distinct_inventor_ids from rawinventor;
+        """
         duplicate_query = """
         SELECT count(1) as duplicates
             from (SELECT inventor_id from disambiguated_inventor_ids group by inventor_id having count(1) > 1) x
@@ -110,7 +109,7 @@ class TestPostProcessInventor:
         from updater.post_processing.post_process_inventor import generate_disambiguated_inventors
         from sqlalchemy import create_engine
         engine = create_engine(get_connection_string(config, "NEW_DB"))
-        inventors = generate_disambiguated_inventors(config, engine, limit, offset)
+        inventors = generate_disambiguated_inventors(engine, limit, offset)
         assert (len(inventors.inventor_id.unique()) == expected)
         # disambiguated id, name first, name last, patent date
         assert (inventors.shape[1] == 4)
@@ -122,12 +121,12 @@ class TestPostProcessInventor:
         import pandas as pd
         engine = create_engine(get_connection_string(config, "NEW_DB"))
         count_query = "SELECT count(1)  as `rows` from inventor"
-        distinct_id_query = "SELECT count(distinct inventor_id) inventors from (SELECT inventor_id from rawinventor UNION SELECT inventor_id from {pgpubs_database}.rawinventor)x".format(pgpubs_database=config["DATABASE"]["PGPUBS_DATABASE"])
+        distinct_id_query = "SELECT count(distinct inventor_id) inventors from rawinventor"
         column_query = """
                 SELECT COLUMN_NAME
                 from information_schema.COLUMNS
                 where TABLE_SCHEMA='{schema}'
-                        and TABLE_NAME='inventor'""".format(schema=config["DATABASE"]["NEW_DB"])
+                        and TABLE_NAME='inventor'""".format(schema=config["PATENTSVIEW_DATABASES"]["NEW_DB"])
 
         column_data = pd.read_sql_query(column_query, con=engine)
         expected_columns = ['id', 'name_first', 'name_last']
@@ -144,3 +143,4 @@ class TestPostProcessInventor:
         duplicate_query = "SELECT count(1) dups from (SELECT count(1)   from inventor group by id having count(1)>1)x"
         dup_count = pd.read_sql_query(duplicate_query, con=engine)
         assert (dup_count.dups.tolist()[0] == 0)
+        engine.execute("TRUNCATE TABLE inventor")

@@ -585,10 +585,10 @@ group by
 drop table if exists `{{params.reporting_database}}`.`inventor_rawinventor`;
 create table if not exists `{{params.reporting_database}}`.`inventor_rawinventor` (uuid int(10) unsigned AUTO_INCREMENT PRIMARY KEY,name_first varchar(64),name_last varchar(64),patent_id varchar(20),inventor_id int(10) unsigned);
 
-INSERT INTO `{{params.reporting_database}}`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id) 
-SELECT DISTINCT ri.name_first,ri.name_last,ri.patent_id,repi.inventor_id 
-FROM `{{params.reporting_database}}`.`inventor` repi 
-left join `{{params.raw_database}}`.`rawinventor` ri 
+INSERT INTO `{{params.reporting_database}}`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id)
+SELECT DISTINCT ri.name_first,ri.name_last,ri.patent_id,repi.inventor_id
+FROM `{{params.reporting_database}}`.`inventor` repi
+left join `{{params.raw_database}}`.`rawinventor` ri
 on ri.inventor_id = repi.persistent_inventor_id;
 
 alter table `{{params.reporting_database}}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_first` (`name_first`);

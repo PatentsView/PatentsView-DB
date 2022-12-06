@@ -1,0 +1,11 @@
+alter table `{{params.reporting_database}}`.`foreignpriority` add index `ix_foreignpriority_foreign_doc_number` (`foreign_doc_number`);
+alter table `{{params.reporting_database}}`.`foreignpriority` add index `ix_foreignpriority_date` (`date`);
+alter table `{{params.reporting_database}}`.`foreignpriority` add index `ix_foreignpriority_kind` (`kind`);
+alter table `{{params.reporting_database}}`.`foreignpriority` add index `ix_foreignpriority_country` (`country`);
+ALTER TABLE `{{params.reporting_database}}`.`government_interest` ADD FULLTEXT INDEX `fti_government_interest_gi_statement` (`gi_statement`);
+alter table `{{params.reporting_database}}`.`inventor_coinventor` add index `ix_inventor_coinventor_coinventor_id` (`coinventor_id`);
+alter table `{{params.reporting_database}}`.`inventor_coinventor` add index `ix_inventor_coinventor_inventor_id` (`inventor_id`);
+alter table `{{params.reporting_database}}`.`inventor_coinventor` add index `ix_inventor_coinventor_num_patents` (`num_patents`);
+alter table `{{params.reporting_database}}`.`inventor_cpc_group` add index `ix_inventor_cpc_group_group_id` (`group_id`);
+alter table `{{params.reporting_database}}`.`inventor_cpc_group` add index `ix_inventor_cpc_group_inventor_id` (`inventor_id`);
+alter table `{{params.reporting_database}}`.`inventor_cpc_group` add index `ix_inventor_cpc_group_num_patents` (`num_patents`);

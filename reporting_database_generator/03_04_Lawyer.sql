@@ -20,8 +20,8 @@ insert into `{{params.reporting_database}}`.`temp_lawyer_num_patents`
 select
   `lawyer_id`, count(distinct `patent_id`)
 from
-  `{{params.raw_database}}`.`patent_lawyer`
-  where `lawyer_id` is not null
+  `{{params.raw_database}}`.`patent_lawyer`  pl join `{{ params.raw_database }}`.`patent` p on p.id=pl.patent_id where p.version_indicator <={{ params.version_indicator }} and
+   `lawyer_id` is not null
 group by
   `lawyer_id`;
 
@@ -43,8 +43,8 @@ select
 from
   `{{params.raw_database}}`.`patent_lawyer` ii
   join `{{params.raw_database}}`.`patent_assignee` aa
-  on aa.`patent_id` = ii.`patent_id`
-  where `lawyer_id` is not null
+  on aa.`patent_id` = ii.`patent_id`  join `{{ params.raw_database }}`.`patent` p on p.id=ii.patent_id where p.version_indicator <={{ params.version_indicator }}
+  and `lawyer_id` is not null
 group by
   ii.`lawyer_id`;
 
@@ -66,8 +66,8 @@ select
   count(distinct ii.`inventor_id`)
 from
   `{{params.raw_database}}`.`patent_lawyer` aa
-  join `{{params.raw_database}}`.`patent_inventor` ii on ii.patent_id = aa.patent_id
-   where `lawyer_id` is not null
+  join `{{params.raw_database}}`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `{{ params.raw_database }}`.`patent` p on p.id=aa.patent_id where p.version_indicator <={{ params.version_indicator }}
+   and `lawyer_id` is not null
 group by
   aa.`lawyer_id`;
 
@@ -112,6 +112,13 @@ create table `{{params.reporting_database}}`.`patent_lawyer`
 )
 engine=InnoDB;
 
+create table `{{params.reporting_database}}`.`patent_lawyer_unique` (
+select rl.patent_id, lawyer_id, min(sequence) sequence
+from `patent`.`rawlawyer` rl
+	left join patent p on rl.patent_id=p.patent_id
+group by 1,2
+);
+
 
 # 12,389,559 @ 29:50
 insert into `{{params.reporting_database}}`.`patent_lawyer`
@@ -119,12 +126,11 @@ insert into `{{params.reporting_database}}`.`patent_lawyer`
   `patent_id`, `lawyer_id`, `sequence`
 )
 select distinct
-  pii.`patent_id`, t.`new_lawyer_id`, ri.`sequence`
+  pii.`patent_id`, t.`new_lawyer_id`, u.`sequence`
 from
   `{{params.raw_database}}`.`patent_lawyer` pii
   inner join `{{params.reporting_database}}`.`temp_id_mapping_lawyer` t on t.`old_lawyer_id` = pii.`lawyer_id`
-  left outer join (select patent_id, lawyer_id, min(sequence) sequence from `{{params.raw_database}}`.`rawlawyer` group by patent_id, lawyer_id) t on t.`patent_id` = pii.`patent_id` and t.`lawyer_id` = pii.`lawyer_id`
-  left outer join `{{params.raw_database}}`.`rawlawyer` ri on ri.`patent_id` = t.`patent_id` and ri.`lawyer_id` = t.`lawyer_id` and ri.`sequence` = t.`sequence`;
+  inner join `{{params.reporting_database}}`.`patent_lawyer_unique` u on u.`patent_id` = pii.`patent_id` and u.`lawyer_id` = pii.`lawyer_id`
 
 
 drop table if exists `{{params.reporting_database}}`.`lawyer`;

@@ -1,10 +1,11 @@
+
 import logging
-import multiprocessing
+
 import os
-import time
+import datetime
 
 from QA.xml_to_csv.XMLTest import XMLTest
-from lib.configuration import get_config
+from lib.configuration import get_today_dict
 
 
 def clean_single_file(raw_xml_file, new_xml_file):
@@ -65,7 +66,7 @@ def check_schema(patent_xml):
     if not main_fields == expected_main_fields:
         logger.error(main_fields)
         raise Exception(
-            "The main fields in the us-bibliographic-grant-data have changed ...check that it is not the ones we use.")
+                "The main fields in the us-bibliographic-grant-data have changed ...check that it is not the ones we use.")
     if without_us_bibliographic > 200:
         raise Exception("There are more patents missing the us-bibliographic-grant-data field than ussual ")
 
@@ -83,21 +84,8 @@ def begin_xml_cleaning(config):
     out_files = ['{}/{}_clean.xml'.format(outfolder, raw_file[-13:-4]) for raw_file in in_files]
     files = zip(in_files, out_files)
 
-    total_cpus = multiprocessing.cpu_count()
-    desired_processes = (total_cpus // 2) + 1  # usually num cpu - 1
-    jobs = []
-    pool = multiprocessing.Pool(desired_processes)
     for f in files:
-        p = pool.apply_async(clean_single_file, args=([f[0], f[1]]))
-        jobs.append(p)
-
-    logger.info("{n} jobs have started, now waiting for them to complete".format(n=len(jobs)))
-
-    for job in jobs:
-        job.get()
-
-    pool.close()
-    pool.join()
+        clean_single_file(f[0], f[1])
 
     logger.info("finished")
     # wait until all jobs finish processing to move on
@@ -117,7 +105,9 @@ def post_xml(update_config):
     qc_step.runTest(update_config)
 
 
-def preprocess_xml(config):
+def preprocess_xml(**kwargs):
+    from lib.configuration import get_current_config
+    config = get_current_config('granted_patent', **kwargs)
     begin_xml_cleaning(config)
     try:
         post_xml(config)
@@ -126,5 +116,15 @@ def preprocess_xml(config):
 
 
 if __name__ == '__main__':
-    config = get_config()
-    preprocess_xml(config)
+    from lib.configuration import get_current_config
+
+    config = get_current_config('granted_patent', **{
+            "execution_date": datetime.date(2020, 12, 29)
+
+            })
+
+    config['DATES'] = {
+            "START_DATE": '20201006',
+            "END_DATE":   '20201229'
+            }
+    begin_xml_cleaning(config)

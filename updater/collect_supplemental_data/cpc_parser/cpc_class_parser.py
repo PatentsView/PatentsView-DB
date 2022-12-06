@@ -1,11 +1,14 @@
+import datetime
 import re
 import os
 from bs4 import BeautifulSoup as bs
+from sqlalchemy import create_engine
 import sys
 
 from QA.collect_supplemental_data.cpc_parser.CPCClassParserTest import CPCClassParserTest
-from lib.configuration import get_config
+from lib.configuration import get_config, get_current_config
 from lib.utilities import write_csv
+from time import time
 
 
 def parse_and_write_cpc_class(inputdir, outputdir):
@@ -212,18 +215,22 @@ def parse_cpc_subgroups(soup):
     return rows
 
 
-def process_cpc_class_parser(config):
+def process_cpc_class_parser(**kwargs):
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     location_of_cpc_files = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     output_directory = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
     parse_and_write_cpc_class(location_of_cpc_files, output_directory)
 
 
-def post_class_parser(config):
+def post_class_parser(**kwargs):
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     qc = CPCClassParserTest(config)
     qc.runTests()
 
-
 if __name__ == '__main__':
-    config = get_config()
-    process_cpc_class_parser(config)
-    post_class_parser(config)
+    process_cpc_class_parser(**{
+            "execution_date": datetime.date(2021, 12, 30)
+            })
+    # post_class_parser(**{
+    #         "execution_date": datetime.date(2020, 12, 15)
+    #         })

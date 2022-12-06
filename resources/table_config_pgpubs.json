@@ -1,0 +1,1593 @@
+{
+  "application": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "type": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "application_number": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": true
+      },
+      "series_code": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "invention_title": {
+        "data_type": "mediumtext",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "invention_abstract": {
+        "data_type": "mediumtext",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "rule_47_flag": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "assignee": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "type": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "organization": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": []
+  },
+  "cpc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "version": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "section_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "subgroup_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "value": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "category": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "action_date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "cpc_current": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "version": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "section_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "subgroup_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "value": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "category": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      }
+    },
+    "TestScripts": []
+  },
+  "foreign_priority": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": true
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "foreign_doc_number": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "further_cpc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "version": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "section": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "class": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "subclass": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "main_group": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "subgroup": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "value": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "action_date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "government_interest": {
+    "fields": {
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "gi_statement": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": ["GovtInterestTester"]
+  },
+  "publication_contractawardnumber": {
+    "fields": {
+      "document_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "contract_award_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": ["GovtInterestTester"]
+  },
+  "publication_govintorg": {
+    "fields": {
+      "document_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "organization_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": ["GovtInterestTester"]
+  },
+  "granted_patent_crosswalk": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "patent_number": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "application_number": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "application",
+        "main_table_id": "application_number",
+        "related_table_id": "application_number"
+      }
+    ],
+    "TestScripts": []
+  },
+  "inventor": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": []
+  },
+  "ipcr": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "version": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "class_level": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "section": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "class": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "subclass": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "main_group": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "subgroup": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "class_value": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "action_date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "class_status": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "class_data_source": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "location_assignee": {
+    "fields": {
+      "location_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "assignee_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "assignee",
+        "main_table_id": "assignee_id",
+        "related_table_id": "id"
+      }
+    ],
+    "TestScripts": []
+  },
+  "location_inventor": {
+    "fields": {
+      "inventor_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "location_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "inventor",
+        "main_table_id": "inventor_id",
+        "related_table_id": "id"
+      }
+    ],
+    "TestScripts": []
+  },
+  "main_cpc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "version": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "section": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "class": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "subclass": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "main_group": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "subgroup": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "value": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "action_date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "pct_data": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "pct_doc_number": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": true
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "us_371c124_date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "us_371c12_date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "doc_type": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "publication": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": true
+      },
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "filing_type": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "application",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "cpc",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "foreign_priority",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "further_cpc",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "granted_patent_crosswalk",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "ipcr",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "main_cpc",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "pct_data",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "publication_assignee",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "publication_inventor",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+       "related_table": "rawassignee",
+       "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "rawinventor",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "rawuspc",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "rel_app_text",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "us_parties",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "uspc",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      },
+      {
+        "related_table": "usreldoc",
+        "main_table_id": "document_number",
+        "related_table_id": "document_number"
+      }
+    ],
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "publication_assignee": {
+    "fields": {
+      "document_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "assignee_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "location_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "assignee",
+        "main_table_id": "assignee_id",
+        "related_table_id": "id"
+      }
+    ],
+    "TestScripts": []
+  },
+  "publication_inventor": {
+    "fields": {
+      "document_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "inventor_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "location_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "inventor",
+        "main_table_id": "inventor_id",
+        "related_table_id": "id"
+      }
+    ],
+    "TestScripts": []
+  },
+  "rawassignee": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "assignee_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "organization": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "type": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "rawlocation_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "city": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "state": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": true
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "rawinventor": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "inventor_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "designation": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "deceased": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "rawlocation_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "city": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "state": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": true
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "rawlocation": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "location_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "city": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "state": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": true
+      },
+      "country_transformed": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "latitude": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "longitude": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "rawlocation_geos_missed": {
+    "fields": {
+      "lat": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "lon": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": []
+  },
+  "rawlocation_lat_lon": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "lat": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "lon": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": []
+  },
+  "rawuspc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "classification": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "rel_app_text": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "text": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "us_parties": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "organization": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "type": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "designation": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "rawlocation_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "city": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "state": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": true
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "uspc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "subclass_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  },
+  "usreldoc": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "document_number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "related_doc_number": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": true
+      },
+      "doc_type": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "relkind": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      },
+      "filename": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": [
+      "MergeTestWeekly",
+      "MergeTestQuarterly",
+      "UploadTest"
+    ]
+  }
+}

@@ -1,0 +1,2454 @@
+{
+  "application": {
+    "fields": {
+      "type": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "application_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "assignee": {
+    "fields": {
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_state": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "type": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_latitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "persistent_assignee_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_persistent_location_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_longitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "organization": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_city": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "assignee_cpc_group": {
+    "fields": {
+      "assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "assignee_cpc_subsection": {
+    "fields": {
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "assignee_inventor": {
+    "fields": {
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "assignee_nber_subcategory": {
+    "fields": {
+      "subcategory_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "assignee_uspc_mainclass": {
+    "fields": {
+      "assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "assignee_year": {
+    "fields": {
+      "assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_current": {
+    "fields": {
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents_group": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "category": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date_group": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date_group": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "section_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees_group": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subgroup_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active_group": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors_group": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subgroup_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_current_copy": {
+    "fields": {
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "subgroup_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "category": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "section_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_current_group": {
+    "fields": {
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "section_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_current_group_application_year": {
+    "fields": {
+      "average_patent_processing_days": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "application_year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "sample_size": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_current_group_copy": {
+    "fields": {
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "section_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_current_group_patent_year": {
+    "fields": {
+      "patent_year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_current_subsection": {
+    "fields": {
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "section_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_current_subsection_copy": {
+    "fields": {
+      "section_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_current_subsection_patent_year": {
+    "fields": {
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_group": {
+    "fields": {
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_subgroup": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "cpc_subsection": {
+    "fields": {
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "examiner": {
+    "fields": {
+      "persistent_examiner_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "role": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "group": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "examiner_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "foreignpriority": {
+    "fields": {
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "foreign_doc_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "government_interest": {
+    "fields": {
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "gi_statement": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "government_organization": {
+    "fields": {
+      "name": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "level_one": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "level_two": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "level_three": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "organization_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "inventor": {
+    "fields": {
+      "lastknown_country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_latitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "persistent_inventor_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_persistent_location_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_longitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_city": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "lastknown_state": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "inventor_coinventor": {
+    "fields": {
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "coinventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "inventor_cpc_group": {
+    "fields": {
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "inventor_cpc_subsection": {
+    "fields": {
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "inventor_nber_subcategory": {
+    "fields": {
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subcategory_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "inventor_rawinventor": {
+    "fields": {
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "uuid": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "inventor_uspc_mainclass": {
+    "fields": {
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "inventor_year": {
+    "fields": {
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "ipcr": {
+    "fields": {
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "subgroup": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "ipc_version_indicator": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "section": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "symbol_position": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "ipc_class": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "classification_value": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subclass": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "classification_data_source": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "main_group": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "action_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "lawyer": {
+    "fields": {
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_last": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "organization": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "lawyer_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "persistent_lawyer_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "name_first": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "location": {
+    "fields": {
+      "county": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "state_fips": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "city": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "county_fips": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "state": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "latitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "persistent_location_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "longitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "location_assignee": {
+    "fields": {
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "location_cpc_group": {
+    "fields": {
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "group_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "location_cpc_subsection": {
+    "fields": {
+      "location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subsection_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "location_inventor": {
+    "fields": {
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "location_nber_subcategory": {
+    "fields": {
+      "location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subcategory_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "location_uspc_mainclass": {
+    "fields": {
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "location_year": {
+    "fields": {
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "nber": {
+    "fields": {
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "category_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "category_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "subcategory_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "subcategory_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "nber_category": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "nber_copy": {
+    "fields": {
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "category_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "subcategory_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "nber_subcategory": {
+    "fields": {
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "nber_subcategory_patent_year": {
+    "fields": {
+      "subcategory_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "patent": {
+    "fields": {
+      "patent_processing_days": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "abstract": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_us_patents_cited": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "uspc_current_mainclass_average_patent_processing_days": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_latitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_latitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_total_documents_cited": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_persistent_location_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_persistent_location_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "cpc_current_group_average_patent_processing_days": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_longitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_longitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_claims": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_times_cited_by_us_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_city": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_city": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "term_extension": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_foreign_documents_cited": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "earliest_application_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_state": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_state": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "detail_desc_length": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_us_applications_cited": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_persistent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "type": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_persistent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "patent_assignee": {
+    "fields": {
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "patent_contractawardnumber": {
+    "fields": {
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "contract_award_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "patent_examiner": {
+    "fields": {
+      "role": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "examiner_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "patent_govintorg": {
+    "fields": {
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "organization_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "patent_inventor": {
+    "fields": {
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "patent_lawyer": {
+    "fields": {
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "lawyer_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "pctdata": {
+    "fields": {
+      "date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "102_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "doc_type": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "371_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "doc_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "PVSupport_API_20210330_missing_data": {
+    "fields": {
+      "title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_us_patents_cited": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_location_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "uspc_current_mainclass_average_patent_processing_days": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_latitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_latitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_total_documents_cited": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_persistent_location_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_persistent_location_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "date": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "cpc_current_group_average_patent_processing_days": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_longitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_longitude": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_claims": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_times_cited_by_us_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_city": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_city": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "term_extension": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_foreign_documents_cited": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "type": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "earliest_application_date": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_state": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_state": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "abstract": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "detail_desc_length": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_us_applications_cited": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_persistent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_persistent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "number": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_processing_days": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_inventor_country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "firstnamed_assignee_country": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "usapplicationcitation": {
+    "fields": {
+      "category": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "cited_application_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "name": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "citing_patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "kind": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "uspatentcitation": {
+    "fields": {
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "cited_patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "category": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "citing_patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "uspc_current": {
+    "fields": {
+      "subclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "subclass_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "mainclass_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "uspc_current_copy": {
+    "fields": {
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "subclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "uspc_current_mainclass": {
+    "fields": {
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "mainclass_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "uspc_current_mainclass_application_year": {
+    "fields": {
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "application_year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "sample_size": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "average_patent_processing_days": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "uspc_current_mainclass_copy": {
+    "fields": {
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "uspc_current_mainclass_patent_year": {
+    "fields": {
+      "mainclass_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_year": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "uspc_mainclass": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "first_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "last_seen_date": {
+        "data_type": "date",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_patents": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "years_active": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_inventors": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "num_assignees": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "uspc_subclass": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "wipo": {
+    "fields": {
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false
+      },
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "field_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  },
+  "wipo_field": {
+    "fields": {
+      "id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "sector_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      },
+      "field_title": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false
+      }
+    }
+  }
+}

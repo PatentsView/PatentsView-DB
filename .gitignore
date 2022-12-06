@@ -18,7 +18,6 @@ airflow-metadata-db-disk
 airflow/unittests.cfg
 Development/dev_config.ini
 Assignee_Lawyer_Disambiguation/lib/alchemy/alchemy_config.ini
-airflow_db_production/
 airflow-metadata-db-disk/*
 airflow/logs/
 data/
@@ -33,4 +32,4 @@ upload_*/*
 archive/*
 **/.ipynb_checkpoints
 updater/create_databases/merge_status.json
-airflow-metadata-db-diskdata_length_string
+airflow_db_production/

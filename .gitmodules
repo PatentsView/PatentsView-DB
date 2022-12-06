@@ -4,3 +4,6 @@
 [submodule "lib/utils"]
 	path = lib/utils
 	url = git@github.com:American-Institutes-for-Research/pv-utilities
+[submodule "updater/disambiguation/hierarchical_clustering_disambiguation"]
+	path = updater/disambiguation/hierarchical_clustering_disambiguation
+	url = git@github.com:PatentsView/PatentsView-Disambiguation.git

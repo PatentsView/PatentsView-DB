@@ -22,8 +22,8 @@ CREATE TABLE `{{params.reporting_database}}`.`wipo_field` (
    KEY `ix_wipo_field_field_title` (`field_title`)
  ) ENGINE=InnoDB;
 
-INSERT INTO `{{params.reporting_database}}`.`wipo` SELECT * FROM `{{params.raw_database}}`.`wipo`;
-INSERT INTO `{{params.reporting_database}}`.`wipo_field` SELECT * FROM `{{params.raw_database}}`.`wipo_field`;
+INSERT INTO `{{params.reporting_database}}`.`wipo` SELECT `patent_id`, `field_id`, `sequence` FROM `{{params.raw_database}}`.`wipo`;
+INSERT INTO `{{params.reporting_database}}`.`wipo_field` SELECT `id`, `sector_title`, `field_title` FROM `{{params.raw_database}}`.`wipo_field`;
 
 # END WIPO fields tables
 

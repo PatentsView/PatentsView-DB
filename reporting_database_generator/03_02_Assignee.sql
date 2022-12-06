@@ -28,7 +28,7 @@ create table `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
 # 320,156 @ 3:51
 insert into `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
 (`assignee_id`, `location_id`, `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`)
-select t.`assignee_id`,
+select lastknown.`assignee_id`,
        tl.`new_location_id`,
        tl.`old_location_id_transformed`,
        nullif(trim(l.`city`), ''),
@@ -37,32 +37,28 @@ select t.`assignee_id`,
        l.`latitude`,
        l.`longitude`
 from (
-         select t.`assignee_id`,
-                t.`location_id`,
-                t.`location_id_transformed`
-         from (select ROW_NUMBER() OVER (PARTITION BY t.assignee_id ORDER BY t.`date` desc) AS rownum,
-                      t.`assignee_id`,
-                      t.`location_id`,
-                      t.`location_id_transformed`
+         select srw.`assignee_id`,
+                srw.`location_id`
+         from (select ROW_NUMBER() OVER (PARTITION BY rw.assignee_id ORDER BY rw.`date` desc) AS rownum,
+                      rw.`assignee_id`,
+                      rw.`location_id`
                from (
                         select ra.`assignee_id`,
                                rl.`location_id`,
-                               rl.`location_id_transformed`,
                                p.`date`,
                                p.`id`
                         from `{{params.raw_database}}`.`rawassignee` ra
                                  inner join `{{params.raw_database}}`.`patent` p on p.`id` = ra.`patent_id`
                                  inner join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
-                        where rl.`location_id_transformed` is not null
-                          and ra.`assignee_id` is not null
+                          and ra.`assignee_id` is not null and ra.version_indicator <={{ params.version_indicator }}
                         order by ra.`assignee_id`,
                                  p.`date` desc,
                                  p.`id` desc
-                    ) t) t
-         where rownum = 1) t
-         left join `{{params.raw_database}}`.`location` l on l.`id` = t.`location_id`
-         left join `{{params.reporting_database}}`.`temp_id_mapping_location_transformed` tl
-                   on tl.`old_location_id_transformed` = t.`location_id_transformed`;
+                    ) rw) srw
+         where rownum = 1) lastknown
+         left join `{{params.raw_database}}`.`location` l on l.`id` = lastknown.`location_id`
+         left join `{{params.reporting_database}}`.`temp_id_mapping_location` tl
+                   on tl.`old_location_id` = lastknown.`location_id`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_num_patents`;
 create table `{{params.reporting_database}}`.`temp_assignee_num_patents`
@@ -78,7 +74,7 @@ insert into `{{params.reporting_database}}`.`temp_assignee_num_patents`
     (`assignee_id`, `num_patents`)
 select `assignee_id`,
        count(distinct `patent_id`)
-from `{{params.raw_database}}`.`patent_assignee`
+from `{{params.raw_database}}`.`patent_assignee` pa join `{{ params.raw_database }}`.`patent` p on p.id=pa.patent_id where p.version_indicator <={{ params.version_indicator }}
 group by `assignee_id`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_num_inventors`;
@@ -96,7 +92,7 @@ insert into `{{params.reporting_database}}`.`temp_assignee_num_inventors`
 select aa.`assignee_id`,
        count(distinct ii.`inventor_id`)
 from `{{params.raw_database}}`.`patent_assignee` aa
-         join `{{params.raw_database}}`.`patent_inventor` ii on ii.patent_id = aa.patent_id
+         join `{{params.raw_database}}`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `{{ params.raw_database }}`.`patent` p on p.id=aa.patent_id where p.version_indicator <={{ params.version_indicator }}
 group by aa.`assignee_id`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_years_active`;
@@ -246,6 +242,6 @@ from `{{params.raw_database}}`.`assignee` a
                          on tani.`assignee_id` = a.`id`;
 
 
-# END assignee 
+# END assignee
 
 ################################################################################################################################################

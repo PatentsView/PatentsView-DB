@@ -1,10 +1,11 @@
+import datetime
 import urllib
 import zipfile
 import os
 from lxml import html
 
 from QA.collect_supplemental_data.cpc_parser.CPCDownloadTest import CPCDownloadTest
-from lib.configuration import get_config
+from lib.configuration import get_config, get_current_config
 from lib.utilities import download
 
 
@@ -41,33 +42,33 @@ def find_cpc_schema_url():
     most recent schema is returned.
     """
     base_url = 'http://www.cooperativepatentclassification.org'
-    page = urllib.request.urlopen(base_url + '/cpcSchemeAndDefinitions/Bulk.html')
+    # page = urllib.request.urlopen(base_url + '/cpcSchemeAndDefinitions/Bulk.html')
+    page = urllib.request.urlopen(base_url + '/cpcSchemeAndDefinitions/bulk')
     tree = html.fromstring(page.read())
     potential_links = []
     for link in tree.xpath('//a/@href'):
-        if (link.lstrip(".").startswith("/cpc/bulk/CPCSchemeXML")
+        if ("/cpc/bulk/CPCSchemeXML" in link.lstrip(".")
                 and link.endswith(".zip")):
             potential_links.append(link.replace('..', ''))
 
+    print(potential_links)
     # Since zip files are formatted CPCSchemeXMLYYYYMM.zip,
     # the last sorted url corresponds to the latest version
     return base_url + sorted(potential_links)[-1]
 
 
-def download_cpc_grant_and_pgpub_classifications(destination_folder):
+def download_cpc_grant_and_pgpub_classifications(granted_cpc_folder, pgpubs_cpc_folder):
     """
     Download and extract the most recent CPC Master Classification Files (MCF)
     """
     # Find the correct CPC Grant and PGPub MCF urls
     cpc_grant_mcf_url, cpc_pgpub_mcf_url = find_cpc_grant_and_pgpub_urls()
-    cpc_grant_zip_filepath = os.path.join(destination_folder,
-                                          'CPC_grant_mcf.zip')
-    cpc_pgpub_zip_filepath = os.path.join(destination_folder,
-                                          'CPC_pgpub_mcf.zip')
+    cpc_grant_zip_filepath = os.path.join(granted_cpc_folder, 'CPC_grant_mcf.zip')
+    cpc_pgpub_zip_filepath = os.path.join(pgpubs_cpc_folder, 'CPC_pgpub_mcf.zip')
 
     # Download and extract CPC Grant and PGPub classifications
-    for (filepath, url) in [(cpc_grant_zip_filepath, cpc_grant_mcf_url),
-                            (cpc_pgpub_zip_filepath, cpc_pgpub_mcf_url)]:
+    for (filepath, url, output_folder) in [(cpc_grant_zip_filepath, cpc_grant_mcf_url, granted_cpc_folder),
+                            (cpc_pgpub_zip_filepath, cpc_pgpub_mcf_url, pgpubs_cpc_folder)]:
 
         # Download the files
         print("Destination: {}".format(filepath))
@@ -78,13 +79,13 @@ def download_cpc_grant_and_pgpub_classifications(destination_folder):
         # the contents, so rename the subfiles to ignore their container
         z = zipfile.ZipFile(filepath)
         text_files = [file for file in z.infolist()
-                      if file.filename.endswith('.xml')]
+                      if file.filename.endswith('.xml') or file.filename.endswith('.txt') ]
 
         # For example, zip file contents ['foo/', 'foo/bar.txt, 'foo/baz.txt']
         # would be extracted as ['bar.txt', 'baz.txt'] (with 'foo/' ignored)
         for text_file in text_files:
             text_file.filename = text_file.filename.split('/')[-1]
-            z.extract(text_file, path=destination_folder)
+            z.extract(text_file, path=output_folder)
         z.close()
 
         # Remove the original zip file
@@ -145,7 +146,8 @@ def find_ipc_url():
     potential_links = []
     for link in tree.xpath('//a/@href'):
         print(link)
-        if (link.lstrip('.').lstrip("/").startswith("cpc/concordances/cpc-ipc-concordance")
+        # if (link.lstrip('.').lstrip("/").startswith("cpc/concordances/cpc-ipc-concordance")
+        if ("cpc/concordances/cpc-ipc-concordance" in link.lstrip('.').lstrip("/")
                 and link.endswith(".txt")):
             potential_links.append(link)
 
@@ -179,21 +181,34 @@ def find_ipc_url_test():
     assert (find_ipc_url() == expected_url)
 
 
-def collect_cpc_data(config):
+def collect_cpc_data(**kwargs):
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     destination_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+
+    pgpubs_config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
+    pgpubs_cpc_folder = '{}/{}'.format(pgpubs_config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder)
+    if not os.path.exists(pgpubs_cpc_folder):
+        os.makedirs(pgpubs_cpc_folder)
     download_cpc_schema(destination_folder)  # <1 min
-    download_cpc_grant_and_pgpub_classifications(destination_folder)  # few minutes
+    download_cpc_grant_and_pgpub_classifications(destination_folder, pgpubs_cpc_folder)  # few minutes
     download_ipc(destination_folder)  # <1 min
+    download_ipc(download_ipc(destination_folder))
 
 
-def post_download(config):
-    qc = CPCDownloadTest(config)
+def post_download(**kwargs):
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+    pgpubs_config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
+    qc = CPCDownloadTest(config, pgpubs_config)
     qc.runTests()
 
 
 if __name__ == '__main__':
-    config = get_config()
-    collect_cpc_data(config)
-    post_download(config)
+    # collect_cpc_data(**{
+    #     "execution_date": datetime.date(2021, 12, 30)
+    # })
+    post_download(**{
+        "execution_date": datetime.date(2021, 12, 30)
+    })

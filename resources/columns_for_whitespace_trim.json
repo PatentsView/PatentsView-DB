@@ -1,0 +1,92 @@
+{
+  "application": {
+    "fields": ["number"],
+    "TestScripts": [
+      "upload"
+    ]
+  },
+  "botanic": {
+    "fields": ["latin_name", "variety"],
+    "TestScripts": [
+      "upload"
+      ]
+  },
+  "foreign_priority": {
+  "fields": ["number", "country"],
+  "TestScripts": [
+    "upload"
+    ]
+},
+  "foreigncitation": {
+  "fields": ["number", "country"],
+  "TestScripts": [
+    "upload"
+    ]
+},
+  "ipcr": {
+  "fields": ["ipc_class"],
+  "TestScripts": [
+    "upload"
+    ]
+},
+  "non_inventor_applicant": {
+  "fields": ["lname", "fname", "organization"],
+  "TestScripts": [
+    "upload"
+    ]
+},
+  "pct_data": {
+  "fields": ["kind"],
+  "TestScripts": [
+    "upload"
+    ]
+},
+  "rawassignee": {
+  "fields": ["name_first", "organization", "city", "state"],
+  "TestScripts": [
+    "pgpubs"
+    ]
+},
+  "rawinventor": {
+  "fields": ["name_first", "city", "state"],
+  "TestScripts": [
+    "pgpubs"
+    ]
+},
+  "rawlawyer": {
+  "fields": ["name_first", "name_last", "organization"],
+  "TestScripts": [
+    "upload"
+    ]
+},
+  "rawlocation": {
+  "fields": ["city"],
+  "TestScripts": [
+    "pgpubs"
+    ]
+},
+  "rawuspc": {
+  "fields": ["classification"],
+  "TestScripts": [
+    "pgpubs"
+    ]
+},
+  "us_term_of_grant": {
+  "fields": ["term_grant"],
+  "TestScripts": [
+    "upload"
+    ]
+},
+  "usapplicationcitation": {
+  "fields": ["name"],
+  "TestScripts": [
+    "upload"
+    ]
+},
+  "us_parties": {
+  "fields": ["name_first", "name_last", "city", "state"],
+  "TestScripts": [
+    "pgpubs"
+    ]
+}
+}

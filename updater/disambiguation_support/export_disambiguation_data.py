@@ -9,7 +9,7 @@ from lib.utils.table_exporter import export
 def export_table(config, table, table_config):
     output_file = '{}/{}/{}.tsv'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_inputs', table)
     engine = create_engine(get_connection_string(config, 'NEW_DB'))
-    database = config["DATABASE"]["NEW_DB"]
+    database = config["PATENTSVIEW_DATABASES"]["NEW_DB"]
     fields = table_config['fields']
     order_fields = table_config['order_fields']
     separator = "\t"

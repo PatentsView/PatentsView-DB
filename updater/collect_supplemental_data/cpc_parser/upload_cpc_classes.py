@@ -1,14 +1,16 @@
+import csv
+import datetime
+import os
+import re
+
 import pandas as pd
 from sqlalchemy import create_engine
 
-import csv
-import re, os
-import sys
-
-from lib.configuration import get_connection_string, get_config
+from lib.configuration import get_connection_string, get_current_config
+from updater.create_databases.upload_new import setup_database
 
 
-def upload_cpc_small_tables(db_con, db, folder):
+def upload_cpc_small_tables(db_con, db, folder, version_indicator):
     '''
     db_conn: sql alchemy connection engine
     db : name of the database
@@ -19,7 +21,13 @@ def upload_cpc_small_tables(db_con, db, folder):
     counter = 0
     for m in mainclass:
         towrite = [re.sub('"', "'", item) for item in m]
-        query = 'insert into {}.cpc_subsection values("{}", "{}")'.format(db, towrite[0], towrite[1])
+        query = 'insert into {}.cpc_subsection(id, title, version_indicator) values("{}", "{}", "{}")'.format(db,
+                                                                                                              towrite[
+                                                                                                                  0],
+                                                                                                              towrite[
+                                                                                                                  1],
+                                                                                                              version_indicator)
+        print(query)
         db_con.execute(query)
 
     # Upload CPC group data
@@ -29,11 +37,15 @@ def upload_cpc_small_tables(db_con, db, folder):
         towrite = [re.sub('"', "'", item) for item in m]
         if not towrite[0] in exist:
             exist.add(towrite[0])
-            query = 'insert into {}.cpc_group values("{}", "{}")'.format(db, towrite[0], towrite[1])
+            query = 'insert into {}.cpc_group(id, title, version_indicator) values("{}", "{}", "{}")'.format(db,
+                                                                                                             towrite[0],
+                                                                                                             towrite[1],
+                                                                                                             version_indicator)
+            print(query)
             db_con.execute(query)
 
 
-def upload_cpc_subgroup(db_con, db, folder):
+def upload_cpc_subgroup(db_con, db, folder, version_indicator):
     '''
     db_con : sql alchemy connection engine
     db: new/updated database
@@ -53,18 +65,45 @@ def upload_cpc_subgroup(db_con, db, folder):
             subgroup_out.writerow(clean)
     print('now uploading')
     data = pd.read_csv('{0}/{1}'.format(folder, 'cpc_subgroup_clean.csv'), delimiter='\t', encoding='utf-8')
+    data = data.assign(version_indicator=version_indicator)
     data.to_sql('cpc_subgroup', db_con, if_exists='append', index=False)
 
 
-def upload_cpc_classes(config):
-    cstr = get_connection_string(config, "NEW_DB")
+def update_raw_db(db_con, temp_db):
+    upsert_query_template = """
+INSERT INTO `{table}`(`id`, `title`, `version_indicator`)
+SELECT id, title, version_indicator
+from `{temp_db}`.`{table}`
+ON DUPLICATE KEY UPDATE title = VALUES(title),
+                        version_indicator= VALUES(version_indicator);
+"""
+    cpc_subsection_upsert_query = upsert_query_template.format(temp_db=temp_db, table='cpc_subsection')
+    cpc_group_upsert_query = upsert_query_template.format(temp_db=temp_db, table='cpc_group')
+    cpc_subgroup_upsert_query = upsert_query_template.format(temp_db=temp_db, table='cpc_subgroup')
+    with db_con.connect() as connection:
+        connection.execute(cpc_subsection_upsert_query)
+        connection.execute(cpc_group_upsert_query)
+        connection.execute(cpc_subgroup_upsert_query)
+
+
+def upload_cpc_classes(**kwargs):
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+
+    cstr = get_connection_string(config, "TEMP_UPLOAD_DB")
     db_con = create_engine(cstr)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
+    setup_database(config, drop=False, cpc_only=True)
+    upload_cpc_small_tables(db_con, config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], cpc_folder,
+                            config['DATES']['END_DATE'])
+    upload_cpc_subgroup(db_con, config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'], cpc_folder,
+                        config['DATES']['END_DATE'])
 
-    upload_cpc_small_tables(db_con, config['DATABASE']['NEW_DB'], cpc_folder)
-    upload_cpc_subgroup(db_con, config['DATABASE']['NEW_DB'], cpc_folder)
+    raw_cstr = get_connection_string(config, "PROD_DB")
+    raw_db_con = create_engine(raw_cstr)
+    update_raw_db(raw_db_con, config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
 
 
 if __name__ == '__main__':
-    config = get_config()
-    upload_cpc_classes(config)
+    upload_cpc_classes(**{
+        "execution_date": datetime.date(2020, 12, 15)
+    })

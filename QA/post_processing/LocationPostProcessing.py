@@ -2,123 +2,15 @@ import datetime
 import time
 
 from QA.post_processing.DisambiguationTester import DisambiguationTester
+from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
+from lib.configuration import get_current_config
 
 
 class LocationPostProcessingQC(DisambiguationTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-        super().__init__(config, 'NEW_DB', datetime.date(year=1976, month=1, day=1), end_date)
-        self.table_config = {
-                'rawlocation': {
-                        'fields': {
-                                'id':                      {
-                                        'data_type':    'varchar',
-                                        'null_allowed': False,
-                                        'category':     False
-                                        },
-                                'country_transformed':     {
-                                        'data_type':    'varchar',
-                                        'null_allowed': True,
-                                        'category':     False
-                                        },
-                                'location_id':             {
-                                        'data_type':    'varchar',
-                                        'null_allowed': True,
-                                        'category':     False
-                                        },
-                                'location_id_transformed': {
-                                        'data_type':    'varchar',
-                                        'null_allowed': True,
-                                        'category':     False
-                                        },
-                                'city':                    {
-                                        'data_type':    'varchar',
-                                        'null_allowed': True,
-                                        'category':     False
-                                        },
-                                'state':                   {
-                                        'data_type':    'varchar',
-                                        'null_allowed': True,
-                                        'category':     False
-                                        },
-                                'country':                 {
-                                        'data_type':    'varchar',
-                                        'null_allowed': True,
-                                        'category':     False
-                                        }
-                                }
-                        },
-                'location':    {
-                        "fields":           {
-                                "id":          {
-                                        "data_type":    "varchar",
-                                        "null_allowed": False,
-                                        "category":     False
-                                        },
-                                "city":        {
-                                        "data_type":    "varchar",
-                                        "null_allowed": True,
-                                        "category":     False
-                                        },
-                                "state":       {
-                                        "data_type":    "varchar",
-                                        "null_allowed": True,
-                                        "category":     False
-                                        },
-                                "country":     {
-                                        "data_type":    "varchar",
-                                        "null_allowed": True,
-                                        "category":     True
-                                        },
-                                "latitude":    {
-                                        "data_type":    "float",
-                                        "null_allowed": True,
-                                        "category":     False
-                                        },
-                                "longitude":   {
-                                        "data_type":    "float",
-                                        "null_allowed": True,
-                                        "category":     False
-                                        },
-                                "county":      {
-                                        "data_type":    "varchar",
-                                        "null_allowed": True,
-                                        "category":     False
-                                        },
-                                "state_fips":  {
-                                        "data_type":    "int",
-                                        "null_allowed": True,
-                                        "category":     False
-                                        },
-                                "county_fips": {
-                                        "data_type":    "int",
-                                        "null_allowed": True,
-                                        "category":     False
-                                        }
-                                },
-                        'related_entities': [
-                                {
-                                        'table':          'location_assignee',
-                                        'source_id':      'id',
-                                        'destination_id': 'location_id'
-                                        },
-                                {
-                                        'table':          'location_inventor',
-                                        'source_id':      'id',
-                                        'destination_id': 'location_id'
-                                        }]
-                        }
-                }
+        super().__init__(config, config['PATENTSVIEW_DATABASES']["PROD_DB"], datetime.date(year=1976, month=1, day=1), end_date)
 
-        self.disambiguated_data_fields = ['city', 'state', 'country']
-        self.entity_table = 'rawlocation'
-        self.entity_id = 'id'
-        self.disambiguated_id = 'location_id'
-        self.disambiguated_table = 'location'
-        self.patent_exclusion_list.extend(['location', 'rawlocation'])
-
-    def test_floating_entities(self, table=None, table_config=None):
-        pass
 
     def load_top_n_patents(self):
         chunk_size = 1000
@@ -184,12 +76,14 @@ group by l.id, l.city, l.state, l.country;
             rank += 1
 
     def runTests(self):
-        self.load_top_n_patents()
+        # self.load_top_n_patents()
         super(LocationPostProcessingQC, self).runTests()
+        super(DisambiguationTester, self).runTests()
 
 
 if __name__ == '__main__':
-    from lib.configuration import get_config
-
-    lqc = LocationPostProcessingQC(config=get_config())
-    lqc.runTests()
+    config = get_current_config('granted_patent',schedule='quarterly', **{
+            "execution_date": datetime.date(2021, 10, 1)
+            })
+    lc = LocationPostProcessingQC(config)
+    lc.runTests()

@@ -1,0 +1,287 @@
+{
+  "foreign_key_config": {
+    "field_name": "patent_id",
+    "friendly_name": "Patent Number",
+    "xml_path": "us-bibliographic-data-grant/publication-reference/document-id/doc-number",
+    "data-type": "string"
+  },
+  "table_xml_map": [
+    {
+      "table_prefix": "government_interest",
+      "friendly_name": "Government Interest",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "gi_statement",
+          "friendly_name": "GI Text",
+          "xml_path": "description",
+          "description": "Government Interest",
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "gi.tsv",
+      "table_name": "government_interest"
+    },
+    {
+      "table_name": "rel_app_text",
+      "friendly_name": "Related Application Text",
+      "multi_valued": false,
+      "fields": [
+        {
+          "field_name": "text",
+          "friendly_name": "Text",
+          "xml_path": "description",
+          "description": "Other Patent Relations",
+          "sequence": false,
+          "attribute": null,
+          "flag": null,
+          "tag": false,
+          "data-type": "fulltext"
+        }
+      ],
+      "filename": "rel_app_text.tsv"
+    },
+    {
+      "table_name": "main_cpc",
+      "friendly_name": "Main CPC",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-grant/classifications-cpc/main-cpc/",
+      "fields": [
+        {
+          "field_name": "version",
+          "friendly_name": "Version Indicator",
+          "xml_path": "cpc-version-indicator/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "section",
+          "friendly_name": "Section",
+          "xml_path": "section",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "class",
+          "friendly_name": "Class",
+          "xml_path": "class",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subclass",
+          "friendly_name": "Subclass",
+          "xml_path": "subclass",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "main_group",
+          "friendly_name": "Main Group",
+          "xml_path": "main-group",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subgroup",
+          "friendly_name": "Subgroup",
+          "xml_path": "subgroup",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "symbol_position",
+          "friendly_name": "Symbol Position",
+          "xml_path": "symbol-position",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "value",
+          "friendly_name": "Value",
+          "xml_path": "classification-value",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "action_date",
+          "friendly_name": "Action Date",
+          "xml_path": "action-date/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "main_cpc.tsv"
+    },
+    {
+      "table_name": "further_cpc",
+      "friendly_name": "Further CPC",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-grant/classifications-cpc/further-cpc/",
+      "fields": [
+        {
+          "field_name": "version",
+          "friendly_name": "Version Indicator",
+          "xml_path": "cpc-version-indicator/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "date"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "section",
+          "friendly_name": "Section",
+          "xml_path": "section",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "class",
+          "friendly_name": "Class",
+          "xml_path": "class",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subclass",
+          "friendly_name": "Subclass",
+          "xml_path": "subclass",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "main_group",
+          "friendly_name": "Main Group",
+          "xml_path": "main-group",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "subgroup",
+          "friendly_name": "Subgroup",
+          "xml_path": "subgroup",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "symbol_position",
+          "friendly_name": "Symbol Position",
+          "xml_path": "symbol-position",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "value",
+          "friendly_name": "Value",
+          "xml_path": "classification-value",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "action_date",
+          "friendly_name": "Action Date",
+          "xml_path": "action-date/date",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "further_cpc.tsv"
+    }
+  ]
+}
