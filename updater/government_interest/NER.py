@@ -5,6 +5,8 @@
 ##################################################################
 import datetime
 import math
+import multiprocessing
+import multiprocessing as mp
 import os
 import re
 import subprocess
@@ -12,9 +14,10 @@ from os import listdir
 
 import pandas as pd
 from sqlalchemy import create_engine
+from tqdm import tqdm
 
 from lib.configuration import get_connection_string, get_current_config
-from lib.utilities import chunks
+from lib.utilities import chunks, mpp, queue_processor
 
 
 def get_heading(gi_statement):
@@ -28,8 +31,17 @@ def get_heading(gi_statement):
     return ''
 
 
-def prepare_input_files(connection_string, merged_csv_output, id_type = 'patent_id'):
+def prepare_input_files(connection_string, merged_csv_output, id_type='patent_id'):
     engine = create_engine(connection_string)
+    # all_gi_data = pd.read_sql_query(
+    #     sql="""
+    # select *
+    # from
+    #     government_interest
+    # where
+    #         gi_statement like '%%memphis%%'
+    #         """,
+    #     con=engine)
     all_gi_data = pd.read_sql_table(table_name='government_interest', con=engine)
     # reset index after appending all data together
     all_gi_data.reset_index(inplace=True)
@@ -46,17 +58,24 @@ def prepare_input_files(connection_string, merged_csv_output, id_type = 'patent_
 
     # eliminate rows that have statements ~ to "No federal government funds were used in researching or developing this invention..."
     idx_rm_nofunds = all_gi_data[all_gi_data['gi_statement'].str.contains(
-            'No federal government funds|No federal funds|without the sponsorship or funding', flags=re.IGNORECASE,
-            regex=True) == True].index.tolist()
+        'No federal government funds|No federal funds|without the sponsorship or funding', flags=re.IGNORECASE,
+        regex=True) == True].index.tolist()
 
     all_to_rm = idx_rm_na + idx_rm_empty + idx_rm_nofunds
 
     all_gi_data.drop(all_to_rm, inplace=True)
-
+    # selected_gi_data = all_gi_data.sample(1000)
+    # all_gi_data = all_gi_data[
+    #     all_gi_data.document_number.isin([20010001798, 20160351894, 20090136827, 20090305113, 20020045192])]
     all_gi_data.reset_index(inplace=True)
 
     all_gi_data.to_csv(merged_csv_output, index=False)
     return all_gi_data
+
+
+def execute_and_save(cmd, output_file):
+    with open(output_file, "w") as xml_out:
+        subprocess.run(cmd, stdout=xml_out)
 
 
 # Requires: NER DB filepath, dataframe
@@ -81,49 +100,69 @@ def run_NER(fp, txt_fp_in, txt_fp_out, data, classif, classif_dirs):
     gi_chunked = chunks(gi_stmt_full, nerfc)
 
     for item in range(0, len(gi_chunked)):
-        with open(txt_fp_in + str(item) + '_file.txt', 'w', encoding='utf-8') as f:
+        with open(txt_fp_in + str(item).zfill(4) + '_file.txt', 'w', encoding='utf-8') as f:
             gi_stmt_str = '\n'.join(gi_chunked[item])
             f.write(gi_stmt_str)
 
         # Save file name
-        infile_name = str(item) + "_file.txt"
+        infile_name = str(item).zfill(4) + "_file.txt"
         input_files.append(infile_name)
-
+    cmds_and_paths = []
     # Run java call for NER
     for cf in range(0, len(classif)):
         for f in input_files:
             cmd_pt1 = 'java -mx500m -classpath stanford-ner.jar edu.stanford.nlp.ie.crf.CRFClassifier'
             cmd_pt2 = '-loadClassifier ' + './' + classif[cf]
-            cmd_pt3 = '-textFile ./in/' + f + ' -outputFormat inlineXML 2>> error.log'
+            cmd_pt3 = f'-textFile {txt_fp_in}' + f + ' -outputFormat inlineXML 2>> error.log'
             cmd_full = cmd_pt1 + ' ' + cmd_pt2 + ' ' + cmd_pt3
             cmdline_params = cmd_full.split()
             print(cmdline_params)
-
-            with open(txt_fp_out + classif_dirs[cf] + f, "w") as xml_out:
-                subprocess.run(cmdline_params, stdout=xml_out)
-
+            cmds_and_paths.append((cmdline_params, txt_fp_out + classif_dirs[cf] + f))
+    pool = mpp.Pool(12)
+    results = pool.istarmap(execute_and_save, cmds_and_paths)
+    for result in tqdm(results):
+        continue
     return
+
+
+def process_NER_outfiles(infile, out_folder):
+    infile_name = os.path.basename(infile)
+    idx = infile_name.split("_")[0]
+    out_formats = ["out-7class{idx}_file.txt", "out-4class{idx}_file.txt", "out-3class{idx}_file.txt"]
+    handles = [open("{path}{file}".format(path=out_folder, file=outfile.format(idx=idx)), "r") for outfile in
+               out_formats]
+    current_file_orgs = []
+    for op_7, op_4, op_3 in zip(*handles):
+        current_line_orgs = set()
+        current_line_orgs.update(parse_xml_ner(op_7))
+        current_line_orgs.update(parse_xml_ner(op_4))
+        current_line_orgs.update(parse_xml_ner(op_3))
+        current_file_orgs.append(current_line_orgs)
+    return current_file_orgs
 
 
 # Requires: filepath, merged_df frame
 # Modifies: nothing
 # Effects: Process NER on merged_csvs, returns orgs list, locs list
-def process_NER(txt_fp_out, data):
+def process_NER(indir, txt_fp_out):
     os.chdir(txt_fp_out)
-    ner_output = listdir(os.getcwd())
-    print(ner_output)
-    orgs_full_list = []
-
-    for f in ner_output:
-        with open(f, "r") as output:
-            content = output.readlines()
-            orgs_full_list = parse_xml_ner(orgs_full_list, content)
-
-    # Flatten list of lists
-    flat_orgs = [y for x in orgs_full_list for y in x]
-    orgs_final = set(flat_orgs)
-
-    return orgs_final
+    ner_input_files = sorted(listdir(indir))
+    # ner_output = listdir(os.getcwd())
+    # print(ner_output)
+    ner_processor_args = []
+    for f in ner_input_files:
+        ner_processor_args.append((f, txt_fp_out))
+    ner_batched_load_results = queue_processor(func=process_NER_outfiles, arg_tups=ner_processor_args, loop=True)
+    # p = multiprocessing.Pool(os.cpu_count() - 2)
+    # ner_batched_load_results = p.starmap(process_NER_outfiles, ner_processor_args)
+    # exit(0)
+    # return None
+    orgs_for_gi = []
+    for sublist in ner_batched_load_results:
+        for item in sublist:
+            orgs_for_gi.append(item)
+    # orgs_for_gi = [item for sublist in ner_batched_load_results for item in sublist]
+    return orgs_for_gi
 
 
 def extract_contract_award(gi_row):
@@ -149,22 +188,22 @@ def extract_contract_award(gi_row):
         match_string += start + " [A-Za-z\d][A-Za-z\d-]+[^\s][\d][A-Za-z\d-]+|" + start + " [A-Z\d]{1,5}\s[A-Z\d-]+\d|"
     match_string += "[A-Za-z\d][A-Za-z\d-]+[^\s][\d][A-Za-z\d-]+|[A-Z\d]{1,5}\s[A-Z\d-]+\d"
     contract_nums = re.findall(
-            match_string,
-            statement)
+        match_string,
+        statement)
 
     if "public law" in gi_row.gi_statement.lower() or "p.l." in statement.lower():
         contract_nums = [
-                re.sub("((96|85)-\d{3}|USC\s\d{3}|20\d{3}|111-\d{3})\|?", "", x)
-                for x in contract_nums
-                ]
+            re.sub("((96|85)-\d{3}|USC\s\d{3}|20\d{3}|111-\d{3})\|?", "", x)
+            for x in contract_nums
+        ]
     if "Calif." in gi_row.gi_statement or "Bethesda" in statement:
         contract_nums = [
-                x if x not in [
-                        "619)553-5118", "619)553-5120", "553-5118", "(619-)?553-2778",
-                        "92152", "72120", "20012", "53510", "D0012", "53560", "20014",
-                        "20892"
-                        ] else None for x in contract_nums
-                ]
+            x if x not in [
+                "619)553-5118", "619)553-5120", "553-5118", "(619-)?553-2778",
+                "92152", "72120", "20012", "53510", "D0012", "53560", "20014",
+                "20892"
+            ] else None for x in contract_nums
+        ]
     return contract_nums
 
 
@@ -174,24 +213,25 @@ def extract_contract_award(gi_row):
 def add_cols(data, orgs):
     print("Cleaning and Adding Columns...")
     # Clean organizations
-    orgs_final = clean_orgs(orgs)
+    # orgs_final = clean_orgs(orgs)
 
-    gi_statements = data['gi_statement'].tolist()
+    # gi_statements = data['gi_statement'].tolist()
 
     # Add orgs column
-    gi_all_orgs = []
-    for gi in gi_statements:
-        gi_orgs = []
-        for org in orgs_final:
-            if org in gi:
-                gi_orgs.append(org)
+    # gi_all_orgs = []
+    # for gi in tqdm(gi_statements):
+    #     gi_orgs = []
+    #     for org in orgs_final:
+    #         # if re.search(r'\b' + re.escape(org) + r'\b', gi):
+    #         if org in gi:
+    # #             gi_orgs.append(org)
+    #
+    #     # Once full org list formed for gi, join
+    #     gi_final = '|'.join(gi_orgs)
+    #     gi_all_orgs.append(gi_final)
 
-        # Once full org list formed for gi, join
-        gi_final = '|'.join(gi_orgs)
-        gi_all_orgs.append(gi_final)
-
-    gi_all_orgs = [x.lstrip('|') for x in gi_all_orgs]
-    data['orgs'] = pd.Series(gi_all_orgs)
+    # gi_all_orgs = [x.lstrip('|') for x in gi_all_orgs]
+    # data['orgs'] = pd.Series(gi_all_orgs)
 
     # Extract and clean Contract Numbers
     # contracts = clean_contracts(data, gi_statements)
@@ -231,18 +271,18 @@ def clean_orgs(orgs):
 
     # Grant-related cleaning
     orgs = [re.sub(
-            "Federally[\-,\s]Sponsored\sResearch(\sThis)?|Federal\s(Contract|Government|Government Contract)|(Federal\sGrant|Grant\sNumber).+|Grant\sNo\.?.+|Grant\s#.+|(and)?\s?Grant",
-            "", x) for x in orgs]
+        "Federally[\-,\s]Sponsored\sResearch(\sThis)?|Federal\s(Contract|Government|Government Contract)|(Federal\sGrant|Grant\sNumber).+|Grant\sNo\.?.+|Grant\s#.+|(and)?\s?Grant",
+        "", x) for x in orgs]
 
     # Contract/Case related cleaning
     orgs = [re.sub(
-            "Government\sContract.+|Case?\s(Number)?|Subcontract.+|and\s(Contract)|(and)?\s?Contract\sNos?\.?.+|Contract\s[A-Z,\d,\-,a-z].+[\d].+|Case\sNo\.?.+|(Contract\sNumber|Contract\s#).+|Order\sNo|[C,c]ontract\/|Case"
-            , "", x) for x in orgs]
+        "Government\sContract.+|Case?\s(Number)?|Subcontract.+|and\s(Contract)|(and)?\s?Contract\sNos?\.?.+|Contract\s[A-Z,\d,\-,a-z].+[\d].+|Case\sNo\.?.+|(Contract\sNumber|Contract\s#).+|Order\sNo|[C,c]ontract\/|Case"
+        , "", x) for x in orgs]
 
     # Award/Agreement related cleaning
     orgs = [re.sub(
-            "(Award|Agreement)\sNumbers?.+|(Award|Agreement)\sNos?\.?.+|Award\s[A-Z].+[\d].+\sand|Award\s[A-Z,\d,\-,/]{10,30}|Award",
-            "", x) for x in orgs]
+        "(Award|Agreement)\sNumbers?.+|(Award|Agreement)\sNos?\.?.+|Award\s[A-Z].+[\d].+\sand|Award\s[A-Z,\d,\-,/]{10,30}|Award",
+        "", x) for x in orgs]
 
     # Misc. cleaning
     orgs = [re.sub("Cooperative\sAgreement.+", "Cooperative Agreement", x) for x in orgs]
@@ -257,9 +297,9 @@ def clean_orgs(orgs):
     orgs = [re.sub("\sNos?\.?$|\]|\[|no\.|NS.+|&|;$|\s1$|#|'|[#,A-Z][a-z,\d,A-Z][a-z\d][\d]{3,10}", "", x) for x in
             orgs]
     orgs = [
-            re.sub("Applications?\sI[dD]?.+|Project\s#|Project\sNumber.+|Prime\sContract|Merit\sReview?.+|Merit\sAward",
-                   "",
-                   x) for x in orgs]
+        re.sub("Applications?\sI[dD]?.+|Project\s#|Project\sNumber.+|Prime\sContract|Merit\sReview?.+|Merit\sAward",
+               "",
+               x) for x in orgs]
     orgs = [re.sub("Goverment|Government\sSupport\s?(under)?|(NIH|NHI)\s1|Health 1R43|U01", "", x) for x in orgs]
     orgs = [re.sub("Foundation\sNumber|Foundation\s[\d]{5,15}|U01|R01|P\.O\.|Numbers?", "", x) for x in orgs]
     orgs = [re.sub("NIH[#/]", "NIH", x) for x in orgs]
@@ -327,8 +367,8 @@ def clean_contracts(data, gi_statements):
 
     for idx in idx_cabe:
         contracts[idx] = re.sub(
-                "619\)553-5118\|?|619\)553-5120\|?|553-5118\|?|(619-)?553-2778\|?|92152\|?|72120\|?|20012\|?|53510\|?|D0012\|?|53560\|?|20014\|?|20892\|?",
-                "", contracts[idx])
+            "619\)553-5118\|?|619\)553-5120\|?|553-5118\|?|(619-)?553-2778\|?|92152\|?|72120\|?|20012\|?|53510\|?|D0012\|?|53560\|?|20014\|?|20892\|?",
+            "", contracts[idx])
 
     contracts = [x.lstrip() for x in contracts]
     contracts = [x.rstrip('|') for x in contracts]
@@ -339,13 +379,10 @@ def clean_contracts(data, gi_statements):
 # Requires: organizations list, locations list, content
 # Modifies: nothing
 # Effects: parses XML file for orgs, locs
-def parse_xml_ner(orgs_full, content):
-    for line in content:
-        orgs = re.findall("<ORGANIZATION>[^<]+</ORGANIZATION>", line)
-        orgs_clean = [re.sub("<ORGANIZATION>|</ORGANIZATION>", "", x) for x in orgs]
-        orgs_full.append(orgs_clean)
-
-    return orgs_full
+def parse_xml_ner(line):
+    orgs = re.findall("<ORGANIZATION>[^<]+</ORGANIZATION>", line)
+    orgs_clean = [re.sub("<ORGANIZATION>|</ORGANIZATION>", "", x) for x in orgs]
+    return set(orgs_clean)
 
 
 # --------Test Functions -------#
@@ -363,17 +400,17 @@ def test_dataframe(df, rw, col):
     return
 
 
-def begin_NER_processing(dbtype='granted_patent',database='TEMP_UPLOAD_DB', **kwargs):
+def begin_NER_processing(dbtype='granted_patent', database='TEMP_UPLOAD_DB', **kwargs):
     config = get_current_config(type=dbtype, **kwargs)
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
-
+    persistent_files_path = config['FOLDERS']['persistent_files']
     # Set up vars + directories
     merged_csv = '{}/merged_csvs.csv'.format(pre_manual)
-    ner_dir = "/project/persistent_files/stanford-ner-2017-06-09/"
-    ner_txt_indir = "/project/persistent_files/stanford-ner-2017-06-09/in/"
+    ner_dir = f"{persistent_files_path}/stanford-ner-2017-06-09/"
+    ner_txt_indir = "{}/NER_in/".format(pre_manual)
     ner_txt_outdir = '{}/NER_out/'.format(pre_manual)
-    if not os.path.exists(ner_txt_outdir):
-        os.makedirs(ner_txt_outdir)
+    os.makedirs(ner_txt_outdir, exist_ok=True)
+    os.makedirs(ner_txt_indir, exist_ok=True)
     classifiers = ['classifiers/english.all.3class.distsim.crf.ser.gz',
                    'classifiers/english.conll.4class.distsim.crf.ser.gz',
                    'classifiers/english.muc.7class.distsim.crf.ser.gz']
@@ -382,25 +419,35 @@ def begin_NER_processing(dbtype='granted_patent',database='TEMP_UPLOAD_DB', **kw
     final_output_dir = pre_manual
     connection_string = get_connection_string(config, database=database)
     # 1. Merge csvs together and read in the input file
-    merged_df = prepare_input_files(connection_string, merged_csv, id_type=('patent_id' if dbtype =='granted_patent' else 'document_number'))
-
+    merged_df = prepare_input_files(connection_string, merged_csv,
+                                    id_type=('patent_id' if dbtype == 'granted_patent' else 'document_number'))
+    # merged_df = pd.read_csv("pgpubs_20220630/government_interest/pre_manual/merged_csvs.csv", index_col=0)
     # # 2. run NER
     run_NER(ner_dir, ner_txt_indir, ner_txt_outdir, merged_df, classifiers, ner_classif_dirs)
 
     # 3. process NER output
-    orgs_list = process_NER(ner_txt_outdir, merged_df)
+    orgs_list = process_NER(ner_txt_indir, ner_txt_outdir)
+    clean_orgs_list = [clean_orgs(x) for x in tqdm(orgs_list, desc='Cleaning NER orgs')]
+    merged_df = merged_df.assign(orgs_iterable=clean_orgs_list)
+    tqdm.pandas(desc="Assign org to DF")
+    merged_df = merged_df.assign(orgs=merged_df.orgs_iterable.progress_apply(lambda x: "|".join(clean_orgs(x))))
+    tqdm.pandas(desc="Assign contracts to DF")
 
+    contracts = merged_df.progress_apply(extract_contract_award, axis=1)
+
+    # Add contracts column for contracts
+    merged_df['contracts'] = pd.Series(contracts)
     # 4. add extracted organizations and contract numbers
-    df_final, orgs_final = add_cols(merged_df, orgs_list)
-
+    # df_final, orgs_final = add_cols(merged_df, orgs_list)
+    orgs_final = list(set([item for items in merged_df.orgs_iterable.tolist() for item in items]))
     # 5. write output file
-    write_output(final_output_dir, df_final, orgs_final)
+    write_output(final_output_dir, merged_df, orgs_final)
 
 
 if __name__ == '__main__':
     # config = get_current_config('granted_patent', **{
     #         "execution_date": datetime.date(2020, 12, 29)
     #         })
-    begin_NER_processing(dbtype='granted_patent', database='TEMP_UPLOAD_DB', **{
-            "execution_date": datetime.date(2020, 12, 22)
-            })
+    begin_NER_processing(dbtype='pgpubs', database='PROD_DB', **{
+        "execution_date": datetime.date(2022, 6, 23)
+    })

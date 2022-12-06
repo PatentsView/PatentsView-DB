@@ -14,6 +14,7 @@ from queue import Queue
 from statistics import mean
 import pandas as pd
 from time import time
+import multiprocessing.pool as mpp
 
 import boto3
 import requests
@@ -394,6 +395,38 @@ def generate_index_statements(config, database_section, table):
 
     return add_indexes, drop_indexes
 
+def queue_processor(func, arg_tups, loop=True):
+    if not loop:
+        mp = mpp.Pool(8)
+        # match_results = mp.starmap(func, arg_tups)
+        yield from mp.istarmap(func, arg_tups)
+    else:
+        for arg in arg_tups:
+            yield func(*arg)
+
+
+def istarmap(self, func, iterable, chunksize=1):
+    """starmap-version of imap
+    """
+    self._check_running()
+    if chunksize < 1:
+        raise ValueError(
+            "Chunksize must be 1+, not {0:n}".format(
+                chunksize))
+
+    task_batches = mpp.Pool._get_tasks(func, iterable, chunksize)
+    result = mpp.IMapIterator(self)
+    self._taskqueue.put(
+        (
+            self._guarded_task_generation(result._job,
+                                          mpp.starmapstar,
+                                          task_batches),
+            result._set_length
+        ))
+    return (item for chunk in result for item in chunk)
+
+
+mpp.Pool.istarmap = istarmap
 
 def mp_csv_writer(write_queue, target_file, header):
     with open(target_file, 'w', newline='') as writefile:

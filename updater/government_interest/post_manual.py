@@ -6,6 +6,7 @@ import datetime
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
+from tqdm import tqdm
 
 from QA.government_interest.GovtInterestTester import GovtInterestTester
 from lib.configuration import get_connection_string, get_current_config, get_version_indicator
@@ -114,19 +115,25 @@ def process_NER(pre_manual, post_manual, dict_clean_org):
 
 def readOrgs(db_cursor):
     org_dict = {}
-    orgs = db_cursor.execute('SELECT organization_id, name FROM government_organization;')
-    for row in orgs:
-        org_dict[row[1].upper()] = int(row[0])
+    orgs=pd.read_csv("pgpubs_20220630/government_interest/manual_inputs/government_organization.csv")
+    for idx,row in orgs.iterrows():
+        org_dict[row['name'].upper()]=row.organization_id
+    # orgs = db_cursor.execute('SELECT organization_id, name FROM government_organization;')
+    # for row in orgs:
+    #     org_dict[row[1].upper()] = int(row[0])
     return org_dict
 
 
-def push_orgs(looked_up_data, org_id_mapping, config, version_indicator,database='TEMP_UPLOAD_DB', id_type = 'patent_id'):
+def push_orgs(looked_up_data, org_id_mapping, config, version_indicator, database='TEMP_UPLOAD_DB',
+              id_type='patent_id'):
     missed = {}
-    engine = create_engine(get_connection_string(config, database=database))
+    # engine = create_engine(get_connection_string(config, database=database))
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
-    engine.execute('set foreign_key_checks=0')
+    # engine.execute('set foreign_key_checks=0')
     table_prefix = 'patent' if id_type == 'patent_id' else 'publication'
-    for idx, row in looked_up_data.iterrows():
+    gi_orgs = []
+    contracts_data = []
+    for idx, row in tqdm(looked_up_data.iterrows()):
         doc_id = row[id_type]
         # gi_statement = row['gi_statement']
         if row['looked_up'] is not np.nan:
@@ -140,28 +147,36 @@ def push_orgs(looked_up_data, org_id_mapping, config, version_indicator,database
                 else:
                     missed[doc_id] = org
             for org_id in list(all_orgs):
-                query = "INSERT IGNORE INTO {}_govintorg ({}, organization_id, version_indicator) VALUES ('{}', '{}', '{}');".format(
-                    table_prefix, id_type, doc_id, org_id, version_indicator)
-                cursor = engine.connect()
-                cursor.execute(query)
-                cursor.close()
+                gi_orgs.append({'prefix': table_prefix, id_type: doc_id, 'organization_id': org_id,
+                                'version_indicator': version_indicator})
+                # query = "INSERT IGNORE INTO {}_govintorg ({}, organization_id, version_indicator) VALUES ('{}', '{}', '{}');".format(
+                #     table_prefix, id_type, doc_id, org_id, version_indicator)
+                # cursor = engine.connect()
+                # cursor.execute(query)
+                # cursor.close()
         if row['contracts'] is not np.nan:
             contracts = ast.literal_eval(row['contracts'])
             # contracts = list(set(row['contracts'].split('|')))
             for contract_award_no in contracts:
                 if contract_award_no is not None:
-                    query = "INSERT IGNORE INTO {}_contractawardnumber ({}, contract_award_number, version_indicator) values ('{}', '{}', '{}')".format(
-                        table_prefix, id_type, doc_id, contract_award_no, version_indicator)
-                    cursor = engine.connect()
-                    cursor.execute(query)
-                    cursor.close()
+                    contracts_data.append(
+                        {'prefix': table_prefix, id_type: doc_id, 'contract_award_number': contract_award_no,
+                         'version_indicator': version_indicator})
+                    # query = "INSERT IGNORE INTO {}_contractawardnumber ({}, contract_award_number, version_indicator) values ('{}', '{}', '{}')".format(
+                    #     table_prefix, id_type, doc_id, contract_award_no, version_indicator)
+                    # cursor = engine.connect()
+                    # cursor.execute(query)
+                    # cursor.close()
+
+    pd.DataFrame(gi_orgs).to_excel('{}/gi_orgs.xlsx'.format(post_manual))
+    pd.DataFrame(contracts_data).to_excel('{}/contracts.xlsx'.format(post_manual))
     missed_org_list = list(set(missed.keys()))
     missed_org_count = [missed[item] for item in missed_org_list]
     total_missed_orgs = pd.DataFrame(missed_org_list, missed_org_count)
     total_missed_orgs.to_csv('{}/incorrect_clean_orgs.csv'.format(post_manual))
 
 
-def process_post_manual(doctype='granted_patent',database='TEMP_UPLOAD_DB', **kwargs):
+def process_post_manual(doctype='granted_patent', database='TEMP_UPLOAD_DB', **kwargs):
     config = get_current_config(type=doctype, **kwargs)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
@@ -183,21 +198,27 @@ def process_post_manual(doctype='granted_patent',database='TEMP_UPLOAD_DB', **kw
     org_id_mapping = readOrgs(full_db_engine)
 
     # push the mappings into the db
-    id_type=('patent_id' if doctype =='granted_patent' else 'document_number')
+    id_type = ('patent_id' if doctype == 'granted_patent' else 'document_number')
     push_orgs(looked_up, org_id_mapping, config, version_indicator, database=database, id_type=id_type)
 
 
-def qc_gi(doctype='granted_patent', database='TEMP_UPLOAD_DB',**kwargs):
+def qc_gi(doctype='granted_patent', database='TEMP_UPLOAD_DB', **kwargs):
     config = get_current_config(type=doctype, **kwargs)
-    qc = GovtInterestTester(config, database=database, id_type=('patent_id' if doctype =='granted_patent' else 'document_number'))
+    qc = GovtInterestTester(config, database=database,
+                            id_type=('patent_id' if doctype == 'granted_patent' else 'document_number'))
     qc.runTests()
 
 
 if __name__ == '__main__':
-    from dateutil import rrule
+    # from dateutil import rrule
 
-    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime.date(2020, 12, 29), until=datetime.date(2021, 3, 23)):
-        process_post_manual(**{
-            "execution_date": dt
-        })
-        break
+    kw = {
+        "execution_date": datetime.date(2022, 6, 23)
+    }
+    process_post_manual(doctype='pgpubs', **kw)
+
+    # for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime.date(2020, 12, 29), until=datetime.date(2021, 3, 23)):
+    #     process_post_manual(**{
+    #         "execution_date": dt
+    #     })
+    #     break

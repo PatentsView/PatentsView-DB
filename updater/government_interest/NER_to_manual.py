@@ -1,6 +1,8 @@
 import datetime
+import multiprocessing
 import os
 import re
+import time
 
 import numpy as np
 import pandas as pd
@@ -10,9 +12,10 @@ from fuzzywuzzy import process
 # Modifies: list of solid matches
 # Effects: if solid match has non_government as extra tag, removes non_government tag
 from sqlalchemy import create_engine
+from tqdm import tqdm
 
 from lib.configuration import get_connection_string, get_current_config
-from lib.utilities import better_title
+from lib.utilities import better_title, mpp, queue_processor
 
 
 def non_gov_check(matched_df):
@@ -36,9 +39,7 @@ def clean_matchlist(match_list):
     return match_list
 
 
-def fuzzy_match(org, govt_acc_dict, existing_lookup):
-    all_possible_long = [item.strip() for item in govt_acc_dict.values()] + [item.strip() for item in
-                                                                             existing_lookup.values()]
+def fuzzy_match(org, all_possible_long):
     solid_matches = []
     possible_matches = []
     if len(org.split(' ')) >= 3:
@@ -68,33 +69,36 @@ def fuzzy_match(org, govt_acc_dict, existing_lookup):
     return solid_matches, possible_matches
 
 
-def match(org, govt_acc_dict, existing_lookup):
-    solid_matches = []
-    possible_matches = []
-
-    for acronym, name in govt_acc_dict.items():
-        if re.search(r'\b' + acronym + r'\b', org):
-            solid_matches.append(name)
-        if name in org:
-            solid_matches.append(name)
-    for existing, clean in existing_lookup.items():
-        if re.search(r'\b' + existing + r'|' + clean + r'\b', org, flags=re.IGNORECASE):
-            solid_matches.append(clean)
-    solid_fuzzy, possible_fuzzy = fuzzy_match(org, govt_acc_dict, existing_lookup)
-    solid_matches.extend(solid_fuzzy)
-    # convert to set to get rid of duplicates
-    solid_matches = list(set(solid_matches))
-    possible_matches = list(set(possible_matches))
-    # only get possible matches if there aren't solid matches
-    if len(solid_matches) < 1:
-        possible_matches.extend(possible_fuzzy)
-    # if there are too many solid matches, put them in possible for review
-    if len(solid_matches) > 2:
-        possible_matches.extend(solid_matches)
-        solid_matches = []
-    # switch empty lists for nan and join them with '|'
-    solid_matches = clean_matchlist(solid_matches)
-    possible_matches = clean_matchlist(possible_matches)
+def match(org, govt_acc_dict, existing_lookup, all_possible_long):
+    solid_matches = set()
+    possible_matches = set()
+    if org is not None:
+        for acronym, name in govt_acc_dict.items():
+            if acronym is not None:
+                if re.search(r'\b' + acronym + r'\b', org):
+                    solid_matches.add(name)
+            if name in org:
+                solid_matches.add(name)
+        for existing, clean in existing_lookup.items():
+            if re.search(r'\b' + re.escape(existing) + r'\b|\b' + re.escape(clean) + r'\b', org, flags=re.IGNORECASE):
+                solid_matches.add(clean)
+        if len(solid_matches) < 1:
+            # Fuzzy match only if there are no solid matches
+            solid_fuzzy, possible_fuzzy = fuzzy_match(org, all_possible_long)
+            solid_matches.update(solid_fuzzy)
+            # only get possible matches if there aren't solid matches
+            possible_matches.update(possible_fuzzy)
+        # convert to set to get rid of duplicates
+        solid_matches = list(solid_matches)
+        possible_matches = list(possible_matches)
+        # if there are too many solid matches, put them in possible for review
+        if len(solid_matches) > 2:
+            possible_matches.extend(solid_matches)
+            # Choose the first one still
+            solid_matches = [solid_matches[0]]
+        # switch empty lists for nan and join them with '|'
+        solid_matches = clean_matchlist(solid_matches)
+        possible_matches = clean_matchlist(possible_matches)
     return solid_matches, possible_matches
 
 
@@ -111,7 +115,7 @@ def get_data(persistent_files, pre_manual):
 
     gov_to_skip = ['Government', 'US Government', 'U.S. Government', 'United States Government']
     # there is only one column in orgs file
-    organizations = [item for item in orgs.iloc[:, 0] if not item in gov_to_skip]
+    organizations = [item for item in orgs.iloc[:, 0] if not item in gov_to_skip and not pd.isna(item)]
 
     return existing_lookup, govt_acc_dict, organizations
 
@@ -119,10 +123,23 @@ def get_data(persistent_files, pre_manual):
 def perform_lookups(existing_lookup, govt_acc_dict, organizations, manual_inputs):
     all_solid = []
     all_possible = []
-    for org in organizations:  # kinda slow, ~7 minutes for 6 months of data
-        solid_for_org, possible_for_org = match(org, govt_acc_dict, existing_lookup)
+    match_args = []
+    all_possible_long = [item.strip() for item in govt_acc_dict.values()] + [item.strip() for item in
+                                                                             existing_lookup.values()]
+    for org in tqdm(organizations):  # kinda slow, ~7 minutes for 6 months of data
+        print(org)
+        # if 'Frontier' in org:
+        match_args.append((org, govt_acc_dict, existing_lookup, all_possible_long))
+    match_results = queue_processor(func=match, arg_tups=match_args, loop=False)
+    durations = []
+    start = time.time()
+    for solid_for_org, possible_for_org in tqdm(match_results, total=len(match_args)):
         all_solid.append(solid_for_org)
         all_possible.append(possible_for_org)
+        durations.append(time.time() - start)
+    print(sum(durations))
+    print(len(durations))
+    print(sum(durations) / len(durations))
     results = pd.DataFrame([organizations, all_solid, all_possible]).T
     results.columns = ['organization', 'solid', 'possible']
     matched = results[~pd.isnull(results['solid'])][['organization', 'solid']]
@@ -160,6 +177,6 @@ def process_ner_to_manual(dbtype='granted_patent', **kwargs):
 
 
 if __name__ == '__main__':
-    process_ner_to_manual( **{
-            "execution_date": datetime.date(2020, 12, 22)
-            })
+    process_ner_to_manual('pgpubs', **{
+        "execution_date": datetime.date(2022, 6, 23)
+    })
