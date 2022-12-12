@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
+from thefuzz import fuzz
+from thefuzz import process
 import re
 import os
 import pytest
