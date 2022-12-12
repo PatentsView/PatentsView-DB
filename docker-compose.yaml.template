@@ -1,0 +1,123 @@
+version: "3"
+services:
+  pv_data_pipeline_initializer:
+    volumes:
+      - pv_update_volume:/data-volume/
+      - '{path_to_project_folder}/PatentsView-DB/:/project'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/.my.cnf:/home/airflow/.my.cnf'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView/PatentsView-DB/airflow/:/airflow'
+      - '{path_to_project_folder}/PatentsView-DB/:/project/updater/disambiguation/hierarchical_clustering_disambiguation/data/'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
+      - {other_volume_mounts}
+    image: update_pipeline_20221206
+    env_file:
+      - airflow_pipeline_env.sh
+    container_name: pv_production_pipeline_initializer
+    healthcheck:
+      test: [ "airflow", "db", "check" ]
+      interval: 2m
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    command:
+      - db
+      - init
+
+  pv_data_pipeline_scheduler:
+    volumes:
+      - pv_update_volume:/data-volume/
+      - '{path_to_project_folder}/PatentsView-DB/:/project'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/.my.cnf:/home/airflow/.my.cnf'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView/PatentsView-DB/airflow/:/airflow'
+      - '{path_to_project_folder}/PatentsView-DB/:/project/updater/disambiguation/hierarchical_clustering_disambiguation/data/'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
+      - {other_volume_mounts}
+    image: update_pipeline_20221206
+    healthcheck:
+      test: [ "airflow", "db", "check" ]
+      interval: 2m
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    env_file:
+      - airflow_pipeline_env.sh
+    restart: on-failure:5
+    container_name: pv_production_pipeline_scheduler
+    depends_on:
+      - pv_data_pipeline_initializer
+      - rabbitmq
+    command:
+      - scheduler
+  pv_data_pipeline_webserver:
+    healthcheck:
+      test: [ "airflow", "db", "check" ]
+      interval: 2m
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - pv_update_volume:/data-volume/
+      - '{path_to_project_folder}/PatentsView-DB/:/project'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/.my.cnf:/home/airflow/.my.cnf'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView/PatentsView-DB/airflow/:/airflow'
+      - '{path_to_project_folder}/PatentsView-DB/:/project/updater/disambiguation/hierarchical_clustering_disambiguation/data/'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
+      - {other_volume_mounts}
+    image: update_pipeline_20221206
+    restart: on-failure:5
+    ports:
+      - 9090:8080
+    env_file:
+      - airflow_pipeline_env.sh
+    container_name: pv_production_pipeline_webserver
+    depends_on:
+      - pv_data_pipeline_initializer
+      - rabbitmq
+    command:
+      - webserver
+
+  pv_data_pipeline_celery_flower:
+    healthcheck:
+      test: [ "airflow", "db", "check" ]
+      interval: 2m
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - pv_update_volume:/data-volume/
+      - '{path_to_project_folder}/PatentsView-DB/:/project'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/.my.cnf:/home/airflow/.my.cnf'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView/PatentsView-DB/airflow/:/airflow'
+      - '{path_to_project_folder}/PatentsView-DB/:/project/updater/disambiguation/hierarchical_clustering_disambiguation/data/'
+      - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
+      - {other_volume_mounts}
+    image: update_pipeline_20221206
+    restart: on-failure:5
+    ports:
+      - 5555:5555
+    env_file:
+      - airflow_pipeline_env.sh
+    container_name: pv_production_pipeline_celery_flower
+    depends_on:
+      - pv_data_pipeline_initializer
+      - rabbitmq
+      - pv_data_pipeline_scheduler
+      - pv_data_pipeline_admin_worker
+    command:
+      - celery
+      - flower
+  rabbitmq:
+    container_name: airflow-broker
+    ports:
+      - '8188:15672'
+      - '5672:5672'
+    image: 'rabbitmq:3-management'
+
+volumes:
+  pv_update_volume:
+    external: true
+
+networks:
+  default:
+    external: true
+    name: patentsview-pipeline-network
