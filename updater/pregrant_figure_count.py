@@ -4,7 +4,7 @@ import traceback
 import pandas as pd
 from tqdm import tqdm
 from lxml import etree
-from datetime import date
+from datetime import date, datetime
 from sqlalchemy import create_engine
 
 
@@ -48,33 +48,37 @@ def count_figures(start, end, raisefail=True, upload=True, output=False):
                     parser = etree.HTMLParser(no_network=False)
                     pub_doc = etree.HTML(current_xml.encode('utf-8'), parser=parser)
                     pubbase = pub_doc.find("body//patent-application-publication")
-                    if not pubbase:
+                    if pubbase is None:
                         continue
                     # parse out the number of figs
-                    pubnum = pubbase.find("subdoc-bibliographic-information/document-id/doc-number").text
                     figparent = pubbase.find('subdoc-drawings')
+                    if figparent is None:
+                        continue
+                    pubnum = pubbase.find("subdoc-bibliographic-information/document-id/doc-number").text
                     figlist = figparent.findall('figure')
                     docpages = []
                     repfigtag = figparent.find('representative-figure')
-                    repfig = repfigtag.text if repfigtag else ''
+                    repfig = repfigtag.text if repfigtag is not None else None
                 elif file.startswith('ipa'): #pgpubs version 4.x
                     parser = etree.XMLParser(load_dtd=True, no_network=False)
                     pub_doc = etree.XML(current_xml.encode('utf-8'), parser=parser)
                     if pub_doc.tag == 'sequence-cwu':
                         continue
                     #parse out the number of figs
-                    pubnum = pub_doc.find("us-bibliographic-data-application/publication-reference/document-id/doc-number").text
                     figparent = pub_doc.find('drawings')
+                    if figparent is None:
+                        continue
+                    pubnum = pub_doc.find("us-bibliographic-data-application/publication-reference/document-id/doc-number").text
                     docpages = figparent.findall('doc-page')
                     figlist = figparent.findall('figure')
-                    repfig = ''
+                    repfig = None
                 
                 record = {
                     'document_number'   : pubnum,
                     'num_figures'          : len(figlist),
                     'num_pages'         : len(docpages),
                     'rep_fig'           : repfig,
-                    'version_indicator' : filedate
+                    'version_indicator' : datetime.strptime(filedate,'%Y%m%d').date()
                 }
                 recordlist.append(record)
             record_df = pd.DataFrame(recordlist)
