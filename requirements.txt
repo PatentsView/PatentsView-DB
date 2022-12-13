@@ -14,7 +14,6 @@ editdistance
 lxml
 matplotlib
 mysql-connector-python
-mysql_connector_repackaged
 networkx
 nltk
 pandas

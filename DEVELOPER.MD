@@ -3,12 +3,12 @@
 # Requirements
 
 * Docker
-* docker-compose
+* docker-compose v2 (make sure its v2)
 
 # Pre-requisites
 
 * Logged into Dockerhub
-*
+* `patentsview/airflow` image is available on dockerhub
 
 # Docker Image
 
@@ -53,31 +53,53 @@ There are at least 7 containers that will be running:
   reference
 - The variables need to be same in each server where any pipeline container is deployed
 
+## init-sample.sql
+
+- Make a copy of this file as airflow-metadata-db-sql/init.sql
+- Replace placeholder password with a generated password. You'll use this in the next section
+
 ## docker-compose-db.yaml
 
 - Contains the configuration required to start the database. This includes
-    - An init sql that creates the database and username required for airflow
+    - An init sql that creates the database and username required for airflow (Use password from previous section)
     - The root password configuration
     - Mounted volume configuration where the database files are stored
 - See `docker-compose-db.yml.template` for reference
 
+## docker volume (Developer machine)
+
+- On developer machines (non-production), you'll need to create the data volume like so:
+  `docker volume create pv_update_volume`
+
+## docker network create
+
+- The first time you set this up on each machine, you'll need to create a network using the command
+  `docker network create patentsview-pipeline-network`
+
 ## docker-compose.yaml
 
 - Contains all, but one, service that needs to run on the GP Server. These are
-  - RabbitMQ
-  - Flower
-  - Scheduler
-  - Webserver
-  - Initializer
+    - RabbitMQ
+    - Flower
+    - Scheduler
+    - Webserver
+    - Initializer
+
 ### Initializer
+
 - Initializer is solely meant for running airflow for the first time
-  - The same container can also be used to upgrade the airflow database with the command: ` docker-compose  run --rm  pv_data_pipeline_initializer db upgrade  `
+    - The same container can also be used to upgrade the airflow database with the
+      command: ` docker-compose  run --rm  pv_data_pipeline_initializer db upgrade  `
 - Initializer container is expected to run and exit.
+
 ### Flower, Initializer, Scheduler & Webserver
+
 - These are all based on `patentsview/airflow` container
 - The docker compose configuration differ only in two ways:
-  - The command is different (airflow scheduler v airflow webserver for example)
-  - Port numbers exposed are different
+    - The command is different (airflow scheduler v airflow webserver for example)
+    - Port numbers exposed are different
 
 ### Worker docker-compose files
-- docker-compose-admin-worker.yml, docker-compose-disambiguator.yaml, docker-compose-worker.yaml all have the same configuration as other `patentsview/airflow` image, again, except for the command and port numbers
+
+- docker-compose-admin-worker.yml, docker-compose-disambiguator.yaml, docker-compose-worker.yaml all have the same
+  configuration as other `patentsview/airflow` image, again, except for the command and port numbers

@@ -9,10 +9,11 @@ services:
       - '{path_to_project_folder}/PatentsView-DB/:/project/updater/disambiguation/hierarchical_clustering_disambiguation/data/'
       - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
       - {other_volume_mounts}
-    image: update_pipeline_20221206
+    image: patentsview/update_pipeline_20221210
     env_file:
       - airflow_pipeline_env.sh
     container_name: pv_production_pipeline_initializer
+    user: "${HOST_UID}:0"
     healthcheck:
       test: [ "airflow", "db", "check" ]
       interval: 2m
@@ -25,14 +26,9 @@ services:
 
   pv_data_pipeline_scheduler:
     volumes:
-      - pv_update_volume:/data-volume/
-      - '{path_to_project_folder}/PatentsView-DB/:/project'
-      - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/.my.cnf:/home/airflow/.my.cnf'
-      - '{path_to_project_folder}/PatentsView-DB/PatentsView/PatentsView-DB/airflow/:/airflow'
-      - '{path_to_project_folder}/PatentsView-DB/:/project/updater/disambiguation/hierarchical_clustering_disambiguation/data/'
-      - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
+e
       - {other_volume_mounts}
-    image: update_pipeline_20221206
+    image: patentsview/update_pipeline_20221210
     healthcheck:
       test: [ "airflow", "db", "check" ]
       interval: 2m
@@ -63,13 +59,14 @@ services:
       - '{path_to_project_folder}/PatentsView-DB/:/project/updater/disambiguation/hierarchical_clustering_disambiguation/data/'
       - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
       - {other_volume_mounts}
-    image: update_pipeline_20221206
+    image: patentsview/update_pipeline_20221210
     restart: on-failure:5
     ports:
       - 9090:8080
     env_file:
       - airflow_pipeline_env.sh
     container_name: pv_production_pipeline_webserver
+    user: "${HOST_UID}:0"
     depends_on:
       - pv_data_pipeline_initializer
       - rabbitmq
@@ -91,13 +88,14 @@ services:
       - '{path_to_project_folder}/PatentsView-DB/:/project/updater/disambiguation/hierarchical_clustering_disambiguation/data/'
       - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
       - {other_volume_mounts}
-    image: update_pipeline_20221206
+    image: patentsview/update_pipeline_20221210
     restart: on-failure:5
     ports:
       - 5555:5555
     env_file:
       - airflow_pipeline_env.sh
     container_name: pv_production_pipeline_celery_flower
+    user: "${HOST_UID}:0"
     depends_on:
       - pv_data_pipeline_initializer
       - rabbitmq
