@@ -93,7 +93,7 @@ There are at least 7 containers that will be running:
 
 - Initializer is solely meant for running airflow for the first time
     - The same container can also be used to upgrade the airflow database with the
-      command: ` docker-compose  run --rm  pv_data_pipeline_initializer db upgrade  `
+      command: ` docker-compose  run --rm  pv_data_pipeline_initializer db upgrade`
 - Initializer container is expected to run and exit.
 
 ### Flower, Initializer, Scheduler & Webserver

@@ -10,6 +10,7 @@ services:
       - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
       - {other_volume_mounts}
     image: patentsview/update_pipeline_20221210
+    user: "${HOST_UID}:0"
     env_file:
       - airflow_pipeline_env.sh
     container_name: pv_production_pipeline_initializer
@@ -29,6 +30,7 @@ services:
 e
       - {other_volume_mounts}
     image: patentsview/update_pipeline_20221210
+    user: "${HOST_UID}:0"
     healthcheck:
       test: [ "airflow", "db", "check" ]
       interval: 2m
@@ -60,6 +62,7 @@ e
       - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
       - {other_volume_mounts}
     image: patentsview/update_pipeline_20221210
+    user: "${HOST_UID}:0"
     restart: on-failure:5
     ports:
       - 9090:8080
@@ -89,6 +92,7 @@ e
       - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
       - {other_volume_mounts}
     image: patentsview/update_pipeline_20221210
+    user: "${HOST_UID}:0"
     restart: on-failure:5
     ports:
       - 5555:5555

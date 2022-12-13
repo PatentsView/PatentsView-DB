@@ -14,7 +14,8 @@ services:
       - '{path_to_project_folder}/PatentsView-DB/PatentsView/PatentsView-DB/airflow/:/airflow'
       - '{path_to_project_folder}/PatentsView-DB/:/project/updater/disambiguation/hierarchical_clustering_disambiguation/data/'
       - '{path_to_project_folder}/PatentsView-DB/PatentsView-DB/clustering_resources/:/project/clustering_resources/'
-    image: update_pipeline_20221206
+    image: patentsview/update_pipeline_20221210
+    user: "${HOST_UID}:0"
     restart: on-failure:5
     ports:
       - 8793:8793
