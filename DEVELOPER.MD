@@ -76,6 +76,10 @@ There are at least 7 containers that will be running:
 - The first time you set this up on each machine, you'll need to create a network using the command
   `docker network create patentsview-pipeline-network`
 
+## .env.template (Only on Linux machines)
+
+- Make a copy of .env.template to .env and se the `HOST_UID` value to the result of running this command: `id -u`
+
 ## docker-compose.yaml
 
 - Contains all, but one, service that needs to run on the GP Server. These are
