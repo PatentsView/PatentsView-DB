@@ -4,8 +4,8 @@ import re
 
 import numpy as np
 import pandas as pd
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
+from thefuzz import fuzz
+from thefuzz import process
 # Requires: solid matched organizations dataframe
 # Modifies: list of solid matches
 # Effects: if solid match has non_government as extra tag, removes non_government tag
@@ -78,7 +78,7 @@ def match(org, govt_acc_dict, existing_lookup):
         if name in org:
             solid_matches.append(name)
     for existing, clean in existing_lookup.items():
-        if existing.lower() in org.lower() or clean.lower() in org.lower():
+        if (' ' + existing.lower() + ' ') in org.lower() or (' ' + clean.lower() + ' ') in (' ' + org.lower() + ' '):
             solid_matches.append(clean)
     solid_fuzzy, possible_fuzzy = fuzzy_match(org, govt_acc_dict, existing_lookup)
     solid_matches.extend(solid_fuzzy)
