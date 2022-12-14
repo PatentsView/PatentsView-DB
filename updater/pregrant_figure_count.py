@@ -36,7 +36,8 @@ def count_figures(start, end, raisefail=True, upload=True, output=False):
 
     engine = create_engine(
             'mysql+pymysql://{0}:{1}@{2}:{3}/?charset=utf8mb4'.format(user, password, host, port))
-
+    pubnum = ''
+    err_ct = 0
 
 
     for file in tqdm(usefiles):
@@ -75,22 +76,31 @@ def count_figures(start, end, raisefail=True, upload=True, output=False):
                 
                 record = {
                     'document_number'   : pubnum,
-                    'num_figures'          : len(figlist),
+                    'num_figures'       : len(figlist),
                     'num_pages'         : len(docpages),
-                    'rep_fig'           : repfig,
+                    'rep_figure'        : repfig,
                     'version_indicator' : datetime.strptime(filedate,'%Y%m%d').date()
                 }
                 recordlist.append(record)
             record_df = pd.DataFrame(recordlist)
-            if upload:
-                record_df.to_sql(name='pg_figures', con=engine, schema=database, if_exists='append', index=False)
             if output:
                 return record_df
+            if upload:
+                l1 = record_df.shape[0]
+                record_df.drop_duplicates(inplace=True)
+                l2 = record_df.shape[0]
+                if (l1-l2 > 0): print(f"dropped {l1-l2} duplicate record(s) in file {filedate}")
+                record_df.to_sql(name='pg_figures', con=engine, schema=database, if_exists='append', index=False)
         
         except Exception as e:
+            print(f"errorred with pubnum = {pubnum} and filedate = {filedate}")
             if raisefail:
                 raise
             else:
                 print(f"{type(e).__name__}: {e}")
                 print(traceback.format_exc())
+                err_ct +=1
+                print(f"error number {err_ct}")
+
+    print(f"completed {len(usefiles)} files; encountered {err_ct} errors")
 
