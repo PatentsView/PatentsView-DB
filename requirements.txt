@@ -14,7 +14,6 @@ editdistance
 lxml
 matplotlib
 mysql-connector-python
-mysql_connector_repackaged
 networkx
 nltk
 pandas
@@ -29,7 +28,6 @@ slack_sdk
 sqlparse
 tabulate
 textdistance
-the1owl
 thebrainfuck
 thefuzz
 torch

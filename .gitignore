@@ -33,3 +33,11 @@ archive/*
 **/.ipynb_checkpoints
 updater/create_databases/merge_status.json
 airflow_db_production/
+experiments
+exp_out
+scratch
+*.bak/
+**/*.pid
+**/*.out
+**/*.err
+pgpubs_*
