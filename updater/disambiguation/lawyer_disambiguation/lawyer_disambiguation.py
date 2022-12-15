@@ -9,7 +9,7 @@ from datetime import date, datetime
 from hashlib import md5
 from pathlib import Path
 from string import ascii_lowercase as alphabet
-import multiprocessing as mp
+import billiard as mp
 from sqlalchemy import create_engine
 from textdistance import jaro_winkler
 from tqdm import tqdm

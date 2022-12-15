@@ -1,7 +1,7 @@
 import csv
 import datetime
 import logging
-import multiprocessing as mp
+import billiard as mp
 import os
 import time
 import uuid
