@@ -26,7 +26,7 @@ services:
       - celery
       - worker
       - -q
-      - disambiguation
+      - disambiguator
     extra_hosts:
       - "airflow_database:{Internal IP address of Airflow Database Server}"
       - "airflow-broker:{Internal IP address of Airflow Broker Server}"
