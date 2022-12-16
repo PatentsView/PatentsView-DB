@@ -1,5 +1,5 @@
 elasticsearch==8.1.0
-numpy==1.20
+numpy==1.23.5
 git+https://github.com/PatentsView/grinch.git
 git+https://github.com/PatentsView/sent2vec.git
 Cython
