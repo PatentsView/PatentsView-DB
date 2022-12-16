@@ -361,7 +361,7 @@ def rawlawyer_postprocesing(**kwargs):
     engine.execute(q)
     engine.dispose()
     update_version_indicator('lawyer', 'granted_patent', **kwargs)
-    # update_to_granular_version_indicator('rawlawyer', 'granted_patent')
+    update_to_granular_version_indicator('rawlawyer', 'granted_patent')
 
 
 def start_lawyer_disambiguation(**kwargs):
