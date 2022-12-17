@@ -178,7 +178,7 @@ def session_generator(dbtype='grant'):
 
     schema.GrantBase.metadata.create_all(engine)
 
-    Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
+    Session = sessionmaker(bind=engine)
     return scoped_session(Session)
 
 
@@ -204,7 +204,7 @@ def fetch_session(dbtype='grant'):
 
     schema.GrantBase.metadata.create_all(engine, checkfirst=True)
 
-    Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
+    Session = sessionmaker(bind=engine)
     session = Session()
     return session
 

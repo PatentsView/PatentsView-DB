@@ -195,7 +195,6 @@ def collect_cpc_data(**kwargs):
     download_cpc_schema(destination_folder)  # <1 min
     download_cpc_grant_and_pgpub_classifications(destination_folder, pgpubs_cpc_folder)  # few minutes
     download_ipc(destination_folder)  # <1 min
-    download_ipc(download_ipc(destination_folder))
 
 
 def post_download(**kwargs):
