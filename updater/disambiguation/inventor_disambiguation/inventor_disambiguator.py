@@ -12,9 +12,9 @@ def setup_inventor_assignee_disambiguation(**kwargs):
                                  supplemental_configs=['config/new_consolidated_config.ini'],
                                  **kwargs)
     end_date = config['DATES']['END_DATE']
-    os.makedirs(os.path.dirname(config['BASE_PATH']['inventor'].format(end_date=end_date)), exist_ok=True)
-    os.makedirs(os.path.dirname(config['BASE_PATH']['assignee'].format(end_date=end_date)), exist_ok=True)
-    print(f"New PATH created {config['BASE_PATH']['inventor'].format(end_date=end_date)}")
+    os.makedirs(os.path.dirname(f"{config['BASE_PATH']['inventor']}".format(end_date=end_date)), exist_ok=True)
+    os.makedirs(os.path.dirname(f"{config['BASE_PATH']['inventor']}".format(end_date=end_date)), exist_ok=True)
+    print(f"NEW PATH CREATED ---- {config['BASE_PATH']['inventor']}".format(end_date=end_date))
 
 
 def build_assignee_features(**kwargs):
