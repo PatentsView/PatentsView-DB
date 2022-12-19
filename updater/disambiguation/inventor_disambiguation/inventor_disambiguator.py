@@ -14,7 +14,7 @@ def setup_inventor_assignee_disambiguation(**kwargs):
     end_date = config['DATES']['END_DATE']
     os.makedirs(os.path.dirname(config['BASE_PATH']['inventor'].format(end_date=end_date)), exist_ok=True)
     os.makedirs(os.path.dirname(config['BASE_PATH']['assignee'].format(end_date=end_date)), exist_ok=True)
-    print(os.getcwd())
+    print(f"New PATH created {config['BASE_PATH']['inventor'].format(end_date=end_date)}")
 
 
 def build_assignee_features(**kwargs):
