@@ -12,8 +12,8 @@ def setup_inventor_assignee_disambiguation(**kwargs):
                                  supplemental_configs=['config/new_consolidated_config.ini'],
                                  **kwargs)
     end_date = config['DATES']['END_DATE']
-    os.makedirs(os.path.dirname(config['BASE_PATH']['inventor'].format(end_date)), exist_ok=True)
-    os.makedirs(os.path.dirname(config['BASE_PATH']['assignee'].format(end_date)), exist_ok=True)
+    os.makedirs(os.path.dirname(config['BASE_PATH']['inventor'].format(end_date=end_date)), exist_ok=True)
+    os.makedirs(os.path.dirname(config['BASE_PATH']['assignee'].format(end_date=end_date)), exist_ok=True)
     print(os.getcwd())
 
 
@@ -93,12 +93,13 @@ def archive_results(**kwargs):
 
 
 if __name__ == '__main__':
-    config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/new_consolidated_config.ini'],
-                                 **{'execution_date': DateTime(year=2021, month=7, day=1)})
-    config = prepare_config(config)
-    import pprint
-
-    archive_results(**{'execution_date': DateTime(year=2021, month=7, day=1)})
-    pprint.pprint({section: dict(config[section]) for section in config.sections()})
-    build_title_map(**{'execution_date': DateTime(year=2021, month=7, day=1)})
+    # config = get_disambig_config(schedule='quarterly',
+    #                              supplemental_configs=['config/new_consolidated_config.ini'],
+    #                              **{'execution_date': DateTime(year=2021, month=7, day=1)})
+    # config = prepare_config(config)
+    # import pprint
+    #
+    # archive_results(**{'execution_date': DateTime(year=2021, month=7, day=1)})
+    # pprint.pprint({section: dict(config[section]) for section in config.sections()})
+    # build_title_map(**{'execution_date': DateTime(year=2021, month=7, day=1)})
+    setup_inventor_assignee_disambiguation(**{'execution_date': DateTime(year=2022, month=7, day=1)})
