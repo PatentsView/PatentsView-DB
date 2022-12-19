@@ -492,4 +492,4 @@ for dependency_group in operator_sequence:
     chain_operators(dependency_sequence)
 
 inv_build_coinventor_features.set_upstream(assignee_inventor_disambig_setup)
-assignee_inventor_disambig_setup.setup_upstream(quarterly_merge_completed)
+assignee_inventor_disambig_setup.set_upstream(quarterly_merge_completed)
