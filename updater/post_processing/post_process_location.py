@@ -691,7 +691,7 @@ def update_fips(config):
 
 def post_process_location(**kwargs):
     config = get_current_config(**kwargs)
-    # version_indicator = config['DATES']['END_DATE']
+    version_indicator = config['DATES']['END_DATE']
     update_rawlocation(config)
     update_rawlocation(config, database='PGPUBS_DATABASE')
     precache_locations(config)
