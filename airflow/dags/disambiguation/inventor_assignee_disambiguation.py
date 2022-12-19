@@ -15,7 +15,7 @@ from updater.disambiguation.assignee_disambiguation.assignee_disambiguator impor
 from updater.disambiguation.inventor_disambiguation.inventor_disambiguator import build_assignee_features, \
     build_canopies, archive_results as archive_inventor_results, build_coinventor_features, build_title_map, \
     run_hierarchical_clustering as run_inventor_hierarchical_clustering, \
-    finalize_disambiguation, upload_results as upload_inventor_results
+    finalize_disambiguation, upload_results as upload_inventor_results, setup_inventor_assignee_disambiguation
 from updater.disambiguation.location_disambiguation.location_disambiguator import *
 from updater.post_processing.post_process_location import post_process_location, post_process_qc
 from updater.post_processing.post_process_assignee import additional_post_processing_assignee, post_process_qc as qc_post_process_assignee,  \
@@ -73,6 +73,14 @@ quarterly_merge_completed = ExternalTaskSensor(
     failed_states=['failed', 'skipped'],
     mode="reschedule",
 )
+
+assignee_inventor_disambig_setup = PythonOperator(task_id='Inventor_Assignee_Disambiguation_Setup',
+                                             python_callable=setup_inventor_assignee_disambiguation,
+                                             provide_context=True,
+                                             dag=disambiguation,
+                                             on_success_callback=airflow_task_success,
+                                             on_failure_callback=airflow_task_failure,
+                                             queue='disambiguator')
 
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
@@ -483,4 +491,5 @@ for dependency_group in operator_sequence:
     dependency_sequence = operator_sequence[dependency_group]
     chain_operators(dependency_sequence)
 
-inv_build_coinventor_features.set_upstream(quarterly_merge_completed)
+inv_build_coinventor_features.set_upstream(assignee_inventor_disambig_setup)
+assignee_inventor_disambig_setup.setup_upstream(quarterly_merge_completed)
