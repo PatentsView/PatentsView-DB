@@ -2,6 +2,7 @@ from lib.configuration import get_connection_string, get_current_config
 # from lib import utilities
 # import pymysql
 import datetime
+from datetime import date
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
@@ -16,13 +17,13 @@ def generate_US_locationID_exactmatch(config):
     db = config['PATENTSVIEW_DATABASES'][temp_db]
     print(db)
     location_types = ['city', 'town', 'village', 'hamlet']
-    total_rows = engine.execute("""SELECT count(*) from rawlocation where country_transformed='US';""")
+    total_rows = engine.execute("""SELECT count(*) from rawlocation where country='US';""")
     total_rows_affected = total_rows.first()[0]
     query_dict = {"city/state/country": """
         update {db}.rawlocation a 
         inner join geo_data.curated_locations b on a.city=b.location_name
         inner join patent.state_codes d on b.state=d.`State/Possession`
-        inner join patent.country_codes c on a.`country_transformed`=c.`alpha-2`
+        inner join patent.country_codes c on a.`country`=c.`alpha-2`
                 and b.`country` = c.name and a.state = d.Abbreviation
         inner join 
                 (
@@ -47,7 +48,7 @@ def generate_US_locationID_exactmatch(config):
                 print(exactmatch_query)
                 connection.execute(exactmatch_query)
                 rows_affected = connection.execute(
-                    """SELECT count(*) from rawlocation where location_id is not null and country_transformed='US';""")
+                    """SELECT count(*) from rawlocation where location_id is not null and country='US';""")
                 if loc == 'city':
                     previous = 0
                 notnull_rows = rows_affected.first()[0]
@@ -223,6 +224,41 @@ set a.location_id=b.uuid
             highlevel_counter = highlevel_counter + 1
 
 
+def location_data_setup(**kwargs):
+    weekly_config = get_current_config('granted_patent', **kwargs)
+    cstr = get_connection_string(weekly_config, "PROD_DB")
+    engine = create_engine(cstr)
+    end_date = weekly_config["DATES"]["END_DATE"].strip("-")
+    current_end_date = weekly_config["DATES"]["END_DATE"]
+
+    from lib.is_it_update_time import get_update_range
+    q_start_date, q_end_date = get_update_range(kwargs['execution_date']+ datetime.timedelta(days=7))
+    end_of_quarter = q_end_date.strftime('%Y%m%d')
+
+    if kwargs['execution_date'].weekday() == 1:
+        db_type = 'upload'
+        db = 'patent'
+    else:
+        db_type = 'pgpubs'
+        db = 'pregrant_publications'
+
+    with engine.connect() as connection:
+        query = f"""
+CREATE TABLE if not exists {db}.`location_disambiguation_mapping_{end_of_quarter}` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `location_id` varchar(256) COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`id`),
+  KEY `location_id_2` (`location_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"""
+        print(query)
+        connection.execute(query)
+        query2 = f"""
+insert into {db}.location_disambiguation_mapping_{end_of_quarter} (id, location_id)
+select id, location_id from {db_type}_{current_end_date}.rawlocation
+        """
+        print(query2)
+        connection.execute(query2)
+
 def run_location_disambiguation(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
     generate_US_locationID_exactmatch(config)
@@ -241,19 +277,27 @@ if __name__ == "__main__":
     # config = get_current_config('pgpubs', **{
     #     "execution_date": datetime.date(2022, 6, 2)
     # })
-    # generate_US_locationID_exactmatch(config)
-    # find_nearest_latlong_us(config)
-    # find_nearest_latlong(config)
-    # tests = LocationUploadTest(config)
-    # tests.runTests()
 
-    run_location_disambiguation(dbtype='granted_patent', **{
-        "execution_date": datetime.date(2022, 5, 31)
-    })
+    # run_location_disambiguation(dbtype='granted_patent', **{
+    #     "execution_date": datetime.date(2022, 7, 12)
+    # })
     # run_location_disambiguation_tests(dbtype='granted_patent', **{
     #     "execution_date": datetime.date(2022, 5, 24)
     # })
-    # HOW TO "UNDO" THIS CODE --- CAREFUL
-    # drop rows from table patent_QA.DataMonitor_LocDisambig;
-    # update {temp_db}.rawlocation set location_id = null;
+    date_list = []
+    date = datetime.date(2022, 6, 30)
+    for i in range(0, 12):
+        date = date + datetime.timedelta(days=7)
+        date_list.append(date)
+
+    print(date_list)
+    for d in date_list:
+        run_location_disambiguation(dbtype='pgpubs', **{
+            "execution_date": d
+        })
+        location_data_setup(**{
+            "execution_date": d
+        })
+
+
 

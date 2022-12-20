@@ -459,14 +459,14 @@ def clean_loc(loc):
     return cleaned_loc
 
 
-
-def update_rawlocation(update_config, database='RAW_DB', uuid_field='id'):
+def update_rawlocation(update_config, end_date, database='RAW_DB'):
     engine = create_engine(get_connection_string(update_config, database))
-    update_statement = """
-        UPDATE rawlocation rl left join location_disambiguation_mapping ldm
-            on ldm.uuid = rl.{uuid_field}
+    db = update_config['PATENTSVIEW_DATABASES'][database]
+    update_statement = f"""
+        UPDATE {db}.rawlocation rl left join location_disambiguation_mapping_{end_date} ldm
+            on ldm.id = rl.id
         set rl.location_id = ldm.location_id
-    """.format(uuid_field=uuid_field, granted_db=update_config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    """
     print(update_statement)
     engine.execute(update_statement)
 
@@ -690,12 +690,12 @@ def update_fips(config):
 
 
 def post_process_location(**kwargs):
-    config = get_current_config(**kwargs)
-    version_indicator = config['DATES']['END_DATE']
-    update_rawlocation(config)
-    update_rawlocation(config, database='PGPUBS_DATABASE')
+    config = get_current_config(schedule="quarterly", **kwargs)
+    end_date = config['DATES']['END_DATE']
+    update_rawlocation(config, end_date)
+    update_rawlocation(config, end_date, database='PGPUBS_DATABASE')
     precache_locations(config)
-    create_location(config, version_indicator=version_indicator)
+    create_location(config, version_indicator=end_date)
     update_fips(config)
     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
                       parent_entity_id=None, entity='assignee', include_location=True,
