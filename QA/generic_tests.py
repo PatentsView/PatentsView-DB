@@ -1,8 +1,5 @@
-from lib.configuration import get_connection_string, get_current_config, get_version_indicator
-from lib.xml_helpers import process_date
-import datetime
+from lib.configuration import get_connection_string, get_current_config
 
-import pymysql
 from sqlalchemy import create_engine
 from time import time
 
@@ -16,13 +13,11 @@ def qa_test_table_updated(table, db, **kwargs):
     patent_cq_query = f"""
     select count(*), count(distinct version_indicator)
     from {table}
-    where version_indicator >= {sd} and version_indicator<= {ed}
+    where version_indicator >= DATE({sd}) and version_indicator <= DATE({ed})
             """
     print(patent_cq_query)
     query_start_time = time()
-    # engine.execute(patent_cq_query)
-    rows = engine.execute(patent_cq_query).fetchone()[0]
-    distinct_vi = engine.execute(patent_cq_query).fetchone()[1]
+    rows, distinct_vi = engine.execute(patent_cq_query).fetchone()
     query_end_time = time()
     print("This query took:", query_end_time - query_start_time, "seconds")
     print(f"{table} HAS {distinct_vi} UNIQUE WEEKS OF DATA")
@@ -32,4 +27,4 @@ def qa_test_table_updated(table, db, **kwargs):
 
 
 if __name__ == '__main__':
-    print()
+    raise NotImplementedError
