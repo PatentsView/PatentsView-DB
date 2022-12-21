@@ -327,18 +327,17 @@ def download(url, filepath):
     print("Downloading: {}".format(url))
     r = requests.get(url, stream=True)
 
+    content_length = r.headers.get('content-length')
+    if not content_length:
+        print("\tNo Content Length Attached. Attempting download without progress bar.")
+        chunker = r.iter_content(chunk_size=1024)
+    else:
+        chunker = progress.bar(r.iter_content(chunk_size=1024), expected_size=(int(content_length) / 1024) + 1)
     with open(filepath, 'wb') as f:
-        # print(r.headers.get('content-length'))
-        content_length = r.headers.get('content-length')
-        if not content_length:
-            print("\tNo Content Length Attached")
-        else:
-            content_length = int(content_length)
-            for chunk in progress.bar(r.iter_content(chunk_size=1024),
-                                      expected_size=(content_length / 1024) + 1):
-                if chunk:
-                    f.write(chunk)
-                    f.flush()
+        for chunk in chunker:
+            if chunk:
+                f.write(chunk)
+                f.flush()
 
 
 def chunks(l, n):
