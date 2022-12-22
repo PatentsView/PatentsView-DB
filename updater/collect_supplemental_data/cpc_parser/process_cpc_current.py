@@ -48,6 +48,10 @@ def consolidate_cpc_data(config, add_indexes, db='granted_patent', cpc_file=None
                 cpc_chunk.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
         delete_query = "DELETE cpc FROM cpc_current cpc Inner JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null or p.version_indicator >'{vind}'"\
                 .format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], vind=end_date)
+        dedup_ind_add = """
+        ALTER TABLE cpc_current ADD INDEX patent_id_ind (patent_id) USING BTREE; 
+        ALTER TABLE cpc_current ADD INDEX subgroup_id_ind (subgroup_id) USING BTREE; 
+        ALTER TABLE cpc_current ADD INDEX sequence_ind (sequence) USING BTREE;"""
         dedup_query = """
             DELETE t1 FROM cpc_current t1 
             INNER JOIN cpc_current t2
@@ -56,9 +60,17 @@ def consolidate_cpc_data(config, add_indexes, db='granted_patent', cpc_file=None
             AND t1.sequence = t2.sequence
             AND t1.uuid < t2.uuid);
             """
+        dedup_ind_drop = """
+        ALTER TABLE cpc_current DROP INDEX patent_id_ind; 
+        ALTER TABLE cpc_current DROP INDEX subgroup_id_ind; 
+        ALTER TABLE cpc_current DROP INDEX sequence_ind;"""
     else:
         delete_query = "DELETE cpc FROM {raw_db}.cpc_current cpc Inner JOIN {raw_db}.publication p on p.document_number = cpc.document_number WHERE p.document_number is null or p.version_indicator >'{vind}'".format(
         raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"], vind=end_date)
+        dedup_ind_add = """
+        ALTER TABLE cpc_current ADD INDEX document_number_ind (document_number) USING BTREE; 
+        ALTER TABLE cpc_current ADD INDEX subgroup_id_ind (subgroup_id) USING BTREE; 
+        ALTER TABLE cpc_current ADD INDEX sequence_ind (sequence) USING BTREE;"""
         dedup_query = """
             DELETE t1 FROM cpc_current t1 
             INNER JOIN cpc_current t2
@@ -67,17 +79,25 @@ def consolidate_cpc_data(config, add_indexes, db='granted_patent', cpc_file=None
             AND t1.sequence = t2.sequence
             AND t1.uuid < t2.uuid);
             """
+        dedup_ind_drop = """
+        ALTER TABLE cpc_current DROP INDEX document_number_ind; 
+        ALTER TABLE cpc_current DROP INDEX subgroup_id_ind; 
+        ALTER TABLE cpc_current DROP INDEX sequence_ind;"""
     print(f"initial size of cpc_current: {engine.execute('SELECT COUNT(*) FROM cpc_current').fetchone()[0]}")
     print("deleting patents absent in patent table:")
     print(delete_query)
     deletion = engine.execute(delete_query)
     print(f"number of records removed: {deletion.rowcount}")
+    print("adding temporary indices for deduplication")
+    engine.execute(dedup_ind_add)
     print("deduplicating table on document id, subgroup id, and sequence:")
     print(dedup_query)
     deduplication = engine.execute(dedup_query)
     print(f"number of duplicates removed: {deduplication.rowcount}") # this may slightly overcount due to patents with multiple duplicates
+    print("removing temporary indices")
+    engine.execute(dedup_ind_drop)
     print(f"final size of cpc_current: {engine.execute('SELECT COUNT(*) FROM cpc_current').fetchone()[0]}")
-    print("adding table indices:")
+    print("adding permanent table indices:")
     for add_statement in add_indexes:
         print(add_statement)
         engine.execute(add_statement[0])
