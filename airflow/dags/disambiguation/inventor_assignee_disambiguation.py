@@ -430,7 +430,12 @@ qc_post_process_location_operator = PythonOperator(task_id='qc_post_process_loca
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
 # TASK DEPENDENCY MAPPING
 
-operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clustering],
+operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, inv_build_assignee_features],
+                     'coinventor_feat_setup': [assignee_inventor_disambig_setup, inv_build_coinventor_features],
+                     'title_feat_setup': [assignee_inventor_disambig_setup, inv_build_titles],
+                     'canopies_setup': [assignee_inventor_disambig_setup, inv_build_canopies],
+                     'assignee_mentions_setup': [assignee_inventor_disambig_setup, assignee_build_assignee_features],
+                     'assignee_feat': [inv_build_assignee_features, inv_run_clustering],
                      'coinventor_feat': [inv_build_coinventor_features, inv_run_clustering],
                      'title_feat': [inv_build_titles, inv_run_clustering],
                      'canopies': [inv_build_canopies, inv_run_clustering],
@@ -477,10 +482,11 @@ operator_sequence = {'assignee_feat': [inv_build_assignee_features, inv_run_clus
                          qc_post_process_assignee_operator
                      ],
                      'location_post_processing': [post_process_location_operator, qc_post_process_location_operator],
-                     'location_assignee_granted_link': [qc_post_process_location_operator,
-                                                        post_process_load_assignee_granted_lookup],
-                     'location_assignee_pregranted_link': [qc_post_process_location_operator,
-                                                           post_process_load_assignee_pregranted_lookup],
+                     'location_assignee_link': [qc_post_process_location_operator, assignee_build_assignee_features],
+                     # 'location_assignee_granted_link': [qc_post_process_location_operator,
+                     #                                    post_process_load_assignee_granted_lookup],
+                     # 'location_assignee_pregranted_link': [qc_post_process_location_operator,
+                     #                                       post_process_load_assignee_pregranted_lookup],
                      'location_inventor_granted_link': [qc_post_process_location_operator,
                                                         post_process_load_granted_lookup],
                      'location_inventor_pregranted_link': [qc_post_process_location_operator,
@@ -491,5 +497,5 @@ for dependency_group in operator_sequence:
     dependency_sequence = operator_sequence[dependency_group]
     chain_operators(dependency_sequence)
 
-inv_build_coinventor_features.set_upstream(assignee_inventor_disambig_setup)
+# inv_build_coinventor_features.set_upstream(assignee_inventor_disambig_setup)
 assignee_inventor_disambig_setup.set_upstream(quarterly_merge_completed)

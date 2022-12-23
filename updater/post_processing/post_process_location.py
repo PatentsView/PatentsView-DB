@@ -491,7 +491,7 @@ def precache_locations(config):
 def generate_disambiguated_locations(engine, rank_chunk):
     location_core_template = """
         SELECT location_id
-        FROM location_id_rank where rk % 100 = {rank_chunk}
+        FROM location_id_rank where rk %% 100 = {rank_chunk}
     """
 
     location_data_template = """
@@ -528,11 +528,10 @@ FROM pregrant_publications.rawlocation rl2
 WHERE rl2.location_id is not null and ri2.document_number is not null
    or ra2.document_number is not null;
     """
-
     location_core_query = location_core_template.format(rank_chunk=rank_chunk)
-    location_data_query = location_data_template.format(
-            loc_core_query=location_core_query)
+    location_data_query = location_data_template.format(loc_core_query=location_core_query)
 
+    print(location_data_query)
     current_location_data = pd.read_sql_query(sql=location_data_query, con=engine)
     return current_location_data
 
@@ -697,12 +696,12 @@ def post_process_location(**kwargs):
     precache_locations(config)
     create_location(config, version_indicator=end_date)
     update_fips(config)
-    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
-                      parent_entity_id=None, entity='assignee', include_location=True,
-                      location_strict=True)
-    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
-                      parent_entity_id=None, entity="inventor", include_location=True,
-                      location_strict=True)
+    # load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
+    #                   parent_entity_id=None, entity='assignee', include_location=True,
+    #                   location_strict=True)
+    # load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
+    #                   parent_entity_id=None, entity="inventor", include_location=True,
+    #                   location_strict=True)
 
 
 def post_process_qc(**kwargs):
@@ -712,9 +711,17 @@ def post_process_qc(**kwargs):
 
 
 if __name__ == '__main__':
-    post_process_location(**{
-            "execution_date": datetime.date(2021, 6, 22)
-            })
+    # post_process_location(**{
+    #         "execution_date": datetime.date(2021, 6, 22)
+    #         })
     # post_process_qc(**{
     #         "execution_date": datetime.date(2021, 6, 22)
     #         })
+    config = get_current_config(schedule='quarterly', **{
+            "execution_date": datetime.date(2022, 7, 1)
+            })
+    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    limit = 10000
+    offset = 0
+    for rank in range(0, 100):
+        generate_disambiguated_locations(engine, rank)

@@ -234,6 +234,8 @@ def location_data_setup(**kwargs):
     from lib.is_it_update_time import get_update_range
     q_start_date, q_end_date = get_update_range(kwargs['execution_date']+ datetime.timedelta(days=7))
     end_of_quarter = q_end_date.strftime('%Y%m%d')
+    # l_quarter = q_start_date-datetime.timedelta(days=1)
+    # last_quarter = l_quarter.strftime('%Y%m%d')
 
     if kwargs['execution_date'].weekday() == 1:
         db_type = 'upload'
@@ -250,6 +252,10 @@ CREATE TABLE if not exists {db}.`location_disambiguation_mapping_{end_of_quarter
   PRIMARY KEY (`id`),
   KEY `location_id_2` (`location_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"""
+        # query = f"""
+        # CREATE TABLE if not exists {db}.`location_disambiguation_mapping_{end_of_quarter}`
+        # select * from location_disambiguation_mapping_{last_quarter}
+        # """
         print(query)
         connection.execute(query)
         query2 = f"""
@@ -277,27 +283,30 @@ if __name__ == "__main__":
     # config = get_current_config('pgpubs', **{
     #     "execution_date": datetime.date(2022, 6, 2)
     # })
-
+    d = datetime.date(2022, 7, 12)
+    location_data_setup(**{
+        "execution_date": d
+    })
     # run_location_disambiguation(dbtype='granted_patent', **{
     #     "execution_date": datetime.date(2022, 7, 12)
     # })
     # run_location_disambiguation_tests(dbtype='granted_patent', **{
     #     "execution_date": datetime.date(2022, 5, 24)
     # })
-    date_list = []
-    date = datetime.date(2022, 6, 30)
-    for i in range(0, 12):
-        date = date + datetime.timedelta(days=7)
-        date_list.append(date)
-
-    print(date_list)
-    for d in date_list:
-        run_location_disambiguation(dbtype='pgpubs', **{
-            "execution_date": d
-        })
-        location_data_setup(**{
-            "execution_date": d
-        })
+    # date_list = []
+    # date = datetime.date(2022, 6, 30)
+    # for i in range(0, 12):
+    #     date = date + datetime.timedelta(days=7)
+    #     date_list.append(date)
+    #
+    # print(date_list)
+    # for d in date_list:
+    #     run_location_disambiguation(dbtype='pgpubs', **{
+    #         "execution_date": d
+    #     })
+    #     location_data_setup(**{
+    #         "execution_date": d
+    #     })
 
 
 
