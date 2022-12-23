@@ -487,8 +487,8 @@ def precache_locations(config):
     print(location_cache_query)
     engine.execute(location_cache_query)
 
-def generate_disambiguated_locations(engine, rank_chunk):
-    location_data_template = """
+def generate_disambiguated_locations(engine):
+    location_data_query = """
 SELECT rl.location_id,
        rl.city,
        rl.state,
@@ -597,30 +597,48 @@ def location_reduce(location_full_data: pd.DataFrame):
     return full_final_data
 
 
+# def create_location(update_config, version_indicator):
+#     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
+#     limit = 10000
+#     offset = 0
+#     for rank in range(0, 100):
+#         start = time.time()
+#         current_location_data = generate_disambiguated_locations(engine)
+#         print(current_location_data.shape[0])
+#         if current_location_data.shape[0] < 1:
+#             break
+#         step_time = time.time() - start
+#         start = time.time()
+#
+#         step_time = time.time() - start
+#         canonical_assignments = location_reduce(current_location_data)
+#         canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
+#         canonical_assignments.to_sql(name='location', con=engine,
+#                                      if_exists='append',
+#                                      index=False)
+#         current_iteration_duration = time.time() - start
+#         offset = limit + offset
+#
+#     truncate_max_locs(engine)
+
 def create_location(update_config, version_indicator):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
-    limit = 10000
-    offset = 0
-    for rank in range(0, 100):
-        start = time.time()
-        current_location_data = generate_disambiguated_locations(engine, rank)
-        print(current_location_data.shape[0])
-        if current_location_data.shape[0] < 1:
-            break
-        step_time = time.time() - start
-        start = time.time()
 
-        step_time = time.time() - start
-        canonical_assignments = location_reduce(current_location_data)
-        canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
-        canonical_assignments.to_sql(name='location', con=engine,
-                                     if_exists='append',
-                                     index=False)
-        current_iteration_duration = time.time() - start
-        offset = limit + offset
+    start = time.time()
+    current_location_data = generate_disambiguated_locations(engine)
+    print(current_location_data.shape[0])
+    # if current_location_data.shape[0] < 1:
+    #     break
+    step_time = time.time() - start
+    start = time.time()
 
+    step_time = time.time() - start
+    canonical_assignments = location_reduce(current_location_data)
+    canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
+    canonical_assignments.to_sql(name='location', con=engine,
+                                 if_exists='append',
+                                 index=False)
     truncate_max_locs(engine)
-
 
 def update_lat_lon(config):
     engine = create_engine(get_connection_string(config, "RAW_DB"))
