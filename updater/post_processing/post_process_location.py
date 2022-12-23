@@ -494,12 +494,15 @@ SELECT rl.location_id,
        rl.state,
        rl.country as country,
        rl.location_id_transformed,
-       IF(p1.id is null, p2.date, p1.date) patent_date
+       IF(p1.id is null, p2.date, p1.date) patent_date,
+       c.lat as latitude,
+       c.lon as longitude
 FROM patent.rawlocation rl
          left join patent.rawassignee ra on ra.rawlocation_id = rl.id
          left join patent.patent p1 on p1.id = ra.patent_id
          left join patent.rawinventor ri on ri.rawlocation_id = rl.id
          left join patent.patent p2 on p2.id = ri.patent_id
+         left join geo_data.curated_locations c on rl.location_id=c.uuid
 WHERE rl.location_id is not null
   and (ri.patent_id is not null
     or ra.patent_id is not null)
@@ -509,12 +512,15 @@ SELECT rl2.location_id,
        rl2.state,
        rl2.country as country,
        rl2.location_id_transformed,
-       IF(pb1.document_number is null, pb2.date, pb1.date)
+       IF(pb1.document_number is null, pb2.date, pb1.date),
+       c.lat as latitude,
+       c.lon as longitude
 FROM pregrant_publications.rawlocation rl2
          left join pregrant_publications.rawassignee ra2 on ra2.rawlocation_id = rl2.id
          left join pregrant_publications.publication pb1 on pb1.document_number = ra2.document_number
          left join pregrant_publications.rawinventor ri2 on ri2.rawlocation_id = rl2.id
          left join pregrant_publications.publication pb2 on pb2.document_number = ri2.document_number
+         left join geo_data.curated_locations c on rl2.location_id=c.uuid
 WHERE rl2.location_id is not null and (ri2.document_number is not null
    or ra2.document_number is not null);
     """
