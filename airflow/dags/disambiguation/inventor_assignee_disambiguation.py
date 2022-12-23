@@ -417,13 +417,13 @@ post_process_location_operator = PythonOperator(task_id='post_process_location',
                                                 python_callable=post_process_location,
                                                 dag=disambiguation,
                                                 on_success_callback=airflow_task_success,
-                                                on_failure_callback=airflow_task_failure)
+                                                on_failure_callback=airflow_task_failure, pool='default_pool')
 # UPDATED
 qc_post_process_location_operator = PythonOperator(task_id='qc_post_process_location',
                                                    python_callable=post_process_qc,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
-                                                   on_failure_callback=airflow_task_failure)
+                                                   on_failure_callback=airflow_task_failure, pool='default_pool')
 
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
