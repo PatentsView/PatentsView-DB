@@ -487,27 +487,19 @@ def precache_locations(config):
     print(location_cache_query)
     engine.execute(location_cache_query)
 
-
 def generate_disambiguated_locations(engine, rank_chunk):
-    location_core_template = """
-        SELECT location_id
-        FROM location_id_rank where rk %% 100 = {rank_chunk}
-    """
-
     location_data_template = """
-        SELECT rl.location_id,
+SELECT rl.location_id,
        rl.city,
        rl.state,
-       rl.country_transformed as           country,
+       rl.country as country,
        rl.location_id_transformed,
        IF(p1.id is null, p2.date, p1.date) patent_date
-FROM rawlocation rl
-         left join rawassignee ra on ra.rawlocation_id = rl.id
-         left join patent p1 on p1.id = ra.patent_id
-         left join rawinventor ri on ri.rawlocation_id = rl.id
-         left join patent p2 on p2.id = ri.patent_id
-         JOIN
-     ({loc_core_query}) location on location.location_id = rl.location_id
+FROM patent.rawlocation rl
+         left join patent.rawassignee ra on ra.rawlocation_id = rl.id
+         left join patent.patent p1 on p1.id = ra.patent_id
+         left join patent.rawinventor ri on ri.rawlocation_id = rl.id
+         left join patent.patent p2 on p2.id = ri.patent_id
 WHERE rl.location_id is not null
   and (ri.patent_id is not null
     or ra.patent_id is not null)
@@ -515,7 +507,7 @@ UNION ALL
 SELECT rl2.location_id,
        rl2.city,
        rl2.state,
-       rl2.country_transformed as country,
+       rl2.country as country,
        rl2.location_id_transformed,
        IF(pb1.document_number is null, pb2.date, pb1.date)
 FROM pregrant_publications.rawlocation rl2
@@ -523,14 +515,9 @@ FROM pregrant_publications.rawlocation rl2
          left join pregrant_publications.publication pb1 on pb1.document_number = ra2.document_number
          left join pregrant_publications.rawinventor ri2 on ri2.rawlocation_id = rl2.id
          left join pregrant_publications.publication pb2 on pb2.document_number = ri2.document_number
-         JOIN
-     ({loc_core_query}) location on location.location_id = rl2.location_id
-WHERE rl2.location_id is not null and ri2.document_number is not null
-   or ra2.document_number is not null;
+WHERE rl2.location_id is not null and (ri2.document_number is not null
+   or ra2.document_number is not null);
     """
-    location_core_query = location_core_template.format(rank_chunk=rank_chunk)
-    location_data_query = location_data_template.format(loc_core_query=location_core_query)
-
     print(location_data_query)
     current_location_data = pd.read_sql_query(sql=location_data_query, con=engine)
     return current_location_data
