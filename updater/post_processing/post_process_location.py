@@ -365,7 +365,6 @@ class LocationPostProcessor():
                 # fips_dict['DC']['counties']
                 # {'District of Columbia': {'county_fips': 11001}}
                 county_fips = state_settings['counties'][county]['county_fips']
-
         result_dict = {
                 'found_county':      county,
                 'found_county_fips': county_fips,
@@ -494,15 +493,12 @@ SELECT rl.location_id,
        rl.state,
        rl.country as country,
        rl.location_id_transformed,
-       IF(p1.id is null, p2.date, p1.date) patent_date,
-       c.lat as latitude,
-       c.lon as longitude
+       IF(p1.id is null, p2.date, p1.date) patent_date
 FROM patent.rawlocation rl
          left join patent.rawassignee ra on ra.rawlocation_id = rl.id
          left join patent.patent p1 on p1.id = ra.patent_id
          left join patent.rawinventor ri on ri.rawlocation_id = rl.id
          left join patent.patent p2 on p2.id = ri.patent_id
-         left join geo_data.curated_locations c on rl.location_id=c.uuid
 WHERE rl.location_id is not null
   and (ri.patent_id is not null
     or ra.patent_id is not null)
@@ -512,15 +508,12 @@ SELECT rl2.location_id,
        rl2.state,
        rl2.country as country,
        rl2.location_id_transformed,
-       IF(pb1.document_number is null, pb2.date, pb1.date),
-       c.lat as latitude,
-       c.lon as longitude
+       IF(pb1.document_number is null, pb2.date, pb1.date)
 FROM pregrant_publications.rawlocation rl2
          left join pregrant_publications.rawassignee ra2 on ra2.rawlocation_id = rl2.id
          left join pregrant_publications.publication pb1 on pb1.document_number = ra2.document_number
          left join pregrant_publications.rawinventor ri2 on ri2.rawlocation_id = rl2.id
          left join pregrant_publications.publication pb2 on pb2.document_number = ri2.document_number
-         left join geo_data.curated_locations c on rl2.location_id=c.uuid
 WHERE rl2.location_id is not null and (ri2.document_number is not null
    or ra2.document_number is not null);
     """
@@ -585,14 +578,6 @@ def location_reduce(location_full_data: pd.DataFrame):
                                                         na_position='last').drop_duplicates(
             'location_id', keep='first').drop(
             ['help', 'patent_date'], 1)
-    final_lat_long = final_lat_long.join(pd.Series(np.where(
-            pd.isnull(final_lat_long.location_id_transformed), None,
-            final_lat_long.location_id_transformed.astype(str))).str.split("|", expand=True).rename(
-            {
-                    0: 'latitude',
-                    1: 'longitude'
-                    },
-            axis=1))
     final_lat_long = final_lat_long.replace('None', np.nan)
     full_final_data = final_loc[["location_id", "city", "state", "country"]].merge(
             other=final_lat_long[["location_id", "latitude", "longitude"]], how='outer', on='location_id')
@@ -603,48 +588,54 @@ def location_reduce(location_full_data: pd.DataFrame):
     return full_final_data
 
 
-# def create_location(update_config, version_indicator):
-#     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
-#     limit = 10000
-#     offset = 0
-#     for rank in range(0, 100):
-#         start = time.time()
-#         current_location_data = generate_disambiguated_locations(engine)
-#         print(current_location_data.shape[0])
-#         if current_location_data.shape[0] < 1:
-#             break
-#         step_time = time.time() - start
-#         start = time.time()
-#
-#         step_time = time.time() - start
-#         canonical_assignments = location_reduce(current_location_data)
-#         canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
-#         canonical_assignments.to_sql(name='location', con=engine,
-#                                      if_exists='append',
-#                                      index=False)
-#         current_iteration_duration = time.time() - start
-#         offset = limit + offset
-#
-#     truncate_max_locs(engine)
-
-def create_location(update_config, version_indicator):
+def create_location(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
+    end_date = update_config["DATES"]["END_DATE"].strip("-")
+    query0 = f"""
+    create table location_{end_date}
+    select uuid as location_id 
+    , id as curated_location_id  
+    , location_name as city
+    , state
+    , country
+    , lat as latitude
+    , lon as longitude
+    , null as county
+    , null as state_fips 
+    , null as county_fips
+    from geo_data.curated_locations g 
+    inner join patent.disambiguated_location_ids d on g.uuid=d.location_id
+    """
+    query1 = """
+    update location_{end_date} l Join location_fips lf
+    set l.county      = lf.county,
+        l.county_fips = lf.county_fips,
+        l.state_fips=lf.state_fips
+    where l.`id` = lf.`id`
+    """
+    query2 = f"""
+    Drop view if exists location;
+    """
+    query3 = f"""
+    CREATE  SQL SECURITY INVOKER  VIEW `location` AS SELECT
+   `patent`.`location_{end_date}`.`location_id` AS `id`,
+   `patent`.`location_{end_date}`.`curated_location_id` AS `curated_location_id`,
+   `patent`.`location_{end_date}`.`city` AS `city`,
+   `patent`.`location_{end_date}`.`state` AS `state`,
+   `patent`.`location_{end_date}`.`country` AS `country`,
+   `patent`.`location_{end_date}`.`latitude` AS `latitude`,
+   `patent`.`location_{end_date}`.`longitude` AS `longitude`,
+   `patent`.`location_{end_date}`.`county` AS `county`,
+   `patent`.`location_{end_date}`.`state_fips` AS `state_fips`,
+   `patent`.`location_{end_date}`.`county_fips` AS `county_fips`,
+   '{end_date}' AS `version_indicator`
+FROM `patent`.`location_{end_date}`;
+    """
 
-    start = time.time()
-    current_location_data = generate_disambiguated_locations(engine)
-    print(current_location_data.shape[0])
-    # if current_location_data.shape[0] < 1:
-    #     break
-    step_time = time.time() - start
-    start = time.time()
+    for q in [query0, query1, query2, query3]:
+        print(q)
+        engine.execute(q)
 
-    step_time = time.time() - start
-    canonical_assignments = location_reduce(current_location_data)
-    canonical_assignments = canonical_assignments.assign(version_indicator=version_indicator)
-    canonical_assignments.to_sql(name='location', con=engine,
-                                 if_exists='append',
-                                 index=False)
-    truncate_max_locs(engine)
 
 def update_lat_lon(config):
     engine = create_engine(get_connection_string(config, "RAW_DB"))
@@ -653,37 +644,9 @@ def update_lat_lon(config):
     engine.execute(query)
 
 
-def update_county_info(config):
+def create_fips(config):
     engine = create_engine(get_connection_string(config, "RAW_DB"))
-    query = """
-    update location l Join location_fips lf
-    set l.county      = lf.county,
-        l.county_fips = lf.county_fips,
-        l.state_fips=lf.state_fips
-    where l.`id` = lf.`id`
-    """
-    engine.execute(query)
-
-
-def update_location_lat_lon(config):
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
-    location_query = "select * from location"
-    location_df = pd.read_sql_query(sql=location_query, con=engine)
-    lp = LocationPostProcessor(config)
-    tqdm.pandas()
-    df = location_df.join(location_df.progress_apply(lp.run_query, axis=1))
-    df2 = df[['id', 'lat', 'lon']]
-    df2 = df2.rename(columns={
-            'lat': 'latitude',
-            'lon': 'longitude'
-            })
-    df2.to_sql("location_lat_lon", engine, if_exists="replace", index=False)
-    update_lat_lon(config)
-
-
-def update_fips(config):
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
-    location_query = "select * from location"
+    location_query = "select id, city, state, country from rawlocation"
     location_df = pd.read_sql_query(sql=location_query, con=engine)
 
     tqdm.pandas()
@@ -696,7 +659,7 @@ def update_fips(config):
             'found_state_fips':  'state_fips'
             })
     df2.to_sql("location_fips", engine, if_exists="replace", index=False)
-    update_county_info(config)
+    # update_county_info(config)
 
 
 def post_process_location(**kwargs):
@@ -705,14 +668,8 @@ def post_process_location(**kwargs):
     update_rawlocation(config, end_date)
     update_rawlocation(config, end_date, database='PGPUBS_DATABASE')
     precache_locations(config)
-    create_location(config, version_indicator=end_date)
-    update_fips(config)
-    # load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
-    #                   parent_entity_id=None, entity='assignee', include_location=True,
-    #                   location_strict=True)
-    # load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
-    #                   parent_entity_id=None, entity="inventor", include_location=True,
-    #                   location_strict=True)
+    create_fips(config)
+    create_location(config)
 
 
 def post_process_qc(**kwargs):
@@ -722,17 +679,14 @@ def post_process_qc(**kwargs):
 
 
 if __name__ == '__main__':
-    # post_process_location(**{
-    #         "execution_date": datetime.date(2021, 6, 22)
-    #         })
     # post_process_qc(**{
     #         "execution_date": datetime.date(2021, 6, 22)
     #         })
-    config = get_current_config(schedule='quarterly', **{
+    # config = get_current_config(schedule='quarterly', **{
+    #         "execution_date": datetime.date(2022, 7, 1)
+    #         })
+    # engine = create_engine(get_connection_string(config, "RAW_DB"))
+    post_process_location(**{
             "execution_date": datetime.date(2022, 7, 1)
             })
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
-    limit = 10000
-    offset = 0
-    for rank in range(0, 100):
-        generate_disambiguated_locations(engine, rank)
+
