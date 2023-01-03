@@ -410,7 +410,7 @@ class LocationPostProcessor():
         city = clean_loc(row['city'])
         state = clean_loc(row['state'])
         country = clean_loc(row['country'])
-        engine = create_engine(get_connection_string(config, 'PROD_DB'))
+        engine = create_engine(get_connection_string(self.config, 'PROD_DB'))
         query = self.build_location_query(city, state, country)
         if query is not None:
             results = pd.read_sql_query(sql=query, con=engine)
@@ -471,20 +471,27 @@ def update_rawlocation(update_config, end_date, database='RAW_DB'):
 
 
 def precache_locations(config):
-    location_cache_query = """
-        INSERT IGNORE INTO disambiguated_location_ids (location_id)
-        SELECT distinct location_id 
-        from {granted_db}.rawlocation 
-        where location_id is not null
-        UNION
-        SELECT distinct location_id 
-        from {pregrant_db}.rawlocation
-        where location_id is not null;
-    """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
-               granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    # location_cache_query = """
+    #     INSERT IGNORE INTO disambiguated_location_ids (location_id)
+    #     SELECT distinct location_id
+    #     from {granted_db}.rawlocation
+    #     where location_id is not null
+    #     UNION
+    #     SELECT distinct location_id
+    #     from {pregrant_db}.rawlocation
+    #     where location_id is not null;
+    # """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
+    #            granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
+    query0 = """drop table unique_locations;"""
+    query1 = """create table unique_locations 
+select distinct location_id, city, state, country from (
+select location_id, city, state, country from patent.rawlocation
+union all
+select location_id, city, state, country from pregrant_publications.rawlocation) as UNDERLYING;"""
     engine = create_engine(get_connection_string(config, "RAW_DB"))
-    print(location_cache_query)
-    engine.execute(location_cache_query)
+    for q in [query0, query1]:
+        print(q)
+        engine.execute(q)
 
 def generate_disambiguated_locations(engine):
     location_data_query = """
@@ -591,32 +598,29 @@ def location_reduce(location_full_data: pd.DataFrame):
 def create_location(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     end_date = update_config["DATES"]["END_DATE"].strip("-")
-    query0 = f"""
+    query0 = """drop table if exists unique_locations"""
+    query1 = f"""
+    create table unique_locations select distinct location_id, city, state, country from rawlocation where location_id is not null;
+    """
+    query2 = f"""
     create table location_{end_date}
     select uuid as location_id 
-    , id as curated_location_id  
-    , location_name as city
-    , state
-    , country
+    , g.id as curated_location_id  
+    , u.city
+    , u.state
+    , u.country
     , lat as latitude
     , lon as longitude
     , null as county
-    , null as state_fips 
+    , null as state_fips
     , null as county_fips
     from geo_data.curated_locations g 
-    inner join patent.disambiguated_location_ids d on g.uuid=d.location_id
+    inner join unique_locations u on g.uuid=u.location_id
     """
-    query1 = """
-    update location_{end_date} l Join location_fips lf
-    set l.county      = lf.county,
-        l.county_fips = lf.county_fips,
-        l.state_fips=lf.state_fips
-    where l.`id` = lf.`id`
-    """
-    query2 = f"""
+    query3 = """
     Drop view if exists location;
     """
-    query3 = f"""
+    query4 = f"""
     CREATE  SQL SECURITY INVOKER  VIEW `location` AS SELECT
    `patent`.`location_{end_date}`.`location_id` AS `id`,
    `patent`.`location_{end_date}`.`curated_location_id` AS `curated_location_id`,
@@ -631,8 +635,10 @@ def create_location(update_config):
    '{end_date}' AS `version_indicator`
 FROM `patent`.`location_{end_date}`;
     """
-
-    for q in [query0, query1, query2, query3]:
+    query5 = f""" alter table `location_{end_date}` add index city (city); """
+    query6 = f""" alter table `location_{end_date}` add index state (state); """
+    query7 = f""" alter table `location_{end_date}` add index country (country); """
+    for q in [query0, query1, query2, query3, query4, query5, query6, query7]:
         print(q)
         engine.execute(q)
 
@@ -646,30 +652,47 @@ def update_lat_lon(config):
 
 def create_fips(config):
     engine = create_engine(get_connection_string(config, "RAW_DB"))
-    location_query = "select id, city, state, country from rawlocation"
+    end_date = config["DATES"]["END_DATE"].strip("-")
+    location_query = f"""
+    select location_id 
+    , city
+    , state
+    , country
+    from location_{end_date}
+    """
+    # location_query = "select distinct city, state, country from rawlocation"
+    print(location_query)
     location_df = pd.read_sql_query(sql=location_query, con=engine)
 
     tqdm.pandas()
     lp = LocationPostProcessor(config)
     df = location_df.join(location_df.progress_apply(lp.find_county, axis=1))
-    df2 = df[['id', 'found_county', 'found_county_fips', 'found_state_fips']]
+    df2 = df[['location_id', 'found_county', 'found_county_fips', 'found_state_fips']]
     df2 = df2.rename(columns={
             'found_county':      'county',
             'found_county_fips': 'county_fips',
             'found_state_fips':  'state_fips'
             })
     df2.to_sql("location_fips", engine, if_exists="replace", index=False)
-    # update_county_info(config)
+    update_loc_query =f"""
+    update location_{end_date} l 
+	inner join location_fips lf on l.location_id=lf.location_id
+set l.county=lf.county,
+    l.state_fips=lf.state_fips,
+    l.county_fips=lf.county_fips"""
+    print(update_loc_query)
+    engine.execute(update_loc_query)
 
 
 def post_process_location(**kwargs):
     config = get_current_config(schedule="quarterly", **kwargs)
     end_date = config['DATES']['END_DATE']
-    update_rawlocation(config, end_date)
-    update_rawlocation(config, end_date, database='PGPUBS_DATABASE')
-    precache_locations(config)
-    create_fips(config)
+    # update_rawlocation(config, end_date)
+    # update_rawlocation(config, end_date, database='PGPUBS_DATABASE')
+    # precache_locations(config)
     create_location(config)
+    create_fips(config)
+
 
 
 def post_process_qc(**kwargs):

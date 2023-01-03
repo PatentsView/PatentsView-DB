@@ -252,10 +252,6 @@ CREATE TABLE if not exists {db}.`location_disambiguation_mapping_{end_of_quarter
   PRIMARY KEY (`id`),
   KEY `location_id_2` (`location_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"""
-        # query = f"""
-        # CREATE TABLE if not exists {db}.`location_disambiguation_mapping_{end_of_quarter}`
-        # select * from location_disambiguation_mapping_{last_quarter}
-        # """
         print(query)
         connection.execute(query)
         query2 = f"""
@@ -283,12 +279,12 @@ if __name__ == "__main__":
     # config = get_current_config('pgpubs', **{
     #     "execution_date": datetime.date(2022, 6, 2)
     # })
-    d = datetime.date(2022, 7, 12)
-    location_data_setup(**{
-        "execution_date": d
-    })
+    # d = datetime.date(2022, 7, 5)
+    # location_data_setup(**{
+    #     "execution_date": d
+    # })
     # run_location_disambiguation(dbtype='granted_patent', **{
-    #     "execution_date": datetime.date(2022, 7, 12)
+    #     "execution_date": datetime.date(2022, 7, 5)
     # })
     # run_location_disambiguation_tests(dbtype='granted_patent', **{
     #     "execution_date": datetime.date(2022, 5, 24)
@@ -307,6 +303,10 @@ if __name__ == "__main__":
     #     location_data_setup(**{
     #         "execution_date": d
     #     })
+    for d in [datetime.date(2022, 6, 30), datetime.date(2022, 7, 7), datetime.date(2022, 7, 14)]:
+        run_location_disambiguation(dbtype='pgpubs', **{
+            "execution_date": d
+        })
 
 
 
