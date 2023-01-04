@@ -17,8 +17,7 @@ class LocationUploadTest:
 
     def character_matches(self):
         print("TESTING FOR STATE AND COUNTRY MISMATCHES BETWEEN RAWLOCATION_ID & CURATED_ID")
-        temp_db = 'TEMP_UPLOAD_DB'
-        cstr = get_connection_string(self.config, temp_db)
+        cstr = get_connection_string(self.config, 'TEMP_UPLOAD_DB')
         engine = create_engine(cstr)
         query_dict = {"Country":
             """
@@ -49,8 +48,7 @@ where a.country is not null and a.state <> `Abbreviation`;"""
 
     def no_location_id(self):
         print("TESTING FOR MISSING LOCATION_ID")
-        temp_db = 'TEMP_UPLOAD_DB'
-        cstr = get_connection_string(self.config, temp_db)
+        cstr = get_connection_string(self.config, 'TEMP_UPLOAD_DB')
         engine = create_engine(cstr)
         # df = pd.read_sql("""select * from rawlocation where location_id is null;""", con=engine)
         with engine.connect() as connection:
@@ -99,17 +97,49 @@ where a.country is not null and b.uuid is not null;""")
             if (max_lat_diff > 5) or (min_lat_diff < -5) or (max_long_diff > 5) or (min_long_diff < -5):
                 raise Exception("LAT OR LONG LOOKS WRONG")
 
+    def percent_location_id_null(self):
+        cstr = get_connection_string(self.config, 'TEMP_UPLOAD_DB')
+        engine = create_engine(cstr)
+        with engine.connect() as connection:
+            query = connection.execute(f"""
+select (sum(case when location_id is null then 1 else 0 end)/ count(*))
+from rawlocation;""")
+            q_rows = query.first()[0]
+            print(f"""{q_rows} % NULL LOCATION_ID THIS WEEK """)
+            if q_rows > .05:
+                raise Exception(f"{q_rows} % of NULL LOCATION IDs -- TOO HIGH")
+
+    def check_disambig_mapping_updated(self):
+        from lib.is_it_update_time import get_update_range
+        sd = datetime.datetime.strptime(self.config['DATES']['START_DATE'], '%Y%m%d')
+        q_start_date, q_end_date = get_update_range(sd + datetime.timedelta(days=6))
+        end_of_quarter = q_end_date.strftime('%Y%m%d')
+
+        cstr = get_connection_string(self.config, 'TEMP_UPLOAD_DB')
+        engine = create_engine(cstr)
+        with engine.connect() as connection:
+            query = connection.execute(f"""
+select count(*)
+from rawlocation a 
+	inner join {config['PATENTSVIEW_DATABASES']['PROD_DB']}.location_disambiguation_mapping_{end_of_quarter} b on a.id=b.id""")
+            q_rows = query.first()[0]
+            print(f"""{q_rows} Updated In the Location Disambiguation Table""")
+            if q_rows == 0:
+                raise Exception(f"LOCATION DISAMBIGUATION MAPPING NOT UPDATED FOR THE CURRENT WEEK")
 
     def runTests(self):
         self.character_matches()
         self.no_location_id()
         self.create_lat_long_comparison_table()
+        self.percent_location_id_null()
+        self.check_disambig_mapping_updated()
 
 if __name__ == '__main__':
     config = get_current_config('granted_patent', schedule='weekly', **{
-        "execution_date": datetime.date(2022, 5, 24)
+        "execution_date": datetime.date(2022, 8, 16)
     })
-    l = LocationUploadTest
+    l = LocationUploadTest(config)
     # l.character_matches(config)
     # l.no_location_id(config)
-    l.create_lat_long_comparison_table(config)
+    # l.create_lat_long_comparison_table(config)
+    l.percent_location_id_null()

@@ -224,25 +224,21 @@ set a.location_id=b.uuid
             highlevel_counter = highlevel_counter + 1
 
 
-def location_data_setup(**kwargs):
+def location_disambig_mapping_update(dbtype, **kwargs):
     weekly_config = get_current_config('granted_patent', **kwargs)
     cstr = get_connection_string(weekly_config, "PROD_DB")
     engine = create_engine(cstr)
-    end_date = weekly_config["DATES"]["END_DATE"].strip("-")
     current_end_date = weekly_config["DATES"]["END_DATE"]
 
     from lib.is_it_update_time import get_update_range
-    q_start_date, q_end_date = get_update_range(kwargs['execution_date']+ datetime.timedelta(days=7))
+    q_start_date, q_end_date = get_update_range(kwargs['execution_date'] + datetime.timedelta(days=7))
     end_of_quarter = q_end_date.strftime('%Y%m%d')
-    # l_quarter = q_start_date-datetime.timedelta(days=1)
-    # last_quarter = l_quarter.strftime('%Y%m%d')
 
     if kwargs['execution_date'].weekday() == 1:
-        db_type = 'upload'
         db = 'patent'
     else:
-        db_type = 'pgpubs'
         db = 'pregrant_publications'
+    print(f"Using Data FROM {dbtype}_{current_end_date}")
 
     with engine.connect() as connection:
         query = f"""
@@ -252,19 +248,19 @@ CREATE TABLE if not exists {db}.`location_disambiguation_mapping_{end_of_quarter
   PRIMARY KEY (`id`),
   KEY `location_id_2` (`location_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"""
-        print(query)
-        connection.execute(query)
         query2 = f"""
 insert into {db}.location_disambiguation_mapping_{end_of_quarter} (id, location_id)
-select id, location_id from {db_type}_{current_end_date}.rawlocation
+select id, location_id from {dbtype}_{current_end_date}.rawlocation
         """
-        print(query2)
-        connection.execute(query2)
+        for q in [query, query2]:
+            print(q)
+            connection.execute(q)
 
 def run_location_disambiguation(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
     generate_US_locationID_exactmatch(config)
     find_nearest_latlong(config, geo_type_list=['domestic', 'foreign'])
+    location_disambig_mapping_update(dbtype, **kwargs)
 
 def run_location_disambiguation_tests(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
@@ -280,7 +276,7 @@ if __name__ == "__main__":
     #     "execution_date": datetime.date(2022, 6, 2)
     # })
     # d = datetime.date(2022, 7, 5)
-    # location_data_setup(**{
+    # location_disambig_mapping_update(**{
     #     "execution_date": d
     # })
     # run_location_disambiguation(dbtype='granted_patent', **{
@@ -300,13 +296,16 @@ if __name__ == "__main__":
     #     run_location_disambiguation(dbtype='pgpubs', **{
     #         "execution_date": d
     #     })
-    #     location_data_setup(**{
+    #     location_disambig_mapping_update(**{
     #         "execution_date": d
     #     })
-    for d in [datetime.date(2022, 6, 30), datetime.date(2022, 7, 7), datetime.date(2022, 7, 14)]:
-        run_location_disambiguation(dbtype='pgpubs', **{
+    d = datetime.date(2022, 7, 19)
+    while d <= datetime.date(2022, 10, 1):
+        location_disambig_mapping_update(dbtype='granted_patent', **{
             "execution_date": d
         })
+        d = d + datetime.timedelta(days=7)
+
 
 
 

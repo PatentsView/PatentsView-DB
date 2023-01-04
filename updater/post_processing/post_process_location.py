@@ -462,7 +462,7 @@ def update_rawlocation(update_config, end_date, database='RAW_DB'):
     engine = create_engine(get_connection_string(update_config, database))
     db = update_config['PATENTSVIEW_DATABASES'][database]
     update_statement = f"""
-        UPDATE {db}.rawlocation rl left join location_disambiguation_mapping_{end_date} ldm
+        UPDATE {db}.rawlocation rl inner join location_disambiguation_mapping_{end_date} ldm
             on ldm.id = rl.id
         set rl.location_id = ldm.location_id
     """
@@ -687,9 +687,9 @@ set l.county=lf.county,
 def post_process_location(**kwargs):
     config = get_current_config(schedule="quarterly", **kwargs)
     end_date = config['DATES']['END_DATE']
-    # update_rawlocation(config, end_date)
-    # update_rawlocation(config, end_date, database='PGPUBS_DATABASE')
-    # precache_locations(config)
+    update_rawlocation(config, end_date)
+    update_rawlocation(config, end_date, database='PGPUBS_DATABASE')
+    precache_locations(config)
     create_location(config)
     create_fips(config)
 
