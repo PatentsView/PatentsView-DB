@@ -12,452 +12,6 @@ from lib.configuration import get_connection_string, get_current_config
 from updater.post_processing.create_lookup import load_lookup_table
 
 
-class LocationPostProcessor():
-    def __init__(self, config):
-        self.state_dict = {
-                'AL': 'Alabama',
-                'AK': 'Alaska',
-                'AS': 'American Samoa',
-                'AZ': 'Arizona',
-                'AR': 'Arkansas',
-                'CA': 'California',
-                'CO': 'Colorado',
-                'CT': 'Connecticut',
-                'DE': 'Delaware',
-                'DC': 'District of Columbia',
-                'FM': 'Federated States of Micronesia',
-                'FL': 'Florida',
-                'GA': 'Georgia',
-                'GU': 'Guam',
-                'HI': 'Hawaii',
-                'ID': 'Idaho',
-                'IL': 'Illinois',
-                'IN': 'Indiana',
-                'IA': 'Iowa',
-                'KS': 'Kansas',
-                'KY': 'Kentucky',
-                'LA': 'Louisiana',
-                'ME': 'Maine',
-                'MH': 'Marshall Islands',
-                'MD': 'Maryland',
-                'MA': 'Massachusetts',
-                'MI': 'Michigan',
-                'MN': 'Minnesota',
-                'MS': 'Mississippi',
-                'MO': 'Missouri',
-                'MT': 'Montana',
-                'NE': 'Nebraska',
-                'NV': 'Nevada',
-                'NH': 'New Hampshire',
-                'NJ': 'New Jersey',
-                'NM': 'New Mexico',
-                'NY': 'New York',
-                'NC': 'North Carolina',
-                'ND': 'North Dakota',
-                'MP': 'Northern Mariana Islands',
-                'OH': 'Ohio',
-                'OK': 'Oklahoma',
-                'OR': 'Oregon',
-                'PW': 'Palau',
-                'PA': 'Pennsylvania',
-                'PR': 'Puerto Rico',
-                'RI': 'Rhode Island',
-                'SC': 'South Carolina',
-                'SD': 'South Dakota',
-                'TN': 'Tennessee',
-                'TX': 'Texas',
-                'UT': 'Utah',
-                'VT': 'Vermont',
-                'VI': 'Virgin Islands',
-                'VA': 'Virginia',
-                'WA': 'Washington',
-                'WV': 'West Virginia',
-                'WI': 'Wisconsin',
-                'WY': 'Wyoming'
-                }
-        self.country_dict = {
-                'AD': 'Andorra',
-                'AE': 'United Arab Emirates',
-                'AF': 'Afghanistan',
-                'AG': 'Antigua and Barbuda',
-                'AI': 'Anguilla',
-                'AL': 'Albania',
-                'AM': 'Armenia',
-                'AN': 'Netherlands Antilles',
-                'AO': 'Angola',
-                'AQ': 'Antarctica',
-                'AR': 'Argentina',
-                'AS': 'American Samoa',
-                'AT': 'Austria',
-                'AU': 'Australia',
-                'AW': 'Aruba',
-                'AZ': 'Azerbaijan',
-                'BA': 'Bosnia and Herzegovina',
-                'BB': 'Barbados',
-                'BD': 'Bangladesh',
-                'BE': 'Belgium',
-                'BF': 'Burkina Faso',
-                'BG': 'Bulgaria',
-                'BH': 'Bahrain',
-                'BI': 'Burundi',
-                'BJ': 'Benin',
-                'BM': 'Bermuda',
-                'BN': 'Brunei',
-                'BO': 'Bolivia',
-                'BR': 'Brazil',
-                'BS': 'Bahamas',
-                'BT': 'Bhutan',
-                'BV': 'Bouvet Island',
-                'BW': 'Botswana',
-                'BY': 'Belarus',
-                'BZ': 'Belize',
-                'CA': 'Canada',
-                'CC': 'Cocos [Keeling] Islands',
-                'CD': 'Congo [DRC]',
-                'CF': 'Central African Republic',
-                'CG': 'Congo [Republic]',
-                'CH': 'Switzerland',
-                'CI': 'Côte d\'Ivoire',
-                'CK': 'Cook Islands',
-                'CL': 'Chile',
-                'CM': 'Cameroon',
-                'CN': 'China',
-                'CO': 'Colombia',
-                'CR': 'Costa Rica',
-                'CU': 'Cuba',
-                'CV': 'Cape Verde',
-                'CX': 'Christmas Island',
-                'CY': 'Cyprus',
-                'CZ': 'Czech Republic',
-                'DE': 'Germany',
-                'DJ': 'Djibouti',
-                'DK': 'Denmark',
-                'DM': 'Dominica',
-                'DO': 'Dominican Republic',
-                'DZ': 'Algeria',
-                'EC': 'Ecuador',
-                'EE': 'Estonia',
-                'EG': 'Egypt',
-                'EH': 'Western Sahara',
-                'ER': 'Eritrea',
-                'ES': 'Spain',
-                'ET': 'Ethiopia',
-                'FI': 'Finland',
-                'FJ': 'Fiji',
-                'FK': 'Falkland Islands [Islas Malvinas]',
-                'FM': 'Micronesia',
-                'FO': 'Faroe Islands',
-                'FR': 'France',
-                'GA': 'Gabon',
-                'GB': 'United Kingdom',
-                'GD': 'Grenada',
-                'GE': 'Georgia',
-                'GF': 'French Guiana',
-                'GG': 'Guernsey',
-                'GH': 'Ghana',
-                'GI': 'Gibraltar',
-                'GL': 'Greenland',
-                'GM': 'Gambia',
-                'GN': 'Guinea',
-                'GP': 'Guadeloupe',
-                'GQ': 'Equatorial Guinea',
-                'GR': 'Greece',
-                'GS': 'South Georgia and the South Sandwich Islands',
-                'GT': 'Guatemala',
-                'GU': 'Guam',
-                'GW': 'Guinea-Bissau',
-                'GY': 'Guyana',
-                'GZ': 'Gaza Strip',
-                'HK': 'Hong Kong',
-                'HM': 'Heard Island and McDonald Islands',
-                'HN': 'Honduras',
-                'HR': 'Croatia',
-                'HT': 'Haiti',
-                'HU': 'Hungary',
-                'ID': 'Indonesia',
-                'IE': 'Ireland',
-                'IL': 'Israel',
-                'IM': 'Isle of Man',
-                'IN': 'India',
-                'IO': 'British Indian Ocean Territory',
-                'IQ': 'Iraq',
-                'IR': 'Iran',
-                'IS': 'Iceland',
-                'IT': 'Italy',
-                'JE': 'Jersey',
-                'JM': 'Jamaica',
-                'JO': 'Jordan',
-                'JP': 'Japan',
-                'KE': 'Kenya',
-                'KG': 'Kyrgyzstan',
-                'KH': 'Cambodia',
-                'KI': 'Kiribati',
-                'KM': 'Comoros',
-                'KN': 'Saint Kitts and Nevis',
-                'KP': 'North Korea',
-                'KR': 'South Korea',
-                'KW': 'Kuwait',
-                'KY': 'Cayman Islands',
-                'KZ': 'Kazakhstan',
-                'LA': 'Laos',
-                'LB': 'Lebanon',
-                'LC': 'Saint Lucia',
-                'LI': 'Liechtenstein',
-                'LK': 'Sri Lanka',
-                'LR': 'Liberia',
-                'LS': 'Lesotho',
-                'LT': 'Lithuania',
-                'LU': 'Luxembourg',
-                'LV': 'Latvia',
-                'LY': 'Libya',
-                'MA': 'Morocco',
-                'MC': 'Monaco',
-                'MD': 'Moldova',
-                'ME': 'Montenegro',
-                'MG': 'Madagascar',
-                'MH': 'Marshall Islands',
-                'MK': 'Macedonia [FYROM]',
-                'ML': 'Mali',
-                'MM': 'Myanmar [Burma]',
-                'MN': 'Mongolia',
-                'MO': 'Macau',
-                'MP': 'Northern Mariana Islands',
-                'MQ': 'Martinique',
-                'MR': 'Mauritania',
-                'MS': 'Montserrat',
-                'MT': 'Malta',
-                'MU': 'Mauritius',
-                'MV': 'Maldives',
-                'MW': 'Malawi',
-                'MX': 'Mexico',
-                'MY': 'Malaysia',
-                'MZ': 'Mozambique',
-                'NA': 'Namibia',
-                'NC': 'New Caledonia',
-                'NE': 'Niger',
-                'NF': 'Norfolk Island',
-                'NG': 'Nigeria',
-                'NI': 'Nicaragua',
-                'NL': 'Netherlands',
-                'NO': 'Norway',
-                'NP': 'Nepal',
-                'NR': 'Nauru',
-                'NU': 'Niue',
-                'NZ': 'New Zealand',
-                'OM': 'Oman',
-                'PA': 'Panama',
-                'PE': 'Peru',
-                'PF': 'French Polynesia',
-                'PG': 'Papua New Guinea',
-                'PH': 'Philippines',
-                'PK': 'Pakistan',
-                'PL': 'Poland',
-                'PM': 'Saint Pierre and Miquelon',
-                'PN': 'Pitcairn Islands',
-                'PR': 'Puerto Rico',
-                'PS': 'Palestinian Territories',
-                'PT': 'Portugal',
-                'PW': 'Palau',
-                'PY': 'Paraguay',
-                'QA': 'Qatar',
-                'RE': 'Réunion',
-                'RO': 'Romania',
-                'RS': 'Serbia',
-                'RU': 'Russia',
-                'RW': 'Rwanda',
-                'SA': 'Saudi Arabia',
-                'SB': 'Solomon Islands',
-                'SC': 'Seychelles',
-                'SD': 'Sudan',
-                'SE': 'Sweden',
-                'SG': 'Singapore',
-                'SH': 'Saint Helena',
-                'SI': 'Slovenia',
-                'SJ': 'Svalbard and Jan Mayen',
-                'SK': 'Slovakia',
-                'SL': 'Sierra Leone',
-                'SM': 'San Marino',
-                'SN': 'Senegal',
-                'SO': 'Somalia',
-                'SR': 'Suriname',
-                'ST': 'São Tomé and Príncipe',
-                'SV': 'El Salvador',
-                'SY': 'Syria',
-                'SZ': 'Swaziland',
-                'TC': 'Turks and Caicos Islands',
-                'TD': 'Chad',
-                'TF': 'French Southern Territories',
-                'TG': 'Togo',
-                'TH': 'Thailand',
-                'TJ': 'Tajikistan',
-                'TK': 'Tokelau',
-                'TL': 'Timor-Leste',
-                'TM': 'Turkmenistan',
-                'TN': 'Tunisia',
-                'TO': 'Tonga',
-                'TR': 'Turkey',
-                'TT': 'Trinidad and Tobago',
-                'TV': 'Tuvalu',
-                'TW': 'Taiwan',
-                'TZ': 'Tanzania',
-                'UA': 'Ukraine',
-                'UG': 'Uganda',
-                'UM': 'U.S. Minor Outlying Islands',
-                'US': 'United States',
-                'UY': 'Uruguay',
-                'UZ': 'Uzbekistan',
-                'VA': 'Vatican City',
-                'VC': 'Saint Vincent and the Grenadines',
-                'VE': 'Venezuela',
-                'VG': 'British Virgin Islands',
-                'VI': 'U.S. Virgin Islands',
-                'VN': 'Vietnam',
-                'VU': 'Vanuatu',
-                'WF': 'Wallis and Futuna',
-                'WS': 'Samoa',
-                'XK': 'Kosovo',
-                'YE': 'Yemen',
-                'YT': 'Mayotte',
-                'ZA': 'South Africa',
-                'ZM': 'Zambia',
-                'ZW': 'Zimbabwe',
-                'SU': 'Soviet Union',
-                'YU': 'Yugoslavia',
-                'CW': 'Curacao',
-                'AX': 'Aland Islands',
-                'BQ': 'Bonaire, Sint Eustatius and Saba',
-                'BL': 'Saint Barthelemy',
-                'SX': 'Sint Maarten',
-                'SS': 'South Sudan',
-                'MF': 'Saint Martin'
-                }
-        self.config = config
-        self.create_fips_lookups()
-
-    def create_fips_lookups(self):
-        persistent_files = self.config['FOLDERS']['PERSISTENT_FILES']
-        state_lookup = pd.read_csv('{}/state_fips.csv'.format(persistent_files), dtype=object)
-        # TODO: maybe just store this as a json file that directly becomes a dict?
-        county_lookup = pd.read_csv('{}/county_lookup.csv'.format(persistent_files))
-        self.fips_dict = state_lookup.set_index('State').to_dict(orient='index')
-        for state in self.fips_dict:
-            self.fips_dict[state]['counties'] = county_lookup.loc[
-                county_lookup.state == state, ["county", "county_fips"]].drop_duplicates().set_index('county').to_dict(
-                    orient='index')
-            self.fips_dict[state]['cities'] = county_lookup.loc[county_lookup.state == state,
-                                                                ["city", "county"]].set_index(
-                    'city').to_dict(orient='index')
-
-    def find_county(self, row):
-        city = clean_loc(row['city'])
-        state = clean_loc(row['state'])
-        country = clean_loc(row['country'])
-        state_fips = None
-        county = None
-        county_fips = None
-        if country == 'US' and state in self.fips_dict:
-            state_settings = self.fips_dict[state]
-            state_fips = state_settings['State_FIPS']
-            # fips_dict['DC']['cities']['Washington']
-            # {'county': 'District of Columbia'}
-            if city in state_settings['cities']:
-                county = state_settings['cities'][city]['county']
-                # fips_dict['DC']['counties']
-                # {'District of Columbia': {'county_fips': 11001}}
-                county_fips = state_settings['counties'][county]['county_fips']
-        result_dict = {
-                'found_county':      county,
-                'found_county_fips': county_fips,
-                'found_state_fips':  state_fips
-                }
-
-        return pd.Series(result_dict)
-
-    def build_location_query(self, city, state, country):
-        final_q = None
-        full_q = "Select name, state, country_code, lat, lon from geo_data.places gl WHERE "
-        city_q = "MATCH(gl.name) AGAINST('{city}')"
-        state_q = "'{state}' = gl.state"
-        country_q = "gl.country_code = '{country}'"
-
-        added = False
-
-        if city is None and state is None and country is None:
-            return None
-
-        else:
-            if city is not None:
-                final_q = full_q.format(score_select=city) + city_q.format(city=city)
-                added = True
-            if state is not None and state in self.state_dict:
-                if added:
-                    final_q = final_q + " and " + state_q.format(state=self.state_dict[state])
-                else:
-                    final_q = full_q.format(score_select=self.state_dict[state]) + state_q.format(
-                            state=self.state_dict[state])
-                    added = True
-            if country is not None and country in self.country_dict:
-                if added:
-                    final_q = final_q + " and " + country_q.format(country=country)
-                else:
-                    full_q = full_q.format(score_select=self.country_dict[country]) + country_q.format(country=country)
-                    added = True
-        return final_q
-
-    def run_query(self, row):
-        lat = ''
-        lon = ''
-        city = clean_loc(row['city'])
-        state = clean_loc(row['state'])
-        country = clean_loc(row['country'])
-        engine = create_engine(get_connection_string(self.config, 'PROD_DB'))
-        query = self.build_location_query(city, state, country)
-        if query is not None:
-            results = pd.read_sql_query(sql=query, con=engine)
-            if len(results) > 0:
-                found_name = results.loc[0]['name']
-                found_state = results.loc[0]['state']
-                found_country = results.loc[0]['country_code']
-                lat = results.loc[0]['lat']
-                lon = results.loc[0]['lon']
-                result_dict = {
-                        'found_name':    found_name,
-                        'found_state':   found_state,
-                        'found_country': found_country,
-                        'lat':           lat,
-                        'lon':           lon,
-                        'query':         query
-                        }
-            else:
-                result_dict = {
-                        'found_name':    None,
-                        'found_state':   None,
-                        'found_country': None,
-                        'lat':           None,
-                        'long':          None,
-                        'query':         query
-                        }
-        else:
-            result_dict = {
-                    'found_name':    None,
-                    'found_state':   None,
-                    'found_country': None,
-                    'lat':           None,
-                    'lon':           None,
-                    'query':         query
-                    }
-
-        return pd.Series(result_dict)
-
-
-def clean_loc(loc):
-    if loc is not None:
-        cleaned_loc = loc.replace("'", "''")
-    else:
-        cleaned_loc = None
-    return cleaned_loc
-
-
 def update_rawlocation(update_config, end_date, database='RAW_DB'):
     engine = create_engine(get_connection_string(update_config, database))
     db = update_config['PATENTSVIEW_DATABASES'][database]
@@ -471,156 +25,67 @@ def update_rawlocation(update_config, end_date, database='RAW_DB'):
 
 
 def precache_locations(config):
-    # location_cache_query = """
-    #     INSERT IGNORE INTO disambiguated_location_ids (location_id)
-    #     SELECT distinct location_id
-    #     from {granted_db}.rawlocation
-    #     where location_id is not null
-    #     UNION
-    #     SELECT distinct location_id
-    #     from {pregrant_db}.rawlocation
-    #     where location_id is not null;
-    # """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
-    #            granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'])
-    query0 = """drop table unique_locations;"""
+    query0 = """drop table if exists unique_locations;"""
     query1 = """create table unique_locations 
-select distinct location_id, city, state, country from (
-select location_id, city, state, country from patent.rawlocation
+select distinct location_id from (
+select location_id from patent.rawlocation
 union all
-select location_id, city, state, country from pregrant_publications.rawlocation) as UNDERLYING;"""
+select location_id from pregrant_publications.rawlocation) as UNDERLYING;"""
+    query2 = f""" alter table unique_locations add index location_id (location_id);"""
     engine = create_engine(get_connection_string(config, "RAW_DB"))
-    for q in [query0, query1]:
+    for q in [query0, query1, query2]:
         print(q)
         engine.execute(q)
-
-def generate_disambiguated_locations(engine):
-    location_data_query = """
-SELECT rl.location_id,
-       rl.city,
-       rl.state,
-       rl.country as country,
-       rl.location_id_transformed,
-       IF(p1.id is null, p2.date, p1.date) patent_date
-FROM patent.rawlocation rl
-         left join patent.rawassignee ra on ra.rawlocation_id = rl.id
-         left join patent.patent p1 on p1.id = ra.patent_id
-         left join patent.rawinventor ri on ri.rawlocation_id = rl.id
-         left join patent.patent p2 on p2.id = ri.patent_id
-WHERE rl.location_id is not null
-  and (ri.patent_id is not null
-    or ra.patent_id is not null)
-UNION ALL
-SELECT rl2.location_id,
-       rl2.city,
-       rl2.state,
-       rl2.country as country,
-       rl2.location_id_transformed,
-       IF(pb1.document_number is null, pb2.date, pb1.date)
-FROM pregrant_publications.rawlocation rl2
-         left join pregrant_publications.rawassignee ra2 on ra2.rawlocation_id = rl2.id
-         left join pregrant_publications.publication pb1 on pb1.document_number = ra2.document_number
-         left join pregrant_publications.rawinventor ri2 on ri2.rawlocation_id = rl2.id
-         left join pregrant_publications.publication pb2 on pb2.document_number = ri2.document_number
-WHERE rl2.location_id is not null and (ri2.document_number is not null
-   or ra2.document_number is not null);
-    """
-    print(location_data_query)
-    current_location_data = pd.read_sql_query(sql=location_data_query, con=engine)
-    return current_location_data
-
-
-def create_date_table(engine):
-    date_query = """
-        SELECT ml.location_id, ml.city, ml.state, ml.country, ml.location_count, p.date
-        from max_location_counts ml
-                left join location_disambiguation_mapping ldm on ldm.location_id = ml.location_id
-                left join rawassignee ra on ra.rawlocation_id = ldm.uuid
-                left join patent p on p.id = ra.patent_id
-        UNION ALL
-        SELECT ml2.location_id, ml2.city, ml2.state, ml2.country, ml2.location_count, p2.date
-        from max_location_counts ml2
-                left join location_disambiguation_mapping ldm2 on ldm2.location_id = ml2.location_id
-                left join rawinventor ri on ri.rawlocation_id = ldm2.uuid
-                left join patent p2 on p2.id = ri.patent_id
-        UNION ALL
-        SELECT ml3.location_id, ml3.city, ml3.state, ml3.country, ml3.location_count, a.date
-        from max_location_counts ml3
-                left join pregrant_publications.location_disambiguation_mapping ldm3 on ldm3.location_id = ml3.location_id
-                left join pregrant_publications.rawinventor pri on pri.rawlocation_id = ldm3.uuid
-                left join pregrant_publications.application a on a.document_number = pri.document_number
-                UNION ALL
-        SELECT ml4.location_id, ml4.city, ml4.state, ml4.country, ml4.location_count, a.date
-        from max_location_counts ml4
-                left join pregrant_publications.location_disambiguation_mapping ldm4 on ldm4.location_id = ml4.location_id
-                left join pregrant_publications.rawassignee pra on pra.rawlocation_id = ldm4.uuid
-                left join pregrant_publications.application a on a.document_number = pra.document_number
-    """
-    location_date_df = pd.read_sql_query(sql=date_query, con=engine)
-    return location_date_df
-
-
-def truncate_max_locs(engine):
-    truncate_query = """
-    DELETE FROM max_location_counts;
-    """
-    with engine.connect() as connection:
-        connection.execute(truncate_query)
-        print('max_location_counts truncated')
-
-
-def location_reduce(location_full_data: pd.DataFrame):
-    location_full_data = location_full_data.fillna(value='None')
-    location_data: pd.DataFrame = location_full_data
-    location_data['help'] = location_data.groupby(['location_id', 'city', 'state', 'country'])['location_id'].transform(
-            'count')
-    final_loc: DataFrame = location_data.sort_values(['help', 'patent_date'], ascending=[False, False],
-                                                     na_position='last').drop_duplicates(
-            'location_id', keep='first').drop(
-            ['help', 'patent_date'], 1)
-    final_loc = final_loc.replace('None', np.nan)
-    location_lat_long_data = location_full_data
-    location_lat_long_data['help'] = location_lat_long_data.groupby(['location_id', 'location_id_transformed'])[
-        'location_id'].transform('count')
-    final_lat_long = location_lat_long_data.sort_values(['help', 'patent_date'], ascending=[False, False],
-                                                        na_position='last').drop_duplicates(
-            'location_id', keep='first').drop(
-            ['help', 'patent_date'], 1)
-    final_lat_long = final_lat_long.replace('None', np.nan)
-    full_final_data = final_loc[["location_id", "city", "state", "country"]].merge(
-            other=final_lat_long[["location_id", "latitude", "longitude"]], how='outer', on='location_id')
-    full_final_data = full_final_data.rename(columns={
-            'location_id': 'id'
-            })
-    full_final_data = full_final_data.reset_index(drop=True)
-    return full_final_data
 
 
 def create_location(update_config):
     engine = create_engine(get_connection_string(update_config, "RAW_DB"))
     end_date = update_config["DATES"]["END_DATE"].strip("-")
-    query0 = """drop table if exists unique_locations"""
-    query1 = f"""
-    create table unique_locations select distinct location_id, city, state, country from rawlocation where location_id is not null;
-    """
-    query2 = f"""
+    print(f"CREATING location_{end_date} ... ")
+    # from lib.is_it_update_time import get_update_range
+    # q_start_date, q_end_date = get_update_range(update_config['DATES']['START_DATE'] + datetime.timedelta(days=6))
+
+    # query1 = f"""insert ignore into unique_locations (select distinct location_id, city, state, country from rawlocation where location_id is not null and version_indicator >= '{q_start_date}') """
+
+    query0 = f"""
     create table location_{end_date}
     select uuid as location_id 
-    , g.id as curated_location_id  
-    , u.city
-    , u.state
-    , u.country
+    , g.id as curated_location_id 
+    , location_name as city
+    , g.state as curated_locations_state
+    , cc.`Alpha-2` as country
+    , g.country as curated_locations_country
     , lat as latitude
     , lon as longitude
-    , null as county
-    , null as state_fips
-    , null as county_fips
-    from geo_data.curated_locations g 
-    inner join unique_locations u on g.uuid=u.location_id
+    from patent.unique_locations u 
+    inner join geo_data.curated_locations g on g.uuid=u.location_id
+    inner join geo_data.country_codes cc on g.country=cc.name
     """
-    query3 = """
+    query1 = f""" alter table patent.location_{end_date} add index location_id (location_id) """
+    query2 = f""" alter table patent.location_{end_date} add index curated_locations_state (curated_locations_state) """
+    query3 = f"""alter table patent.location_{end_date} add column state nvarchar(200), add column state_fips nvarchar(200)"""
+    query4 = f"""
+update patent.location_{end_date} a 
+inner join geo_data.state_codes sc on a.curated_locations_state=sc.`State/Possession`
+left join geo_data.census_fips cf on Abbreviation=cf.State
+set a.state_fips = cf.STATE_FIPS, a.state = Abbreviation
+where a.country = 'US' or a.country = 'CA'"""
+    query5 = f"""alter table patent.location_{end_date} add column county nvarchar(200), add column county_fips nvarchar(200)"""
+    query6 = f""" 
+update patent.location_{end_date} a 
+inner join geo_data.county_lookup coun on a.state=coun.state and a.city=coun.city
+set a.county_fips = coun.county_fips, a.county = coun.county
+where a.country = 'US'
+     """
+    for q in [query0, query1, query2, query3, query4, query5, query6]:
+        print(q)
+        engine.execute(q)
+
+    print(f"CREATING location ... ")
+    query1 = """
     Drop view if exists location;
     """
-    query4 = f"""
+    query2 = f"""
     CREATE  SQL SECURITY INVOKER  VIEW `location` AS SELECT
    `patent`.`location_{end_date}`.`location_id` AS `id`,
    `patent`.`location_{end_date}`.`curated_location_id` AS `curated_location_id`,
@@ -635,53 +100,12 @@ def create_location(update_config):
    '{end_date}' AS `version_indicator`
 FROM `patent`.`location_{end_date}`;
     """
-    query5 = f""" alter table `location_{end_date}` add index city (city); """
-    query6 = f""" alter table `location_{end_date}` add index state (state); """
-    query7 = f""" alter table `location_{end_date}` add index country (country); """
-    for q in [query0, query1, query2, query3, query4, query5, query6, query7]:
+    query3 = f""" alter table `location_{end_date}` add index city (city); """
+    query4 = f""" alter table `location_{end_date}` add index state (state); """
+    query5 = f""" alter table `location_{end_date}` add index country (country); """
+    for q in [query1, query2, query3, query4, query5]:
         print(q)
         engine.execute(q)
-
-
-def update_lat_lon(config):
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
-    query = "update location l Join location_lat_lon lll set l.latitude = lll.latitude, l.longitude = lll.longitude " \
-            "where l.`id` = lll.`id`"
-    engine.execute(query)
-
-
-def create_fips(config):
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
-    end_date = config["DATES"]["END_DATE"].strip("-")
-    location_query = f"""
-    select location_id 
-    , city
-    , state
-    , country
-    from location_{end_date}
-    """
-    # location_query = "select distinct city, state, country from rawlocation"
-    print(location_query)
-    location_df = pd.read_sql_query(sql=location_query, con=engine)
-
-    tqdm.pandas()
-    lp = LocationPostProcessor(config)
-    df = location_df.join(location_df.progress_apply(lp.find_county, axis=1))
-    df2 = df[['location_id', 'found_county', 'found_county_fips', 'found_state_fips']]
-    df2 = df2.rename(columns={
-            'found_county':      'county',
-            'found_county_fips': 'county_fips',
-            'found_state_fips':  'state_fips'
-            })
-    df2.to_sql("location_fips", engine, if_exists="replace", index=False)
-    update_loc_query =f"""
-    update location_{end_date} l 
-	inner join location_fips lf on l.location_id=lf.location_id
-set l.county=lf.county,
-    l.state_fips=lf.state_fips,
-    l.county_fips=lf.county_fips"""
-    print(update_loc_query)
-    engine.execute(update_loc_query)
 
 
 def post_process_location(**kwargs):
@@ -691,8 +115,6 @@ def post_process_location(**kwargs):
     update_rawlocation(config, end_date, database='PGPUBS_DATABASE')
     precache_locations(config)
     create_location(config)
-    create_fips(config)
-
 
 
 def post_process_qc(**kwargs):
