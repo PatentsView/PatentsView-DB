@@ -3,7 +3,8 @@ import re
 import json
 import os
 
-def update_create_view_sql_file(config):
+def update_create_view_sql(config, output_path, if_exists='replace'):
+	assert if_exists in ('replace','fail','append'), "disallowed if_exists value. must be in ('replace','fail','append')"
 	host = '{}'.format(config['DATABASE_SETUP']['HOST'])
 	user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
 	password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -12,27 +13,29 @@ def update_create_view_sql_file(config):
 
 	inspector = sqla.inspect(engine)
 
-	target_path = f"{config['FOLDERS']['project_root']}/{config['FOLDERS']['resources_folder']}/create_export_views.sql"
-
-	if os.path.exists(target_path):
-		os.remove(target_path)
-
-	for schema in ['patentsview_exports_granted','patentsview_exports_pregrant']:
+	if os.path.exists(output_path): 
+		if if_exists == 'fail':
+			raise Exception("output path already exists")
+		if if_exists == 'replace':
+			os.remove(output_path)
+	
+	for schema in ['patentsview_export_granted','patentsview_export_pregrant']:
 		for view in inspector.get_view_names(schema):
 			create_syntax = inspector.get_view_definition(view,schema)
-			remove = 'ALGORITHM=UNDEFINED DEFINER=.* SQL SECURITY DEFINER'
-			create_syntax = re.sub(remove, 'OR REPLACE', create_syntax)
+			remove = 'ALGORITHM=UNDEFINED DEFINER=.* SQL SECURITY (DEFINER|INVOKER)'
+			create_syntax = re.sub(remove, 'OR REPLACE SQL SECURITY INVOKER', create_syntax)
 			create_syntax = re.sub('[0-9]{4}-[01][0-9]-[0123][0-9]', "{{datestring}}",create_syntax)
 			create_syntax = re.sub(' from ', ' \nfrom ', create_syntax, flags=re.I)
 			create_syntax = re.sub(' select ', ' \nselect ', create_syntax, flags=re.I)
 			create_syntax = re.sub(' where ', ' \nwhere ', create_syntax, flags=re.I)
 			create_syntax = re.sub(' group by ', ' \ngroup by ', create_syntax, flags=re.I)
 			create_syntax = re.sub('`,','`,\n',create_syntax)
-			with open(target_path, 'a') as f:
+			with open(output_path, 'a') as f:
 				f.write(create_syntax)
 				f.write(";\n\n")
 
-def update_create_view_json(config):
+def update_create_view_json(config, output_path, if_exists='replace'):
+	assert if_exists in ('replace','fail','append'), "disallowed if_exists value. must be in ('replace','fail','append')"
 	host = '{}'.format(config['DATABASE_SETUP']['HOST'])
 	user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
 	password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -41,17 +44,23 @@ def update_create_view_json(config):
 
 	inspector = sqla.inspect(engine)
 
+	if os.path.exists(output_path): 
+		if if_exists == 'fail':
+			raise Exception("output path already exists")
+		if if_exists == 'replace':
+			os.remove(output_path)
+
 	create_commands = {}
 
-	for schema in ['patentsview_exports_granted','patentsview_exports_pregrant']:
+	for schema in ['patentsview_export_granted','patentsview_export_pregrant']:
 		for view in inspector.get_view_names(schema):
 			create_syntax = inspector.get_view_definition(view,schema)
-			remove = 'ALGORITHM=UNDEFINED DEFINER=.* SQL SECURITY DEFINER'
-			create_syntax = re.sub(remove, 'OR REPLACE', create_syntax)
+			remove = 'ALGORITHM=UNDEFINED DEFINER=.* SQL SECURITY (DEFINER|INVOKER)'
+			create_syntax = re.sub(remove, 'OR REPLACE SQL SECURITY INVOKER', create_syntax)
 			create_syntax = re.sub('[0-9]{4}-[01][0-9]-[0123][0-9]', "{datestring}",create_syntax)
 			create_commands[f"{schema}.{view}"] = create_syntax
 
-	with open(f"{config['FOLDERS']['project_root']}/{config['FOLDERS']['resources_folder']}/create_export_views.json",'w') as f:
+	with open(output_path,'a') as f:
 		json.dump(create_commands, f)
 
 def read_create_view_dictionary(config):
