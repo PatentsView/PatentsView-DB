@@ -78,6 +78,8 @@ def match_locations(locations_to_search, es_con, chunksize = 100):
     unique_locations.dropna(subset=['query'], inplace=True) # don't bother searching null queries
     unique_locations.reset_index(drop=True, inplace=True)
 
+    print(f'matching {unique_locations.shape[0]} unique locations...')
+
     # search locations individually (slow)
     if chunksize in [0,1,None]:
         tophits = []
@@ -119,11 +121,13 @@ def match_locations(locations_to_search, es_con, chunksize = 100):
                                                 } for res in results])
     # nontrivial chunksize
     else:
+        print(f"peforming chunked matching with chunksize {chunksize}")
         divs = [chunksize * n for n in range(ceil(unique_locations.shape[0]/chunksize))]
         divs.append(unique_locations.shape[0])
         hitframe = pd.DataFrame()
         # for i in tqdm(range(len(divs)-1)):
         for i in range(len(divs)-1):
+            print(f"matching chunk {i+1} of {len(divs)-1}")
             chunk = unique_locations[divs[i]:divs[i+1]]
             search_bodies = []
             for qry in chunk['query']:
@@ -174,8 +178,10 @@ def create_location_match_table(config):
     es_password = config['ELASTICSEARCH']['PASSWORD']
     es_con = Elasticsearch(hosts=es_hostname, http_auth=(es_username, es_password), timeout=45)
 
+    print('retrieving locations to match...')
     locations_to_search = pd.read_sql(f"SELECT id, city, state, country FROM rawlocation", con=engine)
     matched_data = match_locations(locations_to_search, es_con)
+    print('creating table for matched locations...')
     create_sql = """
     CREATE TABLE IF NOT EXISTS `matched_rawlocation` (
   `id`  varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -184,9 +190,12 @@ def create_location_match_table(config):
   `longitude` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
+    print(create_sql)
     engine.execute(create_sql)
+    print('populating match table...')
     matched_data[['id','matched_name','latitude','longitude']].to_sql(name='matched_rawlocation' ,schema=database ,con=engine, if_exists='append', index=False)
 
+    print('propagating match results to rawlocation...')
     update_sql = """
     UPDATE `rawlocation` r 
     LEFT JOIN `matched_rawlocation` mr ON (r.id = mr.id)
@@ -194,6 +203,7 @@ def create_location_match_table(config):
     r.longitude = mr.longitude
     WHERE mr.latitude IS NOT NULL
     """
+    print(update_sql)
     engine.execute(update_sql)
 
 def geocode_by_osm(**kwargs):
