@@ -145,7 +145,7 @@ def process_and_upload_wipo(db, **kwargs):
     print(concordance_file)
     cpc_ipc_concordance_map = get_ipc_cpc_ipc_concordance_map(concordance_file)
 
-    limit = 30000
+    limit = 30_000
     offset = 0
     if db == 'granted_patent':
         base_query_template = "SELECT id from patent where version_indicator <= '{vind}' order by id limit {limit} offset {offset} "
@@ -164,7 +164,7 @@ def process_and_upload_wipo(db, **kwargs):
         num_batches = int(pgpubs_batches.iloc[:, 0][0])
         unique_id = 'document_number'
     else:
-        raise Exception("Wrong DB")
+        raise Exception(f"DB name provided: {db}. expected 'granted_patent' or 'pgpubs'")
     for batch in range(num_batches):
         start = time.time()
         base_query = base_query_template.format(limit=limit, offset=offset, vind=version_indicator)
