@@ -617,8 +617,9 @@ def link_view_to_new_disambiguation_table(connection, table_name, disambiguation
     g_cursor = connection.cursor()
     index_query = 'alter table {table_name} add primary key (uuid)'.format(
         table_name=table_name)
+    print(index_query)
     replace_view_query = """
-        CREATE OR REPLACE VIEW {dtype}_disambiguation_mapping as SELECT uuid,{dtype}_id from {table_name}
+        CREATE OR REPLACE SQL SECURITY INVOKER VIEW {dtype}_disambiguation_mapping as SELECT uuid,{dtype}_id from {table_name}
         """.format(table_name=table_name, dtype=disambiguation_type)
     try:
         g_cursor.execute(index_query)
@@ -626,6 +627,7 @@ def link_view_to_new_disambiguation_table(connection, table_name, disambiguation
         from mysql.connector import errorcode
         if not e.errno == errorcode.ER_MULTIPLE_PRI_KEY:
             raise
+    print(replace_view_query)
     g_cursor.execute(replace_view_query)
 
 def update_to_granular_version_indicator(table, db):
