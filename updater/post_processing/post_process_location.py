@@ -118,7 +118,7 @@ def post_process_location(**kwargs):
 
 
 def post_process_qc(**kwargs):
-    config = get_current_config(**kwargs)
+    config = get_current_config(schedule="quarterly", **kwargs)
     qc = LocationPostProcessingQC(config)
     qc.runTests()
 

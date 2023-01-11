@@ -128,9 +128,11 @@ def create_inventor(update_config):
             KEY `inventor_name_last_name_first_index` (`name_last`(256),`name_first`(256))
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """.format(rename_name=rename_name)
+    print(create_sql)
     view_sql = """
-    CREATE OR REPLACE VIEW inventor as select * from inventor_{suffix}
+    CREATE OR REPLACE SQL SECURITY INVOKER VIEW inventor as select * from inventor_{suffix}
     """.format(suffix=suffix)
+    print(view_sql)
     engine.execute(create_sql)
     engine.execute(view_sql)
     limit = 10000
