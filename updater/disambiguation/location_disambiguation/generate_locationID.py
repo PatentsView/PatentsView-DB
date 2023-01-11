@@ -22,8 +22,8 @@ def generate_US_locationID_exactmatch(config):
     query_dict = {"city/state/country": """
         update {db}.rawlocation a 
         inner join geo_data.curated_locations b on a.city=b.location_name
-        inner join patent.state_codes d on b.state=d.`State/Possession`
-        inner join patent.country_codes c on a.`country`=c.`alpha-2`
+        inner join geo_data.state_codes d on b.state=d.`State/Possession`
+        inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
                 and b.`country` = c.name and a.state = d.Abbreviation
         inner join 
                 (
