@@ -4,7 +4,7 @@ import csv
 from math import ceil
 from elasticsearch import Elasticsearch
 from sqlalchemy import create_engine
-# from tqdm import tqdm
+from tqdm import tqdm
 
 project_home = os.environ['PACKAGE_HOME']
 
@@ -125,9 +125,9 @@ def match_locations(locations_to_search, es_con, chunksize = 100):
         divs = [chunksize * n for n in range(ceil(unique_locations.shape[0]/chunksize))]
         divs.append(unique_locations.shape[0])
         hitframe = pd.DataFrame()
-        # for i in tqdm(range(len(divs)-1)):
-        for i in range(len(divs)-1):
-            print(f"matching chunk {i+1} of {len(divs)-1}")
+        for i in tqdm(range(len(divs)-1)):
+        # for i in range(len(divs)-1):
+            # print(f"matching chunk {i+1} of {len(divs)-1}")
             chunk = unique_locations[divs[i]:divs[i+1]]
             search_bodies = []
             for qry in chunk['query']:
@@ -173,14 +173,19 @@ def create_location_match_table(config):
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
     engine = create_engine('mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
+    print('retrieving locations to match...')
+    locations_to_search = pd.read_sql(f"SELECT id, city, state, country FROM rawlocation", con=engine)
+
     es_hostname = config['ELASTICSEARCH']['HOST']
     es_username = config['ELASTICSEARCH']['USER']
     es_password = config['ELASTICSEARCH']['PASSWORD']
     es_con = Elasticsearch(hosts=es_hostname, http_auth=(es_username, es_password), timeout=45)
 
-    print('retrieving locations to match...')
-    locations_to_search = pd.read_sql(f"SELECT id, city, state, country FROM rawlocation", con=engine)
     matched_data = match_locations(locations_to_search, es_con)
+
+    # recreate engine because match_locations() can take long enough for the mysql connection to reset.
+    engine = create_engine('mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database)) 
+
     print('creating table for matched locations...')
     create_sql = """
     CREATE TABLE IF NOT EXISTS `matched_rawlocation` (
