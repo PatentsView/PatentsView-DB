@@ -117,8 +117,8 @@ def find_nearest_latlong(config, geo_type_list=['domestic', 'foreign']):
                     f"""
                 select uuid, lat, lon
                     from geo_data.curated_locations b 
-                    inner join patent.country_codes c on  b.`country` = c.name 
-                    inner join patent.state_codes d on b.state=d.`State/Possession`
+                    inner join geo_data.country_codes c on  b.`country` = c.name 
+                    inner join geo_data.state_codes d on b.state=d.`State/Possession`
                 where c.`alpha-2` = 'US' and d.Abbreviation='{geo}' """, con=engine)
                 state_list = df['state'].unique()
                 rawlocations = pd.read_sql(
