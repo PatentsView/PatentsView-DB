@@ -19,6 +19,8 @@ from updater.collect_supplemental_data.cpc_parser.process_wipo import process_an
 from updater.collect_supplemental_data.cpc_parser.upload_cpc_classes import upload_cpc_classes
 from updater.collect_supplemental_data.cpc_parser.pgpubs_cpc_parser import parse_pgpub_file
 
+from updater.collect_supplemental_data.cpc_parser.classification_qa_calls import call_patent_cpc_qa, call_pgpubs_cpc_qa, call_patent_wipo_qa, call_pgpubs_wipo_qa
+
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
@@ -130,7 +132,7 @@ patent_cpc_current_update_vi = PythonOperator(task_id='patent_cpc_current_update
                                        )
 
 qa_patent_cpc_updated = PythonOperator(task_id='qa_patent_cpc_current',
-                                python_callable=qa_test_table_updated,
+                                python_callable=call_patent_cpc_qa,
                                 dag=cpc_wipo_updater,
                                 provide_context=True,
                                 on_success_callback=airflow_task_success,
@@ -158,7 +160,7 @@ pgpubs_cpc_current_update_vi = PythonOperator(task_id='pgpubs_cpc_current_update
                                        )
 
 qa_pgpubs_cpc_updated = PythonOperator(task_id='qa_pgpubs_cpc_current',
-                                python_callable=qa_test_table_updated,
+                                python_callable=call_pgpubs_cpc_qa,
                                 dag=cpc_wipo_updater,
                                 provide_context=True,
                                 on_success_callback=airflow_task_success,
@@ -190,7 +192,7 @@ patent_wipo_update_vi = PythonOperator(task_id='patent_wipo_update_vi',
                                        )
 
 patent_qa_wipo_updated = PythonOperator(task_id='patent_qa_wipo_updated',
-                                python_callable=qa_test_table_updated,
+                                python_callable=call_patent_wipo_qa,
                                 dag=cpc_wipo_updater,
                                 provide_context=True,
                                 on_success_callback=airflow_task_success,
@@ -221,7 +223,7 @@ pgpubs_wipo_update_vi = PythonOperator(task_id='pgpubs_wipo_update_vi',
                                        )
 
 pgpubs_qa_wipo_updated = PythonOperator(task_id='pgpubs_qa_wipo_updated',
-                                python_callable=qa_test_table_updated,
+                                python_callable=call_pgpubs_wipo_qa,
                                 dag=cpc_wipo_updater,
                                 provide_context=True,
                                 on_success_callback=airflow_task_success,
