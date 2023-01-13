@@ -102,10 +102,10 @@ def find_nearest_latlong(config, geo_type_list=['domestic', 'foreign']):
     for geo_type in geo_type_list:
         if geo_type == 'domestic':
             df = pd.read_sql("""select distinct state from rawlocation where location_id is null and country = 'US';""", con=engine)
-            geo_list = df['state'].unique().str.replace('\W| ','') # remove punctuation and spaces
+            geo_list = df['state'].str.replace('\W| ','').unique() # remove punctuation and spaces
         elif geo_type == 'foreign':
             df = pd.read_sql("""select distinct country from rawlocation where location_id is null and country != 'US';""", con=engine)
-            geo_list = df['country'].unique().str.replace('\W| ','') # remove punctuation and spaces
+            geo_list = df['country'].str.replace('\W| ','').unique() # remove punctuation and spaces
         print(f"There are {len(geo_list)} Entities To Process")
         highlevel_counter = 1
         for geo in geo_list:
