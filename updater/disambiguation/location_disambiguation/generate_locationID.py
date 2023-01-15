@@ -109,7 +109,7 @@ def find_nearest_latlong(config, geo_type_list=['domestic', 'foreign']):
             df = pd.read_sql("""select distinct state from rawlocation a inner join geo_data.state_codes b on a.state=b.`Abbreviation` where location_id is null and country = 'US';""", con=engine)
             geo_list = df['state'].unique() # remove punctuation and spaces
         elif geo_type == 'foreign':
-            df = pd.read_sql("""select distinct country from rawlocation inner join geo_data.country_codes b on a.country=b.`alpha-2` where location_id is null and country != 'US';""", con=engine)
+            df = pd.read_sql("""select distinct country from rawlocation a inner join geo_data.country_codes b on a.country=b.`alpha-2` where location_id is null and country != 'US';""", con=engine)
             geo_list = df['country'].unique() # remove punctuation and spaces
         print(f"There are {len(geo_list)} Entities To Process")
         highlevel_counter = 1
@@ -159,7 +159,7 @@ where country = '{geo}'
             nn_final = []
             counter = 1
             wrong_latlongs = []
-            
+
             if curated_latlongs.empty or rawlocations.empty:
                 continue
             else:
