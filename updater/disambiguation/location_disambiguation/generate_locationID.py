@@ -104,16 +104,19 @@ def find_nearest_latlong(config, geo_type_list=['domestic', 'foreign']):
     # db = config['PATENTSVIEW_DATABASES'][temp_db]
     db = 'pgpubs_temp_location_backfill'
     print(db)
+    sd = config["DATES"]["START_DATE"]
+    ed = config["DATES"]["END_DATE"]
     for geo_type in geo_type_list:
         if geo_type == 'domestic':
             df = pd.read_sql("""select distinct state from rawlocation a inner join geo_data.state_codes b on a.state=b.`Abbreviation` where location_id is null and country = 'US';""", con=engine)
-            geo_list = df['state'].unique() # remove punctuation and spaces
+            geo_list = df['state'].unique()
         elif geo_type == 'foreign':
             df = pd.read_sql("""select distinct country from rawlocation a inner join geo_data.country_codes b on a.country=b.`alpha-2` where location_id is null and country != 'US';""", con=engine)
-            geo_list = df['country'].unique() # remove punctuation and spaces
+            geo_list = df['country'].unique()
         print(f"There are {len(geo_list)} Entities To Process")
         highlevel_counter = 1
-        for geo in geo_list:
+        # for geo in geo_list:
+        for geo in ['DE']:
             print(" --------------------- --------------------- --------------------- ")
             print(f"Processing {highlevel_counter} of {len(geo_list)} of {geo_type}")
             print(" --------------------- --------------------- --------------------- ")
@@ -150,7 +153,8 @@ select id, latitude, longitude
 where country = '{geo}' 
     and location_id is null 
     and latitude is not null 
-    and longitude is not null"""
+    and longitude is not null
+    and version_indicator >= '{sd}' and version_indicator <= '{ed}'"""
                 print(q2)
                 rawlocations = pd.read_sql(q2, con=engine)
             total_rawloc = rawlocations.shape[0]
@@ -309,16 +313,15 @@ if __name__ == "__main__":
     #     location_disambig_mapping_update(**{
     #         "execution_date": d
     #     })
-    # d = datetime.date(2022, 7, 19)
-    # while d <= datetime.date(2022, 10, 1):
-    #     location_disambig_mapping_update(dbtype='granted_patent', **{
-    #         "execution_date": d
-    #     })
-    #     d = d + datetime.timedelta(days=7)
-    config = get_current_config('pgpubs', **{
-        "execution_date": datetime.date(2022, 7, 1)
-    })
-    find_nearest_latlong(config, geo_type_list=['foreign'])
+    d = datetime.date(2001, 3, 15)
+    while d <= datetime.date(2022, 10, 1):
+        config = get_current_config('pgpubs', **{
+            "execution_date": d
+        })
+        find_nearest_latlong(config, geo_type_list=['foreign'])
+        d = d + datetime.timedelta(days=7)
+
+
 
 
 
