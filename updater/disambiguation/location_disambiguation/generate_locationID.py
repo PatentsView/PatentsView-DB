@@ -1,4 +1,4 @@
-from lib.configuration import get_connection_string, get_current_config
+from lib.configuration import get_connection_string, get_current_config, get_unique_connection_string
 # from lib import utilities
 # import pymysql
 import datetime
@@ -12,9 +12,11 @@ from QA.post_processing.LocationUploadQA import LocationUploadTest
 
 def generate_US_locationID_exactmatch(config):
     temp_db = 'TEMP_UPLOAD_DB'
-    cstr = get_connection_string(config, temp_db)
+    # cstr = get_connection_string(config, temp_db)
+    cstr = get_unique_connection_string(config, database='pgpubs_temp_location_backfill')
     engine = create_engine(cstr)
-    db = config['PATENTSVIEW_DATABASES'][temp_db]
+    # db = config['PATENTSVIEW_DATABASES'][temp_db]
+    db = 'pgpubs_temp_location_backfill'
     print(db)
     location_types = ['city', 'town', 'village', 'hamlet']
     total_rows = engine.execute("""SELECT count(*) from rawlocation where country='US';""")
@@ -40,6 +42,7 @@ def generate_US_locationID_exactmatch(config):
         and (latitude-lat) <= 1.83
         and (longitude-lon) >= -1.45
         and (longitude-lon) <= 1.45
+        and a.location_id is null 
         """}
     for key in query_dict:
         for loc in location_types:
@@ -95,17 +98,19 @@ def haversince(lat1, long1, lat2, long2):
 
 def find_nearest_latlong(config, geo_type_list=['domestic', 'foreign']):
     temp_db = 'TEMP_UPLOAD_DB'
-    cstr = get_connection_string(config, temp_db)
+    # cstr = get_connection_string(config, temp_db)
+    cstr = get_unique_connection_string(config, database='pgpubs_temp_location_backfill')
     engine = create_engine(cstr)
-    db = config['PATENTSVIEW_DATABASES'][temp_db]
+    # db = config['PATENTSVIEW_DATABASES'][temp_db]
+    db = 'pgpubs_temp_location_backfill'
     print(db)
     for geo_type in geo_type_list:
         if geo_type == 'domestic':
-            df = pd.read_sql("""select distinct state from rawlocation where location_id is null and country = 'US';""", con=engine)
-            geo_list = df['state'].str.replace('\W| ','').unique() # remove punctuation and spaces
+            df = pd.read_sql("""select distinct state from rawlocation a inner join geo_data.state_codes b on a.state=b.`Abbreviation` where location_id is null and country = 'US';""", con=engine)
+            geo_list = df['state'].unique() # remove punctuation and spaces
         elif geo_type == 'foreign':
-            df = pd.read_sql("""select distinct country from rawlocation where location_id is null and country != 'US';""", con=engine)
-            geo_list = df['country'].str.replace('\W| ','').unique() # remove punctuation and spaces
+            df = pd.read_sql("""select distinct country from rawlocation inner join geo_data.country_codes b on a.country=b.`alpha-2` where location_id is null and country != 'US';""", con=engine)
+            geo_list = df['country'].unique() # remove punctuation and spaces
         print(f"There are {len(geo_list)} Entities To Process")
         highlevel_counter = 1
         for geo in geo_list:
@@ -124,7 +129,7 @@ def find_nearest_latlong(config, geo_type_list=['domestic', 'foreign']):
                 rawlocations = pd.read_sql(
                     f"""
                 select id, latitude, longitude
-                    from rawlocation
+                    from {db}.rawlocation
                 where country = 'US' 
                     and state = '{geo}'
                     and location_id is null 
@@ -132,96 +137,104 @@ def find_nearest_latlong(config, geo_type_list=['domestic', 'foreign']):
                     and longitude is not null""", con=engine)
 
             elif geo_type == 'foreign':
-                curated_latlongs = pd.read_sql(
-    f"""
+                q1 = f"""
 select uuid, lat, lon
     from geo_data.curated_locations b 
-    inner join patent.country_codes c on  b.`country` = c.name 
-where c.`alpha-2` = '{geo}'""", con=engine)
-                rawlocations = pd.read_sql(
-                    f"""
+    inner join geo_data.country_codes c on  b.`country` = c.name 
+where c.`alpha-2` = '{geo}'"""
+                print(q1)
+                curated_latlongs = pd.read_sql(q1, con=engine)
+                q2 = f"""
 select id, latitude, longitude
-    from rawlocation
-where country = '{geo}' and location_id is null and latitude is not null and longitude is not null""",
-                    con=engine)
+    from {db}.rawlocation
+where country = '{geo}' 
+    and location_id is null 
+    and latitude is not null 
+    and longitude is not null"""
+                print(q2)
+                rawlocations = pd.read_sql(q2, con=engine)
             total_rawloc = rawlocations.shape[0]
             print(f"\tThere are {total_rawloc} rawlocations to process for {geo}")
             raw_latlongs = rawlocations[['id', 'latitude', 'longitude']].to_records(index=False)
             nn_final = []
             counter = 1
             wrong_latlongs = []
-            for raw_id, lat1, long1 in raw_latlongs:
-                print(f"Processing {counter} of {total_rawloc}")
-                country_nn_lookup = []
+            
+            if curated_latlongs.empty or rawlocations.empty:
+                continue
+            else:
+                for raw_id, lat1, long1 in raw_latlongs:
+                    print(f"Processing {counter} of {total_rawloc}")
+                    country_nn_lookup = []
 
-                curated_latlongs_temp = curated_latlongs[
-                    (curated_latlongs['lat'] <= (lat1 + 1.83)) & (curated_latlongs['lat'] >= (lat1 - 1.83)) & (
-                                curated_latlongs['lon'] <= (long1 + 1.45)) & (curated_latlongs['lon'] >= (long1 - 1.45))]
-                cur_latlongs = curated_latlongs_temp[['uuid', 'lat', 'lon']].to_records(index=False)
-                if curated_latlongs_temp.empty==True:
-                    # print("\t\tTHIS ID NEEDS REVIEWING: ", raw_id, lat1, long1)
-                    wrong_latlongs.append([raw_id])
-                else:
-                    for cur_uuid, lat2, long2 in cur_latlongs:
-                        distance = haversince(lat1, long1, lat2, long2)
-                        country_nn_lookup.append([cur_uuid, lat2, long2, distance])
-                    country_nn_lookup_df = pd.DataFrame(country_nn_lookup)
-                    nearest = country_nn_lookup_df[3].min()
-                    nearest_df = country_nn_lookup_df[country_nn_lookup_df[3] == nearest]
-                    if nearest_df.shape[0] > 1:
-                        raise Exception("We have two identical curated records that are nearest instead of one")
-                        # curated_location_id = nearest_df.iloc[0][0]
+                    curated_latlongs_temp = curated_latlongs[
+                        (curated_latlongs['lat'] <= (lat1 + 1.83)) & (curated_latlongs['lat'] >= (lat1 - 1.83)) & (
+                                    curated_latlongs['lon'] <= (long1 + 1.45)) & (curated_latlongs['lon'] >= (long1 - 1.45))]
+                    cur_latlongs = curated_latlongs_temp[['uuid', 'lat', 'lon']].to_records(index=False)
+                    if curated_latlongs_temp.empty==True:
+                        # print("\t\tTHIS ID NEEDS REVIEWING: ", raw_id, lat1, long1)
+                        wrong_latlongs.append([raw_id])
                     else:
-                        curated_location_id = nearest_df.iloc[0][0]
-                    nn_final.append([raw_id, curated_location_id])
-                counter = counter+1
+                        for cur_uuid, lat2, long2 in cur_latlongs:
+                            distance = haversince(lat1, long1, lat2, long2)
+                            country_nn_lookup.append([cur_uuid, lat2, long2, distance])
+                        country_nn_lookup_df = pd.DataFrame(country_nn_lookup)
+                        nearest = country_nn_lookup_df[3].min()
+                        nearest_df = country_nn_lookup_df[country_nn_lookup_df[3] == nearest]
+                        if nearest_df.shape[0] > 1:
+                            raise Exception("We have two identical curated records that are nearest instead of one")
+                            # curated_location_id = nearest_df.iloc[0][0]
+                        else:
+                            curated_location_id = nearest_df.iloc[0][0]
+                        nn_final.append([raw_id, curated_location_id])
+                    counter = counter+1
 
-            wrong_latlongs_df = pd.DataFrame(wrong_latlongs, columns=['rawlocation_id'])
-            wrong_latlongs_df.to_sql('rawlocation_latlong_unmatched', engine, if_exists='append', index=False)
+                wrong_latlongs_df = pd.DataFrame(wrong_latlongs, columns=['rawlocation_id'])
+                wrong_latlongs_df.to_sql('rawlocation_latlong_unmatched', engine, if_exists='append', index=False)
 
-            rawlocation_with_nn = pd.DataFrame(nn_final, columns=['rawlocation_id', 'uuid'])
-            rawlocation_with_nn.to_sql('rawlocation_intermediate', engine, if_exists='replace', index=False)
-            with engine.connect() as connection:
-                update_nn_query = """
-update rawlocation a 
-inner join rawlocation_intermediate b on a.id=b.rawlocation_id
+                rawlocation_with_nn = pd.DataFrame(nn_final, columns=['rawlocation_id', 'uuid'])
+                rawlocation_with_nn.to_sql('rawlocation_intermediate', engine, if_exists='replace', index=False)
+                with engine.connect() as connection:
+                    update_nn_query = f"""
+update {db}.rawlocation a 
+inner join {db}.rawlocation_intermediate b on a.id=b.rawlocation_id
 set a.location_id=b.uuid
-                """
-                print(update_nn_query)
-                connection.execute(update_nn_query)
+                    """
+                    print(update_nn_query)
+                    connection.execute(update_nn_query)
 
-                rows_affected = connection.execute(
-                    f"""SELECT count(*) from rawlocation_intermediate;""")
-                notnull_rows = rows_affected.first()[0]
-                # print("--------------------------------------------------------")
-                # print(f"{notnull_rows} UPDATED FOR {geo}")
-                # print("--------------------------------------------------------")
-                if geo_type == 'domestic':
-                    data = {
-                        "join_type": ['NN'],
-                        'country': ['US'],
-                        'state': [geo],
-                        'version_indicator': [db],
-                        'count': [notnull_rows]
-                    }
-                elif geo_type == 'foreign':
-                    data = {
-                        "join_type": ['NN'],
-                        'country': [geo],
-                        'state': [''],
-                        'version_indicator': [db],
-                        'count': [notnull_rows]
-                    }
-                table_frame = pd.DataFrame(data)
-                qa_connection_string = get_connection_string(config, 'QA_DATABASE', connection='APP_DATABASE_SETUP')
-                qa_engine = create_engine(qa_connection_string)
-                qa_table = 'DataMonitor_LocDisambig'
-                try:
-                    table_frame.to_sql(name=qa_table, if_exists='append', con=qa_engine, index=False)
-                except SQLAlchemyError as e:
-                    table_frame.to_csv("errored_qa_data" + qa_table, index=False)
-                    raise e
-            highlevel_counter = highlevel_counter + 1
+                    rows_affected = connection.execute(
+                        f"""SELECT count(*) from rawlocation_intermediate;""")
+                    notnull_rows = rows_affected.first()[0]
+                    # print("--------------------------------------------------------")
+                    # print(f"{notnull_rows} UPDATED FOR {geo}")
+                    # print("--------------------------------------------------------")
+                    if geo_type == 'domestic':
+                        data = {
+                            "join_type": ['NN'],
+                            'country': ['US'],
+                            'state': [geo],
+                            'version_indicator': [db],
+                            'count': [notnull_rows]
+                        }
+                    elif geo_type == 'foreign':
+                        data = {
+                            "join_type": ['NN'],
+                            'country': [geo],
+                            'state': [''],
+                            'version_indicator': [db],
+                            'count': [notnull_rows]
+                        }
+                    table_frame = pd.DataFrame(data)
+                    qa_connection_string = get_connection_string(config, 'QA_DATABASE', connection='APP_DATABASE_SETUP')
+                    qa_engine = create_engine(qa_connection_string)
+                    qa_table = 'DataMonitor_LocDisambig'
+                    try:
+                        table_frame.to_sql(name=qa_table, if_exists='append', con=qa_engine, index=False)
+                    except SQLAlchemyError as e:
+                        table_frame.to_csv("errored_qa_data" + qa_table, index=False)
+                        raise e
+                highlevel_counter = highlevel_counter + 1
 
 
 def location_disambig_mapping_update(dbtype, **kwargs):
@@ -272,9 +285,6 @@ if __name__ == "__main__":
     # config = get_current_config('granted_patent', **{
     #     "execution_date": datetime.date(2022, 5, 24)
     # })
-    # config = get_current_config('pgpubs', **{
-    #     "execution_date": datetime.date(2022, 6, 2)
-    # })
     # d = datetime.date(2022, 7, 5)
     # location_disambig_mapping_update(**{
     #     "execution_date": d
@@ -299,13 +309,16 @@ if __name__ == "__main__":
     #     location_disambig_mapping_update(**{
     #         "execution_date": d
     #     })
-    d = datetime.date(2022, 7, 19)
-    while d <= datetime.date(2022, 10, 1):
-        location_disambig_mapping_update(dbtype='granted_patent', **{
-            "execution_date": d
-        })
-        d = d + datetime.timedelta(days=7)
-
+    # d = datetime.date(2022, 7, 19)
+    # while d <= datetime.date(2022, 10, 1):
+    #     location_disambig_mapping_update(dbtype='granted_patent', **{
+    #         "execution_date": d
+    #     })
+    #     d = d + datetime.timedelta(days=7)
+    config = get_current_config('pgpubs', **{
+        "execution_date": datetime.date(2022, 7, 1)
+    })
+    find_nearest_latlong(config, geo_type_list=['foreign'])
 
 
 
