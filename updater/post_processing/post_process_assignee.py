@@ -202,7 +202,7 @@ def precache_assignees(**kwargs):
 def create_canonical_assignees(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     create_assignee(config)
-    
+
 
 def additional_post_processing(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
@@ -216,7 +216,6 @@ def additional_post_processing(**kwargs):
     unique_assignees = assignee_data.gp.unique()
     gp_all_distances = []
     for ass in unique_assignees:
-        print(ass)
         temp_raw_data = assignee_data[assignee_data['gp']==ass]
         unique_orgs = temp_raw_data.organization.unique()
         new_dataframe_for_combos = pd.DataFrame(unique_orgs, columns=["organization"])
@@ -283,7 +282,8 @@ def build_clusters(connections):
 def remapping(gp_all_distances, tfidf_model):
     remapping = []
     import scipy
-    for record in tqdm(gp_all_distances):
+    for record in tqdm(gp_all_distances, desc='Assignee Remapping', position=0, leave=True, miniters=100000, maxinterval=1200):
+    # for record in tqdm(gp_all_distances):
         for top_org_idx in record:
             for comparison in record[top_org_idx]['comparison']:
                 X = tfidf_model.transform([str(record[top_org_idx]['org']).lower(),
