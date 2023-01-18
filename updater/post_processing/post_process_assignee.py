@@ -4,7 +4,7 @@ import time
 import pandas as pd
 from sqlalchemy import create_engine
 
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 tqdm.pandas()
 from thefuzz import fuzz
 import  multiprocess as mp
@@ -118,7 +118,7 @@ def create_assignee(update_config):
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """.format(version_indicator=version_indicator, target_table=target_table)
     view_query = """
-    CREATE OR REPLACE VIEW assignee as select * from {target_table}
+    CREATE OR REPLACE SQL SECURITY INVOKER VIEW assignee as select * from {target_table}
     """.format(target_table=target_table)
     engine.execute(create_sql)
     engine.execute(view_query)
@@ -202,48 +202,7 @@ def precache_assignees(**kwargs):
 def create_canonical_assignees(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     create_assignee(config)
-
-"""
-Archive
-# assignee_data = pd.read_sql_table(assignee_table, con=engine)
-# assignee_data = assignee_data.assign(gp=assignee_data.organization.str.lower().str[0:4])
-# gp_all_distances = assignee_data.groupby('gp').progress_apply(generate_combinations)
-# gp_all_distances = pd.concat(pool.map_async(generate_combinations, data_split))
-# connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
-#                              user=config['DATABASE_SETUP']['USERNAME'],
-#                              password=config['DATABASE_SETUP']['PASSWORD'],
-#                              db=config['PATENTSVIEW_DATABASES']["PROD_DB"],
-#                              charset='utf8mb4',
-#                              cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
-# q = f'select distinct lower(left(organization,4)) as org from {assignee_table};'
-# try:
-#     if not connection.open:
-#         connection.connect()
-#     with connection.cursor() as generic_cursor:
-#         generic_cursor.execute(q)
-#         assignee_org_list = generic_cursor.fetchall()
-# finally:
-#     if connection.open:
-#         connection.close()
-#     assignee_data = pd.DataFrame(assignee_org_list, columns=["gp"])
-# data_split = np.array_split(assignee_data_gp, 4)
-# pool = mp.Pool(4)
-# p_list = []
-# for data in data_split:
-#     print(data)
-#     print(type(data))
-#     data =pd.DataFrame(data)
-#     print(data.head())
-#     p = data.progress_apply(generate_combinations)
-#     p_list.append(p)
-#
-# gp_all_distances_t = []
-# for t in p_list:
-#     gp_all_distances_t.append(t.get())
-#
-# pool.close()
-# pool.join()
-"""
+    
 
 def additional_post_processing(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
