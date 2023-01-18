@@ -154,7 +154,7 @@ def precache_assignees_ids(config):
         CREATE TABLE disambiguated_assignee_ids_{suffix} (assignee_id varchar(256),  PRIMARY KEY (`assignee_id`))
         """.format(suffix=suffix)
     view_query = """
-        CREATE OR REPLACE VIEW disambiguated_assignee_ids as select assignee_id from disambiguated_assignee_ids_{suffix}
+        CREATE OR REPLACE SQL SECURITY INVOKER VIEW disambiguated_assignee_ids as select assignee_id from disambiguated_assignee_ids_{suffix}
         """.format(suffix=suffix)
     assignee_cache_query = """
         INSERT IGNORE INTO disambiguated_assignee_ids_{suffix} (assignee_id)
