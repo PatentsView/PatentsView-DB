@@ -18,7 +18,7 @@ def call_patent_wipo_qa(**kwargs):
     save_qa_data(qa_data, db, **kwargs)
 
 
-def call_pgpubs_wip_qa(**kwargs):
+def call_pgpubs_wipo_qa(**kwargs):
     db = 'pgpubs'
     qa_data = qa_wipo(db, **kwargs)
     save_qa_data(qa_data, db, **kwargs)
