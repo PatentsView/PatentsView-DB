@@ -245,7 +245,7 @@ def additional_post_processing_update_queries(**kwargs):
         query_list.append(query_0)
         query_1 = f"alter table patent.assignee add index id (id)"
         query_list.append(query_1)
-        query_2 = f"alter table patent.assignee add index `` (organization)"
+        query_2 = f"alter table patent.assignee add index organization (organization)"
         query_list.append(query_2)
         query_3 = f" alter table patent.assignee_reassignment_final add index `index` (`index`)"
         query_list.append(query_3)
