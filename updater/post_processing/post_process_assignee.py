@@ -241,21 +241,31 @@ def additional_post_processing_update_queries(**kwargs):
     db_list = ["patent", "pregrant_publications"]
     engine = create_engine(get_connection_string(config, "RAW_DB"))
     for db in db_list:
-        query_1 = f"""
+        query_0 = f"alter table {db}.{adm_table} add index assignee_id (assignee_id)"
+        query_list.append(query_0)
+        query_1 = f"alter table patent.assignee add index id (id)"
+        query_list.append(query_1)
+        query_2 = f"alter table patent.assignee add index `` (organization)"
+        query_list.append(query_2)
+        query_3 = f" alter table patent.assignee_reassignment_final add index `index` (`index`)"
+        query_list.append(query_3)
+        query_4 = f"alter table patent.assignee_reassignment_final add  index `value` (`value`)"
+        query_list.append(query_4)
+        query_5 = f"""
         update {db}.{adm_table} adm
             join patent.assignee a on a.id = adm.assignee_id
             join patent.assignee_reassignment_final arr on arr.`index` collate utf8mb4_bin = a.organization
             join patent.assignee a2 on arr.`value` collate utf8mb4_bin = a2.organization
         set adm.assignee_id=a2.id;
         """
-        query_list.append(query_1)
-        query_2 = f"""
+        query_list.append(query_5)
+        query_6 = f"""
         update {db}.rawassignee r
             join patent.assignee_reassignment_final arr on arr.`index` collate utf8mb4_bin = r.organization
             join patent.assignee a2 on arr.`value` collate utf8mb4_bin = a2.organization
         set adm.assignee_id=a2.id;
             """
-        query_list.append(query_2)
+        query_list.append(query_6)
     for q in query_list:
         print(q)
         engine.execute(q)
