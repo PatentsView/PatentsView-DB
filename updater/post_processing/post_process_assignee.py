@@ -243,9 +243,9 @@ def additional_post_processing_update_queries(**kwargs):
     for db in db_list:
         query_0 = f"alter table {db}.{adm_table} add index assignee_id (assignee_id)"
         query_list.append(query_0)
-        query_1 = f"alter table patent.assignee add index id (id)"
+        query_1 = f"alter table patent.assignee_{suffix} add index id (id)"
         query_list.append(query_1)
-        query_2 = f"alter table patent.assignee add index organization (organization)"
+        query_2 = f"alter table patent.assignee_{suffix} add index organization (organization)"
         query_list.append(query_2)
         query_3 = f" alter table patent.assignee_reassignment_final add index `index` (`index`)"
         query_list.append(query_3)
@@ -274,7 +274,7 @@ def build_network_graph(remapping):
     import networkx as nx
     G = nx.Graph()
     G.add_edges_from(remapping)
-    print(len(G.nodes))
+    # print(len(G.nodes))
     return nx.connected_components(G)
 
 def build_clusters(connections):
@@ -356,7 +356,7 @@ def post_process_assignee(**kwargs):
 
 
 def additional_post_processing_assignee(**kwargs):
-    additional_post_processing(**kwargs)
+    # additional_post_processing(**kwargs)
     additional_post_processing_update_queries(**kwargs)
     precache_assignees(**kwargs)
     create_canonical_assignees(**kwargs)
