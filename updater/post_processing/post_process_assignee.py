@@ -261,7 +261,8 @@ def additional_post_processing_update_queries(**kwargs):
         query_list.append(query_5)
         query_6 = f"""
         update {db}.rawassignee r
-            join patent.assignee_reassignment_final arr on arr.`index` collate utf8mb4_bin = r.organization
+            join patent.assignee a on a.id = r.assignee_id
+            join patent.assignee_reassignment_final arr on arr.`index` collate utf8mb4_bin = a.organization
             join patent.assignee a2 on arr.`value` collate utf8mb4_bin = a2.organization
         set r.assignee_id=a2.id;
             """
@@ -357,7 +358,7 @@ def post_process_assignee(**kwargs):
 
 def additional_post_processing_assignee(**kwargs):
     # additional_post_processing(**kwargs)
-    additional_post_processing_update_queries(**kwargs)
+    # additional_post_processing_update_queries(**kwargs)
     precache_assignees(**kwargs)
     create_canonical_assignees(**kwargs)
 
