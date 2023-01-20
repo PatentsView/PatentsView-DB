@@ -263,7 +263,7 @@ def additional_post_processing_update_queries(**kwargs):
         update {db}.rawassignee r
             join patent.assignee_reassignment_final arr on arr.`index` collate utf8mb4_bin = r.organization
             join patent.assignee a2 on arr.`value` collate utf8mb4_bin = a2.organization
-        set adm.assignee_id=a2.id;
+        set r.assignee_id=a2.id;
             """
         query_list.append(query_6)
     for q in query_list:
