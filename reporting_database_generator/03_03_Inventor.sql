@@ -19,13 +19,12 @@ create table `{{params.reporting_database}}`.`temp_inventor_lastknown_location`
   `longitude` float null,
   primary key (`inventor_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # Populate temp_inventor_lastknown_location table.  The goal here is to grab the location associated
 # with the most recent patent associated with the inventor.  It is possible for a patent/inventor
 # combination not to have a location, so we will grab the most recent KNOWN location.
-# 3,437,668 @ 22:05
 
 
 insert into `{{params.reporting_database}}`.`temp_inventor_lastknown_location`
@@ -76,10 +75,9 @@ create table `{{params.reporting_database}}`.`temp_inventor_num_patents`
   `num_patents` int unsigned not null,
   primary key (`inventor_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 2:06
 insert into `{{params.reporting_database}}`.`temp_inventor_num_patents`
   (`inventor_id`, `num_patents`)
 select
@@ -96,10 +94,9 @@ create table `{{params.reporting_database}}`.`temp_inventor_num_assignees`
   `num_assignees` int unsigned not null,
   primary key (`inventor_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 0:15
 insert into `{{params.reporting_database}}`.`temp_inventor_num_assignees`
   (`inventor_id`, `num_assignees`)
 select
@@ -121,10 +118,9 @@ create table `{{params.reporting_database}}`.`temp_inventor_years_active`
   `actual_years_active` smallint unsigned not null,
   primary key (`inventor_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 5:42
 insert into `{{params.reporting_database}}`.`temp_inventor_years_active`
   (`inventor_id`, `first_seen_date`, `last_seen_date`, `actual_years_active`)
 select
@@ -148,10 +144,9 @@ create table `{{params.reporting_database}}`.`patent_inventor`
   primary key (`patent_id`, `inventor_id`,`sequence`),
   unique index ak_patent_inventor (`inventor_id`, `patent_id`,`sequence`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 12,389,559 @ 29:50
 insert ignore into `{{params.reporting_database}}`.`patent_inventor`
 (
   `patent_id`, `inventor_id`, `location_id`, `sequence`
@@ -173,10 +168,9 @@ create table `{{params.reporting_database}}`.`location_inventor`
   `num_patents` int unsigned,
   primary key (`location_id`, `inventor_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 4,188,507 @ 0:50
 insert into `{{params.reporting_database}}`.`location_inventor`
   (`location_id`, `inventor_id`, `num_patents`)
 select distinct
@@ -210,10 +204,9 @@ create table `{{params.reporting_database}}`.`inventor`
   `persistent_inventor_id` varchar(256) not null,
   primary key (`inventor_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 3,572,763 @ 1:57
 insert into `{{params.reporting_database}}`.`inventor`
 (
   `inventor_id`, `name_first`, `name_last`, `num_patents`, `num_assignees`,

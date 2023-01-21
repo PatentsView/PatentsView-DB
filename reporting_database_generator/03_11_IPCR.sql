@@ -3,9 +3,6 @@
 
 ################################################################################################################################################
 
-##
-
-
 drop table if exists `{{params.reporting_database}}`.`temp_ipcr_aggregations`;
 create table `{{params.reporting_database}}`.`temp_ipcr_aggregations`
 (
@@ -16,10 +13,9 @@ create table `{{params.reporting_database}}`.`temp_ipcr_aggregations`
   `num_inventors` int unsigned not null,
   unique key (`section`, `ipc_class`, `subclass`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 11:53
 insert into `{{params.reporting_database}}`.`temp_ipcr_aggregations`
   (`section`, `ipc_class`, `subclass`, `num_assignees`, `num_inventors`)
 select
@@ -45,10 +41,9 @@ create table `{{params.reporting_database}}`.`temp_ipcr_years_active`
   `actual_years_active` smallint unsigned not null,
   unique key (`section`, `ipc_class`, `subclass`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 2:17
 insert into `{{params.reporting_database}}`.`temp_ipcr_years_active`
 (
   `section`, `ipc_class`, `subclass`, `first_seen_date`,
@@ -89,10 +84,8 @@ create table `{{params.reporting_database}}`.`ipcr`
   `years_active` smallint unsigned null,
   primary key (`patent_id`, `sequence`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 7,702,885 @ 6:38
 insert into `{{params.reporting_database}}`.`ipcr`
 (
   `patent_id`, `sequence`, `section`, `ipc_class`, `subclass`, `main_group`, `subgroup`,

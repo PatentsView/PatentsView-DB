@@ -16,10 +16,9 @@ create table `{{params.reporting_database}}`.`temp_mainclass_current_aggregate_c
   `actual_years_active` smallint unsigned not null,
   primary key (`mainclass_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 24:52
 insert into `{{params.reporting_database}}`.`temp_mainclass_current_aggregate_counts`
 (
   `mainclass_id`, `num_assignees`, `num_inventors`, `num_patents`,
@@ -50,11 +49,9 @@ create table `{{params.reporting_database}}`.`temp_mainclass_current_title`
   `title` varchar(512) null,
   primary key (`id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# "Fix" casing where necessary.
-# 0.125 sec
 insert into `{{params.reporting_database}}`.`temp_mainclass_current_title`
   (`id`, `title`)
 select
@@ -75,11 +72,9 @@ create table `{{params.reporting_database}}`.`temp_subclass_current_title`
   `title` varchar(512) null,
   primary key (`id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# "Fix" casing where necessary.
-# 1.719 sec
 insert into `{{params.reporting_database}}`.`temp_subclass_current_title`
   (`id`, `title`)
 select
@@ -109,12 +104,9 @@ create table `{{params.reporting_database}}`.`uspc_current`
   `years_active` smallint unsigned null,
   primary key (`patent_id`, `sequence`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 21,191,230 @ 16:54
-# 21,175,812 @ 1:02:06
-# 21,175,812 @ 11:36
 insert ignore into `{{params.reporting_database}}`.`uspc_current`
 (
   `patent_id`, `sequence`, `mainclass_id`,
@@ -153,10 +145,9 @@ create table `{{params.reporting_database}}`.`uspc_current_mainclass`
   `years_active` smallint unsigned null,
   primary key (`patent_id`, `mainclass_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 9,054,003 @ 9:27
 insert into `{{params.reporting_database}}`.`uspc_current_mainclass`
 (
   `patent_id`, `mainclass_id`, `mainclass_title`,
@@ -195,10 +186,9 @@ create table `{{params.reporting_database}}`.`uspc_current_mainclass_application
   `average_patent_processing_days` int unsigned null,
   primary key (`mainclass_id`, `application_year`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 20,241 @ 0:56
 insert into `{{params.reporting_database}}`.`uspc_current_mainclass_application_year`
   (`mainclass_id`, `application_year`, `sample_size`, `average_patent_processing_days`)
 select
@@ -215,7 +205,6 @@ group by
   u.`mainclass_id`, year(p.`earliest_application_date`);
 
 
-# 5,406,673 @ 32:45
 # Update the patent with the average mainclass processing days.
 update
   `{{params.reporting_database}}`.`patent` p
@@ -244,10 +233,9 @@ create table `{{params.reporting_database}}`.`uspc_current_mainclass_patent_year
   `num_patents` int unsigned not null,
   primary key (`mainclass_id`, `patent_year`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 18,316 @ 12:56
 insert into `{{params.reporting_database}}`.`uspc_current_mainclass_patent_year`
   (`mainclass_id`, `patent_year`, `num_patents`)
 select

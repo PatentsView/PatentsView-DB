@@ -7,7 +7,7 @@ CREATE TABLE `{{params.reporting_database}}`.`government_interest` (
    `patent_id` varchar(24) NOT NULL,
    `gi_statement` text,
    PRIMARY KEY (`patent_id`)
- ) ENGINE=InnoDB;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 drop table if exists `{{params.reporting_database}}`.`government_organization`;
 CREATE TABLE IF NOT EXISTS `{{params.reporting_database}}`.`government_organization` (
@@ -17,26 +17,26 @@ CREATE TABLE IF NOT EXISTS `{{params.reporting_database}}`.`government_organizat
    `level_two` varchar(255) DEFAULT NULL,
    `level_three` varchar(255) DEFAULT NULL,
    PRIMARY KEY (`organization_id`)
- ) ENGINE=InnoDB AUTO_INCREMENT=137;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=137;
+
 drop table if exists `{{params.reporting_database}}`.`patent_contractawardnumber`;
 CREATE TABLE `{{params.reporting_database}}`.`patent_contractawardnumber` (
    `patent_id` varchar(24) NOT NULL,
    `contract_award_number` varchar(64) Null,
    PRIMARY KEY (`patent_id`,`contract_award_number`),
    CONSTRAINT `patent_contractawardnumber_ibfk_1` FOREIGN KEY (`patent_id`) REFERENCES `{{params.reporting_database}}`.`government_interest` (`patent_id`) ON DELETE CASCADE
- ) ENGINE=InnoDB;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 
 drop table if exists `{{params.reporting_database}}`.`patent_govintorg`;
-
 CREATE TABLE `{{params.reporting_database}}`.`patent_govintorg` (
    `patent_id` varchar(24) NOT NULL,
    `organization_id` int(11) NOT NULL,
    PRIMARY KEY (`patent_id`,`organization_id`),
    KEY `organization_id` (`organization_id`),
    CONSTRAINT `patent_govintorg_ibfk_2` FOREIGN KEY (`organization_id`) REFERENCES `{{params.reporting_database}}`.`government_organization` (`organization_id`) ON DELETE CASCADE
- ) ENGINE=InnoDB;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 

@@ -19,7 +19,7 @@ create table `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
     `longitude`              float        null,
     primary key (`assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # Populate temp_assignee_lastknown_location table.  The goal here is to grab the location associated
@@ -67,7 +67,7 @@ create table `{{params.reporting_database}}`.`temp_assignee_num_patents`
     `num_patents` int unsigned not null,
     primary key (`assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 insert into `{{params.reporting_database}}`.`temp_assignee_num_patents`
@@ -84,7 +84,7 @@ create table `{{params.reporting_database}}`.`temp_assignee_num_inventors`
     `num_inventors` int unsigned not null,
     primary key (`assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 # 0:15
 insert into `{{params.reporting_database}}`.`temp_assignee_num_inventors`
@@ -104,7 +104,7 @@ create table `{{params.reporting_database}}`.`temp_assignee_years_active`
     `actual_years_active` smallint unsigned not null,
     primary key (`assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # Years active is essentially the number of years difference between first associated patent and last.
@@ -130,7 +130,7 @@ create table `{{params.reporting_database}}`.`patent_assignee`
     primary key (`patent_id`, `assignee_id`),
     unique index ak_patent_assignee (`assignee_id`, `patent_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 4,825,748 @ 7:20
@@ -165,7 +165,7 @@ create table `{{params.reporting_database}}`.`location_assignee`
     `num_patents` int unsigned,
     primary key (`location_id`, `assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 438,452 @ 0:07
@@ -204,7 +204,7 @@ create table `{{params.reporting_database}}`.`assignee`
     `persistent_assignee_id`           varchar(64)       not null,
     primary key (`assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 345,185 @ 0:15

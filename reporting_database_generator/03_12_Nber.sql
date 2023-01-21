@@ -3,9 +3,6 @@
 
 ################################################################################################################################################
 
-##
-
-
 drop table if exists `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_counts`;
 create table `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_counts`
 (
@@ -21,7 +18,6 @@ create table `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_co
 engine=InnoDB;
 
 
-# 38 @ 4:45
 insert into `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_counts`
 (
   `subcategory_id`, `num_assignees`, `num_inventors`, `num_patents`,
@@ -62,7 +58,6 @@ create table `{{params.reporting_database}}`.`nber`
 engine=InnoDB;
 
 
-# 4,927,287 @ 1:47
 insert into `{{params.reporting_database}}`.`nber`
 (
   `patent_id`, `category_id`, `category_title`, `subcategory_id`,
@@ -110,7 +105,6 @@ create table `{{params.reporting_database}}`.`nber_subcategory_patent_year`
 engine=InnoDB;
 
 
-# 1,483 @ 1:01
 insert into `{{params.reporting_database}}`.`nber_subcategory_patent_year`
   (`subcategory_id`, `patent_year`, `num_patents`)
 select

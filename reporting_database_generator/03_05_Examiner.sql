@@ -14,10 +14,9 @@ create table `{{params.reporting_database}}`.`examiner`
   `persistent_examiner_id` varchar(36) not null,
   primary key (`examiner_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 3,572,763 @ 1:57
 insert into `{{params.reporting_database}}`.`examiner`
 (
   `examiner_id`, `name_first`, `name_last`, `role`, `group`, `persistent_examiner_id`
@@ -39,10 +38,9 @@ create table `{{params.reporting_database}}`.`patent_examiner`
   primary key (`patent_id`, `examiner_id`),
   unique index ak_patent_examiner (`examiner_id`, `patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 12,389,559 @ 29:50
 insert into `{{params.reporting_database}}`.`patent_examiner`
 (
   `patent_id`, `examiner_id`, `role`

@@ -10,7 +10,7 @@ create table `{{params.reporting_database}}`.`temp_location_num_assignees`
     `num_assignees` int unsigned not null,
     primary key (`location_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 34,018 @ 0:02
@@ -30,7 +30,7 @@ create table `{{params.reporting_database}}`.`temp_location_num_inventors`
     `num_inventors` int unsigned not null,
     primary key (`location_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 94,350 @ 0:50
@@ -62,7 +62,7 @@ create table `{{params.reporting_database}}`.`temp_location_patent`
     `location_id` int unsigned not null,
     `patent_id`   varchar(20)  not null
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 11,867,513 @ 3:41
@@ -99,7 +99,7 @@ create table `{{params.reporting_database}}`.`temp_location_num_patents`
     `num_patents` int unsigned not null,
     primary key (`location_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 121,475 @ 1:10
@@ -129,7 +129,7 @@ create table `{{params.reporting_database}}`.`location`
     `persistent_location_id` varchar(128) not null,
     primary key (`location_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 121,477 @ 0:02

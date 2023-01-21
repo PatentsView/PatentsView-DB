@@ -20,7 +20,7 @@ create table `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
   `longitude` float null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 4,694,651 @ 2:22
@@ -67,7 +67,7 @@ create table `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
   `longitude` float null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 5,425,008 @ 6:03
@@ -106,7 +106,7 @@ create table `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`
   `num_foreign_documents_cited` int unsigned not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 insert into `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`
@@ -126,7 +126,7 @@ create table `{{params.reporting_database}}`.`temp_num_us_applications_cited`
   `num_us_applications_cited` int unsigned not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 insert into `{{params.reporting_database}}`.`temp_num_us_applications_cited`
@@ -146,7 +146,7 @@ create table `{{params.reporting_database}}`.`temp_num_us_patents_cited`
   `num_us_patents_cited` int unsigned not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 
@@ -167,7 +167,7 @@ create table `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents
   `num_times_cited_by_us_patents` int unsigned not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 insert into `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents`
@@ -193,7 +193,7 @@ create table `{{params.reporting_database}}`.`temp_patent_aggregations`
   `num_times_cited_by_us_patents` int unsigned not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 
@@ -224,7 +224,7 @@ create table `{{params.reporting_database}}`.`temp_patent_earliest_application_d
   `earliest_application_date` date not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 insert into `{{params.reporting_database}}`.`temp_patent_earliest_application_date`
@@ -246,7 +246,7 @@ create table `{{params.reporting_database}}`.`temp_patent_date`
   `date` date null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 insert into `{{params.reporting_database}}`.`temp_patent_date`
@@ -303,7 +303,7 @@ create table `{{params.reporting_database}}`.`patent`
   `detail_desc_length` int unsigned null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 5,425,879 @ 6:45
