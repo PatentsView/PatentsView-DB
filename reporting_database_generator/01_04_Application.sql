@@ -1,6 +1,4 @@
-
-
-# BEGIN application 
+# BEGIN application
 
 ###########################################################################################################################################
 
@@ -19,7 +17,6 @@ create table `{{params.reporting_database}}`.`application`
 engine=InnoDB;
 
 
-# 5,425,879 @ 1:11
 insert into `{{params.reporting_database}}`.`application`
   (`application_id`, `patent_id`, `type`, `number`, `country`, `date`)
 select
@@ -27,7 +24,7 @@ select
   nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''),
   case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end
 from
-  `{{params.raw_database}}`.`application`  where version_indicator<={{params.version_indicator}};
+  `{{params.raw_database}}`.`application`  where version_indicator<='{{params.version_indicator}}';
 
 
 # END application 

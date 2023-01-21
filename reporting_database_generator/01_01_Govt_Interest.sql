@@ -41,11 +41,11 @@ CREATE TABLE `{{params.reporting_database}}`.`patent_govintorg` (
 
 
 
-INSERT INTO `{{params.reporting_database}}`.`government_interest` SELECT `patent_id`, `gi_statement` FROM `{{params.raw_database}}`.`government_interest` where version_indicator<={{params.version_indicator}};
+INSERT INTO `{{params.reporting_database}}`.`government_interest` SELECT `patent_id`, `gi_statement` FROM `{{params.raw_database}}`.`government_interest` where version_indicator<='{{params.version_indicator}}';
 INSERT INTO `{{params.reporting_database}}`.`government_organization` SELECT `organization_id`, `name`, `level_one`, `level_two`, `level_three` FROM `{{params.raw_database}}`.`government_organization`;
-INSERT INTO `{{params.reporting_database}}`.`patent_contractawardnumber` SELECT `patent_id`, `contract_award_number` FROM `{{params.raw_database}}`.`patent_contractawardnumber`  where version_indicator<={{params.version_indicator}};
+INSERT INTO `{{params.reporting_database}}`.`patent_contractawardnumber` SELECT `patent_id`, `contract_award_number` FROM `{{params.raw_database}}`.`patent_contractawardnumber`  where version_indicator<='{{params.version_indicator}}';
 
-INSERT INTO `{{params.reporting_database}}`.`patent_govintorg` SELECT `patent_id`, `organization_id` FROM `{{params.raw_database}}`.`patent_govintorg`  where version_indicator<={{params.version_indicator}};
+INSERT INTO `{{params.reporting_database}}`.`patent_govintorg` SELECT `patent_id`, `organization_id` FROM `{{params.raw_database}}`.`patent_govintorg`  where version_indicator<='{{params.version_indicator}}';
 
 ALTER TABLE `{{params.reporting_database}}`.`government_organization` ADD INDEX `ix_government_organization_name`(`name`);
 ALTER TABLE `{{params.reporting_database}}`.`government_organization` ADD INDEX `ix_government_organization_level_one`(`level_one`);

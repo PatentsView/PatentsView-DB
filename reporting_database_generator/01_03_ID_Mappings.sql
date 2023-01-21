@@ -17,14 +17,13 @@ engine=InnoDB;
 
 
 # There are assignees in the raw data that are not linked to anything so we will take our
-# assignee ids from the patent_assignee table to ensure we don't copy any unused assignees over.
-# 345,185 @ 0:23
+# assignee ids from the patent_assignee table to ensure we dont copy any unused assignees over.
 insert ignore into
   `{{params.reporting_database}}`.`temp_id_mapping_assignee` (`old_assignee_id`)
 select
   pa.`assignee_id`
 from
-  `{{params.raw_database}}`.`rawassignee` pa where assignee_id is not null and  version_indicator<={{params.version_indicator}};
+  `{{params.raw_database}}`.`rawassignee` pa where assignee_id is not null and  version_indicator<='{{params.version_indicator}}';
 
 
 # END assignee id mapping
@@ -50,14 +49,13 @@ engine=InnoDB;
 
 
 # There are inventors in the raw data that are not linked to anything so we will take our
-# inventor ids from the patent_inventor table to ensure we don't copy any unused inventors over.
-# 3,572,763 @ 1:08
+# inventor ids from the patent_inventor table to ensure we dont copy any unused inventors over.
 insert ignore into
   `{{params.reporting_database}}`.`temp_id_mapping_inventor` (`old_inventor_id`)
 select
   `inventor_id`
 from
-  `{{params.raw_database}}`.`rawinventor` where inventor_id is not null and version_indicator<={{params.version_indicator}};
+  `{{params.raw_database}}`.`rawinventor` where inventor_id is not null and version_indicator<='{{params.version_indicator}}';
 
 
 # END inventor id mapping
@@ -83,15 +81,15 @@ engine=InnoDB;
 
 
 # There are inventors in the raw data that are not linked to anything so we will take our
-# lawyer ids from the patent_lawyer table to ensure we don't copy any unused lawyers over.
-# 3,572,763 @ 1:08
+# lawyer ids from the patent_lawyer table to ensure we dont copy any unused lawyers over.
+
 insert ignore into
   `{{params.reporting_database}}`.`temp_id_mapping_lawyer` (`old_lawyer_id`)
 select
   `lawyer_id`
 from
   `{{params.raw_database}}`.`rawlawyer`
-  where lawyer_id is not null and lawyer_id !=  ''  and version_indicator<={{params.version_indicator}};
+  where lawyer_id is not null and lawyer_id !=  ''  and version_indicator<='{{params.version_indicator}}';
 
 
 # END lawyer id mapping
@@ -117,14 +115,14 @@ engine=InnoDB;
 
 
 # There are inventors in the raw data that are not linked to anything so we will take our
-# lawyer ids from the patent_lawyer table to ensure we don't copy any unused lawyers over.
-# 3,572,763 @ 1:08
+# lawyer ids from the patent_lawyer table to ensure we dont copy any unused lawyers over.
+
 insert into
   `{{params.reporting_database}}`.`temp_id_mapping_examiner` (`old_examiner_id`)
 select distinct
   `uuid`
 from
-  `{{params.raw_database}}`.`rawexaminer` where version_indicator<= {{params.version_indicator}};
+  `{{params.raw_database}}`.`rawexaminer` where version_indicator<= '{{params.version_indicator}}';
 
 
 # END examiner id mapping
