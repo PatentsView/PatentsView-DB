@@ -1,5 +1,4 @@
 
-
 # BEGIN patent 
 
 ################################################################################################################################################
@@ -22,8 +21,6 @@ create table `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 4,694,651 @ 2:22
 insert into `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
 (
   `patent_id`, `assignee_id`, `persistent_assignee_id`, `location_id`,
@@ -69,8 +66,6 @@ create table `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 5,425,008 @ 6:03
 insert into `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
 (
   `patent_id`, `inventor_id`, `persistent_inventor_id`, `location_id`,
@@ -305,8 +300,6 @@ create table `{{params.reporting_database}}`.`patent`
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 5,425,879 @ 6:45
 insert into `{{params.reporting_database}}`.`patent`
 (
   `patent_id`, `type`, `number`, `country`, `date`, `year`,

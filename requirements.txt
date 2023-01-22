@@ -34,3 +34,6 @@ torch
 tqdm
 wandb
 xlrd
+er-evaluation
+pv-evaluation
+mysql-connector-python==8.0.29

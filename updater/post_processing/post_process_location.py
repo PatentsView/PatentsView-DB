@@ -97,7 +97,7 @@ where a.country = 'US'
    `patent`.`location_{end_date}`.`county` AS `county`,
    `patent`.`location_{end_date}`.`state_fips` AS `state_fips`,
    `patent`.`location_{end_date}`.`county_fips` AS `county_fips`,
-   '{end_date}' AS `version_indicator`
+    convert('{end_date}' using utf8mb4) COLLATE utf8mb4_unicode_ci AS `version_indicator`
 FROM `patent`.`location_{end_date}`;
     """
     query3 = f""" alter table `location_{end_date}` add index city (city); """
