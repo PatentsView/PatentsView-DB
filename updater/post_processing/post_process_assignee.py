@@ -103,6 +103,9 @@ def create_assignee(update_config):
     version_indicator = update_config['DATES']['END_DATE']
     suffix = update_config['DATES']['END_DATE']
     target_table = "assignee_{suffix}".format(suffix=suffix)
+    drop_sql = f"""drop table if exists {target_table}"""
+    print(drop_sql)
+    engine.execute(drop_sql)
     create_sql = """
     CREATE TABLE `{target_table}` (
     `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -150,28 +153,31 @@ def create_assignee(update_config):
 
 def precache_assignees_ids(config):
     suffix = config['DATES']['END_DATE']
-    create_query = """
+    query_list = []
+    drop_query = f"""drop table if exists disambiguated_assignee_ids_{suffix} """
+    query_list.append(drop_query)
+    create_query = f"""
         CREATE TABLE disambiguated_assignee_ids_{suffix} (assignee_id varchar(256),  PRIMARY KEY (`assignee_id`))
         """.format(suffix=suffix)
-    view_query = """
+    query_list.append(create_query)
+    view_query = f"""
         CREATE OR REPLACE SQL SECURITY INVOKER VIEW disambiguated_assignee_ids as select assignee_id from disambiguated_assignee_ids_{suffix}
         """.format(suffix=suffix)
-    assignee_cache_query = """
+    query_list.append(view_query)
+    assignee_cache_query = f"""
         INSERT IGNORE INTO disambiguated_assignee_ids_{suffix} (assignee_id)
         SELECT assignee_id
-        from {granted_db}.rawassignee
+        from patent.rawassignee
         UNION
         SELECT assignee_id
-        from {pregrant_db}.rawassignee;
+        from pregrant_publications.rawassignee;
     """.format(pregrant_db=config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE'],
                granted_db=config['PATENTSVIEW_DATABASES']['RAW_DB'], suffix=suffix)
+    query_list.append(assignee_cache_query)
     engine = create_engine(get_connection_string(config, "RAW_DB"))
-    print(create_query)
-    engine.execute(create_query)
-    print(assignee_cache_query)
-    engine.execute(assignee_cache_query)
-    print(view_query)
-    engine.execute(view_query)
+    for query in query_list:
+        print(query)
+        engine.execute(query)
 
 
 def assignee_reduce(assignee_data):
@@ -195,7 +201,7 @@ def update_pregranted_rawassignee(**kwargs):
 
 
 def precache_assignees(**kwargs):
-    config = get_current_config(schedule='quarterly',**kwargs)
+    config = get_current_config(schedule='quarterly', **kwargs)
     precache_assignees_ids(config)
 
 
@@ -241,16 +247,16 @@ def additional_post_processing_update_queries(**kwargs):
     db_list = ["patent", "pregrant_publications"]
     engine = create_engine(get_connection_string(config, "RAW_DB"))
     for db in db_list:
-        # query_0 = f"alter table {db}.{adm_table} add index assignee_id (assignee_id)"
-        # query_list.append(query_0)
-        # query_1 = f"alter table patent.assignee_{suffix} add index id (id)"
-        # query_list.append(query_1)
-        # query_2 = f"alter table patent.assignee_{suffix} add index organization (organization)"
-        # query_list.append(query_2)
-        # query_3 = f" alter table patent.assignee_reassignment_final add index `index` (`index`)"
-        # query_list.append(query_3)
-        # query_4 = f"alter table patent.assignee_reassignment_final add  index `value` (`value`)"
-        # query_list.append(query_4)
+        query_0 = f"alter table {db}.{adm_table} add index assignee_id (assignee_id)"
+        query_list.append(query_0)
+        query_1 = f"alter table patent.assignee_{suffix} add index id (id)"
+        query_list.append(query_1)
+        query_2 = f"alter table patent.assignee_{suffix} add index organization (organization)"
+        query_list.append(query_2)
+        query_3 = f" alter table patent.assignee_reassignment_final add index `index` (`index`)"
+        query_list.append(query_3)
+        query_4 = f"alter table patent.assignee_reassignment_final add  index `value` (`value`)"
+        query_list.append(query_4)
         query_5 = f"""
         update {db}.{adm_table} adm
             join patent.assignee a on a.id = adm.assignee_id
@@ -357,8 +363,8 @@ def post_process_assignee(**kwargs):
 
 
 def additional_post_processing_assignee(**kwargs):
-    # additional_post_processing(**kwargs)
-    # additional_post_processing_update_queries(**kwargs)
+    additional_post_processing(**kwargs)
+    additional_post_processing_update_queries(**kwargs)
     precache_assignees(**kwargs)
     create_canonical_assignees(**kwargs)
 
@@ -370,7 +376,7 @@ def post_process_qc(**kwargs):
 
 
 if __name__ == '__main__':
-    date = datetime.date(2022, 6, 30)
+    date = datetime.date(2022, 7, 1)
     additional_post_processing_assignee(**{
         "execution_date": date
     })
