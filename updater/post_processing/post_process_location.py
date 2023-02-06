@@ -4,10 +4,12 @@ import pandas as pd
 from sqlalchemy import create_engine
 import shapefile
 from shapely.geometry import shape, Point
+from tqdm import tqdm
 
 from QA.post_processing.LocationPostProcessing import LocationPostProcessingQC
 from lib.configuration import get_connection_string, get_current_config
 
+tqdm.pandas()
 
 def update_rawlocation(update_config, end_date, database='RAW_DB'):
     engine = create_engine(get_connection_string(update_config, database))
@@ -130,13 +132,14 @@ def fips_geo_patch(config):
     fills in state and county FIPS codes for locations that were not coded by lookup but could be coded by latitude/longitude
     :param config: config object containing crucial date, file, and database information
     """
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
     end_date = config["DATES"]["END_DATE"].strip("-")
     
     print("reading shapefiles...")
     shapefile_source = config['FILES']['COUNTY_SHAPEFILES']
     rdr = shapefile.Reader(shapefile_source)
     county_shapes = [s for s in rdr.iterShapeRecords()]
+
+    engine = create_engine(get_connection_string(config, "RAW_DB"))
 
     print('retrieving US locations without county FIPS code:')
     missing_fips_query = f"""
@@ -153,8 +156,9 @@ def fips_geo_patch(config):
         print("mapping locations...")
         missing_fips_records = missing_fips_records.assign(pt=missing_fips_records.apply(lambda x: Point(x.longitude, x.latitude), axis=1))
 
-        lookup_results = missing_fips_records.apply(lookup_fips, axis=1, args=(county_shapes,))
+        lookup_results = missing_fips_records.progress_apply(lookup_fips, axis=1, args=(county_shapes,))
 
+        engine = create_engine(get_connection_string(config, "RAW_DB")) # re-connecting as failsafe in case record matching takes too long
         print("uploading matched locations...")
         lookup_results.to_sql(f"temp_fips_geocode_patch_{end_date}", con=engine, index=False)
 
@@ -167,9 +171,12 @@ def fips_geo_patch(config):
         loc.county_fips = patch.county_fips,
         loc.county = fips.county_name,
         loc.state = fips.state
+        WHERE loc.country = 'US'
+        AND loc.county_fips IS NULL
         """
         print(merge_query)
-        engine.execute(merge_query)
+        mergeres = engine.execute(merge_query)
+        print(f"{mergeres.rowcount} records updated")
 
     else:
         print("no locations required geographic FIPS assignment.")
