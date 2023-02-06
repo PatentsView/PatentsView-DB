@@ -11,79 +11,59 @@ class LocationPostProcessingQC(DisambiguationTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, config['PATENTSVIEW_DATABASES']["PROD_DB"], datetime.date(year=1976, month=1, day=1), end_date)
 
+    def init_qa_dict_disambig(self):
+        self.qa_data = {
+            "DataMonitor_regioncount": [],
+        }
 
-#     def load_top_n_patents(self):
-#         chunk_size = 1000
-#         location_template = """
-#         SELEcT {select} from location order by id limit {limit} offset {offset}
-#         """
-#         offset = 0
-#         location_n_template = """
-# SELECT l.city,
-#        l.state,
-#        l.country,
-#        count(patent_id)
-# from ({data_query}) l
-#          join
-#      (SELECT *
-#       from (SELECT patent_id, location_id
-#             from patent_assignee
-#                      join ({core_query}) l on l.id = patent_assignee.location_id) pa
-#       union
-#       SELECT *
-#       from (SELECT patent_id, location_id
-#             from patent_inventor
-#                      join ({core_query}) l on l.id = patent_inventor.location_id) pi) ai
-#      on ai.location_id = l.id
-# group by l.id, l.city, l.state, l.country;
-#         """
-#         location_counts = {}
-#         while True:
-#             query_start = time.time()
-#             location_core_query = location_template.format(limit=chunk_size, offset=offset, select="id")
-#             location_data_query = location_template.format(limit=chunk_size, offset=offset,
-#                                                            select=", ".join(["id", "city", "state", "country"]))
-#             location_n_query = location_n_template.format(core_query=location_core_query,
-#                                                           data_query=location_data_query)
-#
-#             if not self.connection.open:
-#                 self.connection.connect()
-#             cursor_size = 0
-#             with self.connection.cursor() as top_cursor:
-#                 top_cursor.execute(location_n_query)
-#                 for top_n_data_row in top_cursor:
-#                     cursor_size += 1
-#                     location_counts[(top_n_data_row[0], top_n_data_row[1], top_n_data_row[2])] = top_n_data_row[-1]
-#             if cursor_size == 0:
-#                 break
-#             offset += chunk_size
-#             print("Completed {core_query} in {duration} seconds".format(core_query=location_core_query,
-#                                                                         duration=time.time() - query_start))
-#         top_n_locations = sorted(location_counts.items(), key=lambda x: x[1], reverse=True)[:100]
-#         rank = 1
-#         for location in top_n_locations:
-#             data_value = ", ".join([x if x is not None else 'N/A' for x in location[0]])
-#             self.qa_data['DataMonitor_topnentities'].append(
-#                     {
-#                             "database_type":        self.database_type,
-#                             'entity_name':          'location',
-#                             "related_entity":       'patent',
-#                             'update_version':       self.version,
-#                             'entity_value':         data_value,
-#                             'related_entity_count': location[1],
-#                             'entity_rank':          rank
-#                             })
-#             rank += 1
+    def save_qa_data(self):
+        super(LocationPostProcessingQC, self).save_qa_data()
 
-    def runTests(self):
-        # self.load_top_n_patents()
+    def records_by_region(self, config, table_name):
+        e_date = config["DATES"]["END_DATE"]
+        s_date = config["DATES"]["START_DATE"]
+        region_types = ['region','sub-region']
+        for region_type in region_types:
+            query = f"""
+    select `{region_type}`, count(*)
+    from patent.{table_name}_20220630  a
+        inner join geo_data.country_codes b on a.country=b.`alpha-2`
+    where a.version_indicator >= '{s_date}' and  a.version_indicator <= '{e_date}'
+    group by 1
+            """
+            print(query)
+            if not self.connection.open:
+                self.connection.connect()
+            with self.connection.cursor() as top_cursor:
+                top_cursor.execute(query)
+                for top_n_data_row in top_cursor:
+                    self.qa_data['DataMonitor_regioncount'].append(
+                        {
+                            "database_type": self.database_type,
+                            "update_version": self.version,
+                            'table_name': table_name,
+                            "region_type": region_type,
+                            'region': top_n_data_row[0],
+                            'count': top_n_data_row[1],
+                            'quarter': self.quarter
+                        })
+
+
+    def runTests(self, config):
         # super(LocationPostProcessingQC, self).runTests()
-        super(DisambiguationTester, self).runTests()
+        # super(DisambiguationTester, self).runTests()
+        self.init_qa_dict_disambig()
+        for table in self.table_config:
+            print(table)
+            if table in ['rawlocation', 'location']:
+                self.records_by_region(config, table,)
+                self.save_qa_data()
+                self.init_qa_dict_disambig()
 
 
 if __name__ == '__main__':
     config = get_current_config('granted_patent', schedule='quarterly', **{
-            "execution_date": datetime.date(2021, 10, 1)
+            "execution_date": datetime.date(2022, 4, 1)
             })
     lc = LocationPostProcessingQC(config)
-    lc.runTests()
+    lc.runTests(config)

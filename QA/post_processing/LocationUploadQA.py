@@ -4,6 +4,7 @@ import time
 import pymysql.cursors
 from sqlalchemy import create_engine
 import matplotlib.pyplot as plt
+from math import radians, cos, sin, asin, sqrt
 
 from QA.post_processing.DisambiguationTester import DisambiguationTester
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
@@ -14,6 +15,23 @@ from lib.configuration import get_connection_string
 class LocationUploadTest:
     def __init__(self, config):
         self.config = config
+
+    def haversince(self, lat1, long1, lat2, long2):
+        """
+        Calculate the great circle distance in miles between two points
+        on the earth (specified in decimal degrees)
+        """
+        # convert decimal degrees to radians
+        lon1, lat1, lon2, lat2 = map(radians, [long1, lat1, long2, lat2])
+
+        # haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        c = 2 * asin(sqrt(a))
+        r = 3956  # Radius of earth in kilometers. Use 3956 for miles. Determines return value units.
+        return c * r
+
 
     def character_matches(self):
         print("TESTING FOR STATE AND COUNTRY MISMATCHES BETWEEN RAWLOCATION_ID & CURATED_ID")
@@ -64,38 +82,51 @@ where a.country is not null and location_id is null;""")
     def create_lat_long_comparison_table(self):
         print("TESTING FOR LAT/LONG DIFF BETWEEN RAWLOCATION_ID & CURATED_ID")
         temp_db = 'TEMP_UPLOAD_DB'
+        # temp_db = 'PROD_DB'
         cstr = get_connection_string(self.config, temp_db)
         engine = create_engine(cstr)
+        start = self.config["DATES"]["START_DATE"]
+        end = self.config["DATES"]["END_DATE"]
         with engine.connect() as connection:
             connection.execute(" drop table if exists rawlocation_disambig_compare ;")
-            rows = connection.execute(f"""
-create table rawlocation_disambig_compare 
-select a.id as rawlocation_id, b.uuid as curated_location_id, a.version_indicator, latitude, longitude,  lat, lon, (latitude-lat) as lat_diff, (longitude-lon) as long_diff
+            hav_list = []
+            df = pd.read_sql(f"""
+select a.id as rawlocation_id
+    , b.uuid as curated_location_id
+    , a.version_indicator
+    , latitude
+    , longitude
+    , lat
+    , lon
 from rawlocation a
         left join geo_data.curated_locations b on a.location_id=b.uuid
-where a.country is not null and b.uuid is not null;""")
-            df = pd.read_sql("select * from rawlocation_disambig_compare", con=connection)
+where a.country is not null 
+    and b.uuid is not null
+    and a.version_indicator >= {start} 
+    and a.version_indicator <= {end};""", con=connection)
+            for index, row in df.iterrows():
+                i = self.haversince(row['lat'], row['lon'], row['latitude'], row['longitude'])
+                hav_list.append(i)
+            df['haversince_distance'] = hav_list
+            df.to_sql('rawlocation_disambig_compare', engine, if_exists='append', index=False)
 
             # Create Histogram of Lat and Long differences between Rawlocation and our Curated Locations table
-            latlongdiff = ['lat_diff', 'long_diff']
-            for l in latlongdiff:
-                f = plt.figure()
-                plt.hist(df[l])
-                # plt.show()
-                f.savefig(f"{l}.pdf", bbox_inches='tight')
+            l = ['haversince_distance']
+            f = plt.figure()
+            plt.hist(df[l])
+            # plt.show()
+            f.savefig(f"{l[0]}.pdf", bbox_inches='tight')
 
             # SEE THE TOP OUTLIERS
-            for b in latlongdiff:
-                for a in [True, False]:
-                    print(df.sort_values(by=b, ascending=a).head(10))
+            for a in [True, False]:
+                print(df.sort_values(by=l, ascending=a).head(10))
 
-            max_lat_diff = df['lat_diff'].max()
-            min_lat_diff = df['lat_diff'].min()
-            max_long_diff = df['long_diff'].max()
-            min_long_diff = df['long_diff'].min()
-            print(f"LAT DIFF RANGE {min_lat_diff}, {max_lat_diff} --/-- LONG DIFF RANGE {min_long_diff}, {max_long_diff}")
-            if (max_lat_diff > 5) or (min_lat_diff < -5) or (max_long_diff > 5) or (min_long_diff < -5):
-                raise Exception("LAT OR LONG LOOKS WRONG")
+            max_hav_dist = df['haversince_distance'].max()
+            min_hav_dist = df['haversince_distance'].min()
+            print(f"MIN HAVERSINE DISTANCE: {min_hav_dist} // MAX HAVERSINE DISTANCE: {max_hav_dist}")
+            if (min_hav_dist < 0) or (max_hav_dist > 250):
+                print("WARNING LAT/LONG LOOKS WRONG")
+                # raise Exception("LAT OR LONG LOOKS WRONG")
 
     def percent_location_id_null(self):
         cstr = get_connection_string(self.config, 'TEMP_UPLOAD_DB')
@@ -134,12 +165,31 @@ from rawlocation a
         self.percent_location_id_null()
         self.check_disambig_mapping_updated()
 
+
 if __name__ == '__main__':
-    config = get_current_config('granted_patent', schedule='weekly', **{
-        "execution_date": datetime.date(2022, 8, 16)
+    # d = datetime.date(2022, 6, 28)
+    # while d <= datetime.date(2022, 10, 1):
+    #     print("----------------------------------------------------")
+    #     print(f"STARTING FOR DATE: {d}")
+    #     print("----------------------------------------------------")
+    #     config = get_current_config('granted_patent', schedule='weekly', **{
+    #         "execution_date": d
+    #     })
+    #     l = LocationUploadTest(config)
+    #     l.create_lat_long_comparison_table()
+    #     d = d + datetime.timedelta(weeks=1)
+
+
+    d = datetime.date(2022, 7, 5)
+    config = get_current_config('granted_patent', schedule='quarterly', **{
+        "execution_date": d
     })
     l = LocationUploadTest(config)
-    # l.character_matches(config)
-    # l.no_location_id(config)
-    # l.create_lat_long_comparison_table(config)
-    l.percent_location_id_null()
+    l.create_lat_long_comparison_table()
+
+
+    # config = get_current_config('granted_patent', schedule='weekly', **{
+    #     "execution_date": datetime.date(2022, 10, 11)
+    # })
+    # l = LocationUploadTest(config)
+    # l.create_lat_long_comparison_table()

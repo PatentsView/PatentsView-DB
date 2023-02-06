@@ -10,73 +10,93 @@ from math import radians, cos, sin, asin, sqrt
 from QA.post_processing.LocationUploadQA import LocationUploadTest
 
 
-def generate_US_locationID_exactmatch(config):
+def generate_locationID_exactmatch(config, geo_type_list=['domestic', 'foreign']):
     temp_db = 'TEMP_UPLOAD_DB'
-    # cstr = get_connection_string(config, temp_db)
-    cstr = get_unique_connection_string(config, database='pgpubs_temp_location_backfill')
-    engine = create_engine(cstr)
-    # db = config['PATENTSVIEW_DATABASES'][temp_db]
-    db = 'pgpubs_temp_location_backfill'
-    print(db)
-    location_types = ['city', 'town', 'village', 'hamlet']
-    total_rows = engine.execute("""SELECT count(*) from rawlocation where country='US';""")
-    total_rows_affected = total_rows.first()[0]
-    query_dict = {"city/state/country": """
-        update {db}.rawlocation a 
-        inner join geo_data.curated_locations b on a.city=b.location_name
-        inner join geo_data.state_codes d on b.state=d.`State/Possession`
-        inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
-                and b.`country` = c.name and a.state = d.Abbreviation
-        inner join 
-                (
-                    select location_name, `state`, b.country, count(*)
-                    from geo_data.curated_locations b 
-                    where place= '{loc}' and b.`country`='United States of America' 
-                    group by 1, 2, 3
-                    having count(*)=1                 
-                ) as dedup on b.location_name=dedup.location_name and b.state=dedup.state and b.country=dedup.country
-        set location_id= b.uuid
-        
-        ## Adding in the lat/long distance back in because there are some exact matches with widely inaccurate lat/long data
-        where (latitude-lat) >= -1.83
-        and (latitude-lat) <= 1.83
-        and (longitude-lon) >= -1.45
-        and (longitude-lon) <= 1.45
-        and a.location_id is null 
-        """}
-    for key in query_dict:
-        for loc in location_types:
-            with engine.connect() as connection:
-                exactmatch_query = eval(f'f"""{query_dict[key]}"""')
-                print(exactmatch_query)
-                connection.execute(exactmatch_query)
-                rows_affected = connection.execute(
-                    """SELECT count(*) from rawlocation where location_id is not null and country='US';""")
-                if loc == 'city':
-                    previous = 0
-                notnull_rows = rows_affected.first()[0]
-                new_rows_affected = (notnull_rows - previous)
-                perc = notnull_rows / total_rows_affected
-                print(f"{new_rows_affected} Rows Have Been Updated from {loc} on join {key}")
-                print(f"A Total of {notnull_rows} OUT OF {total_rows_affected} or {perc} of US Rawlocations have Been Updated")
-                data = {
-                    "join_type": [key+'/'+loc],
-                    'state': [""],
-                    'country': ['US'],
-                    'version_indicator': [db],
-                    'count': [new_rows_affected]
-                }
-                table_frame = pd.DataFrame(data)
-                qa_connection_string = get_connection_string(config, 'QA_DATABASE', connection='APP_DATABASE_SETUP')
-                qa_engine = create_engine(qa_connection_string)
-                qa_table = 'DataMonitor_LocDisambig'
-                previous = notnull_rows
+    db = config['PATENTSVIEW_DATABASES'][temp_db]
+    cstr = get_connection_string(config, temp_db)
 
-                try:
-                    table_frame.to_sql(name=qa_table, if_exists='append', con=qa_engine, index=False)
-                except SQLAlchemyError as e:
-                    table_frame.to_csv("errored_qa_data" + qa_table, index=False)
-                    raise e
+    # db = config['PATENTSVIEW_DATABASES']['PROD_DB']
+    # db = 'rawlocation_fixes'
+    # cstr = get_connection_string(config, database="PROD_DB")
+    engine = create_engine(cstr)
+
+    location_types = ['city', 'town', 'village', 'hamlet']
+    for geo in geo_type_list:
+        if geo=='domestic':
+            filter = "="
+            query_dict = {"city/state/country": """
+                            update {db}.rawlocation_fixes a 
+                            inner join geo_data.curated_locations b on a.city=b.location_name
+                            inner join geo_data.state_codes d on b.state=d.`State/Possession`
+                            inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
+                                    and b.`country` = c.name and a.state = d.Abbreviation
+                            inner join (
+                                select location_name, `state`, b.country, count(*)
+                                from geo_data.curated_locations b 
+                                where place= '{loc}' and b.`country` {filter} 'United States of America' 
+                                group by 1, 2, 3
+                                having count(*)=1                 
+                                ) as dedup on b.location_name=dedup.location_name and b.state=dedup.state and b.country=dedup.country
+                            set location_id= b.uuid
+
+                            ## Adding in the lat/long distance back in because there are some exact matches with widely inaccurate lat/long data
+                            where ((SUBSTRING_INDEX(location_id_transformed, "|", 1))-lat) >= -1.83
+                            and ((SUBSTRING_INDEX(location_id_transformed, "|", 1)-lat) <= 1.83
+                            and ((SUBSTRING_INDEX(location_id_transformed, "|", -1)-lon) >= -1.45
+                            and ((SUBSTRING_INDEX(location_id_transformed, "|", -1)-lon) <= 1.45
+                            and a.location_id is null 
+                            """}
+        else:
+            filter = "!="
+            query_dict = {"city/state/country": """
+                update {db}.rawlocation_fixes a 
+                inner join geo_data.non_us_unique_city_countries b on a.city=b.location_name
+                inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
+                        and b.`country` = c.name
+                set location_id= b.uuid
+                ## Adding in the lat/long distance back in because there are some exact matches with widely inaccurate lat/long data
+                where 
+                (latitude-lat) >= -1.83
+                and (latitude-lat) <= 1.83
+                and (longitude-lon) >= -1.45
+                and (longitude-lon) <= 1.45
+                a.location_id is null 
+                and b.place= '{loc}'
+                """}
+        total_rows = engine.execute(f"""SELECT count(*) from rawlocation_fixes where country {filter} 'US';""")
+        total_rows_affected = total_rows.first()[0]
+        for key in query_dict:
+            for loc in location_types:
+                with engine.connect() as connection:
+                    exactmatch_query = eval(f'f"""{query_dict[key]}"""')
+                    print(exactmatch_query)
+                    connection.execute(exactmatch_query)
+                    rows_affected = connection.execute(
+                        f"""SELECT count(*) from rawlocation_fixes where location_id is not null and country {filter} 'US';""")
+                    if loc == 'city':
+                        previous = 0
+                    notnull_rows = rows_affected.first()[0]
+                    new_rows_affected = (notnull_rows - previous)
+                    perc = notnull_rows / total_rows_affected
+                    print(f"{new_rows_affected} Rows Have Been Updated from {loc} on join {key}")
+                    print(f"A Total of {notnull_rows} OUT OF {total_rows_affected} or {perc} of US Rawlocations have Been Updated")
+                    data = {
+                        "join_type": [key+'/'+loc],
+                        'state': [""],
+                        'country': ['US'],
+                        'version_indicator': [db],
+                        'count': [new_rows_affected]
+                    }
+                    table_frame = pd.DataFrame(data)
+                    qa_connection_string = get_connection_string(config, 'QA_DATABASE', connection='APP_DATABASE_SETUP')
+                    qa_engine = create_engine(qa_connection_string)
+                    qa_table = 'DataMonitor_LocDisambig'
+                    previous = notnull_rows
+                    try:
+                        table_frame.to_sql(name=qa_table, if_exists='append', con=qa_engine, index=False)
+                    except SQLAlchemyError as e:
+                        table_frame.to_csv("errored_qa_data" + qa_table, index=False)
+                        raise e
 
 
 def haversince(lat1, long1, lat2, long2):
@@ -95,14 +115,13 @@ def haversince(lat1, long1, lat2, long2):
     r = 3956  # Radius of earth in kilometers. Use 3956 for miles. Determines return value units.
     return c * r
 
-
 def find_nearest_latlong(config, geo_type_list=['domestic', 'foreign']):
     temp_db = 'TEMP_UPLOAD_DB'
-    # cstr = get_connection_string(config, temp_db)
-    cstr = get_unique_connection_string(config, database='pgpubs_temp_location_backfill')
+    cstr = get_connection_string(config, temp_db)
+    # cstr = get_unique_connection_string(config, database='pgpubs_temp_location_backfill')
     engine = create_engine(cstr)
-    # db = config['PATENTSVIEW_DATABASES'][temp_db]
-    db = 'pgpubs_temp_location_backfill'
+    db = config['PATENTSVIEW_DATABASES'][temp_db]
+    # db = 'pgpubs_temp_location_backfill'
     print(db)
     sd = config["DATES"]["START_DATE"]
     ed = config["DATES"]["END_DATE"]
@@ -115,8 +134,7 @@ def find_nearest_latlong(config, geo_type_list=['domestic', 'foreign']):
             geo_list = df['country'].unique()
         print(f"There are {len(geo_list)} Entities To Process")
         highlevel_counter = 1
-        # for geo in geo_list:
-        for geo in ['DE']:
+        for geo in geo_list:
             print(" --------------------- --------------------- --------------------- ")
             print(f"Processing {highlevel_counter} of {len(geo_list)} of {geo_type}")
             print(" --------------------- --------------------- --------------------- ")
@@ -154,9 +172,11 @@ where country = '{geo}'
     and location_id is null 
     and latitude is not null 
     and longitude is not null
-    and version_indicator >= '{sd}' and version_indicator <= '{ed}'"""
+--     and version_indicator >= '{sd}' and version_indicator <= '{ed}'
+    """
                 print(q2)
                 rawlocations = pd.read_sql(q2, con=engine)
+
             total_rawloc = rawlocations.shape[0]
             print(f"\tThere are {total_rawloc} rawlocations to process for {geo}")
             raw_latlongs = rawlocations[['id', 'latitude', 'longitude']].to_records(index=False)
@@ -210,9 +230,6 @@ set a.location_id=b.uuid
                     rows_affected = connection.execute(
                         f"""SELECT count(*) from rawlocation_intermediate;""")
                     notnull_rows = rows_affected.first()[0]
-                    # print("--------------------------------------------------------")
-                    # print(f"{notnull_rows} UPDATED FOR {geo}")
-                    # print("--------------------------------------------------------")
                     if geo_type == 'domestic':
                         data = {
                             "join_type": ['NN'],
@@ -239,7 +256,6 @@ set a.location_id=b.uuid
                         table_frame.to_csv("errored_qa_data" + qa_table, index=False)
                         raise e
                 highlevel_counter = highlevel_counter + 1
-
 
 def location_disambig_mapping_update(dbtype, **kwargs):
     weekly_config = get_current_config('granted_patent', **kwargs)
@@ -275,7 +291,7 @@ select id, location_id from {dbtype}_{current_end_date}.rawlocation
 
 def run_location_disambiguation(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
-    generate_US_locationID_exactmatch(config)
+    generate_locationID_exactmatch(config, geo_type_list=['domestic', 'foreign'])
     find_nearest_latlong(config, geo_type_list=['domestic', 'foreign'])
     location_disambig_mapping_update(dbtype, **kwargs)
 
@@ -283,7 +299,6 @@ def run_location_disambiguation_tests(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
     tests = LocationUploadTest(config)
     tests.runTests()
-
 
 if __name__ == "__main__":
     # config = get_current_config('granted_patent', **{
@@ -296,31 +311,23 @@ if __name__ == "__main__":
     # run_location_disambiguation(dbtype='granted_patent', **{
     #     "execution_date": datetime.date(2022, 7, 5)
     # })
-    # run_location_disambiguation_tests(dbtype='granted_patent', **{
-    #     "execution_date": datetime.date(2022, 5, 24)
-    # })
-    # date_list = []
-    # date = datetime.date(2022, 6, 30)
-    # for i in range(0, 12):
-    #     date = date + datetime.timedelta(days=7)
-    #     date_list.append(date)
-    #
-    # print(date_list)
-    # for d in date_list:
-    #     run_location_disambiguation(dbtype='pgpubs', **{
+    d = datetime.date(2022, 7, 1)
+    # while d <= datetime.date(2022, 10, 1):
+    #     config = get_current_config('pgpubs', schedule='quarterly', **{
     #         "execution_date": d
     #     })
-    #     location_disambig_mapping_update(**{
-    #         "execution_date": d
-    #     })
-    d = datetime.date(2001, 3, 15)
-    while d <= datetime.date(2022, 10, 1):
-        config = get_current_config('pgpubs', **{
-            "execution_date": d
-        })
-        find_nearest_latlong(config, geo_type_list=['foreign'])
-        d = d + datetime.timedelta(days=7)
+    #     find_nearest_latlong(config, geo_type_list=['foreign'])
+    #     d = d + datetime.timedelta(weeks=12)
 
+    # config = get_current_config('pgpubs', schedule='quarterly', **{
+    #     "execution_date": d
+    # })
+    # find_nearest_latlong(config, geo_type_list=['foreign'])'
+
+    config = get_current_config('granted_patent', schedule='quarterly', **{
+        "execution_date": d
+    })
+    generate_locationID_exactmatch(config, geo_type_list=['foreign'])
 
 
 
