@@ -531,6 +531,7 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
     :param xml_file: XML file with pgpubs data
     :param table_xml_map: dictionary of parsing configuration
     :param config: config file
+    :param destination: the config label of the database to upload results to, or 'local' or 'return' to indicate that the results should be returned instead of uploaded.
     """
     xml_file_name = os.path.basename(xml_file)
     debug = False
@@ -621,7 +622,8 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
     for df in dfs:
         dfs[df].dropna(inplace=True, thresh=2) # drop any rows that have fewer than 2 non-Null values (i.e. any that have only the doc id)
     # Load the generated data frames to database
-    load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destination=destination)
+    if not destination in ('local','return'):
+        load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destination=destination)
 
     xml_file_duration = round(
             time.time() - xml_file_start, 3)
@@ -642,6 +644,8 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                     })
     if unlink:
         delete_xml_file(xml_file)
+    if destination in ('local','return'):
+        return dfs
 
 
 def chunks(l, n):
