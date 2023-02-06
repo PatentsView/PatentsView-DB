@@ -470,7 +470,7 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                                             post_process_load_assignee_granted_lookup,
                                             prepare_granted_persistent_wide_assignee,
                                             create_granted_persistent_wide_assignee,
-                                            update_granted_persistent_long_assignee,
+                                            #update_granted_persistent_long_assignee,
                                             qc_post_process_assignee_operator
                                             ],
                      'pgpubs_persistent': [
@@ -478,7 +478,7 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                          post_process_load_assignee_pregranted_lookup,
                          prepare_pregrant_persistent_wide_assignee,
                          create_pregrant_persistent_wide_assignee,
-                         update_pregrant_persistent_long_assignee,
+                         #update_pregrant_persistent_long_assignee,
                          qc_post_process_assignee_operator
                      ],
                      'location_post_processing': [post_process_location_operator, qc_post_process_location_operator],
