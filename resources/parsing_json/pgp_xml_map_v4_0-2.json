@@ -1133,6 +1133,28 @@
           "data-type": "string"
         },
         {
+          "field_name": "is_legal_representative",
+          "friendly_name": "Is Legal Representative",
+          "xml_path": "us-rights",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": true,
+          "tag": true,
+          "data-type": "int"
+        },
+        {
+          "field_name": "represents_inventor",
+          "friendly_name": "Represents Inventor",
+          "xml_path": "us-rights",
+          "attribute": "to-dead-inventor",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
             "field_name": "city",
             "friendly_name": "City",
             "xml_path": "addressbook/address/city",
