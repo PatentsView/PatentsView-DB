@@ -1,5 +1,6 @@
 import csv
 import datetime
+import re
 import time
 import pandas as pd
 from sqlalchemy import create_engine
