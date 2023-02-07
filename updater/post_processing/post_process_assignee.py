@@ -238,6 +238,7 @@ def additional_post_processing(**kwargs):
     melted_assignment = pd.DataFrame.from_dict(clusters, orient='index').reset_index().melt(id_vars='index')
     final_assignment = melted_assignment[~melted_assignment.value.isna()]
     final_assignment['value'].str.len().max()
+    final_assignment = final_assignment.rename(columns={'index': 'cluster', 'value': 'original_org_name'})
     final_assignment.to_sql(name='assignee_reassignment_final', con=engine)
 
 def additional_post_processing_update_queries(**kwargs):
@@ -255,23 +256,23 @@ def additional_post_processing_update_queries(**kwargs):
             query_list.append(query_1)
             query_2 = f"alter table patent.assignee_{suffix} add index organization (organization)"
             query_list.append(query_2)
-            query_3 = f" alter table patent.assignee_reassignment_final add index `index` (`index`)"
+            query_3 = f" alter table patent.assignee_reassignment_final add index `cluster` (`cluster`)"
             query_list.append(query_3)
-            query_4 = f"alter table patent.assignee_reassignment_final add  index `value` (`value`)"
+            query_4 = f"alter table patent.assignee_reassignment_final add  index `original_org_name` (`original_org_name`)"
             query_list.append(query_4)
         query_5 = f"""
         update {db}.{adm_table} adm
             join patent.assignee a on a.id = adm.assignee_id
-            join patent.assignee_reassignment_final arr on arr.`index` collate utf8mb4_bin = a.organization
-            join patent.assignee a2 on arr.`value` collate utf8mb4_bin = a2.organization
+            join patent.assignee_reassignment_final arr on arr.`original_org_name` collate utf8mb4_bin = a.organization
+            join patent.assignee a2 on arr.`cluster` collate utf8mb4_bin = a2.organization
         set adm.assignee_id=a2.id;
         """
         query_list.append(query_5)
         query_6 = f"""
         update {db}.rawassignee r
             join patent.assignee a on a.id = r.assignee_id
-            join patent.assignee_reassignment_final arr on arr.`index` collate utf8mb4_bin = a.organization
-            join patent.assignee a2 on arr.`value` collate utf8mb4_bin = a2.organization
+            join patent.assignee_reassignment_final arr on a.organization = arr.`original_org_name` collate utf8mb4_bin  
+            join patent.assignee a2 on arr.`cluster` collate utf8mb4_bin = a2.organization
         set r.assignee_id=a2.id;
             """
         query_list.append(query_6)
@@ -381,3 +382,4 @@ if __name__ == '__main__':
     additional_post_processing_assignee(**{
         "execution_date": date
     })
+
