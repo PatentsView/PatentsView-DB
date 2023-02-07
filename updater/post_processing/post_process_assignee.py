@@ -306,8 +306,8 @@ def remapping(gp_all_distances, tfidf_model):
     # for record in tqdm(gp_all_distances):
         for top_org_idx in record:
             for comparison in record[top_org_idx]['comparison']:
-                X = tfidf_model.transform([str(record[top_org_idx]['org']).lower(),
-                                           str(comparison['org']).lower()])
+                X = tfidf_model.transform([str(record[top_org_idx]['org_std']).lower(),
+                                           str(comparison['org_std']).lower()])
 
                 rowsum = X.sum(axis=1)
                 ratio = rowsum[0, 0] / rowsum[1, 0]
@@ -320,8 +320,8 @@ def collect_training(gp_all_distances):
     for record in gp_all_distances:
         for top_org_idx in record:
             for comparison in record[top_org_idx]['comparison']:
-                documents.append(str(record[top_org_idx]['org']))
-                documents.append(str(comparison['org']))
+                documents.append(str(record[top_org_idx]['org_std']))
+                documents.append(str(comparison['org_std']))
     return documents
 
 def generate_combinations(gp):
@@ -334,11 +334,17 @@ def generate_combinations(gp):
     for a, b in tqdm(x, total=l):
         top_org = gp.loc[a, 'organization']
         comparison_org = gp.loc[b, 'organization']
-        overlap = fuzz.token_set_ratio(str(top_org).lower(), str(comparison_org).lower())
+        top_org_std = re.sub('[^A-Za-z0-9]+', '', str(top_org))
+        comparison_org_std = re.sub('[^A-Za-z0-9]+', '', str(comparison_org))
+        overlap = max(fuzz.token_set_ratio(top_org_std, comparison_org_std),
+                      fuzz.ratio(top_org_std, comparison_org_std),
+                      fuzz.partial_ratio(top_org_std, comparison_org_std),
+                      fuzz.partial_token_set_ratio(top_org_std, comparison_org_std))
         if overlap > 95:
             if a not in distances:
-                distances[a] = {'org': top_org, 'comparison': []}
-            distances[a]['comparison'].append({'org': comparison_org, 'comparison_idx': b, 'overlap': overlap})
+                distances[a] = {'org': top_org, 'org_std': top_org_std, 'comparison': []}
+            distances[a]['comparison'].append(
+                {'org': comparison_org, 'org_std': comparison_org_std, 'comparison_idx': b, 'overlap': overlap})
     return distances
 
 def load_granted_lookup(**kwargs):
