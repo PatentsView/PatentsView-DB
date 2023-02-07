@@ -50,7 +50,7 @@ from (
                         from `{{params.raw_database}}`.`rawassignee` ra
                                  inner join `{{params.raw_database}}`.`patent` p on p.`id` = ra.`patent_id`
                                  inner join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
-                          and ra.`assignee_id` is not null and ra.version_indicator <={{ params.version_indicator }}
+                          and ra.`assignee_id` is not null and ra.version_indicator <='{{ params.version_indicator }}'
                         order by ra.`assignee_id`,
                                  p.`date` desc,
                                  p.`id` desc
@@ -74,7 +74,7 @@ insert into `{{params.reporting_database}}`.`temp_assignee_num_patents`
     (`assignee_id`, `num_patents`)
 select `assignee_id`,
        count(distinct `patent_id`)
-from `{{params.raw_database}}`.`patent_assignee` pa join `{{ params.raw_database }}`.`patent` p on p.id=pa.patent_id where p.version_indicator <={{ params.version_indicator }}
+from `{{params.raw_database}}`.`patent_assignee` pa join `{{ params.raw_database }}`.`patent` p on p.id=pa.patent_id where p.version_indicator <='{{ params.version_indicator }}'
 group by `assignee_id`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_num_inventors`;
@@ -92,7 +92,7 @@ insert into `{{params.reporting_database}}`.`temp_assignee_num_inventors`
 select aa.`assignee_id`,
        count(distinct ii.`inventor_id`)
 from `{{params.raw_database}}`.`patent_assignee` aa
-         join `{{params.raw_database}}`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `{{ params.raw_database }}`.`patent` p on p.id=aa.patent_id where p.version_indicator <={{ params.version_indicator }}
+         join `{{params.raw_database}}`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `{{ params.raw_database }}`.`patent` p on p.id=aa.patent_id where p.version_indicator <='{{ params.version_indicator }}'
 group by aa.`assignee_id`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_years_active`;
