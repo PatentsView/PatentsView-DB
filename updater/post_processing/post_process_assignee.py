@@ -222,6 +222,7 @@ def additional_post_processing(**kwargs):
     unique_assignees = assignee_data.gp.unique()
     gp_all_distances = []
     for ass in unique_assignees:
+    # for ass in ['sony']:
         temp_raw_data = assignee_data[assignee_data['gp']==ass]
         unique_orgs = temp_raw_data.organization.unique()
         new_dataframe_for_combos = pd.DataFrame(unique_orgs, columns=["organization"])
@@ -336,8 +337,7 @@ def generate_combinations(gp):
         if overlap > 95:
             if a not in distances:
                 distances[a] = {'org': top_org, 'comparison': []}
-            else:
-                distances[a]['comparison'].append({'org': comparison_org, 'comparison_idx': b, 'overlap': overlap})
+            distances[a]['comparison'].append({'org': comparison_org, 'comparison_idx': b, 'overlap': overlap})
     return distances
 
 def load_granted_lookup(**kwargs):
