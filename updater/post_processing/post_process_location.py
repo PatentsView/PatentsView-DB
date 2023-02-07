@@ -116,10 +116,10 @@ FROM `patent`.`location_{end_date}`;
 def lookup_fips(db_record, county_shapes):
     """
     checks geographic point for membership in county shapes and returns related state and county FIPS codes
-    :param db_record: pandas DataFrame row containing a shapely.geometry Point under the index 'pt'
+    :param db_record: pandas DataFrame row containing a shapely.geometry Point under the index 'pt' and the location_id the point represents
     :param all_county_shapes: the set of shape objects to check if db_record.pt falls inside
     """
-    fips = {'county_fips': None, 'state_fips': None}
+    fips = {'location_id': db_record.location_id,'county_fips': None, 'state_fips': None}
     counties = [x for x in county_shapes if shape(x.shape).contains(db_record.pt)]
     # do not assign a code if there are zero or multiple containing counties
     if len(counties) == 1:
@@ -165,7 +165,7 @@ def fips_geo_patch(config):
         print("merging geo-matched locations into main table:")
         merge_query = f"""
         UPDATE patent.location_{end_date} loc
-        JOIN temp_fips_geocode_patch_{end_date} patch ON loc.id = patch.id
+        JOIN patent.temp_fips_geocode_patch_{end_date} patch ON loc.location_id = patch.location_id
         LEFT JOIN geo_data.census_fips fips ON (patch.state_fips = fips.state_fips AND patch.county_fips = fips.county_fips)
         SET loc.state_fips = patch.state_fips,
         loc.county_fips = patch.county_fips,
@@ -173,6 +173,7 @@ def fips_geo_patch(config):
         loc.state = fips.state
         WHERE loc.country = 'US'
         AND loc.county_fips IS NULL
+        AND patch.county_fips IS NOT NULL
         """
         print(merge_query)
         mergeres = engine.execute(merge_query)
