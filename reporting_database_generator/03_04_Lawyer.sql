@@ -111,7 +111,7 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 create table `{{params.reporting_database}}`.`patent_lawyer_unique` (
 select rl.patent_id, lawyer_id, min(sequence) sequence
 from `patent`.`rawlawyer` rl
-	left join patent p on rl.patent_id=p.patent_id
+	left join `patent`.patent p on rl.patent_id=p.patent_id
 group by 1,2
 );
 
