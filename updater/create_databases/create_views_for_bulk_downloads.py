@@ -2,6 +2,7 @@ import sqlalchemy as sqla
 import re
 import json
 import os
+import traceback
 
 def update_create_view_sql(config, output_path, if_exists='replace'):
 	assert if_exists in ('replace','fail','append'), "disallowed if_exists value. must be in ('replace','fail','append')"
@@ -67,8 +68,18 @@ def read_create_view_dictionary(config):
 	with open(f"{config['FOLDERS']['project_root']}/{config['FOLDERS']['resources_folder']}/create_export_views.json",'r') as f:
 		return(json.load(f))
 
+# def update_persistent_view_columns(config):
+# 	"""
+# 	To complete - will update views for persistent tables (persistent_inventor, etc) to include new quarterly column names.
+# 	will hand-perform for 20220929 update
+# 	"""
+# 	pass
 
 def update_view_date_ranges(config):
+	"""
+	reads view dictionary json file and executes view create/replace SQL using new date threshold.
+	all view replacements are attempted before any errors are raised to streamline simultaneous identification and correction of issues.
+	"""
 	host = '{}'.format(config['DATABASE_SETUP']['HOST'])
 	user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
 	password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -89,6 +100,7 @@ def update_view_date_ranges(config):
 		except Exception as e:
 			print('update unsuccessful')
 			print(e)
+			print(traceback.format_exc())
 			failed_updates.append(view)
 	
 	if len(failed_updates) > 0:
