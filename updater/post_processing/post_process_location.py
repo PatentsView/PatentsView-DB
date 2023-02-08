@@ -2,7 +2,7 @@ import datetime
 
 import pandas as pd
 from sqlalchemy import create_engine
-import shapefile
+# import shapefile
 from shapely.geometry import shape, Point
 from tqdm import tqdm
 
