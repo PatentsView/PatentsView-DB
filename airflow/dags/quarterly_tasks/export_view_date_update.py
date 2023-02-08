@@ -14,7 +14,7 @@ from QA.post_processing.BulkDownloadsTesterPgpubs import run_bulk_downloads_qa a
 
 default_args = {
     'owner': 'smadhavan',
-    'depends_on_past': False,
+    'depends_on_past': True,
     'email': ['contact@patentsview.org'],
     'email_on_failure': False,
     'email_on_retry': False,
@@ -34,7 +34,7 @@ view_date_updater = DAG(
     description='update the maximum version indicator for the download export views',
     start_date=datetime(2022, 6, 30),
     schedule_interval='@quarterly',
-    catchup=False
+    catchup=True
 )
 
 operator_settings = {
@@ -44,17 +44,20 @@ operator_settings = {
     'on_retry_callback': airflow_task_failure
 }
 
-update_max_vi = PythonOperator(task_id='update_bulk_downloads_views', python_callable=update_view_date_ranges,
+update_max_vi = PythonOperator(task_id='update_bulk_downloads_views', 
+                        python_callable=update_view_date_ranges,
                         **operator_settings)
 
 # placeholder for future addition
 # add_persistent_columns = PythonOperator(task_id = 'add_persistent_columns', python_callable= update_persistent_view_columns, 
 #                         **operator_settings)
 
-qa_granted_bulk_downloads = PythonOperator(task_id='qa_granted_bulk_downloads', python_callable=run_bulk_downloads_qa,
+qa_granted_bulk_downloads = PythonOperator(task_id='qa_granted_bulk_downloads', 
+                        python_callable=run_bulk_downloads_qa,
                         **operator_settings)
 
-qa_pgpubs_bulk_downloads = PythonOperator(task_id='qa_pgpubs_bulk_downloads', python_callable=run_pgpubs_bulk_downloads_qa,
+qa_pgpubs_bulk_downloads = PythonOperator(task_id='qa_pgpubs_bulk_downloads', 
+                        python_callable=run_pgpubs_bulk_downloads_qa,
                         **operator_settings)
 
 qa_granted_bulk_downloads.set_upstream(update_max_vi)

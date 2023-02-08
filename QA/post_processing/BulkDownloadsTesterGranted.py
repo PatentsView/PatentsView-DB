@@ -11,10 +11,8 @@ class BulkDownloadsTesterGranted(DatabaseTester):
 
 
 
-def run_bulk_downloads_qa(config):
-    # config = get_current_config('granted_patent', **{
-    #                 "execution_date": datetime.date(2022, 6, 30)
-    #                             })
+def run_bulk_downloads_qa(**kwargs):
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     qc = BulkDownloadsTesterGranted(config)
     qc.runTests()
 

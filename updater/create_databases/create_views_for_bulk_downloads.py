@@ -3,6 +3,7 @@ import re
 import json
 import os
 import traceback
+from lib.configuration import get_current_config
 
 def update_create_view_sql(config, output_path, if_exists='replace'):
 	assert if_exists in ('replace','fail','append'), "disallowed if_exists value. must be in ('replace','fail','append')"
@@ -62,7 +63,7 @@ def update_create_view_json(config, output_path, if_exists='replace'):
 			create_commands[f"{schema}.{view}"] = create_syntax
 
 	with open(output_path,'a') as f:
-		json.dump(create_commands, f)
+		json.dump(create_commands, f) # use indent argument here to get newlines
 
 def read_create_view_dictionary(config):
 	with open(f"{config['FOLDERS']['project_root']}/{config['FOLDERS']['resources_folder']}/create_export_views.json",'r') as f:
@@ -75,11 +76,12 @@ def read_create_view_dictionary(config):
 # 	"""
 # 	pass
 
-def update_view_date_ranges(config):
+def update_view_date_ranges(**kwargs):
 	"""
 	reads view dictionary json file and executes view create/replace SQL using new date threshold.
 	all view replacements are attempted before any errors are raised to streamline simultaneous identification and correction of issues.
 	"""
+	config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
 	host = '{}'.format(config['DATABASE_SETUP']['HOST'])
 	user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
 	password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])

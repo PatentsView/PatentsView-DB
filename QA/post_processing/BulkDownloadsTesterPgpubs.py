@@ -11,16 +11,14 @@ class BulkDownloadsTesterPgpubs(DatabaseTester):
 
 
 
-def run_bulk_downloads_qa(config):
-    # config = get_current_config('granted_patent', **{
-    #                 "execution_date": datetime.date(2022, 6, 30)
-    #                             })
+def run_bulk_downloads_qa(**kwargs):
+    config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     qc = BulkDownloadsTesterPgpubs(config)
     qc.runTests()
 
 
 if __name__ == '__main__':
     # check_reporting_db_row_count()
-    config = get_current_config('granted_patent', **{"execution_date": datetime.date(2022, 6, 30)})
+    config = get_current_config('pgpubs', **{"execution_date": datetime.date(2022, 6, 30)})
     qc = BulkDownloadsTesterPgpubs(config)
     qc.runTests()
