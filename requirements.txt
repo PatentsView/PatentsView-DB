@@ -24,6 +24,8 @@ python_dateutil
 requests
 scikit-learn
 scipy
+pyshp
+shapely
 slack_sdk
 sqlparse
 tabulate

@@ -2,8 +2,8 @@ import datetime
 
 import pandas as pd
 from sqlalchemy import create_engine
-# import shapefile
-# from shapely.geometry import shape, Point
+import shapefile
+from shapely.geometry import shape, Point
 from tqdm import tqdm
 
 from QA.post_processing.LocationPostProcessing import LocationPostProcessingQC
