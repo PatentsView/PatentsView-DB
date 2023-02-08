@@ -32,7 +32,7 @@ view_date_updater = DAG(
     dag_id='regenerate_bulk_downloads',
     default_args=default_args,
     description='update the maximum version indicator for the download export views',
-    start_date=datetime(2022, 6, 30),
+    start_date=datetime(2022, 1, 1),
     schedule_interval='@quarterly',
     catchup=True
 )
