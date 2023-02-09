@@ -393,12 +393,11 @@ group by
 update
   `{{params.reporting_database}}`.`patent` p
   inner join `{{params.reporting_database}}`.`cpc_current` u on
-    u.`patent_id` = p.`patent_id` and u.`sequence` = 0
+    u.`patent_id` = p.`patent_id`
   inner join `{{params.reporting_database}}`.`cpc_current_group_application_year` c on
     c.`group_id` = u.`group_id` and c.`application_year` = year(p.`earliest_application_date`)
-set
-  p.`cpc_current_group_average_patent_processing_days` = c.`average_patent_processing_days`;
-
+set p.`cpc_current_group_average_patent_processing_days` = c.`average_patent_processing_days`;
+where  u.`sequence` = 0
 
 # END cpc_current_group_application_year 
 
