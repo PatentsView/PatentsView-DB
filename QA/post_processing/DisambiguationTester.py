@@ -150,10 +150,10 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
 
     def runTests(self):
         print("Beginning Disambiguation Specific Tests")
-        # self.test_entity_id_updated()
+        self.test_entity_id_updated()
         self.init_qa_dict_disambig()
-        # self.test_invalid_id()
-        # self.test_floating_entities()
+        self.test_invalid_id()
+        self.test_floating_entities()
         for table in self.table_config:
             print(f"\t\tBeginning Tests for {table}")
             self.top_n_generator(table)

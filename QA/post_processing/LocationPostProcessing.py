@@ -50,8 +50,8 @@ class LocationPostProcessingQC(DisambiguationTester):
 
 
     def runTests(self, config):
-        # super(LocationPostProcessingQC, self).runTests()
-        # super(DisambiguationTester, self).runTests()
+        super(LocationPostProcessingQC, self).runTests()
+        super(DisambiguationTester, self).runTests()
         self.init_qa_dict_disambig()
         for table in self.table_config:
             print(table)

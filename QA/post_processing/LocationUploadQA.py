@@ -175,11 +175,6 @@ if __name__ == '__main__':
     #     config = get_current_config('granted_patent', schedule='weekly', **{
     #         "execution_date": d
     #     })
-    #     l = LocationUploadTest(config)
-    #     l.create_lat_long_comparison_table()
-    #     d = d + datetime.timedelta(weeks=1)
-
-
     d = datetime.date(2022, 7, 5)
     config = get_current_config('granted_patent', schedule='quarterly', **{
         "execution_date": d
@@ -187,9 +182,3 @@ if __name__ == '__main__':
     l = LocationUploadTest(config)
     l.create_lat_long_comparison_table()
 
-
-    # config = get_current_config('granted_patent', schedule='weekly', **{
-    #     "execution_date": datetime.date(2022, 10, 11)
-    # })
-    # l = LocationUploadTest(config)
-    # l.create_lat_long_comparison_table()
