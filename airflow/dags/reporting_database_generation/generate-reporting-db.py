@@ -46,7 +46,7 @@ default_args = {
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
     'concurrency': 4,
-    'queue': 'disambiguator'
+    'queue': 'data_collector'
     # 'pool': 'backfill',
     # 'priority_weight': 10,
     # 'end_date': datetime(2016, 1, 1),
