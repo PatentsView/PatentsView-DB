@@ -323,6 +323,17 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
         print("Could not find CPC Zip XML file under {cpc_input}".format(cpc_input=cpc_folder))
         exit(1)
 
+def delete_cpc_currents_pre_1976(db='granted_patent', **kwargs):
+    config = get_current_config(db, schedule='quarterly', **kwargs)
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
+    query = """
+delete 
+from cpc_current a 
+	left join patent b on a.patent_id=b.patent_id 
+where b.patent_id is null;
+    """
+    print(query)
+    engine.execute(query)
 
 
 if __name__ == '__main__':

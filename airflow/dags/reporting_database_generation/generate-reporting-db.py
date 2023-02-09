@@ -29,7 +29,8 @@ template_extension_config = [".sql"]
 database_name_config = {
     'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
     'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME'],
-    'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR']
+    'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR'],
+    'last_reporting_database': config['REPORTING_DATABASE_OPTIONS']['LAST_REPORTING_DATABASE_NAME'],
 }
 
 
