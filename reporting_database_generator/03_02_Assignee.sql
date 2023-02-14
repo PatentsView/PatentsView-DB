@@ -86,7 +86,6 @@ create table `{{params.reporting_database}}`.`temp_assignee_num_inventors`
 )
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-# 0:15
 insert into `{{params.reporting_database}}`.`temp_assignee_num_inventors`
     (`assignee_id`, `num_inventors`)
 select aa.`assignee_id`,
@@ -108,7 +107,6 @@ create table `{{params.reporting_database}}`.`temp_assignee_years_active`
 
 
 # Years active is essentially the number of years difference between first associated patent and last.
-# 1:15
 insert into `{{params.reporting_database}}`.`temp_assignee_years_active`
 (`assignee_id`, `first_seen_date`, `last_seen_date`, `actual_years_active`)
 select pa.`assignee_id`,
@@ -133,7 +131,6 @@ create table `{{params.reporting_database}}`.`patent_assignee`
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 4,825,748 @ 7:20
 insert into `{{params.reporting_database}}`.`patent_assignee`
 (`patent_id`, `assignee_id`, `location_id`, `sequence`)
 select distinct pa.`patent_id`,
@@ -168,7 +165,6 @@ create table `{{params.reporting_database}}`.`location_assignee`
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 438,452 @ 0:07
 insert into `{{params.reporting_database}}`.`location_assignee`
     (`location_id`, `assignee_id`, `num_patents`)
 select distinct timl.`new_location_id`,
@@ -207,7 +203,6 @@ create table `{{params.reporting_database}}`.`assignee`
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 345,185 @ 0:15
 insert into `{{params.reporting_database}}`.`assignee`
 (`assignee_id`, `type`, `name_first`, `name_last`, `organization`,
  `num_patents`, `num_inventors`, `lastknown_location_id`, `lastknown_persistent_location_id`, `lastknown_city`,

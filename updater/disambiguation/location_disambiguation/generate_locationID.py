@@ -27,48 +27,48 @@ def generate_locationID_exactmatch(config, geo_type_list=['domestic', 'foreign']
         if geo == 'domestic':
             filter = "="
             query_dict = {"city/state/country": """
-                            update {db}.rawlocation a 
-                            inner join geo_data.curated_locations b on a.city=b.location_name
-                            inner join geo_data.state_codes d on b.state=d.`State/Possession`
-                            inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
-                                    and b.`country` = c.name and a.state = d.Abbreviation
-                            inner join (
-                                select location_name, `state`, b.country, count(*)
-                                from geo_data.curated_locations b 
-                                where place= '{loc}' and b.`country` {filter} 'United States of America' 
-                                group by 1, 2, 3
-                                having count(*)=1                 
-                                ) as dedup on b.location_name=dedup.location_name and b.state=dedup.state and b.country=dedup.country
-                            set location_id= b.uuid
-                            ## Adding in the lat/long distance back in because there are some exact matches with widely inaccurate lat/long data
-                            where 
-                            # approx. ~ 126 miles 
-                            (latitude-lat) >= -1.83
-                            and (latitude-lat) <= 1.83
-                            # approx. ~ 79 miles 
-                            and (longitude-lon) >= -1.45
-                            and (longitude-lon) <= 1.45
-                            a.location_id is null 
-                            and a.location_id is null 
+update {db}.rawlocation a 
+inner join geo_data.curated_locations b on a.city=b.location_name
+inner join geo_data.state_codes d on b.state=d.`State/Possession`
+inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
+        and b.`country` = c.name and a.state = d.Abbreviation
+inner join (
+    select location_name, `state`, b.country, count(*)
+    from geo_data.curated_locations b 
+    where place= '{loc}' and b.`country` {filter} 'United States of America' 
+    group by 1, 2, 3
+    having count(*)=1                 
+    ) as dedup on b.location_name=dedup.location_name and b.state=dedup.state and b.country=dedup.country
+set location_id= b.uuid
+## Adding in the lat/long distance back in because there are some exact matches with widely inaccurate lat/long data
+where 
+# approx. ~ 126 miles 
+(latitude-lat) >= -1.83
+and (latitude-lat) <= 1.83
+# approx. ~ 79 miles 
+and (longitude-lon) >= -1.45
+and (longitude-lon) <= 1.45
+a.location_id is null 
+and a.location_id is null 
                             """}
         else:
             filter = "!="
             query_dict = {"city/state/country": """
-                update {db}.rawlocation_fixes a 
-                inner join geo_data.non_us_unique_city_countries b on a.city=b.location_name
-                inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
-                        and b.`country` = c.name
-                set location_id= b.uuid
-                ## Adding in the lat/long distance restriction between canonical locations and geocoded rawlocations because there are some exact matches with widely inaccurate lat/long data
-                where 
-                # approx. ~ 126 miles 
-                (latitude-lat) >= -1.83
-                and (latitude-lat) <= 1.83
-                # approx. ~ 79 miles 
-                and (longitude-lon) >= -1.45
-                and (longitude-lon) <= 1.45
-                a.location_id is null 
-                and b.place= '{loc}'
+update {db}.rawlocation_fixes a 
+inner join geo_data.non_us_unique_city_countries b on a.city=b.location_name
+inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
+        and b.`country` = c.name
+set location_id= b.uuid
+## Adding in the lat/long distance restriction between canonical locations and geocoded rawlocations because there are some exact matches with widely inaccurate lat/long data
+where 
+# approx. ~ 126 miles 
+(latitude-lat) >= -1.83
+and (latitude-lat) <= 1.83
+# approx. ~ 79 miles 
+and (longitude-lon) >= -1.45
+and (longitude-lon) <= 1.45
+a.location_id is null 
+and b.place= '{loc}'
                 """}
         total_rows = engine.execute(f"""SELECT count(*) from rawlocation where country {filter} 'US';""")
         total_rows_affected = total_rows.first()[0]

@@ -208,12 +208,24 @@ def load_granted_lookup(**kwargs):
                       parent_entity_id='patent_id', entity='inventor',
                       include_location=True, location_strict=False)
 
+def load_granted_location_inventor(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
+                      parent_entity_id='location_id', entity='inventor',
+                      include_location=True, location_strict=True)
+
 
 def load_pregranted_lookup(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
                       parent_entity_id='document_number', entity="inventor",
                       include_location=True)
+
+def load_pregranted_location_inventor(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
+                      parent_entity_id='location_id', entity='inventor',
+                      include_location=True, location_strict=True)
 
 
 def post_process_inventor(**kwargs):
@@ -263,6 +275,9 @@ if __name__ == '__main__':
     # post_process_qc(**{
     #         "execution_date": datetime.date(2020, 12, 29)
     #         })
-    evaluate_inventor_clustering(**{
-        "execution_date": datetime.date(2020, 12, 29)
+    # evaluate_inventor_clustering(**{
+    #     "execution_date": datetime.date(2020, 12, 29)
+    # })
+    load_pregranted_location_inventor(**{
+        "execution_date": datetime.date(2022, 7, 1)
     })

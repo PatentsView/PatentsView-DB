@@ -354,12 +354,23 @@ def load_granted_lookup(**kwargs):
                       parent_entity_id='patent_id', entity='assignee',
                       include_location=True, location_strict=False)
 
+def load_granted_location_assignee(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
+                      parent_entity_id='location_id', entity='assignee',
+                      include_location=True, location_strict=True)
 
 def load_pregranted_lookup(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
                       parent_entity_id='document_number', entity="assignee",
                       include_location=True)
+
+def load_pregranted_location_assignee(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
+                      parent_entity_id='location_id', entity='assignee',
+                      include_location=True, location_strict=True)
 
 
 def post_process_assignee(**kwargs):
@@ -386,7 +397,10 @@ def post_process_qc(**kwargs):
 
 if __name__ == '__main__':
     date = datetime.date(2022, 7, 1)
-    additional_post_processing_assignee(**{
+    load_granted_lookup(**{
+        "execution_date": date
+    })
+    load_pregranted_location_assignee(**{
         "execution_date": date
     })
 

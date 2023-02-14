@@ -423,25 +423,25 @@ set
 ######################################################################################################################
 
 
--- drop table if exists `{{params.reporting_database}}`.`location_cpc_subsection`;
--- create table `{{params.reporting_database}}`.`location_cpc_subsection`
--- (
---   `location_id` int unsigned not null,
---   `subsection_id` varchar(20) not null,
---   `num_patents` int unsigned not null
--- )
--- engine=InnoDB;
+drop table if exists `{{params.reporting_database}}`.`location_cpc_subsection`;
+create table `{{params.reporting_database}}`.`location_cpc_subsection`
+(
+  `location_id` int unsigned not null,
+  `subsection_id` varchar(20) not null,
+  `num_patents` int unsigned not null
+)
+engine=InnoDB;
 
 
--- insert into `{{params.reporting_database}}`.`location_cpc_subsection`
---   (`location_id`, `subsection_id`, `num_patents`)
--- select
---   tlp.`location_id`, cpc.`subsection_id`, count(distinct tlp.`patent_id`)
--- from
---   `{{params.reporting_database}}`.`temp_location_patent` tlp
---   inner join `{{params.reporting_database}}`.`cpc_current_subsection` cpc using(`patent_id`)
--- group by
---   tlp.`location_id`, cpc.`subsection_id`;
+insert into `{{params.reporting_database}}`.`location_cpc_subsection`
+  (`location_id`, `subsection_id`, `num_patents`)
+select
+  tlp.`location_id`, cpc.`subsection_id`, count(distinct tlp.`patent_id`)
+from
+  `{{params.reporting_database}}`.`temp_location_patent` tlp
+  inner join `{{params.reporting_database}}`.`cpc_current_subsection` cpc using(`patent_id`)
+group by
+  tlp.`location_id`, cpc.`subsection_id`;
 
 
 # END location_cpc_subsection
@@ -484,25 +484,25 @@ set
 ######################################################################################################################
 
 
--- drop table if exists `{{params.reporting_database}}`.`location_uspc_mainclass`;
--- create table `{{params.reporting_database}}`.`location_uspc_mainclass`
--- (
---   `location_id` int unsigned not null,
---   `mainclass_id` varchar(20) not null,
---   `num_patents` int unsigned not null
--- )
--- engine=InnoDB;
+drop table if exists `{{params.reporting_database}}`.`location_uspc_mainclass`;
+create table `{{params.reporting_database}}`.`location_uspc_mainclass`
+(
+  `location_id` int unsigned not null,
+  `mainclass_id` varchar(20) not null,
+  `num_patents` int unsigned not null
+)
+engine=InnoDB;
 
 
--- insert into `{{params.reporting_database}}`.`location_uspc_mainclass`
---   (`location_id`, `mainclass_id`, `num_patents`)
--- select
---   tlp.`location_id`, uspc.`mainclass_id`, count(distinct tlp.`patent_id`)
--- from
---   `{{params.reporting_database}}`.`temp_location_patent` tlp
---   inner join `{{params.reporting_database}}`.`uspc_current_mainclass` uspc using(`patent_id`)
--- group by
---   tlp.`location_id`, uspc.`mainclass_id`;
+insert into `{{params.reporting_database}}`.`location_uspc_mainclass`
+  (`location_id`, `mainclass_id`, `num_patents`)
+select
+  tlp.`location_id`, uspc.`mainclass_id`, count(distinct tlp.`patent_id`)
+from
+  `{{params.reporting_database}}`.`temp_location_patent` tlp
+  inner join `{{params.reporting_database}}`.`uspc_current_mainclass` uspc using(`patent_id`)
+group by
+  tlp.`location_id`, uspc.`mainclass_id`;
 
 
 # END location_uspc_mainclass
@@ -515,25 +515,25 @@ set
 ######################################################################################################################
 
 
--- drop table if exists `{{params.reporting_database}}`.`location_nber_subcategory`;
--- create table `{{params.reporting_database}}`.`location_nber_subcategory`
--- (
---   `location_id` int unsigned not null,
---   `subcategory_id` varchar(20) not null,
---   `num_patents` int unsigned not null
--- )
--- engine=InnoDB;
+drop table if exists `{{params.reporting_database}}`.`location_nber_subcategory`;
+create table `{{params.reporting_database}}`.`location_nber_subcategory`
+(
+  `location_id` int unsigned not null,
+  `subcategory_id` varchar(20) not null,
+  `num_patents` int unsigned not null
+)
+engine=InnoDB;
 
 
--- insert into `{{params.reporting_database}}`.`location_nber_subcategory`
---   (`location_id`, `subcategory_id`, `num_patents`)
--- select
---   tlp.`location_id`, nber.`subcategory_id`, count(distinct tlp.`patent_id`)
--- from
---   `{{params.reporting_database}}`.`temp_location_patent` tlp
---   inner join `{{params.reporting_database}}`.`nber` nber using(`patent_id`)
--- group by
---   tlp.`location_id`, nber.`subcategory_id`;
+insert into `{{params.reporting_database}}`.`location_nber_subcategory`
+  (`location_id`, `subcategory_id`, `num_patents`)
+select
+  tlp.`location_id`, nber.`subcategory_id`, count(distinct tlp.`patent_id`)
+from
+  `{{params.reporting_database}}`.`temp_location_patent` tlp
+  inner join `{{params.reporting_database}}`.`nber` nber using(`patent_id`)
+group by
+  tlp.`location_id`, nber.`subcategory_id`;
 
 
 # END location_nber_subcategory
@@ -544,25 +544,25 @@ set
 # BEGIN location_year ######################################################################################################################
 
 
--- drop table if exists `{{params.reporting_database}}`.`location_year`;
--- create table `{{params.reporting_database}}`.`location_year`
--- (
---   `location_id` int unsigned not null,
---   `year` smallint not null,
---   `num_patents` int unsigned not null
--- )
--- engine=InnoDB;
+drop table if exists `{{params.reporting_database}}`.`location_year`;
+create table `{{params.reporting_database}}`.`location_year`
+(
+  `location_id` int unsigned not null,
+  `year` smallint not null,
+  `num_patents` int unsigned not null
+)
+engine=InnoDB;
 
 
--- insert into `{{params.reporting_database}}`.`location_year`
---   (`location_id`, `year`, `num_patents`)
--- select
---   tlp.`location_id`, p.`year`, count(distinct tlp.`patent_id`)
--- from
---   `{{params.reporting_database}}`.`temp_location_patent` tlp
---   inner join `{{params.reporting_database}}`.`patent` p using(`patent_id`)
--- group by
---   tlp.`location_id`, p.`year`;
+insert into `{{params.reporting_database}}`.`location_year`
+  (`location_id`, `year`, `num_patents`)
+select
+  tlp.`location_id`, p.`year`, count(distinct tlp.`patent_id`)
+from
+  `{{params.reporting_database}}`.`temp_location_patent` tlp
+  inner join `{{params.reporting_database}}`.`patent` p using(`patent_id`)
+group by
+  tlp.`location_id`, p.`year`;
 
 
 # END location_year ######################################################################################################################
@@ -570,19 +570,19 @@ set
 # BEGIN inventor_rawinventor alias 
 
 ###############################################################################################################################
--- drop table if exists `{{params.reporting_database}}`.`inventor_rawinventor`;
--- create table if not exists `{{params.reporting_database}}`.`inventor_rawinventor` (uuid int(10) unsigned AUTO_INCREMENT PRIMARY KEY,name_first varchar(64),name_last varchar(64),patent_id varchar(20),inventor_id int(10) unsigned);
---
--- INSERT INTO `{{params.reporting_database}}`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id)
--- SELECT DISTINCT ri.name_first,ri.name_last,ri.patent_id,repi.inventor_id
--- FROM `{{params.reporting_database}}`.`inventor` repi
--- left join `{{params.raw_database}}`.`rawinventor` ri
--- on ri.inventor_id = repi.persistent_inventor_id;
---
--- alter table `{{params.reporting_database}}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_first` (`name_first`);
--- alter table `{{params.reporting_database}}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_last` (`name_last`);
--- alter table `{{params.reporting_database}}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_inventor_id` (`inventor_id`);
--- alter table `{{params.reporting_database}}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_patent_id` (`patent_id`);
+drop table if exists `{{params.reporting_database}}`.`inventor_rawinventor`;
+create table if not exists `{{params.reporting_database}}`.`inventor_rawinventor` (uuid int(10) unsigned AUTO_INCREMENT PRIMARY KEY,name_first varchar(64),name_last varchar(64),patent_id varchar(20),inventor_id int(10) unsigned);
+
+INSERT INTO `{{params.reporting_database}}`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id)
+SELECT DISTINCT ri.name_first,ri.name_last,ri.patent_id,repi.inventor_id
+FROM `{{params.reporting_database}}`.`inventor` repi
+left join `{{params.raw_database}}`.`rawinventor` ri
+on ri.inventor_id = repi.persistent_inventor_id;
+
+alter table `{{params.reporting_database}}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_first` (`name_first`);
+alter table `{{params.reporting_database}}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_last` (`name_last`);
+alter table `{{params.reporting_database}}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_inventor_id` (`inventor_id`);
+alter table `{{params.reporting_database}}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_patent_id` (`patent_id`);
 
 # END inventor_rawinventor alias 
 
