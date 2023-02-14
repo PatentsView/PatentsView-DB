@@ -71,10 +71,11 @@ def generate_locationID_exactmatch(config, geo_type='domestic'):
     engine, db = get_temp_db_config(config)
     # Grab Update Query & Relevant Filter
     query, filter = get_exact_match_update_query(geo_type=geo_type)
-    # Total Rows Up for Disambiguation
+    # Total Rows Available for Disambiguation
     total_rows = engine.execute(f"""SELECT count(*) from rawlocation where country {filter} 'US';""")
     total_rows_affected = total_rows.first()[0]
-    # Our canonical locations table includes the following location_types. We iterate through the location_types starting with the largest population size first with city
+    # Our canonical locations table includes the following location_types.
+    # Because locations may be in our database tagged as city and town, We iterate through the location_types starting with the largest population size first with city
     location_types = ['city', 'town', 'village', 'hamlet']
     for loc in location_types:
         with engine.connect() as connection:
@@ -119,7 +120,7 @@ where location_id is null and country != 'US';""", con=engine)
 def get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type, geo):
     engine, db = get_temp_db_config(config)
     if geo_type == "domestic":
-        # Pull all parsed rawlocation within a given state
+        # Pull all rawlocations (parsed from USPTO's weekly published XML files) within a given state
         rawlocations = pd.read_sql(
             f"""
         select id, latitude, longitude
@@ -130,7 +131,7 @@ def get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type,
         and latitude is not null 
         and longitude is not null""", con=engine)
         
-        # Pull all canonical locations associated with a given state
+        # Pull all canonical locations (derived from OSM) associated with a given state
         canonical_locations = pd.read_sql(
             f"""
         select uuid, lat, lon
@@ -140,7 +141,7 @@ def get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type,
         where c.`alpha-2` = 'US' and d.Abbreviation='{geo}' """, con=engine)
         
     elif geo_type == 'foreign':
-        # Pull all parsed rawlocations within a given country
+        # Pull all rawlocations (parsed from USPTO's weekly published XML files) within a given country
         rawlocations = pd.read_sql(f"""
                 select id, latitude, longitude
                 from {db}.rawlocation
@@ -149,7 +150,7 @@ def get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type,
                 and latitude is not null 
                 and longitude is not null
                 """, con=engine)
-        # Pull all canonical locations for a given country
+        # Pull all canonical locations (derived from OSM) for a given country
         canonical_locations = pd.read_sql(f"""
             select uuid, lat, lon
             from geo_data.curated_locations b 
@@ -219,7 +220,7 @@ def find_nearest_latlong(config, geo_type='domestic'):
             ambiguous_rawlocations_df = pd.DataFrame(ambiguous_rawlocations, columns=['rawlocation_id'])
             ambiguous_rawlocations_df.to_sql('rawlocations_ambiguous', engine, if_exists='append', index=False)
 
-            # Create a temporary table rawlocation_intermediate to update rawlocations iteratively for each geo
+            # Create a temporary table rawlocation_intermediate used to update rawlocations iteratively for each geo
             rawlocation_with_nn = pd.DataFrame(nn_final, columns=['rawlocation_id', 'uuid'])
             rawlocation_with_nn.to_sql('rawlocation_intermediate', engine, if_exists='replace', index=False)
 
@@ -269,6 +270,7 @@ def save_aggregate_results_to_qa_table(config, loc, db, state, country, new_rows
 
 
 def location_disambig_mapping_update(config, dbtype, **kwargs):
+    # Creates and appends a table called location_disambiguation_mapping containing rawlocation.uuid to location_id
     weekly_config = get_current_config('granted_patent', **kwargs)
     cstr = get_connection_string(weekly_config, "PROD_DB")
     engine = create_engine(cstr)
@@ -297,11 +299,11 @@ select id, location_id from {dbtype}_{current_end_date}.rawlocation
 
 def run_location_disambiguation(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
-    # generate_locationID_exactmatch(config, geo_type='domestic')
-    # generate_locationID_exactmatch(config, geo_type='foreign')
+    generate_locationID_exactmatch(config, geo_type='domestic')
+    generate_locationID_exactmatch(config, geo_type='foreign')
     find_nearest_latlong(config, geo_type='domestic')
-    # find_nearest_latlong(config, geo_type='foreign')
-    # location_disambig_mapping_update(config, dbtype, **kwargs)
+    find_nearest_latlong(config, geo_type='foreign')
+    location_disambig_mapping_update(config, dbtype, **kwargs)
 
 def run_location_disambiguation_tests(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
@@ -310,12 +312,6 @@ def run_location_disambiguation_tests(dbtype, **kwargs):
 
 if __name__ == "__main__":
     d = datetime.date(2022, 11, 1)
-    # while d <= datetime.date(2022, 10, 1):
-    #     config = get_current_config('pgpubs', schedule='quarterly', **{
-    #         "execution_date": d
-    #     })
-    #     find_nearest_latlong(config, geo_type_list=['foreign'])
-    #     d = d + datetime.timedelta(weeks=12)
     run_location_disambiguation("granted_patent", **{
             "execution_date": d
         })
