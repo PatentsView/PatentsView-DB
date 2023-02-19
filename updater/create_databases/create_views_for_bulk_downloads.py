@@ -66,7 +66,7 @@ def update_create_view_json(config, output_path, if_exists='replace'):
 		json.dump(create_commands, f) # use indent argument here to get newlines
 
 def read_create_view_dictionary(config):
-	with open(f"{config['FOLDERS']['project_root']}/{config['FOLDERS']['resources_folder']}/create_export_views.json",'r') as f:
+	with open(f"{config['FOLDERS']['resources_folder']}/create_export_views.json",'r') as f:
 		return(json.load(f))
 
 # def update_persistent_view_columns(config):
@@ -104,6 +104,7 @@ def update_view_date_ranges(**kwargs):
 			print(e)
 			print(traceback.format_exc())
 			failed_updates.append(view)
+		print('\n\n')
 	
 	if len(failed_updates) > 0:
 		raise Exception("view creation/update failed for {0} views:\n{1}".format(len(failed_updates), '\n'.join(failed_updates)))
