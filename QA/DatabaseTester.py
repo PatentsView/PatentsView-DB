@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import datetime
 from time import time
 import os
+import re
 
 from lib.configuration import get_connection_string
 from lib.configuration import get_current_config
@@ -152,6 +153,35 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
                        db=self.database_section)
             raise Exception(exception_message)
 
+
+    def test_newlines(self, table, field, where_vi):
+        skip = False
+        allowables = { # set of tables and fields where newlines are allowable in the field content
+            'brf_sum_text' : ['summary_text'], 
+            'detail_desc_text' : ['description_text']
+        }
+        if table in allowables: #non-text tables
+            if field in allowables[table]:
+                skip = True
+        elif re.match(".*_[0-9]{4}", table) and table[:-5] in allowables: #text-tables
+            if field in allowables[table[:-5]]:
+                skip = True
+
+        if skip:
+            print('newlines marked as permitted for this field. skipping newline test')
+        else: 
+            newline_query = f"""
+            SELECT count(*) as count
+            from `{table}`
+            where INSTR(`{field}`, '\n') > 0"""
+            count_value = self.query_runner(newline_query, single_value_return=True, where_vi=where_vi)
+            if count_value > 1:
+                exception_message = """
+    {count} rows with unwanted newlines found in {field} of {table_name} for {db}""".format(count=count_value, field=field, table_name=table,
+                        db=self.database_section)
+                raise Exception(exception_message)
+
+
     def load_category_counts(self, table, field):
         category_count_query = f"""
 SELECT `{field}` as value
@@ -202,14 +232,17 @@ from `{table}` where `{field}` is null
 
 
     def test_zero_dates(self, table, field, where_vi):
-        zero_query = \
-f"SELECT count(*) zero_count " \
-f"from `{table}` " \
-f"where `{field}` ='0000-00-00'"
+        zero_query = f"""
+SELECT count(*) zero_count 
+FROM `{table}` 
+WHERE `{field}`  LIKE '0000-__-__'
+OR `{field}`  LIKE '____-00-__'
+OR `{field}`  LIKE '____-__-00'
+"""
         count_value = self.query_runner(zero_query, single_value_return=True, where_vi=where_vi)
         if count_value != 0:
             raise Exception(
-                "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {"
+                "zero date encountered in table found:{database}.{table} column {col}. Count: {"
                 "count}".format(
                     database=self.database_section, table=table, col=field,
                     count=count_value))
@@ -470,6 +503,8 @@ where invention_abstract is null """
                     self.load_category_counts(table, field)
                 if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
                     self.load_text_length(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text', 'varchar']:
+                    self.test_newlines(table,field, where_vi=False)
                 if self.table_config[table]["fields"][field]["location_field"]:
                     self.load_counts_by_location(table, field)
                 if self.table_config[table]["fields"][field]['data_type'] == 'varchar' and 'id' not in field and (self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest'):
