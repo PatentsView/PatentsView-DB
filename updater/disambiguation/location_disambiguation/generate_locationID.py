@@ -165,7 +165,6 @@ def haversince(lat1, long1, lat2, long2):
     """
     # convert decimal degrees to radians
     lon1, lat1, lon2, lat2 = map(radians, [long1, lat1, long2, lat2])
-
     # haversine formula
     dlon = lon2 - lon1
     dlat = lat2 - lat1
@@ -174,49 +173,78 @@ def haversince(lat1, long1, lat2, long2):
     r = 3956  # Radius of earth in kilometers. Use 3956 for miles. Determines return value units.
     return c * r
 
+def get_canonical_locations_for_hav_distance(canonical_locations, lat1, long1):
+    can_locs_to_search = canonical_locations[['uuid', 'lat', 'lon']][
+        (canonical_locations['lat'] <= (lat1 + 1.83)) & (canonical_locations['lat'] >= (lat1 - 1.83)) & (
+                canonical_locations['lon'] <= (long1 + 1.45)) & (
+                canonical_locations['lon'] >= (long1 - 1.45))].to_records(index=False)
+    return can_locs_to_search
+
+def find_shortest_distance(can_locs_to_search, lat1, long1):
+    # Iterate through all the canonical raw records within a state or country & calculate the haversine distance
+    country_nn_lookup = []
+    for cur_uuid, lat2, long2 in can_locs_to_search:
+        distance = haversince(lat1, long1, lat2, long2)
+        country_nn_lookup.append([cur_uuid, lat2, long2, distance])
+    country_nn_lookup_df = pd.DataFrame(country_nn_lookup)
+    # Find the closest distance from the rawlocation geocodes to our canonical locations list
+    nearest = country_nn_lookup_df[3].min()
+    nearest_df = country_nn_lookup_df[country_nn_lookup_df[3] == nearest]
+    if nearest_df.shape[0] > 1:
+        raise Exception("We have two identical curated records that are nearest instead of one")
+    else:
+        curated_location_id = nearest_df.iloc[0][0]
+    return curated_location_id
+
+def update_batch(engine, db):
+    with engine.connect() as connection:
+        # Update our rawlocations table in our temporary weekly parsed database
+        update_nn_query = f"""
+    update {db}.rawlocation a 
+    inner join {db}.rawlocation_intermediate b on a.id=b.rawlocation_id
+    set a.location_id=b.uuid
+                    """
+        print(update_nn_query)
+        connection.execute(update_nn_query)
+
+        # Save the Number of Records Updated for QA
+        rows_affected = connection.execute(f"""SELECT count(*) from rawlocation_intermediate;""")
+        notnull_rows = rows_affected.first()[0]
+    return notnull_rows
+
+
 def find_nearest_latlong(config, geo_type='domestic'):
     engine, db = get_temp_db_config(config)
     geo_list = get_unique_list_of_geos(config, geo_type)
-    highlevel_counter = 1
+    geo_counter = 1
     for geo in geo_list:
         rawlocations, canonical_locations = get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type, geo)
         total_rawloc = rawlocations.shape[0]
         print(f"There are {total_rawloc} rawlocations to process for {geo}")
         raw_latlongs = rawlocations[['id', 'latitude', 'longitude']].to_records(index=False)
+        # nn_final is a temporary list that stores rawlocation_id and location_id (uuid in our DB) for each iteration
         nn_final = []
-        counter = 1
+        rawlocation_counter = 1
+        # ambiguous_rawlocations is a temporary list that stores rawlocation_ids where location_id was not found
         ambiguous_rawlocations = []
+        # Skip rawlocation records if we have no canonical records nearby
         if canonical_locations.empty or rawlocations.empty:
             continue
         else:
             # Iterate through each rawlocations
             for raw_id, lat1, long1 in raw_latlongs:
-                print(f"Processing {counter} of {total_rawloc}")
-                country_nn_lookup = []
+                print(f"Processing {rawlocation_counter} of {total_rawloc}")
                 # filter to a list of curated locations within a given distance range of the rawlocation
-                cur_latlongs = canonical_locations[['uuid', 'lat', 'lon']][
-                    (canonical_locations['lat'] <= (lat1 + 1.83)) & (canonical_locations['lat'] >= (lat1 - 1.83)) & (
-                                canonical_locations['lon'] <= (long1 + 1.45)) & (
-                                canonical_locations['lon'] >= (long1 - 1.45))].to_records(index=False)
-                if cur_latlongs.size == 0:
+                can_locs_to_search = get_canonical_locations_for_hav_distance(canonical_locations, lat1, long1)
+                # saving unattributed rawlocations
+                if can_locs_to_search.size == 0:
                     ambiguous_rawlocations.append([raw_id])
                 else:
-                    # Iterate through all the canonical raw records within a state or country & calculate the haversine distance
-                    for cur_uuid, lat2, long2 in cur_latlongs:
-                        distance = haversince(lat1, long1, lat2, long2)
-                        country_nn_lookup.append([cur_uuid, lat2, long2, distance])
-                    country_nn_lookup_df = pd.DataFrame(country_nn_lookup)
-                    # Find the closest distance from the rawlocation geocodes to our canonical locations list
-                    nearest = country_nn_lookup_df[3].min()
-                    nearest_df = country_nn_lookup_df[country_nn_lookup_df[3] == nearest]
-                    if nearest_df.shape[0] > 1:
-                        raise Exception("We have two identical curated records that are nearest instead of one")
-                    else:
-                        curated_location_id = nearest_df.iloc[0][0]
+                    curated_location_id = find_shortest_distance(can_locs_to_search, lat1, long1)
                     nn_final.append([raw_id, curated_location_id])
-                counter = counter+1
+                rawlocation_counter = rawlocation_counter+1
 
-            # Save RawLocations that are Ambiguous
+            # Save RawLocations that are still Ambiguous after location disambiguation attempt to table called rawlocations_ambiguous
             ambiguous_rawlocations_df = pd.DataFrame(ambiguous_rawlocations, columns=['rawlocation_id'])
             ambiguous_rawlocations_df.to_sql('rawlocations_ambiguous', engine, if_exists='append', index=False)
 
@@ -224,29 +252,18 @@ def find_nearest_latlong(config, geo_type='domestic'):
             rawlocation_with_nn = pd.DataFrame(nn_final, columns=['rawlocation_id', 'uuid'])
             rawlocation_with_nn.to_sql('rawlocation_intermediate', engine, if_exists='replace', index=False)
 
-            with engine.connect() as connection:
-                # Update our rawlocations table in our temporary weekly parsed database
-                update_nn_query = f"""
-update {db}.rawlocation a 
-inner join {db}.rawlocation_intermediate b on a.id=b.rawlocation_id
-set a.location_id=b.uuid
-                """
-                print(update_nn_query)
-                connection.execute(update_nn_query)
+            notnull_rows = update_batch(engine, db)
 
-                # Save Processing Data for QA purposes
-                rows_affected = connection.execute(f"""SELECT count(*) from rawlocation_intermediate;""")
-                notnull_rows = rows_affected.first()[0]
-
-                if geo_type == 'domestic':
-                    state = geo
-                    country = "US"
-                else:
-                    state = ""
-                    country = geo
-
-                save_aggregate_results_to_qa_table(config, "NN", db, state, country, notnull_rows)
-            highlevel_counter = highlevel_counter + 1
+            state = geo if geo_type == 'domestic' else ""
+            country = geo if geo_type != 'domestic' else ""
+            # if geo_type == 'domestic':
+            #     state = geo
+            #     country = "US"
+            # else:
+            #     state = ""
+            #     country = geo
+            save_aggregate_results_to_qa_table(config, "NN", db, state, country, notnull_rows)
+            geo_counter = geo_counter + 1
 
 
 def save_aggregate_results_to_qa_table(config, loc, db, state, country, new_rows_affected):

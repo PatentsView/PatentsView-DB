@@ -21,10 +21,10 @@ from updater.post_processing.post_process_location import post_process_location,
 from updater.post_processing.post_process_assignee import additional_post_processing_assignee, post_process_qc as qc_post_process_assignee,  \
     update_granted_rawassignee, update_pregranted_rawassignee, \
     precache_assignees, create_canonical_assignees, load_granted_lookup as load_granted_assignee_lookup, \
-    load_pregranted_lookup as load_pregranted_assignee_lookup
+    load_pregranted_lookup as load_pregranted_assignee_lookup, load_granted_location_assignee, load_pregranted_location_assignee
 from updater.post_processing.post_process_inventor import update_granted_rawinventor, update_pregranted_rawinventor, \
     precache_inventors, create_canonical_inventors, load_granted_lookup, load_pregranted_lookup, \
-    post_process_qc as qc_inventor_post_processing
+    post_process_qc as qc_inventor_post_processing, load_granted_location_inventor, load_pregranted_location_inventor
 from updater.post_processing.post_process_persistent import prepare_wide_table, update_long_entity, write_wide_table
 
 
@@ -148,7 +148,6 @@ post_process_update_granted_rawinventor = PythonOperator(task_id='Inventor_updat
                                                          dag=disambiguation,
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
-
                                                          queue='data_collector')
 
 post_process_update_pregranted_rawinventor = PythonOperator(task_id='Inventor_update_pregranted_rawinventor',
@@ -170,14 +169,26 @@ post_process_create_canonical_inventors = PythonOperator(task_id='Inventor_creat
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
                                                          queue='data_collector', pool='database_write_iops_contenders')
-post_process_load_granted_lookup = PythonOperator(task_id='Inventor_load_granted_lookup',
+post_process_create_patent_inventor = PythonOperator(task_id='Inventor_create_patent_inventor',
                                                   python_callable=load_granted_lookup,
                                                   dag=disambiguation,
                                                   on_success_callback=airflow_task_success,
                                                   on_failure_callback=airflow_task_failure,
                                                   queue='data_collector', pool='database_write_iops_contenders')
-post_process_load_pregranted_lookup = PythonOperator(task_id='Inventor_load_pregranted_lookup',
-                                                     python_callable=load_pregranted_lookup,
+post_process_create_pgpubs_inventor = PythonOperator(task_id='Inventor_create_pgpubs_inventor',
+                                                     python_callable=load_granted_location_inventor,
+                                                     dag=disambiguation,
+                                                     on_success_callback=airflow_task_success,
+                                                     on_failure_callback=airflow_task_failure,
+                                                     queue='data_collector', pool='database_write_iops_contenders')
+post_process_create_patent_loc_inventor = PythonOperator(task_id='Inventor_create_patent_location_inventor',
+                                                     python_callable=load_granted_location_inventor,
+                                                     dag=disambiguation,
+                                                     on_success_callback=airflow_task_success,
+                                                     on_failure_callback=airflow_task_failure,
+                                                     queue='data_collector', pool='database_write_iops_contenders')
+post_process_create_pgpubs_loc_inventor = PythonOperator(task_id='Inventor_create_pgpubs_location_inventor',
+                                                     python_callable=load_pregranted_location_inventor,
                                                      dag=disambiguation,
                                                      on_success_callback=airflow_task_success,
                                                      on_failure_callback=airflow_task_failure,
@@ -306,7 +317,6 @@ post_process_update_granted_rawassignee = PythonOperator(task_id='assignee_updat
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
                                                          queue='data_collector', pool='database_write_iops_contenders')
-
 post_process_update_pregranted_rawassignee = PythonOperator(task_id='assignee_update_pregranted_rawassignee',
                                                             python_callable=update_pregranted_rawassignee,
                                                             dag=disambiguation,
@@ -332,15 +342,29 @@ post_process_assignees = PythonOperator(task_id='assignee_additional_post_proces
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
                                                          queue='data_collector', pool='database_write_iops_contenders')
-post_process_load_assignee_granted_lookup = PythonOperator(task_id='assignee_load_granted_lookup',
+post_process_create_patent_assignee = PythonOperator(task_id='assignee_create_patent_assignee',
                                                            python_callable=load_granted_assignee_lookup,
                                                            dag=disambiguation,
                                                            on_success_callback=airflow_task_success,
                                                            on_failure_callback=airflow_task_failure,
                                                            queue='data_collector',
                                                            pool='database_write_iops_contenders')
-post_process_load_assignee_pregranted_lookup = PythonOperator(task_id='assignee_load_pregranted_lookup',
+post_process_create_pgpubs_assignee = PythonOperator(task_id='assignee_create_pgpubs_assignee',
                                                               python_callable=load_pregranted_assignee_lookup,
+                                                              dag=disambiguation,
+                                                              on_success_callback=airflow_task_success,
+                                                              on_failure_callback=airflow_task_failure,
+                                                              queue='data_collector',
+                                                              pool='database_write_iops_contenders')
+post_process_create_patent_loc_assignee = PythonOperator(task_id='assignee_create_patent_loc_assignee',
+                                                           python_callable=load_granted_location_assignee,
+                                                           dag=disambiguation,
+                                                           on_success_callback=airflow_task_success,
+                                                           on_failure_callback=airflow_task_failure,
+                                                           queue='data_collector',
+                                                           pool='database_write_iops_contenders')
+post_process_create_pgpubs_loc_assignee = PythonOperator(task_id='assignee_create_pgpubs_loc_assignee',
+                                                              python_callable=load_pregranted_location_assignee,
                                                               dag=disambiguation,
                                                               on_success_callback=airflow_task_success,
                                                               on_failure_callback=airflow_task_failure,
@@ -352,15 +376,15 @@ qc_post_process_assignee_operator = PythonOperator(task_id='qc_post_process_assi
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
                                                    queue='data_collector')
-update_granted_persistent_long_assignee = PythonOperator(
-    task_id='update_granted_persistent_long_assignee',
-    python_callable=update_long_entity,
-    op_kwargs={
-        'entity': 'assignee',
-        'database_type': 'granted_patent'
-    },
-    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
-)
+# update_granted_persistent_long_assignee = PythonOperator(
+#     task_id='update_granted_persistent_long_assignee',
+#     python_callable=update_long_entity,
+#     op_kwargs={
+#         'entity': 'assignee',
+#         'database_type': 'granted_patent'
+#     },
+#     dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
+# )
 create_granted_persistent_wide_assignee = PythonOperator(
     task_id='create_granted_persistent_wide_assignee',
     python_callable=write_wide_table,
@@ -379,15 +403,15 @@ prepare_granted_persistent_wide_assignee = PythonOperator(
     },
     dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 )
-update_pregrant_persistent_long_assignee = PythonOperator(
-    task_id='update_pregrant_persistent_long_assignee',
-    python_callable=update_long_entity,
-    op_kwargs={
-        'entity': 'assignee',
-        'database_type': 'pgpubs'
-    },
-    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
-)
+# update_pregrant_persistent_long_assignee = PythonOperator(
+#     task_id='update_pregrant_persistent_long_assignee',
+#     python_callable=update_long_entity,
+#     op_kwargs={
+#         'entity': 'assignee',
+#         'database_type': 'pgpubs'
+#     },
+#     dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
+# )
 create_pregrant_persistent_wide_assignee = PythonOperator(
     task_id='create_pregrant_persistent_wide_assignee',
     python_callable=write_wide_table,
@@ -444,13 +468,15 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                                              post_process_update_granted_rawinventor, post_process_precache_inventors,
                                              post_process_create_canonical_inventors],
                      'inventor_post_processing_1': [post_process_create_canonical_inventors,
-                                                    post_process_load_granted_lookup,
+                                                    post_process_create_patent_inventor,
+                                                    post_process_create_patent_loc_inventor,
                                                     prepare_granted_persistent_wide_inventor,
                                                     create_granted_persistent_wide_inventor,
                                                     update_granted_persistent_long_inventor,
                                                     qc_post_process_inventor_operator],
                      'inventor_post_processing_2': [post_process_create_canonical_inventors,
-                                                    post_process_load_pregranted_lookup,
+                                                    post_process_create_pgpubs_inventor,
+                                                    post_process_create_pgpubs_loc_inventor,
                                                     prepare_pregranted_persistent_wide_inventor,
                                                     create_pregranted_persistent_wide_inventor,
                                                     update_pregranted_persistent_long_inventor,
@@ -467,7 +493,8 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                                              post_process_assignees
                                              ],
                      'granted_persistent': [post_process_assignees,
-                                            post_process_load_assignee_granted_lookup,
+                                            post_process_create_patent_assignee,
+                                            post_process_create_patent_loc_assignee,
                                             prepare_granted_persistent_wide_assignee,
                                             create_granted_persistent_wide_assignee,
                                             #update_granted_persistent_long_assignee,
@@ -475,7 +502,8 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                                             ],
                      'pgpubs_persistent': [
                          post_process_assignees,
-                         post_process_load_assignee_pregranted_lookup,
+                         post_process_create_pgpubs_assignee,
+                         post_process_create_pgpubs_loc_assignee,
                          prepare_pregrant_persistent_wide_assignee,
                          create_pregrant_persistent_wide_assignee,
                          #update_pregrant_persistent_long_assignee,
@@ -483,14 +511,14 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                      ],
                      'location_post_processing': [post_process_location_operator, qc_post_process_location_operator],
                      'location_assignee_link': [qc_post_process_location_operator, assignee_build_assignee_features],
-                     # 'location_assignee_granted_link': [qc_post_process_location_operator,
-                     #                                    post_process_load_assignee_granted_lookup],
-                     # 'location_assignee_pregranted_link': [qc_post_process_location_operator,
-                     #                                       post_process_load_assignee_pregranted_lookup],
+                     'location_assignee_granted_link': [qc_post_process_location_operator,
+                                                        load_granted_location_assignee],
+                     'location_assignee_pregranted_link': [qc_post_process_location_operator,
+                                                           load_pregranted_location_assignee],
                      'location_inventor_granted_link': [qc_post_process_location_operator,
-                                                        post_process_load_granted_lookup],
-                     'location_inventor_pregranted_link': [qc_post_process_location_operator,
-                                                           post_process_load_pregranted_lookup]
+                                                        load_granted_location_inventor],
+                     'location_inventor_pregranted_link': [load_granted_location_inventor,
+                                                           post_process_create_pgpubs_inventor]
                      }
 
 for dependency_group in operator_sequence:
