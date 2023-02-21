@@ -81,7 +81,7 @@ and b.place= '{loc}'"""
     return query_string, filter
 
 def generate_locationID_exactmatch(config, geo_type='domestic'):
-    """ Setting up location standardization to run on the weekly parsed data which we call our temporary upload databases
+    """ Associates location_id to rawlocation objects where there is an exact text match to city, state, and country (domestic) or for city and country matches (foreign)
     Arguments:
         - config => credentials for our databases
         - geo_type => domestic or foreign
@@ -142,7 +142,7 @@ where location_id is null and country != 'US';""", con=engine)
     return geo_list
 
 def get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type, geo):
-    """ Returns a list of rawlocations and canonical locations that are within the same region for comparison
+    """ Returns rawlocations and canonical locations dataframes that are within the same region for comparison
     Arguments:
         - config => credentials for our databases
         - geo_type => domestic or foreign
@@ -210,7 +210,7 @@ def haversince(lat1, long1, lat2, long2):
     return c * r
 
 def get_canonical_locations_for_hav_distance(canonical_locations, lat1, long1):
-    """ Returns a list of canonical locations for comparison to a given geo-location
+    """ Returns a list of canonical locations for comparison to a given rawlocation coordinate
     Arguments:
         - canonical_locations => a list of locations for a given geo (state or country)
         - lat1 => rawlocation latitude
