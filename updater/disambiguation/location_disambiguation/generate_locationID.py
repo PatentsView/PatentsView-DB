@@ -256,12 +256,7 @@ def find_nearest_latlong(config, geo_type='domestic'):
 
             state = geo if geo_type == 'domestic' else ""
             country = geo if geo_type != 'domestic' else ""
-            # if geo_type == 'domestic':
-            #     state = geo
-            #     country = "US"
-            # else:
-            #     state = ""
-            #     country = geo
+            
             save_aggregate_results_to_qa_table(config, "NN", db, state, country, notnull_rows)
             geo_counter = geo_counter + 1
 
