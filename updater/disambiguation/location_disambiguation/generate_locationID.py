@@ -12,8 +12,8 @@ from QA.post_processing.LocationUploadQA import LocationUploadTest
 
 def get_temp_db_config(config):
     """ Gets database credentials for read/write connection
-        @param config: credentials for our databases
-        @return: sqlalchemy pythonic way to connect to databases, database name
+        :keyword config: credentials for our databases
+        :return: sqlalchemy pythonic way to connect to databases, database name
     """
     temp_db = 'TEMP_UPLOAD_DB'
     cstr = get_connection_string(config, temp_db)
@@ -23,8 +23,8 @@ def get_temp_db_config(config):
 
 def get_exact_match_update_query(geo_type):
     """ Gets query to update rawlocation object with a location_id from an exact string match to city, state, country (U.S. locations) or city, country (foreign)
-        @param geo_type: domestic or foreign
-        @return: query to update rawlocation records based on canonical locations, '=' or '!=' for later use filtering to U.S. locations or non-U.S. locations
+        :keyword geo_type: domestic or foreign
+        :return: query to update rawlocation records based on canonical locations, '=' or '!=' for later use filtering to U.S. locations or non-U.S. locations
     """
     if geo_type == 'domestic':
         query_string = """
@@ -76,8 +76,8 @@ and b.place= '{loc}'"""
 
 def generate_locationID_exactmatch(config, geo_type='domestic'):
     """ Associates location_id to rawlocation objects where there is an exact text match to city, state, and country (domestic) or for city and country matches (foreign)
-        @param config: credentials for our databases
-        @param geo_type: credentials for our databases
+        :keyword config: credentials for our databases
+        :keyword geo_type: credentials for our databases
     """
     engine, db = get_temp_db_config(config)
     # Grab Update Query & Relevant Filter
@@ -108,9 +108,9 @@ def generate_locationID_exactmatch(config, geo_type='domestic'):
 
 def get_unique_list_of_geos(config, geo_type):
     """ Return a list of states (U.S. locations) or a list of countries (Non-U.S. locations) for a given week of rawlocations
-        @param config: credentials for our databases
-        @param geo_type: domestic or foreign
-        @return: A list of states of countries
+        :keyword config: credentials for our databases
+        :keyword geo_type: domestic or foreign
+        :return: A list of states of countries
     """
     engine, db = get_temp_db_config(config)
     # Iterate by State for U.S. Locations
@@ -134,10 +134,10 @@ where location_id is null and country != 'US';""", con=engine)
 
 def get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type, geo):
     """ Returns rawlocations and canonical locations dataframes that are within the same region for comparison
-        @param config: credentials for our databases
-        @param geo_type: domestic or foreign
-        @param geo: a state or country
-        @return: all rawlocation for a given geo (state or country), a list of locations for a given geo (state or country)
+        :keyword config: credentials for our databases
+        :keyword geo_type: domestic or foreign
+        :keyword geo: a state or country
+        :return: all rawlocation for a given geo (state or country), a list of locations for a given geo (state or country)
     """
     engine, db = get_temp_db_config(config)
     if geo_type == "domestic":
@@ -179,11 +179,11 @@ def get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type,
 
 def haversince(lat1, long1, lat2, long2):
     """ Calculate the great circle distance in miles between two points on the earth (specified in decimal degrees)
-        @param lat1: latitude of the first location
-        @param long1: longitude of the first location
-        @param lat2: latitude of the second location
-        @param long2: longitude of the second location
-        @return: distance (miles)
+        :keyword lat1: latitude of the first location
+        :keyword long1: longitude of the first location
+        :keyword lat2: latitude of the second location
+        :keyword long2: longitude of the second location
+        :return: distance (miles)
     """
     # convert decimal degrees to radians
     lon1, lat1, lon2, lat2 = map(radians, [long1, lat1, long2, lat2])
@@ -197,10 +197,10 @@ def haversince(lat1, long1, lat2, long2):
 
 def get_canonical_locations_for_hav_distance(canonical_locations, lat1, long1):
     """ Returns a list of canonical locations for comparison to a given rawlocation coordinate
-        @param canonical_locations:
-        @param lat1: rawlocation latitude
-        @param long1: rawlocation longitude
-        @return: a list of canonical locations within approx. ~126 miles latitude and approx. ~79 miles longitude
+        :keyword canonical_locations:
+        :keyword lat1: rawlocation latitude
+        :keyword long1: rawlocation longitude
+        :return: a list of canonical locations within approx. ~126 miles latitude and approx. ~79 miles longitude
     """
     can_locs_to_search = canonical_locations[['uuid', 'lat', 'lon']][
         (canonical_locations['lat'] <= (lat1 + 1.83)) & (canonical_locations['lat'] >= (lat1 - 1.83)) & (
@@ -210,10 +210,10 @@ def get_canonical_locations_for_hav_distance(canonical_locations, lat1, long1):
 
 def find_shortest_distance(can_locs_to_search, lat1, long1):
     """ Finds the closest canonical location to a given rawlocation record
-        @param can_locs_to_search: a list of canonical locations within approx. ~ 126 miles latitude and approx. ~ 79 miles longitude
-        @param lat1: rawlocation latitude
-        @param long1: rawlocation longitude
-        @return: the closest canonical location to a given rawlocation record
+        :keyword can_locs_to_search: a list of canonical locations within approx. ~ 126 miles latitude and approx. ~ 79 miles longitude
+        :keyword lat1: rawlocation latitude
+        :keyword long1: rawlocation longitude
+        :return: the closest canonical location to a given rawlocation record
     """
     country_nn_lookup = []
     for cur_uuid, lat2, long2 in can_locs_to_search:
@@ -231,9 +231,9 @@ def find_shortest_distance(can_locs_to_search, lat1, long1):
 
 def update_batch(engine, db):
     """ Update a batch (defined by a state or country) of rawlocations with location_id
-    @param engine: sqlalchemy pythonic way to connect to databases
-    @param db: database name
-    @return: the number of records updated this batch
+    :keyword engine: sqlalchemy pythonic way to connect to databases
+    :keyword db: database name
+    :return: the number of records updated this batch
     """
     with engine.connect() as connection:
         # Update our rawlocations table in our temporary weekly parsed database
@@ -253,8 +253,8 @@ def update_batch(engine, db):
 
 def find_nearest_latlong(config, geo_type='domestic'):
     """ Iterate through all remaining unattributed rawlocations to match the nearest canonical locations
-        @param config: sqlalchemy pythonic way to connect to databases
-        @param geo_type: domestic or foreign
+        :keyword config: sqlalchemy pythonic way to connect to databases
+        :keyword geo_type: domestic or foreign
     """
     engine, db = get_temp_db_config(config)
     geo_list = get_unique_list_of_geos(config, geo_type)
@@ -305,12 +305,12 @@ def find_nearest_latlong(config, geo_type='domestic'):
 
 def save_aggregate_results_to_qa_table(config, join_type, db, state, country, new_rows_affected):
     """ Save metadata on the processing of rawlocation records
-        @param config: sqlalchemy pythonic way to connect to databases
-        @param join_type: NN (nearest neighbor or city, town, village, hamlet)
-        @param db: database name (e.g. upload_20221108 which will contain parsed USPTO patent data from 2022-11-01 through 2022-11-01)
-        @param state: state code if iterating through U.S. locations
-        @param country: country code
-        @param new_rows_affected: number of records updated in the current batch
+        :keyword config: sqlalchemy pythonic way to connect to databases
+        :keyword join_type: NN (nearest neighbor or city, town, village, hamlet)
+        :keyword db: database name (e.g. upload_20221108 which will contain parsed USPTO patent data from 2022-11-01 through 2022-11-01)
+        :keyword state: state code if iterating through U.S. locations
+        :keyword country: country code
+        :keyword new_rows_affected: number of records updated in the current batch
     """
     data = {
         "join_type": [join_type],
@@ -333,9 +333,9 @@ def save_aggregate_results_to_qa_table(config, join_type, db, state, country, ne
 
 def location_disambig_mapping_update(config, dbtype, **kwargs):
     """ Creates and appends a table called location_disambiguation_mapping containing rawlocation.uuid and location_id
-        @param config: sqlalchemy pythonic way to connect to databases
-        @param dbtype: granted_patent or pgpubs
-        @param kwargs: execution_date (the last day in a weeks worth of parsed data)
+        :keyword config: sqlalchemy pythonic way to connect to databases
+        :keyword dbtype: granted_patent or pgpubs
+        :keyword kwargs: execution_date (the last day in a weeks worth of parsed data)
     """
     weekly_config = get_current_config('granted_patent', **kwargs)
     cstr = get_connection_string(weekly_config, "PROD_DB")
