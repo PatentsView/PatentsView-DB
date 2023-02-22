@@ -215,7 +215,8 @@ select `location`.`id` AS `location_id`,
 `location`.`state_fips` AS `state_fips`,
 `location`.`county_fips` AS `county_fips` 
 from `patent`.`location` 
-where `location`.`version_indicator` <= '{{datestring}}';
+where `location`.`id` in (select distinct `patent`.`rawlocation`.`location_id` from `patent`.`rawlocation`) 
+and `location`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_location_not_disambiguated` AS 
 select `a`.`id` AS `rawlocation_id`,
@@ -259,7 +260,8 @@ from `patent`.`pct_data` `a`
 where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_persistent_assignee` AS 
-select `patent`.`persistent_assignee_disambig`.`current_rawassignee_id` AS `rawassignee_uuid`,
+select `patent`.`persistent_assignee_disambig`.`patent_id` AS `patent_id`,
+`patent`.`persistent_assignee_disambig`.`sequence` AS `sequence`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20181127` AS `disamb_assignee_id_20181127`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20190312` AS `disamb_assignee_id_20190312`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20190820` AS `disamb_assignee_id_20190820`,
@@ -271,15 +273,16 @@ select `patent`.`persistent_assignee_disambig`.`current_rawassignee_id` AS `rawa
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20201229` AS `disamb_assignee_id_20201229`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20210330` AS `disamb_assignee_id_20210330`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20210629` AS `disamb_assignee_id_20210629`,
-`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20210708` AS `disamb_assignee_id_20210708`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20210930` AS `disamb_assignee_id_20210930`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20211230` AS `disamb_assignee_id_20211230`,
-`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220630` AS `disamb_assignee_id_20220630` 
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220630` AS `disamb_assignee_id_20220630`,
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929` 
 from `patent`.`persistent_assignee_disambig` 
 where `patent`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_persistent_inventor` AS 
-select `patent`.`persistent_inventor_disambig`.`current_rawinventor_id` AS `rawinventor_uuid`,
+select `patent`.`persistent_inventor_disambig`.`patent_id` AS `patent_id`,
+`patent`.`persistent_inventor_disambig`.`sequence` AS `sequence`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20170808` AS `disamb_inventor_id_20170808`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20171003` AS `disamb_inventor_id_20171003`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20171226` AS `disamb_inventor_id_20171226`,
@@ -294,7 +297,8 @@ select `patent`.`persistent_inventor_disambig`.`current_rawinventor_id` AS `rawi
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20200929` AS `disamb_inventor_id_20200929`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20201229` AS `disamb_inventor_id_20201229`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20211230` AS `disamb_inventor_id_20211230`,
-`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220630` AS `disamb_inventor_id_20220630` 
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220630` AS `disamb_inventor_id_20220630`,
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929` 
 from `patent`.`persistent_inventor_disambig` 
 where `patent`.`persistent_inventor_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -472,9 +476,20 @@ select `pregrant_publications`.`cpc_current`.`document_number` AS `pgpub_id`,
 `pregrant_publications`.`cpc_current`.`subgroup_id` AS `cpc_group`,
 `pregrant_publications`.`cpc_current`.`category` AS `cpc_type`,
 `pregrant_publications`.`cpc_current`.`version` AS `cpc_version_indicator`,
-`pregrant_publications`.`cpc_current`.`symbol_position` AS `cpc_symbol_position`
+`pregrant_publications`.`cpc_current`.`symbol_position` AS `cpc_symbol_position` 
 from `pregrant_publications`.`cpc_current` 
 where `pregrant_publications`.`cpc_current`.`version_indicator` <= '{{datestring}}';
+
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_cpc_title` AS 
+select `a`.`id` AS `cpc_subclass`,
+`a`.`title` AS `cpc_subclass_title`,
+`b`.`id` AS `cpc_group`,
+`b`.`title` AS `cpc_group_title`,
+`c`.`id` AS `cpc_class`,
+`c`.`title` AS `cpc_class_title` 
+from ((`patent`.`cpc_group` `a` 
+join `patent`.`cpc_subgroup` `b` on(`a`.`id` = left(`b`.`id`, 4))) 
+join `patent`.`cpc_subsection` `c` on(left(`b`.`id`, 3) = `c`.`id`));
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_foreign_priority` AS 
 select `a`.`document_number` AS `pgpub_id`,
@@ -511,10 +526,10 @@ where `pg`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_granted_patent_crosswalk` AS 
 select `pregrant_publications`.`granted_patent_crosswalk`.`document_number` AS `pgpub_id`,
-`pregrant_publications`.`granted_patent_crosswalk`.`patent_number` AS `patent_id`,
+`pregrant_publications`.`granted_patent_crosswalk`.`patent_id` AS `patent_id`,
 `pregrant_publications`.`granted_patent_crosswalk`.`application_number` AS `application_id` 
 from `pregrant_publications`.`granted_patent_crosswalk` 
-where `pregrant_publications`.`granted_patent_crosswalk`.`version_indicator` <= '{{datestring}}';
+where (`granted_patent_crosswalk`.`g_version_indicator` <= '{{datestring}}' or `granted_patent_crosswalk`.`g_version_indicator` is null) and (`granted_patent_crosswalk`.`pg_version_indicator` <= '{{datestring}}' or `granted_patent_crosswalk`.`pg_version_indicator` is null);
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_inventor_disambiguated` AS 
 select `a`.`document_number` AS `pgpub_id`,
@@ -558,6 +573,20 @@ select `pregrant_publications`.`ipcr`.`document_number` AS `pgpub_id`,
 from `pregrant_publications`.`ipcr` 
 where `pregrant_publications`.`ipcr`.`version_indicator` <= '{{datestring}}';
 
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_location_disambiguated` AS 
+select `location`.`id` AS `location_id`,
+`location`.`city` AS `disambig_city`,
+`location`.`state` AS `disambig_state`,
+`location`.`country` AS `disambig_country`,
+`location`.`latitude` AS `latitude`,
+`location`.`longitude` AS `longitude`,
+`location`.`county` AS `county`,
+`location`.`state_fips` AS `state_fips`,
+`location`.`county_fips` AS `county_fips` 
+from `patent`.`location` 
+where `location`.`id` in (select distinct `pregrant_publications`.`rawlocation`.`location_id` from `pregrant_publications`.`rawlocation`) 
+and `location`.`version_indicator` <= '{{datestring}}';
+
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_location_not_disambiguated` AS 
 select `a`.`id` AS `rawlocation_id`,
 `a`.`location_id` AS `location_id`,
@@ -575,9 +604,33 @@ select `a`.`document_number` AS `pgpub_id`,
 `a`.`country` AS `filed_country`,
 `a`.`kind` AS `application_kind`,
 `a`.`pct_doc_number` AS `pct_doc_number`,
-`a`.`doc_type` AS `pct_doc_type`
-from `pregrant_publications`.`pct_data` `a`
+`a`.`doc_type` AS `pct_doc_type` 
+from `pregrant_publications`.`pct_data` `a` 
 where `a`.`version_indicator` <= '{{datestring}}';
+
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_persistent_assignee` AS 
+select `pregrant_publications`.`persistent_assignee_disambig`.`document_id` AS `pgpub_id`,
+`pregrant_publications`.`persistent_assignee_disambig`.`sequence` AS `sequence`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20201229` AS `disamb_assignee_id_20201229`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20210330` AS `disamb_assignee_id_20210330`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20210930` AS `disamb_assignee_id_20210930`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20211230` AS `disamb_assignee_id_20211230`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20220630` AS `disamb_assignee_id_20220630`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929` 
+from `pregrant_publications`.`persistent_assignee_disambig` 
+where `pregrant_publications`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
+
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_persistent_inventor` AS 
+select `pregrant_publications`.`persistent_inventor_disambig`.`document_id` AS `pgpub_id`,
+`pregrant_publications`.`persistent_inventor_disambig`.`sequence` AS `sequence`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20210330` AS `disamb_inventor_id_20210330`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20210629` AS `disamb_inventor_id_20210629`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20210930` AS `disamb_inventor_id_20210930`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20211230` AS `disamb_inventor_id_20211230`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20220630` AS `disamb_inventor_id_20220630`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929` 
+from `pregrant_publications`.`persistent_inventor_disambig` 
+where `pregrant_publications`.`persistent_inventor_disambig`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_published_application` AS 
 select `b`.`document_number` AS `pgpub_id`,

@@ -26,12 +26,14 @@ def update_create_view_sql(config, output_path, if_exists='replace'):
 			create_syntax = inspector.get_view_definition(view,schema)
 			remove = 'ALGORITHM=UNDEFINED DEFINER=.* SQL SECURITY (DEFINER|INVOKER)'
 			create_syntax = re.sub(remove, 'OR REPLACE SQL SECURITY INVOKER', create_syntax)
-			create_syntax = re.sub('[0-9]{4}-[01][0-9]-[0123][0-9]', "{{datestring}}",create_syntax)
+			create_syntax = re.sub('(?<=[\'\"])[0-9]{4}-?[01][0-9]-?[0123][0-9](?=[\'\"])', "{{datestring}}",create_syntax)
 			create_syntax = re.sub(' from ', ' \nfrom ', create_syntax, flags=re.I)
 			create_syntax = re.sub(' select ', ' \nselect ', create_syntax, flags=re.I)
 			create_syntax = re.sub(' where ', ' \nwhere ', create_syntax, flags=re.I)
 			create_syntax = re.sub(' group by ', ' \ngroup by ', create_syntax, flags=re.I)
-			create_syntax = re.sub('`,','`,\n',create_syntax)
+			create_syntax = re.sub(' left join ', ' \nleft join ', create_syntax, flags=re.I)
+			create_syntax = re.sub('(?<!left) join ', ' \njoin ', create_syntax, flags=re.I)
+			create_syntax = re.sub('`, `','`,\n`',create_syntax)
 			with open(output_path, 'a') as f:
 				f.write(create_syntax)
 				f.write(";\n\n")
@@ -59,11 +61,11 @@ def update_create_view_json(config, output_path, if_exists='replace'):
 			create_syntax = inspector.get_view_definition(view,schema)
 			remove = 'ALGORITHM=UNDEFINED DEFINER=.* SQL SECURITY (DEFINER|INVOKER)'
 			create_syntax = re.sub(remove, 'OR REPLACE SQL SECURITY INVOKER', create_syntax)
-			create_syntax = re.sub('[0-9]{4}-[01][0-9]-[0123][0-9]', "{datestring}",create_syntax)
+			create_syntax = re.sub('(?<=[\'\"])[0-9]{4}-?[01][0-9]-?[0123][0-9](?=[\'\"])', "{datestring}",create_syntax)
 			create_commands[f"{schema}.{view}"] = create_syntax
 
 	with open(output_path,'a') as f:
-		json.dump(create_commands, f) # use indent argument here to get newlines
+		json.dump(create_commands, f, indent=4)
 
 def read_create_view_dictionary(config):
 	with open(f"{config['FOLDERS']['resources_folder']}/create_export_views.json",'r') as f:
