@@ -33,15 +33,7 @@ inner join geo_data.curated_locations b on a.city=b.location_name
 inner join geo_data.state_codes d on b.state=d.`State/Possession`
 inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
         and b.`country` = c.name and a.state = d.Abbreviation
-inner join (
-    select location_name, `state`, b.country, count(*)
-    from geo_data.curated_locations b 
-    where place= '{loc}' and b.`country` {filter} 'United States of America' 
-    group by 1, 2, 3
-    having count(*)=1                 
-    ) as dedup on b.location_name=dedup.location_name and b.state=dedup.state and b.country=dedup.country
 set location_id= b.uuid
-## Adding in the lat/long distance back in because there are some exact matches with widely inaccurate lat/long data
 where b.place= '{loc}'"""
         filter = '='
     elif geo_type == 'foreign':
@@ -51,7 +43,6 @@ inner join geo_data.non_us_unique_city_countries b on a.city=b.location_name
 inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
         and b.`country` = c.name
 set location_id= b.uuid
-## Adding in the lat/long distance restriction between canonical locations and geocoded rawlocations because there are some exact matches with widely inaccurate lat/long data
 where b.place= '{loc}'"""
         filter = '!='
     else:
