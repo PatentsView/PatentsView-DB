@@ -42,15 +42,7 @@ inner join (
     ) as dedup on b.location_name=dedup.location_name and b.state=dedup.state and b.country=dedup.country
 set location_id= b.uuid
 ## Adding in the lat/long distance back in because there are some exact matches with widely inaccurate lat/long data
-where 
-# approx. ~ 126 miles 
-(latitude-lat) >= -1.83
-and (latitude-lat) <= 1.83
-# approx. ~ 79 miles 
-and (longitude-lon) >= -1.45
-and (longitude-lon) <= 1.45
-and a.location_id is null
-and b.place= '{loc}'"""
+where b.place= '{loc}'"""
         filter = '='
     elif geo_type == 'foreign':
         query_string = """
@@ -60,15 +52,7 @@ inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
         and b.`country` = c.name
 set location_id= b.uuid
 ## Adding in the lat/long distance restriction between canonical locations and geocoded rawlocations because there are some exact matches with widely inaccurate lat/long data
-where 
-# approx. ~ 126 miles 
-(latitude-lat) >= -1.83
-and (latitude-lat) <= 1.83
-# approx. ~ 79 miles 
-and (longitude-lon) >= -1.45
-and (longitude-lon) <= 1.45
-and a.location_id is null 
-and b.place= '{loc}'"""
+where b.place= '{loc}'"""
         filter = '!='
     else:
         raise Exception("geography type not recognized")
