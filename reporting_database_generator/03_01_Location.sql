@@ -10,10 +10,9 @@ create table `{{params.reporting_database}}`.`temp_location_num_assignees`
     `num_assignees` int unsigned not null,
     primary key (`location_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 34,018 @ 0:02
 insert into `{{params.reporting_database}}`.`temp_location_num_assignees`
     (`location_id`, `num_assignees`)
 select timl.`new_location_id`,
@@ -30,7 +29,7 @@ create table `{{params.reporting_database}}`.`temp_location_num_inventors`
     `num_inventors` int unsigned not null,
     primary key (`location_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 94,350 @ 0:50
@@ -62,10 +61,9 @@ create table `{{params.reporting_database}}`.`temp_location_patent`
     `location_id` int unsigned not null,
     `patent_id`   varchar(20)  not null
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 11,867,513 @ 3:41
 insert into `{{params.reporting_database}}`.`temp_location_patent`
     (`location_id`, `patent_id`)
 select timl.`new_location_id`,
@@ -75,7 +73,6 @@ from `{{params.reporting_database}}`.`temp_id_mapping_location` timl
          inner join `{{params.raw_database}}`.`rawinventor` ri on ri.`rawlocation_id` = rl.`id`;
 
 
-# 4,457,955 @ 2:54
 insert into `{{params.reporting_database}}`.`temp_location_patent`
     (`location_id`, `patent_id`)
 select timl.`new_location_id`,
@@ -85,7 +82,6 @@ from `{{params.reporting_database}}`.`temp_id_mapping_location` timl
          inner join `{{params.raw_database}}`.`rawassignee` ra on ra.`rawlocation_id` = rl.`id`;
 
 
-# 15:00
 alter table `{{params.reporting_database}}`.`temp_location_patent`
     add index (`location_id`, `patent_id`);
 alter table `{{params.reporting_database}}`.`temp_location_patent`
@@ -99,10 +95,9 @@ create table `{{params.reporting_database}}`.`temp_location_num_patents`
     `num_patents` int unsigned not null,
     primary key (`location_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 121,475 @ 1:10
 insert into `{{params.reporting_database}}`.`temp_location_num_patents`
     (`location_id`, `num_patents`)
 select `location_id`,
@@ -129,10 +124,9 @@ create table `{{params.reporting_database}}`.`location`
     `persistent_location_id` varchar(128) not null,
     primary key (`location_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 121,477 @ 0:02
 insert into `{{params.reporting_database}}`.`location`
 (`location_id`, `city`, `state`, `country`,
  `county`, `state_fips`, `county_fips`,

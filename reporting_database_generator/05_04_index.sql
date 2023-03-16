@@ -1,6 +1,6 @@
--- alter table `{{params.reporting_database}}`.`cpc_current` add index `ix_cpc_current_num_assignees` (`num_assignees`);
--- alter table `{{params.reporting_database}}`.`cpc_current` add index `ix_cpc_current_num_inventors` (`num_inventors`);
--- alter table `{{params.reporting_database}}`.`cpc_current` add index `ix_cpc_current_num_inventors_group` (`num_inventors_group`);
+alter table `{{params.reporting_database}}`.`cpc_current` add index `ix_cpc_current_num_assignees` (`num_assignees`);
+alter table `{{params.reporting_database}}`.`cpc_current` add index `ix_cpc_current_num_inventors` (`num_inventors`);
+alter table `{{params.reporting_database}}`.`cpc_current` add index `ix_cpc_current_num_inventors_group` (`num_inventors_group`);
 alter table `{{params.reporting_database}}`.`cpc_current` add index `ix_cpc_current_num_assignees_group` (`num_assignees_group`);
 alter table `{{params.reporting_database}}`.`cpc_current` add index `ix_cpc_current_subsection_id` (`subsection_id`);
 alter table `{{params.reporting_database}}`.`cpc_current` add index `ix_cpc_current_num_patents_group` (`num_patents_group`);

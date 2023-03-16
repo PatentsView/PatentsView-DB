@@ -13,10 +13,8 @@ create table `{{params.reporting_database}}`.`uspatentcitation`
   `category` varchar(64) null,
   primary key (`citing_patent_id`, `sequence`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 71,126,097 @ 32:52
 insert into `{{params.reporting_database}}`.`uspatentcitation`
   (`citing_patent_id`, `sequence`, `cited_patent_id`, `category`)
 select

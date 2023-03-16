@@ -120,14 +120,15 @@ def readOrgs(db_cursor):
     return org_dict
 
 
-def push_orgs(looked_up_data, org_id_mapping, config, version_indicator):
+def push_orgs(looked_up_data, org_id_mapping, config, version_indicator,database='TEMP_UPLOAD_DB', id_type = 'patent_id'):
     missed = {}
-    engine = create_engine(get_connection_string(config, 'TEMP_UPLOAD_DB'))
+    engine = create_engine(get_connection_string(config, database=database))
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     engine.execute('set foreign_key_checks=0')
+    table_prefix = 'patent' if id_type == 'patent_id' else 'publication'
     for idx, row in looked_up_data.iterrows():
-        patent_id = row['patent_id']
-        gi_statement = row['gi_statement']
+        doc_id = row[id_type]
+        # gi_statement = row['gi_statement']
         if row['looked_up'] is not np.nan:
             orgs = row['looked_up'].split('|')
             # initialize set to track all orgs for each gi patent
@@ -137,10 +138,10 @@ def push_orgs(looked_up_data, org_id_mapping, config, version_indicator):
                     org_id = org_id_mapping[org.upper()]
                     all_orgs.add(org_id)
                 else:
-                    missed[patent_id] = org
+                    missed[doc_id] = org
             for org_id in list(all_orgs):
-                query = "INSERT IGNORE INTO patent_govintorg (patent_id, organization_id, version_indicator) VALUES ('{}', '{}', '{}');".format(
-                    patent_id, org_id, version_indicator)
+                query = "INSERT IGNORE INTO {}_govintorg ({}, organization_id, version_indicator) VALUES ('{}', '{}', '{}');".format(
+                    table_prefix, id_type, doc_id, org_id, version_indicator)
                 cursor = engine.connect()
                 cursor.execute(query)
                 cursor.close()
@@ -149,8 +150,8 @@ def push_orgs(looked_up_data, org_id_mapping, config, version_indicator):
             # contracts = list(set(row['contracts'].split('|')))
             for contract_award_no in contracts:
                 if contract_award_no is not None:
-                    query = "INSERT IGNORE INTO patent_contractawardnumber (patent_id, contract_award_number, version_indicator) values ('{}', '{}', '{}')".format(
-                        patent_id, contract_award_no, version_indicator)
+                    query = "INSERT IGNORE INTO {}_contractawardnumber ({}, contract_award_number, version_indicator) values ('{}', '{}', '{}')".format(
+                        table_prefix, id_type, doc_id, contract_award_no, version_indicator)
                     cursor = engine.connect()
                     cursor.execute(query)
                     cursor.close()
@@ -160,16 +161,16 @@ def push_orgs(looked_up_data, org_id_mapping, config, version_indicator):
     total_missed_orgs.to_csv('{}/incorrect_clean_orgs.csv'.format(post_manual))
 
 
-def process_post_manual(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
+def process_post_manual(dbtype='granted_patent',database='TEMP_UPLOAD_DB', **kwargs):
+    config = get_current_config(type=dbtype, **kwargs)
     persistent_files = config['FOLDERS']['PERSISTENT_FILES']
     pre_manual = '{}/government_interest/pre_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
-    engine = create_engine(get_connection_string(config, 'TEMP_UPLOAD_DB'))
+    # engine = create_engine(get_connection_string(config, database=database))
     full_db_engine = create_engine(get_connection_string(config, 'RAW_DB'))
     # upload the new government organization we manually identified
     # upload_new_orgs(post_manual, engine)
-    version_indicator = get_version_indicator(**kwargs)
+    version_indicator = config['DATES']['END_DATE']
 
     # make and update the dictionary mapping original to clean org name
     dict_clean_org = create_dict(pre_manual, post_manual, persistent_files)
@@ -182,12 +183,13 @@ def process_post_manual(**kwargs):
     org_id_mapping = readOrgs(full_db_engine)
 
     # push the mappings into the db
-    push_orgs(looked_up, org_id_mapping, config, version_indicator)
+    id_type=('patent_id' if dbtype =='granted_patent' else 'document_number')
+    push_orgs(looked_up, org_id_mapping, config, version_indicator, database=database, id_type=id_type)
 
 
-def qc_gi(**kwargs):
-    config = get_current_config('granted_patent', **kwargs)
-    qc = GovtInterestTester(config)
+def qc_gi(dbtype='granted_patent', database='TEMP_UPLOAD_DB',**kwargs):
+    config = get_current_config(type=dbtype, **kwargs)
+    qc = GovtInterestTester(config, database=database, id_type=('patent_id' if dbtype =='granted_patent' else 'document_number'))
     qc.runTests()
 
 

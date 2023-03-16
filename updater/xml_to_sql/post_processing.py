@@ -8,8 +8,10 @@ from sqlalchemy import create_engine
 from QA.text_parser.AppTest import AppUploadTest
 from lib.configuration import get_connection_string, get_current_config
 from lib import utilities
+from updater.disambiguation.location_disambiguation.osm_location_match import create_location_match_table
 
 def pct_data_doc_type(config):
+    print('fixing pct doc types')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
 
@@ -20,6 +22,7 @@ def pct_data_doc_type(config):
 
 
 def consolidate_uspc(config):
+    print('consolidating rawuspc into uspc')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
@@ -29,15 +32,20 @@ def consolidate_uspc(config):
 
 
 def consolidate_rawlocation(config):
+    print('consolidating rawlocations from inventors, assignees, and applicants')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
+    applicant_table = 'non_inventor_applicant' if config['PATENTSVIEW_DATABASES']['PROD_DB'] == 'patent' else 'us_parties'
     engine = create_engine(cstr)
     engine.execute(
             'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM rawassignee;')
     engine.execute(
             'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM rawinventor;')
+    engine.execute(
+            f'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM {applicant_table};')
 
 
 def create_country_transformed(config):
+    print('creating country_transformed')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
@@ -46,6 +54,7 @@ def create_country_transformed(config):
 
 
 def consolidate_cpc(config):
+    print('consolidating cpc main and further into cpc')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
@@ -59,6 +68,7 @@ def consolidate_cpc(config):
 
 
 def consolidate_usreldoc(config):
+    print('consolidating usreldoc from parent_child, single, and related tables')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
@@ -72,35 +82,38 @@ def consolidate_usreldoc(config):
 
 
 def consolidate_claim(config):
+    print('cleaning claims dependent text')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
-            "UPDATE claim SET dependent = replace(dependent, 'claim ', '');")
+            "UPDATE claims SET dependent = replace(dependent, 'claim ', '');")
 
     engine.execute(
-            "UPDATE claim SET dependent = replace(dependent, 'Claim ', '');")
+            "UPDATE claims SET dependent = replace(dependent, 'Claim ', '');")
 
     engine.execute(
-            "UPDATE claim SET dependent = replace(dependent, 'claims ', '');")
+            "UPDATE claims SET dependent = replace(dependent, 'claims ', '');")
 
     engine.execute(
-            "UPDATE claim SET dependent = replace(dependent, 'Claims ', '');")
+            "UPDATE claims SET dependent = replace(dependent, 'Claims ', '');")
 
     engine.execute(
-            "UPDATE claim SET dependent = concat('claim ', dependent) WHERE dependent NOT LIKE '%%,%%';")
+            "UPDATE claims SET dependent = concat('claim ', dependent) WHERE dependent NOT LIKE '%%,%%';")
 
     engine.execute(
-            "UPDATE claim SET dependent = concat('claims ', dependent) WHERE dependent LIKE '%%,%%';")
+            "UPDATE claims SET dependent = concat('claims ', dependent) WHERE dependent LIKE '%%,%%';")
 
 
 def detail_desc_length(config):
+    print('measuring detail description text length')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
-            'UPDATE detail_desc_text d SET `length` = LENGTH(d.`text`);')
+            'UPDATE detail_desc_text d SET `description_length` = LENGTH(d.`description_text`);')
 
 
 def yearly_claim(config):
+    print('migrating claims to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
@@ -110,7 +123,7 @@ def yearly_claim(config):
     con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
-        cur.execute("SELECT DISTINCT SUBSTRING(c.document_number, 1, 4) FROM claim c")
+        cur.execute("SELECT DISTINCT SUBSTRING(c.pgpub_id, 1, 4) FROM claims c")
 
         rows = cur.fetchall()
 
@@ -121,12 +134,13 @@ def yearly_claim(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into claim_{} select * from claim c where substring(c.document_number, 1, 4) = '{}';".format(
+                "insert into claims_{} select * from claims c where substring(c.pgpub_id, 1, 4) = '{}';".format(
                         year,
                         year))
 
 
 def yearly_brf_sum_text(config):
+    print('migrating brief summary texts to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
@@ -136,7 +150,7 @@ def yearly_brf_sum_text(config):
     con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
-        cur.execute("SELECT DISTINCT SUBSTRING(b.document_number, 1, 4) FROM brf_sum_text b")
+        cur.execute("SELECT DISTINCT SUBSTRING(b.pgpub_id, 1, 4) FROM brf_sum_text b")
 
         rows = cur.fetchall()
 
@@ -147,11 +161,12 @@ def yearly_brf_sum_text(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into brf_sum_text_{} select * from brf_sum_text b where substring(b.document_number, 1, 4) = '{}';".format(
+                "insert into brf_sum_text_{} select * from brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
                         year, year))
 
 
 def yearly_draw_desc_text(config):
+    print('migrating drawing descriptions to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
@@ -161,7 +176,7 @@ def yearly_draw_desc_text(config):
     con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
-        cur.execute("SELECT DISTINCT SUBSTRING(d.document_number, 1, 4) FROM draw_desc_text d")
+        cur.execute("SELECT DISTINCT SUBSTRING(d.pgpub_id, 1, 4) FROM draw_desc_text d")
 
         rows = cur.fetchall()
 
@@ -172,11 +187,12 @@ def yearly_draw_desc_text(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into draw_desc_text_{} select * from draw_desc_text d where substring(d.document_number, 1, 4) = '{}';".format(
+                "insert into draw_desc_text_{} select * from draw_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
                         year, year))
 
 
 def yearly_detail_desc_text(config):
+    print('migrating detail description texts to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
@@ -186,7 +202,7 @@ def yearly_detail_desc_text(config):
     con = pymysql.connect(host=host, user=user, password=password, database=database)
 
     with con.cursor() as cur:
-        cur.execute("SELECT DISTINCT SUBSTRING(d.document_number, 1, 4) FROM detail_desc_text d")
+        cur.execute("SELECT DISTINCT SUBSTRING(d.pgpub_id, 1, 4) FROM detail_desc_text d")
 
         rows = cur.fetchall()
 
@@ -197,12 +213,13 @@ def yearly_detail_desc_text(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into detail_desc_text_{} select * from detail_desc_text d where substring(d.document_number, "
+                "insert into detail_desc_text_{} select * from detail_desc_text d where substring(d.pgpub_id, "
                 "1, 4) = '{}';".format(
                         year, year))
 
 
 def consolidate_granted_cpc(config):
+    print('consolidating cpc from main and further cpc tables')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
@@ -248,9 +265,12 @@ def trim_rawassignee(config):
 
 def fix_rawassignee_wrong_org(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
-    print(cstr)
+#     print(cstr)
     engine = create_engine(cstr)
     print("Fixing Wrong Organization Landing")
+    # remove tables first in event of rerun.
+    engine.execute("DROP TABLE IF EXISTS temp_rawassignee_org_fixes_nf;")
+    engine.execute("DROP TABLE IF EXISTS temp_rawassignee_org_fixes_nl;")
     # First Name contains Organization
     engine.execute(
         """
@@ -335,6 +355,7 @@ def begin_post_processing(**kwargs):
     fix_rawassignee_wrong_org(config)
     consolidate_rawlocation(config)
     create_country_transformed(config)
+    create_location_match_table(config)
     consolidate_cpc(config)
     detail_desc_length(config)
     consolidate_uspc(config)

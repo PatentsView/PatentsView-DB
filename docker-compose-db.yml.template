@@ -1,0 +1,17 @@
+version: "3"
+services:
+  pv_updater_meta_db:
+    volumes:
+      - '{path_to_project_folder}/PatentsView-DB/airflow-metadata-db-sql/:/docker-entrypoint-initdb.d'
+    image: mariadb:latest
+    command: --explicit_defaults_for_timestamp=1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: {generated_root_password}
+    container_name: airflow_database
+    ports:
+      - 3308:3306
+networks:
+  default:
+    external: true
+    name: patentsview-pipeline-network

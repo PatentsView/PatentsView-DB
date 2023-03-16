@@ -9,6 +9,9 @@ from slack_sdk import WebClient
 from airflow.dags.granted_patent_parser.patentsview_data_updater import operator_settings
 from slack_sdk.errors import SlackApiError
 
+from reporting_database_generator.database import validate_query
+from QA.post_processing.ReportingDBTester import run_reporting_db_qa
+
 project_home = os.environ['PACKAGE_HOME']
 config = configparser.ConfigParser()
 config.read(project_home + '/config.ini')
@@ -22,13 +25,12 @@ if schema_only == "TRUE":
 else:
     schema_only = False
 
-from reporting_database_generator.database import validate_query
-
 template_extension_config = [".sql"]
 database_name_config = {
     'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
     'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME'],
-    'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR']
+    'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR'],
+    'last_reporting_database': config['REPORTING_DATABASE_OPTIONS']['LAST_REPORTING_DATABASE_NAME'],
 }
 
 
@@ -44,8 +46,8 @@ default_args = {
     'email_on_retry': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
-    'concurrency': 4
-    # 'queue': 'bash_queue',
+    'concurrency': 4,
+    'queue': 'disambiguator'
     # 'pool': 'backfill',
     # 'priority_weight': 10,
     # 'end_date': datetime(2016, 1, 1),
@@ -55,7 +57,7 @@ default_args = {
 
 reporting_db_dag = DAG("reporting_database_generation"
                        , default_args=default_args
-                       , start_date=datetime(2022, 3, 1)
+                       , start_date=datetime(2022, 6, 30)
                        , schedule_interval=None
                        , template_searchpath="/project/reporting_database_generator/")
 
@@ -91,17 +93,6 @@ govt_interest = SQLTemplatedPythonOperator(
     templates_exts=template_extension_config,
     params=database_name_config
 )
-# claims = SQLTemplatedPythonOperator(
-#     task_id='Claims_Table',
-#     provide_context=True,
-#     python_callable=validate_query.validate_and_execute,
-#     dag=reporting_db_dag,
-#     op_kwargs={'filename': '01_02_Claims', 
-#                "schema_only": schema_only},
-#     templates_dict={'source_sql': '01_02_Claims.sql'},
-#     templates_exts=template_extension_config,
-#     params=database_name_config
-# )
 id_mappings = SQLTemplatedPythonOperator(
     task_id='ID_Mappings',
     provide_context=True,
@@ -568,6 +559,12 @@ rep_tbl_2 = SQLTemplatedPythonOperator(
     params=database_name_config
 )
 
+reporting_db_qa = PythonOperator(task_id='reporting_DB_QA',
+                                          python_callable=run_reporting_db_qa,
+                                          dag=reporting_db_dag
+                                          )
+
+
 # half_join_table = SQLTemplatedPythonOperator(
 #     task_id='half_join_table',
 #     provide_context=True,
@@ -644,3 +641,5 @@ idx_9.set_downstream(rep_tbl_2)
 idx_10.set_downstream(rep_tbl_2)
 idx_11.set_downstream(rep_tbl_2)
 idx_12.set_downstream(rep_tbl_2)
+
+reporting_db_qa.set_upstream(rep_tbl_2)

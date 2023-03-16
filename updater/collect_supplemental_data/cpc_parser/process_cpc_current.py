@@ -1,7 +1,7 @@
 import csv
 import datetime
 import logging
-import multiprocessing as mp
+import billiard as mp
 import os
 import time
 import uuid
@@ -24,6 +24,7 @@ def prepare_cpc_table(config, drop_indexes):
     """
     engine = create_engine(get_connection_string(config, "TEMP_UPLOAD_DB"))
     for drop_statement in drop_indexes:
+        print(drop_statement[0])
         engine.execute(drop_statement[0])
 
 
@@ -41,18 +42,62 @@ def consolidate_cpc_data(config, add_indexes, db='granted_patent', cpc_file=None
     end_date = config['DATES']['END_DATE']
 
     if db == 'granted_patent':
-        cpc_csv_file_chunks = pd.read_csv(cpc_file, sep=",", quoting=csv.QUOTE_NONNUMERIC, chunksize=100000)
+        cpc_csv_file_chunks = pd.read_csv(cpc_file, sep=",", quoting=csv.QUOTE_NONNUMERIC, chunksize=100_000)
         for cpc_chunk in tqdm(cpc_csv_file_chunks):
             with engine.connect() as conn:
                 cpc_chunk.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
-        delete_query = "DELETE cpc FROM cpc_current cpc Inner JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null or p.version_indicator >'{vind}'".format(
-        raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], vind=end_date)
-
+        delete_query = "DELETE cpc FROM cpc_current cpc Inner JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null or p.version_indicator >'{vind}'"\
+                .format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], vind=end_date)
+        dedup_ind_add =["ALTER TABLE cpc_current ADD INDEX patent_id_ind (patent_id) USING BTREE;",
+                        "ALTER TABLE cpc_current ADD INDEX subgroup_id_ind (subgroup_id) USING BTREE;",
+                        "ALTER TABLE cpc_current ADD INDEX sequence_ind (sequence) USING BTREE;"]
+        dedup_query = """
+            DELETE t1 FROM cpc_current t1 
+            INNER JOIN cpc_current t2
+            ON (t1.patent_id = t2.patent_id 
+            AND t1.subgroup_id = t2.`subgroup_id`
+            AND t1.sequence = t2.sequence
+            AND t1.uuid < t2.uuid);
+            """
+        dedup_ind_drop = ["ALTER TABLE cpc_current DROP INDEX patent_id_ind;", 
+                          "ALTER TABLE cpc_current DROP INDEX subgroup_id_ind;", 
+                          "ALTER TABLE cpc_current DROP INDEX sequence_ind;"]
     else:
         delete_query = "DELETE cpc FROM {raw_db}.cpc_current cpc Inner JOIN {raw_db}.publication p on p.document_number = cpc.document_number WHERE p.document_number is null or p.version_indicator >'{vind}'".format(
         raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"], vind=end_date)
+        dedup_ind_add = ["ALTER TABLE cpc_current ADD INDEX document_number_ind (document_number) USING BTREE;",
+                         "ALTER TABLE cpc_current ADD INDEX subgroup_id_ind (subgroup_id) USING BTREE;" ,
+                         "ALTER TABLE cpc_current ADD INDEX sequence_ind (sequence) USING BTREE;"]
+        dedup_query = """
+            DELETE t1 FROM cpc_current t1 
+            INNER JOIN cpc_current t2
+            ON (t1.document_number = t2.document_number 
+            AND t1.subgroup_id = t2.`subgroup_id`
+            AND t1.sequence = t2.sequence
+            AND t1.uuid < t2.uuid);
+            """
+        dedup_ind_drop = ["ALTER TABLE cpc_current DROP INDEX document_number_ind;",
+                          "ALTER TABLE cpc_current DROP INDEX subgroup_id_ind;",
+                          "ALTER TABLE cpc_current DROP INDEX sequence_ind;"]
+    print(f"initial size of cpc_current: {engine.execute('SELECT COUNT(*) FROM cpc_current').fetchone()[0]}")
+    print("deleting patents absent in patent table:")
     print(delete_query)
-    engine.execute(delete_query)
+    deletion = engine.execute(delete_query)
+    print(f"number of records removed: {deletion.rowcount}")
+    print("adding temporary indices for deduplication")
+    for q in dedup_ind_add:
+        print(q)
+        engine.execute(q)
+    print("deduplicating table on document id, subgroup id, and sequence:")
+    print(dedup_query)
+    deduplication = engine.execute(dedup_query)
+    print(f"number of duplicates removed: {deduplication.rowcount}") # this may slightly overcount due to patents with multiple duplicates
+    print("removing temporary indices")
+    for q in dedup_ind_drop:
+        print(q)
+        engine.execute(q)
+    print(f"final size of cpc_current: {engine.execute('SELECT COUNT(*) FROM cpc_current').fetchone()[0]}")
+    print("adding permanent table indices:")
     for add_statement in add_indexes:
         print(add_statement)
         engine.execute(add_statement[0])
@@ -63,8 +108,10 @@ def consolidate_cpc_data(config, add_indexes, db='granted_patent', cpc_file=None
     rename table {upload_db}.cpc_current to {raw_db}.cpc_current
     """.format(raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"],
                upload_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
+    print("renaming past cpc_current table:")
     print(rename_raw_statement)
     engine.execute(rename_raw_statement)
+    print("relocating new cpc_current table to production:")
     print(rename_upload_statement)
     engine.execute(rename_upload_statement)
 
@@ -79,7 +126,7 @@ def generate_file_list(zipfilepath, extension='.xml'):
     for filename in archive.filelist:
         fname, ext = os.path.splitext(filename.filename)
         if ext == extension:
-            print(filename.filename)
+            # print(filename.filename) # printed outside of generator as well
             yield filename.filename
 
 
@@ -205,7 +252,7 @@ def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue, writer):
 # process_and_upload_patent_cpc_current
 def process_and_upload_cpc_current(db='granted_patent', **kwargs):
     config = get_current_config(db, schedule='quarterly', **kwargs)
-    setup_database(config, drop=False)
+    setup_database(config, drop=False, cpc_only=True)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     cpc_output_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
 
@@ -214,64 +261,79 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
     else:
         file_name = "CPC_pgpub_mcf"
 
-        cpc_xml_file = None
-        for filename in os.listdir(cpc_folder):
-            if (filename.startswith(file_name) and filename.endswith('.zip')):
-                cpc_xml_file = "{cpc_folder}/{cpc_file}".format(cpc_folder=cpc_folder, cpc_file=filename)
+    cpc_xml_file = None
+    for filename in os.listdir(cpc_folder):
+        if (filename.startswith(file_name) and filename.endswith('.zip')):
+            cpc_xml_file = "{cpc_folder}/{cpc_file}".format(cpc_folder=cpc_folder, cpc_file=filename)
+            print(cpc_xml_file)
 
-        if cpc_xml_file:
-            add_index, drop_index = generate_index_statements(config, "PROD_DB", "cpc_current")
-            prepare_cpc_table(config, drop_index)
+    if cpc_xml_file:
+        add_index, drop_index = generate_index_statements(config, "PROD_DB", "cpc_current")
+        prepare_cpc_table(config, drop_index)
 
-            if db == 'granted_patent':
-                xml_file_name_generator = generate_file_list(cpc_xml_file)
+        if db == 'granted_patent':
+            xml_file_name_generator = generate_file_list(cpc_xml_file)
+            print(xml_file_name_generator)
 
-                parallelism = int(config["PARALLELISM"]["parallelism"])
-                manager = mp.Manager()
-                log_queue = manager.Queue()
-                csv_queue = manager.Queue()
+            parallelism = int(config["PARALLELISM"]["parallelism"])
+            manager = mp.Manager()
+            log_queue = manager.Queue()
+            csv_queue = manager.Queue()
 
-                parser_start = time.time()
-                pool = mp.Pool(parallelism)
-                cpc_file = "{data_folder}/cpc_current.csv".format(data_folder=cpc_output_folder)
-                header = ["patent_id", "sequence", "version_indicator", "uuid", "section_id", "subsection_id",
-                          "group_id",
-                          "subgroup_id", "category"]
-                watcher = pool.apply_async(log_writer, (log_queue, "cpc_parser"))
-                writer = pool.apply_async(mp_csv_writer, (
-                    csv_queue,
-                    cpc_file, header))
-                p_list = []
-                # process_cpc_file(cpc_xml_file, list(xml_file_name_generator)[-1], config, log_queue, csv_queue)
-                for xml_file_name in xml_file_name_generator:
-                    p = pool.apply_async(process_cpc_file, (cpc_xml_file, xml_file_name, config, log_queue, csv_queue))
-                    p_list.append(p)
+            parser_start = time.time()
+            pool = mp.Pool(parallelism)
+            cpc_file = "{data_folder}/cpc_current.csv".format(data_folder=cpc_output_folder)
+            header = ["patent_id", "sequence", "version_indicator", "uuid", "section_id", "subsection_id",
+                      "group_id",
+                      "subgroup_id", "category"]
+            watcher = pool.apply_async(log_writer, (log_queue, "cpc_parser"))
+            writer = pool.apply_async(mp_csv_writer, (
+                csv_queue,
+                cpc_file, header))
+            p_list = []
+            # process_cpc_file(cpc_xml_file, list(xml_file_name_generator)[-1], config, log_queue, csv_queue)
+            for xml_file_name in xml_file_name_generator:
+                print(xml_file_name)
+                # process_cpc_file(cpc_xml_file, xml_file_name, config, log_queue, csv_queue)
+                p = pool.apply_async(process_cpc_file, (cpc_xml_file, xml_file_name, config, log_queue, csv_queue))
+                p_list.append(p)
 
-                for t in p_list:
-                    t.get()
+            for t in p_list:
+                t.get()
 
-                log_queue.put({
-                    "level": logging.INFO,
-                    "message": "Total parsing time {parser_duration}".format(
-                        parser_duration=round(time.time() - parser_start, 3))
-                })
-                log_queue.put({
-                    "level": None,
-                    "message": "kill"
-                })
-                csv_queue.put(['kill'])
-                watcher.get()
-                writer.get()
-                pool.close()
-                pool.join()
-                consolidate_cpc_data(config, add_index, db, cpc_file)
-            else:
-                parse_and_write_cpc(cpc_folder, **kwargs)
-                consolidate_cpc_data(config, add_index, db)
+            log_queue.put({
+                "level": logging.INFO,
+                "message": "Total parsing time {parser_duration}".format(
+                    parser_duration=round(time.time() - parser_start, 3))
+            })
+            log_queue.put({
+                "level": None,
+                "message": "kill"
+            })
+            csv_queue.put(['kill'])
+            watcher.get()
+            writer.get()
+            pool.close()
+            pool.join()
+            consolidate_cpc_data(config, add_index, db, cpc_file)
         else:
-            print("Could not find CPC Zip XML file under {cpc_input}".format(cpc_input=cpc_folder))
-            exit(1)
+            parse_and_write_cpc(cpc_folder, **kwargs)
+            consolidate_cpc_data(config, add_index, db)
+    else:
+        print("Could not find CPC Zip XML file under {cpc_input}".format(cpc_input=cpc_folder))
+        exit(1)
 
+def delete_cpc_currents_pre_1976(db='granted_patent', **kwargs):
+    config = get_current_config(db, schedule='quarterly', **kwargs)
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
+    query = """
+delete 
+from cpc_current a 
+	left join patent b on a.patent_id=b.patent_id 
+where b.patent_id is null;
+    """
+    print(query)
+    engine.execute(query)
 
 
 if __name__ == '__main__':

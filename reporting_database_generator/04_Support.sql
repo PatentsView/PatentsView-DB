@@ -1,5 +1,4 @@
 
-
 # BEGIN assignee_inventor ######################################################################################################################
 
 
@@ -13,7 +12,6 @@ create table `{{params.reporting_database}}`.`assignee_inventor`
 engine=InnoDB;
 
 
-# 4,352,502 @ 1:52
 insert into `{{params.reporting_database}}`.`assignee_inventor`
   (`assignee_id`, `inventor_id`, `num_patents`)
 select
@@ -42,7 +40,7 @@ create table `{{params.reporting_database}}`.`inventor_coinventor`
 )
 engine=InnoDB;
 
-# 16,742,248 @ 11:55
+
 insert into `{{params.reporting_database}}`.`inventor_coinventor`
   (`inventor_id`, `coinventor_id`, `num_patents`)
 select
@@ -72,7 +70,6 @@ create table `{{params.reporting_database}}`.`inventor_cpc_subsection`
 engine=InnoDB;
 
 
-# 7,171,415 @ 11:55
 insert into `{{params.reporting_database}}`.`inventor_cpc_subsection`
   (`inventor_id`, `subsection_id`, `num_patents`)
 select
@@ -106,7 +103,6 @@ create table `{{params.reporting_database}}`.`inventor_cpc_group`
 engine=InnoDB;
 
 
-# 7,171,415 @ 11:55
 insert into `{{params.reporting_database}}`.`inventor_cpc_group`
   (`inventor_id`, `group_id`, `num_patents`)
 select
@@ -172,7 +168,7 @@ create table `{{params.reporting_database}}`.`inventor_uspc_mainclass`
 )
 engine=InnoDB;
 
-# 10,350,577 @ 14:44
+
 insert into `{{params.reporting_database}}`.`inventor_uspc_mainclass`
   (`inventor_id`, `mainclass_id`, `num_patents`)
 select
@@ -200,7 +196,7 @@ create table `{{params.reporting_database}}`.`inventor_year`
 )
 engine=InnoDB;
 
-# 8,140,017 @ 2:19
+
 insert into `{{params.reporting_database}}`.`inventor_year`
 (`inventor_id`, `patent_year`, `num_patents`)
 select
@@ -230,7 +226,7 @@ create table `{{params.reporting_database}}`.`assignee_cpc_subsection`
 engine=InnoDB;
 
 
-# 933,903 @ 2:22
+
 insert into `{{params.reporting_database}}`.`assignee_cpc_subsection`
   (`assignee_id`, `subsection_id`, `num_patents`)
 select
@@ -264,7 +260,7 @@ create table `{{params.reporting_database}}`.`assignee_cpc_group`
 engine=InnoDB;
 
 
-# 933,903 @ 2:22
+
 insert into `{{params.reporting_database}}`.`assignee_cpc_group`
   (`assignee_id`, `group_id`, `num_patents`)
 select
@@ -296,7 +292,7 @@ create table `{{params.reporting_database}}`.`assignee_nber_subcategory`
 )
 engine=InnoDB;
 
-# 618,873 @ 0:48
+
 insert into `{{params.reporting_database}}`.`assignee_nber_subcategory`
   (`assignee_id`, `subcategory_id`, `num_patents`)
 select
@@ -329,7 +325,7 @@ create table `{{params.reporting_database}}`.`assignee_uspc_mainclass`
 )
 engine=InnoDB;
 
-# 1,534,644 @ 3:30
+
 insert into `{{params.reporting_database}}`.`assignee_uspc_mainclass`
   (`assignee_id`, `mainclass_id`, `num_patents`)
 select
@@ -358,7 +354,6 @@ create table `{{params.reporting_database}}`.`assignee_year`
 )
 engine=InnoDB;
 
-# 931,856 @ 2:00
 insert into `{{params.reporting_database}}`.`assignee_year`
   (`assignee_id`, `patent_year`, `num_patents`)
 select
@@ -378,7 +373,6 @@ group by
 ###################################################################################################################################
 
 
-# 434,823 @ 0:17
 update
   `{{params.reporting_database}}`.`location_assignee` la
   inner join
@@ -404,7 +398,6 @@ set
 ###################################################################################################################################
 
 
-# 4,167,939 @ 2:33
 update
   `{{params.reporting_database}}`.`location_inventor` li
   inner join
@@ -440,7 +433,6 @@ create table `{{params.reporting_database}}`.`location_cpc_subsection`
 engine=InnoDB;
 
 
-# 1,077,971 @ 6:19
 insert into `{{params.reporting_database}}`.`location_cpc_subsection`
   (`location_id`, `subsection_id`, `num_patents`)
 select
@@ -461,26 +453,25 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `{{params.reporting_database}}`.`location_cpc_group`;
-create table `{{params.reporting_database}}`.`location_cpc_group`
-(
-  `location_id` int unsigned not null,
-  `group_id` varchar(20) not null,
-  `num_patents` int unsigned not null
-)
-engine=InnoDB;
+-- drop table if exists `{{params.reporting_database}}`.`location_cpc_group`;
+-- create table `{{params.reporting_database}}`.`location_cpc_group`
+-- (
+--   `location_id` int unsigned not null,
+--   `group_id` varchar(20) not null,
+--   `num_patents` int unsigned not null
+-- )
+-- engine=InnoDB;
 
 
-# 1,077,971 @ 6:19
-insert into `{{params.reporting_database}}`.`location_cpc_group`
-  (`location_id`, `group_id`, `num_patents`)
-select
-  tlp.`location_id`, cpc.`group_id`, count(distinct tlp.`patent_id`)
-from
-  `{{params.reporting_database}}`.`temp_location_patent` tlp
-  inner join `{{params.reporting_database}}`.`cpc_current_group` cpc using(`patent_id`)
-group by
-  tlp.`location_id`, cpc.`group_id`;
+-- insert into `{{params.reporting_database}}`.`location_cpc_group`
+--   (`location_id`, `group_id`, `num_patents`)
+-- select
+--   tlp.`location_id`, cpc.`group_id`, count(distinct tlp.`patent_id`)
+-- from
+--   `{{params.reporting_database}}`.`temp_location_patent` tlp
+--   inner join `{{params.reporting_database}}`.`cpc_current_group` cpc using(`patent_id`)
+-- group by
+--   tlp.`location_id`, cpc.`group_id`;
 
 
 # END location_cpc_group
@@ -503,7 +494,6 @@ create table `{{params.reporting_database}}`.`location_uspc_mainclass`
 engine=InnoDB;
 
 
-# 2,260,351 @ 7:47
 insert into `{{params.reporting_database}}`.`location_uspc_mainclass`
   (`location_id`, `mainclass_id`, `num_patents`)
 select
@@ -535,7 +525,6 @@ create table `{{params.reporting_database}}`.`location_nber_subcategory`
 engine=InnoDB;
 
 
-#
 insert into `{{params.reporting_database}}`.`location_nber_subcategory`
   (`location_id`, `subcategory_id`, `num_patents`)
 select
@@ -565,7 +554,6 @@ create table `{{params.reporting_database}}`.`location_year`
 engine=InnoDB;
 
 
-# 867,942 @ 1:19
 insert into `{{params.reporting_database}}`.`location_year`
   (`location_id`, `year`, `num_patents`)
 select
@@ -585,10 +573,10 @@ group by
 drop table if exists `{{params.reporting_database}}`.`inventor_rawinventor`;
 create table if not exists `{{params.reporting_database}}`.`inventor_rawinventor` (uuid int(10) unsigned AUTO_INCREMENT PRIMARY KEY,name_first varchar(64),name_last varchar(64),patent_id varchar(20),inventor_id int(10) unsigned);
 
-INSERT INTO `{{params.reporting_database}}`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id) 
-SELECT DISTINCT ri.name_first,ri.name_last,ri.patent_id,repi.inventor_id 
-FROM `{{params.reporting_database}}`.`inventor` repi 
-left join `{{params.raw_database}}`.`rawinventor` ri 
+INSERT INTO `{{params.reporting_database}}`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id)
+SELECT DISTINCT ri.name_first,ri.name_last,ri.patent_id,repi.inventor_id
+FROM `{{params.reporting_database}}`.`inventor` repi
+left join `{{params.raw_database}}`.`rawinventor` ri
 on ri.inventor_id = repi.persistent_inventor_id;
 
 alter table `{{params.reporting_database}}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_first` (`name_first`);

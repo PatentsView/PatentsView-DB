@@ -13,18 +13,17 @@ create table `{{params.reporting_database}}`.`temp_id_mapping_assignee`
   primary key (`old_assignee_id`),
   unique index `ak_temp_id_mapping_assignee` (`new_assignee_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # There are assignees in the raw data that are not linked to anything so we will take our
-# assignee ids from the patent_assignee table to ensure we don't copy any unused assignees over.
-# 345,185 @ 0:23
+# assignee ids from the patent_assignee table to ensure we dont copy any unused assignees over.
 insert ignore into
   `{{params.reporting_database}}`.`temp_id_mapping_assignee` (`old_assignee_id`)
 select
   pa.`assignee_id`
 from
-  `{{params.raw_database}}`.`rawassignee` pa where assignee_id is not null and  version_indicator<={{params.version_indicator}};
+  `{{params.raw_database}}`.`rawassignee` pa where assignee_id is not null and  version_indicator<='{{params.version_indicator}}';
 
 
 # END assignee id mapping
@@ -46,18 +45,17 @@ create table `{{params.reporting_database}}`.`temp_id_mapping_inventor`
   primary key (`old_inventor_id`),
   unique index `ak_temp_id_mapping_inventor` (`new_inventor_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # There are inventors in the raw data that are not linked to anything so we will take our
-# inventor ids from the patent_inventor table to ensure we don't copy any unused inventors over.
-# 3,572,763 @ 1:08
+# inventor ids from the patent_inventor table to ensure we dont copy any unused inventors over.
 insert ignore into
   `{{params.reporting_database}}`.`temp_id_mapping_inventor` (`old_inventor_id`)
 select
   `inventor_id`
 from
-  `{{params.raw_database}}`.`rawinventor` where inventor_id is not null and version_indicator<={{params.version_indicator}};
+  `{{params.raw_database}}`.`rawinventor` where inventor_id is not null and version_indicator<='{{params.version_indicator}}';
 
 
 # END inventor id mapping
@@ -79,19 +77,19 @@ create table `{{params.reporting_database}}`.`temp_id_mapping_lawyer`
   primary key (`old_lawyer_id`),
   unique index `ak_temp_id_mapping_lawyer` (`new_lawyer_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # There are inventors in the raw data that are not linked to anything so we will take our
-# lawyer ids from the patent_lawyer table to ensure we don't copy any unused lawyers over.
-# 3,572,763 @ 1:08
+# lawyer ids from the patent_lawyer table to ensure we dont copy any unused lawyers over.
+
 insert ignore into
   `{{params.reporting_database}}`.`temp_id_mapping_lawyer` (`old_lawyer_id`)
 select
   `lawyer_id`
 from
   `{{params.raw_database}}`.`rawlawyer`
-  where lawyer_id is not null and lawyer_id !=  ''  and version_indicator<={{params.version_indicator}};
+  where lawyer_id is not null and lawyer_id !=  ''  and version_indicator<='{{params.version_indicator}}';
 
 
 # END lawyer id mapping
@@ -113,18 +111,18 @@ create table `{{params.reporting_database}}`.`temp_id_mapping_examiner`
   primary key (`old_examiner_id`),
   unique index `ak_temp_id_mapping_examiner` (`new_examiner_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # There are inventors in the raw data that are not linked to anything so we will take our
-# lawyer ids from the patent_lawyer table to ensure we don't copy any unused lawyers over.
-# 3,572,763 @ 1:08
+# lawyer ids from the patent_lawyer table to ensure we dont copy any unused lawyers over.
+
 insert into
   `{{params.reporting_database}}`.`temp_id_mapping_examiner` (`old_examiner_id`)
 select distinct
   `uuid`
 from
-  `{{params.raw_database}}`.`rawexaminer` where version_indicator<= {{params.version_indicator}};
+  `{{params.raw_database}}`.`rawexaminer` where version_indicator<= '{{params.version_indicator}}';
 
 
 # END examiner id mapping
@@ -165,10 +163,9 @@ create table `{{params.reporting_database}}`.`temp_id_mapping_location`
   index `ak_temp_id_mapping_location` (`new_location_id`),
   index `ak_old_id_mapping_location` (`old_location_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 120,449 @ 3:27
 insert into
   `{{params.reporting_database}}`.`temp_id_mapping_location` (`old_location_id`,`old_location_id_transformed`)
 select

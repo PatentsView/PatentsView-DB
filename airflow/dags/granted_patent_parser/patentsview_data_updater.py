@@ -11,13 +11,18 @@ from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.collect_supplemental_data.update_withdrawn import post_withdrawn, process_withdrawn
 from updater.create_databases.merge_in_new_data import begin_merging, begin_text_merging, post_merge_weekly_granted, \
     post_merge_quarterly_granted
-from updater.create_databases.rename_db import qc_database_granted
+from updater.create_databases.rename_db import check_patent_prod_integrity, qc_database_granted
 from updater.create_databases.upload_new import begin_database_setup, post_upload_granted, upload_current_data
+from updater.disambiguation.location_disambiguation.generate_locationID import run_location_disambiguation, \
+    run_location_disambiguation_tests
+from updater.disambiguation.location_disambiguation.osm_location_match import geocode_by_osm
+
 from updater.government_interest.NER import begin_NER_processing
 from updater.government_interest.NER_to_manual import process_ner_to_manual
 from updater.government_interest.post_manual import process_post_manual, qc_gi
 from updater.government_interest.simulate_manual import simulate_manual
-from updater.text_data_processor.text_table_parsing import begin_text_parsing, post_text_parsing_granted, post_text_merge_granted
+from updater.text_data_processor.text_table_parsing import begin_text_parsing, post_text_parsing_granted, \
+    post_text_merge_granted
 from updater.xml_to_csv.bulk_downloads import bulk_download
 from updater.xml_to_csv.parse_patents import patent_parser
 from updater.xml_to_csv.preprocess_xml import preprocess_xml
@@ -84,9 +89,9 @@ parse_xml_operator = PythonOperator(task_id='parse_xml',
                                     **operator_settings, pool='high_memory_pool')
 
 #### Database Load ####
-qc_database_operator = PythonOperator(task_id='qc_database_setup',
-                                      python_callable=qc_database_granted,
-                                      **operator_settings)
+qc_temp_database_operator = PythonOperator(task_id='qc_upload_database_setup',
+                                           python_callable=qc_database_granted,
+                                           **operator_settings)
 
 upload_new_operator = PythonOperator(task_id='upload_current', python_callable=upload_current_data,
                                      **operator_settings
@@ -117,6 +122,20 @@ patent_sql_operator = PythonOperator(task_id='parse_xml_to_sql', python_callable
 qc_upload_operator = PythonOperator(task_id='qc_upload_new', python_callable=post_upload_granted,
                                     **operator_settings
                                     )
+### new OSM ElasticSearch geocoding
+OSM_geocode_operator = PythonOperator(task_id='geocode_rawlocations', python_callable=geocode_by_osm,
+                                      **operator_settings
+                                      )
+
+### Location_ID generation
+loc_disambiguation = PythonOperator(task_id='loc_disambiguation', python_callable=run_location_disambiguation, op_kwargs={'dbtype': 'granted_patent'},
+                                    **operator_settings)
+
+qc_loc_disambiguation = PythonOperator(task_id='qc_loc_disambiguation'
+                                       , python_callable=run_location_disambiguation_tests
+                                       , op_kwargs={'dbtype': 'granted_patent'}
+                                       , **operator_settings)
+
 ### GI Processing
 gi_NER = PythonOperator(task_id='gi_NER', python_callable=begin_NER_processing,
                         **operator_settings)
@@ -206,6 +225,11 @@ qc_parse_text_operator = PythonOperator(task_id='qc_parse_text_data',
                                         **operator_settings)
 
 #### merge in newly parsed data
+integrity_check_operator = PythonOperator(task_id='check_prod_integrity',
+                                          python_callable=check_patent_prod_integrity,
+                                          **operator_settings
+                                          )
+
 merge_new_operator = PythonOperator(task_id='merge_db',
                                     python_callable=begin_merging,
                                     **operator_settings
@@ -237,19 +261,21 @@ qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_
 operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,
                                             parse_xml_operator, upload_new_operator,
                                             upload_trigger_operator, patent_sql_operator,
-                                            patent_id_fix_operator, qc_upload_operator,
-                                            gi_NER, gi_postprocess_NER, manual_simulation_operator,
-                                            post_manual_operator, gi_qc_operator, withdrawn_operator,
-                                            qc_withdrawn_operator, merge_new_operator]
+                                            patent_id_fix_operator, qc_upload_operator, OSM_geocode_operator,
+                                            loc_disambiguation, qc_loc_disambiguation, gi_NER,
+                                            gi_postprocess_NER, manual_simulation_operator, post_manual_operator,
+                                            gi_qc_operator, withdrawn_operator, qc_withdrawn_operator,
+                                            merge_new_operator]
 
-operator_sequence_groups['text_sequence'] = [upload_setup_operator, upload_table_creation_operator,
-                                             parse_text_data_operator, patent_id_fix_operator,
-                                             qc_parse_text_operator, table_creation_operator,
-                                             merge_text_operator]
+operator_sequence_groups['text_sequence'] = [upload_setup_operator, qc_temp_database_operator,
+                                             upload_table_creation_operator, parse_text_data_operator,
+                                             patent_id_fix_operator, qc_parse_text_operator,
+                                             table_creation_operator, merge_text_operator]
+
 operator_sequence_groups['xml_text_cross_dependency'] = [download_xml_operator, parse_text_data_operator]
-operator_sequence_groups['xml_preprare_dependency'] = [upload_setup_operator, upload_new_operator]
-operator_sequence_groups['merge_prepare_xml_dependency'] = [qc_database_operator, merge_new_operator]
-operator_sequence_groups['merge_prepare_text_dependency'] = [qc_database_operator, merge_text_operator]
+operator_sequence_groups['xml_preprare_dependency'] = [qc_temp_database_operator, upload_new_operator]
+operator_sequence_groups['merge_prepare_xml_dependency'] = [integrity_check_operator, merge_new_operator]
+operator_sequence_groups['merge_prepare_text_dependency'] = [integrity_check_operator, merge_text_operator]
 for dependency_group in operator_sequence_groups:
     dependency_sequence = operator_sequence_groups[dependency_group]
     chain_operators(dependency_sequence)

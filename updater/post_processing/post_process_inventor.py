@@ -128,9 +128,11 @@ def create_inventor(update_config):
             KEY `inventor_name_last_name_first_index` (`name_last`(256),`name_first`(256))
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """.format(rename_name=rename_name)
+    print(create_sql)
     view_sql = """
-    CREATE OR REPLACE VIEW inventor as select * from inventor_{suffix}
+    CREATE OR REPLACE SQL SECURITY INVOKER VIEW inventor as select * from inventor_{suffix}
     """.format(suffix=suffix)
+    print(view_sql)
     engine.execute(create_sql)
     engine.execute(view_sql)
     limit = 10000
@@ -206,12 +208,24 @@ def load_granted_lookup(**kwargs):
                       parent_entity_id='patent_id', entity='inventor',
                       include_location=True, location_strict=False)
 
+def load_granted_location_inventor(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='location',
+                      parent_entity_id='location_id', entity='inventor',
+                      include_location=True, location_strict=True)
+
 
 def load_pregranted_lookup(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
                       parent_entity_id='document_number', entity="inventor",
                       include_location=True)
+
+def load_pregranted_location_inventor(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='location',
+                      parent_entity_id='location_id', entity='inventor',
+                      include_location=True, location_strict=True)
 
 
 def post_process_inventor(**kwargs):
@@ -228,12 +242,42 @@ def post_process_qc(**kwargs):
     qc = InventorPostProcessingQC(config)
     qc.runTests()
 
+def evaluate_inventor_clustering(**kwargs):
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+    engine = create_engine(get_connection_string(config, "RAW_DB"))
+    pquery = "select patent_id, patent_date from patentsview_export_granted.g_patent"
+    print(pquery)
+    patent = pd.read_sql_query(sql=pquery, con=engine)
+    rquery = "select patent_id, sequence, inventor_id from patent.rawinventor "
+    print(rquery)
+    rawinventor = pd.read_sql_query(sql=rquery, con=engine)
+    patent_date = pd.DatetimeIndex(patent.patent_date)
+    patent["patent_date"] = patent_date.year.astype(int)
+    joined = rawinventor.merge(patent, on="patent_id", how="left")
+    joined["mention_id"] = "US" + joined.patent_id + "-" + joined.sequence
+    breakpoint()
+    joined = joined.query('patent_date >= 1975 and patent_date <= 2022')
+    current_disambiguation = joined.set_index("mention_id")["inventor_id"]
+
+    from er_evaluation.estimators import pairwise_precision_design_estimate, pairwise_recall_design_estimate
+    from er_evaluation.summary import cluster_sizes
+    from pv_evaluation.benchmark import load_binette_2022_inventors_benchmark
+    pairwise_precision_design_estimate(current_disambiguation, load_binette_2022_inventors_benchmark(),
+                                       weights=1 / cluster_sizes(load_binette_2022_inventors_benchmark()))
+
+
 
 if __name__ == '__main__':
     # post_process_inventor(config)
-    post_process_inventor(**{
-        "execution_date": datetime.date(2020, 12, 29)
-    })
+    # post_process_inventor(**{
+    #     "execution_date": datetime.date(2020, 12, 29)
+    # })
     # post_process_qc(**{
     #         "execution_date": datetime.date(2020, 12, 29)
     #         })
+    # evaluate_inventor_clustering(**{
+    #     "execution_date": datetime.date(2020, 12, 29)
+    # })
+    load_pregranted_location_inventor(**{
+        "execution_date": datetime.date(2022, 7, 1)
+    })

@@ -35,16 +35,18 @@ def check_encoding_and_collation(db_con, tables_list):
     if tables_list == "":
         return True
     else:
-        collation_information = db_con.execute(
-                f"""
+        query = f"""
                 SELECT DISTINCT CHARACTER_SET_NAME, COLLATION_NAME 
                 from information_schema.COLUMNS where DATA_TYPE in ('varchar') 
                     AND TABLE_SCHEMA in {table_schema_list_str} 
                     AND TABLE_NAME in {table_name_list_str} 
                     AND CHARACTER_SET_NAME is not null 
                     AND COLLATION_NAME is not null
-                    """)
+                    """
+        print(query)
+        collation_information = db_con.execute(query)
     collation_data = collation_information.fetchall()
+    print(collation_data)
     if len(collation_data) > 1:
         return False
     else:

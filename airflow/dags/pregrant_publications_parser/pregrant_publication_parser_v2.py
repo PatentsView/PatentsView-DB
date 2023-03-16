@@ -11,9 +11,16 @@ from updater.create_databases.pregrant_database_setup import create_database
 from updater.xml_to_sql.parser import begin_parsing
 from updater.xml_to_sql.post_processing import begin_post_processing
 
+from updater.disambiguation.location_disambiguation.generate_locationID import run_location_disambiguation, run_location_disambiguation_tests
+from updater.government_interest.NER import begin_NER_processing
+from updater.government_interest.NER_to_manual import process_ner_to_manual
+from updater.government_interest.post_manual import process_post_manual, qc_gi
+from updater.government_interest.simulate_manual import simulate_manual
+
+
 # QA STEPS
-from updater.create_databases.upload_new import post_upload_pgpubs
-from updater.create_databases.rename_db import qc_database_pgpubs
+from updater.create_databases.upload_new import begin_database_setup, post_upload_pgpubs
+from updater.create_databases.rename_db import check_pgpubs_prod_integrity, qc_database_pgpubs
 from updater.create_databases.merge_in_new_data import post_merge_weekly_pgpubs, post_merge_quarterly_pgpubs, begin_text_merging_pgpubs
 from updater.create_databases.other_misc_tasks import create_granted_patent_crosswalk
 from updater.text_data_processor.text_table_parsing import post_text_merge_pgpubs, post_text_parsing_pgpubs
@@ -61,6 +68,13 @@ create_database_operator = PythonOperator(task_id='create_pgpubs_database',
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure
                                           )
+# create_database_operator = PythonOperator(task_id='create_pgpubs_database',
+#                                           python_callable=begin_database_setup,
+#                                           op_kwargs={'dbtype': 'pgpubs'},
+#                                           dag=app_xml_dag,
+#                                           on_success_callback=airflow_task_success,
+#                                           on_failure_callback=airflow_task_failure
+#                                           )
 
 qc_database_operator = PythonOperator(task_id='qc_database_setup',
                                       python_callable=qc_database_pgpubs,
@@ -98,6 +112,66 @@ qc_text_upload_operator = PythonOperator(task_id='qc_text_upload_new',
                                     on_success_callback=airflow_task_success,
                                     on_failure_callback=airflow_task_failure
                                     )
+
+integrity_check_operator = PythonOperator(task_id='check_prod_integrity',
+                                    python_callable=check_pgpubs_prod_integrity,
+                                    dag=app_xml_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure
+                                    )
+
+loc_disambiguation = PythonOperator(task_id='loc_disambiguation',
+                                    python_callable=run_location_disambiguation,
+                                    op_kwargs={'dbtype': 'pgpubs'},
+                                    dag=app_xml_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure
+                                    )
+
+loc_disambiguation_qc = PythonOperator(task_id='loc_disambiguation_qc',
+                                    python_callable=run_location_disambiguation_tests,
+                                    op_kwargs={'dbtype': 'pgpubs'},
+                                    dag=app_xml_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure
+                                    )
+
+### GI Processing
+gi_NER = PythonOperator(task_id='gi_NER', 
+                        python_callable=begin_NER_processing,
+                        op_kwargs={'dbtype': 'pgpubs'},
+                        dag=app_xml_dag,
+                        on_success_callback=airflow_task_success,
+                        on_failure_callback=airflow_task_failure)
+
+gi_postprocess_NER = PythonOperator(task_id='postprocess_NER', 
+                                    python_callable=process_ner_to_manual,
+                                    op_kwargs={'dbtype': 'pgpubs'},
+                                    dag=app_xml_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure)
+
+manual_simulation_operator = PythonOperator(task_id='simulate_manual_task', 
+                                            python_callable=simulate_manual,
+                                            op_kwargs={'dbtype': 'pgpubs'},
+                                            dag=app_xml_dag,
+                                            on_success_callback=airflow_task_success,
+                                            on_failure_callback=airflow_task_failure)
+
+post_manual_operator = PythonOperator(task_id='post_manual', 
+                                    python_callable=process_post_manual,
+                                    op_kwargs={'dbtype': 'pgpubs'},
+                                    dag=app_xml_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure)
+
+gi_qc_operator = PythonOperator(task_id='GI_QC', 
+                                python_callable=qc_gi,
+                                op_kwargs={'dbtype': 'pgpubs'},
+                                dag=app_xml_dag,
+                                on_success_callback=airflow_task_success,
+                                on_failure_callback=airflow_task_failure)
+
 
 merge_database_operator = SQLTemplatedPythonOperator(
     task_id='merge_database',
@@ -146,13 +220,21 @@ qc_merge_weekly_text_operator = PythonOperator(task_id='qc_text_merge_weekly',
                                          )
 
 # OTHER MISC TASKS TO BE RUN
-create_granted_patent_crosswalk = PythonOperator(task_id='create_granted_patent_crosswalk',
-                                                 python_callable=create_granted_patent_crosswalk)
+# create_crosswalk = PythonOperator(task_id='create_granted_patent_crosswalk',
+#                                                  dag=app_xml_dag,
+#                                                  provide_context=True,
+#                                                  on_success_callback=airflow_task_success,
+#                                                  on_failure_callback=airflow_task_failure,
+#                                                  python_callable=create_granted_patent_crosswalk)
 
 
-qa_granted_patent_crosswalk = PythonOperator(task_id='qa_granted_patent_crosswalk',
-                                             python_callable=qa_test_table_updated,
-                                             op_kwargs={'table': 'granted_patent_crosswalk', 'db': 'pgpubs'})
+# qa_granted_patent_crosswalk = PythonOperator(task_id='qa_granted_patent_crosswalk',
+#                                              dag=app_xml_dag,
+#                                              provide_context=True,
+#                                              on_success_callback=airflow_task_success,
+#                                              on_failure_callback=airflow_task_failure,
+#                                              python_callable=qa_test_table_updated,
+#                                              op_kwargs={'table': 'granted_patent_crosswalk', 'db': 'pgpubs'})
 
 
 qc_database_operator.set_upstream(create_database_operator)
@@ -160,8 +242,19 @@ parse_xml_operator.set_upstream(qc_database_operator)
 post_processing_operator.set_upstream(parse_xml_operator)
 qc_upload_operator.set_upstream(post_processing_operator)
 qc_text_upload_operator.set_upstream(post_processing_operator)
-merge_database_operator.set_upstream(qc_upload_operator)
-merge_database_operator.set_upstream(qc_text_upload_operator)
+integrity_check_operator.set_upstream(qc_upload_operator)
+integrity_check_operator.set_upstream(qc_text_upload_operator)
+loc_disambiguation.set_upstream(integrity_check_operator)
+loc_disambiguation_qc.set_upstream(loc_disambiguation)
+gi_NER.set_upstream(loc_disambiguation_qc)
+gi_postprocess_NER.set_upstream(gi_NER)
+manual_simulation_operator.set_upstream(gi_postprocess_NER)
+post_manual_operator.set_upstream(manual_simulation_operator)
+gi_qc_operator.set_upstream(post_manual_operator)
+merge_database_operator.set_upstream(gi_qc_operator)
 qc_merge_weekly_operator.set_upstream(merge_database_operator)
 qc_merge_weekly_text_operator.set_upstream(merge_database_operator)
+# create_crosswalk.set_upstream(qc_merge_weekly_operator)
+# create_crosswalk.set_upstream(qc_merge_weekly_text_operator)
+# qa_granted_patent_crosswalk.set_upstream(create_crosswalk)
 

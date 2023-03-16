@@ -70,6 +70,13 @@ def get_connection_string(config, database='TEMP_UPLOAD_DB', connection='DATABAS
     port = '{}'.format(config[connection]['PORT'])
     return 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database)
 
+def get_unique_connection_string(config, connection='DATABASE_SETUP', database='unique_name'):
+    database = f'{database}'
+    host = '{}'.format(config[connection]['HOST'])
+    user = '{}'.format(config[connection]['USERNAME'])
+    password = '{}'.format(config[connection]['PASSWORD'])
+    port = '{}'.format(config[connection]['PORT'])
+    return 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database)
 
 def get_backup_command(**kwargs):
     command = "mydumper"
@@ -133,9 +140,10 @@ def get_today_dict(type='granted_patent', from_date=datetime.date.today()):
 
 def get_table_config(update_config):
     project_home = os.environ['PACKAGE_HOME']
-    resources_file = "{root}/{resources}/raw_db_tables.json".format(root=project_home,
-                                                                    resources=update_config["FOLDERS"][
-                                                                        "resources_folder"])
+    dbtype = 'pgpubs' if update_config["PATENTSVIEW_DATABASES"]['PROD_DB']=='pregrant_publications' else 'patent'
+    resources_file = "{root}/{resources}/raw_db_tables_{dbtype}.json".format(root=project_home,
+                                                                    resources=update_config["FOLDERS"]["resources_folder"],
+                                                                    dbtype=dbtype)
     raw_db_table_settings = json.load(open(resources_file))
     return raw_db_table_settings
 
@@ -212,9 +220,9 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
         print("Canopy Settings are {canopy_setting}".format(
             canopy_setting=pprint.pformat(config['INVENTOR_BUILD_CANOPIES'])))
 
-    incremental = 1
-    if end_date.month == 12:
-        incremental = 0
+    incremental = 0
+    # if end_date.month == 12:
+    #     incremental = 0
     config['DISAMBIGUATION']['INCREMENTAL'] = str(incremental)
     print("Incremental Setting is {incremental}".format(incremental=config['DISAMBIGUATION']['INCREMENTAL']))
     return config
@@ -281,7 +289,7 @@ def get_es(config):
     es_hostname = config['ELASTICSEARCH']['HOST']
     username = config['ELASTICSEARCH']['USER']
     password = config['ELASTICSEARCH']['PASSWORD']
-    es = Elasticsearch(hosts=es_hostname, http_auth=(username, password))
+    es = Elasticsearch(hosts=es_hostname, http_auth=(username, password),timeout=1200)
     return es
 
 if __name__ == '__main__':

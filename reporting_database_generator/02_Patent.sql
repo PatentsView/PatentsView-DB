@@ -1,5 +1,4 @@
 
-
 # BEGIN patent 
 
 ################################################################################################################################################
@@ -20,10 +19,8 @@ create table `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
   `longitude` float null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 4,694,651 @ 2:22
 insert into `{{params.reporting_database}}`.`temp_patent_firstnamed_assignee`
 (
   `patent_id`, `assignee_id`, `persistent_assignee_id`, `location_id`,
@@ -49,7 +46,7 @@ from
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tl on l.`id` =  tl.`old_location_id`
 where
   (ta.`new_assignee_id` is not null or
-  tl.`new_location_id` is not null) and  p.version_indicator<={{params.version_indicator}};
+  tl.`new_location_id` is not null) and  p.version_indicator<='{{params.version_indicator}}';
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`;
@@ -67,10 +64,8 @@ create table `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
   `longitude` float null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 5,425,008 @ 6:03
 insert into `{{params.reporting_database}}`.`temp_patent_firstnamed_inventor`
 (
   `patent_id`, `inventor_id`, `persistent_inventor_id`, `location_id`,
@@ -96,7 +91,7 @@ from
   left outer join `{{params.reporting_database}}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
 where
   (ti.`new_inventor_id` is not null or
-  tli.`new_location_id` is not null)and  p.version_indicator<={{params.version_indicator}};
+  tli.`new_location_id` is not null)and  p.version_indicator<='{{params.version_indicator}}';
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`;
@@ -106,17 +101,15 @@ create table `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`
   `num_foreign_documents_cited` int unsigned not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# The number of foreign documents cited.
-# 2,751,072 @ 1:52
 insert into `{{params.reporting_database}}`.`temp_num_foreign_documents_cited`
   (`patent_id`, `num_foreign_documents_cited`)
 select
   `patent_id`, count(*)
 from
-  `{{params.raw_database}}`.`foreigncitation`  where version_indicator<={{params.version_indicator}}
+  `{{params.raw_database}}`.`foreigncitation`  where version_indicator<='{{params.version_indicator}}'
 group by
   `patent_id`;
 
@@ -128,17 +121,15 @@ create table `{{params.reporting_database}}`.`temp_num_us_applications_cited`
   `num_us_applications_cited` int unsigned not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# The number of U.S. patent applications cited.
-# 1,534,484 @ 0:21
 insert into `{{params.reporting_database}}`.`temp_num_us_applications_cited`
   (`patent_id`, `num_us_applications_cited`)
 select
   `patent_id`, count(*)
 from
-  `{{params.raw_database}}`.`usapplicationcitation`  where version_indicator<={{params.version_indicator}}
+  `{{params.raw_database}}`.`usapplicationcitation`  where version_indicator<='{{params.version_indicator}}'
 group by
   `patent_id`;
 
@@ -150,17 +141,16 @@ create table `{{params.reporting_database}}`.`temp_num_us_patents_cited`
   `num_us_patents_cited` int unsigned not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# The number of U.S. patents cited.
-# 5,231,893 @ 7:17
+
 insert into `{{params.reporting_database}}`.`temp_num_us_patents_cited`
   (`patent_id`, `num_us_patents_cited`)
 select
   `patent_id`, count(*)
 from
-  `{{params.raw_database}}`.`uspatentcitation`  where version_indicator<={{params.version_indicator}}
+  `{{params.raw_database}}`.`uspatentcitation`  where version_indicator<='{{params.version_indicator}}'
 group by
   `patent_id`;
 
@@ -172,11 +162,9 @@ create table `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents
   `num_times_cited_by_us_patents` int unsigned not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# The number of times a U.S. patent was cited.
-# 6,333,277 @ 7:27
 insert into `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents`
   (`patent_id`, `num_times_cited_by_us_patents`)
 select
@@ -184,7 +172,7 @@ select
 from
   `{{params.raw_database}}`.`uspatentcitation`
 where
-  `citation_id` is not null and `citation_id` != ''  and version_indicator<={{params.version_indicator}}
+  `citation_id` is not null and `citation_id` != ''  and version_indicator<='{{params.version_indicator}}'
 group by
   `citation_id`;
 
@@ -200,11 +188,10 @@ create table `{{params.reporting_database}}`.`temp_patent_aggregations`
   `num_times_cited_by_us_patents` int unsigned not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# Combine all of our patent aggregations.
-# 5,425,879 @ 2:14
+
 insert into `{{params.reporting_database}}`.`temp_patent_aggregations`
 (
   `patent_id`, `num_foreign_documents_cited`, `num_us_applications_cited`,
@@ -222,7 +209,7 @@ from
   left outer join `{{params.reporting_database}}`.`temp_num_foreign_documents_cited` t1 on t1.`patent_id` = p.`id`
   left outer join `{{params.reporting_database}}`.`temp_num_us_applications_cited` t2 on t2.`patent_id` = p.`id`
   left outer join `{{params.reporting_database}}`.`temp_num_us_patents_cited` t3 on t3.`patent_id` = p.`id`
-  left outer join `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents` t4 on t4.`patent_id` = p.`id`  where version_indicator<={{params.version_indicator}};
+  left outer join `{{params.reporting_database}}`.`temp_num_times_cited_by_us_patents` t4 on t4.`patent_id` = p.`id`  where version_indicator<='{{params.version_indicator}}';
 
 
 drop table if exists `{{params.reporting_database}}`.`temp_patent_earliest_application_date`;
@@ -232,11 +219,9 @@ create table `{{params.reporting_database}}`.`temp_patent_earliest_application_d
   `earliest_application_date` date not null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# Find the earliest application date for each patent.
-# 5,425,837 @ 1:35
 insert into `{{params.reporting_database}}`.`temp_patent_earliest_application_date`
   (`patent_id`, `earliest_application_date`)
 select
@@ -244,7 +229,7 @@ select
 from
   `{{params.raw_database}}`.`application` a
 where
-  a.`date` is not null and a.`date` > date('1899-12-31') and a.`date` < date_add(current_date, interval 10 year)  and version_indicator<={{params.version_indicator}}
+  a.`date` is not null and a.`date` > date('1899-12-31') and a.`date` < date_add(current_date, interval 10 year)  and version_indicator<='{{params.version_indicator}}'
 group by
   a.`patent_id`;
 
@@ -256,11 +241,9 @@ create table `{{params.reporting_database}}`.`temp_patent_date`
   `date` date null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# Eliminate obviously bad patent dates.
-# 5,425,875 @ 0:37
 insert into `{{params.reporting_database}}`.`temp_patent_date`
   (`patent_id`, `date`)
 select
@@ -268,11 +251,10 @@ select
 from
   `{{params.raw_database}}`.`patent` p
 where
-  p.`date` is not null and p.`date` > date('1899-12-31') and p.`date` < date_add(current_date, interval 10 year) and version_indicator<={{params.version_indicator}};
+  p.`date` is not null and p.`date` > date('1899-12-31') and p.`date` < date_add(current_date, interval 10 year) and version_indicator<='{{params.version_indicator}}';
 
 
 drop table if exists `{{params.reporting_database}}`.`patent`;
-
 create table `{{params.reporting_database}}`.`patent`
 (
   `patent_id` varchar(20) not null,
@@ -316,10 +298,8 @@ create table `{{params.reporting_database}}`.`patent`
   `detail_desc_length` int unsigned null,
   primary key (`patent_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 5,425,879 @ 6:45
 insert into `{{params.reporting_database}}`.`patent`
 (
   `patent_id`, `type`, `number`, `country`, `date`, `year`,
@@ -334,9 +314,13 @@ insert into `{{params.reporting_database}}`.`patent`
   `firstnamed_inventor_state`, `firstnamed_inventor_country`,
   `firstnamed_inventor_latitude`, `firstnamed_inventor_longitude`,
   `num_foreign_documents_cited`, `num_us_applications_cited`,
-  `num_us_patents_cited`, `num_total_documents_cited`,
+  `num_us_patents_cited`,
+  `num_total_documents_cited`,
   `num_times_cited_by_us_patents`,
-  `earliest_application_date`, `patent_processing_days`,
+  `earliest_application_date`,
+  `patent_processing_days`,
+  `uspc_current_mainclass_average_patent_processing_days`,
+  `cpc_current_group_average_patent_processing_days`,
   `term_extension`, `detail_desc_length`
 )
 select
@@ -350,10 +334,13 @@ select
   tpfni.`persistent_location_id`, tpfni.`city`,
   tpfni.`state`, tpfni.`country`, tpfni.`latitude`, tpfni.`longitude`,
   tpa.`num_foreign_documents_cited`, tpa.`num_us_applications_cited`,
-  tpa.`num_us_patents_cited`, tpa.`num_total_documents_cited`,
+  tpa.`num_us_patents_cited`,
+  tpa.`num_total_documents_cited`,
   tpa.`num_times_cited_by_us_patents`,
   tpead.`earliest_application_date`,
   case when tpead.`earliest_application_date` <= p.`date` then timestampdiff(day, tpead.`earliest_application_date`, tpd.`date`) else null end,
+  null,
+  null,
   ustog.`term_extension`, `detail_desc_length`
 from
   `{{params.raw_database}}`.`patent` p
@@ -363,7 +350,8 @@ from
   left outer join `{{params.reporting_database}}`.`temp_patent_aggregations` tpa on tpa.`patent_id` = p.`id`
   left outer join `{{params.reporting_database}}`.`temp_patent_earliest_application_date` tpead on tpead.`patent_id` = p.`id`
   left outer join `{{params.raw_database}}`.`us_term_of_grant` ustog on ustog.`patent_id`=p.`id`
-  left outer join `{{params.raw_database}}`.`detail_desc_length` ddl on ddl.`patent_id` = p.`id` where  p.version_indicator<={{params.version_indicator}};
+  left outer join `{{params.raw_database}}`.`detail_desc_length` ddl on ddl.`patent_id` = p.`id`
+ where  p.version_indicator<='{{params.version_indicator}}';
 
 # END patent 
 

@@ -1155,8 +1155,8 @@
       "filename": "rel_app_text.tsv"
     },
 {
-      "table_name": "claim",
-      "friendly_name": "Claim",
+      "table_name": "claims",
+      "friendly_name": "Claims",
       "multi_valued": true,
       "entity_root_path": "claims/",
       "fields": [
@@ -1259,6 +1259,17 @@
           "field_name": "name_last",
           "friendly_name": "Name Last",
           "xml_path": "addressbook/last-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "organization",
+          "friendly_name": "Organization",
+          "xml_path": "addressbook/orgname",
           "attribute": null,
           "description": null,
           "sequence": false,

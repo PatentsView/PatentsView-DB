@@ -420,7 +420,41 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["GovtInterestTester"]
+  },
+  "publication_contractawardnumber": {
+    "fields": {
+      "document_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "contract_award_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": ["GovtInterestTester"]
+  },
+  "publication_govintorg": {
+    "fields": {
+      "document_number": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "organization_id": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "TestScripts": ["GovtInterestTester"]
   },
   "granted_patent_crosswalk": {
     "fields": {

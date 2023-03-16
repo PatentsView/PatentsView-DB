@@ -19,7 +19,7 @@ create table `{{params.reporting_database}}`.`temp_assignee_lastknown_location`
     `longitude`              float        null,
     primary key (`assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # Populate temp_assignee_lastknown_location table.  The goal here is to grab the location associated
@@ -50,7 +50,7 @@ from (
                         from `{{params.raw_database}}`.`rawassignee` ra
                                  inner join `{{params.raw_database}}`.`patent` p on p.`id` = ra.`patent_id`
                                  inner join `{{params.raw_database}}`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
-                          and ra.`assignee_id` is not null and ra.version_indicator <={{ params.version_indicator }}
+                          and ra.`assignee_id` is not null and ra.version_indicator <='{{ params.version_indicator }}'
                         order by ra.`assignee_id`,
                                  p.`date` desc,
                                  p.`id` desc
@@ -67,14 +67,14 @@ create table `{{params.reporting_database}}`.`temp_assignee_num_patents`
     `num_patents` int unsigned not null,
     primary key (`assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 insert into `{{params.reporting_database}}`.`temp_assignee_num_patents`
     (`assignee_id`, `num_patents`)
 select `assignee_id`,
        count(distinct `patent_id`)
-from `{{params.raw_database}}`.`patent_assignee` pa join `{{ params.raw_database }}`.`patent` p on p.id=pa.patent_id where p.version_indicator <={{ params.version_indicator }}
+from `{{params.raw_database}}`.`patent_assignee` pa join `{{ params.raw_database }}`.`patent` p on p.id=pa.patent_id where p.version_indicator <='{{ params.version_indicator }}'
 group by `assignee_id`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_num_inventors`;
@@ -84,15 +84,14 @@ create table `{{params.reporting_database}}`.`temp_assignee_num_inventors`
     `num_inventors` int unsigned not null,
     primary key (`assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-# 0:15
 insert into `{{params.reporting_database}}`.`temp_assignee_num_inventors`
     (`assignee_id`, `num_inventors`)
 select aa.`assignee_id`,
        count(distinct ii.`inventor_id`)
 from `{{params.raw_database}}`.`patent_assignee` aa
-         join `{{params.raw_database}}`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `{{ params.raw_database }}`.`patent` p on p.id=aa.patent_id where p.version_indicator <={{ params.version_indicator }}
+         join `{{params.raw_database}}`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `{{ params.raw_database }}`.`patent` p on p.id=aa.patent_id where p.version_indicator <='{{ params.version_indicator }}'
 group by aa.`assignee_id`;
 
 drop table if exists `{{params.reporting_database}}`.`temp_assignee_years_active`;
@@ -104,11 +103,10 @@ create table `{{params.reporting_database}}`.`temp_assignee_years_active`
     `actual_years_active` smallint unsigned not null,
     primary key (`assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # Years active is essentially the number of years difference between first associated patent and last.
-# 1:15
 insert into `{{params.reporting_database}}`.`temp_assignee_years_active`
 (`assignee_id`, `first_seen_date`, `last_seen_date`, `actual_years_active`)
 select pa.`assignee_id`,
@@ -130,10 +128,9 @@ create table `{{params.reporting_database}}`.`patent_assignee`
     primary key (`patent_id`, `assignee_id`),
     unique index ak_patent_assignee (`assignee_id`, `patent_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 4,825,748 @ 7:20
 insert into `{{params.reporting_database}}`.`patent_assignee`
 (`patent_id`, `assignee_id`, `location_id`, `sequence`)
 select distinct pa.`patent_id`,
@@ -165,10 +162,9 @@ create table `{{params.reporting_database}}`.`location_assignee`
     `num_patents` int unsigned,
     primary key (`location_id`, `assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 438,452 @ 0:07
 insert into `{{params.reporting_database}}`.`location_assignee`
     (`location_id`, `assignee_id`, `num_patents`)
 select distinct timl.`new_location_id`,
@@ -204,10 +200,9 @@ create table `{{params.reporting_database}}`.`assignee`
     `persistent_assignee_id`           varchar(64)       not null,
     primary key (`assignee_id`)
 )
-    engine = InnoDB;
+    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 345,185 @ 0:15
 insert into `{{params.reporting_database}}`.`assignee`
 (`assignee_id`, `type`, `name_first`, `name_last`, `organization`,
  `num_patents`, `num_inventors`, `lastknown_location_id`, `lastknown_persistent_location_id`, `lastknown_city`,

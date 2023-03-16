@@ -137,6 +137,7 @@ def update_text_data(table, update_config):
     # qa_connection_string = get_connection_string(update_config, 'QA_DATABASE', connection='QA_DATABASE_SETUP')
     engine = create_engine(connection_string)
     query = table["insert"]
+    print(query)
     engine.execute(query)
 
 
@@ -167,45 +168,48 @@ def begin_text_merging(**kwargs):
     text_table_config = {
             'brf_sum_text':       {
                     "insert": f"""
-INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, `text`, version_indicator)
-SELECT uuid, patent_id, text, version_indicator
+INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, summary_text, version_indicator)
+SELECT uuid, patent_id, summary_text, version_indicator
 from {temp_db}.brf_sum_text_{year}
                     """
                     },
+
             'claim':              {
                     'preprocess': normalize_exemplary,
                     "insert":     f"""
-INSERT INTO {text_db}.claims_{year}(uuid, patent_id, num, `text`, `sequence`, dependent, exemplary, 
-version_indicator)
+INSERT INTO {text_db}.claims_{year}(uuid, patent_id, claim_number, claim_text, claim_sequence, dependent, exemplary, version_indicator)
 SELECT c.uuid,
        c.patent_id,
-       c.num,
-       c.text,
-       c.sequence - 1,
+       c.claim_number,
+       c.claim_text,
+       c.claim_sequence - 1,
        c.dependent,
        case when tce.exemplary is null then 0 else 1 end,
        c.version_indicator
 from {temp_db}.claims_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
-                   on tce.patent_id = c.patent_id and tce.exemplary = c.sequence
+                   on tce.patent_id = c.patent_id and tce.exemplary = c.claim_sequence
                     """
                     },
+
             'draw_desc_text':     {
                     "insert": f"""
-INSERT INTO {text_db}.draw_desc_text_{year}(uuid, patent_id, text, sequence, version_indicator)
-SELECT uuid, patent_id, text, sequence, version_indicator
+INSERT INTO {text_db}.draw_desc_text_{year}(uuid, patent_id, draw_desc_text, draw_desc_sequence, version_indicator)
+SELECT uuid, patent_id, draw_desc_text, draw_desc_sequence, version_indicator
 from {temp_db}.draw_desc_text_{year}
                     """
                     },
+
             'detail_desc_text':   {
                     "insert": f"""
-INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, text,length,version_indicator)
-SELECT uuid, patent_id, text,char_length(text), version_indicator
+INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, description_text, description_length, version_indicator)
+SELECT uuid, patent_id, description_text, char_length(description_text), version_indicator
 from {temp_db}.detail_desc_text_{year}
                               """
                     },
+
             'detail_desc_length': {
-                    "insert": f"INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(text), version_indicator from {temp_db}.detail_desc_text_{year}"
+                    "insert": f"INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(description_text), version_indicator from {temp_db}.detail_desc_text_{year}"
                     }
             }
     merge_text_data(text_table_config, config)
@@ -222,51 +226,54 @@ def begin_text_merging_pgpubs(**kwargs):
     text_table_config = {
             'brf_sum_text':       {
                     "insert": """
-INSERT INTO {text_db}.brf_sum_text_{year}(id, document_number, `text`, version_indicator)
-SELECT id, document_number, text, version_indicator
+INSERT INTO {text_db}.brf_sum_text_{year}(id, pgpub_id, summary_text, version_indicator)
+SELECT id, pgpub_id, summary_text, version_indicator
 from {temp_db}.brf_sum_text_{year}
                     """.format(text_db=text_db,
                                temp_db=temp_db,
                                year=year)
                     },
+
             'claim':              {
                     "insert":     """
-INSERT INTO {text_db}.claim_{year}(id, document_number, `text`, `sequence`, dependent, num, 
-version_indicator)
+INSERT INTO {text_db}.claim_{year}(id, pgpub_id, claim_text, claim_sequence, dependent, claim_number, version_indicator)
 SELECT c.id,
-       c.document_number,
-       c.text,
-       c.sequence - 1,
+       c.pgpub_id,
+       c.claim_text,
+       c.claim_sequence - 1,
        c.dependent,
-       c.num,
+       c.claim_number,
        c.version_indicator
 from {temp_db}.claim_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
-                   on tce.document_number = c.document_number 
+                   on tce.pgpub_id = c.pgpub_id 
                     """.format(
                             text_db=text_db,
                             temp_db=temp_db, year=year)
                     },
+
             'draw_desc_text':     {
                     "insert": """
-INSERT INTO {text_db}.draw_desc_text_{year}(id, document_number, text, sequence, version_indicator)
-SELECT id, document_number, text, sequence, version_indicator
+INSERT INTO {text_db}.draw_desc_text_{year}(id, pgpub_id, draw_desc_text, draw_desc_sequence, version_indicator)
+SELECT id, pgpub_id, draw_desc_text, draw_desc_sequence, version_indicator
 from {temp_db}.draw_desc_text_{year}
                     """.format(text_db=text_db,
                                temp_db=temp_db,
                                year=year)
                     },
+
             'detail_desc_text':   {
                     "insert": """
-INSERT INTO {text_db}.detail_desc_text_{year}(id, document_number, text, length, version_indicator)
-SELECT id, document_number, text, char_length(text), version_indicator
+INSERT INTO {text_db}.detail_desc_text_{year}(id, pgpub_id, description_text, description_length, version_indicator)
+SELECT id, pgpub_id, description_text, char_length(description_text), version_indicator
 from {temp_db}.detail_desc_text_{year}
                               """.format(text_db=text_db,
                                          temp_db=temp_db,
                                          year=year)
                     },
+
             'detail_desc_length': {
-                    "insert": "INSERT INTO {raw_db}.detail_desc_length( document_number, detail_desc_length, version_indicator) SELECT  document_number, CHAR_LENGTH(text), version_indicator from {temp_db}.detail_desc_text_{year}".format(
+                    "insert": "INSERT INTO {raw_db}.detail_desc_length( pgpub_id, detail_desc_length, version_indicator) SELECT  pgpub_id, CHAR_LENGTH(description_text), version_indicator from {temp_db}.detail_desc_text_{year}".format(
                             raw_db=prod_db,
                             temp_db=temp_db, year=year)
                     }

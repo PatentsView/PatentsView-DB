@@ -1091,18 +1091,6 @@
         "null_allowed": true,
         "category": false,
         "location_field": false
-      },
-      "lat_new": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "long_new": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
       }
     },
       "related_entities": [
@@ -2322,6 +2310,7 @@
     },
     "TestScripts": [
       "MergeTestWeekly",
+      "UploadTest",
       "MergeTestQuarterly"
     ]
   },
@@ -2486,12 +2475,6 @@
         "location_field": true
       },
       "location_id_transformed": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "location_new_id": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
