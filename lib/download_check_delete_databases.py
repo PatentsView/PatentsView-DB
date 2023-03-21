@@ -254,7 +254,7 @@ def clean_up_backups(db, output_path):
         print(i)
         subprocess_cmd(i)
 
-def run_database_archive(type):
+def run_database_archive(type, output_override=None):
     # LOOPING THROUGH MANY
     # for i in range(0, 16):
     #     print(f"We are on Iteration {i} of 16 or {i/16} %")
@@ -269,7 +269,9 @@ def run_database_archive(type):
     # Create Archive SQL FILE
     old_db, table_list = get_oldest_databases(config, db_type=type)
 
-    if type == 'pgpubs':
+    if output_override is not None:
+        output_path = output_override
+    elif type in ('pgpubs','pregrant'):
         output_path = '/archive/PregrantPublications/pregrant_publications'
     else:
         output_path = '/archive/patent_'
