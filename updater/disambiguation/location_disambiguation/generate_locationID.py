@@ -14,19 +14,20 @@ def fix_incorrect_us_territories(config):
     total_rows = engine.execute(f"""
 select *
 from rawlocation
-where country in ('AS','GU','MH','MP','PR','VI','UM');""")
+where country in ('AS','GU','MH','MP','PR','VI','UM');""").rowcount
     if total_rows > 0:
         with engine.connect() as connection:
-            query = """
-    create table incorrect_us_territories_rawlocations
+            query1 = "create table if not exists incorrect_us_territories_rawlocations like rawlocation"
+            query2 = """
+    insert into incorrect_us_territories_rawlocations
     select *
     from rawlocation
     where country in ('AS','GU','MH','MP','PR','VI','UM')"""
-            query2 = """
+            query3 = """
     update rawlocation 
     set state = country, country = 'US', country_transformed = 'US'
     where country in ('AS','GU','MH','MP','PR','VI','UM')"""
-            for q in [query, query2]:
+            for q in [query1, query2, query3]:
                 print(q)
                 connection.execute(q)
 
