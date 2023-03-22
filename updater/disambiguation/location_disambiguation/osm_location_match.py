@@ -203,7 +203,7 @@ def create_location_match_table(config):
     print('propagating match results to rawlocation...')
     update_sql = """
     UPDATE `rawlocation` r 
-    LEFT JOIN `matched_rawlocation` mr ON (r.id = mr.id)
+    JOIN `matched_rawlocation` mr ON (r.id = mr.id)
     SET r.latitude = mr.latitude,
     r.longitude = mr.longitude
     WHERE mr.latitude IS NOT NULL
