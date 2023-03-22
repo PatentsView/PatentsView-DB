@@ -9,6 +9,26 @@ from sqlalchemy.exc import SQLAlchemyError
 from math import radians, cos, sin, asin, sqrt
 from QA.post_processing.LocationUploadQA import LocationUploadTest
 
+def fix_incorrect_us_territories(config):
+    engine, db = get_temp_db_config(config)
+    total_rows = engine.execute(f"""
+select *
+from rawlocation
+where country in ('AS','GU','MH','MP','PR','VI','UM');""")
+    if total_rows > 0:
+        with engine.connect() as connection:
+            query = """
+    create table incorrect_us_territories_rawlocations
+    select *
+    from rawlocation
+    where country in ('AS','GU','MH','MP','PR','VI','UM')"""
+            query2 = """
+    update rawlocation 
+    set state = country, country = 'US', country_transformed = 'US'
+    where country in ('AS','GU','MH','MP','PR','VI','UM')"""
+            for q in [query, query2]:
+                print(q)
+                connection.execute(q)
 
 def get_temp_db_config(config):
     """ Gets database credentials for read/write connection
@@ -340,6 +360,7 @@ select id, location_id from {dbtype}_{current_end_date}.rawlocation
 
 def run_location_disambiguation(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
+    fix_incorrect_us_territories(config)
     generate_locationID_exactmatch(config, geo_type='domestic')
     generate_locationID_exactmatch(config, geo_type='foreign')
     find_nearest_latlong(config, geo_type='domestic')
