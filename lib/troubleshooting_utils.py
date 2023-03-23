@@ -6,9 +6,6 @@ from datetime import date, datetime
 from lxml import etree
 from typing import Iterator, Dict
 
-from updater.xml_to_sql.parser import process_publication_document
-from lib.configuration import get_current_config, dtd_finder, tables_dtd_to_json, long_text_dtd_to_json
-
 def document_text_generator(xml_file: str) -> Iterator[str]:
     """
     generator that sequentially yields each xml document within an xml file as a string
@@ -88,6 +85,9 @@ def parse_single_xml_to_dfs(xml_file:str, parse_type:str, logging:bool=False) ->
     :param logging: boolean indicating whether to produce a log file
     """
     assert parse_type in ('granted_patent','pgpubs','long_text'), f"invalid parse_type: '{parse_type}'. Allowed values are {{'granted_patent','pgpubs','long_text'}}"
+    from updater.xml_to_sql.parser import dtd_finder, tables_dtd_to_json, long_text_dtd_to_json
+    from lib.configuration import get_current_config
+    config = get_current_config(type=parse_type, **{"execution_date": date.today()})
     parser_start = time.time()
     p_list = []
     dtd_file = dtd_finder(xml_file)
