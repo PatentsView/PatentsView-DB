@@ -25,7 +25,7 @@ requests
 scikit-learn
 scipy
 pyshp
-shapely
+shapely<2
 slack_sdk
 sqlparse
 tabulate
