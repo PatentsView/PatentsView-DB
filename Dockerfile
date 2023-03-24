@@ -3,4 +3,5 @@ FROM patentsview/airflow:$PV_PIPELINE_VERSION
 ENV PACKAGE_HOME /project
 ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}"
 ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}/updater/disambiguation/hierarchical_clustering_disambiguation"
+ENV PYTHONPATH "${PYTHONPATH}:${PACKAGE_HOME}/lib"
 WORKDIR $PACKAGE_HOME
