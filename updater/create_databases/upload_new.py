@@ -62,7 +62,7 @@ def setup_database(update_config, drop=True, cpc_only=False):
             print("Creating Table : {tbl}".format(tbl=table))
             if drop:
                 con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
-            if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee', 'location', 'patent_assignee'] and raw_database=='patent':
+            if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee', 'location'] and raw_database=='patent':
                 # tables with version-specific base tables (will need quarterly updating)
                 query = "create table if not exists {0}.{2} like {1}.{2}_{3}".format(temp_upload_database, raw_database, table, '20211230') 
                 print(query)
