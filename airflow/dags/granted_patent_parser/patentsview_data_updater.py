@@ -82,7 +82,7 @@ upload_setup_operator = PythonOperator(task_id='upload_database_setup', python_c
 
 process_xml_operator = PythonOperator(task_id='process_xml',
                                       python_callable=preprocess_xml,
-                                      **operator_settings, pool='memory_intensive_pool')
+                                      **operator_settings, pool='high_memory_pool')
 
 parse_xml_operator = PythonOperator(task_id='parse_xml',
                                     python_callable=patent_parser,
