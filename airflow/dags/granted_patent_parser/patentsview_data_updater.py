@@ -60,7 +60,7 @@ granted_patent_parser = DAG(
     dag_id='granted_patent_updater',
     default_args=default_args,
     description='Download and process granted patent data and corresponding classifications data',
-    start_date=datetime(2021, 7, 1, hour=5, minute=0, second=0, tzinfo=local_tz),
+    start_date=datetime(2022, 6, 30, hour=5, minute=0, second=0, tzinfo=local_tz),
     schedule_interval=timedelta(weeks=1), catchup=True,
     template_searchpath=templates_searchpath,
 )
