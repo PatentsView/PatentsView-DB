@@ -160,12 +160,12 @@ def fips_geo_patch(config):
 
         engine = create_engine(get_connection_string(config, "RAW_DB")) # re-connecting as failsafe in case record matching takes too long
         print("uploading matched locations...")
-        lookup_results.to_sql(f"temp_fips_geocode_patch_{end_date}", con=engine, index=False)
+        lookup_results.to_sql(f"fips_geocode_patch_log_{end_date}", con=engine, index=False)
 
         print("merging geo-matched locations into main table:")
         merge_query = f"""
         UPDATE patent.location_{end_date} loc
-        JOIN patent.temp_fips_geocode_patch_{end_date} patch ON loc.location_id = patch.location_id
+        JOIN patent.fips_geocode_patch_log_{end_date} patch ON loc.location_id = patch.location_id
         LEFT JOIN geo_data.census_fips fips ON (patch.state_fips = fips.state_fips AND patch.county_fips = fips.county_fips)
         SET loc.state_fips = patch.state_fips,
         loc.county_fips = patch.county_fips,

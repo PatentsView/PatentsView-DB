@@ -110,10 +110,11 @@ def load_clean_rawlawyer(**kwargs):
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr + "&local_infile=1")
     disambig_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'disambig_output')
-    q1 = "ALTER TABLE rawlawyer RENAME TO temp_rawlawyer_predisambig;"
+    end_date = config['DATES']['END_DATE'].strip("-")
+    q1 = f"ALTER TABLE rawlawyer RENAME TO rawlawyer_predisambig_{end_date};"
     print(q1)
     engine.execute(q1)
-    q2 = "CREATE TABLE rawlawyer LIKE temp_rawlawyer_predisambig;"
+    q2 = f"CREATE TABLE rawlawyer LIKE rawlawyer_predisambig_{end_date};"
     print(q2)
     engine.execute(q2)
     engine.execute(
