@@ -43,7 +43,7 @@ config = get_current_config(type='granted_patent', supplemental_configs=None, **
 
 default_args = {
     'owner': 'smadhavan',
-    'depends_on_past': False,
+    'depends_on_past': True,
     'email': ['contact@patentsview.org'],
     'email_on_failure': False,
     'email_on_retry': False,
