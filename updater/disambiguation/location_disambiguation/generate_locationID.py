@@ -27,24 +27,30 @@ def get_exact_match_update_query(geo_type):
         :return: query to update rawlocation records based on canonical locations, '=' or '!=' for later use filtering to U.S. locations or non-U.S. locations
     """
     if geo_type == 'domestic':
+        filter = '='
         query_string = """
 update {db}.rawlocation a 
 inner join geo_data.curated_locations b on a.city=b.location_name
-inner join geo_data.state_codes d on b.state=d.`State/Possession`
-inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
-        and b.`country` = c.name and a.state = d.Abbreviation
+inner join geo_data.state_codes d on b.state=d.`State/Possession` and a.state = d.Abbreviation
+inner join (
+    select location_name, `state`, count(*)
+    from geo_data.curated_locations b 
+    where place= '{loc}' and b.`country` {filter} 'United States of America' 
+    group by 1, 2
+    having count(*)=1                 
+    ) as dedup on b.location_name=dedup.location_name and b.state=dedup.state 
 set location_id= b.uuid
-where b.place= '{loc}'"""
-        filter = '='
+where location_id is null"""
     elif geo_type == 'foreign':
+        filter = '!='
         query_string = """
 update {db}.rawlocation a 
 inner join geo_data.non_us_unique_city_countries b on a.city=b.location_name
 inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
         and b.`country` = c.name
 set location_id= b.uuid
-where b.place= '{loc}'"""
-        filter = '!='
+where b.place= '{loc}' and location_id is null and b.`country` {filter} 'United States of America' """
+
     else:
         raise Exception("geography type not recognized")
     return query_string, filter
@@ -66,6 +72,7 @@ def generate_locationID_exactmatch(config, geo_type='domestic'):
     for loc in location_types:
         with engine.connect() as connection:
             exactmatch_query = eval(f'f"""{query}"""')
+            print(exactmatch_query)
             connection.execute(exactmatch_query)
             rows_affected = connection.execute(
                 f"""SELECT count(*) from rawlocation where location_id is not null and country {filter} 'US';""")
@@ -73,11 +80,11 @@ def generate_locationID_exactmatch(config, geo_type='domestic'):
                 previous = 0
             # Cumulative Rows Affected Over the 4 location Types
             notnull_rows = rows_affected.first()[0]
-            previous = notnull_rows
             new_rows_affected = (notnull_rows - previous)
             perc = notnull_rows / total_rows_affected
             print(f"{new_rows_affected} Rows Have Been Updated from {loc}")
             print(f"A Total of {notnull_rows} OUT OF {total_rows_affected} or {perc} of {geo_type} Rawlocations have Been Updated")
+            previous = notnull_rows
             save_aggregate_results_to_qa_table(config, loc, db, "", geo_type, new_rows_affected)
 
 
@@ -104,7 +111,7 @@ from rawlocation a
     inner join geo_data.country_codes b on a.country=b.`alpha-2` 
 where location_id is null and country != 'US';""", con=engine)
         geo_list = df['country'].unique()
-    print(f"There are {len(geo_list)} Entities To Process")
+    print(f"There are {len(geo_list)} {geo_type} Entities To Process")
     return geo_list
 
 def get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type, geo):
@@ -355,7 +362,7 @@ def run_location_disambiguation_tests(dbtype, **kwargs):
     tests.runTests()
 
 if __name__ == "__main__":
-    d = datetime.date(2022, 11, 1)
+    d = datetime.date(2022, 9, 27)
     run_location_disambiguation("granted_patent", **{
             "execution_date": d
         })
