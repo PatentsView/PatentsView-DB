@@ -25,12 +25,6 @@
         "bulk_generated": false,
         "direct_load": false
       },
-      "country_codes": {
-        "raw_data": false,
-        "lookup": true,
-        "bulk_generated": false,
-        "direct_load": false
-      },
       "cpc": {
         "raw_data": true,
         "lookup": false,
