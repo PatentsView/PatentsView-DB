@@ -312,10 +312,10 @@ def location_disambig_mapping_update(config, dbtype, **kwargs):
         :keyword dbtype: granted_patent or pgpubs
         :keyword kwargs: execution_date (the last day in a weeks worth of parsed data)
     """
-    weekly_config = get_current_config('granted_patent', **kwargs)
+    weekly_config = get_current_config(dbtype, **kwargs)
     cstr = get_connection_string(weekly_config, "PROD_DB")
     engine = create_engine(cstr)
-    current_end_date = weekly_config["DATES"]["END_DATE"]
+    temp_db = weekly_config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
     db = config["PATENTSVIEW_DATABASES"]["PROD_DB"]
 
     from lib.is_it_update_time import get_update_range
@@ -332,7 +332,7 @@ CREATE TABLE if not exists {db}.`location_disambiguation_mapping_{end_of_quarter
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"""
         query2 = f"""
 insert into {db}.location_disambiguation_mapping_{end_of_quarter} (id, location_id)
-select id, location_id from {dbtype}_{current_end_date}.rawlocation
+select id, location_id from {temp_db}.rawlocation
         """
         for q in [query, query2]:
             print(q)
