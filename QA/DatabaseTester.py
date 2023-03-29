@@ -159,6 +159,7 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
         allowables = { # set of tables and fields where newlines are allowable in the field content
             'brf_sum_text' : ['summary_text'], 
             'detail_desc_text' : ['description_text'],
+            'claims_text' : ['claim_text'],
             'rel_app_text' : ['text']
         }
         if table in allowables: #non-text tables
