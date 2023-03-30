@@ -61,7 +61,7 @@ where a.country is not null and a.state <> `Abbreviation`;"""
                 q_rows = rows.first()[0]
                 print(q_rows)
                 if q_rows > 0:
-                    raise Exception(f"{q} MISMATCH for {q_rows}")
+                    raise Exception(f"{q} MISMATCH for {q_rows} rows")
 
 
     def no_location_id(self):

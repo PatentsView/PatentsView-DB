@@ -316,23 +316,26 @@ def location_disambig_mapping_update(config, dbtype, **kwargs):
     cstr = get_connection_string(weekly_config, "PROD_DB")
     engine = create_engine(cstr)
     temp_db = weekly_config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
-    db = config["PATENTSVIEW_DATABASES"]["PROD_DB"]
+    # db = config["PATENTSVIEW_DATABASES"]["PROD_DB"]
 
-    from lib.is_it_update_time import get_update_range
-    q_start_date, q_end_date = get_update_range(kwargs['execution_date'] + datetime.timedelta(days=7))
-    end_of_quarter = q_end_date.strftime('%Y%m%d')
+    # from lib.is_it_update_time import get_update_range
+    # q_start_date, q_end_date = get_update_range(kwargs['execution_date'] + datetime.timedelta(days=7))
+    # end_of_quarter = q_end_date.strftime('%Y%m%d')
 
     with engine.connect() as connection:
         query = f"""
-CREATE TABLE if not exists {db}.`location_disambiguation_mapping_{end_of_quarter}` (
+CREATE TABLE if not exists {temp_db}.`location_disambiguation_mapping` (
   `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `location_id` varchar(256) COLLATE utf8mb4_unicode_ci,
+  `version_indicator` DATE NOT NULL,
+  `created_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
   PRIMARY KEY (`id`),
   KEY `location_id_2` (`location_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"""
         query2 = f"""
-insert into {db}.location_disambiguation_mapping_{end_of_quarter} (id, location_id)
-select id, location_id from {temp_db}.rawlocation
+insert into {temp_db}.`location_disambiguation_mapping` (id, location_id, version_indicator)
+select id, location_id, version_indicator from {temp_db}.rawlocation
         """
         for q in [query, query2]:
             print(q)
