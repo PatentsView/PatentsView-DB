@@ -141,10 +141,10 @@ from rawlocation;""")
                 raise Exception(f"{q_rows} % of NULL LOCATION IDs -- TOO HIGH")
 
     def check_disambig_mapping_updated(self):
-        from lib.is_it_update_time import get_update_range
-        sd = datetime.datetime.strptime(self.config['DATES']['START_DATE'], '%Y%m%d')
-        q_start_date, q_end_date = get_update_range(sd + datetime.timedelta(days=6))
-        end_of_quarter = q_end_date.strftime('%Y%m%d')
+        # from lib.is_it_update_time import get_update_range
+        # sd = datetime.datetime.strptime(self.config['DATES']['START_DATE'], '%Y%m%d')
+        # q_start_date, q_end_date = get_update_range(sd + datetime.timedelta(days=6))
+        # end_of_quarter = q_end_date.strftime('%Y%m%d')
 
         cstr = get_connection_string(self.config, 'TEMP_UPLOAD_DB')
         engine = create_engine(cstr)
@@ -152,9 +152,9 @@ from rawlocation;""")
             query = connection.execute(f"""
 select count(*)
 from rawlocation a 
-	inner join {self.config['PATENTSVIEW_DATABASES']['PROD_DB']}.location_disambiguation_mapping_{end_of_quarter} b on a.id=b.id""")
+	inner join location_disambiguation_mapping b on a.id=b.id""")
             q_rows = query.first()[0]
-            print(f"""{q_rows} Updated In the Location Disambiguation Table""")
+            print(f"""{q_rows} Updated In the Weekly Location Disambiguation Table""")
             if q_rows == 0:
                 raise Exception(f"LOCATION DISAMBIGUATION MAPPING NOT UPDATED FOR THE CURRENT WEEK")
 
