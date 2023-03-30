@@ -353,7 +353,6 @@ def run_location_disambiguation(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
     generate_locationID_exactmatch(config, geo_type='domestic')
     generate_locationID_exactmatch(config, geo_type='foreign')
-    breakpoint()
     find_nearest_latlong(config, geo_type='domestic')
     find_nearest_latlong(config, geo_type='foreign')
     location_disambig_mapping_update(config, dbtype, **kwargs)
