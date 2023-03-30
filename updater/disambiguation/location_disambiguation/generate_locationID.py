@@ -242,6 +242,7 @@ def find_nearest_latlong(config, geo_type='domestic'):
     geo_list = get_unique_list_of_geos(config, geo_type)
     geo_counter = 1
     for geo in geo_list:
+        print(geo)
         rawlocations, canonical_locations = get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type, geo)
         total_rawloc = rawlocations.shape[0]
         print(f"There are {total_rawloc} rawlocations to process for {geo}")
@@ -352,6 +353,7 @@ def run_location_disambiguation(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
     generate_locationID_exactmatch(config, geo_type='domestic')
     generate_locationID_exactmatch(config, geo_type='foreign')
+    breakpoint()
     find_nearest_latlong(config, geo_type='domestic')
     find_nearest_latlong(config, geo_type='foreign')
     location_disambig_mapping_update(config, dbtype, **kwargs)
