@@ -329,7 +329,7 @@ CREATE TABLE if not exists {temp_db}.`location_disambiguation_mapping` (
   `location_id` varchar(256) COLLATE utf8mb4_unicode_ci,
   `version_indicator` DATE NOT NULL,
   `created_date` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `location_id_2` (`location_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"""
