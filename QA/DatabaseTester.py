@@ -162,6 +162,10 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
             'claims' : ['claim_text'],
             'rel_app_text' : ['text']
         }
+        # autofixes = {
+        #     'draw_desc_text' : ['draw_desc_text'],
+        #     'rawassignee': ['orgnaization']
+        # }
         if table in allowables: #non-text tables
             if field in allowables[table]:
                 skip = True
@@ -178,9 +182,17 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
             where INSTR(`{field}`, '\n') > 0"""
             count_value = self.query_runner(newline_query, single_value_return=True, where_vi=where_vi)
             if count_value > 1:
-                exception_message = """
-    {count} rows with unwanted newlines found in {field} of {table_name} for {db}""".format(count=count_value, field=field, table_name=table,
-                        db=self.database_section)
+                # if table in autofixes and field in autofixes[table]:
+                #     makelogquery = f"CREATE TABLE IF NOT EXISTS `{table}_newline_log` LIKE {table}"
+                #     filllogquery = f"INSERT INTO `{table}_newline_log` SELECT * FROM `{table}` WHERE `{field}` LIKE '%\n%'"
+                #     fixquery = f"""
+                #     UPDATE `{table}`
+                #     SET {field} = REPLACE(REPLACE({field}, '\n', ' '), '  ', ' ')
+                #     WHERE `{field}` LIKE '%\n%';
+                #     """
+                #     self.query_runner(fixquery, single_value_return=False, where_vi=where_vi)
+                # else:
+                exception_message = f"{count_value} rows with unwanted newlines found in {field} of {table} for {self.database_section}"
                 raise Exception(exception_message)
 
 
