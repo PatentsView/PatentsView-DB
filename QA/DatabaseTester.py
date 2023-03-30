@@ -182,18 +182,26 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
             where INSTR(`{field}`, '\n') > 0"""
             count_value = self.query_runner(newline_query, single_value_return=True, where_vi=where_vi)
             if count_value > 1:
-                # if table in autofixes and field in autofixes[table]:
-                #     makelogquery = f"CREATE TABLE IF NOT EXISTS `{table}_newline_log` LIKE {table}"
-                #     filllogquery = f"INSERT INTO `{table}_newline_log` SELECT * FROM `{table}` WHERE `{field}` LIKE '%\n%'"
-                #     fixquery = f"""
-                #     UPDATE `{table}`
-                #     SET {field} = REPLACE(REPLACE({field}, '\n', ' '), '  ', ' ')
-                #     WHERE `{field}` LIKE '%\n%';
-                #     """
-                #     self.query_runner(fixquery, single_value_return=False, where_vi=where_vi)
-                # else:
-                exception_message = f"{count_value} rows with unwanted newlines found in {field} of {table} for {self.database_section}"
-                raise Exception(exception_message)
+                print(f"{count_value} rows with unwanted newlines found in {field} of {table} for {self.database_section}. Correcting records ...")
+                makelogquery = f"CREATE TABLE IF NOT EXISTS `{table}_newline_log` LIKE {table}"
+                filllogquery = f"INSERT INTO `{table}_newline_log` SELECT * FROM `{table}` WHERE `{field}` LIKE '%\n%'"
+                fixquery = f"""
+                UPDATE `{table}`
+                SET {field} = REPLACE(REPLACE({field}, '\n', ' '), '  ', ' ')
+                WHERE `{field}` LIKE '%\n%';
+                """
+                try:
+                    if not self.connection.open:
+                        self.connection.connect()
+                    with self.connection.cursor() as generic_cursor:
+                        for query in [makelogquery, filllogquery, fixquery]:
+                            print(query)
+                            generic_cursor.execute(query)
+                finally:
+                    if self.connection.open:
+                        self.connection.close()
+                # exception_message = f"{count_value} rows with unwanted newlines found in {field} of {table} for {self.database_section}"
+                # raise Exception(exception_message)
 
 
     def load_category_counts(self, table, field):
