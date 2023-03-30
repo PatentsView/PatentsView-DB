@@ -152,7 +152,7 @@ from rawlocation;""")
             query = connection.execute(f"""
 select count(*)
 from rawlocation a 
-	inner join {config['PATENTSVIEW_DATABASES']['PROD_DB']}.location_disambiguation_mapping_{end_of_quarter} b on a.id=b.id""")
+	inner join {self.config['PATENTSVIEW_DATABASES']['PROD_DB']}.location_disambiguation_mapping_{end_of_quarter} b on a.id=b.id""")
             q_rows = query.first()[0]
             print(f"""{q_rows} Updated In the Location Disambiguation Table""")
             if q_rows == 0:
