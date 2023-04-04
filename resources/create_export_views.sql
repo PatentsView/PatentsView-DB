@@ -11,7 +11,7 @@ from `patent`.`non_inventor_applicant` `a`
 where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_application` AS 
-select `a`.`id` AS `application_id`,
+select `a`.`number_transformed` AS `application_id`,
 `a`.`patent_id` AS `patent_id`,
 `a`.`type` AS `patent_application_type`,
 `a`.`date` AS `filing_date`,
