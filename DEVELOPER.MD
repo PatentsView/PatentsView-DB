@@ -65,6 +65,12 @@ There are at least 6 containers with unique services running:
   `docker volume create pv_update_volume`
 - Volumes connect to the host server so that data will be saved. Otherwise, everything in the container is deleted everytime the container is closed.
 
+| Volume      | Purpose                                                 | Servers                | 
+|-------------|---------------------------------------------------------|------------------------|
+| data-volume | Store XML rawdata                                       | PV-DataCollector; PVGP |
+| app-volume  | Store PGPUBS XML rawdata                                    | PV-DataCollector; PVGP |
+| archive     | Store archived weekly PV databases (e.g. upload_20100422) | PV-DataCollector; PVGP |
+
 ### docker network create
 
 - The first time you set this up on each machine, you'll need to create a network using the command
@@ -101,6 +107,7 @@ There are at least 6 containers with unique services running:
 - docker-compose-admin-worker.yml, docker-compose-disambiguator.yaml, docker-compose-worker.yaml all have the same
   configuration as other `patentsview/airflow` image, again, except for the command and port numbers
   - The worker `queues` execute the python code in Airflow. Different DAGs run using different workers and are controlled using different pools. For the latest configuration, see the [DAGS](airflow/dags) folder
+- Note that all DAG processes listed below also need to have `PVGP server` running to run airflow
 
 | DAG                                | Worker (Queue)                 | Pools                                                          | Servers                             | 
 |------------------------------------|--------------------------------|----------------------------------------------------------------|-------------------------------------|
