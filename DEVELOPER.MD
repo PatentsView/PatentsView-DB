@@ -7,17 +7,20 @@
 * docker-compose v2 (make sure its v2)
 * Logged into Dockerhub
 * `patentsview/airflow:{tag}` image is available on dockerhub
-
+* Sensitive variables should be stored in `airflow_pipeline_env.sh`. See `airflow_pipeline_env.sh.template` for
+  reference
+  - The variables need to be same in each server where any pipeline container is deployed
+  
 ### Docker Image
+
+#### How to build
+* Ensure you are logged into dockerhub.
+* Run the command:
 
 #### When to (re-)build the docker image
 Whenever the underlying airflow image has changed. Refer to
 the [Pipline Image repo](https://github.com/PatentsView/PatentsView-Pipeline-Setup) to learn about when and how to build
 that image
-
-#### How to build
-* Ensure you are logged into dockerhub.
-* Run the command:
 
 ```shell
 docker buildx build \
@@ -26,13 +29,8 @@ docker buildx build \
 --build-arg PYTHON_BASE_IMAGE="0.1" \
  --tag patentsview/airflow:{tag}`
 ```
-#### airflow_pipeline_env.sh
 
-- Sensitive variables should be stored in `airflow_pipeline_env.sh`. See `airflow_pipeline_env.sh.template` for
-  reference
-- The variables need to be same in each server where any pipeline container is deployed
-
-## Docker Container Organization Explanation
+## Docker Container Organization & Explanation
 
 There are at least 6 containers with unique services running:
 
