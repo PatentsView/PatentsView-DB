@@ -36,6 +36,13 @@
         "bulk_generated": false,
         "direct_load": false
       },
+      "government_organization": {
+        "raw_data": false,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false,
+        "tmp_view": true
+      },
       "ipcr": {
         "raw_data": true,
         "lookup": false,

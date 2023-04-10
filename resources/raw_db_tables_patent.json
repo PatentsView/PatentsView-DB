@@ -101,7 +101,8 @@
         "raw_data": false,
         "lookup": false,
         "bulk_generated": false,
-        "direct_load": false
+        "direct_load": false,
+        "tmp_view": true
       },
       "inventor": {
         "raw_data": false,
