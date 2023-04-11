@@ -148,10 +148,28 @@ from `{table}`
 where INSTR(`{field}`, CHAR(0x00)) > 0"""
         count_value = self.query_runner(nul_byte_query, single_value_return=True, where_vi=where_vi)
         if count_value > 0:
-            exception_message = """
-{count} rows with NUL Byte found in {field} of {table_name} for {db}""".format(count=count_value, field=field, table_name=table,
-                       db=self.database_section)
-            raise Exception(exception_message)
+        # attempt automatic correction
+            null_str_fix_query = """
+            UPDATE `{table}`
+            SET `{field}` = REPLACE(`{field}`, CHAR(0x00), '')
+            WERE INSTR(`{field}`, CHAR(0x00)) > 0
+            """
+            try:
+                if not self.connection.open:
+                    self.connection.connect()
+                with self.connection.cursor() as generic_cursor:
+                    print(null_str_fix_query)
+                    generic_cursor.execute(null_str_fix_query)
+                print(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
+                print(nul_byte_query)
+                count_value = self.query_runner(nul_byte_query, single_value_return=True, where_vi=where_vi)
+                if count_value > 0:
+                    exception_message = f"{count_value} rows with NUL Byte found in `{field}` of `{self.database_section}`.`{table}` after attempted correction."
+                    raise Exception(exception_message)
+            finally:
+                if self.connection.open:
+                    self.connection.close()
+        
 
 
     def test_newlines(self, table, field, where_vi):
@@ -344,8 +362,7 @@ where main_table.{main_table_id} is null and related_table.{related_table_id} is
         if table_name not in self.exclusion_list and 'related_entities' in table_config:
             for related_entity_config in table_config['related_entities']:
                 ###### CHECKING IF THE RELATED TABLE HAS DATA
-                exists_query = \
-f"""SHOW TABLES LIKE '{related_entity_config["related_table"]}'; """
+                exists_query = f"""SHOW TABLES LIKE '{related_entity_config["related_table"]}'; """
                 exists_table_count = self.query_runner(exists_query, single_value_return=False, where_vi=False)
                 if not exists_table_count:
                     continue
