@@ -11,8 +11,8 @@ INSERT INTO pregrant_publications.application SELECT * FROM `{{source_database}}
 INSERT INTO pgpubs_text.brf_sum_text_2022 (`id`, `pgpub_id`, `summary_text`, `filename`, `version_indicator`) 
     SELECT `id`, `pgpub_id`, `summary_text`, `filename`, `version_indicator` FROM `{{source_database}}`.brf_sum_text_2022;
 
-INSERT INTO pgpubs_text.brf_sum_text_2021 (`id`, `pgpub_id`, `summary_text`, `filename`, `version_indicator`) 
-    SELECT `id`, `pgpub_id`, `summary_text`, `filename`, `version_indicator` FROM `{{source_database}}`.brf_sum_text_2021;
+-- INSERT INTO pgpubs_text.brf_sum_text_2021 (`id`, `pgpub_id`, `summary_text`, `filename`, `version_indicator`) 
+--     SELECT `id`, `pgpub_id`, `summary_text`, `filename`, `version_indicator` FROM `{{source_database}}`.brf_sum_text_2021;
 
 INSERT INTO pgpubs_text.brf_sum_text_2020 (`id`, `pgpub_id`, `summary_text`, `filename`, `version_indicator`) 
     SELECT `id`, `pgpub_id`, `summary_text`, `filename`, `version_indicator` FROM `{{source_database}}`.brf_sum_text_2020;
@@ -77,8 +77,8 @@ INSERT INTO pgpubs_text.brf_sum_text_2001 (`id`, `pgpub_id`, `summary_text`, `fi
 INSERT INTO pgpubs_text.claims_2022 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
     SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2022;
 
-INSERT INTO pgpubs_text.claims_2021 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2021;
+-- INSERT INTO pgpubs_text.claims_2021 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
+--     SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2021;
 
 INSERT INTO pgpubs_text.claims_2020 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number`) 
     SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `filename`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2020;
@@ -145,8 +145,8 @@ INSERT INTO pregrant_publications.cpc SELECT * FROM `{{source_database}}`.cpc;
 INSERT INTO pgpubs_text.detail_desc_text_2022 (`id`, `pgpub_id`, `description_text`, `description_length`, `filename`, `version_indicator`) 
     SELECT `id`, `pgpub_id`, `description_text`, `description_length`, `filename`, `version_indicator` FROM `{{source_database}}`.detail_desc_text_2022;
 
-INSERT INTO pgpubs_text.detail_desc_text_2021 (`id`, `pgpub_id`, `description_text`, `description_length`, `filename`, `version_indicator`) 
-    SELECT `id`, `pgpub_id`, `description_text`, `description_length`, `filename`, `version_indicator` FROM `{{source_database}}`.detail_desc_text_2021;
+-- INSERT INTO pgpubs_text.detail_desc_text_2021 (`id`, `pgpub_id`, `description_text`, `description_length`, `filename`, `version_indicator`) 
+--     SELECT `id`, `pgpub_id`, `description_text`, `description_length`, `filename`, `version_indicator` FROM `{{source_database}}`.detail_desc_text_2021;
 
 INSERT INTO pgpubs_text.detail_desc_text_2020 (`id`, `pgpub_id`, `description_text`, `description_length`, `filename`, `version_indicator`) 
     SELECT `id`, `pgpub_id`, `description_text`, `description_length`, `filename`, `version_indicator` FROM `{{source_database}}`.detail_desc_text_2020;
@@ -211,8 +211,8 @@ INSERT INTO pgpubs_text.detail_desc_text_2001 (`id`, `pgpub_id`, `description_te
 INSERT INTO pgpubs_text.draw_desc_text_2022 (`id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `filename`, `version_indicator`) 
     SELECT `id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `filename`, `version_indicator` FROM `{{source_database}}`.draw_desc_text_2022;
 
-INSERT INTO pgpubs_text.draw_desc_text_2021 (`id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `filename`, `version_indicator`) 
-    SELECT `id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `filename`, `version_indicator` FROM `{{source_database}}`.draw_desc_text_2021;
+-- INSERT INTO pgpubs_text.draw_desc_text_2021 (`id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `filename`, `version_indicator`) 
+--     SELECT `id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `filename`, `version_indicator` FROM `{{source_database}}`.draw_desc_text_2021;
 
 INSERT INTO pgpubs_text.draw_desc_text_2020 (`id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `filename`, `version_indicator`) 
     SELECT `id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `filename`, `version_indicator` FROM `{{source_database}}`.draw_desc_text_2020;
