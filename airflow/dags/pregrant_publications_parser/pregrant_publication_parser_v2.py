@@ -33,7 +33,7 @@ local_tz = pendulum.timezone("America/New_York")
 
 default_args = {
     'owner': 'smadhavan',
-    'depends_on_past': True,
+    'depends_on_past': False,
     'email': ['contact@patentsview.org'],
     'email_on_failure': False,
     'email_on_retry': False,
