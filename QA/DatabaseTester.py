@@ -149,7 +149,7 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
         count_value = self.query_runner(nul_byte_query, single_value_return=True, where_vi=where_vi)
         if count_value > 0:
         # attempt automatic correction
-            null_str_fix_query = """
+            null_str_fix_query = f"""
             UPDATE `{table}`
             SET `{field}` = REPLACE(`{field}`, CHAR(0x00), '')
             WHERE INSTR(`{field}`, CHAR(0x00)) > 0
