@@ -4,6 +4,7 @@ import os
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 
+from lib.utilities import chain_operators
 from lib.configuration import get_section
 from reporting_database_generator.database.validate_query import validate_and_execute
 from updater.callbacks import airflow_task_failure, airflow_task_success
@@ -238,24 +239,35 @@ qc_merge_weekly_text_operator = PythonOperator(task_id='qc_text_merge_weekly',
 #                                              op_kwargs={'table': 'granted_patent_crosswalk', 'db': 'pgpubs'})
 
 
-qc_database_operator.set_upstream(create_database_operator)
-parse_xml_operator.set_upstream(qc_database_operator)
-post_processing_operator.set_upstream(parse_xml_operator)
-qc_upload_operator.set_upstream(post_processing_operator)
-qc_text_upload_operator.set_upstream(post_processing_operator)
-integrity_check_operator.set_upstream(qc_upload_operator)
-integrity_check_operator.set_upstream(qc_text_upload_operator)
-loc_disambiguation.set_upstream(integrity_check_operator)
-loc_disambiguation_qc.set_upstream(loc_disambiguation)
-gi_NER.set_upstream(loc_disambiguation_qc)
-gi_postprocess_NER.set_upstream(gi_NER)
-manual_simulation_operator.set_upstream(gi_postprocess_NER)
-post_manual_operator.set_upstream(manual_simulation_operator)
-gi_qc_operator.set_upstream(post_manual_operator)
-merge_database_operator.set_upstream(gi_qc_operator)
-qc_merge_weekly_operator.set_upstream(merge_database_operator)
-qc_merge_weekly_text_operator.set_upstream(merge_database_operator)
+# qc_database_operator.set_upstream(create_database_operator)
+# parse_xml_operator.set_upstream(qc_database_operator)
+# post_processing_operator.set_upstream(parse_xml_operator)
+# qc_upload_operator.set_upstream(post_processing_operator)
+# qc_text_upload_operator.set_upstream(post_processing_operator)
+# integrity_check_operator.set_upstream(qc_upload_operator)
+# integrity_check_operator.set_upstream(qc_text_upload_operator)
+# loc_disambiguation.set_upstream(integrity_check_operator)
+# loc_disambiguation_qc.set_upstream(loc_disambiguation)
+# gi_NER.set_upstream(loc_disambiguation_qc)
+# gi_postprocess_NER.set_upstream(gi_NER)
+# manual_simulation_operator.set_upstream(gi_postprocess_NER)
+# post_manual_operator.set_upstream(manual_simulation_operator)
+# gi_qc_operator.set_upstream(post_manual_operator)
+# merge_database_operator.set_upstream(gi_qc_operator)
+# qc_merge_weekly_operator.set_upstream(merge_database_operator)
+# qc_merge_weekly_text_operator.set_upstream(merge_database_operator)
 # create_crosswalk.set_upstream(qc_merge_weekly_operator)
 # create_crosswalk.set_upstream(qc_merge_weekly_text_operator)
 # qa_granted_patent_crosswalk.set_upstream(create_crosswalk)
 
+operator_sequence_groups = {}
+operator_sequence_groups['setup_and_process'] = [create_database_operator, qc_database_operator, parse_xml_operator, post_processing_operator]
+operator_sequence_groups['data_upload_qc'] = [post_processing_operator, qc_upload_operator, integrity_check_operator]
+operator_sequence_groups['text_upload_qc'] = [post_processing_operator, qc_text_upload_operator, integrity_check_operator]
+operator_sequence_groups['location_standardization'] = [integrity_check_operator, loc_disambiguation, loc_disambiguation_qc, merge_database_operator]
+operator_sequence_groups['gov_interest'] = [integrity_check_operator, gi_NER, gi_postprocess_NER, manual_simulation_operator, post_manual_operator, gi_qc_operator, merge_database_operator]
+operator_sequence_groups['merge_and_qc_data'] = [merge_database_operator, qc_merge_weekly_operator]
+operator_sequence_groups['merge_and_qc_text'] = [merge_database_operator, qc_merge_weekly_text_operator]
+
+for dependency_group in operator_sequence_groups:
+    chain_operators(operator_sequence_groups[dependency_group])

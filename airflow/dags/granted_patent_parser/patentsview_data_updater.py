@@ -259,14 +259,21 @@ withdrawn_operator = PythonOperator(task_id='withdrawn_processor', python_callab
 qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_callable=post_withdrawn,
                                        **operator_settings)
 
-operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,
+operator_sequence_groups['xml_parse'] = [download_xml_operator, process_xml_operator,
                                             parse_xml_operator, upload_new_operator,
                                             upload_trigger_operator, patent_sql_operator,
-                                            patent_id_fix_operator, qc_upload_operator, OSM_geocode_operator,
-                                            loc_disambiguation, qc_loc_disambiguation, gi_NER,
-                                            gi_postprocess_NER, manual_simulation_operator, post_manual_operator,
-                                            gi_qc_operator, withdrawn_operator, qc_withdrawn_operator,
-                                            merge_new_operator]
+                                            patent_id_fix_operator, qc_upload_operator]
+
+operator_sequence_groups['location_standardization'] = [qc_upload_operator, OSM_geocode_operator, 
+                                                        loc_disambiguation, qc_loc_disambiguation, 
+                                                        merge_new_operator]
+
+operator_sequence_groups['govt_interest'] = [qc_upload_operator, gi_NER, gi_postprocess_NER, 
+                                             manual_simulation_operator, post_manual_operator, 
+                                             gi_qc_operator, merge_new_operator]
+
+operator_sequence_groups['withdrawal_processing'] = [qc_upload_operator, withdrawn_operator, 
+                                                     qc_withdrawn_operator, merge_new_operator]
 
 operator_sequence_groups['text_sequence'] = [upload_setup_operator, qc_temp_database_operator,
                                              upload_table_creation_operator, parse_text_data_operator,
@@ -275,11 +282,8 @@ operator_sequence_groups['text_sequence'] = [upload_setup_operator, qc_temp_data
 
 operator_sequence_groups['xml_text_cross_dependency'] = [download_xml_operator, parse_text_data_operator]
 operator_sequence_groups['xml_preprare_dependency'] = [qc_temp_database_operator, upload_new_operator]
-operator_sequence_groups['merge_prepare_xml_dependency'] = [integrity_check_operator, merge_new_operator]
-operator_sequence_groups['merge_prepare_text_dependency'] = [integrity_check_operator, merge_text_operator]
+operator_sequence_groups['data_merge_integrity'] = [integrity_check_operator, merge_new_operator, qc_merge_operator]
+operator_sequence_groups['text_merge_integrity'] = [integrity_check_operator, merge_text_operator, qc_text_merge_operator]
 for dependency_group in operator_sequence_groups:
     dependency_sequence = operator_sequence_groups[dependency_group]
     chain_operators(dependency_sequence)
-
-qc_merge_operator.set_upstream(merge_new_operator)
-qc_text_merge_operator.set_upstream(merge_text_operator)
