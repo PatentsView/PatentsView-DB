@@ -96,6 +96,7 @@ post_processing_operator = PythonOperator(task_id='post_process',
                                           dag=app_xml_dag,
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure,
+                                          depends_on_past=True,
                                           pool='database_write_iops_contenders'
                                           )
 
