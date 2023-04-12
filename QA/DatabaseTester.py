@@ -152,7 +152,7 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
             null_str_fix_query = """
             UPDATE `{table}`
             SET `{field}` = REPLACE(`{field}`, CHAR(0x00), '')
-            WERE INSTR(`{field}`, CHAR(0x00)) > 0
+            WHERE INSTR(`{field}`, CHAR(0x00)) > 0
             """
             try:
                 if not self.connection.open:
