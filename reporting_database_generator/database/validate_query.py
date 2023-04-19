@@ -150,73 +150,74 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
             
     # insert portion of merge
     # Get processed template file content
-    sql_content = context['templates_dict']['source_sql']
-    # Extract individual statements from sql file
-    sql_statements = sqlparse.split(sql_content)
-    for sql_statement in sql_statements:
-        print(sql_statement)
-        # Certain type of sql are not parsed properly by sqlparse,
-        # this is the implicit else to forthcoming if
-        single_line_query = sql_statement
-        # if the parse is successful we do some sanity checks
-        if len(sqlparse.parse(sql_statement)) > 0:
-            # Parse SQL
-            parsed_statement = sqlparse.parse(sql_statement)[0]
-            single_line_query = parse_and_format_sql(parsed_statement)
-            ## Based on parameter ignore DROP table commands
-            if not drop_existing and parsed_statement.get_type().lower() == 'unknown':
-                if single_line_query.lower().lstrip().startswith("drop"):
-                    continue
+    if 'source_sql' in context['templates_dict']:
+        sql_content = context['templates_dict']['source_sql']
+        # Extract individual statements from sql file
+        sql_statements = sqlparse.split(sql_content)
+        for sql_statement in sql_statements:
+            print(sql_statement)
+            # Certain type of sql are not parsed properly by sqlparse,
+            # this is the implicit else to forthcoming if
+            single_line_query = sql_statement
+            # if the parse is successful we do some sanity checks
+            if len(sqlparse.parse(sql_statement)) > 0:
+                # Parse SQL
+                parsed_statement = sqlparse.parse(sql_statement)[0]
+                single_line_query = parse_and_format_sql(parsed_statement)
+                ## Based on parameter ignore DROP table commands
+                if not drop_existing and parsed_statement.get_type().lower() == 'unknown':
+                    if single_line_query.lower().lstrip().startswith("drop"):
+                        continue
 
-            # Insert statements are usually insert as select
-            # We perform sanity checks on those queries
-            if parsed_statement.get_type().lower() == 'insert':
-                # Check if query plan includes full table scan, if it does send an alert
-                query_plan_check = database_helpers.check_query_plan(db_con, single_line_query)
-                if not query_plan_check:
-                    message = """
-                        Query execution plan involves full table scan: ```{single_line_query} ```
-                        """.format(single_line_query=single_line_query)
-                    # send_slack_notification(message, config,
-                    #                         section,
-                    #                         "warning")
-                    print(message)
-                    # raise Exception(message)
-
-                collation_check_parameters = db_and_table_as_array(single_line_query)
-                # Check if all text fields in all supplied tables have consistent character set & collation
-                # Stops the process if the collation check fails
-                # This is because joins involving tables with inconsistent collation run forever
-                if not database_helpers.check_encoding_and_collation(db_con, collation_check_parameters):
-                    message = """
-                        Character set and/or collation mismatch between tables involved in query :
-                            {single_line_query}
+                # Insert statements are usually insert as select
+                # We perform sanity checks on those queries
+                if parsed_statement.get_type().lower() == 'insert':
+                    # Check if query plan includes full table scan, if it does send an alert
+                    query_plan_check = database_helpers.check_query_plan(db_con, single_line_query)
+                    if not query_plan_check:
+                        message = """
+                            Query execution plan involves full table scan: ```{single_line_query} ```
                             """.format(single_line_query=single_line_query)
-                    # send_slack_notification(message, config,
-                    #                         section,
-                    #                         "warning")
-                    raise Exception(message)
+                        # send_slack_notification(message, config,
+                        #                         section,
+                        #                         "warning")
+                        print(message)
+                        # raise Exception(message)
 
-                # Do not run insert statements if it is schema only run
-                if schema_only:
-                    continue
+                    collation_check_parameters = db_and_table_as_array(single_line_query)
+                    # Check if all text fields in all supplied tables have consistent character set & collation
+                    # Stops the process if the collation check fails
+                    # This is because joins involving tables with inconsistent collation run forever
+                    if not database_helpers.check_encoding_and_collation(db_con, collation_check_parameters):
+                        message = """
+                            Character set and/or collation mismatch between tables involved in query :
+                                {single_line_query}
+                                """.format(single_line_query=single_line_query)
+                        # send_slack_notification(message, config,
+                        #                         section,
+                        #                         "warning")
+                        raise Exception(message)
 
-        # If empty line move on to next sql
-        if not single_line_query.strip():
-            continue
-        try:
-            print(" ")
-            db_con.execute(single_line_query)
-        except Exception as e:
-            print(" ")
-            # send_slack_notification(
-            #         """
-            # Execution of Query failed: ```{single_line_query} ```
-            #     """.format(single_line_query=single_line_query),
-            #         config,
-            #         section,
-            #         "error")
-            raise e
+                    # Do not run insert statements if it is schema only run
+                    if schema_only:
+                        continue
+
+            # If empty line move on to next sql
+            if not single_line_query.strip():
+                continue
+            try:
+                print(" ")
+                db_con.execute(single_line_query)
+            except Exception as e:
+                print(" ")
+                # send_slack_notification(
+                #         """
+                # Execution of Query failed: ```{single_line_query} ```
+                #     """.format(single_line_query=single_line_query),
+                #         config,
+                #         section,
+                #         "error")
+                raise e
     if not fk_check:
         print(" ")
         db_con.execute("SET FOREIGN_KEY_CHECKS=1")
