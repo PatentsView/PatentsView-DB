@@ -65,6 +65,24 @@ FOR EACH row
   SET new.id = uuid();
 
 
+CREATE TABLE `brf_sum_text_2023` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
+  `summary_text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `brf_sum_text_2023_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TRIGGER before_insert_brf_sum_text_2023 BEFORE INSERT
+ON brf_sum_text_2023
+FOR EACH row
+  SET new.id = uuid();
+
+
 CREATE TABLE `brf_sum_text_2022` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pgpub_id` bigint(16) DEFAULT NULL,
@@ -478,6 +496,27 @@ CREATE TABLE `claims` (
 
 CREATE TRIGGER before_insert_claims BEFORE INSERT
 ON claims
+FOR EACH row
+  SET new.id = uuid();
+
+
+CREATE TABLE `claims_2023` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
+  `claim_text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `claim_sequence` int(11) DEFAULT NULL,
+  `dependent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`,`claim_number`),
+  CONSTRAINT `claims_2023_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TRIGGER before_insert_claims_2023 BEFORE INSERT
+ON claims_2023
 FOR EACH row
   SET new.id = uuid();
 
@@ -991,6 +1030,25 @@ FOR EACH row
   SET new.id = uuid();
 
 
+CREATE TABLE `detail_desc_text_2023` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
+  `description_text` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description_length` bigint(16) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `detail_desc_text_2023_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TRIGGER before_insert_detail_desc_text_2023 BEFORE INSERT
+ON detail_desc_text_2023
+FOR EACH row
+  SET new.id = uuid();
+
+
 CREATE TABLE `detail_desc_text_2022` (
   `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pgpub_id` bigint(16) DEFAULT NULL,
@@ -1424,6 +1482,25 @@ CREATE TABLE `draw_desc_text` (
 
 CREATE TRIGGER before_insert_draw_desc_text BEFORE INSERT
 ON draw_desc_text
+FOR EACH row
+  SET new.id = uuid();
+
+
+CREATE TABLE `draw_desc_text_2023` (
+  `id` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `pgpub_id` bigint(16) DEFAULT NULL,
+  `draw_desc_text` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `draw_desc_sequence` int(11) DEFAULT NULL,
+  `filename` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `version_indicator` date DEFAULT NULL,
+  KEY `pgpub_id` (`pgpub_id`),
+  CONSTRAINT `draw_desc_text_2023_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TRIGGER before_insert_draw_desc_text_2023 BEFORE INSERT
+ON draw_desc_text_2023
 FOR EACH row
   SET new.id = uuid();
 
