@@ -249,6 +249,7 @@ merge_text_operator = PythonOperator(task_id='merge_text_db',
 
 qc_text_merge_operator = PythonOperator(task_id='qc_merge_text_db',
                                         python_callable=post_text_merge_granted,
+                                        depends_on_past=True,
                                         **operator_settings
                                         )
 
