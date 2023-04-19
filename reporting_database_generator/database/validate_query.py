@@ -76,7 +76,7 @@ def db_and_table_as_array(single_line_query):
     return tables_schema
 
 
-def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk_check=True, section=None, **context):
+def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk_check=True, section=None, host = 'DATABASE_SETUP', **context):
     print(f'filename: {filename}')
     print(f'schema_only: {schema_only}')
     project_home = os.environ['PACKAGE_HOME']
@@ -86,10 +86,10 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
         section = "*SQL Executor (" + filename + ") *"
     # Set up database connection
     cstr = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(
-            config['DATABASE_SETUP']['USERNAME'],
-            config['DATABASE_SETUP']['PASSWORD'],
-            config['DATABASE_SETUP']['HOST'],
-            config['DATABASE_SETUP']['PORT'],
+            config[host]['USERNAME'],
+            config[host]['PASSWORD'],
+            config[host]['HOST'],
+            config[host]['PORT'],
             "information_schema")
     db_con = create_engine(cstr)
     if not fk_check:
