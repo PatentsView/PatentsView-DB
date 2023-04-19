@@ -149,17 +149,17 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
         count_value = self.query_runner(nul_byte_query, single_value_return=True, where_vi=where_vi)
         if count_value > 0:
         # attempt automatic correction
-            null_str_fix_query = f"""
+            bad_char_fix_query = f"""
             UPDATE `{table}`
-            SET `{field}` = REPLACE(`{field}`, CHAR(0x00), '')
+            SET `{field}` = REPLACE(REPLACE(REPLACE(`{field}`, CHAR(0x00), ''), CHAR(0x08), ' b'), CHAR(0x1A), 'Z')
             WHERE INSTR(`{field}`, CHAR(0x00)) > 0
             """
             try:
                 if not self.connection.open:
                     self.connection.connect()
                 with self.connection.cursor() as generic_cursor:
-                    print(null_str_fix_query)
-                    generic_cursor.execute(null_str_fix_query)
+                    print(bad_char_fix_query)
+                    generic_cursor.execute(bad_char_fix_query)
                 print(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
                 print(nul_byte_query)
                 count_value = self.query_runner(nul_byte_query, single_value_return=True, where_vi=where_vi)
