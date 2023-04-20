@@ -327,28 +327,33 @@ def run_table_archive(config_db, table_list, output_path):
         # run_table_archive(config)
 
 if __name__ == '__main__':
-    b_list = []
-    for i in range(1976, 2022):
-        temp = f'brf_sum_text_{i}'
-        b_list.append(temp)
-    dr_list = []
-    for i in range(1976, 2022):
-        temp = f'draw_desc_text_{i}'
-        dr_list.append(temp)
-    c_list = []
-    for i in range(1976, 2022):
-        temp = f'claims_{i}'
-        c_list.append(temp)
-    de_list = []
-    for i in range(1976, 2022):
-        temp = f'detail_desc_text_{i}'
-        de_list.append(temp)
-    tab_list = b_list + dr_list + c_list + de_list
+    # b_list = []
+    # for i in range(1976, 2022):
+    #     temp = f'brf_sum_text_{i}'
+    #     b_list.append(temp)
+    # dr_list = []
+    # for i in range(1976, 2022):
+    #     temp = f'draw_desc_text_{i}'
+    #     dr_list.append(temp)
+    # c_list = []
+    # for i in range(1976, 2022):
+    #     temp = f'claims_{i}'
+    #     c_list.append(temp)
+    # de_list = []
+    # for i in range(1976, 2022):
+    #     temp = f'detail_desc_text_{i}'
+    #     de_list.append(temp)
+    # tab_list = b_list + dr_list + c_list + de_list
     type = 'granted_patent'
-    output_path = "/text_output/20220630/patent/download/"
-    config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
+    # output_path = "/text_output/20220630/patent/download/"
+    ### OUTPUT FOR PATENT DB TABLES:
+    output_path = "/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables"
+    run_table_archive(type, ['persistent_assignee_disambig_long_updated','rawlocation_before_fixes_20220929', 'cpc_current_20210930', 'inventor_20210930'] ,output_path)
+
+    # config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
     # upload_tsv_backup_files(config, output_path, 'patent_text', tab_list)
-    upload_tsv_backup_files(config, output_path, 'patent_text', ['brf_sum_text_2022', 'draw_desc_text_2022', 'claims_2022', 'detail_desc_text_2022'])
+    # upload_tsv_backup_files(config, output_path, 'patent_text', ['brf_sum_text_2022', 'draw_desc_text_2022', 'claims_2022', 'detail_desc_text_2022'])
+
 
 
 
