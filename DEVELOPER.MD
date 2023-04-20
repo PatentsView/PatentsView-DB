@@ -109,14 +109,14 @@ There are at least 6 containers with unique services running:
   - The worker `queues` execute the python code in Airflow. Different DAGs run using different workers and are controlled using different pools. For the latest configuration, see the [DAGS](airflow/dags) folder
 - Note that all DAG processes listed below also need to have `PVGP server` running to run airflow
 
-| DAG                                | Worker (Queue)                 | Pools                                                          | Servers                             | 
-|------------------------------------|--------------------------------|----------------------------------------------------------------|-------------------------------------|
-| Granted Patent Weekly Parser       | data_collector                 | high_memory_poool & default_pool                               | PV-DataCollector                    | 
-| Pre-grant Weekly Parser            | data_collector                 | database_write_iops_contenders & default_pool                  | PV-DataCollector                    | 
-| Classifications Parser             | data_collector                 | database_write_iops_contenders & default_pool                  | PV-DataCollector                    | 
-| Lawyer Disambiguation              | data_collector & disambiguator | high_memory_pool & default_pool                                | PV-DataCollector & PV-Disambiguator | 
+| DAG                                | Worker (Queue)                 | Pools                                                         | Servers                             | 
+|------------------------------------|--------------------------------|---------------------------------------------------------------|-------------------------------------|
+| Granted Patent Weekly Parser       | data_collector                 | high_memory_pool & default_pool                               | PV-DataCollector                    | 
+| Pre-grant Weekly Parser            | data_collector                 | database_write_iops_contenders & default_pool                 | PV-DataCollector                    | 
+| Classifications Parser             | data_collector                 | database_write_iops_contenders & default_pool                 | PV-DataCollector                    | 
+| Lawyer Disambiguation              | data_collector & disambiguator | high_memory_pool & default_pool                               | PV-DataCollector & PV-Disambiguator | 
 | Assignee & Inventor Disambiguation | data_collector & disambiguator | high_memory_pool, database_write_iops_contenders, default_pool | PV-DataCollector & PV-Disambiguator | 
-| Reporting DB                       | disambiguator | default_pool                                                   | PV-Disambiguator                    | 
+| Reporting DB                       | disambiguator | default_pool                                                  | PV-Disambiguator                    | 
 
 An [Airflow Pool](https://airflow.apache.org/docs/apache-airflow/stable/administration-and-deployment/pools.html) is an isolated space where a task can run. Each pool has a fixed number of slots and each task uses one slot. Each task without an explicit assigned pool is assigned to `default_pool` which has 128 slots.
 * For example, if a pool named `small_pool` was allocated 3 slots and 5 tasks were queued in that pool, only 3 could run simultaneously.
