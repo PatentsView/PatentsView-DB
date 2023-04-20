@@ -70,7 +70,7 @@ inner join geo_data.non_us_unique_city_countries b on a.city=b.location_name
 inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
         and b.`country` = c.name
 set location_id= b.uuid
-where b.place= '{loc}' and location_id is null and b.`country` {filter} 'United States of America' """
+where b.place= '{loc}' and location_id is null and state is null and b.`country` {filter} 'United States of America' """
 
     else:
         raise Exception("geography type not recognized")
@@ -363,7 +363,7 @@ CREATE TABLE if not exists {temp_db}.`location_disambiguation_mapping` (
   KEY `location_id_2` (`location_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"""
         query2 = f"""
-insert into {temp_db}.`location_disambiguation_mapping` (id, location_id, version_indicator)
+replace into {temp_db}.`location_disambiguation_mapping` (id, location_id, version_indicator)
 select id, location_id, version_indicator from {temp_db}.rawlocation
         """
         for q in [query, query2]:
@@ -379,13 +379,17 @@ def run_location_disambiguation(dbtype, **kwargs):
     find_nearest_latlong(config, geo_type='foreign')
     location_disambig_mapping_update(config, dbtype, **kwargs)
 
+
 def run_location_disambiguation_tests(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
     tests = LocationUploadTest(config)
     tests.runTests()
 
 if __name__ == "__main__":
-    d = datetime.date(2022, 9, 27)
-    run_location_disambiguation("granted_patent", **{
-            "execution_date": d
-        })
+    d = datetime.date(2022, 10, 20)
+    while d < datetime.date(2023, 4, 20):
+        run_location_disambiguation("pgpubs", **{
+                "execution_date": d
+            })
+        d =  d + datetime.timedelta(days=7)
+
