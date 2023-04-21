@@ -317,6 +317,12 @@ def get_results(patents, field_dictionary):
 
                 is_app = True  # indicator for whether something being cited is a patent application
 
+                # stating in December 2022, application IDs in application citations are formatted as 11 digits (4 for year, 7 for ID)
+                # previously the year and ID digits were separated by a slash.
+                # reformatting those IDs here for consistency and compatibility with prior versions
+                if re.match(r"(19|20)\d{9}", cited_doc_num):
+                    cited_doc_num = f"{cited_doc_num[:4]}/{cited_doc_num[4:]}"
+
                 if cited_doc_num:
                     # basically if there is anything other than number and digits its an application
                     if re.match(r'^[A-Z]*\.?\s?\d+$', cited_doc_num):
