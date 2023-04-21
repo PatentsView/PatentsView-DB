@@ -88,8 +88,8 @@ class ParserTest:
         free_space_in_bytes = rds_free_space(
                 self.update_config,
                 self.update_config['PATENTSVIEW_DATABASES']['identifier'])
-        if free_space_in_bytes / (1024 * 1024 * 1024) < 50:
-            raise Exception("Free space less than 50G in RDS, stopping the process")
+        if free_space_in_bytes / (1024 * 1024 * 1024) < 30:
+            raise Exception("Free space less than 30G in RDS, stopping the process")
 
 
 if __name__ == '__main__':
