@@ -58,7 +58,7 @@ select `a`.`patent_id` AS `patent_id`,
 `b`.`name_last` AS `disambig_attorney_name_last`,
 `b`.`organization` AS `disambig_attorney_organization`,
 `b`.`country` AS `attorney_country` 
-from (`patent`.`patent_lawyer` `a` 
+from (`patent`.`rawlawyer` `a` 
 join `patent`.`lawyer` `b` on(`a`.`lawyer_id` = `b`.`id`)) 
 where `b`.`version_indicator` <= '{{datestring}}';
 

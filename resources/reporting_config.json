@@ -1841,25 +1841,6 @@
       }
     }
   },
-  "patent_lawyer": {
-    "fields": {
-      "patent_id": {
-        "data_type": "varchar",
-        "null_allowed": false,
-        "category": false
-      },
-      "lawyer_id": {
-        "data_type": "int",
-        "null_allowed": false,
-        "category": false
-      },
-      "sequence": {
-        "data_type": "int",
-        "null_allowed": false,
-        "category": false
-      }
-    }
-  },
   "pctdata": {
     "fields": {
       "date": {

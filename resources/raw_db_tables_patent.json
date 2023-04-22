@@ -230,12 +230,6 @@
         "bulk_generated": false,
         "direct_load": false
       },
-      "patent_lawyer": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
       "pct_data": {
         "raw_data": true,
         "lookup": false,

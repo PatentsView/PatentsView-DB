@@ -73,11 +73,6 @@ patentinventor = Table(
     Column('patent_id', Unicode(20), ForeignKey('patent.id')),
     Column('inventor_id', Unicode(36), ForeignKey('inventor.id')))
 
-patentlawyer = Table(
-    'patent_lawyer', GrantBase.metadata,
-    Column('patent_id', Unicode(20), ForeignKey('patent.id')),
-    Column('lawyer_id', Unicode(36), ForeignKey('lawyer.id')))
-
 locationassignee = Table(
     'location_assignee', GrantBase.metadata,
     Column('location_id', Unicode(128), ForeignKey('location.id')),

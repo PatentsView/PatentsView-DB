@@ -67,11 +67,6 @@ def setup_database(update_config, drop=True, cpc_only=False):
                 query = "create table if not exists {0}.{2} like {1}.{2}_{3}".format(temp_upload_database, raw_database, table, '20211230') 
                 print(query)
                 con.execute(query)
-            elif table == 'patent_lawyer' and raw_database=='patent':
-                # special case similar to above
-                query = "create table if not exists {0}.{2} like {1}.patent_lawyer_old".format(temp_upload_database, raw_database, table) 
-                print(query)
-                con.execute(query)
             elif table in ['government_organization']: #set any tables that should be defined as views of the production version.
                 query = f"create view if not exists {temp_upload_database}.{table} as SELECT * FROM {raw_database}.{table}"
             else:
