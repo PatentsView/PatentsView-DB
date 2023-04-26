@@ -68,7 +68,7 @@ def setup_database(update_config, drop=True, cpc_only=False):
                 print(query)
                 con.execute(query)
             elif table in ['government_organization']: #set any tables that should be defined as views of the production version.
-                query = f"create view if not exists {temp_upload_database}.{table} as SELECT * FROM {raw_database}.{table}"
+                query = f"CREATE SQL SECURITY INVOKER VIEW IF NOT EXISTS {temp_upload_database}.{table} AS SELECT * FROM {raw_database}.{table}"
             else:
                 query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
             print(query)
