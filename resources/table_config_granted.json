@@ -765,6 +765,13 @@
         "location_field": false
       }
     },
+    "related_entities": [
+      {
+      "related_table": "patent_govintorg",
+      "main_table_id": "organization_id",
+      "related_table_id": "organization_id"
+      }
+    ],
     "TestScripts": ["GovtInterestTester"]
   },
   "inventor": {
@@ -1779,13 +1786,6 @@
         "location_field": false
       }
     },
-    "related_entities": [
-      {
-      "related_table": "government_organization",
-      "main_table_id": "organization_id",
-      "related_table_id": "organization_id"
-      }
-    ],
     "TestScripts": ["GovtInterestTester"]
   },
   "patent_inventor": {
