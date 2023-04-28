@@ -99,7 +99,16 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
     #         "Executing Query File: `" + filename + "`", config, section,
     #         "info")
     # when needed, clear out any existing entries in the prod db to make room for inserts - mostly duplicated from insert section below
-    if 'delete_sql' in context['templates_dict'] and drop_existing:
+    skip_deletion = False
+    if 'gate_deletion' in context['params']:
+        print('Checking for existing data to delete:')
+        gate_query = context['params']['gate_deletion'].format(vi=config['DATES']['END_DATE'])
+        print(gate_query)
+        gate_response = db_con.execute(gate_query)
+        if gate_response.fetchone()[0] == 0:
+            print('No existing data found. Skipping pre-merge deletions.')
+            skip_deletion = True
+    if 'delete_sql' in context['templates_dict'] and drop_existing and not skip_deletion:
         rm_sql_content = context['templates_dict']['delete_sql']
         rm_statements = sqlparse.split(rm_sql_content)
         for sql_statement in rm_statements:
