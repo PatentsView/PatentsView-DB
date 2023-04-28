@@ -191,7 +191,8 @@ clear_data_monitor_operator = SQLTemplatedPythonOperator(
     params={
         'database': 'pgpubs_',
         'add_suffix': True
-    }
+    },
+    depends_on_past = True
 )
 
 merge_database_operator = SQLTemplatedPythonOperator(
@@ -213,7 +214,8 @@ merge_database_operator = SQLTemplatedPythonOperator(
     params={
         'database': 'pgpubs_',
         'add_suffix': True
-    }
+    },
+    depends_on_past = True
 )
 
 # merge_text_database_operator = PythonOperator(task_id='merge_text_database',
