@@ -363,18 +363,25 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
 
 
 def extract_document(xml_file):
-    xml_marker = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml_marker = '<?xml version="1.0"'
     current_document_lines = []
     with open(xml_file, "r") as freader:
         # Loop through all the lines in the file
         for line in freader:
             # Determine the start of a new document
-            if line == xml_marker:
+            # some of the early documents are marked by just '<?xml version="1.0"?>' - this caused inadvertent merging of documents
+            #some documents split on the middle of a line - mostly in 2002-04, but some observed in 2023
+            if xml_marker in line:
+                current_document_lines.append(line.split(xml_marker)[0])
                 # Join all lines for a given document
                 current_xml = "".join(current_document_lines)
-                yield current_xml
+                if current_xml.strip() != '':
+                    yield current_xml
                 current_document_lines = []
-            current_document_lines.append(line)
+                current_document_lines.append(xml_marker)
+                current_document_lines.append(line.split(xml_marker)[-1])
+            else:
+                current_document_lines.append(line)
         current_xml = "".join(current_document_lines)
         yield current_xml
 
