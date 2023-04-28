@@ -429,8 +429,13 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
             if debug and counter > 250:
                 break
             # Create an etree element for the current document
-            parser = etree.XMLParser(load_dtd=True, no_network=False)
-            patent_app_document = etree.XML(current_xml.encode('utf-8'), parser=parser)
+            try:
+                parser = etree.XMLParser(load_dtd=True, no_network=False)
+                patent_app_document = etree.XML(current_xml.encode('utf-8'), parser=parser)
+            except Exception as e:
+                print(f'xml failed to parse on document number {counter}')
+                print(f"xml text begins: {current_xml[:min(len(current_xml), 350)]}")
+                raise(e)
             if patent_app_document.tag == 'sequence-cwu':
                 continue
             else:
