@@ -280,6 +280,8 @@ def process_publication_document(patent_app_document, patent_config):
     """
     # Get the document number for the given input
     document_number = patent_app_document.findall(patent_config['foreign_key_config']['xml_path'])[0].text
+    if len(document_number) == 13 and document_number.endswith('A1'):
+        document_number = document_number[:-2] # cleaning exception found in 2023-03-23
     # Get the table_xml_map element from the JSON file
     table_xml_map = patent_config['table_xml_map']
     # Loop through the tables in the table_xml_map to extract all data that is present
@@ -441,7 +443,9 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                             continue
                         else:
                             current_data_frame = pd.DataFrame(extracted_data)
-                            dfs[table_name] = dfs[table_name].append(current_data_frame)
+                            # dfs[table_name] = dfs[table_name].append(current_data_frame) 
+                            # FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead
+                            dfs[table_name] = pd.concat((dfs[table_name],current_data_frame), axis=0)
                 except IndexError as e:
                     log_queue.put(
                             {
