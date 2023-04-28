@@ -212,8 +212,7 @@ merge_database_operator = SQLTemplatedPythonOperator(
     templates_exts=['.sql'],
     params={
         'database': 'pgpubs_',
-        'add_suffix': True,
-        'gate_deletion': "SELECT COUNT(*) FROM pregrant_publications.publication WHERE version_indicator = '{vi}'" # publication is the first table filled by the merge commands
+        'add_suffix': True
     }
 )
 
