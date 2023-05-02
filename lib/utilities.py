@@ -21,6 +21,7 @@ from bs4 import BeautifulSoup
 from clint.textui import progress
 from sqlalchemy import create_engine
 from lib.xml_helpers import process_date
+from lib.notifications import send_slack_notification
 
 def with_keys(d, keys):
     return {x: d[x] for x in d if x in keys}
@@ -484,23 +485,37 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
         log_queue = Queue()
     files_to_download = []
 
-    for year in range(start_year, end_year + 1):
+    for year in range(start_year-1, end_year + 1): 
+        #starting one year early to check for revisions to old files (particularly important at the start of a new calendar year)- should add negligible time to typical runs
         year_xml_page = xml_path_template.format(year=year)
         print(year_xml_page)
         r = requests.get(year_xml_page)
         soup = BeautifulSoup(r.content, "html.parser")
-        links = soup.find_all("a", href=re.compile("[0-9]{6}\.zip"))
+        links = soup.find_all("a", href=re.compile(r"[0-9]{6}(_r\d)?\.zip"))
         idx_counter = 0
         for link in links:
             href = link.attrs['href']
-            href_match = re.match(r".*([0-9]{6})", href)
+            href_match = re.match(r".*([0-9]{6})(_r\d)?\.zip", href)
             if href_match is not None:
                 file_date = datetime.datetime.strptime(href_match.group(1), '%y%m%d')
                 if end_date >= file_date >= start_date:
+                    # should apply to original and revised versions
                     files_to_download.append(
                         (xml_path_template.format(year=year) + href, href, config["FOLDERS"][xml_download_setting],
                          idx_counter, log_queue))
                 idx_counter += 1
+                if href_match.group(2) is not None: # has a revision suffix
+                    if file_date < start_date:
+                        # if the file date is earlier than the current date, check if the file has already been downloaded to the matching folder
+                        downloaded_files = os.listdir(config["FOLDERS"][xml_download_setting])
+                        matching_files = [f for f in downloaded_files if re.match(f'ip[ag]{file_date}', f)]
+                        if href[:-4] > max(matching_files)[:-4]: # more recent file than is downloaded
+                            # if the file has not already been downloaded to the matching folder, send slack message indicating unparsed revision
+                            revised_file_message = f"""
+                            revized XML file available for download: {href}
+                            latest version downloaded for {file_date}: {max(matching_files)}
+                            """
+                            send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
     watcher = None
     pool = None
     if parallelism > 1:

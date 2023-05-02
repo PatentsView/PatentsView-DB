@@ -81,12 +81,16 @@ def generate_timestamp_uploads(update_config):
     connection_string = get_connection_string(update_config, "TEMP_UPLOAD_DB")
     parsed_data_folder = "{working_folder}/{parsed_folder}".format(working_folder=working_folder,
                                                                    parsed_folder="parsed_data")
-    print(parsed_data_folder)
-    for timestamp_folder in os.listdir(parsed_data_folder):
-        timestamp_folder_full_path = "{source_root}/{folder_name}/".format(source_root=parsed_data_folder,
-                                                                           folder_name=timestamp_folder)
-        upload_from_timestamp_folder(timestamp_folder_full_path, connection_string,
-                                     version_indicator=update_config['DATES']['END_DATE'])
+    print(f"checking for parsed data in {parsed_data_folder}...")
+    parse_folders = os.listdir(parsed_data_folder)
+    print(f"{len(parse_folders)} parse(s) found: {parse_folders}")
+    latest_parse_folder = max(parse_folders)
+    # for timestamp_folder in parse_folders:
+    timestamp_folder_full_path = "{source_root}/{folder_name}/".format(source_root=parsed_data_folder,
+                                                                        folder_name=latest_parse_folder)
+    print(f"beginning upload of data from {timestamp_folder_full_path}...")
+    upload_from_timestamp_folder(timestamp_folder_full_path, connection_string,
+                                    version_indicator=update_config['DATES']['END_DATE'])
 
 
 def begin_database_setup(dbtype='granted_patent' , **kwargs):

@@ -515,7 +515,7 @@ def main_process(data_file, outloc, field_dictionary):
     local_logger.info("Completed {file}, output sent to {outloc}".format(file=data_file, outloc=outloc))
 
 
-def begin_parsing(update_config):
+def begin_parsing(update_config, parse_all_versions=False):
     # TO run Everything:
     with open('{}/field_dict.json'.format(update_config['FOLDERS']['PERSISTENT_FILES'])) as myfile:
         field_dictionary = json.load(myfile)
@@ -526,13 +526,16 @@ def begin_parsing(update_config):
     in_files = ['{0}/{1}'.format(input_folder, item) for item in os.listdir(input_folder)]
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
-    out_files = ['{0}/{1}'.format(output_folder, item[-16:-10])
-                 for item in in_files]
-    fields = [field_dictionary for item in in_files]
-    files = zip(in_files, out_files, fields)
-
-    for f in files:
-        main_process(*f)
+        
+    out_files = ['{0}/{1}'.format(output_folder, re.match("i?p[ag](\d{6}(_r\d)?)_clean.xml", item).group(1)) for item in in_files]
+    
+    if parse_all_versions:
+        fields = [field_dictionary for item in in_files]
+        files = zip(in_files, out_files, fields)
+        for f in files:
+            main_process(*f)
+    else:
+        main_process(max(in_files), max(out_files), field_dictionary)
 
     logger.info("finished processing")
 

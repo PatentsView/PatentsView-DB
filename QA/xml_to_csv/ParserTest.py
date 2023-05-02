@@ -37,7 +37,7 @@ class ParserTest:
         for fname in self.ip_filenames:
             filename = os.path.basename(fname)
             name, ext = os.path.splitext(filename)
-            tstamp_match = re.match('.*([0-9]{6}).*', name)
+            tstamp_match = re.match('.*([0-9]{6}(_r\d)?).*', name)
             if tstamp_match is None:
                 raise AssertionError("Non patent file found in input folder")
             folder_name = tstamp_match.group(1)
@@ -69,7 +69,7 @@ class ParserTest:
         for fname in self.ip_filenames:
             filename = os.path.basename(fname)
             name, ext = os.path.splitext(filename)
-            tstamp_match = re.match('.*([0-9]{6}).*', name)
+            tstamp_match = re.match('.*([0-9]{6}(_r\d)?).*', name)
             if tstamp_match is None:
                 raise AssertionError("Non patent file found in input folder")
             folder_name = tstamp_match.group(1)

@@ -514,26 +514,36 @@ def get_filenames_to_parse(config, type='granted_patent'):
     xml_directory = config['FOLDERS'][xml_directory_setting]
 
     xml_files = []
+    file_dates = {}
     start_date_string = '{}'.format(config['DATES']['START_DATE'])
     start_date = datetime.strptime(start_date_string, '%Y%m%d')
     end_date_string = '{}'.format(config['DATES']['END_DATE'])
     end_date = datetime.strptime(end_date_string, '%Y%m%d')
-    for file_name in os.listdir(xml_directory):
+    allfiles = os.listdir(xml_directory)
+    for file_name in allfiles:
         # print(file_name)
         if file_name.endswith(".xml"):
             file_date_string = re.match(".*([0-9]{6}).*", file_name).group(1)
             file_date = datetime.strptime(file_date_string, '%y%m%d')
 
-            # file_date = file_name.split("_")[-1].split(".")[0]
-            # file_date = file_name[3:-4]
             # print(file_date)
             # print(start_date)
             # print(end_date)
             if start_date <= file_date <= end_date:
-                xml_files.append(xml_directory + "/" + file_name)
-    print(f"files identified for parsing: {xml_files}")
+                xml_files.append(file_name)
+                file_dates.add(file_date_string)
+    # if only one file, no need to bother checking for revisions
+    if len(xml_files) > 1:
+        #for each date on the list, keep only the most recent file
+        xml_files = [max([file for file in xml_files if re.match(f'i?p[ag]{datestring}',file)]) for datestring in file_dates] 
+        # this will fail if there are ever more than ten revisions of a single file, but this seems highly unlikely
+        
 
-    return xml_files
+    print(f"files identified for parsing in directory {xml_directory}: {xml_files}")
+
+    parse_list = [f"{xml_directory}/{file_name}" for file_name in xml_files]
+
+    return parse_list
 
 
 def queue_parsers(config, type='granted_patent'):
