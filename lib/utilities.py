@@ -467,6 +467,7 @@ def save_zip_file(url, name, path, counter=0, log_queue=None):
         zip_ref.extractall(path)
 
     os.remove(path + name)
+    print(f"{name} downloaded and extracted to {path}")
 
 
 def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
@@ -524,6 +525,7 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
 
     p_list = []
     idx_counter = 0
+    print(f"{len(files_to_download)} files found to download: {files_to_download}")
     for file_to_download in files_to_download:
         if parallelism > 1:
             p = pool.apply_async(save_zip_file, file_to_download)
