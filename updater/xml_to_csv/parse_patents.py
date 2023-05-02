@@ -527,7 +527,7 @@ def begin_parsing(update_config, parse_all_versions=False):
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
         
-    out_files = ['{0}/{1}'.format(output_folder, re.match("i?p[ag](\d{6}(_r\d)?)_clean.xml", item).group(1)) for item in in_files]
+    out_files = ['{0}/{1}'.format(output_folder, re.match(".*i?p[ag](\d{6}(_r\d)?)_clean.xml", item).group(1)) for item in in_files]
     
     if parse_all_versions:
         fields = [field_dictionary for item in in_files]
