@@ -514,7 +514,7 @@ def get_filenames_to_parse(config, type='granted_patent'):
     xml_directory = config['FOLDERS'][xml_directory_setting]
 
     xml_files = []
-    file_dates = {}
+    file_dates = set()
     start_date_string = '{}'.format(config['DATES']['START_DATE'])
     start_date = datetime.strptime(start_date_string, '%Y%m%d')
     end_date_string = '{}'.format(config['DATES']['END_DATE'])

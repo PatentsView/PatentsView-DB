@@ -476,6 +476,8 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
     xml_path_template = config["USPTO_LINKS"][xml_template_setting]
     start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
     end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+    print(f"Start date: {config['DATES']['START_DATE']}")
+    print(f"End date: {config['DATES']['END_DATE']}")
     start_year = int(start_date.strftime('%Y'))
     end_year = int(end_date.strftime('%Y'))
     parallelism = int(config["PARALLELISM"]["parallelism"])
@@ -486,8 +488,8 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
         log_queue = Queue()
     files_to_download = []
 
-    for year in range(start_year-1, end_year + 1): 
-        #starting one year early to check for revisions to old files (particularly important at the start of a new calendar year)- should add negligible time to typical runs
+    #starting one year early to check for revisions to old files (particularly important at the start of a new calendar year) - should add negligible time to typical runs
+    for year in range(start_year - 1, end_year + 1): 
         year_xml_page = xml_path_template.format(year=year)
         print(year_xml_page)
         r = requests.get(year_xml_page)
