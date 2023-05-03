@@ -464,10 +464,24 @@ def save_zip_file(url, name, path, counter=0, log_queue=None):
                     f.write(chunk)
 
     with zipfile.ZipFile(path + name, 'r') as zip_ref:
-        zip_ref.extractall(path)
+        if re.fullmatch(".*_r\d.zip", name): # revised file
+            # set the file name to match the zip file name
+            zipinfo = zip_ref.infolist()
+            for _file in zipinfo:
+                z_nm, z_ext = os.path.splitext(name)
+                f_nm, f_ext = os.path.splitext(_file.filename)
+                if re.match(f"{f_nm}_r\d",z_nm):
+                    # revision file - can't be renamed inside the zip archive, so will extract to a temporary location and rename
+                    os.mkdir(f"{path}/tmp")
+                    zip_ref.extract(_file.filename, f"{path}/tmp")
+                    os.rename(f"{path}/tmp/{_file.filename}",f"{path}/{z_nm}{f_ext}")
+                    os.remove(f"{path}/tmp")
+                else:
+                    zip_ref.extract(_file.filename, path)
 
     os.remove(path + name)
     print(f"{name} downloaded and extracted to {path}")
+    print(f"{path} contains {os.listdir(path)}")
 
 
 def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
@@ -476,8 +490,6 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
     xml_path_template = config["USPTO_LINKS"][xml_template_setting]
     start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
     end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-    print(f"Start date: {config['DATES']['START_DATE']}")
-    print(f"End date: {config['DATES']['END_DATE']}")
     start_year = int(start_date.strftime('%Y'))
     end_year = int(end_date.strftime('%Y'))
     parallelism = int(config["PARALLELISM"]["parallelism"])
@@ -486,6 +498,8 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
         log_queue = manager.Queue()
     else:
         log_queue = Queue()
+    print(f"Start date: {config['DATES']['START_DATE']}")
+    print(f"End date: {config['DATES']['END_DATE']}")
     files_to_download = []
 
     #starting one year early to check for revisions to old files (particularly important at the start of a new calendar year) - should add negligible time to typical runs
