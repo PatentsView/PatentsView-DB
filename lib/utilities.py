@@ -531,12 +531,13 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
                         revised_file_message = f"""
 revized XML file available for download: {href}
 no files identified as downloaded for {file_datestring} in directory {old_download_path}."""
+                        send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
                     elif(href[:-4] > max(matching_files)[:-4]): # more recent file than is downloaded for week matching revised file
                         # if the file has not already been downloaded to the matching folder, send slack message indicating unparsed revision
                         revised_file_message = f"""
 revized XML file available for download: {href}
 latest version downloaded for {file_datestring} in {old_download_path}: {max(matching_files)}"""
-                    send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
+                        send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
     watcher = None
     pool = None
     if parallelism > 1:
