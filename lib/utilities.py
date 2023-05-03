@@ -475,7 +475,7 @@ def save_zip_file(url, name, path, counter=0, log_queue=None):
                     os.mkdir(f"{path}/tmp")
                     zip_ref.extract(_file.filename, f"{path}/tmp")
                     os.rename(f"{path}/tmp/{_file.filename}",f"{path}/{z_nm}{f_ext}")
-                    os.remove(f"{path}/tmp")
+                    os.rmdir(f"{path}/tmp")
                 else:
                     zip_ref.extract(_file.filename, path)
 
