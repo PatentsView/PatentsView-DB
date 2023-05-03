@@ -514,31 +514,29 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
             href = link.attrs['href']
             href_match = re.match(r".*([0-9]{6})(_r\d)?\.zip", href)
             if href_match is not None:
-                datestring = href_match.group(1)
-                file_date = datetime.datetime.strptime(datestring, '%y%m%d')
+                file_datestring = href_match.group(1)
+                file_date = datetime.datetime.strptime(file_datestring, '%y%m%d')
                 if end_date >= file_date >= start_date:
                     # should apply to original and revised versions
                     files_to_download.append(
                         (xml_path_template.format(year=year) + href, href, config["FOLDERS"][xml_download_setting],
                          idx_counter, log_queue))
                 idx_counter += 1
-                if href_match.group(2) is not None: # has a revision suffix
-                    if file_date < start_date:
-                        # if the file date is earlier than the current date, check if the file has already been downloaded to the matching folder
-                        downloaded_files = os.listdir(config["FOLDERS"][xml_download_setting])
-                        matching_files = [f for f in downloaded_files if re.match(f'i?p[ag]{datestring}', f)]
-                        if (len(matching_files) == 0): # no files downloaded for week matching revised file
-                            revised_file_message = f"""
-                            revized XML file available for download: {href}
-                            no files identified as downloaded for {datestring} in directory {config["FOLDERS"][xml_download_setting]}.
-                            """
-                        elif(href[:-4] > max(matching_files)[:-4]): # more recent file than is downloaded for week matching revised file
-                            # if the file has not already been downloaded to the matching folder, send slack message indicating unparsed revision
-                            revised_file_message = f"""
-                            revized XML file available for download: {href}
-                            latest version downloaded for {datestring} in {config["FOLDERS"][xml_download_setting]}: {max(matching_files)}
-                            """
-                        send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
+                if (href_match.group(2) is not None) and (file_date < start_date): # has a revision suffix and past date
+                    # check if the file has already been downloaded to the matching folder
+                    old_download_path = config["FOLDERS"][xml_download_setting].replace(config['DATES']['END_DATE'], file_datestring)
+                    downloaded_files = os.listdir(old_download_path)
+                    matching_files = [f for f in downloaded_files if re.match(f'i?p[ag]{file_datestring}', f)]
+                    if (len(matching_files) == 0): # no files downloaded for week matching revised file
+                        revised_file_message = f"""
+revized XML file available for download: {href}
+no files identified as downloaded for {file_datestring} in directory {old_download_path}."""
+                    elif(href[:-4] > max(matching_files)[:-4]): # more recent file than is downloaded for week matching revised file
+                        # if the file has not already been downloaded to the matching folder, send slack message indicating unparsed revision
+                        revised_file_message = f"""
+revized XML file available for download: {href}
+latest version downloaded for {file_datestring} in {old_download_path}: {max(matching_files)}"""
+                    send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
     watcher = None
     pool = None
     if parallelism > 1:
