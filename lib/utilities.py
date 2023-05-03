@@ -526,7 +526,7 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
                         # if the file date is earlier than the current date, check if the file has already been downloaded to the matching folder
                         downloaded_files = os.listdir(config["FOLDERS"][xml_download_setting])
                         matching_files = [f for f in downloaded_files if re.match(f'ip[ag]{href_match.group(1)}', f)]
-                        if len(matching_files == 0) or href[:-4] > max(matching_files)[:-4]: # more recent file than is downloaded or no files downloaded
+                        if len(matching_files) == 0 or href[:-4] > max(matching_files)[:-4]: # more recent file than is downloaded or no files downloaded
                             # if the file has not already been downloaded to the matching folder, send slack message indicating unparsed revision
                             revised_file_message = f"""
                             revized XML file available for download: {href}
