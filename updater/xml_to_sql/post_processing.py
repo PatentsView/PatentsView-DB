@@ -72,6 +72,8 @@ def consolidate_usreldoc(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
+            'DELETE FROM usreldoc') # should be empty before being populated below. In some instances of repeated post-processing, duplicates were created.
+    engine.execute(
             'DELETE FROM usreldoc_single WHERE related_doc_number IS NULL;')
     engine.execute(
             'INSERT IGNORE INTO usreldoc SELECT * FROM usreldoc_parent_child;')
