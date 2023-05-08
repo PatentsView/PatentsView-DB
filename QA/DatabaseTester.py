@@ -470,7 +470,12 @@ group by t.`{field}`"""
         for qa_table in self.qa_data:
             qa_table_data = self.qa_data[qa_table]
             table_frame = pd.DataFrame(qa_table_data)
-            table_set = f"""('{"', '".join(table_frame.table_name.unique())}')"""
+            if 'table_name' in table_frame.columns:
+                table_set = f"""('{"', '".join(table_frame.table_name.unique())}')"""
+            elif 'main_table' in table_frame.columns: # for floating entity table
+                table_set = f"""('{"', '".join(table_frame.main_table.unique())}')"""
+            else:
+                raise NotImplementedError(f"specification of existing rows to remove not implemented for {qa_table}.\ncolumns available: `{'`,`'.join(table_frame.columns)}`")
             try:
                 print(f'removing prior {qa_table} {self.database_type} records for {table_set} on {self.version}')
                 clean_prior = f"DELETE FROM {qa_table} WHERE `update_version` = {self.version} AND `database_type` = {self.database_type} AND `table_name` IN {table_set}"
