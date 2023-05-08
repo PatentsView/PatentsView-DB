@@ -470,7 +470,13 @@ group by t.`{field}`"""
         for qa_table in self.qa_data:
             qa_table_data = self.qa_data[qa_table]
             table_frame = pd.DataFrame(qa_table_data)
+            table_set = f"""('{"', '".join(table_frame.table_name.unique())}')"""
             try:
+                print(f'removing prior {qa_table} {self.database_type} records for {table_set} on {self.version}')
+                clean_prior = f"DELETE FROM {qa_table} WHERE `update_version` = {self.version} AND `database_type` = {self.database_type} AND `table_name` IN {table_set}"
+                print(clean_prior)
+                qa_engine.execute(clean_prior)
+                print(f'inserting new {qa_table} records for {self.version} and {self.database_type}')
                 table_frame.to_sql(name=qa_table, if_exists='append', con=qa_engine, index=False)
             except SQLAlchemyError as e:
                 table_frame.to_csv("errored_qa_data" + qa_table, index=False)

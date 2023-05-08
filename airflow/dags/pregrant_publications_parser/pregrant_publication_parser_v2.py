@@ -173,28 +173,6 @@ gi_qc_operator = PythonOperator(task_id='GI_QC',
                                 on_success_callback=airflow_task_success,
                                 on_failure_callback=airflow_task_failure)
 
-clear_data_monitor_operator = SQLTemplatedPythonOperator(
-    task_id='monitor_clear',
-    provide_context=True,
-    python_callable=validate_and_execute,
-    op_kwargs={
-        'filename': 'delete_pgpubs_monitor_records',
-        "schema_only": False,
-        "section": get_section('pregrant_publications', 'merge_database'),
-        "host": 'APP_DATABASE_SETUP'
-    },
-    dag=app_xml_dag,
-    templates_dict={
-        'delete_sql': 'delete_pgpubs_monitor_records.sql'
-    },
-    templates_exts=['.sql'],
-    params={
-        'database': 'pgpubs_',
-        'add_suffix': True
-    },
-    depends_on_past = True
-)
-
 merge_database_operator = SQLTemplatedPythonOperator(
     task_id='merge_database',
     provide_context=True,
@@ -274,8 +252,7 @@ gi_postprocess_NER.set_upstream(gi_NER)
 manual_simulation_operator.set_upstream(gi_postprocess_NER)
 post_manual_operator.set_upstream(manual_simulation_operator)
 gi_qc_operator.set_upstream(post_manual_operator)
-clear_data_monitor_operator.set_upstream(gi_qc_operator)
-merge_database_operator.set_upstream(clear_data_monitor_operator)
+merge_database_operator.set_upstream(gi_qc_operator)
 qc_merge_weekly_operator.set_upstream(merge_database_operator)
 qc_merge_weekly_text_operator.set_upstream(merge_database_operator)
 # create_crosswalk.set_upstream(qc_merge_weekly_operator)
