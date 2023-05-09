@@ -469,6 +469,8 @@ group by t.`{field}`"""
         qa_engine = create_engine(self.qa_connection_string)
         for qa_table in self.qa_data:
             qa_table_data = self.qa_data[qa_table]
+            if len(qa_table_data) == 0: 
+                continue
             table_frame = pd.DataFrame(qa_table_data)
             if 'table_name' in table_frame.columns:
                 table_set = f"""('{"', '".join(table_frame.table_name.unique())}')"""
