@@ -478,7 +478,7 @@ group by t.`{field}`"""
                 raise NotImplementedError(f"specification of existing rows to remove not implemented for {qa_table}.\ncolumns available: `{'`,`'.join(table_frame.columns)}`")
             try:
                 print(f'removing prior {qa_table} {self.database_type} records for {table_set} on {self.version}')
-                clean_prior = f"DELETE FROM {qa_table} WHERE `update_version` = {self.version} AND `database_type` = {self.database_type} AND `table_name` IN {table_set}"
+                clean_prior = f"DELETE FROM {qa_table} WHERE `update_version` = '{self.version}' AND `database_type` = '{self.database_type}' AND `table_name` IN {table_set}"
                 print(clean_prior)
                 qa_engine.execute(clean_prior)
                 print(f'inserting new {qa_table} records for {self.version} and {self.database_type}')
