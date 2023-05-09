@@ -136,7 +136,7 @@ def yearly_claim(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into claims_{} select * from claims c where substring(c.pgpub_id, 1, 4) = '{}';".format(
+                "insert ignore into claims_{} select * from claims c where substring(c.pgpub_id, 1, 4) = '{}';".format(
                         year,
                         year))
 
@@ -163,7 +163,7 @@ def yearly_brf_sum_text(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into brf_sum_text_{} select * from brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
+                "insert ignore into brf_sum_text_{} select * from brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
                         year, year))
 
 
@@ -189,7 +189,7 @@ def yearly_draw_desc_text(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into draw_desc_text_{} select * from draw_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
+                "insert ignore into draw_desc_text_{} select * from draw_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
                         year, year))
 
 
@@ -215,7 +215,7 @@ def yearly_detail_desc_text(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into detail_desc_text_{} select * from detail_desc_text d where substring(d.pgpub_id, "
+                "insert ignore into detail_desc_text_{} select * from detail_desc_text d where substring(d.pgpub_id, "
                 "1, 4) = '{}';".format(
                         year, year))
 
