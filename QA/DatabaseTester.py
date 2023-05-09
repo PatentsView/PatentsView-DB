@@ -476,16 +476,19 @@ group by t.`{field}`"""
                 table_set = f"""('{"', '".join(table_frame.table_name.unique())}')"""
                 table_col = "table_name"
                 table_condition = f"AND `{table_col}` IN {table_set}"
+                table_print = f"for {table_set} "
             elif 'main_table' in table_frame.columns: # for floating entity table
                 table_set = f"""('{"', '".join(table_frame.main_table.unique())}')"""
                 table_col = "main_table"
                 table_condition = f"AND `{table_col}` IN {table_set}"
+                table_print = f"for {table_set} "
             elif qa_table in ['DataMonitor_govtinterestsampler']: # table-specific QA tables that just identify records by update_version and db_type
                 table_condition = ""
+                table_print = ""
             else:
                 raise NotImplementedError(f"specification of existing rows to remove not implemented for {qa_table}.\ncolumns available: `{'`,`'.join(table_frame.columns)}`")
             try:
-                print(f'removing prior {qa_table} {self.database_type} records for {table_set} on {self.version}')
+                print(f'removing prior {qa_table} {self.database_type} records {table_print}on {self.version}')
                 clean_prior = f"DELETE FROM {qa_table} WHERE `update_version` = '{self.version}' AND `database_type` = '{self.database_type}' {table_condition}"
                 print(clean_prior)
                 qa_engine.execute(clean_prior)
