@@ -34,7 +34,7 @@ def db_and_table_as_array(single_line_query):
     # Identify all tables used in the query for collation check
     single_line_query = single_line_query.lower()
     single_line_query = single_line_query.replace('`', '')
-    print(single_line_query)
+    print(f"examining table schema for query: {single_line_query}")
     single_line_query_words = single_line_query.split(" ")
     # print(single_line_query_words)
     after_into = nextword('into', single_line_query_words)
@@ -103,7 +103,7 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
         rm_sql_content = context['templates_dict']['delete_sql']
         rm_statements = sqlparse.split(rm_sql_content)
         for sql_statement in rm_statements:
-            print(sql_statement)
+            print(f"preparing query: {sql_statement}")
             single_line_query = sql_statement
             # if the parse is successful we do some sanity checks
             if len(sqlparse.parse(sql_statement)) > 0:
@@ -115,9 +115,6 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
                     if single_line_query.lower().lstrip().startswith("drop"):
                         continue
                     
-                # Log file output
-                print(single_line_query)
-
                 if parsed_statement.get_type().lower() == 'insert':
                     # Check if query plan includes full table scan, if it does send an alert
                     query_plan_check = database_helpers.check_query_plan(db_con, single_line_query)
@@ -134,10 +131,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
             if not single_line_query.strip():
                 continue
             try:
-                print(" ")
+                print(f"executing query: {single_line_query}")
                 db_con.execute(single_line_query)
             except Exception as e:
-                print(" ")
                 # send_slack_notification(
                 #         """
                 # Execution of Query failed: ```{single_line_query} ```
@@ -155,7 +151,7 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
         # Extract individual statements from sql file
         sql_statements = sqlparse.split(sql_content)
         for sql_statement in sql_statements:
-            print(sql_statement)
+            print(f"preparing query: {sql_statement}")
             # Certain type of sql are not parsed properly by sqlparse,
             # this is the implicit else to forthcoming if
             single_line_query = sql_statement
@@ -206,10 +202,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
             if not single_line_query.strip():
                 continue
             try:
-                print(" ")
+                print(f"executing query: {single_line_query}")
                 db_con.execute(single_line_query)
             except Exception as e:
-                print(" ")
                 # send_slack_notification(
                 #         """
                 # Execution of Query failed: ```{single_line_query} ```
