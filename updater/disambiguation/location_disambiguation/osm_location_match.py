@@ -225,7 +225,7 @@ def create_location_match_table(config, **kwargs):
     print(create_sql)
     engine.execute(create_sql)
     print('populating match table...')
-    matched_data[['id','matched_name','latitude','longitude']].to_sql(name='matched_rawlocation' ,schema=database ,con=engine, if_exists='append', index=False)
+    matched_data[['id','matched_name','latitude','longitude']].to_sql(name='matched_rawlocation' ,schema=database ,con=engine, if_exists='replace', index=False)
 
     print('propagating match results to rawlocation...')
     update_sql = """
