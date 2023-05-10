@@ -1,13 +1,17 @@
-import datetime
+from datetime import datetime, timedelta, date
+
 
 import pandas as pd
-from sqlalchemy import create_engine
-# import shapefile
-# from shapely.geometry import shape, Point
+from sqlalchemy import create_engine, inspect
+import re
+import shapefile
+from shapely.geometry import shape, Point
 from tqdm import tqdm
 
 from QA.post_processing.LocationPostProcessing import LocationPostProcessingQC
-from lib.configuration import get_connection_string, get_current_config
+from lib.configuration import get_connection_string, get_current_config, get_today_dict
+from lib.is_it_update_time import get_update_range
+from lib.utilities import weekday_count
 
 tqdm.pandas()
 
@@ -182,6 +186,50 @@ def fips_geo_patch(config):
     else:
         print("no locations required geographic FIPS assignment.")
 
+def consolidate_location_disambiguation_pgpubs(**kwargs):
+    config = get_current_config(type = 'pgpubs', schedule="quarterly", **kwargs)
+    consolidate_location_disambiguation_quarterly(config)
+
+def consolidate_location_disambiguation_patent(**kwargs):
+    config = get_current_config(type = 'granted_patent', schedule="quarterly", **kwargs)
+    consolidate_location_disambiguation_quarterly(config)
+
+def consolidate_location_disambiguation_quarterly(config):
+    prod_db = config["PATENTSVIEW_DATABASES"]['PROD_DB']
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
+    dbtype = 'pgpubs' if prod_db=='pregrant_publications' else 'granted_patent'
+    inspector = inspect(engine)
+    quarter_start, quarter_end = get_update_range(datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d'))
+    weekly_prefix = config['PATENTSVIEW_DATABASES'][f"{dbtype}_upload_db"]
+    db_list = [db for db in inspector.get_schema_names() if re.fullmatch(db, f"{weekly_prefix}\d{8}") and 
+                                                            (quarter_start <= datetime.strptime(db[-8:],'%Y%m%d').date() <= quarter_end)]
+
+    expected_db_count = weekday_count(quarter_start, quarter_end)['Thursday' if dbtype == 'pgpubs' else 'Tuesday']
+    if len(db_list) != expected_db_count:
+        raise Exception(f"number of weekly DBs does not match expected value:\n{len(db_list)} weekly DBs observed; {expected_db_count} weekly DBs expected.")
+    
+    quarter_map_create = f"""
+    CREATE TABLE IF NOT EXISTS {prod_db}.location_disambiguation_mapping_{quarter_end.strftime('%Y%m%d')} (
+    `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `location_id` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `version_indicator` date NOT NULL,
+    `created_date` timestamp NOT NULL DEFAULT current_timestamp(),
+    `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+    PRIMARY KEY (`id`),
+    KEY `location_id_2` (`location_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"""
+    print(quarter_map_create)
+    engine.execute(quarter_map_create)
+
+    for weekly_db in db_list:
+        incorporate_week_query = f"""
+            INSERT INTO {prod_db}.location_disambiguation_mapping_{quarter_end.strftime('%Y%m%d')} 
+            (id, location_id, version_indicator)
+            SELECT id, location_id, version_indicator
+            FROM {weekly_db}.location_disambiguation_mapping"""
+        print(incorporate_week_query)
+        engine.execute(incorporate_week_query)
+
 
 def post_process_location(**kwargs):
     config = get_current_config(schedule="quarterly", **kwargs)
@@ -201,6 +249,6 @@ def post_process_qc(**kwargs):
 
 if __name__ == '__main__':
     post_process_location(**{
-            "execution_date": datetime.date(2022, 7, 1)
+            "execution_date": date(2022, 7, 1)
             })
 
