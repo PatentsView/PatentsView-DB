@@ -524,7 +524,7 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
                 idx_counter += 1
                 if (href_match.group(2) is not None) and (file_date < start_date): # has a revision suffix and past date
                     # check if the file has already been downloaded to the matching folder
-                    old_download_path = config["FOLDERS"][xml_download_setting].replace(config['DATES']['END_DATE'], file_datestring)
+                    old_download_path = config["FOLDERS"][xml_download_setting].replace(config['DATES']['END_DATE'], f"20{file_datestring}") #path uses YYYY, file uses YY
                     downloaded_files = os.listdir(old_download_path)
                     matching_files = [f for f in downloaded_files if re.match(f'i?p[ag]{file_datestring}', f)]
                     if (len(matching_files) == 0): # no files downloaded for week matching revised file
