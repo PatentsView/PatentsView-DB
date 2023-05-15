@@ -15,10 +15,11 @@ def pct_data_doc_type(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
 
-    engine.execute(
-            'UPDATE pct_data SET doc_type = "pct_application" WHERE kind = "00";')
-    engine.execute(
-            'UPDATE pct_data SET doc_type = "wo_grant" WHERE kind = "A";')
+    if config['DATABASE_SETUP']['TEMP_UPLOAD_DB'][:7] == 'pgpubs_':
+        engine.execute('UPDATE pct_data SET kind = "00" WHERE `kind` IS NULL;') # for pgpubs this should generally be all records
+
+    engine.execute('UPDATE pct_data SET doc_type = "pct_application" WHERE kind = "00";')
+    engine.execute('UPDATE pct_data SET doc_type = "wo_grant" WHERE kind = "A";')
 
 
 def consolidate_uspc(config):

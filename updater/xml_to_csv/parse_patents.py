@@ -146,10 +146,10 @@ def get_results(patents, field_dictionary):
                         [rawlocid, None, inventor['address-city'], inventor['address-state'],
                          inventor['address-country'],
                          xml_helpers.clean_country(inventor['address-country'])])
-                deceased = False
+                deceased = 'FALSE'
                 if 'deceased' in output_helper.get_alt_tags(inventor,
                                                             ['addressbook-lastname', 'addressbook-last-name']):
-                    deceased = True
+                    deceased = 'TRUE'
                 results['rawinventor'].append([id_generator(), patent_id, None, rawlocid,
                                                output_helper.get_alt_tags(inventor,
                                                                           ['addressbook-firstname',

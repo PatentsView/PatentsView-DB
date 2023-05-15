@@ -13,7 +13,7 @@ from lib.utilities import load_table_config, class_db_specific_config
 
 def upload_table(table_name, filepath, connection_string, version_indicator):
     engine = create_engine(connection_string)
-    data = pd.read_csv(filepath, delimiter='\t', index_col=False)
+    data = pd.read_csv(filepath, delimiter='\t', index_col=False, keep_default_na=False, na_values=['','NULL','null'])
     data = data.assign(version_indicator=version_indicator)
     if table_name in ['mainclass', 'subclass']:
         table_name = "temp_" + table_name

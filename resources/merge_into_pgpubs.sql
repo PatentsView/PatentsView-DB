@@ -48,7 +48,7 @@ INSERT INTO pregrant_publications.rawassignee (id, document_number, `sequence`, 
 
 INSERT INTO pregrant_publications.rawinventor (id, document_number, name_first, name_last, `sequence`, designation, deceased, rawlocation_id, city, state, country, filename, version_indicator) SELECT id, document_number, name_first, name_last, sequence, designation, deceased, rawlocation_id, city, state, country, filename, version_indicator FROM `{{source_database}}`.rawinventor;
 
-INSERT INTO pregrant_publications.rawlocation (id, city, state, country, latitude, longitude, location_id, filename, version_indicator) SELECT id, city, state, country, latitude, longitude, location_id, filename,version_indicator FROM `{{source_database}}`.rawlocation;
+INSERT INTO pregrant_publications.rawlocation (id, city, state, country, country_transformed, latitude, longitude, location_id, filename, version_indicator) SELECT id, city, state, country, country_transformed, latitude, longitude, location_id, filename,version_indicator FROM `{{source_database}}`.rawlocation;
 
 INSERT INTO pregrant_publications.rawuspc SELECT * FROM `{{source_database}}`.rawuspc;
 
