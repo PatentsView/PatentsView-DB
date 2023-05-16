@@ -229,7 +229,7 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
 
     if cpc_xml_file:
         add_index, drop_index = generate_index_statements(config, "PROD_DB", "cpc_current")
-        prepare_cpc_table(config, drop_index)
+        # prepare_cpc_table(config, drop_index)
 
         if db == 'granted_patent':
             xml_file_name_generator = generate_file_list(cpc_xml_file)
