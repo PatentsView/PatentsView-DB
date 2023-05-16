@@ -188,18 +188,18 @@ def fips_geo_patch(config):
 
 def consolidate_location_disambiguation_pgpubs(**kwargs):
     config = get_current_config(type = 'pgpubs', schedule="quarterly", **kwargs)
-    consolidate_location_disambiguation_quarterly(config)
+    consolidate_location_disambiguation_quarterly(config, **kwargs)
 
 def consolidate_location_disambiguation_patent(**kwargs):
     config = get_current_config(type = 'granted_patent', schedule="quarterly", **kwargs)
-    consolidate_location_disambiguation_quarterly(config)
+    consolidate_location_disambiguation_quarterly(config, **kwargs)
 
-def consolidate_location_disambiguation_quarterly(config):
+def consolidate_location_disambiguation_quarterly(config, **kwargs):
     prod_db = config["PATENTSVIEW_DATABASES"]['PROD_DB']
     engine = create_engine(get_connection_string(config, "PROD_DB"))
     dbtype = 'pgpubs' if prod_db=='pregrant_publications' else 'granted_patent'
     inspector = inspect(engine)
-    quarter_start, quarter_end = get_update_range(datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d'))
+    quarter_start, quarter_end = get_update_range(kwargs['execution_date'])
     print(f"consolidating location disambiguation tables for date range {quarter_start.strftime('%Y-%m-%d')} to {quarter_end.strftime('%Y-%m-%d')}")
     weekly_prefix = config['PATENTSVIEW_DATABASES'][f"{dbtype}_upload_db"]
     db_list = [db for db in inspector.get_schema_names() if re.fullmatch(f"{weekly_prefix}\\d{{8}}", db) and 
