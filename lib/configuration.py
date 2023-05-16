@@ -250,6 +250,11 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     if type == 'pgpubs':
         config_prefix = 'pgpubs_'
     execution_date: DateTime = kwargs['execution_date']
+    print(f"""
+    generating config with parameters: 
+    type: {type}
+    schedule: {schedule}
+    execution date: {execution_date.strftime('%Y-%m-%d')}""")
     if schedule == 'weekly':
         current_week_start = datetime.timedelta(days=1)
         current_week_end = datetime.timedelta(days=7)
