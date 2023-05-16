@@ -59,20 +59,27 @@ def setup_database(update_config, drop=True, cpc_only=False):
                 default collate=utf8mb4_unicode_ci
             """)
         for table in required_tables:
-            print("Creating Table : {tbl}".format(tbl=table))
-            if drop:
-                con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
-            if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee', 'location', 'location_disambiguation_mapping'] and raw_database=='patent':
-                # tables with version-specific base tables (will need quarterly updating)
-                query = "create table if not exists {0}.{2} like {1}.{2}_{3}".format(temp_upload_database, raw_database, table, '20211230') 
+            if cpc_only:
+                if drop:
+                    con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
+                    query = f"create table if not exists {temp_upload_database}.{table} like patent.{table}"
+                    print(query)
+                    con.execute(query)
+            else:
+                print("Creating Table : {tbl}".format(tbl=table))
+                if drop:
+                    con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
+                if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee', 'location', 'location_disambiguation_mapping'] and raw_database=='patent':
+                    # tables with version-specific base tables (will need quarterly updating)
+                    query = "create table if not exists {0}.{2} like {1}.{2}_{3}".format(temp_upload_database, raw_database, table, '20211230')
+                    print(query)
+                    con.execute(query)
+                elif table in ['government_organization']: #set any tables that should be defined as views of the production version.
+                    query = f"CREATE SQL SECURITY INVOKER VIEW IF NOT EXISTS {temp_upload_database}.{table} AS SELECT * FROM {raw_database}.{table}"
+                else:
+                    query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
                 print(query)
                 con.execute(query)
-            elif table in ['government_organization']: #set any tables that should be defined as views of the production version.
-                query = f"CREATE SQL SECURITY INVOKER VIEW IF NOT EXISTS {temp_upload_database}.{table} AS SELECT * FROM {raw_database}.{table}"
-            else:
-                query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
-            print(query)
-            con.execute(query)
     engine.dispose()
 
 
