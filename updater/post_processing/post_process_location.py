@@ -200,8 +200,9 @@ def consolidate_location_disambiguation_quarterly(config):
     dbtype = 'pgpubs' if prod_db=='pregrant_publications' else 'granted_patent'
     inspector = inspect(engine)
     quarter_start, quarter_end = get_update_range(datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d'))
+    print(f"consolidating location disambiguation tables for date range {quarter_start.strftime('%Y-%m-%d')} to {quarter_end.strftime('%Y-%m-%d')}")
     weekly_prefix = config['PATENTSVIEW_DATABASES'][f"{dbtype}_upload_db"]
-    db_list = [db for db in inspector.get_schema_names() if re.fullmatch(db, f"{weekly_prefix}\d{8}") and 
+    db_list = [db for db in inspector.get_schema_names() if re.fullmatch(f"{weekly_prefix}\\d{{8}}", db) and 
                                                             (quarter_start <= datetime.strptime(db[-8:],'%Y%m%d').date() <= quarter_end)]
 
     expected_db_count = weekday_count(quarter_start, quarter_end)['Thursday' if dbtype == 'pgpubs' else 'Tuesday']
