@@ -105,5 +105,5 @@ def upload_cpc_classes(**kwargs):
 
 if __name__ == '__main__':
     upload_cpc_classes(**{
-        "execution_date": datetime.date(2020, 12, 15)
+        "execution_date": datetime.date(2023, 3, 30)
     })

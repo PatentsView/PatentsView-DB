@@ -42,7 +42,7 @@ def setup_database(update_config, drop=True, cpc_only=False):
     raw_database = update_config["PATENTSVIEW_DATABASES"]["PROD_DB"]
     temp_upload_database = update_config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
     if cpc_only:
-        required_tables = ['cpc_current']
+        required_tables = ['cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_subsection']
     else:
         required_tables = get_required_tables(update_config)
     print("Required tables are {tlist}".format(tlist=", ".join(required_tables)))
