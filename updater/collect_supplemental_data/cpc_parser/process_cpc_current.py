@@ -286,12 +286,19 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
 def delete_cpc_currents_pre_1976(db='granted_patent', **kwargs):
     config = get_current_config(db, schedule='quarterly', **kwargs)
     engine = create_engine(get_connection_string(config, "PROD_DB"))
-    query = """
-delete 
-from cpc_current a 
-	left join patent b on a.patent_id=b.patent_id 
-where b.patent_id is null;
-    """
+    if db == 'granted_patent':
+        query = """
+    delete cpc_current
+    from cpc_current 
+        left join patent b on cpc_current.patent_id=patent.id 
+    where patent.patent_id is null;
+        """
+    else:
+        """delete cpc_current
+            from cpc_current 
+                left join publication on cpc_current.document_number=publication.document_number
+            where publication.document_number is null;
+                """
     print(query)
     engine.execute(query)
 
