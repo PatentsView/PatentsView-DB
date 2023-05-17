@@ -16,3 +16,6 @@ def call_patent_wipo_qa(**kwargs):
 def call_pgpubs_wipo_qa(**kwargs):
     qa_data = qa_wipo(**kwargs)
     save_qa_data(qa_data, **kwargs)
+
+if __name__ == '__main__':
+    call_pgpubs_cpc_qa(**{'table': 'cpc_current', 'db': 'pgpubs'})
