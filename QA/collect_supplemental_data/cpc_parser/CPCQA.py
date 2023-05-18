@@ -72,6 +72,7 @@ def qa_cpc_current(**kwargs):
 
 def qa_wipo(**kwargs):
     config = get_current_config(schedule="quarterly", **kwargs)
+    db = kwargs['db']
     if db=='granted_patent':
         id = 'patent_id'
     else:

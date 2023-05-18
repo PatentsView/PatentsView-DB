@@ -290,8 +290,8 @@ def delete_cpc_currents_pre_1976(db='granted_patent', **kwargs):
         query = """
     delete cpc_current
     from cpc_current 
-        left join patent b on cpc_current.patent_id=patent.id 
-    where patent.patent_id is null;
+        left join patent on cpc_current.patent_id=patent.id 
+    where patent.id is null;
         """
     else:
         query = """delete cpc_current
