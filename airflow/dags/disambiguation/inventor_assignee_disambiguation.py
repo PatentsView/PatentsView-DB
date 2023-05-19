@@ -32,11 +32,10 @@ class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
 
-project_home = os.environ['PACKAGE_HOME']
-templates_searchpath = "{home}/resources".format(home=project_home)
-config = get_current_config(type='config.ini', supplemental_configs=None, **get_today_dict())
-
-print(config)
+# project_home = os.environ['PACKAGE_HOME']
+# templates_searchpath = "{home}/resources".format(home=project_home)
+# config = get_current_config(type='config.ini', supplemental_configs=None, **get_today_dict())
+# print(config)
 
 default_args = {
     'owner': 'smadhavan',
@@ -60,7 +59,7 @@ disambiguation = DAG(
     description='Perform inventor, assignee, & location disambiguation',
     start_date=datetime(2021, 7, 1),
     schedule_interval='@quarterly',
-    template_searchpath=templates_searchpath,
+    template_searchpath="/project/resources",
     catchup=True,
 )
 
