@@ -9,12 +9,12 @@ from pv.disambiguation.util.config_util import prepare_config
 
 def setup_inventor_assignee_disambiguation(**kwargs):
     config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/new_consolidated_config.ini', '/project/config.ini'],
+                                 supplemental_configs=['config/new_consolidated_config.ini'],
                                  **kwargs)
     end_date = config['DATES']['END_DATE']
-    os.makedirs(os.path.dirname(f"{config['BASE_PATH']['inventor']}".format(end_date=end_date)), exist_ok=True)
-    os.makedirs(os.path.dirname(f"{config['BASE_PATH']['assignee']}".format(end_date=end_date)), exist_ok=True)
-    print(f"NEW PATH CREATED ---- {config['BASE_PATH']['inventor']}".format(end_date=end_date))
+    os.makedirs(os.path.dirname(f"{config['BASE_PATH']['inventor']}".format(end_date=end_date, data_root=config['FOLDERS']['data_root'])), exist_ok=True)
+    os.makedirs(os.path.dirname(f"{config['BASE_PATH']['assignee']}".format(end_date=end_date, data_root=config['FOLDERS']['data_root'])), exist_ok=True)
+    print(f"NEW PATH CREATED ---- {config['BASE_PATH']['inventor']}".format(end_date=end_date, data_root=config['FOLDERS']['data_root']))
 
 
 def build_assignee_features(**kwargs):
