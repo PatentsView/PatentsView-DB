@@ -176,7 +176,7 @@ post_process_create_patent_inventor = PythonOperator(task_id='Inventor_create_pa
                                                   on_failure_callback=airflow_task_failure,
                                                   queue='data_collector', pool='database_write_iops_contenders')
 post_process_create_pgpubs_inventor = PythonOperator(task_id='Inventor_create_pgpubs_inventor',
-                                                     python_callable=load_granted_location_inventor,
+                                                     python_callable=load_pregranted_lookup,
                                                      dag=disambiguation,
                                                      on_success_callback=airflow_task_success,
                                                      on_failure_callback=airflow_task_failure,
@@ -512,12 +512,12 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                      'location_post_processing': [post_process_location_operator, qc_post_process_location_operator],
                      'location_assignee_link': [qc_post_process_location_operator, assignee_build_assignee_features],
                      'location_assignee_granted_link': [qc_post_process_location_operator,
-                                                        load_granted_location_assignee],
+                                                        post_process_create_patent_loc_assignee],
                      'location_assignee_pregranted_link': [qc_post_process_location_operator,
-                                                           load_pregranted_location_assignee],
+                                                           post_process_create_pgpubs_loc_assignee],
                      'location_inventor_granted_link': [qc_post_process_location_operator,
-                                                        load_granted_location_inventor],
-                     'location_inventor_pregranted_link': [load_granted_location_inventor,
+                                                        post_process_create_patent_loc_inventor],
+                     'location_inventor_pregranted_link': [post_process_create_patent_loc_inventor,
                                                            post_process_create_pgpubs_inventor]
                      }
 
