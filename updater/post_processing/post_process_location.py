@@ -9,19 +9,21 @@ from shapely.geometry import shape, Point
 from tqdm import tqdm
 
 from QA.post_processing.LocationPostProcessing import LocationPostProcessingQC
-from lib.configuration import get_connection_string, get_current_config, get_today_dict
+from lib.configuration import get_connection_string, get_current_config, get_today_dict, get_unique_connection_string
 from lib.is_it_update_time import get_update_range
 from lib.utilities import weekday_count
 
 tqdm.pandas()
 
-def update_rawlocation(update_config, end_date, database='RAW_DB'):
-    engine = create_engine(get_connection_string(update_config, database))
-    db = update_config['PATENTSVIEW_DATABASES'][database]
+def update_rawlocation(update_config):
+    prod_db = update_config["PATENTSVIEW_DATABASES"]['PROD_DB']
+    engine = create_engine(get_connection_string(update_config, database="PROD_DB"))
+    end_date = update_config['DATES']['END_DATE']
     update_statement = f"""
-        UPDATE {db}.rawlocation rl inner join location_disambiguation_mapping_{end_date} ldm
-            on ldm.id = rl.id
+        UPDATE {prod_db}.rawlocation rl 
+            inner join location_disambiguation_mapping_{end_date} ldmon ldm.id = rl.id
         set rl.location_id = ldm.location_id
+        where rl.location_id is null
     """
     print(update_statement)
     engine.execute(update_statement)
@@ -186,13 +188,6 @@ def fips_geo_patch(config):
     else:
         print("no locations required geographic FIPS assignment.")
 
-def consolidate_location_disambiguation_pgpubs(**kwargs):
-    config = get_current_config(type = 'pgpubs', schedule="quarterly", **kwargs)
-    consolidate_location_disambiguation_quarterly(config, **kwargs)
-
-def consolidate_location_disambiguation_patent(**kwargs):
-    config = get_current_config(type = 'granted_patent', schedule="quarterly", **kwargs)
-    consolidate_location_disambiguation_quarterly(config, **kwargs)
 
 def consolidate_location_disambiguation_quarterly(config, **kwargs):
     prod_db = config["PATENTSVIEW_DATABASES"]['PROD_DB']
@@ -231,25 +226,61 @@ def consolidate_location_disambiguation_quarterly(config, **kwargs):
         print(incorporate_week_query)
         engine.execute(incorporate_week_query)
 
+def update_dis_location_mapping(config):
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
+    end_date = config['DATES']['END_DATE']
+    prod_db = config["PATENTSVIEW_DATABASES"]['PROD_DB']
+    query0 = """show create view location_disambiguation_mapping"""
+    current = pd.read_sql(query0, engine)
+    query_list = []
+    current_view_q = current["Create View"][0]
+    new_table_addition = f" union all select `id` as `id`, `location_id` as `location_id` from `location_disambiguation_mapping_{end_date}` ;  "
+    drop_current = f"""drop view {prod_db}.location_disambiguation_mapping"""
+    query_list.append(drop_current)
+    loc_dis_mapping = current_view_q + new_table_addition
+    loc_dis_mapping = loc_dis_mapping.replace("CREATE ALGORITHM=UNDEFINED DEFINER=`pipeline_user`@`%` SQL SECURITY DEFINER VIEW", "CREATE SQL SECURITY INVOKER VIEW")
+    query_list.append(loc_dis_mapping)
+    for q in query_list:
+        print(q)
+        engine.execute(q)
+
+# VIEW STRUCTURE:
+#     query2 = """ \
+# CREATE table location_disambiguation_mapping as
+# select id, location_id
+# from location_disambiguation_mapping_20220630
+# union all
+# select id, location_id
+# from location_disambiguation_mapping_20220929
+# union all
+# select id, location_id
+# from location_disambiguation_mapping_20221229
+# union all
+# select id, location_id
+# from location_disambiguation_mapping_20230330"""
 
 def post_process_location(**kwargs):
-    config = get_current_config(schedule="quarterly", **kwargs)
-    end_date = config['DATES']['END_DATE']
-    update_rawlocation(config, end_date)
-    update_rawlocation(config, end_date, database='PGPUBS_DATABASE')
-    precache_locations(config)
-    create_location(config)
-    fips_geo_patch(config)
+    patent_config = get_current_config(schedule="quarterly", **kwargs)
+    pgpubs_config = get_current_config(type='pgpubs', schedule="quarterly", **kwargs)
+    # consolidate_location_disambiguation_quarterly(patent_config)
+    # consolidate_location_disambiguation_quarterly(pgpubs_config)
+    # update_dis_location_mapping(patent_config)
+    # update_dis_location_mapping(pgpubs_config)
+    # update_rawlocation(patent_config)
+    # update_rawlocation(pgpubs_config)
+    # precache_locations(patent_config)
+    # create_location(patent_config)
+    fips_geo_patch(patent_config)
 
 
 def post_process_qc(**kwargs):
     config = get_current_config(schedule="quarterly", **kwargs)
     qc = LocationPostProcessingQC(config)
-    qc.runTests()
+    qc.runTests(config)
 
 
 if __name__ == '__main__':
     post_process_location(**{
-            "execution_date": date(2022, 7, 1)
+            "execution_date": date(2023, 1, 1)
             })
 
