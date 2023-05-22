@@ -7,6 +7,10 @@ from lib.configuration import get_connection_string, get_current_config
 ## Documentation drafted by Mintlify Doc Writer
 
 def create_outer_patent_publication_crosswalk(**kwargs):
+    """
+    creates, configures, and populates the quarterly patent-publicatin crosswalk table.
+    kwargs must include key 'execution_date' required for config
+    """
     # in Spring 2023 run, total runtime was ~20 minutes. likely some room for improvement, but may not be a priority.
     # with modifications, runtime was about ~19 minutes - 8.4M rows
     config = get_current_config('pgpubs', schedule="quarterly", **kwargs)
@@ -180,6 +184,14 @@ def check_application_id_formatting(table, engine):
         return f"FAILED: {bad_app_num_query} rows with invalid application number formatting"
 
 def check_null_application_id(table, engine):
+    """
+    The function checks for null application numbers in a specified table and returns a pass or fail message.
+    
+    :param table: The name of the table in the pregrant_publications database that we want to check for null application numbers
+    :param engine: a SQLAlchemy engine object used to execute SQL queries
+    :return: either "PASSED" if there are no rows with null application numbers in the specified table, or a string
+        starting with "FAILED:" followed by the number of rows with null application numbers if there are any.
+    """
     print("testing for null applicaiton_numbers")
     app_num_null_qry = f"SELECT COUNT(*) FROM `pregrant_publications`.`{table}` WHERE application_number IS NULL"
     print(app_num_null_qry)
@@ -191,6 +203,14 @@ def check_null_application_id(table, engine):
         return f"FAILED: {app_num_null_count} rows with null application number"
 
 def check_missing_pat_pub_ids(table, engine):
+    """
+    The function checks if a table has at least one patent or document ID and returns a pass or fail message.
+    
+    :param table: The name of the table in the pregrant_publications database that needs to be checked for missing patent or document IDs
+    :param engine: a SQLAlchemy engine object used to execute SQL queries
+    :return: either "PASSED" if there are no rows with missing patent or document ids in the specified table, or
+        or a string starting with "FAILED: " followed by the number of rows with missing ids if there are any.
+    """
     print("testing for presence of at least one ID")
     no_id_qry = f"SELECT COUNT(*) FROM `pregrant_publications`.`{table}` WHERE patent_id IS NULL AND document_number IS NULL"
     print(no_id_qry)
@@ -199,9 +219,18 @@ def check_missing_pat_pub_ids(table, engine):
     if no_id_count == 0:
         return "PASSED"
     else:
-        return f"FAILED: {no_id_count} rows with no patent or document id"
+        return f"FAILED: {no_id_count} rows missing both patent and document id"
 
 def check_version_bounding(table, end_date, engine):
+    """
+    The function checks if version indicators in a given table are within valid date ranges.
+    
+    :param table: The name of the table being queried in the database
+    :param end_date: The end date is a date value used as an upper bound for version indicators in a database table.
+    :param engine: a SQLAlchemy engine object used to execute SQL queries
+    :return: either "PASSED" if there are no g_version_indicator or pg_version_indicator values out of the valid range, or a string starting
+        with "FAILED:" indicating the number of g_version_indicator and pg_version_indicator values that are out of the valid range if there are any.
+    """
     print("testing for correctly bounded version indicators")
     g_vi_bound_query = f"""
     SELECT COUNT(*) FROM `pregrant_publications`.`{table}` 
@@ -225,7 +254,12 @@ def check_version_bounding(table, end_date, engine):
 
 
 def qc_crosswalk(**kwargs):
-    # WIP
+    """
+    The function conducts a number of quality assurance tests on the granted patent crosswalk table.
+    All tests are conducted regardless of the results of any individual test, and if any issues were identified,
+    all failures are reported at the same time.
+    kwargs must include key 'execution_date' required for config.
+    """
     config = get_current_config('pgpubs', schedule="quarterly", **kwargs)
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
