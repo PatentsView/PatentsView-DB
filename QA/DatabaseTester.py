@@ -472,24 +472,29 @@ group by t.`{field}`"""
             if len(qa_table_data) == 0: 
                 continue
             table_frame = pd.DataFrame(qa_table_data)
-            if 'table_name' in table_frame.columns:
+            if qa_table == 'DataMonitor_topnentities': 
+                entity_set = f"""('{"', '".join(table_frame.entity_name.unique())}')"""
+                table_col = 'entity_name'
+                addl_condition = f"AND `{table_col}` IN {entity_set}"
+                print_condition = f"for {entity_set} "
+            elif qa_table in ['DataMonitor_govtinterestsampler']: # table-specific QA tables that just identify records by update_version and db_type
+                addl_condition = ""
+                print_condition = ""
+            elif 'table_name' in table_frame.columns:
                 table_set = f"""('{"', '".join(table_frame.table_name.unique())}')"""
                 table_col = "table_name"
-                table_condition = f"AND `{table_col}` IN {table_set}"
-                table_print = f"for {table_set} "
+                addl_condition = f"AND `{table_col}` IN {table_set}"
+                print_condition = f"for {table_set} "
             elif 'main_table' in table_frame.columns: # for floating entity table
                 table_set = f"""('{"', '".join(table_frame.main_table.unique())}')"""
                 table_col = "main_table"
-                table_condition = f"AND `{table_col}` IN {table_set}"
-                table_print = f"for {table_set} "
-            elif qa_table in ['DataMonitor_govtinterestsampler']: # table-specific QA tables that just identify records by update_version and db_type
-                table_condition = ""
-                table_print = ""
+                addl_condition = f"AND `{table_col}` IN {table_set}"
+                print_condition = f"for {table_set} "
             else:
                 raise NotImplementedError(f"specification of existing rows to remove not implemented for {qa_table}.\ncolumns available: `{'`,`'.join(table_frame.columns)}`")
             try:
-                print(f'removing prior {qa_table} {self.database_type} records {table_print}on {self.version}')
-                clean_prior = f"DELETE FROM {qa_table} WHERE `update_version` = '{self.version}' AND `database_type` = '{self.database_type}' {table_condition}"
+                print(f'removing prior {qa_table} {self.database_type} records {print_condition}on {self.version}')
+                clean_prior = f"DELETE FROM {qa_table} WHERE `update_version` = '{self.version}' AND `database_type` = '{self.database_type}' {addl_condition}"
                 print(clean_prior)
                 qa_engine.execute(clean_prior)
                 print(f'inserting new {qa_table} records for {self.version} and {self.database_type}')
