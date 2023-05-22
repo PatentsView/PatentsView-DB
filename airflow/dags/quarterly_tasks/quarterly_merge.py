@@ -37,20 +37,6 @@ merge_quarterly = DAG(
     # schedule_interval=None
 )
 
-consolidation_task_granted = PythonOperator(task_id='consolidate_weekly_location_maps_granted',
-                                            python_callable = consolidate_location_disambiguation_patent,
-                                            dag=merge_quarterly,
-                                            on_success_callback=airflow_task_success,
-                                            on_failure_callback=airflow_task_failure
-                                            )
-
-consolidation_task_pregrant = PythonOperator(task_id='consolidate_weekly_location_maps_pgpubs',
-                                            python_callable = consolidate_location_disambiguation_pgpubs,
-                                            dag=merge_quarterly,
-                                            on_success_callback=airflow_task_success,
-                                            on_failure_callback=airflow_task_failure
-                                            )
-
 qc_database_quarterly_granted_operator = PythonOperator(task_id='qc_database_quarterly_granted',
                                                         python_callable=qc_database_quarterly_granted,
                                                         dag=merge_quarterly,
@@ -97,8 +83,6 @@ qc_merge_text_quarterly_pgpubs_operator = PythonOperator(task_id='qc_text_merge_
                                                     on_failure_callback=airflow_task_failure
                                                     )
 
-qc_database_quarterly_granted_operator.set_upstream(consolidation_task_granted)
-qc_database_quarterly_granted_operator.set_upstream(consolidation_task_pregrant)
 qc_merge_quarterly_patent_operator.set_upstream(qc_database_quarterly_granted_operator)
 qc_database_quarterly_pgpubs_operator.set_upstream(qc_merge_quarterly_patent_operator)
 qc_merge_quarterly_pgpubs_operator.set_upstream(qc_database_quarterly_pgpubs_operator)
