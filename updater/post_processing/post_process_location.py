@@ -262,14 +262,15 @@ def update_dis_location_mapping(config):
 def post_process_location(**kwargs):
     patent_config = get_current_config(schedule="quarterly", **kwargs)
     pgpubs_config = get_current_config(type='pgpubs', schedule="quarterly", **kwargs)
-    # consolidate_location_disambiguation_quarterly(patent_config, **kwargs)
-    # consolidate_location_disambiguation_quarterly(pgpubs_config, **kwargs)
-    # update_dis_location_mapping(patent_config)
-    # update_dis_location_mapping(pgpubs_config)
-    # update_rawlocation(patent_config)
-    # update_rawlocation(pgpubs_config)
-    # precache_locations(patent_config)
-    # create_location(patent_config)
+    # Technically we no longer need the location-disambiguation-mapping tables anymore because location_id gets mapped over in the migration process
+    consolidate_location_disambiguation_quarterly(patent_config)
+    consolidate_location_disambiguation_quarterly(pgpubs_config)
+    update_dis_location_mapping(patent_config)
+    update_dis_location_mapping(pgpubs_config)
+    update_rawlocation(patent_config)
+    update_rawlocation(pgpubs_config)
+    precache_locations(patent_config)
+    create_location(patent_config)
     fips_geo_patch(patent_config)
 
 
@@ -280,7 +281,10 @@ def post_process_qc(**kwargs):
 
 
 if __name__ == '__main__':
-    post_process_location(**{
+    # post_process_location(**{
+    #         "execution_date": date(2023, 1, 1)
+    #         })
+    post_process_qc(**{
             "execution_date": date(2023, 1, 1)
             })
 

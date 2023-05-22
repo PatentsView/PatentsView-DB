@@ -710,4 +710,6 @@ set update_table.version_indicator={ed}
 
 
 if __name__ == "__main__":
-    update_to_granular_version_indicator('uspc_current', 'granted_patent')
+    # update_to_granular_version_indicator('uspc_current', 'granted_patent')
+    print("HI")
+    breakpoint()

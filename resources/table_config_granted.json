@@ -1830,12 +1830,6 @@
         "null_allowed": false,
         "category": false,
         "location_field": false
-      },
-      "sequence": {
-        "data_type": "int",
-        "null_allowed": false,
-        "category": false,
-        "location_field": false
       }
     },
     "related_entities": [

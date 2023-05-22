@@ -35,7 +35,7 @@ def prepare_tables(**kwargs):
         connection.execute(q)
 
     with engine.connect() as connection:
-        q = "ALTER TABLE rawlawyer ADD COLUMN alpha_lawyer_id varchar(128) AFTER organization;"
+        q = "ALTER TABLE rawlawyer ADD COLUMN alpha_lawyer_id varchar(250) AFTER organization;"
         print(q)
         connection.execute(q)
 
