@@ -1817,6 +1817,36 @@
     },
     "TestScripts": ["InventorPostProcessingQC"]
   },
+  "patent_lawyer": {
+    "fields": {
+      "patent_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "lawyer_id": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "sequence": {
+        "data_type": "int",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "lawyer",
+        "main_table_id": "lawyer_id",
+        "related_table_id": "id"
+      }
+    ],
+    "TestScripts": ["LawyerPostProcessingQC"]
+  },
   "pct_data": {
     "fields": {
       "uuid": {
