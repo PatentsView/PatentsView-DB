@@ -199,7 +199,7 @@ def consolidate_location_disambiguation_quarterly(config, **kwargs):
     weekly_prefix = config['PATENTSVIEW_DATABASES'][f"{dbtype}_upload_db"]
     db_list = [db for db in inspector.get_schema_names() if re.fullmatch(f"{weekly_prefix}\\d{{8}}", db) and 
                                                             (quarter_start <= datetime.strptime(db[-8:],'%Y%m%d').date() <= quarter_end)]
-
+    print(f"{len(db_list)} databases identified in range: {db_list}")
     expected_db_count = weekday_count(quarter_start, quarter_end)['Thursday' if dbtype == 'pgpubs' else 'Tuesday']
     if len(db_list) != expected_db_count:
         raise Exception(f"number of weekly DBs does not match expected value:\n{len(db_list)} weekly DBs observed; {expected_db_count} weekly DBs expected.")
@@ -262,8 +262,8 @@ def update_dis_location_mapping(config):
 def post_process_location(**kwargs):
     patent_config = get_current_config(schedule="quarterly", **kwargs)
     pgpubs_config = get_current_config(type='pgpubs', schedule="quarterly", **kwargs)
-    # consolidate_location_disambiguation_quarterly(patent_config)
-    # consolidate_location_disambiguation_quarterly(pgpubs_config)
+    # consolidate_location_disambiguation_quarterly(patent_config, **kwargs)
+    # consolidate_location_disambiguation_quarterly(pgpubs_config, **kwargs)
     # update_dis_location_mapping(patent_config)
     # update_dis_location_mapping(pgpubs_config)
     # update_rawlocation(patent_config)
