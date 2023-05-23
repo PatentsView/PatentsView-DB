@@ -32,11 +32,9 @@ def update_long_entity(entity, database_type='granted_patent', **kwargs):
         id = 'patent_id'
     target_persistent_table = 'persistent_{entity}_disambig_long'.format(entity=entity)
 
-    entity_update_query = """
-    INSERT INTO {target_table} (uuid, database_update, {entity_id}, version_indicator, {id}}) SELECT uuid, {db_version},{entity_id}, {version_indicator}, {id} from {source_table}
-    """.format(
-            target_table=target_persistent_table, source_table=source_entity_table, entity_id=source_entity_field,
-            db_version=update_version, version_indicator=version_indicator)
+    entity_update_query = f"""
+    INSERT INTO {target_persistent_table} (uuid, database_update, {source_entity_field}, version_indicator, {id}}) SELECT uuid, {update_version},{source_entity_field}, {version_indicator}, {id} from {source_entity_table}
+    """
     print(entity_update_query)
     if not connection.open:
         connection.connect()
@@ -128,12 +126,11 @@ def write_wide_table(entity, database_type='granted_patent', **kwargs):
     id = 'document_number'
     if database_type == 'granted_patent':
         id = 'patent_id'
-    upsert_query = """
-    INSERT INTO {wide_table} ({current_id},{disambig_id},version_indicator, {id}) select uuid,{entity_id},'{version_indicator}', {id} from {source_entity} ON DUPLICATE  
-    KEY UPDATE {disambig_id} = VALUES({disambig_id})
-    """.format(wide_table=persistent_wide_table, current_id=current_rawentity, disambig_id=disamb_col, entity_id=id_col,
-               source_entity=source_entity_table, version_indicator=update_version)
-    # fixed
+    upsert_query = f"""
+    INSERT INTO {persistent_wide_table} ({current_rawentity},{disamb_col},version_indicator, {id}) select uuid,{id_col},'{update_version}', {id} from {source_entity_table} ON DUPLICATE  
+    KEY UPDATE {disamb_col} = VALUES({disamb_col})
+    """
+    print(upsert_query)
 
     cstr = get_connection_string(config, database=section)
     engine = create_engine(cstr)
