@@ -95,7 +95,6 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
                     , count(*)
             FROM  {table_name} main
                 JOIN {related_table_config["related_table"]} related ON main.{related_table_config["main_table_id"]} = related.{related_table_config['related_table_id']}
-            where related.version_indicator >= '2022-07-01' and related.version_indicator <= '2022-10-01'
             GROUP  BY 1
             ORDER  BY 2 DESC
             LIMIT 100"""
