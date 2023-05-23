@@ -33,7 +33,7 @@ def update_long_entity(entity, database_type='granted_patent', **kwargs):
     target_persistent_table = 'persistent_{entity}_disambig_long'.format(entity=entity)
 
     entity_update_query = f"""
-    INSERT INTO {target_persistent_table} (uuid, database_update, {source_entity_field}, version_indicator, {id}}) SELECT uuid, {update_version},{source_entity_field}, {version_indicator}, {id} from {source_entity_table}
+    INSERT INTO {target_persistent_table} (uuid, database_update, {source_entity_field}, version_indicator, {id}) SELECT uuid, {update_version},{source_entity_field}, {version_indicator}, {id} from {source_entity_table}
     """
     print(entity_update_query)
     if not connection.open:
