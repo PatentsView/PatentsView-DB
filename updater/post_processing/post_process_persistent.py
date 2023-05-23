@@ -27,10 +27,13 @@ def update_long_entity(entity, database_type='granted_patent', **kwargs):
     source_entity_table = '{entity}_disambiguation_mapping'.format(entity=entity)
     source_entity_field = '{entity}_id'.format(entity=entity)
 
+    id = 'document_number'
+    if database_type == 'granted_patent':
+        id = 'patent_id'
     target_persistent_table = 'persistent_{entity}_disambig_long'.format(entity=entity)
 
     entity_update_query = """
-    INSERT INTO {target_table} (uuid, database_update, {entity_id}, version_indicator) SELECT uuid, {db_version},{entity_id}, {version_indicator} from {source_table}
+    INSERT INTO {target_table} (uuid, database_update, {entity_id}, version_indicator, {id}}) SELECT uuid, {db_version},{entity_id}, {version_indicator}, {id} from {source_table}
     """.format(
             target_table=target_persistent_table, source_table=source_entity_table, entity_id=source_entity_field,
             db_version=update_version, version_indicator=version_indicator)
@@ -122,8 +125,11 @@ def write_wide_table(entity, database_type='granted_patent', **kwargs):
     disamb_col = 'disamb_{}_id_{}'.format(entity, update_version)
     persistent_wide_table = 'persistent_{0}_disambig'.format(entity)
     id_col = '{0}_id'.format(entity)
+    id = 'document_number'
+    if database_type == 'granted_patent':
+        id = 'patent_id'
     upsert_query = """
-    INSERT INTO {wide_table} ({current_id},{disambig_id},version_indicator) select uuid,{entity_id},'{version_indicator}' from {source_entity} ON DUPLICATE  
+    INSERT INTO {wide_table} ({current_id},{disambig_id},version_indicator, {id}) select uuid,{entity_id},'{version_indicator}', {id} from {source_entity} ON DUPLICATE  
     KEY UPDATE {disambig_id} = VALUES({disambig_id})
     """.format(wide_table=persistent_wide_table, current_id=current_rawentity, disambig_id=disamb_col, entity_id=id_col,
                source_entity=source_entity_table, version_indicator=update_version)
