@@ -123,11 +123,14 @@ def write_wide_table(entity, database_type='granted_patent', **kwargs):
     disamb_col = 'disamb_{}_id_{}'.format(entity, update_version)
     persistent_wide_table = 'persistent_{0}_disambig'.format(entity)
     id_col = '{0}_id'.format(entity)
+    uuid = 'id'
     id = 'document_number'
     if database_type == 'granted_patent':
         id = 'patent_id'
+        uuid = 'uuid'
     upsert_query = f"""
-    INSERT INTO {persistent_wide_table} ({current_rawentity},{disamb_col},version_indicator, {id}) select uuid,{id_col},'{update_version}', {id} from {source_entity_table} ON DUPLICATE  
+    INSERT INTO {persistent_wide_table} ({current_rawentity},{disamb_col},version_indicator, {id}) select {uuid},
+    {id_col},'{update_version}', {id} from {source_entity_table} ON DUPLICATE  
     KEY UPDATE {disamb_col} = VALUES({disamb_col})
     """
     print(upsert_query)
