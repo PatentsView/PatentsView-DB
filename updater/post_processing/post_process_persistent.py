@@ -116,7 +116,7 @@ def write_wide_table(entity, database_type='granted_patent', **kwargs):
                                  charset='utf8mb4',
                                  cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
     update_version = config['DATES']['END_DATE']
-    source_entity_table = '{entity}_disambiguation_mapping'.format(entity=entity)
+    source_entity_table = 'raw{entity}'.format(entity=entity)
     source_entity_field = '{entity}_id'.format(entity=entity)
     # fixed
     current_rawentity = 'current_raw{0}_id'.format(entity)
