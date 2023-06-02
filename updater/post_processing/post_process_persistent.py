@@ -24,7 +24,7 @@ def update_long_entity(entity, database_type='granted_patent', **kwargs):
                                  cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
     update_version = config['DATES']['END_DATE']
     version_indicator = process_date(update_version, as_string=True)
-    source_entity_table = '{entity}_disambiguation_mapping'.format(entity=entity)
+    source_entity_table = 'raw_{entity}'.format(entity=entity)
     source_entity_field = '{entity}_id'.format(entity=entity)
 
     id = 'document_number'
