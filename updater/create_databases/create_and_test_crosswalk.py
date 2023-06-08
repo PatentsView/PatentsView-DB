@@ -6,27 +6,46 @@ from lib.configuration import get_connection_string, get_current_config
 
 ## Documentation drafted by Mintlify Doc Writer
 
+### granted_patent_crosswalk_template create syntax for reference
+# CREATE TABLE `granted_patent_crosswalk_template` (
+#   `id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+#   `document_number` bigint(16) DEFAULT NULL,
+#   `patent_id` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+#   `application_number` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+#   `g_version_indicator` date DEFAULT NULL,
+#   `latest_pat_flag` tinyint(1) DEFAULT NULL,
+#   `pg_version_indicator` date DEFAULT NULL,
+#   `latest_pub_flag` tinyint(1) DEFAULT NULL,
+#   `created_date` timestamp NULL DEFAULT current_timestamp(),
+#   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+#   PRIMARY KEY (`id`),
+#   KEY `document_number` (`document_number`),
+#   KEY `patent_id` (`patent_id`),
+#   KEY `application_number` (`application_number`)
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 def create_outer_patent_publication_crosswalk(**kwargs):
     """
     creates, configures, and populates the quarterly patent-publicatin crosswalk table.
     kwargs must include key 'execution_date' required for config
     """
-    # in Spring 2023 run, total runtime was ~20 minutes. likely some room for improvement, but may not be a priority.
-    # with modifications, runtime was about ~19 minutes - 8.4M rows
+    # in Spring 2023 run, total creation runtime was ~20 minutes prior to adding currency flags. likely some room for improvement, but may not be a priority.
     config = get_current_config('pgpubs', schedule="quarterly", **kwargs)
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
     end_date = config['DATES']["end_date"] # formatted '%Y-%m-%d'
     print(f"beginning creation of publication crosswalk for data ending {end_date}")
 
-    table_create_query = f"""
-    -- creating table...
+    query_dict = {}
+
+    query_dict['table_create_query'] = f"""
+    -- creating crosswalk table...
     CREATE TABLE `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}`
     LIKE `pregrant_publications`.`granted_patent_crosswalk_template`
     """ 
 
     # maybe try skipping this, then setting uuids after population, then adding index?
-    trigger_create_query = f"""
+    query_dict['trigger_create_query'] = f"""
     -- configuring uuid generator...
     CREATE TRIGGER `pregrant_publications`.`before_insert_crosswalk_{end_date.replace('-','')}`
         BEFORE INSERT
@@ -35,8 +54,8 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     """
 
     # Including commented conditions for excluding withdrawn patents in case we change course on their includion in the future.
-    table_population_query = f"""
-    -- populating table...
+    query_dict['table_population_query'] = f"""
+    -- populating crosswalk table...
     INSERT INTO `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}`
     (`document_number`, `patent_id`, `application_number`, `g_version_indicator`, `pg_version_indicator`)
 
@@ -89,11 +108,65 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     ) `q`
     """
 
-    h_pat_rmv_query = "DELETE FROM `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}` WHERE patent_id LIKE 'H%'"
+    query_dict['h_pat_rmv_query'] = """
+    -- removing H patents from crosswalk table...
+    DELETE FROM `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}` 
+    WHERE patent_id LIKE 'H%'
+    """
     # currently H patents don't have corresponding application or publication data, and are the only patents that don't have either. 
     # They won't be useful records in the table until we eventually reparse their data.
 
-    for query in [table_create_query, trigger_create_query, table_population_query, h_pat_rmv_query]:
+    query_dict['latest_pub_create_query'] = f"""
+    -- creating temp table of latest publications...
+    CREATE TEMPORARY TABLE `pregrant_publications`.`temp_xwalk_pub_latest` (
+        `application_number` varchar(16) DEFAULT NULL,
+        `pg_max_vi` DATE DEFAULT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    """
+
+    query_dict['latest_pub_populate_query'] = f"""
+    -- populating temp table of latest publications...
+    INSERT INTO `pregrant_publications`.`temp_xwalk_pub_latest`
+    (application_id, pg_max_vi)
+    SELECT application_id, MAX(pg_version_indicator)
+    FROM `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}`
+    GROUP BY 1
+    """
+
+    query_dict['latest_pat_create_query'] = f"""
+    -- creating temp table of latest patents...
+    CREATE TEMPORARY TABLE `pregrant_publications`.`temp_xwalk_pat_latest` (
+        `application_number` varchar(16) DEFAULT NULL,
+        `g_max_vi` DATE DEFAULT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    """
+
+    query_dict['latest_pat_populate_query'] = f"""
+    -- populating temp table of latest patents...
+    INSERT INTO `pregrant_publications`.`temp_xwalk_pat_latest`
+    (application_id, g_max_vi)
+    SELECT application_id, MAX(g_version_indicator)
+    FROM `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}`
+    GROUP BY 1
+    """
+
+    query_dict['pat_flag_update_query'] = f"""
+    -- setting latest patent flag...
+    UPDATE `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}` xw
+    LEFT JOIN `pregrant_publications`.`temp_xwalk_pat_latest` pat ON (xw.application_id = pat.application_id AND xw.g_version_indicator = pat.g_max_vi)
+    SET xw.latest_pat_flag = CASE WHEN pat.g_max_vi IS NOT NULL THEN 1 ELSE 0 END
+    """
+
+    query_dict['pub_flag_update_query'] = f"""
+    -- setting latest publication flag...
+    UPDATE `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}` xw
+    LEFT JOIN `pregrant_publications`.`temp_xwalk_pub_latest` pub ON (xw.application_id = pub.application_id AND xw.pg_version_indicator = pub.pg_max_vi)
+    SET xw.latest_pat_flag = CASE WHEN pat.g_max_vi IS NOT NULL THEN 1 ELSE 0 END
+    """
+
+    for query_name in query_dict:
+        print(f"running {query_name}:")
+        query = query_dict[query_name]
         print(query)
         query_start_time = time()
         engine.execute(query)
@@ -205,6 +278,7 @@ def check_null_application_id(table, engine):
 def check_missing_pat_pub_ids(table, engine):
     """
     The function checks if a table has at least one patent or document ID and returns a pass or fail message.
+    intended to be used on granted_patent_crosswalk_{DATESTAMP} tables only
     
     :param table: The name of the table in the pregrant_publications database that needs to be checked for missing patent or document IDs
     :param engine: a SQLAlchemy engine object used to execute SQL queries
@@ -250,7 +324,39 @@ def check_version_bounding(table, end_date, engine):
     if g_vi_bound_count == 0 and pg_vi_bound_count == 0:
         return "PASSED"
     else:
-        return f"FAILED: there are {g_vi_bound_count} g_version_indicator value out of valid range and {pg_vi_bound_count} pg_version_indicator values out of valid range."
+        return f"FAILED: there are {g_vi_bound_count} g_version_indicator values out of valid range and {pg_vi_bound_count} pg_version_indicator values out of valid range."
+
+
+def check_unique_current_ids(table, engine):
+    """
+    Checks whether each applicaiton in the table has a unique record marked as current
+    intended to be used on granted_patent_crosswalk_{DATESTAMP} tables only
+
+    :param table: The name of the table in the pregrant_publications database that needs to be checked for duplicate current records
+    :param engine: a SQLAlchemy engine object used to execute SQL queries
+    :return: either "PASSED" if there are no application IDs with multiple records flagged as current in the specified table, or
+        or a string starting with "FAILED: " followed by the number of application IDs with multiple records flagged as current.
+    """
+
+    print("testing that each applicaiton has a unique 'current' record")
+    uniqueness_query = f"""
+    SELECT COUNT(*) 
+    FROM (
+        SELECT application_id, patent_id, pgpub_id, COUNT(*) 
+        FROM `pregrant_publications`.`{table}`
+        WHERE latest_pat_flag = 1
+        AND latest_pub_flag = 1
+        GROUP BY 1,2,3
+        HAVING COUNT(*) > 1
+    ) sq
+    """
+    print(uniqueness_query)
+    duplication_count = engine.execute(uniqueness_query).fetchone()[0]
+
+    if duplication_count == 0:
+        return "PASSED"
+    else:
+        return f"FAILED: {duplication_count} application_ids with multiple records flagged as current"
 
 
 def qc_crosswalk(**kwargs):
@@ -268,27 +374,27 @@ def qc_crosswalk(**kwargs):
 
     test_status = {}
     # check pgpub_id formatting (all numeric, correct length)
-    test_status['pgpub_id'] = check_pgpub_id_formatting(table_name, engine)
+    test_status['pgpub_id_formatting'] = check_pgpub_id_formatting(table_name, engine)
     # check patent_id formatting (all valid prefixes or non-prefixed, prefixed IDs have no leading zero)
-    test_status[' patent_id'] = check_patent_id_formatting(table_name, engine)
+    test_status['patent_id_formatting'] = check_patent_id_formatting(table_name, engine)
     # check application_number formatting (all numeric, correct length)
-    test_status['application_id'] = check_application_id_formatting(table_name, engine)
+    test_status['application_id_formatting'] = check_application_id_formatting(table_name, engine)
     # check no application_number nulls
     test_status['app_id_nulls'] = check_null_application_id(table_name, engine)
     # all rows have either a pgpub_id or patent_id (or both)
     test_status['id_completeness'] = check_missing_pat_pub_ids(table_name, engine)
     # check all g_version_indicators and pg_version_indicators within date bounds
     test_status['version_bounding'] = check_version_bounding(table_name, end_date, engine)
-    # currently no test for duplication:
-        # patents_ids can have multiple valid document_numbers (unclear relationship currently) 
-        # see example of application number 15/138490 in the uspto patent search - one matching patent, 4 matching document_numbers, all with the same title, inventors, continuity, etc.
-        # document numbers should have only one current, unqithdrawn patent_id, but may have many withdrawn patent_ids.
-        # application_numbers will be duplicated due to both above cases.
-    
+    # check uniqueness of all IDs where flagged as latest documents
+    test_status['unique_current_ids'] = check_unique_current_ids(table_name, engine)
+        # some applications will have multiple patent_ids and/or pgpub_ids due to re-publication, withdrawals, etc.
+        # flags identify the most current patent and pgpub for any applicaiton within the date range of the update
     # return all issues at once so they can be checked in a single debugging/correction session
+    print("QA tests complete. test results:")
+    print(json.dumps(test_status, indent=0))
     if not all([test_status[test] == 'PASSED' for test in test_status]):
-        raise Exception(f"crosswalk QA testing failed. Test status:\n{json.dumps(test_status, indent=0)}")
-
+        failures = [test for test in test_status if test_status[test] != 'PASSED']
+        raise Exception(f"crosswalk QA testing failed. Failed tests: {failures}")
 
 
 if __name__ == "__main__":
