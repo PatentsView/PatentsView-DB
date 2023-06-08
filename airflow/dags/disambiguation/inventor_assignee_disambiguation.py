@@ -11,17 +11,20 @@ from lib.utilities import chain_operators
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.disambiguation.assignee_disambiguation.assignee_disambiguator import build_assignee_name_mentions, \
     run_hierarchical_clustering as run_assignee_hierarchical_clustering, create_uuid_map, \
-    upload_results as upload_assignee_results, archive_results as archive_assignee_results, finalize_assignee_clustering
+    upload_results as upload_assignee_results, archive_results as archive_assignee_results, \
+    finalize_assignee_clustering, qc_build_assignee_name_mentions
 from updater.disambiguation.inventor_disambiguation.inventor_disambiguator import build_assignee_features, \
     build_canopies, archive_results as archive_inventor_results, build_coinventor_features, build_title_map, \
     run_hierarchical_clustering as run_inventor_hierarchical_clustering, \
     finalize_disambiguation, upload_results as upload_inventor_results, setup_inventor_assignee_disambiguation
 from updater.disambiguation.location_disambiguation.location_disambiguator import *
 from updater.post_processing.post_process_location import post_process_location, post_process_qc
-from updater.post_processing.post_process_assignee import additional_post_processing_assignee, post_process_qc as qc_post_process_assignee,  \
+from updater.post_processing.post_process_assignee import additional_post_processing_assignee, \
+    post_process_qc as qc_post_process_assignee, \
     update_granted_rawassignee, update_pregranted_rawassignee, \
     precache_assignees, create_canonical_assignees, load_granted_lookup as load_granted_assignee_lookup, \
-    load_pregranted_lookup as load_pregranted_assignee_lookup, load_granted_location_assignee, load_pregranted_location_assignee
+    load_pregranted_lookup as load_pregranted_assignee_lookup, load_granted_location_assignee, \
+    load_pregranted_location_assignee
 from updater.post_processing.post_process_inventor import update_granted_rawinventor, update_pregranted_rawinventor, \
     precache_inventors, create_canonical_inventors, load_granted_lookup, load_pregranted_lookup, \
     post_process_qc as qc_inventor_post_processing, load_granted_location_inventor, load_pregranted_location_inventor
@@ -271,6 +274,14 @@ assignee_build_assignee_features = PythonOperator(task_id='Assignee_Build_Assign
                                                   on_failure_callback=airflow_task_failure,
                                                   queue='disambiguator', pool='high_memory_pool')
 
+qc_assignee_build_assignee_features = PythonOperator(task_id='(QC) Assignee_Build_Assignee_Name_Mentions_Canopies',
+                                                     python_callable=qc_build_assignee_name_mentions,
+                                                     provide_context=True,
+                                                     dag=disambiguation,
+                                                     on_success_callback=airflow_task_success,
+                                                     on_failure_callback=airflow_task_failure,
+                                                     queue='disambiguator', pool='high_memory_pool')
+
 assignee_run_clustering = PythonOperator(task_id='Assignee_Run_Clustering',
                                          python_callable=run_assignee_hierarchical_clustering,
                                          provide_context=True,
@@ -480,7 +491,8 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                                                     create_pregranted_persistent_wide_inventor,
                                                     update_pregranted_persistent_long_inventor,
                                                     qc_post_process_inventor_operator],
-                     'assignee_mention': [assignee_build_assignee_features, assignee_run_clustering],
+                     'assignee_mention': [assignee_build_assignee_features, qc_assignee_build_assignee_features,
+                                          assignee_run_clustering],
                      'cross_link_1': [inv_build_coinventor_features, assignee_run_clustering],
                      'cross_link_2': [inv_build_titles, assignee_run_clustering],
                      'cross_link_3': [inv_build_assignee_features, assignee_run_clustering],
