@@ -1,5 +1,6 @@
 import pymysql
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from time import time
 import json
 from lib.configuration import get_connection_string, get_current_config
@@ -38,13 +39,14 @@ def create_outer_patent_publication_crosswalk(**kwargs):
 
     query_dict = {}
 
+    # currently will fail if the table for the current quarter already exists.
+    # could consider dropping the table if it exists first, but for now let's require human intervention for re-run.
     query_dict['table_create_query'] = f"""
     -- creating crosswalk table...
     CREATE TABLE `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}`
     LIKE `pregrant_publications`.`granted_patent_crosswalk_template`
     """ 
 
-    # maybe try skipping this, then setting uuids after population, then adding index?
     query_dict['trigger_create_query'] = f"""
     -- configuring uuid generator...
     CREATE TRIGGER `pregrant_publications`.`before_insert_crosswalk_{end_date.replace('-','')}`
@@ -164,14 +166,20 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     SET xw.latest_pat_flag = CASE WHEN pat.g_max_vi IS NOT NULL THEN 1 ELSE 0 END
     """
 
-    for query_name in query_dict:
-        print(f"running {query_name}:")
-        query = query_dict[query_name]
-        print(query)
-        query_start_time = time()
-        engine.execute(query)
-        query_end_time = time()
-        print("This query took:", query_end_time - query_start_time, "seconds")
+    #instantiating session to use temporary tables and cause rollback on error
+    Session = sessionmaker(engine)
+    with Session.begin() as session:
+        for query_name in query_dict:
+            print(f"running {query_name}:")
+            query = query_dict[query_name]
+            print(query)
+            query_start_time = time()
+            session.execute(query)
+            query_end_time = time()
+            t = query_end_time - query_start_time
+            m,s = divmod(t, 60)
+            print(f"This query took {m:02.0f}:{s:04.1f} (m:s)")
+        print("committing SQL session...")
 
     print(f"creation and population of granted_patent_crosswalk_{end_date.replace('-','')} is complete.")
 
