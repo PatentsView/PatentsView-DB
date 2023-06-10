@@ -380,6 +380,24 @@ def post_process_assignee(**kwargs):
     create_canonical_assignees(**kwargs)
     load_granted_lookup(**kwargs)
     load_pregranted_lookup(**kwargs)
+    check_largest_clusters()
+
+def check_largest_clusters(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    engine = create_engine(get_connection_string(config, 'RAW_DB'))
+    cluster_query = """
+select assignee_id, count(*) as records
+from rawassignee
+group by 1
+order by 2 desc
+limit 25;
+    """
+    df = pd.read_sql(cluster_query, con=engine)
+    print(df)
+    if df['records'][0] > 150000:
+        raise Exception(f"ASSIGNEE DISAMBIGUATION OVER-CLUSTERED")
+    if df['records'][0] < 50000:
+        raise Exception(f"ASSIGNEE DISAMBIGUATION UNDER-CLUSTERED")
 
 
 def additional_post_processing_assignee(**kwargs):
@@ -388,19 +406,20 @@ def additional_post_processing_assignee(**kwargs):
     precache_assignees(**kwargs)
     create_canonical_assignees(**kwargs)
 
-
 def post_process_qc(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     qc = AssigneePostProcessingQC(config)
     qc.runTests()
 
-
 if __name__ == '__main__':
-    date = datetime.date(2022, 7, 1)
-    load_granted_lookup(**{
-        "execution_date": date
-    })
-    load_pregranted_location_assignee(**{
+    date = datetime.date(2023, 1, 1)
+    # load_granted_lookup(**{
+    #     "execution_date": date
+    # })
+    # load_pregranted_location_assignee(**{
+    #     "execution_date": date
+    # })
+    check_largest_clusters(**{
         "execution_date": date
     })
 
