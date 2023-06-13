@@ -35,7 +35,7 @@ class AssigneePostProcessingQC(DisambiguationTester):
 
 if __name__ == '__main__':
     config = get_current_config('granted_patent', schedule='quarterly', **{
-            "execution_date": datetime.date(2021, 10, 1)
+            "execution_date": datetime.date(2023, 1, 1)
             })
     # print({section: dict(config[section]) for section in config.sections()})
     qc = AssigneePostProcessingQC(config)

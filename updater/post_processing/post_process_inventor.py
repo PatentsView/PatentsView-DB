@@ -88,7 +88,7 @@ def precache_inventors_ids(config):
     CREATE TABLE disambiguated_inventor_ids_{suffix} (inventor_id varchar(256),  PRIMARY KEY (`inventor_id`))
     """.format(suffix=suffix)
     view_query = """
-    CREATE OR REPLACE VIEW disambiguated_inventor_ids as select inventor_id from disambiguated_inventor_ids_{suffix}
+    CREATE OR REPLACE SQL SECURITY INVOKER VIEW disambiguated_inventor_ids as select inventor_id from disambiguated_inventor_ids_{suffix}
     """.format(suffix=suffix)
     inventor_cache_query = """
         INSERT IGNORE INTO disambiguated_inventor_ids_{suffix} (inventor_id)
@@ -133,8 +133,8 @@ def create_inventor(update_config):
     CREATE OR REPLACE SQL SECURITY INVOKER VIEW inventor as select * from inventor_{suffix}
     """.format(suffix=suffix)
     print(view_sql)
-    engine.execute(create_sql)
-    engine.execute(view_sql)
+    # engine.execute(create_sql)
+    # engine.execute(view_sql)
     limit = 10000
     offset = 0
     while True:
@@ -278,6 +278,7 @@ if __name__ == '__main__':
     # evaluate_inventor_clustering(**{
     #     "execution_date": datetime.date(2020, 12, 29)
     # })
-    load_pregranted_location_inventor(**{
-        "execution_date": datetime.date(2022, 7, 1)
+    config = get_disambig_config(schedule='quarterly', **{
+        "execution_date": datetime.date(2023, 1, 1)
     })
+    create_inventor(config)
