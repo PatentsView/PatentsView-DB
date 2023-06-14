@@ -14,8 +14,8 @@ class InventorPostProcessingQC(DisambiguationTester):
         super(DisambiguationTester, self).runTests()
 
 if __name__ == '__main__':
-    config = get_current_config('granted_patent', **{
-                    "execution_date": datetime.date(2022, 1, 15)
+    config = get_current_config('granted_patent', schedule="quarterly", **{
+                    "execution_date": datetime.date(2023, 1, 1)
                                 })
     qc = InventorPostProcessingQC(config)
     qc.runTests()

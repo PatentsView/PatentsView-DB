@@ -13,7 +13,7 @@ class AssigneePostProcessingQC(DisambiguationTester):
 
 
     def runTests(self):
-        # super(AssigneePostProcessingQC, self).runTests()
+        super(AssigneePostProcessingQC, self).runTests()
         super(DisambiguationTester, self).runTests()
 
 

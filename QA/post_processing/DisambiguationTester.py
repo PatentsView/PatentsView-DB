@@ -53,15 +53,8 @@ class DisambiguationTester(DatabaseTester):
                     'ratio_to_self': ratio_to_self
                 })
 
-    def top_n_generator(self, table):
-        if 'related_entities' in self.table_config[table]:
-            related_table_configs = self.table_config[table]["related_entities"]
-            for related_table_config in related_table_configs:
-                print(f"\t\t\tLoading Top N Entities for {self.database_section}.{self.disambiguated_table} from {related_table_config['related_table']}")
-                self.load_top_entities(table, related_table_config)
-
     def test_entity_id_updated(self):
-        if {self.entity_table} in ['assignee','inventor']:
+        if {self.entity_table} in ['assignee', 'inventor']:
             for db, id in [['pregrant_publications', 'id'], ['patent', 'uuid']]:
                 test_entity_id_updated_query = f"""
 select count(*)
@@ -76,6 +69,13 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
                     count_not_updated = g_cursor.fetchall()[0][0]
                     if count_not_updated > 0:
                         raise Exception(f"ENTITY NOT UPDATED IN THE RAW TABLE")
+
+    def top_n_generator(self, table):
+        if 'related_entities' in self.table_config[table]:
+            related_table_configs = self.table_config[table]["related_entities"]
+            for related_table_config in related_table_configs:
+                print(f"\t\t\tLoading Top N Entities for {self.database_section}.{self.disambiguated_table} from {related_table_config['related_table']}")
+                self.load_top_entities(table, related_table_config)
 
     def load_top_entities(self, table_name, related_table_config):
         if 'patent' not in table_name:
