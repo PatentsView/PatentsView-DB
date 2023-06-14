@@ -51,14 +51,14 @@ class LocationPostProcessingQC(DisambiguationTester):
 
     def runTests(self, config):
         super(LocationPostProcessingQC, self).runTests()
-        # super(DisambiguationTester, self).runTests()
-        # self.init_qa_dict_loc()
-        # for table in self.table_config:
-        #     print(table)
-        #     if table in ['rawlocation', 'location']:
-        #         self.records_by_region(config, table,)
-        #         self.save_qa_data()
-        #         self.init_qa_dict_loc()
+        super(DisambiguationTester, self).runTests()
+        self.init_qa_dict_loc()
+        for table in self.table_config:
+            print(table)
+            if table in ['rawlocation', 'location']:
+                self.records_by_region(config, table,)
+                self.save_qa_data()
+                self.init_qa_dict_loc()
 
 
 if __name__ == '__main__':

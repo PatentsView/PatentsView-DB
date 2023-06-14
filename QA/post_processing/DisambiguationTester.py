@@ -146,6 +146,19 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
                 print(invalid_query)
                 raise Exception(f"There are {self.disambiguated_id} in {self.disambiguated_table} table that are not in {self.entity_table}")
 
+    def assert_name_or_organization(self, table):
+        query = f"""
+delete
+from {table} 
+where organization is null and name_first is null and name_last is null;
+        """
+        if not self.connection.open:
+            self.connection.connect()
+        with self.connection.cursor() as cursor:
+            cursor.execute(query)
+            num_affected_rows = cursor.rowcount
+            print("Number of affected rows: ", num_affected_rows)
+
     def runTests(self):
         print("Beginning Disambiguation Specific Tests")
         self.test_entity_id_updated()
@@ -153,9 +166,12 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
         self.test_invalid_id()
         self.test_floating_entities()
         for table in self.table_config:
-            print(f"\t\tBeginning Tests for {table}")
-            self.top_n_generator(table)
-            self.save_qa_data()
-            self.init_qa_dict_disambig()
+            if "assignee_" in table:
+                self.assert_name_or_organization(table)
+            if "disambiguation" not in table and "patent_" not in table:
+                print(f"\t\tBeginning Tests for {table}")
+                self.top_n_generator(table)
+                self.save_qa_data()
+                self.init_qa_dict_disambig()
 
 

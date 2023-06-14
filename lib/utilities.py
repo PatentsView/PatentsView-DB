@@ -40,6 +40,12 @@ def class_db_specific_config(self, table_config, class_called):
     if class_called[:4] == 'Text':
         pass
     else:
+        if "PostProcessing" in str(self):
+            tables_list = list(self.table_config.keys())
+            quarter_date = str(self.end_date.year) + str(self.end_date.strftime("%m")) + str(self.end_date.day)
+            for table in tables_list:
+                if table in ['assignee', 'location', 'inventor']:
+                    self.table_config[f'{table}_{quarter_date}'] = self.table_config.pop(f'{table}')
         print(f"The following list of tables are run for {class_called}:")
         print(self.table_config.keys())
 
