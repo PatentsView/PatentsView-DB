@@ -48,7 +48,10 @@ def check_encoding_and_collation(db_con, tables_list):
     collation_data = collation_information.fetchall()
     print(collation_data)
     if len(collation_data) > 1:
-        return False
+        if collation_data[0][0] == collation_data[1][0]:
+            return True
+        else:
+            return False
     else:
         return True
 
@@ -76,4 +79,4 @@ if __name__ == '__main__':
             config['DATABASE_SETUP']['PORT'],
             "information_schema")
     db_con = create_engine(cstr)
-    check_encoding_and_collation(db_con, [('pgpubs_20050101', 'application'), ('pgpubs_20050101', 'brf_sum_text'), ('pgpubs_20050101', 'brf_sum_text_2001'), ('pgpubs_20050101', 'brf_sum_text_2002')] )
+    check_encoding_and_collation(db_con, [('patent', 'location'), ('PatentsView_20230330', 'temp_id_mapping_location')] )
