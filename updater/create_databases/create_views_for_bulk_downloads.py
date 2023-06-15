@@ -34,7 +34,7 @@ def update_create_view_sql(config, output_path, if_exists='replace'):
 			create_syntax = re.sub(' group by ', ' \ngroup by ', create_syntax, flags=re.I)
 			create_syntax = re.sub(' left join ', ' \nleft join ', create_syntax, flags=re.I)
 			create_syntax = re.sub('(?<!left) join ', ' \njoin ', create_syntax, flags=re.I)
-			create_syntax = re.sub(' union ', ' \union ', create_syntax, flags=re.I)
+			create_syntax = re.sub(' union ', ' \nunion ', create_syntax, flags=re.I)
 			create_syntax = re.sub('`, ?','`,\n',create_syntax)
 			with open(output_path, 'a') as f:
 				f.write(create_syntax)
