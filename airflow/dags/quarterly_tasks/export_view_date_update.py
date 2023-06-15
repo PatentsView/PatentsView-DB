@@ -11,6 +11,7 @@ from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.create_databases.create_views_for_bulk_downloads import update_view_date_ranges #, update_persistent_view_columns
 from QA.post_processing.BulkDownloadsTesterGranted import run_bulk_downloads_qa
 from QA.post_processing.BulkDownloadsTesterPgpubs import run_bulk_downloads_qa as run_pgpubs_bulk_downloads_qa
+from updater.create_databases.create_and_test_crosswalk import create_outer_patent_publication_crosswalk, qc_crosswalk
 
 default_args = {
     'owner': 'smadhavan',
@@ -44,6 +45,20 @@ operator_settings = {
     'on_retry_callback': airflow_task_failure
 }
 
+generate_crosswalk_task = PythonOperator(task_id='generate_pat_pub_crosswalk',
+                                            python_callable = create_outer_patent_publication_crosswalk,
+                                            dag=view_date_updater,
+                                            on_success_callback=airflow_task_success,
+                                            on_failure_callback=airflow_task_failure
+                                            )
+
+qc_crosswalk_task = PythonOperator(task_id='qc_pat_pub_crosswalk',
+                                            python_callable = qc_crosswalk,
+                                            dag=view_date_updater,
+                                            on_success_callback=airflow_task_success,
+                                            on_failure_callback=airflow_task_failure
+                                            )
+
 update_max_vi = PythonOperator(task_id='update_bulk_downloads_views', 
                         python_callable=update_view_date_ranges,
                         **operator_settings)
@@ -60,6 +75,8 @@ qa_pgpubs_bulk_downloads = PythonOperator(task_id='qa_pgpubs_bulk_downloads',
                         python_callable=run_pgpubs_bulk_downloads_qa,
                         **operator_settings)
 
+qc_crosswalk_task.set_upstream(generate_crosswalk_task)
+update_max_vi.set_upstream(qc_crosswalk_task)
 qa_granted_bulk_downloads.set_upstream(update_max_vi)
 qa_pgpubs_bulk_downloads.set_upstream(update_max_vi)
 

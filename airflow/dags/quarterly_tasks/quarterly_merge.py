@@ -5,7 +5,6 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.sensors.external_task import ExternalTaskSensor
 
 from updater.create_databases.merge_in_new_data import post_merge_quarterly_granted, post_merge_quarterly_pgpubs
-from updater.create_databases.create_and_test_crosswalk import create_outer_patent_publication_crosswalk, qc_crosswalk
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.create_databases.rename_db import qc_database_quarterly_pgpubs, qc_database_quarterly_granted
 from updater.text_data_processor.text_table_parsing import post_text_merge_quarterly_pgpubs, post_text_merge_quarterly_granted
@@ -67,20 +66,6 @@ qc_merge_quarterly_pgpubs_operator = PythonOperator(task_id='qc_merge_quarterly_
                                                     on_failure_callback=airflow_task_failure
                                                     )
 
-generate_crosswalk_task = PythonOperator(task_id='generate_pat_pub_crosswalk',
-                                            python_callable = create_outer_patent_publication_crosswalk,
-                                            dag=merge_quarterly,
-                                            on_success_callback=airflow_task_success,
-                                            on_failure_callback=airflow_task_failure
-                                            )
-
-qc_crosswalk_task = PythonOperator(task_id='qc_pat_pub_crosswalk',
-                                            python_callable = qc_crosswalk,
-                                            dag=merge_quarterly,
-                                            on_success_callback=airflow_task_success,
-                                            on_failure_callback=airflow_task_failure
-                                            )
-
 qc_merge_text_quarterly_patent_operator = PythonOperator(task_id='qc_text_merge_quarterly_patents',
                                                     python_callable=post_text_merge_quarterly_granted,
                                                     provide_context=True,
@@ -100,8 +85,5 @@ qc_merge_text_quarterly_pgpubs_operator = PythonOperator(task_id='qc_text_merge_
 qc_merge_quarterly_patent_operator.set_upstream(qc_database_quarterly_granted_operator)
 qc_database_quarterly_pgpubs_operator.set_upstream(qc_merge_quarterly_patent_operator)
 qc_merge_quarterly_pgpubs_operator.set_upstream(qc_database_quarterly_pgpubs_operator)
-generate_crosswalk_task.set_upstream(qc_merge_quarterly_pgpubs_operator)
-qc_crosswalk_task.set_upstream(generate_crosswalk_task)
-
 qc_merge_text_quarterly_patent_operator.set_upstream(qc_merge_quarterly_pgpubs_operator)
 qc_merge_text_quarterly_pgpubs_operator.set_upstream(qc_merge_text_quarterly_patent_operator)
