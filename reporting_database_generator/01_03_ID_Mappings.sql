@@ -163,7 +163,7 @@ create table `{{params.reporting_database}}`.`temp_id_mapping_location`
   index `ak_temp_id_mapping_location` (`new_location_id`),
   index `ak_old_id_mapping_location` (`old_location_id`)
 )
-ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 insert into
