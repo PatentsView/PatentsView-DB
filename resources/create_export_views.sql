@@ -88,7 +88,7 @@ select `patent`.`cpc_current`.`patent_id` AS `patent_id`,
 `patent`.`cpc_current`.`group_id` AS `cpc_subclass`,
 `patent`.`cpc_current`.`subgroup_id` AS `cpc_group`,
 `patent`.`cpc_current`.`category` AS `cpc_type`,
-`patent`.`cpc_current`.`symbol_position` AS `cpc_symbol_position` 
+CASE WHEN `cpc_current`.`sequence` = 0 then 'F' else 'L' END AS `cpc_symbol_position`
 from `patent`.`cpc_current` 
 where `patent`.`cpc_current`.`version_indicator` <= '{{datestring}}';
 
@@ -215,7 +215,8 @@ select `location`.`id` AS `location_id`,
 `location`.`state_fips` AS `state_fips`,
 `location`.`county_fips` AS `county_fips` 
 from `patent`.`location` 
-where `location`.`id` in (select distinct `patent`.`rawlocation`.`location_id` from `patent`.`rawlocation`) 
+where `location`.`id` in (select distinct `patent`.`rawlocation`.`location_id` 
+from `patent`.`rawlocation`) 
 and `location`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_location_not_disambiguated` AS 
@@ -276,7 +277,8 @@ select `patent`.`persistent_assignee_disambig`.`patent_id` AS `patent_id`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20210930` AS `disamb_assignee_id_20210930`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20211230` AS `disamb_assignee_id_20211230`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220630` AS `disamb_assignee_id_20220630`,
-`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929` 
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929`,
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230330` AS `disamb_assignee_id_20230330` 
 from `patent`.`persistent_assignee_disambig` 
 where `patent`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -298,7 +300,8 @@ select `patent`.`persistent_inventor_disambig`.`patent_id` AS `patent_id`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20201229` AS `disamb_inventor_id_20201229`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20211230` AS `disamb_inventor_id_20211230`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220630` AS `disamb_inventor_id_20220630`,
-`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929` 
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929`,
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230330` AS `disamb_inventor_id_20230330` 
 from `patent`.`persistent_inventor_disambig` 
 where `patent`.`persistent_inventor_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -344,7 +347,8 @@ NULL AS `citation_document_number`,
 `uspc`.`version_indicator` AS `version_indicator`,
 `uspc`.`created_date` AS `created_date`,
 `uspc`.`updated_date` AS `updated_date` 
-from `patent`.`uspatentcitation` `uspc` union all 
+from `patent`.`uspatentcitation` `uspc` 
+union all 
 select `usac`.`patent_id` AS `patent_id`,
 'application' AS `citation_type`,
 NULL AS `citation_patent_id`,
@@ -588,7 +592,8 @@ select `location`.`id` AS `location_id`,
 `location`.`state_fips` AS `state_fips`,
 `location`.`county_fips` AS `county_fips` 
 from `patent`.`location` 
-where `location`.`id` in (select distinct `pregrant_publications`.`rawlocation`.`location_id` from `pregrant_publications`.`rawlocation`) 
+where `location`.`id` in (select distinct `pregrant_publications`.`rawlocation`.`location_id` 
+from `pregrant_publications`.`rawlocation`) 
 and `location`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_location_not_disambiguated` AS 
@@ -620,7 +625,8 @@ select `pregrant_publications`.`persistent_assignee_disambig`.`document_id` AS `
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20210930` AS `disamb_assignee_id_20210930`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20211230` AS `disamb_assignee_id_20211230`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20220630` AS `disamb_assignee_id_20220630`,
-`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929` 
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230330` AS `disamb_assignee_id_20230330`
 from `pregrant_publications`.`persistent_assignee_disambig` 
 where `pregrant_publications`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -632,7 +638,8 @@ select `pregrant_publications`.`persistent_inventor_disambig`.`document_id` AS `
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20210930` AS `disamb_inventor_id_20210930`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20211230` AS `disamb_inventor_id_20211230`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20220630` AS `disamb_inventor_id_20220630`,
-`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929` 
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230330` AS `disamb_inventor_id_20230330` 
 from `pregrant_publications`.`persistent_inventor_disambig` 
 where `pregrant_publications`.`persistent_inventor_disambig`.`version_indicator` <= '{{datestring}}';
 
