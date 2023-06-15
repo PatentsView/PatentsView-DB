@@ -42,7 +42,7 @@ def class_db_specific_config(self, table_config, class_called):
     else:
         if "PostProcessing" in str(self):
             tables_list = list(self.table_config.keys())
-            quarter_date = str(self.end_date.year) + str(self.end_date.strftime("%m")) + str(self.end_date.day)
+            quarter_date = self.end_date.strftime("%Y%m%d")
             for table in tables_list:
                 if table in ['assignee', 'location', 'inventor']:
                     self.table_config[f'{table}_{quarter_date}'] = self.table_config.pop(f'{table}')

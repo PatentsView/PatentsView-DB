@@ -146,7 +146,7 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
                 print(invalid_query)
                 raise Exception(f"There are {self.disambiguated_id} in {self.disambiguated_table} table that are not in {self.entity_table}")
 
-    def assert_name_or_organization(self, table):
+    def remove_blank_assignees(self, table):
         query = f"""
 delete
 from {table} 
@@ -167,7 +167,7 @@ where organization is null and name_first is null and name_last is null;
         self.test_floating_entities()
         for table in self.table_config:
             if "assignee_" in table:
-                self.assert_name_or_organization(table)
+                self.remove_blank_assignees(table)
             if "disambiguation" not in table and "patent_" not in table:
                 print(f"\t\tBeginning Tests for {table}")
                 self.top_n_generator(table)
