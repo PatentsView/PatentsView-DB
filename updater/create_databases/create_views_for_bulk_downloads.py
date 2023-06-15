@@ -23,6 +23,7 @@ def update_create_view_sql(config, output_path, if_exists='replace'):
 	
 	for schema in ['patentsview_export_granted','patentsview_export_pregrant']:
 		for view in inspector.get_view_names(schema):
+			if view.startswith('temp_'): continue
 			create_syntax = inspector.get_view_definition(view,schema)
 			remove = 'ALGORITHM=UNDEFINED DEFINER=.* SQL SECURITY (DEFINER|INVOKER)'
 			create_syntax = re.sub(remove, 'OR REPLACE SQL SECURITY INVOKER', create_syntax)
@@ -33,7 +34,8 @@ def update_create_view_sql(config, output_path, if_exists='replace'):
 			create_syntax = re.sub(' group by ', ' \ngroup by ', create_syntax, flags=re.I)
 			create_syntax = re.sub(' left join ', ' \nleft join ', create_syntax, flags=re.I)
 			create_syntax = re.sub('(?<!left) join ', ' \njoin ', create_syntax, flags=re.I)
-			create_syntax = re.sub('`, `','`,\n`',create_syntax)
+			create_syntax = re.sub(' union ', ' \union ', create_syntax, flags=re.I)
+			create_syntax = re.sub('`, ?','`,\n',create_syntax)
 			with open(output_path, 'a') as f:
 				f.write(create_syntax)
 				f.write(";\n\n")
@@ -58,6 +60,7 @@ def update_create_view_json(config, output_path, if_exists='replace'):
 
 	for schema in ['patentsview_export_granted','patentsview_export_pregrant']:
 		for view in inspector.get_view_names(schema):
+			if view.startswith('temp_'): continue
 			create_syntax = inspector.get_view_definition(view,schema)
 			remove = 'ALGORITHM=UNDEFINED DEFINER=.* SQL SECURITY (DEFINER|INVOKER)'
 			create_syntax = re.sub(remove, 'OR REPLACE SQL SECURITY INVOKER', create_syntax)
