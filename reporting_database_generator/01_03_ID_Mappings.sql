@@ -13,7 +13,7 @@ create table `{{params.reporting_database}}`.`temp_id_mapping_assignee`
   primary key (`old_assignee_id`),
   unique index `ak_temp_id_mapping_assignee` (`new_assignee_id`)
 )
-ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # There are assignees in the raw data that are not linked to anything so we will take our
@@ -45,7 +45,7 @@ create table `{{params.reporting_database}}`.`temp_id_mapping_inventor`
   primary key (`old_inventor_id`),
   unique index `ak_temp_id_mapping_inventor` (`new_inventor_id`)
 )
-ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=location;
 
 
 # There are inventors in the raw data that are not linked to anything so we will take our
@@ -77,7 +77,7 @@ create table `{{params.reporting_database}}`.`temp_id_mapping_lawyer`
   primary key (`old_lawyer_id`),
   unique index `ak_temp_id_mapping_lawyer` (`new_lawyer_id`)
 )
-ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=location;
 
 
 # There are inventors in the raw data that are not linked to anything so we will take our
@@ -111,7 +111,7 @@ create table `{{params.reporting_database}}`.`temp_id_mapping_examiner`
   primary key (`old_examiner_id`),
   unique index `ak_temp_id_mapping_examiner` (`new_examiner_id`)
 )
-ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # There are inventors in the raw data that are not linked to anything so we will take our
