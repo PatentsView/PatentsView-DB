@@ -525,11 +525,15 @@ left join `patent`.`government_organization` `go` on(`pg`.`organization_id` = `g
 where `pg`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_granted_patent_crosswalk` AS 
-select `pregrant_publications`.`granted_patent_crosswalk`.`document_number` AS `pgpub_id`,
-`pregrant_publications`.`granted_patent_crosswalk`.`patent_id` AS `patent_id`,
-`pregrant_publications`.`granted_patent_crosswalk`.`application_number` AS `application_id` 
-from `pregrant_publications`.`granted_patent_crosswalk` 
-where (`granted_patent_crosswalk`.`g_version_indicator` <= '{{datestring}}' or `granted_patent_crosswalk`.`g_version_indicator` is null) and (`granted_patent_crosswalk`.`pg_version_indicator` <= '{{datestring}}' or `granted_patent_crosswalk`.`pg_version_indicator` is null);
+SELECT 
+`xw`.`document_number` AS `pgpub_id`,
+`xw`.`patent_id` AS `patent_id`,
+`xw`.`application_number` AS `application_id`,
+CASE WHEN `xw`.`latest_pub_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS 'current_pgpub_id_flag',
+CASE WHEN `xw`.`latest_pat_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS 'current_patent_id_flag'
+FROM `pregrant_publications`.`granted_patent_crosswalk_{{datestring}}` `xw`
+WHERE (`granted_patent_crosswalk`.`g_version_indicator` <= '{{datestring}}' or `granted_patent_crosswalk`.`g_version_indicator` is null) 
+AND (`granted_patent_crosswalk`.`pg_version_indicator` <= '{{datestring}}' or `granted_patent_crosswalk`.`pg_version_indicator` is null);
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_inventor_disambiguated` AS 
 select `a`.`document_number` AS `pgpub_id`,

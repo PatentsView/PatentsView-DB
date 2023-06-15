@@ -7,6 +7,7 @@ from time import time
 
 
 def create_granted_patent_crosswalk(**kwargs):
+    ## archival version used prior to 2022 decision to include records without both publication and patent
     config = get_current_config('pgpubs', schedule="weekly", **kwargs)
     sd = config['DATES']["start_date"]
     ed = config['DATES']["end_date"]
