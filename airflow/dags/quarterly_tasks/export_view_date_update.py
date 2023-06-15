@@ -15,7 +15,7 @@ from updater.create_databases.create_and_test_crosswalk import create_outer_pate
 
 default_args = {
     'owner': 'smadhavan',
-    'depends_on_past': True,
+    'depends_on_past': False,
     'email': ['contact@patentsview.org'],
     'email_on_failure': False,
     'email_on_retry': False,
@@ -32,10 +32,10 @@ config = get_current_config(type='granted_patent', supplemental_configs=None, **
 view_date_updater = DAG(
     dag_id='regenerate_bulk_downloads',
     default_args=default_args,
-    description='update the maximum version indicator for the download export views',
-    start_date=datetime(2022, 1, 1),
+    description='prepare quarterly bulk download export views',
+    start_date=datetime(2023, 1, 1),
     schedule_interval='@quarterly',
-    catchup=True
+    catchup=False
 )
 
 operator_settings = {
@@ -47,17 +47,11 @@ operator_settings = {
 
 generate_crosswalk_task = PythonOperator(task_id='generate_pat_pub_crosswalk',
                                             python_callable = create_outer_patent_publication_crosswalk,
-                                            dag=view_date_updater,
-                                            on_success_callback=airflow_task_success,
-                                            on_failure_callback=airflow_task_failure
-                                            )
+                                            **operator_settings)
 
 qc_crosswalk_task = PythonOperator(task_id='qc_pat_pub_crosswalk',
                                             python_callable = qc_crosswalk,
-                                            dag=view_date_updater,
-                                            on_success_callback=airflow_task_success,
-                                            on_failure_callback=airflow_task_failure
-                                            )
+                                            **operator_settings)
 
 update_max_vi = PythonOperator(task_id='update_bulk_downloads_views', 
                         python_callable=update_view_date_ranges,
