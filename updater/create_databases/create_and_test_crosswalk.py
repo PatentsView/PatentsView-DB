@@ -110,7 +110,7 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     ) `q`
     """
 
-    query_dict['h_pat_rmv_query'] = """
+    query_dict['h_pat_rmv_query'] = f"""
     -- removing H patents from crosswalk table...
     DELETE FROM `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}` 
     WHERE patent_id LIKE 'H%'
