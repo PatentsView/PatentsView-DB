@@ -536,8 +536,8 @@ SELECT
 CASE WHEN `xw`.`latest_pub_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS 'current_pgpub_id_flag',
 CASE WHEN `xw`.`latest_pat_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS 'current_patent_id_flag'
 FROM `pregrant_publications`.`granted_patent_crosswalk_{{datestring}}` `xw`
-WHERE (`granted_patent_crosswalk`.`g_version_indicator` <= '{{datestring}}' or `granted_patent_crosswalk`.`g_version_indicator` is null) 
-AND (`granted_patent_crosswalk`.`pg_version_indicator` <= '{{datestring}}' or `granted_patent_crosswalk`.`pg_version_indicator` is null);
+WHERE (`xw`.`g_version_indicator` <= '{{datestring}}' or `xw`.`g_version_indicator` is null) 
+AND (`xw`.`pg_version_indicator` <= '{{datestring}}' or `xw`.`pg_version_indicator` is null);
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_inventor_disambiguated` AS 
 select `a`.`document_number` AS `pgpub_id`,
@@ -618,7 +618,7 @@ from `pregrant_publications`.`pct_data` `a`
 where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_persistent_assignee` AS 
-select `pregrant_publications`.`persistent_assignee_disambig`.`document_id` AS `pgpub_id`,
+select `pregrant_publications`.`persistent_assignee_disambig`.`document_number` AS `pgpub_id`,
 `pregrant_publications`.`persistent_assignee_disambig`.`sequence` AS `sequence`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20201229` AS `disamb_assignee_id_20201229`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20210330` AS `disamb_assignee_id_20210330`,
@@ -631,7 +631,7 @@ from `pregrant_publications`.`persistent_assignee_disambig`
 where `pregrant_publications`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_persistent_inventor` AS 
-select `pregrant_publications`.`persistent_inventor_disambig`.`document_id` AS `pgpub_id`,
+select `pregrant_publications`.`persistent_inventor_disambig`.`document_number` AS `pgpub_id`,
 `pregrant_publications`.`persistent_inventor_disambig`.`sequence` AS `sequence`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20210330` AS `disamb_inventor_id_20210330`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20210629` AS `disamb_inventor_id_20210629`,
