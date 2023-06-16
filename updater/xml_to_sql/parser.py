@@ -315,6 +315,8 @@ def process_publication_document(patent_app_document, patent_config):
     """
     # Get the document number for the given input
     document_number = patent_app_document.findall(patent_config['foreign_key_config']['xml_path'])[0].text
+    # if len(document_number) == 13 and document_number.endswith('A1'):
+    #     document_number = document_number[:-2] # cleaning exception found in 2023-03-23
     # Get the table_xml_map element from the JSON file
     table_xml_map = patent_config['table_xml_map']
     # Loop through the tables in the table_xml_map to extract all data that is present
