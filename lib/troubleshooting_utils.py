@@ -85,7 +85,7 @@ def parse_single_xml_to_dfs(xml_file:str, parse_type:str, logging:bool=False) ->
     :param logging: boolean indicating whether to produce a log file
     """
     assert parse_type in ('granted_patent','pgpubs','long_text'), f"invalid parse_type: '{parse_type}'. Allowed values are {{'granted_patent','pgpubs','long_text'}}"
-    from updater.xml_to_sql.parser import dtd_finder, tables_dtd_to_json, long_text_dtd_to_json
+    from updater.xml_to_sql.parser import dtd_finder, tables_dtd_to_json, long_text_dtd_to_json, parse_publication_xml
     from lib.configuration import get_current_config
     config = get_current_config(type=parse_type, **{"execution_date": date.today()})
     parser_start = time.time()
@@ -112,11 +112,12 @@ def parse_single_xml_to_dfs(xml_file:str, parse_type:str, logging:bool=False) ->
     if logging:
         from queue import Queue
         import logging
+        from lib.utilities import log_writer
         log_queue = Queue()
         log_queue.put({
                 "level":   logging.INFO,
                 "message": "Starting parsing of {xml_file} using {parsing_config}; Validated by {validator}".format(
-                        xml_file=file_name,
+                        xml_file=xml_file,
                         parsing_config=parsing_config_file,
                         validator=dtd_file)
                 })
