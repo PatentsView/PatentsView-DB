@@ -2,6 +2,7 @@ import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from time import time
+from datetime import datetime
 import json
 from lib.configuration import get_connection_string, get_current_config
 
@@ -34,7 +35,9 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     config = get_current_config('pgpubs', schedule="quarterly", **kwargs)
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
-    end_date = config['DATES']["end_date"] # formatted '%Y-%m-%d'
+    end_date = config['DATES']["end_date"] 
+    if len(end_date) == 8: # formatted '%Y%m%d'
+        end_date = datetime.strptime(end_date,"%Y%m%d").strftime("%Y-%m-%d") # convert to the format MySQL will expect
     print(f"beginning creation of publication crosswalk for data ending {end_date}")
 
     query_dict = {}
@@ -122,7 +125,8 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     -- creating temp table of latest publications...
     CREATE TEMPORARY TABLE `pregrant_publications`.`temp_xwalk_pub_latest` (
         `application_number` varchar(16) DEFAULT NULL,
-        `pg_max_vi` DATE DEFAULT NULL
+        `pg_max_vi` DATE DEFAULT NULL,
+        PRIMARY KEY (`application_number`, `pg_max_vi`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
 
@@ -139,7 +143,8 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     -- creating temp table of latest patents...
     CREATE TEMPORARY TABLE `pregrant_publications`.`temp_xwalk_pat_latest` (
         `application_number` varchar(16) DEFAULT NULL,
-        `g_max_vi` DATE DEFAULT NULL
+        `g_max_vi` DATE DEFAULT NULL,
+        PRIMARY KEY (`application_number`, `g_max_vi`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
 
