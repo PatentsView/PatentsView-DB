@@ -57,7 +57,7 @@ def toggle_tables(xml_map, tabletoggle):
     """
     ontables = []
     for table in xml_map["table_xml_map"]:
-        if tabletoggle[table['table_name']]:
+        if tabletoggle.get(table['table_name']):
             ontables.append(table)
     xml_map['table_xml_map'] = ontables
     return xml_map
@@ -343,9 +343,10 @@ def process_publication_document(patent_app_document, patent_config):
                 # This is the start of the path from which the multiple values will exists
                 # i.e. /inventors can contain multiple /inventor tags within it
                 entity_root_path = table['entity_root_path']
-                sequence = 1
+                sequence = 0
                 # extract all data necessary
                 for entity_element in patent_app_document.findall(entity_root_path):
+                    if entity_element.tag in table.get('skip_children',[]): continue # if any specified skippable child elements, skip them
                     table_rows.append(extract_table_data(table, entity_element, document_number, sequence,
                                                         patent_config['foreign_key_config']))
                     sequence += 1
@@ -444,16 +445,6 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destina
             tabnam = df+'_{}'.format(year)
         else:
             tabnam = df
-        cols = list(dfs[df].columns)
-        cols.remove(foreign_key_config["field_name"])
-        dfs[df] = dfs[df].dropna(subset=cols, how='all')
-        if df == 'government_interest':
-            narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
-            dfs[df] = dfs[df][~narows]
-            dfs[df]['gi_statement'] = dfs[df]['gi_statement'].str.strip()
-        elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
-            dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
-        dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         if xml_file_name.startswith('pa0') or xml_file_name.startswith('ipa'): #pgpubs file
             if df in ['claims','brf_sum_text','draw_desc_text','detail_desc_text']: #text type
                 template = 'pgpubs_text'
@@ -620,9 +611,27 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                     xml_file=xml_file_name,
                     duration=time.time() - parse_start)
             })
-    # drop rows with only Nones (except doc #) - may turn this off if problematic
+    foreign_key_config = table_xml_map['foreign_key_config']
     for df in dfs:
-        dfs[df].dropna(inplace=True, thresh=2) # drop any rows that have fewer than 2 non-Null values (i.e. any that have only the doc id)
+        #drop any rows that have only the document/patent ID
+        cols = list(dfs[df].columns)
+        cols.remove(foreign_key_config["field_name"])
+        dfs[df] = dfs[df].dropna(subset=cols, how='all')
+        #table specific post-processing
+        if df == 'government_interest':
+            narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
+            dfs[df] = dfs[df][~narows]
+            dfs[df]['gi_statement'] = dfs[df]['gi_statement'].str.strip()
+        elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
+            dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
+        elif df == 'rawuspc':
+            from lib.xml_helpers import process_uspc_class_sub
+            dfs[df]['mainclass'] = dfs[df]['classification'].str[:3].str.replace(' ','') # first three characters, spaces removed
+            dfs[df]['processed_sublcass'] = dfs[df]['classification'].apply(process_uspc_class_sub) # subclass cleaning
+            dfs[df]['subclass_id'] = dfs[df]['mainclass'] + '/' + dfs[df]['processed_sublcass']
+            dfs[df].drop(columns=['classification', 'processed_sublcass'], inplace=True)
+        # add version_indicator
+        dfs[df]['version_indicator'] = config['DATES']['END_DATE']
     # Load the generated data frames to database
     if not destination in ('local','return'):
         load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destination=destination)
@@ -689,14 +698,14 @@ tables_dtd_to_json = {
     # granted patents
     'ST32-US-Grant-024.dtd' : None,
     'ST32-US-Grant-025xml.dtd' : None,
-    'us-patent-grant-v40-2004-12-02.dtd' : None,
-    'us-patent-grant-v41-2005-08-25.dtd' : None,
-    'us-patent-grant-v42-2006-08-23.dtd' : None,
-    'us-patent-grant-v43-2012-12-04.dtd' : None,
-    'us-patent-grant-v44-2013-05-16.dtd' : None,
-    'us-patent-grant-v45-2014-04-03.dtd' : None, # is patent_parser.json configured for this version?
-    'us-patent-grant-v46-2021-08-30.dtd' : None,
-    'us-patent-grant-v47-2022-02-17.dtd' : None,
+    'us-patent-grant-v40-2004-12-02.dtd' : 'pat_xml_map_v4x.json',
+    'us-patent-grant-v41-2005-08-25.dtd' : 'pat_xml_map_v4x.json',
+    'us-patent-grant-v42-2006-08-23.dtd' : 'pat_xml_map_v4x.json',
+    'us-patent-grant-v43-2012-12-04.dtd' : 'pat_xml_map_v4x.json',
+    'us-patent-grant-v44-2013-05-16.dtd' : 'pat_xml_map_v4x.json',
+    'us-patent-grant-v45-2014-04-03.dtd' : 'pat_xml_map_v4x.json',
+    'us-patent-grant-v46-2021-08-30.dtd' : 'pat_xml_map_v4x.json',
+    'us-patent-grant-v47-2022-02-17.dtd' : 'pat_xml_map_v4x.json',
     # pgpubs
     'pap-v15-2001-01-31.dtd' : 'pgp_xml_map_v1x.json',
     'pap-v16-2002-01-01.dtd' : 'pgp_xml_map_v1x.json',
