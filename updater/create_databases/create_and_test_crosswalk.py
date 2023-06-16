@@ -129,8 +129,8 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     query_dict['latest_pub_populate_query'] = f"""
     -- populating temp table of latest publications...
     INSERT INTO `pregrant_publications`.`temp_xwalk_pub_latest`
-    (application_id, pg_max_vi)
-    SELECT application_id, MAX(pg_version_indicator)
+    (application_number, pg_max_vi)
+    SELECT application_number, MAX(pg_version_indicator)
     FROM `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}`
     GROUP BY 1
     """
@@ -146,8 +146,8 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     query_dict['latest_pat_populate_query'] = f"""
     -- populating temp table of latest patents...
     INSERT INTO `pregrant_publications`.`temp_xwalk_pat_latest`
-    (application_id, g_max_vi)
-    SELECT application_id, MAX(g_version_indicator)
+    (application_number, g_max_vi)
+    SELECT application_number, MAX(g_version_indicator)
     FROM `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}`
     GROUP BY 1
     """
@@ -155,14 +155,14 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     query_dict['pat_flag_update_query'] = f"""
     -- setting latest patent flag...
     UPDATE `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}` xw
-    LEFT JOIN `pregrant_publications`.`temp_xwalk_pat_latest` pat ON (xw.application_id = pat.application_id AND xw.g_version_indicator = pat.g_max_vi)
+    LEFT JOIN `pregrant_publications`.`temp_xwalk_pat_latest` pat ON (xw.application_number = pat.application_number AND xw.g_version_indicator = pat.g_max_vi)
     SET xw.latest_pat_flag = CASE WHEN pat.g_max_vi IS NOT NULL THEN 1 ELSE 0 END
     """
 
     query_dict['pub_flag_update_query'] = f"""
     -- setting latest publication flag...
     UPDATE `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}` xw
-    LEFT JOIN `pregrant_publications`.`temp_xwalk_pub_latest` pub ON (xw.application_id = pub.application_id AND xw.pg_version_indicator = pub.pg_max_vi)
+    LEFT JOIN `pregrant_publications`.`temp_xwalk_pub_latest` pub ON (xw.application_number = pub.application_number AND xw.pg_version_indicator = pub.pg_max_vi)
     SET xw.latest_pat_flag = CASE WHEN pat.g_max_vi IS NOT NULL THEN 1 ELSE 0 END
     """
 
@@ -240,7 +240,7 @@ def check_pgpub_id_formatting(table, engine):
     else:
         return f"FAILED: {bad_pgp_id_count} rows with invalid pgpub_id formatting"
 
-def check_application_id_formatting(table, engine):
+def check_application_number_formatting(table, engine):
     """
     checks the formatting of application IDs in a given table and returns a pass or fail message.
     
@@ -264,7 +264,7 @@ def check_application_id_formatting(table, engine):
     else:
         return f"FAILED: {bad_app_num_query} rows with invalid application number formatting"
 
-def check_null_application_id(table, engine):
+def check_null_application_number(table, engine):
     """
     The function checks for null application numbers in a specified table and returns a pass or fail message.
     
@@ -350,7 +350,7 @@ def check_unique_current_ids(table, engine):
     uniqueness_query = f"""
     SELECT COUNT(*) 
     FROM (
-        SELECT application_id, patent_id, pgpub_id, COUNT(*) 
+        SELECT application_number, patent_id, document_number, COUNT(*) 
         FROM `pregrant_publications`.`{table}`
         WHERE latest_pat_flag = 1
         AND latest_pub_flag = 1
@@ -364,7 +364,7 @@ def check_unique_current_ids(table, engine):
     if duplication_count == 0:
         return "PASSED"
     else:
-        return f"FAILED: {duplication_count} application_ids with multiple records flagged as current"
+        return f"FAILED: {duplication_count} application_numbers with multiple records flagged as current"
 
 
 def qc_crosswalk(**kwargs):
@@ -386,9 +386,9 @@ def qc_crosswalk(**kwargs):
     # check patent_id formatting (all valid prefixes or non-prefixed, prefixed IDs have no leading zero)
     test_status['patent_id_formatting'] = check_patent_id_formatting(table_name, engine)
     # check application_number formatting (all numeric, correct length)
-    test_status['application_id_formatting'] = check_application_id_formatting(table_name, engine)
+    test_status['application_number_formatting'] = check_application_number_formatting(table_name, engine)
     # check no application_number nulls
-    test_status['app_id_nulls'] = check_null_application_id(table_name, engine)
+    test_status['app_id_nulls'] = check_null_application_number(table_name, engine)
     # all rows have either a pgpub_id or patent_id (or both)
     test_status['id_completeness'] = check_missing_pat_pub_ids(table_name, engine)
     # check all g_version_indicators and pg_version_indicators within date bounds
