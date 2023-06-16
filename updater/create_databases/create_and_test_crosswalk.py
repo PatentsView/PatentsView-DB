@@ -255,12 +255,12 @@ def check_application_number_formatting(table, engine):
         or a string starting with "FAILED: " followed by the number of rows with invalid application ID formatting.
     """
     # expected pattern for application ids:
-    # 8 digits unpunctuated, or, for design patents, D followed by 7 digits
-    # [D0-9][0-9]{7}
+    # 8 digits unpunctuated, or, for design patents, D followed by 6 or 7 digits (6 digits all seem to be between 1994 and 2001)
+    # (D[0-9]{6,7}|[0-9]{8})
     app_id_formatting_query = f"""
     SELECT COUNT(*) 
     FROM {table}
-    WHERE NOT application_number REGEXP "[D0-9][0-9]{{7}}"
+    WHERE NOT application_number REGEXP "(D[0-9]{{6,7}}|[0-9]{{8}})"
     """
     bad_app_num_query = engine.execute(app_id_formatting_query).fetchone()[0]
 
