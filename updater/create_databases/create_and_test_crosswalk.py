@@ -126,7 +126,7 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     CREATE TEMPORARY TABLE `pregrant_publications`.`temp_xwalk_pub_latest` (
         `application_number` varchar(16) DEFAULT NULL,
         `pg_max_vi` DATE DEFAULT NULL,
-        PRIMARY KEY (`application_number`, `pg_max_vi`)
+        PRIMARY KEY (`application_number`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
 
@@ -144,7 +144,7 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     CREATE TEMPORARY TABLE `pregrant_publications`.`temp_xwalk_pat_latest` (
         `application_number` varchar(16) DEFAULT NULL,
         `g_max_vi` DATE DEFAULT NULL,
-        PRIMARY KEY (`application_number`, `g_max_vi`)
+        PRIMARY KEY (`application_number`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """
 
