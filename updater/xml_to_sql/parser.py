@@ -544,7 +544,7 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
     xml_file_start = time.time()
     # Generate the list of headers and use them to create dataframes for each table
     tabletoggle = json.load(open(config['XML_PARSING']['table_toggle']))
-    if config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'][:6] == 'pgpubs':
+    if re.match('i?pa', xml_file_name): # pgp file
         tabletoggle = tabletoggle['pgpubs']
     else: 
         tabletoggle = tabletoggle['granted_patent']
@@ -626,7 +626,7 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
             dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         elif df == 'rawuspc':
             from lib.xml_helpers import process_uspc_class_sub
-            dfs[df]['mainclass'] = dfs[df]['classification'].str[:3].str.replace(' ','') # first three characters, spaces removed
+            dfs[df]['mainclass_id'] = dfs[df]['classification'].str[:3].str.replace(' ','') # first three characters, spaces removed
             dfs[df]['processed_sublcass'] = dfs[df]['classification'].apply(process_uspc_class_sub) # subclass cleaning
             dfs[df]['subclass_id'] = dfs[df]['mainclass'] + '/' + dfs[df]['processed_sublcass']
             dfs[df].drop(columns=['classification', 'processed_sublcass'], inplace=True)
