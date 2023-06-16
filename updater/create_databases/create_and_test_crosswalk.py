@@ -168,7 +168,7 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     -- setting latest publication flag...
     UPDATE `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}` xw
     LEFT JOIN `pregrant_publications`.`temp_xwalk_pub_latest` pub ON (xw.application_number = pub.application_number AND xw.pg_version_indicator = pub.pg_max_vi)
-    SET xw.latest_pat_flag = CASE WHEN pat.g_max_vi IS NOT NULL THEN 1 ELSE 0 END
+    SET xw.latest_pub_flag = CASE WHEN pub.pg_max_vi IS NOT NULL THEN 1 ELSE 0 END
     """
 
     #instantiating session to use temporary tables and cause rollback on error
