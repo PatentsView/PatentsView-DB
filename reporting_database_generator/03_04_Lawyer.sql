@@ -125,7 +125,7 @@ select distinct
 from
   `{{params.raw_database}}`.`patent_lawyer` pii
   inner join `{{params.reporting_database}}`.`temp_id_mapping_lawyer` t on t.`old_lawyer_id` = pii.`lawyer_id`
-  inner join `{{params.reporting_database}}`.`patent_lawyer_unique` u on u.`patent_id` = pii.`patent_id` and u.`lawyer_id` = pii.`lawyer_id`
+  inner join `{{params.reporting_database}}`.`patent_lawyer_unique` u on u.`patent_id` = pii.`patent_id` and u.`lawyer_id` = pii.`lawyer_id`;
 
 
 drop table if exists `{{params.reporting_database}}`.`lawyer`;
