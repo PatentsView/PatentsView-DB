@@ -566,8 +566,7 @@ web_tools = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': 'webtool_tables',
-        "schema_only": schema_only,
-        'host': 'APP_DATABASE_SETUP'
+        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': 'webtool_tables.sql'
