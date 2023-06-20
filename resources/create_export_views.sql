@@ -87,8 +87,7 @@ select `patent`.`cpc_current`.`patent_id` AS `patent_id`,
 `patent`.`cpc_current`.`subsection_id` AS `cpc_class`,
 `patent`.`cpc_current`.`group_id` AS `cpc_subclass`,
 `patent`.`cpc_current`.`subgroup_id` AS `cpc_group`,
-`patent`.`cpc_current`.`category` AS `cpc_type`,
-CASE WHEN `cpc_current`.`sequence` = 0 then 'F' else 'L' END AS `cpc_symbol_position`
+`patent`.`cpc_current`.`category` AS `cpc_type`
 from `patent`.`cpc_current` 
 where `patent`.`cpc_current`.`version_indicator` <= '{{datestring}}';
 
@@ -196,7 +195,6 @@ select `patent`.`ipcr`.`patent_id` AS `patent_id`,
 `patent`.`ipcr`.`subclass` AS `subclass`,
 `patent`.`ipcr`.`main_group` AS `main_group`,
 `patent`.`ipcr`.`subgroup` AS `subgroup`,
-`patent`.`ipcr`.`symbol_position` AS `symbol_position`,
 `patent`.`ipcr`.`classification_value` AS `classification_value`,
 `patent`.`ipcr`.`classification_status` AS `classification_status`,
 `patent`.`ipcr`.`classification_data_source` AS `classification_data_source`,
@@ -466,7 +464,6 @@ select `pregrant_publications`.`cpc`.`document_number` AS `pgpub_id`,
 `pregrant_publications`.`cpc`.`subsection_id` AS `cpc_class`,
 `pregrant_publications`.`cpc`.`group_id` AS `cpc_subclass`,
 `pregrant_publications`.`cpc`.`subgroup_id` AS `cpc_group`,
-`pregrant_publications`.`cpc`.`symbol_position` AS `cpc_symbol_position`,
 `pregrant_publications`.`cpc`.`category` AS `cpc_type`,
 `pregrant_publications`.`cpc`.`action_date` AS `cpc_action_date` 
 from `pregrant_publications`.`cpc` 
@@ -480,8 +477,7 @@ select `pregrant_publications`.`cpc_current`.`document_number` AS `pgpub_id`,
 `pregrant_publications`.`cpc_current`.`group_id` AS `cpc_subclass`,
 `pregrant_publications`.`cpc_current`.`subgroup_id` AS `cpc_group`,
 `pregrant_publications`.`cpc_current`.`category` AS `cpc_type`,
-`pregrant_publications`.`cpc_current`.`version` AS `cpc_version_indicator`,
-`pregrant_publications`.`cpc_current`.`symbol_position` AS `cpc_symbol_position` 
+`pregrant_publications`.`cpc_current`.`version` AS `cpc_version_indicator`
 from `pregrant_publications`.`cpc_current` 
 where `pregrant_publications`.`cpc_current`.`version_indicator` <= '{{datestring}}';
 
@@ -574,7 +570,6 @@ select `pregrant_publications`.`ipcr`.`document_number` AS `pgpub_id`,
 `pregrant_publications`.`ipcr`.`subclass` AS `subclass`,
 `pregrant_publications`.`ipcr`.`main_group` AS `main_group`,
 `pregrant_publications`.`ipcr`.`subgroup` AS `subgroup`,
-`pregrant_publications`.`ipcr`.`symbol_position` AS `symbol_position`,
 `pregrant_publications`.`ipcr`.`class_value` AS `classification_value`,
 `pregrant_publications`.`ipcr`.`class_status` AS `classification_status`,
 `pregrant_publications`.`ipcr`.`class_data_source` AS `classification_data_source`,
