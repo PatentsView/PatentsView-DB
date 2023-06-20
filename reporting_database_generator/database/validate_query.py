@@ -201,8 +201,6 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
             # If empty line move on to next sql
             if not single_line_query.strip():
                 continue
-            if 'location' in single_line_query or 'assignee' in single_line_query or "FROM (" in single_line_query:
-                pass
             else:
                 try:
                     print(f"executing query: {single_line_query}")
