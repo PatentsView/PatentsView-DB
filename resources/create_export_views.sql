@@ -168,11 +168,12 @@ select `a`.`patent_id` AS `patent_id`,
 `a`.`inventor_id` AS `inventor_id`,
 `b`.`name_first` AS `disambig_inventor_name_first`,
 `b`.`name_last` AS `disambig_inventor_name_last`,
-`b`.`male_flag` AS `male_flag`,
-`b`.`attribution_status` AS `attribution_status`,
-`a`.`location_id` AS `location_id` 
-from (`patent`.`patent_inventor` `a` 
-left join `patent`.`inventor` `b` on(`a`.`inventor_id` = `b`.`id`)) 
+`c`.`gender_flag` AS `gender_code`,
+`d`.`location_id` AS `location_id` 
+from (`patent`.`rawinventor` `a` 
+    LEFT JOIN `patent`.`inventor` `b` ON (`a`.`inventor_id` = `b`.`id`)
+    LEFT JOIN `gender_attribution`.`inventor_gender_{{datestring}}` `c` ON (`a`.`inventor_id` = `c`.`inventor_id`)) 
+    LEFT JOIN `patent`.`rawlocation` `d` ON (`a`.`rawlocation_id` = `d`.`id`)
 where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_inventor_not_disambiguated` AS 
@@ -533,8 +534,8 @@ SELECT
 `xw`.`document_number` AS `pgpub_id`,
 `xw`.`patent_id` AS `patent_id`,
 `xw`.`application_number` AS `application_id`,
-CASE WHEN `xw`.`latest_pub_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS 'current_pgpub_id_flag',
-CASE WHEN `xw`.`latest_pat_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS 'current_patent_id_flag'
+CASE WHEN `xw`.`latest_pub_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS `current_pgpub_id_flag`,
+CASE WHEN `xw`.`latest_pat_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS `current_patent_id_flag`
 FROM `pregrant_publications`.`granted_patent_crosswalk_{{datestring}}` `xw`
 WHERE (`xw`.`g_version_indicator` <= '{{datestring}}' or `xw`.`g_version_indicator` is null) 
 AND (`xw`.`pg_version_indicator` <= '{{datestring}}' or `xw`.`pg_version_indicator` is null);
@@ -545,11 +546,12 @@ select `a`.`document_number` AS `pgpub_id`,
 `a`.`inventor_id` AS `inventor_id`,
 `b`.`name_first` AS `disambig_inventor_name_first`,
 `b`.`name_last` AS `disambig_inventor_name_last`,
-`b`.`male_flag` AS `male_flag`,
-`b`.`attribution_status` AS `attribution_status`,
-`a`.`location_id` AS `location_id` 
-from (`pregrant_publications`.`publication_inventor` `a` 
-left join `patent`.`inventor` `b` on(`a`.`inventor_id` = `b`.`id`)) 
+`c`.`gender_flag` AS `gender_code`,
+`d`.`location_id` AS `location_id` 
+from (`pregrant_publications`.`rawinventor` `a` 
+    LEFT JOIN `patent`.`inventor` `b` ON (`a`.`inventor_id` = `b`.`id`)
+    LEFT JOIN `gender_attribution`.`inventor_gender_{{datestring}}` `c` ON (`a`.`inventor_id` = `c`.`inventor_id`)) 
+    LEFT JOIN `pregrant_publications`.`rawlocation` `d` ON (`a`.`rawlocation_id` = `d`.`id`)
 where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_inventor_not_disambiguated` AS 
