@@ -4,9 +4,9 @@ SELECT
   , p.year
   , COUNT(DISTINCT inventor_id) AS invCount
 FROM
-    (SELECT location_id, IF(country = 'AN', 'CW', country) AS country FROM location) l
-        LEFT JOIN patent_inventor pi ON l.location_id = pi.location_id
-        LEFT JOIN patent p ON pi.patent_id = p.patent_id
+    (SELECT location_id, IF(country = 'AN', 'CW', country) AS country FROM `{{params.reporting_database}}`.location) l
+        LEFT JOIN `{{params.reporting_database}}`.patent_inventor pi ON l.location_id = pi.location_id
+        LEFT JOIN `{{params.reporting_database}}`.patent p ON pi.patent_id = p.patent_id
 WHERE
       p.year IS NOT NULL
   AND l.country IS NOT NULL
@@ -23,11 +23,11 @@ SELECT
   , sector_title
   , count(DISTINCT (inventor_id)) AS invSubCount
 FROM
-    (SELECT location_id, IF(country = 'AN', 'CW', country) AS country FROM location) l
-        LEFT JOIN patent_inventor pi ON l.location_id = pi.location_id
-        LEFT JOIN wipo w ON w.patent_id = pi.patent_id
-        LEFT JOIN wipo_field wf ON w.field_id = wf.id
-        LEFT JOIN patent p ON pi.patent_id = p.patent_id
+    (SELECT location_id, IF(country = 'AN', 'CW', country) AS country FROM `{{params.reporting_database}}`.location) l
+        LEFT JOIN `{{params.reporting_database}}`.patent_inventor pi ON l.location_id = pi.location_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo w ON w.patent_id = pi.patent_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo_field wf ON w.field_id = wf.id
+        LEFT JOIN `{{params.reporting_database}}`.patent p ON pi.patent_id = p.patent_id
 WHERE
       p.year IS NOT NULL
   AND sector_title IS NOT NULL
@@ -46,9 +46,9 @@ SELECT
   , p.year
   , COUNT(DISTINCT assignee_id) AS assiCount
 FROM
-    (SELECT location_id, IF(country = 'AN', 'CW', country) AS country FROM location) l
-        LEFT JOIN patent_assignee pa ON l.location_id = pa.location_id
-        LEFT JOIN patent p ON pa.patent_id = p.patent_id
+    (SELECT location_id, IF(country = 'AN', 'CW', country) AS country FROM `{{params.reporting_database}}`.location) l
+        LEFT JOIN `{{params.reporting_database}}`.patent_assignee pa ON l.location_id = pa.location_id
+        LEFT JOIN `{{params.reporting_database}}`.patent p ON pa.patent_id = p.patent_id
 WHERE
       p.year IS NOT NULL
   AND l.country IS NOT NULL
@@ -65,11 +65,11 @@ SELECT
   , sector_title
   , count(DISTINCT (assignee_id)) AS assiSubCount
 FROM
-    (SELECT location_id, IF(country = 'AN', 'CW', country) AS country FROM location) l
-        LEFT JOIN patent_assignee pa ON l.location_id = pa.location_id
-        LEFT JOIN wipo w ON w.patent_id = pa.patent_id
-        LEFT JOIN wipo_field wf ON w.field_id = wf.id
-        LEFT JOIN patent p ON pa.patent_id = p.patent_id
+    (SELECT location_id, IF(country = 'AN', 'CW', country) AS country FROM `{{params.reporting_database}}`.location) l
+        LEFT JOIN `{{params.reporting_database}}`.patent_assignee pa ON l.location_id = pa.location_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo w ON w.patent_id = pa.patent_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo_field wf ON w.field_id = wf.id
+        LEFT JOIN `{{params.reporting_database}}`.patent p ON pa.patent_id = p.patent_id
 WHERE
       p.year IS NOT NULL
   AND sector_title IS NOT NULL
@@ -88,9 +88,9 @@ SELECT
   , p.year
   , count(DISTINCT (inventor_id)) AS invCount
 FROM
-    location l
-        LEFT JOIN patent_inventor pi ON l.location_id = pi.location_id
-        LEFT JOIN patent p ON pi.patent_id = p.patent_id
+    `{{params.reporting_database}}`.location l
+        LEFT JOIN `{{params.reporting_database}}`.patent_inventor pi ON l.location_id = pi.location_id
+        LEFT JOIN `{{params.reporting_database}}`.patent p ON pi.patent_id = p.patent_id
 WHERE
       l.country = 'US'
   AND p.year IS NOT NULL
@@ -108,11 +108,11 @@ SELECT
   , sector_title
   , count(DISTINCT (inventor_id)) AS invSubCount
 FROM
-    location l
-        LEFT JOIN patent_inventor pi ON l.location_id = pi.location_id
-        LEFT JOIN wipo w ON pi.patent_id = w.patent_id
-        LEFT JOIN wipo_field wf ON w.field_id = wf.id
-        LEFT JOIN patent p ON pi.patent_id = p.patent_id
+    `{{params.reporting_database}}`.location l
+        LEFT JOIN `{{params.reporting_database}}`.patent_inventor pi ON l.location_id = pi.location_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo w ON pi.patent_id = w.patent_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo_field wf ON w.field_id = wf.id
+        LEFT JOIN `{{params.reporting_database}}`.patent p ON pi.patent_id = p.patent_id
 WHERE
       w.sequence = 0
   AND sector_title IS NOT NULL
@@ -132,9 +132,9 @@ SELECT
   , p.year
   , count(DISTINCT (assignee_id)) AS assiCount
 FROM
-    location l
-        LEFT JOIN patent_assignee pa ON l.location_id = pa.location_id
-        LEFT JOIN patent p ON pa.patent_id = p.patent_id
+    `{{params.reporting_database}}`.location l
+        LEFT JOIN `{{params.reporting_database}}`.patent_assignee pa ON l.location_id = pa.location_id
+        LEFT JOIN `{{params.reporting_database}}`.patent p ON pa.patent_id = p.patent_id
 WHERE
       l.country = 'US'
   AND p.year IS NOT NULL
@@ -147,11 +147,11 @@ GROUP BY
 
 create table `{{params.reporting_database}}`.webtool_comparison_stateAsector
 SELECT l.state, p.year, sector_title, count(DISTINCT(assignee_id)) AS assiSubCount
-    FROM location l
-    LEFT JOIN patent_assignee pa ON l.location_id = pa.location_id
-    LEFT JOIN wipo w ON pa.patent_id = w.patent_id
-    LEFT JOIN wipo_field wf ON w.field_id = wf.id
-    LEFT JOIN patent p ON pa.patent_id = p.patent_id
+    FROM `{{params.reporting_database}}`.location l
+    LEFT JOIN `{{params.reporting_database}}`.patent_assignee pa ON l.location_id = pa.location_id
+    LEFT JOIN `{{params.reporting_database}}`.wipo w ON pa.patent_id = w.patent_id
+    LEFT JOIN `{{params.reporting_database}}`.wipo_field wf ON w.field_id = wf.id
+    LEFT JOIN `{{params.reporting_database}}`.patent p ON pa.patent_id = p.patent_id
 WHERE w.sequence = 0
 AND sector_title IS NOT NULL
 AND p.year IS NOT NULL
@@ -168,11 +168,11 @@ SELECT
   , sector_title
   , count(DISTINCT (assignee_id)) AS assiSubCount
 FROM
-    location l
-        LEFT JOIN patent_assignee pa ON l.location_id = pa.location_id
-        LEFT JOIN wipo w ON pa.patent_id = w.patent_id
-        LEFT JOIN wipo_field wf ON w.field_id = wf.id
-        LEFT JOIN patent p ON pa.patent_id = p.patent_id
+    `{{params.reporting_database}}`.location l
+        LEFT JOIN `{{params.reporting_database}}`.patent_assignee pa ON l.location_id = pa.location_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo w ON pa.patent_id = w.patent_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo_field wf ON w.field_id = wf.id
+        LEFT JOIN `{{params.reporting_database}}`.patent p ON pa.patent_id = p.patent_id
 WHERE
       w.sequence = 0
   AND sector_title IS NOT NULL
@@ -194,10 +194,10 @@ SELECT
   , field_title
   , COUNT(DISTINCT inventor_id) AS invSubCount
 FROM
-    patent_inventor pi
-        LEFT JOIN wipo w ON pi.patent_id = w.patent_id
-        LEFT JOIN wipo_field wf ON w.field_id = wf.id
-        LEFT JOIN patent p ON pi.patent_id = p.patent_id
+    `{{params.reporting_database}}`.patent_inventor pi
+        LEFT JOIN `{{params.reporting_database}}`.wipo w ON pi.patent_id = w.patent_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo_field wf ON w.field_id = wf.id
+        LEFT JOIN `{{params.reporting_database}}`.patent p ON pi.patent_id = p.patent_id
 WHERE
       w.sequence = 0
   AND p.year IS NOT NULL
@@ -216,9 +216,9 @@ SELECT
   , COUNT(DISTINCT assignee_id) AS assiSubCount
 FROM
     patent_assignee pa
-        LEFT JOIN wipo w ON pa.patent_id = w.patent_id
-        LEFT JOIN wipo_field wf ON w.field_id = wf.id
-        LEFT JOIN patent p ON pa.patent_id = p.patent_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo w ON pa.patent_id = w.patent_id
+        LEFT JOIN `{{params.reporting_database}}`.wipo_field wf ON w.field_id = wf.id
+        LEFT JOIN `{{params.reporting_database}}`.patent p ON pa.patent_id = p.patent_id
 WHERE
       w.sequence = 0
   AND p.year IS NOT NULL
