@@ -201,18 +201,19 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
             # If empty line move on to next sql
             if not single_line_query.strip():
                 continue
-            try:
-                print(f"executing query: {single_line_query}")
-                db_con.execute(single_line_query)
-            except Exception as e:
-                # send_slack_notification(
-                #         """
-                # Execution of Query failed: ```{single_line_query} ```
-                #     """.format(single_line_query=single_line_query),
-                #         config,
-                #         section,
-                #         "error")
-                raise e
+            if not 'location' in single_line_query or 'assignee' not in single_line_query or "FROM (" not in single_line_query:
+                try:
+                    print(f"executing query: {single_line_query}")
+                    db_con.execute(single_line_query)
+                except Exception as e:
+                    # send_slack_notification(
+                    #         """
+                    # Execution of Query failed: ```{single_line_query} ```
+                    #     """.format(single_line_query=single_line_query),
+                    #         config,
+                    #         section,
+                    #         "error")
+                    raise e
     if not fk_check:
         print(" ")
         db_con.execute("SET FOREIGN_KEY_CHECKS=1")
@@ -225,40 +226,8 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
     #                         "success")
 #
 if __name__ == '__main__':
-    q = "insert into `PatentsView_20220630`.`application` (`application_id`, `patent_id`, `type`, `number`, `country`, `date`) select `id_transformed`, `patent_id`, nullif(trim(`type`), ''), nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''), case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end from `patent`.`application` where version_indicator<='2021-12-30';"
-    q = """insert into `PatentsView_20220630`.`temp_assignee_lastknown_location`
-(`assignee_id`, `location_id`, `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`)
-select lastknown.`assignee_id`,
-       tl.`new_location_id`,
-       tl.`old_location_id_transformed`,
-       nullif(trim(l.`city`), ''),
-       nullif(trim(l.`state`), ''),
-       nullif(trim(l.`country`), ''),
-       l.`latitude`,
-       l.`longitude`
-from (
-         select srw.`assignee_id`,
-                srw.`location_id`
-         from (select ROW_NUMBER() OVER (PARTITION BY rw.assignee_id ORDER BY rw.`date` desc) AS rownum,
-                      rw.`assignee_id`,
-                      rw.`location_id`
-               from (
-                        select ra.`assignee_id`,
-                               rl.`location_id`,
-                               p.`date`,
-                               p.`id`
-                        from `patent`.`rawassignee` ra
-                                 inner join `patent`.`patent` p on p.`id` = ra.`patent_id`
-                                 inner join `patent`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
-                          and ra.`assignee_id` is not null and ra.version_indicator <='2022-06-30'
-                        order by ra.`assignee_id`,
-                                 p.`date` desc,
-                                 p.`id` desc
-                    ) rw) srw
-         where rownum = 1) lastknown
-         left join `patent`.`location` l on l.`id` = lastknown.`location_id`
-         left join `PatentsView_20220630`.`temp_id_mapping_location` tl
-                   on tl.`old_location_id` = lastknown.`location_id`;"""
+    # q = "insert into `PatentsView_20220630`.`application` (`application_id`, `patent_id`, `type`, `number`, `country`, `date`) select `id_transformed`, `patent_id`, nullif(trim(`type`), ''), nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''), case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end from `patent`.`application` where version_indicator<='2021-12-30';"
+    q = """create table `PatentsView_20230330`.webtool_comparison_countryI SELECT l.country , p.year , COUNT(DISTINCT inventor_id) AS invCount FROM (SELECT location_id, IF(country = 'AN', 'CW', country) AS country FROM location) l LEFT JOIN patent_inventor pi ON l.location_id = pi.location_id LEFT JOIN patent p ON pi.patent_id = p.patent_id WHERE p.year IS NOT NULL AND l.country IS NOT NULL AND l.country REGEXP '^[A-Z]{2}$' AND l.country NOT IN ('US', 'YU', 'SU') GROUP BY l.country , p.year;"""
     # db_and_table_as_array("INSERT INTO pregrant_publications.publication SELECT * FROM pgpubs_20050101.publication")
     # db_and_table_as_array(q)
     # validate_and_execute(filename='01_04_Application', fk_check=False, source_sql='01_04_Application.sql', **{
@@ -285,10 +254,10 @@ from (
 
     collation_check_parameters = db_and_table_as_array(q)
     cstr = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(
-            config['DATABASE_SETUP']['USERNAME'],
-            config['DATABASE_SETUP']['PASSWORD'],
-            config['DATABASE_SETUP']['HOST'],
-            config['DATABASE_SETUP']['PORT'],
+            config['APP_DATABASE_SETUP']['USERNAME'],
+            config['APP_DATABASE_SETUP']['PASSWORD'],
+            config['APP_DATABASE_SETUP']['HOST'],
+            config['APP_DATABASE_SETUP']['PORT'],
             "information_schema")
     # db_con = create_engine(cstr)
     # database_helpers.check_encoding_and_collation(db_con, collation_check_parameters)
