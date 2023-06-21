@@ -21,5 +21,5 @@ SELECT
 FROM
     `UpdateAPI_bulkdownloadstats`
 WHERE
-    (`UpdateAPI_bulkdownloadstats`.`live` AND
-     NOT (`UpdateAPI_bulkdownloadstats`.`table` LIKE %['detail\_desc', 'draw\_desc', 'claim', 'brf\_sum']%))
+    (`UpdateAPI_bulkdownloadstats`.`live` = 1 AND
+    (`UpdateAPI_bulkdownloadstats`.`table` NOT IN ('detail\_desc', 'draw\_desc', 'claim', 'brf\_sum')))
