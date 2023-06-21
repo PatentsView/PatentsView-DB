@@ -19,7 +19,7 @@ SELECT
   , `UpdateAPI_bulkdownloadstats`.`modified`
   , `UpdateAPI_bulkdownloadstats`.`live`
 FROM
-    `UpdateAPI_bulkdownloadstats`
+    `_root`.`UpdateAPI_bulkdownloadstats`
 WHERE
     (`UpdateAPI_bulkdownloadstats`.`live` = 1 AND
     (`UpdateAPI_bulkdownloadstats`.`table` NOT IN ('detail\_desc', 'draw\_desc', 'claim', 'brf\_sum')))
