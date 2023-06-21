@@ -215,7 +215,7 @@ SELECT
   , field_title
   , COUNT(DISTINCT assignee_id) AS assiSubCount
 FROM
-    patent_assignee pa
+    `{{params.reporting_database}}`.patent_assignee pa
         LEFT JOIN `{{params.reporting_database}}`.wipo w ON pa.patent_id = w.patent_id
         LEFT JOIN `{{params.reporting_database}}`.wipo_field wf ON w.field_id = wf.id
         LEFT JOIN `{{params.reporting_database}}`.patent p ON pa.patent_id = p.patent_id

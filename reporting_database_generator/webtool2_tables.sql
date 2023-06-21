@@ -2,7 +2,7 @@ select *
 from
     `_root`.config
 where
-    `key` like '%timestamp%';
+    `key` like '{{params.version_indicator}}';
 
 SELECT
     `UpdateAPI_bulkdownloadstats`.`id`
