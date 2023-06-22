@@ -212,7 +212,7 @@ select `location`.`id` AS `location_id`,
 `location`.`longitude` AS `longitude`,
 `location`.`county` AS `county`,
 `location`.`state_fips` AS `state_fips`,
-`location`.`county_fips` AS `county_fips` 
+RIGHT(`location`.`county_fips`,3) AS `county_fips` 
 from `patent`.`location` 
 where `location`.`id` in (select distinct `patent`.`rawlocation`.`location_id` 
 from `patent`.`rawlocation`) 
@@ -525,7 +525,7 @@ from (`pregrant_publications`.`publication_govintorg` `pg`
 left join `patent`.`government_organization` `go` on(`pg`.`organization_id` = `go`.`organization_id`)) 
 where `pg`.`version_indicator` <= '{{datestring}}';
 
-CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_granted_patent_crosswalk` AS 
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_granted_pgpubs_crosswalk` AS 
 SELECT 
 `xw`.`document_number` AS `pgpub_id`,
 `xw`.`patent_id` AS `patent_id`,
@@ -587,7 +587,7 @@ select `location`.`id` AS `location_id`,
 `location`.`longitude` AS `longitude`,
 `location`.`county` AS `county`,
 `location`.`state_fips` AS `state_fips`,
-`location`.`county_fips` AS `county_fips` 
+RIGHT(`location`.`county_fips`, 3) AS `county_fips` 
 from `patent`.`location` 
 where `location`.`id` in (select distinct `pregrant_publications`.`rawlocation`.`location_id` 
 from `pregrant_publications`.`rawlocation`) 
