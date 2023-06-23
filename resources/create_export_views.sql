@@ -313,7 +313,7 @@ where `patent`.`rel_app_text`.`version_indicator` <= '{{datestring}}';
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_us_application_citation` AS 
 select `patent`.`usapplicationcitation`.`patent_id` AS `patent_id`,
 `patent`.`usapplicationcitation`.`sequence` AS `citation_sequence`,
-`patent`.`usapplicationcitation`.`number` AS `citation_document_number`,
+`patent`.`usapplicationcitation`.`number_transformed` AS `citation_document_number`,
 `patent`.`usapplicationcitation`.`date` AS `citation_date`,
 `patent`.`usapplicationcitation`.`name` AS `record_name`,
 `patent`.`usapplicationcitation`.`kind` AS `wipo_kind`,
