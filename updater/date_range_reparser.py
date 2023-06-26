@@ -8,6 +8,23 @@ from updater.xml_to_sql.parser import queue_parsers
 from lib.configuration import get_current_config, get_config
 
 def reparse(start, end, clearfirst = True, pubtype = 'pgpubs', raisefail=True):
+    """
+    The function `reparse` takes in start and end dates, clears tables in a database if specified, and
+    parses XML files within a certain date range based on the given publication type.
+    
+    :param start: The start date for parsing patent data in the format "yymmdd" or "yyyymmdd"
+    (punctuation separators allowed)
+    :param end: The end date for parsing patent data in the format "yymmdd" or "yyyymmdd"
+    (punctuation separators allowed)
+    :param clearfirst: A boolean parameter that determines whether to clear the existing data in the
+    database tables before re-parsing the XML files. If set to True (default), the existing data will be cleared.
+    If set to False, the existing data will not be cleared.
+    :param pubtype: The type of publication to be parsed. It can be either 'pgpubs'(default) or 'granted_patent',
+    :param raisefail: a boolean parameter that determines whether an exception raised
+    during the execution of the function should be raised to the calling code or just printed to the
+    console. If set to True(default), any exception raised will be raised to the calling code, otherwise it will
+    just be printed to the console.
+    """
     start = re.sub('[^\d]','', start)[-6:] #remove non-digits and get 6 digits
     end = re.sub('[^\d]','', end)[-6:] #remove non-digits and get 6 digits
     assert re.fullmatch('[0-9]{6}', start) and re.fullmatch('[0-9]{6}',end), 'enter start and end dates as "yymmdd" or "yyyymmdd" (punctuation separators allowed)'
