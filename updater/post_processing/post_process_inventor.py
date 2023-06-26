@@ -210,6 +210,7 @@ def create_canonical_inventors(**kwargs):
 
 
 def create_patent_inventor(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
     q_list = []
     engine = create_engine(get_connection_string(config, 'RAW_DB'))
     q0 = """
@@ -228,6 +229,7 @@ where inventor_id is not null;
         engine.execute(q)
 
 def create_publication_inventor(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
     q_list = []
     engine = create_engine(get_connection_string(config, 'PGPUBS_DATABASE'))
     q0 = """

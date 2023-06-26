@@ -373,6 +373,7 @@ def load_pregranted_location_assignee(**kwargs):
                       include_location=True, location_strict=True)
 
 def create_patent_assignee(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
     q_list = []
     engine = create_engine(get_connection_string(config, 'RAW_DB'))
     q0 = """
@@ -381,7 +382,7 @@ def create_patent_assignee(**kwargs):
     q1 = """
 INSERT IGNORE INTO patent_assignee 
 (patent_id, assignee_id, sequence, location_id, version_indicator) 
-SELECT patent_id, et.assignee_id, location_id, et.sequence, et.version_indicator 
+SELECT patent_id, et.assignee_id, et.sequence,  location_id, et.version_indicator 
     from rawassignee et left join rawlocation rl on rl.id = et.rawlocation_id 
 where assignee_id is not null;
     """
@@ -391,6 +392,7 @@ where assignee_id is not null;
         engine.execute(q)
 
 def create_publication_assignee(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
     q_list = []
     engine = create_engine(get_connection_string(config, 'PGPUBS_DATABASE'))
     q0 = """
