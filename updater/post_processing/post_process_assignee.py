@@ -404,10 +404,6 @@ SELECT document_number, et.assignee_id, et.sequence, location_id,  et.version_in
 where assignee_id is not null; 
     """
     q_list.append(q1)
-    q2 = """
-    alter table patent_inventor add index 
-    """
-    q_list.append(q2)
     for q in q_list:
         print(q)
         engine.execute(q)
