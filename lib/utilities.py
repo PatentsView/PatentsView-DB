@@ -464,20 +464,18 @@ def save_zip_file(url, name, path, counter=0, log_queue=None):
                     f.write(chunk)
 
     with zipfile.ZipFile(path + name, 'r') as zip_ref:
-        if re.fullmatch(".*_r\d.zip", name): # revised file
-            # set the file name to match the zip file name
-            zipinfo = zip_ref.infolist()
-            for _file in zipinfo:
-                z_nm, z_ext = os.path.splitext(name)
-                f_nm, f_ext = os.path.splitext(_file.filename)
-                if re.match(f"{f_nm}_r\d",z_nm):
-                    # revision file - can't be renamed inside the zip archive, so will extract to a temporary location and rename
-                    os.mkdir(f"{path}/tmp")
-                    zip_ref.extract(_file.filename, f"{path}/tmp")
-                    os.rename(f"{path}/tmp/{_file.filename}",f"{path}/{z_nm}{f_ext}")
-                    os.rmdir(f"{path}/tmp")
-                else:
-                    zip_ref.extract(_file.filename, path)
+        zipinfo = zip_ref.infolist()
+        for _file in zipinfo:
+            z_nm, z_ext = os.path.splitext(name)
+            f_nm, f_ext = os.path.splitext(_file.filename)
+            if re.match(f"{f_nm}_r\d",z_nm):
+                # revision file - can't be renamed inside the zip archive, so will extract to a temporary location and rename
+                os.mkdir(f"{path}/tmp")
+                zip_ref.extract(_file.filename, f"{path}/tmp")
+                os.rename(f"{path}/tmp/{_file.filename}",f"{path}/{z_nm}{f_ext}")
+                os.rmdir(f"{path}/tmp")
+            else:
+                zip_ref.extract(_file.filename, path)
 
     os.remove(path + name)
     print(f"{name} downloaded and extracted to {path}")
