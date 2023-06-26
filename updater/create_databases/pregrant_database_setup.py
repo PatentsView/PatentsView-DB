@@ -30,6 +30,7 @@ def create_database(**kwargs):
     conn.cursor().execute(f"Drop database if exists {temp_db};")
     conn.cursor().execute(f"CREATE DATABASE {temp_db} DEFAULT CHARACTER SET = 'utf8mb4' DEFAULT COLLATE 'utf8mb4_unicode_ci';")
 
+    print(f"executing database creation based on file: {sql_path}")
     try:
         subprocess_cmd('mysql --defaults-file=' + defaults_file + ' ' + temp_db + ' < ' + sql_path)
     except:
