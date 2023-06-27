@@ -10,9 +10,20 @@ from lib.configuration import get_connection_string, get_current_config
 
 
 def subprocess_cmd(command):
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
-    proc_stdout = process.communicate()[0].strip()
-    print(proc_stdout)
+    # process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+    # proc_stdout = process.communicate()[0].strip()
+    proc_result = subprocess.run([command], capture_output=True, text=True, shell=True, check=False)
+    # change to subprocess.run from subprocess.Popen to make use of CompletedProcess attributes for convenience
+    # using check=False prevents errors from raising automatically and lets us check manually and format readout more usefully
+    if not proc_result.returncode == 0:
+        raise Exception(f"""
+            subprocess failed to complete. exited with status {proc_result.returncode}.
+            command: {proc_result.args}
+            stdout: {proc_result.stdout}
+            stderr: {proc_result.stderr}
+            """)
+
+    print(proc_result.stdout)
 
 
 def create_database(**kwargs):
@@ -32,7 +43,7 @@ def create_database(**kwargs):
 
     print(f"executing database creation based on file: {sql_path}")
     try:
-        subprocess_cmd('mysql --defaults-file=' + defaults_file + ' ' + temp_db + ' < ' + sql_path)
+        subprocess_cmd(f'mysql --defaults-file={defaults_file} {temp_db} < {sql_path}')
     except:
         print('create bash command failed')
         raise
@@ -53,7 +64,7 @@ def merge_database(**kwargs):
     # DELETE PRIOR DATA IN DESTINATION TABLES (PROD)
     delete_version_in_destination_tables = 'yes'
     if delete_version_in_destination_tables == 'yes':
-        bash_command='mysql --defaults-file=' + defaults_file + ' ' + prod_db + ' -e ' + f'"set @dbdate={vi}; set @qavi={qavi}; source {sql_delete_path};"' + ' ;'
+        bash_command=f'mysql --defaults-file={defaults_file} {prod_db} -e "set @dbdate={vi}; set @qavi={qavi}; source {sql_delete_path};" ;'
         print(bash_command)
         try:
             subprocess_cmd(bash_command)
@@ -61,7 +72,7 @@ def merge_database(**kwargs):
             print('delete bash command failed')
 
     try:
-        subprocess_cmd('mysql --defaults-file=' + defaults_file + ' ' + database + ' < ' + sql_path)
+        subprocess_cmd(f'mysql --defaults-file={defaults_file} {database} < {sql_path}')
     except:
         print('bash command failed')
         raise
