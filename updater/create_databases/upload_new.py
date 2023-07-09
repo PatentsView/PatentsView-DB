@@ -80,6 +80,8 @@ def setup_database(update_config, drop=True, cpc_only=False):
                     query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
                 print(query)
                 con.execute(query)
+        # create column for manual override of automated data qualty flag. should only be modified manually, never automatically.
+        con.execute(f"ALTER TABLE {temp_upload_database}.rawlocation ADD COLUMN `qa_override` int(1) DEFAULT NULL after `longitude`;")
     engine.dispose()
 
 
