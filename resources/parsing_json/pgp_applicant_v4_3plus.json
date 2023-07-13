@@ -1,0 +1,129 @@
+{
+  "foreign_key_config": {
+    "field_name": "document_number",
+    "friendly_name": "Document Number",
+    "xml_path": "us-bibliographic-data-application/publication-reference/document-id/doc-number",
+    "data-type": "string"
+  },
+  "table_xml_map": [
+      {
+      "table_name": "us_parties",
+      "friendly_name": "US Parties",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-application/us-parties/us-applicants/",
+      "fields": [
+        {
+          "field_name": "name_first",
+          "friendly_name": "Name first",
+          "xml_path": "addressbook/first-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },    
+        {
+          "field_name": "name_last",
+          "friendly_name": "Name Last",
+          "xml_path": "addressbook/last-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "organization",
+          "friendly_name": "Organization",
+          "xml_path": "addressbook/orgname",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "designation",
+          "friendly_name": "Designation",
+          "xml_path": ".",
+          "attribute": "designation",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "type",
+          "friendly_name": "Type",
+          "xml_path": ".",
+          "attribute": "app-type",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "authority_category",
+          "friendly_name": "Authority Category",
+          "xml_path": ".",
+          "attribute": "applicant-authority-category",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+            "field_name": "city",
+            "friendly_name": "City",
+            "xml_path": "addressbook/address/city",
+            "attribute": null,
+            "description": null,
+            "sequence": false,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+        }, 
+        {
+            "field_name": "state",
+            "friendly_name": "State",
+            "xml_path": "addressbook/address/state",
+            "attribute": null,
+            "description": null,
+            "sequence": false,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+        }, 
+        {
+            "field_name": "country",
+            "friendly_name": "Country",
+            "xml_path": "addressbook/address/country",
+            "attribute": null,
+            "description": null,
+            "sequence": false,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+        }, 
+        {
+            "field_name": "sequence",
+            "friendly_name": "Sequence",
+            "xml_path": ".",
+            "attribute": "sequence",
+            "description": null,
+            "sequence": true,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+        }
+      ],
+        "filename": "us_parties.tsv"
+    }
+  ]
+}
