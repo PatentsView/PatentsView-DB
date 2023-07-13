@@ -25,7 +25,7 @@ insert into `{{params.reporting_database}}`.`usapplicationcitation`
   `date`, `name`, `kind`, `category`
 )
 select
-  ac.`patent_id`, ac.`sequence`, ac.`application_id_transformed`,
+  ac.`patent_id`, ac.`sequence`, ac.`number_transformed`,
   case when ac.`date` > date('1899-12-31') and ac.`date` < date_add(current_date, interval 10 year) then ac.`date` else null end,
   nullif(trim(ac.`name`), ''),
   nullif(trim(ac.`kind`), ''),
