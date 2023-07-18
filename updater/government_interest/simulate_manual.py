@@ -11,10 +11,10 @@ def simulate_manual(dbtype='granted_patent', **kwargs):
     manual_inputs = '{}/government_interest/manual_inputs'.format(config['FOLDERS']['WORKING_FOLDER'])
     post_manual = '{}/government_interest/post_manual'.format(config['FOLDERS']['WORKING_FOLDER'])
     files_to_copy = {
-            'to_check.csv':                'to_check_checked.csv',
-            'automatically_matched.csv':   'automatically_matched.csv',
-            'government_organization.csv': 'government_organization.csv',
-            }
+        'to_check.csv': 'to_check_checked.csv',
+        'automatically_matched.csv': 'automatically_matched.csv',
+        'government_organization.csv': 'government_organization.csv',
+    }
     for source, destination in files_to_copy.items():
         copyfile('{path}/{file}'.format(path=manual_inputs, file=source),
                  '{path}/{file}'.format(path=post_manual, file=destination))
@@ -26,6 +26,6 @@ def simulate_manual(dbtype='granted_patent', **kwargs):
 
 if __name__ == '__main__':
     kw = {
-            "execution_date": datetime.date(2020, 12, 22)
-            }
-    simulate_manual(**kw)
+        "execution_date": datetime.date(2022, 6, 23)
+    }
+    simulate_manual(dbtype='pgpubs', **kw)
