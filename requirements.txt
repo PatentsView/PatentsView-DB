@@ -31,7 +31,6 @@ slack_sdk
 sqlparse
 tabulate
 textdistance
-thebrainfuck
 thefuzz
 torch
 tqdm
