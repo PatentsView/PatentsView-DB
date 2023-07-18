@@ -273,7 +273,7 @@ assignee_build_assignee_features = PythonOperator(task_id='Assignee_Build_Assign
                                                   on_failure_callback=airflow_task_failure,
                                                   queue='disambiguator', pool='high_memory_pool')
 
-qc_assignee_build_assignee_features = PythonOperator(task_id='(QC) Assignee_Build_Assignee_Name_Mentions_Canopies',
+qc_assignee_build_assignee_features = PythonOperator(task_id='QA_Assignee_Name_Mentions_Canopies',
                                                      python_callable=qc_build_assignee_name_mentions,
                                                      provide_context=True,
                                                      dag=disambiguation,
