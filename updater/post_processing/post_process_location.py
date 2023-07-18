@@ -21,7 +21,7 @@ def update_rawlocation(update_config):
     end_date = update_config['DATES']['END_DATE']
     update_statement = f"""
         UPDATE {prod_db}.rawlocation rl 
-            inner join location_disambiguation_mapping_{end_date} ldmon ldm.id = rl.id
+            inner join location_disambiguation_mapping_{end_date} ldm on ldm.id = rl.id
         set rl.location_id = ldm.location_id
         where rl.location_id is null
     """
@@ -238,7 +238,7 @@ def update_dis_location_mapping(config):
     drop_current = f"""drop view {prod_db}.location_disambiguation_mapping"""
     query_list.append(drop_current)
     loc_dis_mapping = current_view_q + new_table_addition
-    loc_dis_mapping = loc_dis_mapping.replace("CREATE ALGORITHM=UNDEFINED DEFINER=`pipeline_user`@`%` SQL SECURITY DEFINER VIEW", "CREATE SQL SECURITY INVOKER VIEW")
+    loc_dis_mapping.replace("CREATE ALGORITHM=UNDEFINED DEFINER=`pipeline_user`@`%` SQL SECURITY DEFINER VIEW", "CREATE SQL SECURITY INVOKER VIEW")
     query_list.append(loc_dis_mapping)
     for q in query_list:
         print(q)
@@ -263,10 +263,10 @@ def post_process_location(**kwargs):
     patent_config = get_current_config(schedule="quarterly", **kwargs)
     pgpubs_config = get_current_config(type='pgpubs', schedule="quarterly", **kwargs)
     # Technically we no longer need the location-disambiguation-mapping tables anymore because location_id gets mapped over in the migration process
-    consolidate_location_disambiguation_quarterly(patent_config, **kwargs)
-    consolidate_location_disambiguation_quarterly(pgpubs_config, **kwargs)
-    update_dis_location_mapping(patent_config)
-    update_dis_location_mapping(pgpubs_config)
+    # consolidate_location_disambiguation_quarterly(patent_config, **kwargs)
+    # consolidate_location_disambiguation_quarterly(pgpubs_config, **kwargs)
+    # update_dis_location_mapping(patent_config)
+    # update_dis_location_mapping(pgpubs_config)
     update_rawlocation(patent_config)
     update_rawlocation(pgpubs_config)
     precache_locations(patent_config)
@@ -284,7 +284,7 @@ if __name__ == '__main__':
     # post_process_location(**{
     #         "execution_date": date(2023, 1, 1)
     #         })
-    post_process_qc(**{
-            "execution_date": date(2023, 1, 1)
+    post_process_location(**{
+            "execution_date": date(2023, 4, 1)
             })
 
