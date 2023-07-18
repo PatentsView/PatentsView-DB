@@ -21,10 +21,9 @@ from updater.disambiguation.location_disambiguation.location_disambiguator impor
 from updater.post_processing.post_process_location import post_process_location, post_process_qc
 from updater.post_processing.post_process_assignee import additional_post_processing_assignee, \
     post_process_qc as qc_post_process_assignee, \
-    update_granted_rawassignee, update_pregranted_rawassignee, assignee_mentions_pickle_testing
-    precache_assignees, create_canonical_assignees, load_granted_lookup as load_granted_assignee_lookup, \
-    load_pregranted_lookup as load_pregranted_assignee_lookup, load_granted_location_assignee, \
-    load_pregranted_location_assignee
+    update_granted_rawassignee, update_pregranted_rawassignee, \
+    precache_assignees, create_canonical_assignees, load_granted_location_assignee, \
+    load_pregranted_location_assignee, create_patent_assignee, create_publication_assignee
 from updater.post_processing.post_process_inventor import update_granted_rawinventor, update_pregranted_rawinventor, \
     precache_inventors, create_canonical_inventors, create_patent_inventor, create_publication_inventor, \
     post_process_qc as qc_inventor_post_processing, load_granted_location_inventor, load_pregranted_location_inventor
