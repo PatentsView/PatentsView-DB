@@ -25,13 +25,12 @@ if schema_only == "TRUE":
 else:
     schema_only = False
 
-
-
 template_extension_config = [".sql"]
 database_name_config = {
     'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
     'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME'],
-    'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR']
+    'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR'],
+    'last_reporting_database': config['REPORTING_DATABASE_OPTIONS']['LAST_REPORTING_DATABASE_NAME'],
 }
 
 
@@ -47,8 +46,8 @@ default_args = {
     'email_on_retry': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
-    'concurrency': 4
-    # 'queue': 'bash_queue',
+    'concurrency': 4,
+    'queue': 'disambiguator'
     # 'pool': 'backfill',
     # 'priority_weight': 10,
     # 'end_date': datetime(2016, 1, 1),
@@ -94,17 +93,6 @@ govt_interest = SQLTemplatedPythonOperator(
     templates_exts=template_extension_config,
     params=database_name_config
 )
-# claims = SQLTemplatedPythonOperator(
-#     task_id='Claims_Table',
-#     provide_context=True,
-#     python_callable=validate_query.validate_and_execute,
-#     dag=reporting_db_dag,
-#     op_kwargs={'filename': '01_02_Claims', 
-#                "schema_only": schema_only},
-#     templates_dict={'source_sql': '01_02_Claims.sql'},
-#     templates_exts=template_extension_config,
-#     params=database_name_config
-# )
 id_mappings = SQLTemplatedPythonOperator(
     task_id='ID_Mappings',
     provide_context=True,

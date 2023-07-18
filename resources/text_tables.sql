@@ -11,7 +11,7 @@
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
         `patent_id`         varchar(32) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-        `text`              longtext CHARACTER SET utf8mb4
+        `summary_text`              longtext CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
         `version_indicator` date           DEFAULT NULL,
         `created_date`      timestamp NULL DEFAULT current_timestamp(),
@@ -35,11 +35,11 @@
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
         `patent_id`         varchar(32) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-        `num`               varchar(16) CHARACTER SET utf8mb4
+        `claim_number`               varchar(16) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-        `text`              longtext CHARACTER SET utf8mb4
+        `claim_text`              longtext CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-        `sequence`          int(11)        DEFAULT NULL,
+        `claim_sequence`          int(11)        DEFAULT NULL,
         `dependent`         varchar(512) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
         `exemplary`         int(32)        DEFAULT NULL,
@@ -47,7 +47,7 @@
         `created_date`      timestamp NULL DEFAULT current_timestamp(),
         `updated_date`      timestamp NULL DEFAULT NULL
             ON UPDATE current_timestamp(),
-        UNIQUE KEY `patent_id` (`patent_id`, `num`)
+        UNIQUE KEY `patent_id` (`patent_id`, `claim_number`)
     )
         ENGINE = InnoDB
         DEFAULT CHARSET = utf8mb4 
@@ -65,9 +65,9 @@
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
         `patent_id`         varchar(32) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-        `text`              longtext CHARACTER SET utf8mb4
+        `description_text`              longtext CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-        `length`            bigint(16)     DEFAULT NULL,
+        `description_length`            bigint(16)     DEFAULT NULL,
         `version_indicator` date           DEFAULT NULL,
         `created_date`      timestamp NULL DEFAULT current_timestamp(),
         `updated_date`      timestamp NULL DEFAULT NULL
@@ -90,9 +90,9 @@
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
         `patent_id`         varchar(32) CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-        `text`              longtext CHARACTER SET utf8mb4
+        `draw_desc_text`              longtext CHARACTER SET utf8mb4
             COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-        `sequence`          int(11)        DEFAULT NULL,
+        `draw_desc_sequence`          int(11)        DEFAULT NULL,
         `version_indicator` date           DEFAULT NULL,
         `created_date`      timestamp NULL DEFAULT current_timestamp(),
         `updated_date`      timestamp NULL DEFAULT NULL

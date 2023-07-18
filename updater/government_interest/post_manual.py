@@ -198,14 +198,13 @@ def process_post_manual(doctype='granted_patent', database='TEMP_UPLOAD_DB', **k
     org_id_mapping = readOrgs(full_db_engine)
 
     # push the mappings into the db
-    id_type = ('patent_id' if doctype == 'granted_patent' else 'document_number')
+    id_type=('patent_id' if dbtype =='granted_patent' else 'document_number')
     push_orgs(looked_up, org_id_mapping, config, version_indicator, database=database, id_type=id_type)
 
 
-def qc_gi(doctype='granted_patent', database='TEMP_UPLOAD_DB', **kwargs):
-    config = get_current_config(type=doctype, **kwargs)
-    qc = GovtInterestTester(config, database=database,
-                            id_type=('patent_id' if doctype == 'granted_patent' else 'document_number'))
+def qc_gi(dbtype='granted_patent', database='TEMP_UPLOAD_DB',**kwargs):
+    config = get_current_config(type=dbtype, **kwargs)
+    qc = GovtInterestTester(config, database=database, id_type=('patent_id' if dbtype =='granted_patent' else 'document_number'))
     qc.runTests()
 
 

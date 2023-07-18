@@ -115,6 +115,25 @@ def upload_tables_for_testing(config, db, output_path, table_list):
                     print(i)
                     subprocess_cmd(i)
 
+def upload_tsv_backup_files(config, db, output_path, table_list):
+    print("--------------------------------------------------------------")
+    print("UPLOADING DATABASE BACKUPS FOR QA")
+    print("--------------------------------------------------------------")
+    defaults_file = "resources/sql.conf"
+    if db == 'patent_text':
+        pre = 'g_'
+    else:
+        pre = 'pg_'
+    if isinstance(table_list, str):
+        for table in table_list.split(","):
+            # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
+            bash_command1 = f"unzip {output_path}/{db}.{pre}{table}.tsv.zip"
+            bash_command2 = f"mysql --defaults-file={defaults_file} --local-infile=1"
+            bash_command3 = f"LOAD DATA LOCAL INFILE '{output_path}{pre}{table}.tsv' INTO TABLE {db}.{table} FIELDS TERMINATED BY '\t' ENCLOSED BY '' LINES TERMINATED BY '\n' IGNORE 1 LINES;"
+            bash_command4 = f"gzip {output_path}/{db}.{pre}{table}.sql"
+            for i in [bash_command1, bash_command2, bash_command3, bash_command4]:
+                print(i)
+                subprocess_cmd(i)
 
 def query_for_all_tables_in_db(connection_string, temp):
     print("--------------------------------------------------------------")
@@ -294,13 +313,41 @@ def run_table_archive(config_db, table_list, output_path):
     delete_tables(prod_connection_string, db, table_list)
 
 
-if __name__ == '__main__':
-    type = 'pgpubs'
+# if __name__ == '__main__':
+    # type = 'pgpubs'
     # output_path ='/PatentDataVolume/DatabaseBackups/PregrantPublications'
-    config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
-    for i in range(1, 24):
-        print("--------------------------------------------------------------")
-        print(f"RUNNING ITERATION: {i}")
-        print("--------------------------------------------------------------")
-        run_database_archive(type=type)
+    # config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
+    # for i in range(1, 24):
+    #     print("--------------------------------------------------------------")
+    #     print(f"RUNNING ITERATION: {i}")
+    #     print("--------------------------------------------------------------")
+    #     run_database_archive(type=type)
         # run_table_archive(config)
+
+if __name__ == '__main__':
+    b_list = []
+    for i in range(1976, 2022):
+        temp = f'brf_sum_text_{i}'
+        b_list.append(temp)
+    dr_list = []
+    for i in range(1976, 2022):
+        temp = f'draw_desc_text_{i}'
+        dr_list.append(temp)
+    c_list = []
+    for i in range(1976, 2022):
+        temp = f'claims_{i}'
+        c_list.append(temp)
+    de_list = []
+    for i in range(1976, 2022):
+        temp = f'detail_desc_text_{i}'
+        de_list.append(temp)
+    tab_list = b_list + dr_list + c_list + de_list
+    type = 'granted_patent'
+    output_path = "/text_output/20220630/patent/download/"
+    config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
+    # upload_tsv_backup_files(config, output_path, 'patent_text', tab_list)
+    upload_tsv_backup_files(config, output_path, 'patent_text', ['brf_sum_text_2022', 'draw_desc_text_2022', 'claims_2022', 'detail_desc_text_2022'])
+
+
+
+

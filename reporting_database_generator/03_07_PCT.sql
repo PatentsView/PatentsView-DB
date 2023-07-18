@@ -16,10 +16,9 @@ create table `{{params.reporting_database}}`.`pctdata`
   `371_date` date null,
   primary key (`patent_id`, `kind`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 13,617,656 @ 8:22
 insert into `{{params.reporting_database}}`.`pctdata`
 (
   `patent_id`, `doc_type`, `kind`, `doc_number`, `date`, `102_date`, `371_date`

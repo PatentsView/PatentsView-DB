@@ -183,19 +183,19 @@ def find_ipc_url_test():
 
 def collect_cpc_data(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
-    destination_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+    upload_destination_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
 
     pgpubs_config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
-    pgpubs_cpc_folder = '{}/{}'.format(pgpubs_config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+    pgpubs_destination_folder = '{}/{}'.format(pgpubs_config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
 
-    if not os.path.exists(destination_folder):
-        os.makedirs(destination_folder)
-    if not os.path.exists(pgpubs_cpc_folder):
-        os.makedirs(pgpubs_cpc_folder)
-    download_cpc_schema(destination_folder)  # <1 min
-    download_cpc_grant_and_pgpub_classifications(destination_folder, pgpubs_cpc_folder)  # few minutes
-    download_ipc(destination_folder)  # <1 min
-    download_ipc(download_ipc(destination_folder))
+    if not os.path.exists(upload_destination_folder):
+        os.makedirs(upload_destination_folder)
+    if not os.path.exists(pgpubs_destination_folder):
+        os.makedirs(pgpubs_destination_folder)
+    download_cpc_schema(upload_destination_folder)  # <1 min
+    download_cpc_grant_and_pgpub_classifications(upload_destination_folder, pgpubs_destination_folder)  # few minutes
+    download_ipc(upload_destination_folder)  # <1 min
+    download_ipc(pgpubs_destination_folder)
 
 
 def post_download(**kwargs):

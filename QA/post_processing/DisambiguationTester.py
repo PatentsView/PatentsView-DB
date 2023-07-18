@@ -60,16 +60,46 @@ class DisambiguationTester(DatabaseTester):
                 print(f"\t\t\tLoading Top N Entities for {self.database_section}.{self.disambiguated_table} from {related_table_config['related_table']}")
                 self.load_top_entities(table, related_table_config)
 
+    def test_entity_id_updated(self):
+        if {self.entity_table} in ['assignee','inventor']:
+            for db, id in [['pregrant_publications', 'id'], ['patent', 'uuid']]:
+                test_entity_id_updated_query = f"""
+select count(*)
+from {db}.{self.entity_table} a
+    inner join {db}.{self.disambiguated_table}_disambiguation_mapping_{self.end_date} b on a.{id}=b.uuid 
+where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
+                print(test_entity_id_updated_query)
+                if not self.connection.open:
+                    self.connection.connect()
+                with self.connection.cursor() as g_cursor:
+                    g_cursor.execute(test_entity_id_updated_query)
+                    count_not_updated = g_cursor.fetchall()[0][0]
+                    if count_not_updated > 0:
+                        raise Exception(f"ENTITY NOT UPDATED IN THE RAW TABLE")
+
     def load_top_entities(self, table_name, related_table_config):
         if 'patent' not in table_name:
-            top_n_data_query = f"""
-        SELECT {self.aggregator}
-                , count(*)
-        FROM  {table_name} main
-            JOIN {related_table_config["related_table"]} related ON main.{related_table_config["main_table_id"]} = related.{related_table_config['related_table_id']}
-        GROUP  BY 1
-        ORDER  BY 2 DESC
-        LIMIT 100"""
+            if 'location' in table_name:
+                top_n_data_query = f"""
+                SELECT concat(main.location_name, ', ', main.state, ', ', main.country) as location_name
+                        , count(*)
+                FROM  geo_data.curated_locations main
+                    JOIN patent.{related_table_config["related_table"]} related 
+                    ON main.uuid = related.{related_table_config['related_table_id']}
+                where related.version_indicator >= '2022-04-01' and related.version_indicator <= '2022-07-01'
+                GROUP  BY 1
+                ORDER  BY 2 DESC
+                LIMIT 100"""
+            else:
+                top_n_data_query = f"""
+            SELECT {self.aggregator}
+                    , count(*)
+            FROM  {table_name} main
+                JOIN {related_table_config["related_table"]} related ON main.{related_table_config["main_table_id"]} = related.{related_table_config['related_table_id']}
+            where related.version_indicator >= '2022-07-01' and related.version_indicator <= '2022-10-01'
+            GROUP  BY 1
+            ORDER  BY 2 DESC
+            LIMIT 100"""
             print(top_n_data_query)
             if not self.connection.open:
                 self.connection.connect()
@@ -97,7 +127,7 @@ class DisambiguationTester(DatabaseTester):
             SELECT count(*)
             from {self.disambiguated_table} dt
                 left join {self.entity_table} et on et.{self.disambiguated_id} = dt.id
-            where et.{self.disambiguated_id} is null;
+            where et.{self.disambiguated_id} is null and et.version_indicator <= '{self.end_date}';
                     """
         else:
             invalid_query = f"""
@@ -108,7 +138,7 @@ class DisambiguationTester(DatabaseTester):
             where et.{self.disambiguated_id} is null
                 and et2.{self.disambiguated_id} is null;
             """
-
+        print(invalid_query)
         if not self.connection.open:
             self.connection.connect()
         with self.connection.cursor() as count_cursor:
@@ -120,6 +150,7 @@ class DisambiguationTester(DatabaseTester):
 
     def runTests(self):
         print("Beginning Disambiguation Specific Tests")
+        self.test_entity_id_updated()
         self.init_qa_dict_disambig()
         self.test_invalid_id()
         self.test_floating_entities()
@@ -128,4 +159,5 @@ class DisambiguationTester(DatabaseTester):
             self.top_n_generator(table)
             self.save_qa_data()
             self.init_qa_dict_disambig()
+
 

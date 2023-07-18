@@ -7,14 +7,14 @@ class CPCDownloadTest:
         self.pgpubs_config = pgpubs_config
 
     def test_download(self):
-        destination_folder = '{}/{}'.format(self.config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
-        print(destination_folder)
-        cpc_pattern = destination_folder + '/cpc-scheme*'
+        upload_destination_folder = '{}/{}'.format(self.config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
+        print(upload_destination_folder)
+        cpc_pattern = upload_destination_folder + '/cpc-scheme*'
         files = [x for x in glob.glob(cpc_pattern)]
         if len(files) == 0:
             raise AssertionError("CPC Scheme files not found")
 
-        granted_pattern = destination_folder + '/US_Grant_CPC_MCF_*.xml'
+        granted_pattern = upload_destination_folder + '/US_Grant_CPC_MCF_*.xml'
         files = [x for x in glob.glob(granted_pattern)]
         if len(files) == 0:
             raise AssertionError("Granted patent CPC assignment files not found")
@@ -26,8 +26,13 @@ class CPCDownloadTest:
         if len(files) == 0:
             raise AssertionError("Pregranted CPC assignment files not found")
 
-        ipc_concordance = destination_folder + '/ipc_concordance.txt'
-        files = [x for x in glob.glob(ipc_concordance)]
+        g_ipc_concordance = upload_destination_folder + '/ipc_concordance.txt'
+        files = [x for x in glob.glob(g_ipc_concordance)]
+        if len(files) != 1:
+            raise AssertionError("IPC Concordance files not found")
+
+        pg_ipc_concordance = upload_destination_folder + '/ipc_concordance.txt'
+        files = [x for x in glob.glob(pg_ipc_concordance)]
         if len(files) != 1:
             raise AssertionError("IPC Concordance files not found")
 

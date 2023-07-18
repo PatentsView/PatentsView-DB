@@ -16,10 +16,9 @@ create table `{{params.reporting_database}}`.`temp_cpc_current_subsection_aggreg
   `actual_years_active` smallint unsigned not null,
   primary key (`subsection_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 29:37
 insert into `{{params.reporting_database}}`.`temp_cpc_current_subsection_aggregate_counts`
 (
   `subsection_id`, `num_assignees`, `num_inventors`, `num_patents`,
@@ -47,10 +46,9 @@ create table `{{params.reporting_database}}`.`temp_cpc_subsection_title`
   `title` varchar(512) null,
   primary key (`id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 0.125 sec
 insert into `{{params.reporting_database}}`.`temp_cpc_subsection_title`
   (`id`, `title`)
 select
@@ -75,10 +73,9 @@ create table `{{params.reporting_database}}`.`temp_cpc_current_group_aggregate_c
   `actual_years_active` smallint unsigned not null,
   primary key (`group_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 29:37
 insert into `{{params.reporting_database}}`.`temp_cpc_current_group_aggregate_counts`
 (
   `group_id`, `num_assignees`, `num_inventors`, `num_patents`,
@@ -100,10 +97,6 @@ group by
   c.`group_id`;
 
 
-
-
-
-
 drop table if exists `{{params.reporting_database}}`.`temp_cpc_group_title`;
 create table `{{params.reporting_database}}`.`temp_cpc_group_title`
 (
@@ -111,7 +104,7 @@ create table `{{params.reporting_database}}`.`temp_cpc_group_title`
   `title` varchar(512) null,
   primary key (`id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 # 0.156
@@ -134,10 +127,9 @@ create table `{{params.reporting_database}}`.`temp_cpc_subgroup_title`
   `title` varchar(2048) null,
   primary key (`id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 0:07
 insert into `{{params.reporting_database}}`.`temp_cpc_subgroup_title`
   (`id`, `title`)
 select
@@ -177,11 +169,9 @@ create table `{{params.reporting_database}}`.`cpc_current`
   `years_active_group` smallint unsigned null,
   primary key (`patent_id`, `sequence`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 23,151,381 @ 1:29:48
-# 23,151,381 @ 36:32
 insert into `{{params.reporting_database}}`.`cpc_current`
 (
   `patent_id`, `sequence`, `section_id`, `subsection_id`,
@@ -232,10 +222,9 @@ create table `{{params.reporting_database}}`.`cpc_current_subsection`
   `years_active` smallint unsigned null,
   primary key (`patent_id`, `subsection_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 7,240,381 @ 19:00
 insert into `{{params.reporting_database}}`.`cpc_current_subsection`
 (
   `patent_id`, `section_id`, `subsection_id`, `subsection_title`,
@@ -273,10 +262,9 @@ create table `{{params.reporting_database}}`.`cpc_current_group`
   `years_active` smallint unsigned null,
   primary key (`patent_id`, `group_id`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 7,240,381 @ 19:00
 insert into `{{params.reporting_database}}`.`cpc_current_group`
 (
   `patent_id`, `section_id`, `group_id`, `group_title`,
@@ -316,10 +304,9 @@ create table `{{params.reporting_database}}`.`cpc_current_subsection_patent_year
   `num_patents` int unsigned not null,
   primary key (`subsection_id`, `patent_year`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 13:24
 insert into `{{params.reporting_database}}`.`cpc_current_subsection_patent_year`
   (`subsection_id`, `patent_year`, `num_patents`)
 select
@@ -350,10 +337,8 @@ create table `{{params.reporting_database}}`.`cpc_current_group_patent_year`
   `num_patents` int unsigned not null,
   primary key (`group_id`, `patent_year`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 13:24
 insert into `{{params.reporting_database}}`.`cpc_current_group_patent_year`
   (`group_id`, `patent_year`, `num_patents`)
 select
@@ -386,10 +371,8 @@ create table `{{params.reporting_database}}`.`cpc_current_group_application_year
   `average_patent_processing_days` int unsigned null,
   primary key (`group_id`, `application_year`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 20,241 @ 0:56
 insert into `{{params.reporting_database}}`.`cpc_current_group_application_year`
   (`group_id`, `application_year`, `sample_size`, `average_patent_processing_days`)
 select
@@ -406,17 +389,15 @@ group by
   u.`group_id`, year(p.`earliest_application_date`);
 
 
-# 5,406,673 @ 32:45
 # Update the patent with the average mainclass processing days.
 update
   `{{params.reporting_database}}`.`patent` p
   inner join `{{params.reporting_database}}`.`cpc_current` u on
-    u.`patent_id` = p.`patent_id` and u.`sequence` = 0
+    u.`patent_id` = p.`patent_id`
   inner join `{{params.reporting_database}}`.`cpc_current_group_application_year` c on
     c.`group_id` = u.`group_id` and c.`application_year` = year(p.`earliest_application_date`)
-set
-  p.`cpc_current_group_average_patent_processing_days` = c.`average_patent_processing_days`;
-
+set p.`cpc_current_group_average_patent_processing_days` = c.`average_patent_processing_days`;
+where  u.`sequence` = 0
 
 # END cpc_current_group_application_year 
 

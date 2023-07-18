@@ -12,7 +12,7 @@ class AppDatabaseTester(ABC):
         self.start_date = start_date
         self.end_date = end_date
         self.database_section = database_section
-        self.qa_connection_string = get_connection_string(config, 'QA_DATABASE')
+        self.qa_connection_string = get_connection_string(config, database='QA_DATABASE', connection='APP_DATABASE_SETUP')
         self.connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                           user=config['DATABASE_SETUP']['USERNAME'],
                                           password=config['DATABASE_SETUP']['PASSWORD'],

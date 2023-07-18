@@ -1,7 +1,7 @@
 import csv
 import json
 import logging
-import multiprocessing as mp
+import billiard as mp
 import os
 import pprint
 import re
@@ -132,7 +132,7 @@ def extract_text_from_all_children(element):
 
 def parse_description(patent_doc, text_type):
     """
-    Parse and extract data from "description" fields (i.e. brf_sum_text, claim, draw_desc_text)
+    Parse and extract data from "description" fields (i.e. brf_sum_text, claims, draw_desc_text)
     :param patent_doc: XML element containing text data
     :param text_type: Data Field for which text is to be extracted
     :return: Text data from each element
@@ -231,7 +231,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                 data_list[field["field_name"]] = seq
             # If we are looking for the text data in the claims table use the text_extractor to get the right data
             # Claims are special cases
-            elif tab['friendly_name'] == 'Claim' and field['field_name'] == 'text':
+            elif tab['friendly_name'] == 'Claims' and field['field_name'] == 'claim_text':
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
@@ -239,7 +239,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                     if elem.tag in newline_tags:
                         partial_strings.append("\n\n")
                     data_list[field["field_name"]] = ' '.join(partial_strings)
-            elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'text':
+            elif tab['friendly_name'] == 'Drawing Description Text' and field['field_name'] == 'draw_desc_text':
                 partial_strings = []
                 field_elements = patent_doc.findall(path)
                 for elem in field_elements:
@@ -330,8 +330,10 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
         if df == 'government_interest':
             narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
-            dfs[df].drop(index=narows, inplace=True)
+            dfs[df] = dfs[df][~narows]
             dfs[df]['gi_statement'] = dfs[df]['gi_statement'].str.strip()
+        elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
+            dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         try:
             dfs[df].to_sql(df, con=engine, if_exists='append', index=False)

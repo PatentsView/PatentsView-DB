@@ -16,10 +16,9 @@ create table `{{params.reporting_database}}`.`usapplicationcitation`
   `category` varchar(64) null,
   primary key (`citing_patent_id`, `sequence`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 13,617,656 @ 8:22
 insert into `{{params.reporting_database}}`.`usapplicationcitation`
 (
   `citing_patent_id`, `sequence`, `cited_application_id`,

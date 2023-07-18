@@ -74,16 +74,14 @@ FROM   `government_interest` gi
                 gov_int_cursor.execute(sampler_query)
                 for gov_int_row in gov_int_cursor:
                     self.qa_data['DataMonitor_govtinterestsampler'].append({
-                            'sample_type':     where_combination_type,
-                            "database_type":   self.database_type,
-                            'update_version':  self.version,
-                            self.id_type:       gov_int_row[0],
-                            'gov_int_stmt':    gov_int_row[1],
-                            f'{table_prefix}_contract_award_number':
-                                               gov_int_row[
-                                                   4],
-                            'organization_id': gov_int_row[2],
-                            'organization':    gov_int_row[3]
+                            'sample_type'           : where_combination_type,
+                            "database_type"         : self.database_type,
+                            'update_version'        : self.version,
+                            self.id_type            : gov_int_row[0],
+                            'gov_int_stmt'          : gov_int_row[1],
+                            'contract_award_number' : gov_int_row[4],
+                            'organization_id'       : gov_int_row[2],
+                            'organization'          : gov_int_row[3]
                             })
 
     def runTests(self):

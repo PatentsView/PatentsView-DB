@@ -9,10 +9,7 @@ class TextQuarterlyMergeTest(DatabaseTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, config['PATENTSVIEW_DATABASES']["TEXT_DB"], datetime.date(year=1976, month=1, day=1), end_date)
         brf_key = "brf_sum_text_{year}".format(year=end_date.year)
-        if config['PATENTSVIEW_DATABASES']["TEXT_DB"] == 'patent_text':
-            clm_key = "claims_{year}".format(year=end_date.year)
-        else:
-            clm_key = "claim_{year}".format(year=end_date.year)
+        clm_key = "claims_{year}".format(year=end_date.year)
         ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
         keep_tables = []
@@ -30,10 +27,7 @@ class TextMergeTest(DatabaseTester):
         print(end_date)
         super().__init__(config, config['PATENTSVIEW_DATABASES']["TEXT_DB"], datetime.date(year=1976, month=1, day=1), end_date)
         brf_key = "brf_sum_text_{year}".format(year=end_date.year)
-        if config['PATENTSVIEW_DATABASES']["TEXT_DB"] == 'patent_text':
-            clm_key = "claims_{year}".format(year=end_date.year)
-        else:
-            clm_key = "claim_{year}".format(year=end_date.year)
+        clm_key = "claims_{year}".format(year=end_date.year)
         ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
         keep_tables = []
@@ -51,10 +45,7 @@ class TextUploadTest(DatabaseTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"], start_date, end_date)
         brf_key = "brf_sum_text_{year}".format(year=end_date.year)
-        if config['PATENTSVIEW_DATABASES']["TEXT_DB"] == 'patent_text':
-            clm_key = "claims_{year}".format(year=end_date.year)
-        else:
-            clm_key = "claim_{year}".format(year=end_date.year)
+        clm_key = "claims_{year}".format(year=end_date.year)
         ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
         ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
         keep_tables = []
@@ -70,8 +61,8 @@ if __name__ == '__main__':
     # config = get_current_config('granted_patent', **{
     #     "execution_date": datetime.date(2021, 10, 5)
     # })
-    config = get_current_config('pgpubs', **{
-        "execution_date": datetime.date(2022, 3, 24)
+    config = get_current_config('pgpubs', schedule='quarterly', **{
+        "execution_date": datetime.date(2022, 7, 1)
     })
     # config = get_current_config('pgpubs', **kwargs)
     tmt = TextQuarterlyMergeTest(config)

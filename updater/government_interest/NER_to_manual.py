@@ -6,8 +6,8 @@ import time
 
 import numpy as np
 import pandas as pd
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
+from thefuzz import fuzz
+from thefuzz import process
 # Requires: solid matched organizations dataframe
 # Modifies: list of solid matches
 # Effects: if solid match has non_government as extra tag, removes non_government tag

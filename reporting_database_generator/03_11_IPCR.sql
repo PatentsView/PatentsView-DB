@@ -3,9 +3,6 @@
 
 ################################################################################################################################################
 
-##
-
-
 drop table if exists `{{params.reporting_database}}`.`temp_ipcr_aggregations`;
 create table `{{params.reporting_database}}`.`temp_ipcr_aggregations`
 (
@@ -16,10 +13,9 @@ create table `{{params.reporting_database}}`.`temp_ipcr_aggregations`
   `num_inventors` int unsigned not null,
   unique key (`section`, `ipc_class`, `subclass`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 11:53
 insert into `{{params.reporting_database}}`.`temp_ipcr_aggregations`
   (`section`, `ipc_class`, `subclass`, `num_assignees`, `num_inventors`)
 select
@@ -29,7 +25,7 @@ select
 from
   `{{params.raw_database}}`.`ipcr` i
   left outer join `{{params.raw_database}}`.`patent_assignee` pa on pa.`patent_id` = i.`patent_id`
-  left outer join `{{params.raw_database}}`.`patent_inventor` pii on pii.`patent_id` = i.`patent_id`  where i.version_indicator<= {{ params.version_indicator }}
+  left outer join `{{params.raw_database}}`.`patent_inventor` pii on pii.`patent_id` = i.`patent_id`  where i.version_indicator<= '{{ params.version_indicator }}'
 group by
   i.`section`, i.`ipc_class`, i.`subclass`;
 
@@ -45,10 +41,9 @@ create table `{{params.reporting_database}}`.`temp_ipcr_years_active`
   `actual_years_active` smallint unsigned not null,
   unique key (`section`, `ipc_class`, `subclass`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-# 2:17
 insert into `{{params.reporting_database}}`.`temp_ipcr_years_active`
 (
   `section`, `ipc_class`, `subclass`, `first_seen_date`,
@@ -62,7 +57,7 @@ from
   `{{params.raw_database}}`.`ipcr` i
   inner join `{{params.reporting_database}}`.`patent` p on p.`patent_id`= i.`patent_id`
 where
-  p.`date` is not null  and i.version_indicator<= {{ params.version_indicator }}
+  p.`date` is not null  and i.version_indicator<= '{{ params.version_indicator }}'
 group by
   i.`section`, i.`ipc_class`, i.`subclass`;
 
@@ -89,10 +84,8 @@ create table `{{params.reporting_database}}`.`ipcr`
   `years_active` smallint unsigned null,
   primary key (`patent_id`, `sequence`)
 )
-engine=InnoDB;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-# 7,702,885 @ 6:38
 insert into `{{params.reporting_database}}`.`ipcr`
 (
   `patent_id`, `sequence`, `section`, `ipc_class`, `subclass`, `main_group`, `subgroup`,
@@ -118,7 +111,7 @@ from
 tia.`subclass` = i.`subclass`
   left outer join `{{params.reporting_database}}`.`temp_ipcr_years_active` tiya on tiya.`section` = i.`section` and tiya.`ipc_class` = i.`ipc_class` and 
 
-tiya.`subclass` = i.`subclass` where i.version_indicator<= {{ params.version_indicator }};
+tiya.`subclass` = i.`subclass` where i.version_indicator<= '{{ params.version_indicator }}';
 
 
 # END ipcr 

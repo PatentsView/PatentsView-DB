@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import datetime
 from time import time
 import os
+import re
 
 from lib.configuration import get_connection_string
 from lib.configuration import get_current_config
@@ -25,7 +26,7 @@ class DatabaseTester(ABC):
         self.end_date = end_date
 
         # Indicator for Upload/Patents database
-        self.qa_connection_string = get_connection_string(config, 'QA_DATABASE')
+        self.qa_connection_string = get_connection_string(config, database='QA_DATABASE', connection='APP_DATABASE_SETUP')
         self.connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                           user=config['DATABASE_SETUP']['USERNAME'],
                                           password=config['DATABASE_SETUP']['PASSWORD'],
@@ -45,9 +46,17 @@ class DatabaseTester(ABC):
             except IndexError:
                 database_type = self.database_section
 
-        self.version = self.end_date.strftime("%Y%m%d")
-        self.database_type = database_type
+        self.version = self.end_date.strftime("%Y-%m-%d")
 
+        # Add Quarter Variable
+        df = pd.DataFrame(columns=['date'])
+        df.loc[0] = [self.version]
+        df['quarter'] = pd.to_datetime(df.date).dt.to_period('Q')
+        quarter = str(df['quarter'][0])
+        self.quarter = quarter[:4] + "-" + quarter[5]
+        #####
+
+        self.database_type = database_type
         utilities.class_db_specific_config(self, self.table_config, class_called)
 
     def init_qa_dict(self):
@@ -110,7 +119,8 @@ from {table_name}"""
                 "database_type": self.database_type,
                 'table_name': table_name,
                 'update_version': self.version,
-                'table_row_count': count_value
+                'table_row_count': count_value,
+                'quarter': self.quarter
             })
 
 
@@ -143,6 +153,35 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
                        db=self.database_section)
             raise Exception(exception_message)
 
+
+    def test_newlines(self, table, field, where_vi):
+        skip = False
+        allowables = { # set of tables and fields where newlines are allowable in the field content
+            'brf_sum_text' : ['summary_text'], 
+            'detail_desc_text' : ['description_text']
+        }
+        if table in allowables: #non-text tables
+            if field in allowables[table]:
+                skip = True
+        elif re.match(".*_[0-9]{4}", table) and table[:-5] in allowables: #text-tables
+            if field in allowables[table[:-5]]:
+                skip = True
+
+        if skip:
+            print('newlines marked as permitted for this field. skipping newline test')
+        else: 
+            newline_query = f"""
+            SELECT count(*) as count
+            from `{table}`
+            where INSTR(`{field}`, '\n') > 0"""
+            count_value = self.query_runner(newline_query, single_value_return=True, where_vi=where_vi)
+            if count_value > 1:
+                exception_message = """
+    {count} rows with unwanted newlines found in {field} of {table_name} for {db}""".format(count=count_value, field=field, table_name=table,
+                        db=self.database_section)
+                raise Exception(exception_message)
+
+
     def load_category_counts(self, table, field):
         category_count_query = f"""
 SELECT `{field}` as value
@@ -161,7 +200,8 @@ group by 1"""
                     "column_name": field,
                     'update_version': self.version,
                     'value': value,
-                    'count': count_row[1]
+                    'count': count_row[1],
+                    'quarter': self.quarter
                 })
 
 
@@ -186,19 +226,23 @@ from `{table}` where `{field}` is null
                     'table_name': table,
                     "column_name": field,
                     'update_version': self.version,
-                    'null_count': count_value
+                    'null_count': count_value,
+                    'quarter': self.quarter
                 })
 
 
     def test_zero_dates(self, table, field, where_vi):
-        zero_query = \
-f"SELECT count(*) zero_count " \
-f"from `{table}` " \
-f"where `{field}` ='0000-00-00'"
+        zero_query = f"""
+SELECT count(*) zero_count 
+FROM `{table}` 
+WHERE `{field}`  LIKE '0000-__-__'
+OR `{field}`  LIKE '____-00-__'
+OR `{field}`  LIKE '____-__-00'
+"""
         count_value = self.query_runner(zero_query, single_value_return=True, where_vi=where_vi)
         if count_value != 0:
             raise Exception(
-                "0000-00-00 date encountered in table found:{database}.{table} column {col}. Count: {"
+                "zero date encountered in table found:{database}.{table} column {col}. Count: {"
                 "count}".format(
                     database=self.database_section, table=table, col=field,
                     count=count_value))
@@ -318,7 +362,8 @@ where related.{related_table_id} is null {additional_where}
                         'update_version': self.version,
                         'main_table': table_name,
                         'related_table': related_entity_config["related_table"],
-                        'floating_count': related_table_count
+                        'floating_count': related_table_count,
+                        'quarter': self.quarter
                     })
 
     def load_entity_category_counts(self, table_name):
@@ -343,7 +388,8 @@ group by 1
                         'update_version': self.version,
                         'patent_type': count_row[0],
                         'table_name': table_name,
-                        'patent_count': count_row[1]
+                        'patent_count': count_row[1],
+                        'quarter': self.quarter
                     })
 
     def load_counts_by_location(self, table, field):
@@ -372,7 +418,8 @@ group by t.`{field}`"""
                     'table_name': table,
                     'table_row_count': row_count,
                     'patent_id_count': count_row[1],
-                    'location': count_row[0]
+                    'location': count_row[0],
+                    'quarter': self.quarter
                 })
 
     def save_qa_data(self):
@@ -396,7 +443,8 @@ f"from `{table_name}`;"
             'update_version': self.version,
             'table_name': table_name,
             'column_name': field_name,
-            'max_text_length': text_length
+            'max_text_length': text_length,
+            'quarter': self.quarter
         })
 
     def test_patent_abstract_null(self, table, where_vi=False):
@@ -426,57 +474,59 @@ where invention_abstract is null """
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()
         for table in self.table_config:
-            if table[:2] > 'cp':
-                print(" -------------------------------------------------- ")
-                print(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table}")
-                print(" -------------------------------------------------- ")
-                if self.class_called != "ReportingDBTester":
-                    self.test_null_version_indicator(table)
+            # if table[:2] >= 'pa':
+            print(" -------------------------------------------------- ")
+            print(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table}")
+            print(" -------------------------------------------------- ")
+            if self.class_called != "ReportingDBTester":
+                self.test_null_version_indicator(table)
+            self.load_table_row_count(table, where_vi=False)
+            if table in 'rawassignee':
+                self.test_rawassignee_org(table, where_vi=False)
+            self.test_blank_count(table, self.table_config[table], where_vi=False)
+            self.load_nulls(table, self.table_config[table], where_vi=False)
+            vi_cutoff_classes = ['DisambiguationTester', 'LawyerPostProcessingQC']
+            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table],
+                        where_vi=(True if self.class_called in vi_cutoff_classes else False),
+                        vi_comparison=('<=' if self.class_called in vi_cutoff_classes else '='))
+            self.load_main_floating_entity_count(table, self.table_config[table])
+            self.load_entity_category_counts(table)
+            if table == self.central_entity:
+                self.test_patent_abstract_null(table)
+            for field in self.table_config[table]["fields"]:
+                print("\t -------------------------------------------------- ")
+                print(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
+                print("\t -------------------------------------------------- ")
+                if self.table_config[table]["fields"][field]["data_type"] == 'date':
+                    self.test_zero_dates(table, field, where_vi=False)
+                if self.table_config[table]["fields"][field]["category"]:
+                    self.load_category_counts(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
+                    self.load_text_length(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text', 'varchar']:
+                    self.test_newlines(table,field, where_vi=False)
+                if self.table_config[table]["fields"][field]["location_field"]:
+                    self.load_counts_by_location(table, field)
+                if self.table_config[table]["fields"][field]['data_type'] == 'varchar' and 'id' not in field and (self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest'):
+                    self.test_white_space(table, field)
+                self.test_null_byte(table, field, where_vi=False)
+            if self.class_called == "TextMergeTest":
+                continue
+            else:
+                self.save_qa_data()
+                self.init_qa_dict()
+            counter += 1
+            print(" -------------------------------------------------- ")
+            print(f"FINISHED WITH TABLE: {table}")
+            print(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
+            print(" -------------------------------------------------- ")
 
-                self.load_table_row_count(table, where_vi=False)
-                if table in 'rawassignee':
-                    self.test_rawassignee_org(table, where_vi=False)
-                self.test_blank_count(table, self.table_config[table], where_vi=False)
-                self.load_nulls(table, self.table_config[table], where_vi=False)
-                vi_cutoff_classes = ['DisambiguationTester', 'LawyerPostProcessingQC']
-                self.test_related_floating_entities(table_name=table, table_config=self.table_config[table],
-                            where_vi=(True if self.class_called in vi_cutoff_classes else False),
-                            vi_comparison=('<=' if self.class_called in vi_cutoff_classes else '='))
-                self.load_main_floating_entity_count(table, self.table_config[table])
-                self.load_entity_category_counts(table)
-                if table == self.central_entity:
-                    self.test_patent_abstract_null(table)
-                for field in self.table_config[table]["fields"]:
-                    print("\t -------------------------------------------------- ")
-                    print(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
-                    print("\t -------------------------------------------------- ")
-                    if self.table_config[table]["fields"][field]["data_type"] == 'date':
-                        self.test_zero_dates(table, field, where_vi=False)
-                    if self.table_config[table]["fields"][field]["category"]:
-                        self.load_category_counts(table, field)
-                    if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-                        self.load_text_length(table, field)
-                    if self.table_config[table]["fields"][field]["location_field"]:
-                        self.load_counts_by_location(table, field)
-                    if self.table_config[table]["fields"][field]['data_type'] == 'varchar' and 'id' not in field and (self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest'):
-                        self.test_white_space(table, field)
-                    self.test_null_byte(table, field, where_vi=False)
-                if self.class_called == "TextMergeTest":
-                    continue
-                else:
-                    self.save_qa_data()
-                    self.init_qa_dict()
-                counter += 1
-                print(" -------------------------------------------------- ")
-                print(f"FINISHED WITH TABLE: {table}")
-                print(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
-                print(" -------------------------------------------------- ")
 
 
 if __name__ == '__main__':
     # config = get_config()
-    config = get_current_config('pgpubs', **{
-        "execution_date": datetime.date(2020, 12, 29)
+    config = get_current_config('granted_patent', **{
+        "execution_date": datetime.date(2022, 5, 31)
     })
     # fill with correct run_id
     run_id = "backfill__2020-12-29T00:00:00+00:00"

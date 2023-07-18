@@ -49,29 +49,34 @@ def setup_database(update_config, drop=True, cpc_only=False):
     connection_string = get_connection_string(update_config, database="PROD_DB")
     engine = create_engine(connection_string)
     print(temp_upload_database)
-    if drop:
-        engine.execute(f"""
-            DROP DATABASE if exists {temp_upload_database}
-        """)
-    engine.execute(f"""
-            create database if not exists {temp_upload_database} default character set=utf8mb4
-             default collate=utf8mb4_unicode_ci
-        """)
-    for table in required_tables:
-        print("Creating Table : {tbl}".format(tbl=table))
-        con = engine.connect()
+    with engine.connect() as con:
         if drop:
-            con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
-        if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee'] and raw_database=='patent':
-            query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, 'upload_20211230', table)
+            con.execute(f"""
+                DROP DATABASE if exists {temp_upload_database}
+            """)
+        con.execute(f"""
+                create database if not exists {temp_upload_database} default character set=utf8mb4
+                default collate=utf8mb4_unicode_ci
+            """)
+        for table in required_tables:
+            print("Creating Table : {tbl}".format(tbl=table))
+            if drop:
+                con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
+            if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee', 'location', 'patent_assignee'] and raw_database=='patent':
+                # tables with version-specific base tables (will need quarterly updating)
+                query = "create table if not exists {0}.{2} like {1}.{2}_{3}".format(temp_upload_database, raw_database, table, '20211230') 
+                print(query)
+                con.execute(query)
+            elif table == 'patent_lawyer' and raw_database=='patent':
+                # special case similar to above
+                query = "create table if not exists {0}.{2} like {1}.patent_lawyer_old".format(temp_upload_database, raw_database, table) 
+                print(query)
+                con.execute(query)
+            else:
+                query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
             print(query)
             con.execute(query)
-        else:
-            query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
-            print(query)
-            con.execute(query)
-            con.close()
-        engine.dispose()
+    engine.dispose()
 
 
 def generate_timestamp_uploads(update_config):
@@ -87,9 +92,9 @@ def generate_timestamp_uploads(update_config):
                                      version_indicator=update_config['DATES']['END_DATE'])
 
 
-def begin_database_setup(**kwargs):
+def begin_database_setup(dbtype='granted_patent' , **kwargs):
     from lib.configuration import get_current_config
-    config = get_current_config('granted_patent', **kwargs)
+    config = get_current_config(dbtype, **kwargs)
     setup_database(config)
 
 

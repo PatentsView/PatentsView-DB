@@ -2,7 +2,7 @@ import calendar
 import csv
 import datetime
 import logging
-import multiprocessing as mp
+import billiard as mp
 import os
 import json
 import random
@@ -48,23 +48,28 @@ def load_table_config(config, db='patent'):
     root = config["FOLDERS"]["project_root"]
     resources = config["FOLDERS"]["resources_folder"]
     if db == 'patent':
-        table_config = json.load(open(f"{root}/{resources}/{config['FILES']['table_config_granted']}"))
+        config_file = f"{root}/{resources}/{config['FILES']['table_config_granted']}"
     elif db == 'pgpubs':
-        table_config = json.load(open(f"{root}/{resources}/{config['FILES']['table_config_pgpubs']}"))
+        config_file = f"{root}/{resources}/{config['FILES']['table_config_pgpubs']}"
     elif db == 'patent_text' or db[:6] == 'upload':
-        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_granted"]}'))
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_granted"]}'
     elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
-        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'))
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'
     elif db == 'Reporting_DB':
-        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'))
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'
     elif db == 'bulk_exp_granted':
-        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'))
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'
     elif db == 'bulk_exp_pgpubs':
-        table_config = json.load(open(f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'))
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'
+
+    print(f"reading table config from {config_file}")
+    with open(config_file) as file:
+        table_config = json.load(file)
     return table_config
 
 
 def get_relevant_attributes(self, class_called, database_section, config):
+    print(f"assigning class variables based on class {class_called} and database section {database_section}.")
     if class_called == "AssigneePostProcessingQC":
         self.database_section = database_section
         self.table_config = load_table_config(config, db='patent')
@@ -144,7 +149,8 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.f_key = ""
         self.exclusion_list = []
 
-    elif database_section == "patent" or (class_called[:6] == 'Upload' and database_section[:6] == 'upload'):
+    elif database_section == "patent" or (
+            database_section[:6] == 'upload' and class_called[:6] in ('Upload','GovtIn')):
         self.exclusion_list = ['assignee',
                                'cpc_group',
                                'cpc_subgroup',
@@ -170,7 +176,8 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.p_key = "id"
         self.f_key = "patent_id"
 
-    elif (database_section == "pregrant_publications") or (class_called[:6] == 'Upload' and database_section[:6] == 'pgpubs'):
+    elif (database_section == "pregrant_publications") or (
+            database_section[:6] == 'pgpubs' and class_called[:6] in ('Upload','GovtIn')):
         # TABLES WITHOUT DOCUMENT_NUMBER ARE EXCLUDED FROM THE TABLE CONFIG
         self.central_entity = "publication"
         self.category = 'kind'
@@ -193,6 +200,12 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.p_key = ""
         self.f_key = ""
         self.exclusion_list = []
+        if database_section[:6] == 'upload' or database_section == 'patent_text':
+            self.table_config = load_table_config(config, db=database_section)
+        elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
+            self.table_config = load_table_config(config, db=database_section)
+        else:
+            raise NotImplementedError
 
     elif class_called == 'ReportingDBTester':
         self.table_config = load_table_config(config, db='Reporting_DB')
@@ -207,18 +220,12 @@ def get_relevant_attributes(self, class_called, database_section, config):
             self.table_config = load_table_config(config, db='bulk_exp_granted')
         else:
             self.table_config = load_table_config(config, db='bulk_exp_pgpubs')
-
+        
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
         self.f_key = ""
         self.exclusion_list = []
-
-        if database_section[:6] == 'upload' or database_section == 'patent_text':
-            self.table_config = load_table_config(config, db=database_section)
-
-        elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
-            self.table_config = load_table_config(config, db=database_section)
 
     else:
         raise NotImplementedError
@@ -321,18 +328,17 @@ def download(url, filepath):
     print("Downloading: {}".format(url))
     r = requests.get(url, stream=True)
 
+    content_length = r.headers.get('content-length')
+    if not content_length:
+        print("\tNo Content Length Attached. Attempting download without progress bar.")
+        chunker = r.iter_content(chunk_size=1024)
+    else:
+        chunker = progress.bar(r.iter_content(chunk_size=1024), expected_size=(int(content_length) / 1024) + 1)
     with open(filepath, 'wb') as f:
-        # print(r.headers.get('content-length'))
-        content_length = r.headers.get('content-length')
-        if not content_length:
-            print("\tNo Content Length Attached")
-        else:
-            content_length = int(content_length)
-            for chunk in progress.bar(r.iter_content(chunk_size=1024),
-                                      expected_size=(content_length / 1024) + 1):
-                if chunk:
-                    f.write(chunk)
-                    f.flush()
+        for chunk in chunker:
+            if chunk:
+                f.write(chunk)
+                f.flush()
 
 
 def chunks(l, n):
@@ -644,8 +650,9 @@ def link_view_to_new_disambiguation_table(connection, table_name, disambiguation
     g_cursor = connection.cursor()
     index_query = 'alter table {table_name} add primary key (uuid)'.format(
         table_name=table_name)
+    print(index_query)
     replace_view_query = """
-        CREATE OR REPLACE VIEW {dtype}_disambiguation_mapping as SELECT uuid,{dtype}_id from {table_name}
+        CREATE OR REPLACE SQL SECURITY INVOKER VIEW {dtype}_disambiguation_mapping as SELECT uuid,{dtype}_id from {table_name}
         """.format(table_name=table_name, dtype=disambiguation_type)
     try:
         g_cursor.execute(index_query)
@@ -653,6 +660,7 @@ def link_view_to_new_disambiguation_table(connection, table_name, disambiguation
         from mysql.connector import errorcode
         if not e.errno == errorcode.ER_MULTIPLE_PRI_KEY:
             raise
+    print(replace_view_query)
     g_cursor.execute(replace_view_query)
 
 def update_to_granular_version_indicator(table, db):

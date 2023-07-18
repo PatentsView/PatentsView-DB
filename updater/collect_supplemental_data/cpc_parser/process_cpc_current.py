@@ -1,7 +1,7 @@
 import csv
 import datetime
 import logging
-import multiprocessing as mp
+import billiard as mp
 import os
 import time
 import uuid
@@ -42,18 +42,62 @@ def consolidate_cpc_data(config, add_indexes, db='granted_patent', cpc_file=None
     end_date = config['DATES']['END_DATE']
 
     if db == 'granted_patent':
-        cpc_csv_file_chunks = pd.read_csv(cpc_file, sep=",", quoting=csv.QUOTE_NONNUMERIC, chunksize=100000)
+        cpc_csv_file_chunks = pd.read_csv(cpc_file, sep=",", quoting=csv.QUOTE_NONNUMERIC, chunksize=100_000)
         for cpc_chunk in tqdm(cpc_csv_file_chunks):
             with engine.connect() as conn:
                 cpc_chunk.to_sql('cpc_current', conn, if_exists='append', index=False, method="multi")
-        delete_query = "DELETE cpc FROM cpc_current cpc Inner JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null or p.version_indicator >'{vind}'".format(
-        raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], vind=end_date)
-
+        delete_query = "DELETE cpc FROM cpc_current cpc Inner JOIN {raw_db}.patent p on p.id = cpc.patent_id WHERE p.id is null or p.version_indicator >'{vind}'"\
+                .format(raw_db=config["PATENTSVIEW_DATABASES"]["RAW_DB"], vind=end_date)
+        dedup_ind_add =["ALTER TABLE cpc_current ADD INDEX patent_id_ind (patent_id) USING BTREE;",
+                        "ALTER TABLE cpc_current ADD INDEX subgroup_id_ind (subgroup_id) USING BTREE;",
+                        "ALTER TABLE cpc_current ADD INDEX sequence_ind (sequence) USING BTREE;"]
+        dedup_query = """
+            DELETE t1 FROM cpc_current t1 
+            INNER JOIN cpc_current t2
+            ON (t1.patent_id = t2.patent_id 
+            AND t1.subgroup_id = t2.`subgroup_id`
+            AND t1.sequence = t2.sequence
+            AND t1.uuid < t2.uuid);
+            """
+        dedup_ind_drop = ["ALTER TABLE cpc_current DROP INDEX patent_id_ind;", 
+                          "ALTER TABLE cpc_current DROP INDEX subgroup_id_ind;", 
+                          "ALTER TABLE cpc_current DROP INDEX sequence_ind;"]
     else:
         delete_query = "DELETE cpc FROM {raw_db}.cpc_current cpc Inner JOIN {raw_db}.publication p on p.document_number = cpc.document_number WHERE p.document_number is null or p.version_indicator >'{vind}'".format(
         raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"], vind=end_date)
+        dedup_ind_add = ["ALTER TABLE cpc_current ADD INDEX document_number_ind (document_number) USING BTREE;",
+                         "ALTER TABLE cpc_current ADD INDEX subgroup_id_ind (subgroup_id) USING BTREE;" ,
+                         "ALTER TABLE cpc_current ADD INDEX sequence_ind (sequence) USING BTREE;"]
+        dedup_query = """
+            DELETE t1 FROM cpc_current t1 
+            INNER JOIN cpc_current t2
+            ON (t1.document_number = t2.document_number 
+            AND t1.subgroup_id = t2.`subgroup_id`
+            AND t1.sequence = t2.sequence
+            AND t1.uuid < t2.uuid);
+            """
+        dedup_ind_drop = ["ALTER TABLE cpc_current DROP INDEX document_number_ind;",
+                          "ALTER TABLE cpc_current DROP INDEX subgroup_id_ind;",
+                          "ALTER TABLE cpc_current DROP INDEX sequence_ind;"]
+    print(f"initial size of cpc_current: {engine.execute('SELECT COUNT(*) FROM cpc_current').fetchone()[0]}")
+    print("deleting patents absent in patent table:")
     print(delete_query)
-    engine.execute(delete_query)
+    deletion = engine.execute(delete_query)
+    print(f"number of records removed: {deletion.rowcount}")
+    print("adding temporary indices for deduplication")
+    for q in dedup_ind_add:
+        print(q)
+        engine.execute(q)
+    print("deduplicating table on document id, subgroup id, and sequence:")
+    print(dedup_query)
+    deduplication = engine.execute(dedup_query)
+    print(f"number of duplicates removed: {deduplication.rowcount}") # this may slightly overcount due to patents with multiple duplicates
+    print("removing temporary indices")
+    for q in dedup_ind_drop:
+        print(q)
+        engine.execute(q)
+    print(f"final size of cpc_current: {engine.execute('SELECT COUNT(*) FROM cpc_current').fetchone()[0]}")
+    print("adding permanent table indices:")
     for add_statement in add_indexes:
         print(add_statement)
         engine.execute(add_statement[0])
@@ -64,8 +108,10 @@ def consolidate_cpc_data(config, add_indexes, db='granted_patent', cpc_file=None
     rename table {upload_db}.cpc_current to {raw_db}.cpc_current
     """.format(raw_db=config["PATENTSVIEW_DATABASES"]["PROD_DB"],
                upload_db=config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"])
+    print("renaming past cpc_current table:")
     print(rename_raw_statement)
     engine.execute(rename_raw_statement)
+    print("relocating new cpc_current table to production:")
     print(rename_upload_statement)
     engine.execute(rename_upload_statement)
 
@@ -80,7 +126,7 @@ def generate_file_list(zipfilepath, extension='.xml'):
     for filename in archive.filelist:
         fname, ext = os.path.splitext(filename.filename)
         if ext == extension:
-            print(filename.filename)
+            # print(filename.filename) # printed outside of generator as well
             yield filename.filename
 
 
@@ -248,7 +294,7 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
             # process_cpc_file(cpc_xml_file, list(xml_file_name_generator)[-1], config, log_queue, csv_queue)
             for xml_file_name in xml_file_name_generator:
                 print(xml_file_name)
-                process_cpc_file(cpc_xml_file, xml_file_name, config, log_queue, csv_queue)
+                # process_cpc_file(cpc_xml_file, xml_file_name, config, log_queue, csv_queue)
                 p = pool.apply_async(process_cpc_file, (cpc_xml_file, xml_file_name, config, log_queue, csv_queue))
                 p_list.append(p)
 
@@ -277,6 +323,17 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
         print("Could not find CPC Zip XML file under {cpc_input}".format(cpc_input=cpc_folder))
         exit(1)
 
+def delete_cpc_currents_pre_1976(db='granted_patent', **kwargs):
+    config = get_current_config(db, schedule='quarterly', **kwargs)
+    engine = create_engine(get_connection_string(config, "PROD_DB"))
+    query = """
+delete 
+from cpc_current a 
+	left join patent b on a.patent_id=b.patent_id 
+where b.patent_id is null;
+    """
+    print(query)
+    engine.execute(query)
 
 
 if __name__ == '__main__':

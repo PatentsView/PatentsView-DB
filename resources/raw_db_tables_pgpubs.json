@@ -1,0 +1,130 @@
+{
+    "table_list": {
+      "application": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "cpc": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": true
+      },
+      "cpc_current": {
+        "raw_data": false,
+        "lookup": false,
+        "bulk_generated": true,
+        "direct_load": false
+      },
+      "foreign_priority": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "further_cpc": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": true
+      },
+      "government_interest": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "ipcr": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "main_cpc": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": true
+      },
+      "pct_data": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": true,
+        "direct_load": false
+      },
+      "publication": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "publication_contractawardnumber": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": true
+      },
+      "publication_govintorg": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": true
+      },
+      "rawassignee": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "rawinventor": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "rawlocation": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "rawuspc": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "rel_app_text": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "us_parties": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "uspc": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "usreldoc": {
+        "raw_data": true,
+        "lookup": false,
+        "bulk_generated": false,
+        "direct_load": false
+      },
+      "wipo": {
+        "raw_data": false,
+        "lookup": false,
+        "bulk_generated": true,
+        "direct_load": false
+      }
+    }
+  }
