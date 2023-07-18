@@ -131,7 +131,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["AssigneePostProcessingQC"]
   },
   "botanic": {
     "fields": {
@@ -808,11 +808,6 @@
       }
     },
       "related_entities": [
-      {
-        "related_table": "patent_inventor",
-        "main_table_id": "id",
-        "related_table_id": "inventor_id"
-      },
         {
         "related_table": "rawinventor",
         "main_table_id": "id",
@@ -843,7 +838,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["InventorPostProcessingQC"]
   },
   "inventor_gender": {
     "fields": {
@@ -1179,7 +1174,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["LocationPostProcessingQC"]
   },
   "location_fips": {
     "fields": {
