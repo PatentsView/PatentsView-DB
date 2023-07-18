@@ -24,6 +24,7 @@ python_dateutil
 requests
 scikit-learn
 scipy
+seaborn
 pyshp
 shapely<2
 slack_sdk

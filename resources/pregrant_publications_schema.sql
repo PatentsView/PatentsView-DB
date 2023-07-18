@@ -55,7 +55,7 @@ CREATE TABLE `brf_sum_text` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  PRIMARY KEY `pgpub_id` (`pgpub_id`),
+  UNIQUE KEY `pgpub_id_key` (`pgpub_id`),
   CONSTRAINT `brf_sum_text_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -73,7 +73,7 @@ CREATE TABLE `brf_sum_text_2023` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  PRIMARY KEY `pgpub_id` (`pgpub_id`),
+  UNIQUE KEY `pgpub_id_key` (`pgpub_id`),
   CONSTRAINT `brf_sum_text_2023_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -91,7 +91,7 @@ CREATE TABLE `brf_sum_text_2022` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  PRIMARY KEY `pgpub_id` (`pgpub_id`),
+  UNIQUE KEY `pgpub_id_key` (`pgpub_id`),
   CONSTRAINT `brf_sum_text_2022_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -112,8 +112,7 @@ CREATE TABLE `claims` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`pgpub_id`,`claim_sequence`),
-  KEY `pgpub_id` (`pgpub_id`)
+  UNIQUE KEY (`pgpub_id`,`claim_sequence`),
   CONSTRAINT `claims_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -134,8 +133,7 @@ CREATE TABLE `claims_2023` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`pgpub_id`,`claim_sequence`),
-  KEY `pgpub_id` (`pgpub_id`)
+  UNIQUE KEY (`pgpub_id`,`claim_sequence`),
   CONSTRAINT `claims_2023_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -156,8 +154,7 @@ CREATE TABLE `claims_2022` (
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
   `claim_number` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`pgpub_id`,`claim_sequence`),
-  KEY `pgpub_id` (`pgpub_id`)
+  UNIQUE KEY (`pgpub_id`,`claim_sequence`),
   CONSTRAINT `claims_2022_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -204,7 +201,7 @@ CREATE TABLE `detail_desc_text` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  PRIMARY KEY `pgpub_id` (`pgpub_id`),
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
   CONSTRAINT `detail_desc_text_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -223,7 +220,7 @@ CREATE TABLE `detail_desc_text_2023` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  PRIMARY KEY `pgpub_id` (`pgpub_id`),
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
   CONSTRAINT `detail_desc_text_2023_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -242,7 +239,7 @@ CREATE TABLE `detail_desc_text_2022` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  PRIMARY KEY `pgpub_id` (`pgpub_id`),
+  UNIQUE KEY `pgpub_id` (`pgpub_id`),
   CONSTRAINT `detail_desc_text_2022_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -261,8 +258,7 @@ CREATE TABLE `draw_desc_text` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  PRIMARY KEY (`pgpub_id`,`draw_desc_sequence`),
-  KEY `pgpub_id` (`pgpub_id`)
+  UNIQUE KEY (`pgpub_id`,`draw_desc_sequence`),
   CONSTRAINT `draw_desc_text_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -281,8 +277,7 @@ CREATE TABLE `draw_desc_text_2023` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  PRIMARY KEY (`pgpub_id`,`draw_desc_sequence`),
-  KEY `pgpub_id` (`pgpub_id`)
+  UNIQUE KEY (`pgpub_id`,`draw_desc_sequence`),
   CONSTRAINT `draw_desc_text_2023_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -301,8 +296,7 @@ CREATE TABLE `draw_desc_text_2022` (
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `version_indicator` date DEFAULT NULL,
-  PRIMARY KEY (`pgpub_id`,`draw_desc_sequence`),
-  KEY `pgpub_id` (`pgpub_id`)
+  UNIQUE KEY (`pgpub_id`,`draw_desc_sequence`),
   CONSTRAINT `draw_desc_text_2022_ibfk_1` FOREIGN KEY (`pgpub_id`) REFERENCES `publication` (`document_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -318,7 +312,7 @@ CREATE TABLE `government_interest` (
   `version_indicator` date DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  PRIMARY KEY (`document_number`),
+  UNIQUE KEY (`document_number`),
   KEY `government_interest_version_indicator_index` (`version_indicator`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -329,7 +323,7 @@ CREATE TABLE `publication_govintorg` (
   `version_indicator` date DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  PRIMARY KEY (`document_number`,`organization_id`),
+  UNIQUE KEY (`document_number`,`organization_id`),
   KEY `patent_govintorg_version_indicator_index` (`version_indicator`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -340,7 +334,7 @@ CREATE TABLE `publication_contractawardnumber` (
   `version_indicator` date DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  PRIMARY KEY (`document_number`,`contract_award_number`),
+  UNIQUE KEY (`document_number`,`contract_award_number`),
   KEY `patent_contractawardnumber_version_indicator_index` (`version_indicator`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -554,6 +548,7 @@ CREATE TABLE `rawlocation` (
   `country_transformed` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `latitude` float DEFAULT NULL,
   `longitude` float DEFAULT NULL,
+  `qa_override` int(1) DEFAULT NULL,
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),

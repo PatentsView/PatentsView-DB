@@ -453,25 +453,25 @@ group by
 ######################################################################################################################
 
 
--- drop table if exists `{{params.reporting_database}}`.`location_cpc_group`;
--- create table `{{params.reporting_database}}`.`location_cpc_group`
--- (
---   `location_id` int unsigned not null,
---   `group_id` varchar(20) not null,
---   `num_patents` int unsigned not null
--- )
--- engine=InnoDB;
+drop table if exists `{{params.reporting_database}}`.`location_cpc_group`;
+create table `{{params.reporting_database}}`.`location_cpc_group`
+(
+  `location_id` int unsigned not null,
+  `group_id` varchar(20) not null,
+  `num_patents` int unsigned not null
+)
+engine=InnoDB;
 
 
--- insert into `{{params.reporting_database}}`.`location_cpc_group`
---   (`location_id`, `group_id`, `num_patents`)
--- select
---   tlp.`location_id`, cpc.`group_id`, count(distinct tlp.`patent_id`)
--- from
---   `{{params.reporting_database}}`.`temp_location_patent` tlp
---   inner join `{{params.reporting_database}}`.`cpc_current_group` cpc using(`patent_id`)
--- group by
---   tlp.`location_id`, cpc.`group_id`;
+insert into `{{params.reporting_database}}`.`location_cpc_group`
+  (`location_id`, `group_id`, `num_patents`)
+select
+  tlp.`location_id`, cpc.`group_id`, count(distinct tlp.`patent_id`)
+from
+  `{{params.reporting_database}}`.`temp_location_patent` tlp
+  inner join `{{params.reporting_database}}`.`cpc_current_group` cpc using(`patent_id`)
+group by
+  tlp.`location_id`, cpc.`group_id`;
 
 
 # END location_cpc_group
@@ -571,7 +571,7 @@ group by
 
 ###############################################################################################################################
 drop table if exists `{{params.reporting_database}}`.`inventor_rawinventor`;
-create table if not exists `{{params.reporting_database}}`.`inventor_rawinventor` (uuid int(10) unsigned AUTO_INCREMENT PRIMARY KEY,name_first varchar(64),name_last varchar(64),patent_id varchar(20),inventor_id int(10) unsigned);
+create table if not exists `{{params.reporting_database}}`.`inventor_rawinventor` (uuid int(10) unsigned AUTO_INCREMENT PRIMARY KEY,name_first varchar(128),name_last varchar(128),patent_id varchar(20),inventor_id int(10) unsigned);
 
 INSERT INTO `{{params.reporting_database}}`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id)
 SELECT DISTINCT ri.name_first,ri.name_last,ri.patent_id,repi.inventor_id

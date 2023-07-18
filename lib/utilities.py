@@ -40,6 +40,12 @@ def class_db_specific_config(self, table_config, class_called):
     if class_called[:4] == 'Text':
         pass
     else:
+        if "PostProcessing" in str(self):
+            tables_list = list(self.table_config.keys())
+            quarter_date = self.end_date.strftime("%Y%m%d")
+            for table in tables_list:
+                if table in ['assignee', 'location', 'inventor']:
+                    self.table_config[f'{table}_{quarter_date}'] = self.table_config.pop(f'{table}')
         print(f"The following list of tables are run for {class_called}:")
         print(self.table_config.keys())
 
@@ -464,20 +470,18 @@ def save_zip_file(url, name, path, counter=0, log_queue=None):
                     f.write(chunk)
 
     with zipfile.ZipFile(path + name, 'r') as zip_ref:
-        if re.fullmatch(".*_r\d.zip", name): # revised file
-            # set the file name to match the zip file name
-            zipinfo = zip_ref.infolist()
-            for _file in zipinfo:
-                z_nm, z_ext = os.path.splitext(name)
-                f_nm, f_ext = os.path.splitext(_file.filename)
-                if re.match(f"{f_nm}_r\d",z_nm):
-                    # revision file - can't be renamed inside the zip archive, so will extract to a temporary location and rename
-                    os.mkdir(f"{path}/tmp")
-                    zip_ref.extract(_file.filename, f"{path}/tmp")
-                    os.rename(f"{path}/tmp/{_file.filename}",f"{path}/{z_nm}{f_ext}")
-                    os.rmdir(f"{path}/tmp")
-                else:
-                    zip_ref.extract(_file.filename, path)
+        zipinfo = zip_ref.infolist()
+        for _file in zipinfo:
+            z_nm, z_ext = os.path.splitext(name)
+            f_nm, f_ext = os.path.splitext(_file.filename)
+            if re.match(f"{f_nm}_r\d",z_nm):
+                # revision file - can't be renamed inside the zip archive, so will extract to a temporary location and rename
+                os.mkdir(f"{path}/tmp")
+                zip_ref.extract(_file.filename, f"{path}/tmp")
+                os.rename(f"{path}/tmp/{_file.filename}",f"{path}/{z_nm}{f_ext}")
+                os.rmdir(f"{path}/tmp")
+            else:
+                zip_ref.extract(_file.filename, path)
 
     os.remove(path + name)
     print(f"{name} downloaded and extracted to {path}")

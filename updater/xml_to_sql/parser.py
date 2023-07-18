@@ -439,33 +439,34 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
             try:
                 parser = etree.XMLParser(load_dtd=True, no_network=False)
                 patent_app_document = etree.XML(current_xml.encode('utf-8'), parser=parser)
+                if patent_app_document.tag == 'sequence-cwu':
+                    continue
+                else:
+                    # Extract the data fields
+                    data = process_publication_document(patent_app_document, table_xml_map)
+                    # Add the data to the proper dataframe
+                    try:
+                        for table_name, extracted_data in data:
+                            if not len(table_name) > 0:
+                                continue
+                            else:
+                                current_data_frame = pd.DataFrame(extracted_data)
+                                # dfs[table_name] = dfs[table_name].append(current_data_frame) 
+                                # FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead
+                                dfs[table_name] = pd.concat((dfs[table_name],current_data_frame), axis=0)
+                    except IndexError as e:
+                        log_queue.put(
+                                {
+                                        "level":   logging.DEBUG,
+                                        "message": "{xml_file}: {document}".format(xml_file=xml_file_name,
+                                                                                document=pprint.pformat(
+                                                                                        patent_app_document.getchildren()))
+                                        })
             except Exception as e:
-                print(f'xml failed to parse on document number {counter}')
+                print(f'xml failed to parse on document number {counter} within file {xml_file}')
                 print(f"xml text begins: {current_xml[:min(len(current_xml), 350)]}")
                 raise(e)
-            if patent_app_document.tag == 'sequence-cwu':
-                continue
-            else:
-                # Extract the data fields
-                data = process_publication_document(patent_app_document, table_xml_map)
-                # Add the data to the proper dataframe
-                try:
-                    for table_name, extracted_data in data:
-                        if not len(table_name) > 0:
-                            continue
-                        else:
-                            current_data_frame = pd.DataFrame(extracted_data)
-                            # dfs[table_name] = dfs[table_name].append(current_data_frame) 
-                            # FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead
-                            dfs[table_name] = pd.concat((dfs[table_name],current_data_frame), axis=0)
-                except IndexError as e:
-                    log_queue.put(
-                            {
-                                    "level":   logging.DEBUG,
-                                    "message": "{xml_file}: {document}".format(xml_file=xml_file_name,
-                                                                               document=pprint.pformat(
-                                                                                       patent_app_document.getchildren()))
-                                    })
+
     log_queue.put({
             "level":   logging.INFO,
             "message": "XML Document {xml_file} took {duration} seconds to parse".format(

@@ -157,7 +157,7 @@ drop table if exists `{{params.reporting_database}}`.`temp_id_mapping_location`;
 create table `{{params.reporting_database}}`.`temp_id_mapping_location`
 (
   `old_location_id` varchar(128) not null,
-`old_location_id_transformed` varchar(128) null,
+  `old_location_id_transformed` varchar(128) null,
   `new_location_id` int unsigned not null auto_increment,
   primary key (`old_location_id`),
   index `ak_temp_id_mapping_location` (`new_location_id`),

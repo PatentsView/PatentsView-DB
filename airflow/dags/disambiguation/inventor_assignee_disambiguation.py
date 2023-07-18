@@ -21,12 +21,12 @@ from updater.disambiguation.location_disambiguation.location_disambiguator impor
 from updater.post_processing.post_process_location import post_process_location, post_process_qc
 from updater.post_processing.post_process_assignee import additional_post_processing_assignee, \
     post_process_qc as qc_post_process_assignee, \
-    update_granted_rawassignee, update_pregranted_rawassignee, \
+    update_granted_rawassignee, update_pregranted_rawassignee, assignee_mentions_pickle_testing
     precache_assignees, create_canonical_assignees, load_granted_lookup as load_granted_assignee_lookup, \
     load_pregranted_lookup as load_pregranted_assignee_lookup, load_granted_location_assignee, \
     load_pregranted_location_assignee
 from updater.post_processing.post_process_inventor import update_granted_rawinventor, update_pregranted_rawinventor, \
-    precache_inventors, create_canonical_inventors, load_granted_lookup, load_pregranted_lookup, \
+    precache_inventors, create_canonical_inventors, create_patent_inventor, create_publication_inventor, \
     post_process_qc as qc_inventor_post_processing, load_granted_location_inventor, load_pregranted_location_inventor
 from updater.post_processing.post_process_persistent import prepare_wide_table, update_long_entity, write_wide_table
 
@@ -172,13 +172,13 @@ post_process_create_canonical_inventors = PythonOperator(task_id='Inventor_creat
                                                          on_failure_callback=airflow_task_failure,
                                                          queue='data_collector', pool='database_write_iops_contenders')
 post_process_create_patent_inventor = PythonOperator(task_id='Inventor_create_patent_inventor',
-                                                  python_callable=load_granted_lookup,
+                                                  python_callable=create_patent_inventor,
                                                   dag=disambiguation,
                                                   on_success_callback=airflow_task_success,
                                                   on_failure_callback=airflow_task_failure,
                                                   queue='data_collector', pool='database_write_iops_contenders')
 post_process_create_pgpubs_inventor = PythonOperator(task_id='Inventor_create_pgpubs_inventor',
-                                                     python_callable=load_pregranted_lookup,
+                                                     python_callable=create_publication_inventor,
                                                      dag=disambiguation,
                                                      on_success_callback=airflow_task_success,
                                                      on_failure_callback=airflow_task_failure,
@@ -353,14 +353,14 @@ post_process_assignees = PythonOperator(task_id='assignee_additional_post_proces
                                                          on_failure_callback=airflow_task_failure,
                                                          queue='data_collector', pool='database_write_iops_contenders')
 post_process_create_patent_assignee = PythonOperator(task_id='assignee_create_patent_assignee',
-                                                           python_callable=load_granted_assignee_lookup,
+                                                           python_callable=create_patent_assignee,
                                                            dag=disambiguation,
                                                            on_success_callback=airflow_task_success,
                                                            on_failure_callback=airflow_task_failure,
                                                            queue='data_collector',
                                                            pool='database_write_iops_contenders')
 post_process_create_pgpubs_assignee = PythonOperator(task_id='assignee_create_pgpubs_assignee',
-                                                              python_callable=load_pregranted_assignee_lookup,
+                                                              python_callable=create_publication_assignee,
                                                               dag=disambiguation,
                                                               on_success_callback=airflow_task_success,
                                                               on_failure_callback=airflow_task_failure,

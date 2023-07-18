@@ -88,7 +88,7 @@ def precache_inventors_ids(config):
     CREATE TABLE disambiguated_inventor_ids_{suffix} (inventor_id varchar(256),  PRIMARY KEY (`inventor_id`))
     """.format(suffix=suffix)
     view_query = """
-    CREATE OR REPLACE VIEW disambiguated_inventor_ids as select inventor_id from disambiguated_inventor_ids_{suffix}
+    CREATE OR REPLACE SQL SECURITY INVOKER VIEW disambiguated_inventor_ids as select inventor_id from disambiguated_inventor_ids_{suffix}
     """.format(suffix=suffix)
     inventor_cache_query = """
         INSERT IGNORE INTO disambiguated_inventor_ids_{suffix} (inventor_id)
@@ -133,8 +133,8 @@ def create_inventor(update_config):
     CREATE OR REPLACE SQL SECURITY INVOKER VIEW inventor as select * from inventor_{suffix}
     """.format(suffix=suffix)
     print(view_sql)
-    engine.execute(create_sql)
-    engine.execute(view_sql)
+    # engine.execute(create_sql)
+    # engine.execute(view_sql)
     limit = 10000
     offset = 0
     while True:
@@ -200,13 +200,62 @@ def precache_inventors(**kwargs):
 def create_canonical_inventors(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     create_inventor(config)
+############################ ############################ ############################ ############################
+############################ ############################ ############################ ############################
+############################ ############################ ############################ ############################
+####### Simplify by writing queries directly
+############################ ############################ ############################ ############################
+############################ ############################ ############################ ############################
+############################ ############################ ############################ ############################
 
 
-def load_granted_lookup(**kwargs):
+def create_patent_inventor(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
-    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
-                      parent_entity_id='patent_id', entity='inventor',
-                      include_location=True, location_strict=False)
+    q_list = []
+    engine = create_engine(get_connection_string(config, 'RAW_DB'))
+    q0 = """
+    truncate table patent_inventor"""
+    q_list.append(q0)
+    q1 = """
+INSERT IGNORE INTO patent_inventor 
+(patent_id, inventor_id, location_id, sequence, version_indicator) 
+SELECT patent_id, et.inventor_id,location_id, et.sequence, et.version_indicator 
+    from rawinventor et left join rawlocation rl on rl.id = et.rawlocation_id 
+where inventor_id is not null;
+    """
+    q_list.append(q1)
+    for q in q_list:
+        print(q)
+        engine.execute(q)
+
+def create_publication_inventor(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    q_list = []
+    engine = create_engine(get_connection_string(config, 'PGPUBS_DATABASE'))
+    q0 = """
+    truncate table publication_inventor"""
+    q_list.append(q0)
+    q1 = """
+INSERT IGNORE INTO publication_inventor 
+(document_number, inventor_id, sequence, location_id, version_indicator) 
+SELECT document_number, et.inventor_id, et.sequence, location_id, et.version_indicator 
+    from rawinventor et left join rawlocation rl on rl.id = et.rawlocation_id 
+where inventor_id is not null; 
+    """
+    q_list.append(q1)
+    for q in q_list:
+        print(q)
+        engine.execute(q)
+
+############################ ############################ ############################ ############################
+############################ ############################ ############################ ############################
+############################ ############################ ############################ ############################
+
+# def load_granted_lookup(**kwargs):
+#     config = get_current_config(schedule='quarterly', **kwargs)
+#     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
+#                       parent_entity_id='patent_id', entity='inventor',
+#                       include_location=True, location_strict=False)
 
 def load_granted_location_inventor(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
@@ -214,12 +263,11 @@ def load_granted_location_inventor(**kwargs):
                       parent_entity_id='location_id', entity='inventor',
                       include_location=True, location_strict=True)
 
-
-def load_pregranted_lookup(**kwargs):
-    config = get_current_config(schedule='quarterly', **kwargs)
-    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
-                      parent_entity_id='document_number', entity="inventor",
-                      include_location=True)
+# def load_pregranted_lookup(**kwargs):
+#     config = get_current_config(schedule='quarterly', **kwargs)
+#     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
+#                       parent_entity_id='document_number', entity="inventor",
+#                       include_location=True)
 
 def load_pregranted_location_inventor(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
@@ -233,8 +281,8 @@ def post_process_inventor(**kwargs):
     update_pregranted_rawinventor(**kwargs)
     precache_inventors(**kwargs)
     create_canonical_inventors(**kwargs)
-    load_granted_lookup(**kwargs)
-    load_pregranted_lookup(**kwargs)
+    create_patent_inventor(**kwargs)
+    create_publication_inventor(**kwargs)
 
 
 def post_process_qc(**kwargs):
@@ -278,6 +326,7 @@ if __name__ == '__main__':
     # evaluate_inventor_clustering(**{
     #     "execution_date": datetime.date(2020, 12, 29)
     # })
-    load_pregranted_location_inventor(**{
-        "execution_date": datetime.date(2022, 7, 1)
+    config = get_disambig_config(schedule='quarterly', **{
+        "execution_date": datetime.date(2023, 1, 1)
     })
+    create_inventor(config)
