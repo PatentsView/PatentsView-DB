@@ -1154,12 +1154,6 @@
         "category": false,
         "location_field": false
       },
-      "old_location_id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
       "location_id": {
         "data_type": "varchar",
         "null_allowed": true,
