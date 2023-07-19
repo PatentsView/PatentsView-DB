@@ -457,9 +457,9 @@ qc_post_process_location_operator = PythonOperator(task_id='qc_post_process_loca
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure, queue='admin',  pool='default_pool')
-# augment_location_fips
+
 loc_fips_operator = PythonOperator(task_id='augment_location_fips',
-                                                   python_callable=post_process_qc,
+                                                   python_callable=augment_location_fips,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure, queue='admin',  pool='default_pool')
