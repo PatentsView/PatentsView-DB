@@ -18,7 +18,7 @@ def build_assignee_name_mentions(**kwargs):
 def qc_build_assignee_name_mentions(**kwargs):
     airflow_run_date = datetime.fromisoformat(kwargs['ts'])
     config = get_disambig_config(schedule='quarterly',
-                                 supplemental_configs=['config/consolidated_config.ini'],
+                                 supplemental_configs=['config/new_consolidated_config.ini'],
                                  **kwargs)
     tester = AssigneeDisambiguationPipelineTester(config=config)
     tester.test_assignee_mentions_step(airflow_run_date)

@@ -195,15 +195,15 @@ post_process_create_pgpubs_loc_inventor = PythonOperator(task_id='Inventor_creat
                                                      on_failure_callback=airflow_task_failure,
                                                      queue='data_collector', pool='database_write_iops_contenders')
 
-update_granted_persistent_long_inventor = PythonOperator(
-    task_id='update_granted_persistent_long_inventor',
-    python_callable=update_long_entity,
-    op_kwargs={
-        'entity': 'inventor',
-        'database_type': 'granted_patent'
-    },
-    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
-)
+# update_granted_persistent_long_inventor = PythonOperator(
+#     task_id='update_granted_persistent_long_inventor',
+#     python_callable=update_long_entity,
+#     op_kwargs={
+#         'entity': 'inventor',
+#         'database_type': 'granted_patent'
+#     },
+#     dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
+# )
 
 prepare_granted_persistent_wide_inventor = PythonOperator(
     task_id='prepare_granted_persistent_wide_inventor',
@@ -244,15 +244,15 @@ create_pregranted_persistent_wide_inventor = PythonOperator(
     },
     dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 )
-update_pregranted_persistent_long_inventor = PythonOperator(
-    task_id='update_pregranted_persistent_long_inventor',
-    python_callable=update_long_entity,
-    op_kwargs={
-        'entity': 'inventor',
-        'database_type': 'pgpubs'
-    },
-    dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
-)
+# update_pregranted_persistent_long_inventor = PythonOperator(
+#     task_id='update_pregranted_persistent_long_inventor',
+#     python_callable=update_long_entity,
+#     op_kwargs={
+#         'entity': 'inventor',
+#         'database_type': 'pgpubs'
+#     },
+#     dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
+# )
 
 qc_post_process_inventor_operator = PythonOperator(task_id='qc_post_process_inventor',
                                                    python_callable=qc_inventor_post_processing,
