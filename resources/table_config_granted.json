@@ -793,18 +793,6 @@
         "null_allowed": true,
         "category": false,
         "location_field": false
-      },
-      "male_flag": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "attribution_status": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
       }
     },
       "related_entities": [
