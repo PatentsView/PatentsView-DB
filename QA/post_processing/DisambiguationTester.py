@@ -134,7 +134,9 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
                 left join {self.entity_table} et on et.{self.disambiguated_id} = dt.id
                 left join {self.config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE']}.{self.entity_table} et2 on et2.{self.disambiguated_id} = dt.id
             where et.{self.disambiguated_id} is null
-                and et2.{self.disambiguated_id} is null;
+                and et2.{self.disambiguated_id} is null
+                and et.version_indicator <= '{self.end_date}'
+                and et2.version_indicator <= '{self.end_date}';
             """
         print(invalid_query)
         if not self.connection.open:
