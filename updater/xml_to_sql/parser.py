@@ -693,53 +693,52 @@ def get_filenames_to_parse(config, type='granted_patent'):
     return xml_files
 
 
-tables_dtd_to_json = {
-    # to be filled out - we can provide a default
-    # granted patents
-    'ST32-US-Grant-024.dtd' : None,
-    'ST32-US-Grant-025xml.dtd' : None,
-    'us-patent-grant-v40-2004-12-02.dtd' : 'pat_xml_map_v4x.json',
-    'us-patent-grant-v41-2005-08-25.dtd' : 'pat_xml_map_v4x.json',
-    'us-patent-grant-v42-2006-08-23.dtd' : 'pat_xml_map_v4x.json',
-    'us-patent-grant-v43-2012-12-04.dtd' : 'pat_xml_map_v4x.json',
-    'us-patent-grant-v44-2013-05-16.dtd' : 'pat_xml_map_v4x.json',
-    'us-patent-grant-v45-2014-04-03.dtd' : 'pat_xml_map_v4x.json',
-    'us-patent-grant-v46-2021-08-30.dtd' : 'pat_xml_map_v4x.json',
-    'us-patent-grant-v47-2022-02-17.dtd' : 'pat_xml_map_v4x.json',
-    # pgpubs
-    'pap-v15-2001-01-31.dtd' : 'pgp_xml_map_v1x.json',
-    'pap-v16-2002-01-01.dtd' : 'pgp_xml_map_v1x.json',
-    'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_map_v4_0-2.json',
-    'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_map_v4_0-2.json',
-    'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_map_v4_0-2.json',
-    'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_map_v4_3plus.json',
-    'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_map_v4_3plus.json',
-    'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_map_v4_3plus.json',
-    'us-patent-application-v46-2022-02-17.dtd' : 'pgp_xml_map_v4_3plus.json'
-}
+# tables_dtd_to_json = {
+#     # to be filled out - we can provide a default
+#     # granted patents
+#     'ST32-US-Grant-024.dtd' : None,
+#     'ST32-US-Grant-025xml.dtd' : None,
+#     'us-patent-grant-v40-2004-12-02.dtd' : 'pat_xml_map_v4x.json',
+#     'us-patent-grant-v41-2005-08-25.dtd' : 'pat_xml_map_v4x.json',
+#     'us-patent-grant-v42-2006-08-23.dtd' : 'pat_xml_map_v4x.json',
+#     'us-patent-grant-v43-2012-12-04.dtd' : 'pat_xml_map_v4x.json',
+#     'us-patent-grant-v44-2013-05-16.dtd' : 'pat_xml_map_v4x.json',
+#     'us-patent-grant-v45-2014-04-03.dtd' : 'pat_xml_map_v4x.json',
+#     'us-patent-grant-v46-2021-08-30.dtd' : 'pat_xml_map_v4x.json',
+#     'us-patent-grant-v47-2022-02-17.dtd' : 'pat_xml_map_v4x.json',
+#     # pgpubs
+#     'pap-v15-2001-01-31.dtd' : 'pgp_xml_map_v1x.json',
+#     'pap-v16-2002-01-01.dtd' : 'pgp_xml_map_v1x.json',
+#     'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_map_v4_0-2.json',
+#     'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_map_v4_0-2.json',
+#     'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_map_v4_0-2.json',
+#     'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_map_v4_3plus.json',
+#     'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_map_v4_3plus.json',
+#     'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_map_v4_3plus.json',
+#     'us-patent-application-v46-2022-02-17.dtd' : 'pgp_xml_map_v4_3plus.json'
+# }
 
-long_text_dtd_to_json = {
-    # granted patents
-    'ST32-US-Grant-024.dtd' : None,
-    'ST32-US-Grant-025xml.dtd' : None,
-    'us-patent-grant-v40-2004-12-02.dtd' : 'text_parser.json',
-    'us-patent-grant-v41-2005-08-25.dtd' : 'text_parser.json',
-    'us-patent-grant-v42-2006-08-23.dtd' : 'text_parser.json',
-    'us-patent-grant-v43-2012-12-04.dtd' : 'text_parser.json',
-    'us-patent-grant-v44-2013-05-16.dtd' : 'text_parser.json',
-    'us-patent-grant-v45-2014-04-03.dtd' : 'text_parser.json', 
-    'us-patent-grant-v46-2021-08-30.dtd' : 'text_parser.json',
-    # pgpubs
-    'pap-v15-2001-01-31.dtd' : None,
-    'pap-v16-2002-01-01.dtd' : None,
-    'us-patent-application-v40-2004-12-02.dtd' : None,
-    'us-patent-application-v41-2005-08-25.dtd' : None,
-    'us-patent-application-v42-2006-08-23.dtd' : None,
-    'us-patent-application-v43-2012-12-04.dtd' : None,
-    'us-patent-application-v44-2014-04-03.dtd' : None,
-    'us-patent-application-v45-2021-08-30.dtd' : None,
-
-}
+# long_text_dtd_to_json = {
+#     # granted patents
+#     'ST32-US-Grant-024.dtd' : None,
+#     'ST32-US-Grant-025xml.dtd' : None,
+#     'us-patent-grant-v40-2004-12-02.dtd' : 'text_parser.json',
+#     'us-patent-grant-v41-2005-08-25.dtd' : 'text_parser.json',
+#     'us-patent-grant-v42-2006-08-23.dtd' : 'text_parser.json',
+#     'us-patent-grant-v43-2012-12-04.dtd' : 'text_parser.json',
+#     'us-patent-grant-v44-2013-05-16.dtd' : 'text_parser.json',
+#     'us-patent-grant-v45-2014-04-03.dtd' : 'text_parser.json', 
+#     'us-patent-grant-v46-2021-08-30.dtd' : 'text_parser.json',
+#     # pgpubs
+#     'pap-v15-2001-01-31.dtd' : None,
+#     'pap-v16-2002-01-01.dtd' : None,
+#     'us-patent-application-v40-2004-12-02.dtd' : None,
+#     'us-patent-application-v41-2005-08-25.dtd' : None,
+#     'us-patent-application-v42-2006-08-23.dtd' : None,
+#     'us-patent-application-v43-2012-12-04.dtd' : None,
+#     'us-patent-application-v44-2014-04-03.dtd' : None,
+#     'us-patent-application-v45-2021-08-30.dtd' : None,
+# }
 
 
 def dtd_finder(xml_file):
@@ -760,6 +759,15 @@ def queue_parsers(config, type='granted_patent', destination='TEMP_UPLOAD_DB'):
     parser_start = time.time()
 
     parallelism = int(config["PARALLELISM"]["parallelism"])
+    # gather parsing settings from configs
+    if type in ['pgpubs','granted_patent']:
+        json_setting = 'table'
+    elif type == 'long_text':
+        json_setting =  'text'
+    else:
+        raise NotImplementedError(f"no parsing settings configured for type = {type}")
+    with open(config['XML_PARSING'][f"{json_setting}_json_map"]) as f:
+        json_picker = json.load(f)
 
     pool = None
     watcher = None
@@ -780,10 +788,11 @@ def queue_parsers(config, type='granted_patent', destination='TEMP_UPLOAD_DB'):
                 dtd_file = config['XML_PARSING']['default_grant_dtd']
             else:
                 dtd_file = config['XML_PARSING']['default_pgp_dtd']
-        if type in ['pgpubs','granted_patent']:
-            parsing_config_file = tables_dtd_to_json[dtd_file]
-        if type == 'long_text':
-            parsing_config_file = long_text_dtd_to_json[dtd_file]
+        # if type in ['pgpubs','granted_patent']:
+        #     parsing_config_file = tables_dtd_to_json[dtd_file]
+        # if type == 'long_text':
+        #     parsing_config_file = long_text_dtd_to_json[dtd_file]
+        parsing_config_file = json_picker.get(dtd_file)
         #this should be unnecessary after the json dictionary is filled in, but provided as a precaution
         if parsing_config_file is None:
             if type == 'granted_patent': 
