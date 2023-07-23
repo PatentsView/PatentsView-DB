@@ -543,7 +543,8 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
             })
     xml_file_start = time.time()
     # Generate the list of headers and use them to create dataframes for each table
-    tabletoggle = json.load(open(config['XML_PARSING']['table_toggle']))
+    with open(config['XML_PARSING']['table_toggle']) as f:
+        tabletoggle = json.load(f)
     if re.match('i?pa', xml_file_name): # pgp file
         tabletoggle = tabletoggle['pgpubs']
     else: 
@@ -552,7 +553,8 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
     header_list = generate_headers(table_xml_map)
     dfs = generate_dfs(header_list)
     # Set the dtd
-    dtd = etree.DTD(open(dtd_file))
+    with open(dtd_file) as f:
+        dtd = etree.DTD(f)
 
     log_queue.put({
             "level":   logging.INFO,
@@ -567,7 +569,8 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
     current_document_lines = []
     parse_start = time.time()
     xml_doc_start = time.time()
-    fsize = len(open(xml_file).readlines())
+    # with open(xml_file) as f:
+    #     fsize = len(f.readlines())
     # Open the given xml_file
     for current_xml in extract_document(xml_file):
         if len(current_xml) > 0:
@@ -766,7 +769,9 @@ def queue_parsers(config, type='granted_patent', destination='TEMP_UPLOAD_DB'):
         json_setting =  'text'
     else:
         raise NotImplementedError(f"no parsing settings configured for type = {type}")
-    with open(config['XML_PARSING'][f"{json_setting}_json_map"]) as f:
+    json_map_file = config['XML_PARSING'][f"{json_setting}_json_map"]
+    # print(f"loading json selector {json_map_file}")
+    with open(json_map_file) as f:
         json_picker = json.load(f)
 
     pool = None
@@ -799,8 +804,10 @@ def queue_parsers(config, type='granted_patent', destination='TEMP_UPLOAD_DB'):
                 parsing_config_file = config['XML_PARSING']['default_grant_parsing_config']
             else:
                 parsing_config_file = config['XML_PARSING']['default_pgp_parsing_config']
+        # print(f"loading parsing configuration {parsing_config_file}")
         parsing_config_file = '/'.join((config['FOLDERS']['json_folder'], parsing_config_file))
-        parsing_config = json.load(open(parsing_config_file))
+        with open(parsing_config_file) as f:
+            parsing_config = json.load(f)
         dtd_file = '/'.join((config['FOLDERS']['dtd_folder'], dtd_file))
         log_queue.put({
                 "level":   logging.INFO,

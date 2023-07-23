@@ -52,7 +52,8 @@ def reparse(start, end, clearfirst = True, pubtype = 'pgpubs', raisefail=True):
         engine = create_engine('mysql+pymysql://{0}:{1}@{2}:{3}/?charset=utf8mb4'.format(user, password, host, port))
         inspector = inspect(engine)
 
-        tabletoggle = json.load(open(config['XML_PARSING']['table_toggle']))
+        with open(config['XML_PARSING']['table_toggle']) as f:
+            tabletoggle = json.load(f)
         if pubtype == 'pgpubs':
             tabletoggle = tabletoggle['pgpubs']
         else: 
