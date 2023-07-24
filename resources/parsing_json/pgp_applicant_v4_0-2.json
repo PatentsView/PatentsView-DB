@@ -1,16 +1,16 @@
 {
   "foreign_key_config": {
-    "field_name": "patent_id",
-    "friendly_name": "Patent Number",
-    "xml_path": "us-bibliographic-data-grant/publication-reference/document-id/doc-number",
+    "field_name": "document_number",
+    "friendly_name": "Document Number",
+    "xml_path": "us-bibliographic-data-application/publication-reference/document-id/doc-number",
     "data-type": "string"
   },
   "table_xml_map": [
     {
-      "table_name": "g_rawassignee",
+      "table_name": "pg_rawassignee",
       "friendly_name": "Rawassignee",
       "multi_valued": true,
-      "entity_root_path": "us-bibliographic-data-grant/assignees/",
+      "entity_root_path": "us-bibliographic-data-application/assignees/",
       "fields": [
         {
           "field_name": "sequence",
@@ -137,10 +137,10 @@
       "filename": "assignee.tsv"
     },
     {
-      "table_name": "g_rawinventor",
+      "table_name": "pg_rawinventor",
       "friendly_name": "Rawinventor",
       "multi_valued": true,
-      "entity_root_path": "us-bibliographic-data-grant/us-parties/inventors/",
+      "entity_root_path": "us-bibliographic-data-application/parties/inventors/",
       "fields": [
         {
           "field_name": "name_first",
@@ -234,10 +234,10 @@
       "filename": "inventors.tsv"
     },
     {
-      "table_name": "g_applicants",
+      "table_name": "pg_applicants",
       "friendly_name": "US Parties",
       "multi_valued": true,
-      "entity_root_path": "us-bibliographic-data-grant/us-parties/us-applicants/",
+      "entity_root_path": "us-bibliographic-data-application/parties/applicants/",
       "fields": [
         {
           "field_name": "name_first",
@@ -345,6 +345,39 @@
           "attribute": "sequence",
           "description": null,
           "sequence": true,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "assigned_rights",
+          "friendly_name": "Assigned Rights",
+          "xml_path": "us-rights",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": "us-rights",
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "rights_to_inventor",
+          "friendly_name": "Rights to Inventor",
+          "xml_path": "us-rights",
+          "attribute": "to-dead-inventor",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "rights_kind",
+          "friendly_name": "Rights Kind",
+          "xml_path": "us-rights",
+          "attribute": "kind",
+          "description": null,
+          "sequence": false,
           "flag": null,
           "tag": false,
           "data-type": "string"
