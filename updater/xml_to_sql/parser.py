@@ -597,7 +597,7 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
                     for table_name, extracted_data in data:
                         if len(table_name) > 0:
                             current_data_frame = pd.DataFrame(extracted_data)
-                            dfs[table_name] = dfs[table_name].append(current_data_frame)
+                            dfs[table_name] = pd.concat((dfs[table_name],current_data_frame), axis=0)
                         else:
                             continue
                 except IndexError as e:

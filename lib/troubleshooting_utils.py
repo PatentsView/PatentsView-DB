@@ -2,7 +2,7 @@ import json
 import re
 import time
 import pandas as pd
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from lxml import etree
 from typing import Iterator, Dict
 
@@ -85,11 +85,29 @@ def parse_single_xml_to_dfs(xml_file:str, parse_type:str, logging:bool=False) ->
     :param logging: boolean indicating whether to produce a log file
     """
     assert parse_type in ('granted_patent','pgpubs','long_text'), f"invalid parse_type: '{parse_type}'. Allowed values are {{'granted_patent','pgpubs','long_text'}}"
-    from updater.xml_to_sql.parser import dtd_finder, tables_dtd_to_json, long_text_dtd_to_json, parse_publication_xml
+    from updater.xml_to_sql.parser import dtd_finder, parse_publication_xml
     from lib.configuration import get_current_config
+    # set dates based on file name for accurate version_indicator
     config = get_current_config(type=parse_type, **{"execution_date": date.today()})
+    filedate = '20' + re.fullmatch('i?p[ag]([0-9]{6}).xml', xml_file).group(1)
+    config['DATES']['END_DATE'] = filedate
+    config['DATES']['START_DATE'] = (datetime.strptime(filedate, "%Y%m%d") + timedelta(-6)).strftime("%Y%m%d")
+
     parser_start = time.time()
     p_list = []
+
+    # gather parsing settings from configs
+    if parse_type in ['pgpubs','granted_patent']:
+        json_setting = 'table'
+    elif parse_type == 'long_text':
+        json_setting =  'text'
+    else:
+        raise NotImplementedError(f"no parsing settings configured for type = {parse_type}")
+    json_map_file = config['XML_PARSING'][f"{json_setting}_json_map"]
+    print(f"loading json selector {json_map_file}")
+    with open(json_map_file) as f:
+        json_picker = json.load(f)
+
     dtd_file = dtd_finder(xml_file)
     # as a precaution
     if dtd_file is None:
@@ -97,17 +115,21 @@ def parse_single_xml_to_dfs(xml_file:str, parse_type:str, logging:bool=False) ->
             dtd_file = config['XML_PARSING']['default_grant_dtd']
         else:
             dtd_file = config['XML_PARSING']['default_pgp_dtd']
-    if parse_type in ['pgpubs','granted_patent']:
-        parsing_config_file = tables_dtd_to_json[dtd_file]
-    if parse_type == 'long_text':
-        parsing_config_file = long_text_dtd_to_json[dtd_file]
+    # if type in ['pgpubs','granted_patent']:
+    #     parsing_config_file = tables_dtd_to_json[dtd_file]
+    # if type == 'long_text':
+    #     parsing_config_file = long_text_dtd_to_json[dtd_file]
+    parsing_config_file = json_picker.get(dtd_file)
+    #this should be unnecessary after the json dictionary is filled in, but provided as a precaution
     if parsing_config_file is None:
         if type == 'granted_patent': 
             parsing_config_file = config['XML_PARSING']['default_grant_parsing_config']
         else:
             parsing_config_file = config['XML_PARSING']['default_pgp_parsing_config']
+    print(f"loading parsing configuration {parsing_config_file}")
     parsing_config_file = '/'.join((config['FOLDERS']['json_folder'], parsing_config_file))
-    parsing_config = json.load(open(parsing_config_file))
+    with open(parsing_config_file) as f:
+        parsing_config = json.load(f)
     dtd_file = '/'.join((config['FOLDERS']['dtd_folder'], dtd_file))
     if logging:
         from queue import Queue
