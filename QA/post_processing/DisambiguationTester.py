@@ -168,7 +168,7 @@ where organization is null and name_first is null and name_last is null;
         self.test_invalid_id()
         self.test_floating_entities()
         for table in self.table_config:
-            if "assignee_" in table:
+            if "assignee_" in table and len(table) == 8:
                 self.remove_blank_assignees(table)
             if "disambiguation" not in table and "patent_" not in table:
                 print(f"\t\tBeginning Tests for {table}")
