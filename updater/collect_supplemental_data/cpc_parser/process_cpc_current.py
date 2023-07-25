@@ -212,7 +212,7 @@ def process_cpc_file(cpc_xml_zip_file, cpc_xml_file, config, log_queue, writer):
 # process_and_upload_patent_cpc_current
 def process_and_upload_cpc_current(db='granted_patent', **kwargs):
     config = get_current_config(db, schedule='quarterly', **kwargs)
-    setup_database(config, drop=False, cpc_only=True)
+    setup_database(config, drop=True, cpc_only=True)
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     cpc_output_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
 
