@@ -492,17 +492,12 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, table_xml_map, destina
 
 
 def extract_document(xml_file):
-    #xml_marker = '<?xml version="1.0" encoding="UTF-8"?>\n'
     xml_marker = '<?xml version="1.0"'
     current_document_lines = []
     with open(xml_file, "r") as freader:
         # Loop through all the lines in the file
         for line in freader:
             # Determine the start of a new document
-            # if line == xml_marker:
-            # some of the v1.x documents are delimited by just '<?xml version="1.0"?>' - this caused inadvertent merging of documents
-            #if line.startswith(xml_marker): 
-            #some of the v1.6 documents split on the middle of a line -
             if xml_marker in line:
                 current_document_lines.append(line.split(xml_marker)[0])
                 # Join all lines for a given document
@@ -679,69 +674,32 @@ def get_filenames_to_parse(config, type='granted_patent'):
     xml_directory = config['FOLDERS'][xml_directory_setting]
 
     xml_files = []
+    file_dates = set()
     start_date_string = '{}'.format(config['DATES']['START_DATE'])
     start_date = datetime.strptime(start_date_string, '%Y%m%d')
     end_date_string = '{}'.format(config['DATES']['END_DATE'])
     end_date = datetime.strptime(end_date_string, '%Y%m%d')
-    for file_name in os.listdir(xml_directory):
-        #print(file_name)
+    allfiles = os.listdir(xml_directory)
+    for file_name in allfiles:
+        # print(file_name)
         if file_name.endswith(".xml"):
             file_date_string = re.match(".*([0-9]{6}).*", file_name).group(1)
             file_date = datetime.strptime(file_date_string, '%y%m%d')
 
             if start_date <= file_date <= end_date:
-                xml_files.append(xml_directory + "/" + file_name)
-                print(f'added to parsing queue: {file_name}')
-    xml_files.sort()
-    return xml_files
+                xml_files.append(file_name)
+                file_dates.add(file_date_string)
+    # if only one file, no need to bother checking for revisions
+    if len(xml_files) > 1:
+        #for each date on the list, keep only the most recent file
+        xml_files = [max([file for file in xml_files if re.match(f'i?p[ag]{datestring}',file)]) for datestring in file_dates] 
+        # this will fail if there are ever more than ten revisions of a single file, but this seems highly unlikely
 
+    print(f"files identified for parsing in directory {xml_directory}: {xml_files}")
 
-# tables_dtd_to_json = {
-#     # to be filled out - we can provide a default
-#     # granted patents
-#     'ST32-US-Grant-024.dtd' : None,
-#     'ST32-US-Grant-025xml.dtd' : None,
-#     'us-patent-grant-v40-2004-12-02.dtd' : 'pat_xml_map_v4x.json',
-#     'us-patent-grant-v41-2005-08-25.dtd' : 'pat_xml_map_v4x.json',
-#     'us-patent-grant-v42-2006-08-23.dtd' : 'pat_xml_map_v4x.json',
-#     'us-patent-grant-v43-2012-12-04.dtd' : 'pat_xml_map_v4x.json',
-#     'us-patent-grant-v44-2013-05-16.dtd' : 'pat_xml_map_v4x.json',
-#     'us-patent-grant-v45-2014-04-03.dtd' : 'pat_xml_map_v4x.json',
-#     'us-patent-grant-v46-2021-08-30.dtd' : 'pat_xml_map_v4x.json',
-#     'us-patent-grant-v47-2022-02-17.dtd' : 'pat_xml_map_v4x.json',
-#     # pgpubs
-#     'pap-v15-2001-01-31.dtd' : 'pgp_xml_map_v1x.json',
-#     'pap-v16-2002-01-01.dtd' : 'pgp_xml_map_v1x.json',
-#     'us-patent-application-v40-2004-12-02.dtd' : 'pgp_xml_map_v4_0-2.json',
-#     'us-patent-application-v41-2005-08-25.dtd' : 'pgp_xml_map_v4_0-2.json',
-#     'us-patent-application-v42-2006-08-23.dtd' : 'pgp_xml_map_v4_0-2.json',
-#     'us-patent-application-v43-2012-12-04.dtd' : 'pgp_xml_map_v4_3plus.json',
-#     'us-patent-application-v44-2014-04-03.dtd' : 'pgp_xml_map_v4_3plus.json',
-#     'us-patent-application-v45-2021-08-30.dtd' : 'pgp_xml_map_v4_3plus.json',
-#     'us-patent-application-v46-2022-02-17.dtd' : 'pgp_xml_map_v4_3plus.json'
-# }
+    parse_list = [f"{xml_directory}/{file_name}" for file_name in xml_files]
 
-# long_text_dtd_to_json = {
-#     # granted patents
-#     'ST32-US-Grant-024.dtd' : None,
-#     'ST32-US-Grant-025xml.dtd' : None,
-#     'us-patent-grant-v40-2004-12-02.dtd' : 'text_parser.json',
-#     'us-patent-grant-v41-2005-08-25.dtd' : 'text_parser.json',
-#     'us-patent-grant-v42-2006-08-23.dtd' : 'text_parser.json',
-#     'us-patent-grant-v43-2012-12-04.dtd' : 'text_parser.json',
-#     'us-patent-grant-v44-2013-05-16.dtd' : 'text_parser.json',
-#     'us-patent-grant-v45-2014-04-03.dtd' : 'text_parser.json', 
-#     'us-patent-grant-v46-2021-08-30.dtd' : 'text_parser.json',
-#     # pgpubs
-#     'pap-v15-2001-01-31.dtd' : None,
-#     'pap-v16-2002-01-01.dtd' : None,
-#     'us-patent-application-v40-2004-12-02.dtd' : None,
-#     'us-patent-application-v41-2005-08-25.dtd' : None,
-#     'us-patent-application-v42-2006-08-23.dtd' : None,
-#     'us-patent-application-v43-2012-12-04.dtd' : None,
-#     'us-patent-application-v44-2014-04-03.dtd' : None,
-#     'us-patent-application-v45-2021-08-30.dtd' : None,
-# }
+    return parse_list
 
 
 def dtd_finder(xml_file):
@@ -793,10 +751,6 @@ def queue_parsers(config, type='granted_patent', destination='TEMP_UPLOAD_DB'):
                 dtd_file = config['XML_PARSING']['default_grant_dtd']
             else:
                 dtd_file = config['XML_PARSING']['default_pgp_dtd']
-        # if type in ['pgpubs','granted_patent']:
-        #     parsing_config_file = tables_dtd_to_json[dtd_file]
-        # if type == 'long_text':
-        #     parsing_config_file = long_text_dtd_to_json[dtd_file]
         parsing_config_file = json_picker.get(dtd_file)
         #this should be unnecessary after the json dictionary is filled in, but provided as a precaution
         if parsing_config_file is None:
