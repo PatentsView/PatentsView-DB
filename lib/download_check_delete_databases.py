@@ -42,6 +42,7 @@ where left(table_schema, 6) ='upload'
 select table_name 
 from information_schema.tables
 where table_schema = '{db}'
+and table_type = 'BASE TABLE'
             """
         print(q2)
         with connection.cursor() as generic_cursor2:
@@ -176,7 +177,7 @@ def get_count_for_all_tables(connection_string, df, raise_exception=False):
             if num_rows == 0 or table_vi.empty == True:
                 raise Exception(f"{t} IS EMPTY!!!! ")
         final_dataset_local = pd.concat([final_dataset_local, table_vi])
-        print(f"We are {counter / total} % Done with the Queries for this DB")
+        print(f"We are {counter / total:.2%} Done with the Queries for this DB")
         counter = counter + 1
     print(final_dataset_local)
     return final_dataset_local
