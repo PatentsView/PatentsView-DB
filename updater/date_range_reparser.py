@@ -35,10 +35,12 @@ def reparse(start, end, clearfirst = True, pubtype = 'pgpubs', raisefail=True):
     folder_files = os.listdir(config['FOLDERS'][f'{pubtype}_bulk_xml_location'])
 
     usefiles = [fnam for fnam in folder_files if 
-                        re.fullmatch("i?p[ag]([0-9]{6}).xml",fnam) is not None          and
-                        re.fullmatch("i?p[ag]([0-9]{6}).xml",fnam).group(1) <= end      and
-                        re.fullmatch("i?p[ag]([0-9]{6}).xml",fnam).group(1) >= start]
+                        re.fullmatch(r"i?p[ag]([0-9]{6})(_r\d)?\.xml",fnam) is not None          and
+                        re.fullmatch(r"i?p[ag]([0-9]{6})(_r\d)?\.xml",fnam).group(1) <= end      and
+                        re.fullmatch(r"i?p[ag]([0-9]{6})(_r\d)?\.xml",fnam).group(1) >= start]
     usefiles.sort()
+    # revision files should be recognized and included, but all versions will be parsed in order
+    # TODO: recognize when a revision file exists for a date and skip versions before the most recent
 
     if clearfirst:
         import json
@@ -62,7 +64,7 @@ def reparse(start, end, clearfirst = True, pubtype = 'pgpubs', raisefail=True):
 
     config["DATES"] = {}
     for file in tqdm(usefiles):
-        filedate = '20' + re.fullmatch('i?p[ag]([0-9]{6}).xml', file).group(1)
+        filedate = '20' + re.fullmatch(r"i?p[ag]([0-9]{6})(_r\d)?\.xml", file).group(1)
         config['DATES']['END_DATE'] = filedate
         config['DATES']['START_DATE'] = (datetime.strptime(filedate, "%Y%m%d") + timedelta(-6)).strftime("%Y%m%d")
         try:
