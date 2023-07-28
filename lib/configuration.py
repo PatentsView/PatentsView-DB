@@ -132,7 +132,8 @@ def get_table_config(update_config):
     resources_file = "{root}/{resources}/raw_db_tables.json".format(root=update_config["FOLDERS"]["project_root"],
                                                                     resources=update_config["FOLDERS"][
                                                                         "resources_folder"])
-    raw_db_table_settings = json.load(open(resources_file))
+    with open(resources_file) as f:
+        raw_db_table_settings = json.load(f)
     return raw_db_table_settings
 
 

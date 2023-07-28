@@ -73,8 +73,9 @@ def write_csv(rows, outputdir, filename):
     """ Write a list of lists to a csv file """
     print(outputdir)
     print(os.path.join(outputdir, filename))
-    writer = csv.writer(open(os.path.join(outputdir, filename), 'w', encoding='utf-8'))
-    writer.writerows(rows)
+    with open(os.path.join(outputdir, filename), 'w', encoding='utf-8') as outfile:
+        writer = csv.writer(outfile)
+        writer.writerows(rows)
 
 
 def generate_index_statements(config, database_section, table):
