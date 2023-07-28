@@ -16,18 +16,7 @@
           "field_name": "sequence",
           "friendly_name": "Sequence",
           "xml_path": ".",
-          "attribute": null,
-          "description": null,
-          "sequence": true,
-          "flag": null,
-          "tag": false,
-          "data-type": "string"
-        },
-        {
-          "field_name": "name_first",
-          "friendly_name": "Name First",
-          "xml_path": "addressbook/first-name",
-          "attribute": null,
+          "attribute": "sequence",
           "description": null,
           "sequence": false,
           "flag": null,
@@ -37,7 +26,7 @@
         {
           "field_name": "name_first",
           "friendly_name": "Name First",
-          "xml_path": "first-name",
+          "xml_path": ".//first-name",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -48,18 +37,7 @@
         {
           "field_name": "name_last",
           "friendly_name": "Name Last",
-          "xml_path": "addressbook/last-name",
-          "attribute": null,
-          "description": null,
-          "sequence": false,
-          "flag": null,
-          "tag": false,
-          "data-type": "string"
-        },
-        {
-          "field_name": "name_last",
-          "friendly_name": "Name Last",
-          "xml_path": "last-name",
+          "xml_path": ".//last-name",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -70,18 +48,7 @@
         {
           "field_name": "organization",
           "friendly_name": "Organization",
-          "xml_path": "addressbook/orgname",
-          "attribute": null,
-          "description": null,
-          "sequence": false,
-          "flag": null,
-          "tag": false,
-          "data-type": "string"
-        },
-        {
-          "field_name": "organization",
-          "friendly_name": "Organization",
-          "xml_path": "orgname",
+          "xml_path": ".//orgname",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -145,7 +112,7 @@
         {
           "field_name": "name_first",
           "friendly_name": "First Name",
-          "xml_path": "addressbook/first-name",
+          "xml_path": ".//first-name",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -156,7 +123,7 @@
         {
           "field_name": "name_last",
           "friendly_name": "Last Name",
-          "xml_path": "addressbook/last-name",
+          "xml_path": ".//last-name",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -232,6 +199,92 @@
         }
       ],
       "filename": "inventors.tsv"
+    },
+    {
+      "table_name": "g_deceased_inventor",
+      "friendly_name": "deceased inventor",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-grant/us-deceased-inventor",
+      "fields": [
+        {
+          "field_name": "name_first",
+          "friendly_name": "First Name",
+          "xml_path": "addressbook/first-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "name_last",
+          "friendly_name": "Last Name",
+          "xml_path": "addressbook/last-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "city",
+          "friendly_name": "City",
+          "xml_path": "addressbook/address/city",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "state",
+          "friendly_name": "State",
+          "xml_path": "addressbook/address/state",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "country",
+          "friendly_name": "Country",
+          "xml_path": "addressbook/address/country",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": "sequence",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "deceased",
+          "friendly_name": "Deceased",
+          "xml_path": ".",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "tag": false,
+          "flag": "us-deceased-inventor",
+          "data-type": "string"
+        }
+      ],
+      "filename": "deceased_inventors.tsv"
     },
     {
       "table_name": "g_applicants",
@@ -344,7 +397,7 @@
           "xml_path": ".",
           "attribute": "sequence",
           "description": null,
-          "sequence": true,
+          "sequence": false,
           "flag": null,
           "tag": false,
           "data-type": "string"

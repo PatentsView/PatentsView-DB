@@ -16,18 +16,7 @@
           "field_name": "sequence",
           "friendly_name": "Sequence",
           "xml_path": ".",
-          "attribute": null,
-          "description": null,
-          "sequence": true,
-          "flag": null,
-          "tag": false,
-          "data-type": "string"
-        },
-        {
-          "field_name": "name_first",
-          "friendly_name": "Name First",
-          "xml_path": "addressbook/first-name",
-          "attribute": null,
+          "attribute": "sequence",
           "description": null,
           "sequence": false,
           "flag": null,
@@ -37,7 +26,7 @@
         {
           "field_name": "name_first",
           "friendly_name": "Name First",
-          "xml_path": "first-name",
+          "xml_path": ".//first-name",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -48,18 +37,7 @@
         {
           "field_name": "name_last",
           "friendly_name": "Name Last",
-          "xml_path": "addressbook/last-name",
-          "attribute": null,
-          "description": null,
-          "sequence": false,
-          "flag": null,
-          "tag": false,
-          "data-type": "string"
-        },
-        {
-          "field_name": "name_last",
-          "friendly_name": "Name Last",
-          "xml_path": "last-name",
+          "xml_path": ".//last-name",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -70,18 +48,7 @@
         {
           "field_name": "organization",
           "friendly_name": "Organization",
-          "xml_path": "addressbook/orgname",
-          "attribute": null,
-          "description": null,
-          "sequence": false,
-          "flag": null,
-          "tag": false,
-          "data-type": "string"
-        },
-        {
-          "field_name": "organization",
-          "friendly_name": "Organization",
-          "xml_path": "orgname",
+          "xml_path": ".//orgname",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -145,7 +112,7 @@
         {
           "field_name": "name_first",
           "friendly_name": "First Name",
-          "xml_path": "addressbook/first-name",
+          "xml_path": ".//first-name",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -156,7 +123,7 @@
         {
           "field_name": "name_last",
           "friendly_name": "Last Name",
-          "xml_path": "addressbook/last-name",
+          "xml_path": ".//last-name",
           "attribute": null,
           "description": null,
           "sequence": false,
@@ -344,7 +311,7 @@
           "xml_path": ".",
           "attribute": "sequence",
           "description": null,
-          "sequence": true,
+          "sequence": false,
           "flag": null,
           "tag": false,
           "data-type": "string"
