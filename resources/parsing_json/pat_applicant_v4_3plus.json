@@ -16,9 +16,9 @@
           "field_name": "sequence",
           "friendly_name": "Sequence",
           "xml_path": ".",
-          "attribute": "sequence",
+          "attribute": null,
           "description": null,
-          "sequence": false,
+          "sequence": true,
           "flag": null,
           "tag": false,
           "data-type": "string"
