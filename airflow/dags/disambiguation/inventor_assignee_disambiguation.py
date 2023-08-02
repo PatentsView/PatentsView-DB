@@ -26,7 +26,7 @@ from updater.post_processing.post_process_assignee import additional_post_proces
     load_pregranted_location_assignee, create_patent_assignee, create_publication_assignee
 from updater.post_processing.post_process_inventor import update_granted_rawinventor, update_pregranted_rawinventor, \
     precache_inventors, create_canonical_inventors, create_patent_inventor, create_publication_inventor, \
-    post_process_qc as qc_inventor_post_processing, load_granted_location_inventor, load_pregranted_location_inventor
+    post_process_qc as qc_inventor_post_processing, load_granted_location_inventor, load_pregranted_location_inventor, run_genderit
 from updater.post_processing.post_process_persistent import prepare_wide_table, update_long_entity, write_wide_table
 
 
@@ -254,6 +254,20 @@ create_pregranted_persistent_wide_inventor = PythonOperator(
 #     dag=disambiguation, queue='data_collector', pool='database_write_iops_contenders'
 # )
 
+run_patent_gender = PythonOperator(task_id='patent_inventor_gender',
+                                                   python_callable=run_genderit,
+                                                   dag=disambiguation,
+                                                   on_success_callback=airflow_task_success,
+                                                   on_failure_callback=airflow_task_failure,
+                                                   queue='data_collector',
+                                                   op_kwargs={'database': 'patent'})
+run_pgpubs_gender = PythonOperator(task_id='pgpubs_inventor_gender',
+                                                   python_callable=run_genderit,
+                                                   dag=disambiguation,
+                                                   on_success_callback=airflow_task_success,
+                                                   on_failure_callback=airflow_task_failure,
+                                                   queue='data_collector',
+                                                   op_kwargs={'database': 'pgpubs'})
 qc_post_process_inventor_operator = PythonOperator(task_id='qc_post_process_inventor',
                                                    python_callable=qc_inventor_post_processing,
                                                    dag=disambiguation,
@@ -542,5 +556,5 @@ for dependency_group in operator_sequence:
     chain_operators(dependency_sequence)
 
 loc_fips_operator.set_upstream(post_process_location_operator)
-# inv_build_coinventor_features.set_upstream(assignee_inventor_disambig_setup)
-# assignee_inventor_disambig_setup.set_upstream(quarterly_merge_completed)
+post_process_create_canonical_inventors.set_upstream(run_pgpubs_gender)
+post_process_create_canonical_inventors.set_upstream(run_patent_gender)

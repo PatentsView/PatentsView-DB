@@ -6,9 +6,9 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
-from lib.configuration import get_connection_string, get_current_config, get_disambig_config
+from lib.configuration import get_connection_string, get_current_config, get_disambig_config, get_unique_connection_string
 from updater.post_processing.create_lookup import load_lookup_table
-
+from gender_it.patentsview_gender_attribution import get_disambiguated_inventor_batch, run_AIR_genderit
 
 def update_rawinventor_for_type(update_config, incremental="1", database='RAW_DB', uuid_field='uuid'):
     engine = create_engine(get_connection_string(update_config, database))
@@ -284,6 +284,18 @@ def post_process_inventor(**kwargs):
     create_patent_inventor(**kwargs)
     create_publication_inventor(**kwargs)
 
+def run_genderit(db, **kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    cstr = get_unique_connection_string(database='gender_attribution')
+    engine = create_engine(cstr)
+    start_date = config['start_date']
+    end_date = config['end_date']
+    df = get_disambiguated_inventor_batch(engine, start_date, end_date, db=db)
+    final = run_AIR_genderit(df)
+    try:
+        final.to_sql(f'{db}_inventor_genderit_attribution', con=engine, if_exists='append', chunksize=1000)
+    except:
+        print("GENDERIT FAILED TO WRITE DATA")
 
 def post_process_qc(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
@@ -326,7 +338,14 @@ if __name__ == '__main__':
     # evaluate_inventor_clustering(**{
     #     "execution_date": datetime.date(2020, 12, 29)
     # })
-    config = get_disambig_config(schedule='quarterly', **{
+    # config = get_disambig_config(schedule='quarterly', **{
+    #     "execution_date": datetime.date(2023, 1, 1)
+    # })
+    # create_inventor(config)
+
+    run_genderit("pgpubs", **{
         "execution_date": datetime.date(2023, 1, 1)
     })
-    create_inventor(config)
+    run_genderit("patent", **{
+        "execution_date": datetime.date(2023, 1, 1)
+    })

@@ -10,6 +10,7 @@ absl-py
 beautifulsoup4
 boto3
 clint
+dotenv
 editdistance
 lxml
 matplotlib
