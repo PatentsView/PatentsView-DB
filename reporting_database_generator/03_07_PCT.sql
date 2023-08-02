@@ -23,7 +23,7 @@ insert into `{{params.reporting_database}}`.`pctdata`
 (
   `uuid`, `patent_id`, `doc_type`, `kind`, `doc_number`, `date`, `102_date`, `371_date`
 )
-select
+select ac.`uuid`,
   ac.`patent_id`, ac.`doc_type`, ac.`kind`, ac.`rel_id`,
   case when ac.`date` > date('1899-12-31') and ac.`date` < date_add(current_date, interval 10 year) then ac.`date` else null end,
   case when ac.`102_date` > date('1899-12-31') and ac.`102_date` < date_add(current_date, interval 10 year) then ac.`102_date` else null end,
