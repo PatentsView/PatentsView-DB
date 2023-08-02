@@ -9,7 +9,7 @@ create table `{{params.reporting_database}}`.`pctdata`
 ( `uuid` varchar(36) not null,
   `patent_id` varchar(20) not null,
   `doc_type` varchar(20) not null,
-  `kind` varchar(2) not null,
+  `kind` varchar(2) null,
   `doc_number` varchar(20) null,
   `date` date null,
   `102_date` date null,
