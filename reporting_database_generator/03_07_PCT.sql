@@ -6,7 +6,7 @@
 
 drop table if exists `{{params.reporting_database}}`.`pctdata`;
 create table `{{params.reporting_database}}`.`pctdata`
-(
+( `uuid` varchar(36) not null,
   `patent_id` varchar(20) not null,
   `doc_type` varchar(20) not null,
   `kind` varchar(2) not null,
@@ -14,14 +14,14 @@ create table `{{params.reporting_database}}`.`pctdata`
   `date` date null,
   `102_date` date null,
   `371_date` date null,
-  primary key (`patent_id`, `kind`)
+  primary key (`uuid`)
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 insert into `{{params.reporting_database}}`.`pctdata`
 (
-  `patent_id`, `doc_type`, `kind`, `doc_number`, `date`, `102_date`, `371_date`
+  `uuid`, `patent_id`, `doc_type`, `kind`, `doc_number`, `date`, `102_date`, `371_date`
 )
 select
   ac.`patent_id`, ac.`doc_type`, ac.`kind`, ac.`rel_id`,
