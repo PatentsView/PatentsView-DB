@@ -284,17 +284,22 @@ def post_process_inventor(**kwargs):
     create_patent_inventor(**kwargs)
     create_publication_inventor(**kwargs)
 
-def run_genderit(db, **kwargs):
-    config = get_current_config(schedule='quarterly', **kwargs)
-    cstr = get_unique_connection_string(database='gender_attribution')
+def run_genderit(type, **kwargs):
+    config = get_current_config(type, schedule='quarterly', **kwargs)
+    cstr = get_connection_string(config, database="PROD_DB")
     engine = create_engine(cstr)
-    start_date = config['start_date']
-    end_date = config['end_date']
-    df = get_disambiguated_inventor_batch(engine, start_date, end_date, db=db)
+    start_date = config['DATES']['start_date']
+    end_date = config['DATES']['end_date']
+    df = get_disambiguated_inventor_batch(engine, start_date, end_date, type)
     final = run_AIR_genderit(df)
+    if type == 'granted_patent':
+        db = 'patent'
+    else:
+        db = type
     try:
-        final.to_sql(f'{db}_inventor_genderit_attribution', con=engine, if_exists='append', chunksize=1000)
+        final.to_sql(f'gender_attribution.{db}_inventor_genderit_attribution', con=engine, if_exists='append', chunksize=1000)
     except:
+        breakpoint()
         print("GENDERIT FAILED TO WRITE DATA")
 
 def post_process_qc(**kwargs):
@@ -342,10 +347,9 @@ if __name__ == '__main__':
     #     "execution_date": datetime.date(2023, 1, 1)
     # })
     # create_inventor(config)
-
     run_genderit("pgpubs", **{
-        "execution_date": datetime.date(2023, 1, 1)
+        "execution_date": datetime.date(2023, 4, 1)
     })
-    run_genderit("patent", **{
-        "execution_date": datetime.date(2023, 1, 1)
+    run_genderit("granted_patent", **{
+        "execution_date": datetime.date(2023, 4, 1)
     })

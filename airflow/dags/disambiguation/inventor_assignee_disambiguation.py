@@ -556,5 +556,5 @@ for dependency_group in operator_sequence:
     chain_operators(dependency_sequence)
 
 loc_fips_operator.set_upstream(post_process_location_operator)
-post_process_create_canonical_inventors.set_upstream(run_pgpubs_gender)
-post_process_create_canonical_inventors.set_upstream(run_patent_gender)
+run_pgpubs_gender.set_upstream(post_process_create_canonical_inventors)
+run_patent_gender.set_upstream(post_process_create_canonical_inventors)
