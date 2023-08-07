@@ -2,7 +2,6 @@
 {% set reporting_database = params.reporting_database %}
 use `{{elastic_target_database}}`;
 
--- Create syntax for TABLE 'inventor_years'
 CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`inventor_years`
 (
     `inventor_id` int(10) unsigned NOT NULL,
