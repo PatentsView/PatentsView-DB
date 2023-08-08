@@ -296,11 +296,89 @@ def run_genderit(type, **kwargs):
         db = 'patent'
     else:
         db = type
-    try:
-        final.to_sql(f'gender_attribution.{db}_inventor_genderit_attribution', con=engine, if_exists='append', chunksize=1000)
-    except:
-        breakpoint()
-        print("GENDERIT FAILED TO WRITE DATA")
+
+    gen_att_engine = get_unique_connection_string(config, connection='DATABASE_SETUP', database="gender_attribution")
+    final.to_sql(f'{db}_rawinventor_genderit_attribution', con=gen_att_engine, if_exists='append', chunksize=5000)
+
+def post_process_inventor_gender(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    end_date = config["DATES"]["END_DATE"]
+    q_list = []
+    engine = create_engine(get_connection_string(config, 'RAW_DB'))
+    # Takes ~21 minutes
+    q0 = f"""
+create table gender_attribution.inventor_gender_{end_date}
+select inventor_id
+	, sum(case when gender = 'M' then 1 else 0 end) as count_male
+    , sum(case when gender = 'F' then 1 else 0 end) as count_female
+    , sum(case when gender = null then 1 else 0 end) as count_null
+FROM (
+select b.inventor_id, gender
+from gender_attribution.patent_rawinventor_genderit_attribution a 
+	inner join patent.inventor_disambiguation_mapping_{end_date} b on a.uuid=b.uuid
+union all
+select b.inventor_id, gender
+from gender_attribution.pgpubs_rawinventor_genderit_attribution a 
+	inner join pregrant_publications.inventor_disambiguation_mapping_{end_date} b on a.id=b.uuid
+	) as underlying 
+group by 1;
+    """
+    # q_list.append(q0)
+    q1 = f"""
+    alter table gender_attribution.inventor_gender_{end_date} add gender_flag nvarchar(5);
+        """
+    # q_list.append(q1)
+    q2 = f"""
+    alter table gender_attribution.inventor_gender_{end_date} add total_count int;
+        """
+    # q_list.append(q2)
+    q3 = f"""
+update gender_attribution.inventor_gender_{end_date}
+set total_count = count_male+count_female+count_null;
+        """
+    q_list.append(q3)
+    q4 = f"""
+alter table gender_attribution.inventor_gender_{end_date} add female_percent float;
+            """
+    q_list.append(q4)
+    q5 = f"""
+    alter table gender_attribution.inventor_gender_{end_date} add male_percent float;
+                """
+    q_list.append(q5)
+    q6 = f"""
+    alter table gender_attribution.inventor_gender_{end_date} add null_percent float;
+                """
+    q_list.append(q6)
+    q7 = f"""
+update gender_attribution.inventor_gender_{end_date} 
+set female_percent = count_female/NULLIF(total_count, 0),
+male_percent = count_male/NULLIF(total_count, 0),
+null_percent = count_null/NULLIF(total_count, 0);
+                """
+    q_list.append(q7)
+    q8 = f"""
+update gender_attribution.inventor_gender_{end_date} 
+set gender_flag = 'M'
+where male_percent>.5;"""
+    q_list.append(q8)
+    q9 = f"""
+update gender_attribution.inventor_gender_{end_date} 
+set gender_flag = 'F'
+where female_percent>.5  """
+    q_list.append(q9)
+    q10 = f"""
+update gender_attribution.inventor_gender_{end_date} 
+set gender_flag = 'U'
+where female_percent=.5 and male_percent=.5 """
+    q_list.append(q10)
+    q11 = f"""
+update gender_attribution.inventor_gender_{end_date} 
+set gender_flag = 'U'
+where total_count = 0 and gender_flag is null"""
+    q_list.append(q11)
+    for q in q_list:
+        print(q)
+        engine.execute(q)
 
 def post_process_qc(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
@@ -347,9 +425,12 @@ if __name__ == '__main__':
     #     "execution_date": datetime.date(2023, 1, 1)
     # })
     # create_inventor(config)
-    run_genderit("pgpubs", **{
-        "execution_date": datetime.date(2023, 4, 1)
-    })
-    run_genderit("granted_patent", **{
+    # run_genderit("granted_patent", **{
+    #     "execution_date": datetime.date(2023, 4, 1)
+    # })
+    # run_genderit("pgpubs", **{
+    #     "execution_date": datetime.date(2023, 4, 1)
+    # })
+    post_process_inventor_gender(**{
         "execution_date": datetime.date(2023, 4, 1)
     })
