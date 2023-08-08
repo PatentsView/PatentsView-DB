@@ -323,15 +323,15 @@ from gender_attribution.pgpubs_rawinventor_genderit_attribution a
 	) as underlying 
 group by 1;
     """
-    # q_list.append(q0)
+    q_list.append(q0)
     q1 = f"""
     alter table gender_attribution.inventor_gender_{end_date} add gender_flag nvarchar(5);
         """
-    # q_list.append(q1)
+    q_list.append(q1)
     q2 = f"""
     alter table gender_attribution.inventor_gender_{end_date} add total_count int;
         """
-    # q_list.append(q2)
+    q_list.append(q2)
     q3 = f"""
 update gender_attribution.inventor_gender_{end_date}
 set total_count = count_male+count_female+count_null;
