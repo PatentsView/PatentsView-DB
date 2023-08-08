@@ -26,7 +26,7 @@ from updater.post_processing.post_process_assignee import additional_post_proces
     load_pregranted_location_assignee, create_patent_assignee, create_publication_assignee
 from updater.post_processing.post_process_inventor import update_granted_rawinventor, update_pregranted_rawinventor, \
     precache_inventors, create_canonical_inventors, create_patent_inventor, create_publication_inventor, \
-    post_process_qc as qc_inventor_post_processing, load_granted_location_inventor, load_pregranted_location_inventor, run_genderit
+    post_process_qc as qc_inventor_post_processing, load_granted_location_inventor, load_pregranted_location_inventor, run_genderit, post_process_inventor_gender
 from updater.post_processing.post_process_persistent import prepare_wide_table, update_long_entity, write_wide_table
 
 
@@ -263,6 +263,13 @@ run_patent_gender = PythonOperator(task_id='patent_inventor_gender',
                                                    op_kwargs={'database': 'patent'})
 run_pgpubs_gender = PythonOperator(task_id='pgpubs_inventor_gender',
                                                    python_callable=run_genderit,
+                                                   dag=disambiguation,
+                                                   on_success_callback=airflow_task_success,
+                                                   on_failure_callback=airflow_task_failure,
+                                                   queue='data_collector',
+                                                   op_kwargs={'database': 'pgpubs'})
+inventor_gender_post_processing = PythonOperator(task_id='inventor_gender_post_processing',
+                                                   python_callable=post_process_inventor_gender,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
@@ -558,3 +565,6 @@ for dependency_group in operator_sequence:
 loc_fips_operator.set_upstream(post_process_location_operator)
 run_pgpubs_gender.set_upstream(post_process_create_canonical_inventors)
 run_patent_gender.set_upstream(post_process_create_canonical_inventors)
+inventor_gender_post_processing.set_upstream(run_patent_gender)
+inventor_gender_post_processing.set_upstream(run_pgpubs_gender)
+inventor_gender_post_processing.set_upstream(inv_upload_results)
