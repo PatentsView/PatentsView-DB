@@ -44,7 +44,7 @@ default_args = {
 
 elastic_prep_dag = DAG("elastic_data_preparation"
                        , default_args=default_args
-                       , start_date=datetime(2022, 6, 30)
+                       , start_date=datetime(2023, 4, 1)
                        , schedule_interval=None
                        , template_searchpath="/project/reporting_database_generator/elastic_scripts/")
 
