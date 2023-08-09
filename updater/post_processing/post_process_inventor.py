@@ -133,8 +133,8 @@ def create_inventor(update_config):
     CREATE OR REPLACE SQL SECURITY INVOKER VIEW inventor as select * from inventor_{suffix}
     """.format(suffix=suffix)
     print(view_sql)
-    # engine.execute(create_sql)
-    # engine.execute(view_sql)
+    engine.execute(create_sql)
+    engine.execute(view_sql)
     limit = 10000
     offset = 0
     while True:
@@ -376,6 +376,10 @@ update gender_attribution.inventor_gender_{end_date}
 set gender_flag = 'U'
 where total_count = 0 and gender_flag is null"""
     q_list.append(q11)
+    q12 = f"""
+alter table gender_attribution.inventor_gender_{end_date} 
+add KEY `inventor_id` (`inventor_id`)"""
+    q_list.append(q12)
     for q in q_list:
         print(q)
         engine.execute(q)
