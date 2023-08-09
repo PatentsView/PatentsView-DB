@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`us_patent_citations`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
-;
+
 TRUNCATE TABLE `{{elastic_target_database}}`.us_patent_citations;
 INSERT INTO `{{elastic_target_database}}`.us_patent_citations( uuid, patent_id, citation_id, date, name, kind, category
                                                , sequence, patent_zero_prefix)

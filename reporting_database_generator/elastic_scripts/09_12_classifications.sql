@@ -19,11 +19,11 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`wipo_field`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE  `{{elastic_target_databae}}`.wipo_field;
-insert into `{{elastic_target_databae}}`.wipo_field
+TRUNCATE TABLE  `{{elastic_target_database}}`.wipo_field;
+insert into `{{elastic_target_database}}`.wipo_field
 select *
 from
-    `{{reporting_database}}`.`wipo_field;`
+    `{{reporting_database}}`.`wipo_field`;
 
 
 CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`cpc_class`
@@ -47,7 +47,7 @@ TRUNCATE TABLE `{{elastic_target_database}}`.cpc_class;
 INSERT INTO `{{elastic_target_database}}`.cpc_class
 select *
 from
-    `{{reporting_database}}`.`cpc_subsection;`
+    `{{reporting_database}}`.`cpc_subsection`;
 CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`cpc_subclass`
 (
     `id`              varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -70,7 +70,9 @@ TRUNCATE TABLE `{{elastic_target_database}}`.cpc_subclass;
 INSERT INTO `{{elastic_target_database}}`.cpc_subclass
 select *
 from
-    `{{reporting_database}}`.`cpc_group;`CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`cpc_group`
+    `{{reporting_database}}`.`cpc_group`;
+
+CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`cpc_group`
 (
     `id`    varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
     `title` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -109,7 +111,7 @@ TRUNCATE TABLE `{{elastic_target_database}}`.uspc_mainclass;
 insert into `{{elastic_target_database}}`.uspc_mainclass
 select *
 from
-    `{{reporting_database}}`.`uspc_mainclass;`
+    `{{reporting_database}}`.`uspc_mainclass`;
 
 
 CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`uspc_subclass`
@@ -125,5 +127,5 @@ TRUNCATE TABLE `{{elastic_target_database}}`.uspc_subclass;
 insert into `{{elastic_target_database}}`.uspc_subclass
 select *
 from
-    `{{reporting_database}}`.`uspc_subclass;`
+    `{{reporting_database}}`.`uspc_subclass`;
 
