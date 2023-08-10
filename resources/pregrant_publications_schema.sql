@@ -548,6 +548,7 @@ CREATE TABLE `rawlocation` (
   `country_transformed` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `latitude` float DEFAULT NULL,
   `longitude` float DEFAULT NULL,
+  `qa_override` int(1) DEFAULT NULL,
   `filename` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT current_timestamp(),
   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),

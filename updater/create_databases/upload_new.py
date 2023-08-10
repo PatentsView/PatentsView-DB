@@ -61,8 +61,11 @@ def setup_database(update_config, drop=True, cpc_only=False):
         for table in required_tables:
             if cpc_only:
                 if drop:
+                    if table == 'cpc_current' and raw_database == 'pregrant_publications':
+                        query = f"create table if not exists {temp_upload_database}.{table} like {raw_database}.{table}"
+                    else:
+                        query = f"create table if not exists {temp_upload_database}.{table} like patent.{table}"
                     con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
-                    query = f"create table if not exists {temp_upload_database}.{table} like patent.{table}"
                     print(query)
                     con.execute(query)
             else:
@@ -141,20 +144,18 @@ if __name__ == '__main__':
     # post_upload(**{
     #         "execution_date": datetime.date(2020, 12, 1)
     #         })
-    # config = get_current_config('pgpubs', **{
-    #     "execution_date": datetime.date(2022, 6, 2)
-    # })
-    # setup_database(config, **{
-    #         "execution_date": datetime.date(2020, 12, 14)
-    #         })
+    config = get_current_config('pgpubs', schedule="quarterly", **{
+        "execution_date": datetime.date(2023, 4, 1)
+    })
+    setup_database(config, drop=False, cpc_only=True)
     # generate_timestamp_uploads(config)
-    for month, day in [
-(3, 24),
-(1, 27),
-(1, 20),
-(1, 13)
-    ]:
-        post_upload_pgpubs(**{
-            "execution_date": datetime.date(2022, month, day)
-        })
+#     for month, day in [
+# (3, 24),
+# (1, 27),
+# (1, 20),
+# (1, 13)
+#     ]:
+#         post_upload_pgpubs(**{
+#             "execution_date": datetime.date(2022, month, day)
+#         })
 

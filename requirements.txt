@@ -11,6 +11,7 @@ beautifulsoup4
 billiard
 boto3
 clint
+dotenv
 editdistance
 lxml
 matplotlib
@@ -32,7 +33,6 @@ slack_sdk
 sqlparse
 tabulate
 textdistance
-thebrainfuck
 thefuzz
 torch
 tqdm

@@ -261,7 +261,7 @@ where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_persistent_assignee` AS 
 select `patent`.`persistent_assignee_disambig`.`patent_id` AS `patent_id`,
-`patent`.`persistent_assignee_disambig`.`sequence` AS `sequence`,
+`patent`.`persistent_assignee_disambig`.`sequence` AS `assignee_sequence`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20181127` AS `disamb_assignee_id_20181127`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20190312` AS `disamb_assignee_id_20190312`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20190820` AS `disamb_assignee_id_20190820`,
@@ -277,13 +277,14 @@ select `patent`.`persistent_assignee_disambig`.`patent_id` AS `patent_id`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20211230` AS `disamb_assignee_id_20211230`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220630` AS `disamb_assignee_id_20220630`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929`,
-`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230330` AS `disamb_assignee_id_20230330` 
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230330` AS `disamb_assignee_id_20230330`,
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230629` AS `disamb_assignee_id_20230629`
 from `patent`.`persistent_assignee_disambig` 
 where `patent`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_persistent_inventor` AS 
 select `patent`.`persistent_inventor_disambig`.`patent_id` AS `patent_id`,
-`patent`.`persistent_inventor_disambig`.`sequence` AS `sequence`,
+`patent`.`persistent_inventor_disambig`.`sequence` AS `inventor_sequence`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20170808` AS `disamb_inventor_id_20170808`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20171003` AS `disamb_inventor_id_20171003`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20171226` AS `disamb_inventor_id_20171226`,
@@ -300,7 +301,8 @@ select `patent`.`persistent_inventor_disambig`.`patent_id` AS `patent_id`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20211230` AS `disamb_inventor_id_20211230`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220630` AS `disamb_inventor_id_20220630`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929`,
-`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230330` AS `disamb_inventor_id_20230330` 
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230330` AS `disamb_inventor_id_20230330`,
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230629` AS `disamb_inventor_id_20230629` 
 from `patent`.`persistent_inventor_disambig` 
 where `patent`.`persistent_inventor_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -616,27 +618,29 @@ where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_persistent_assignee` AS 
 select `pregrant_publications`.`persistent_assignee_disambig`.`document_number` AS `pgpub_id`,
-`pregrant_publications`.`persistent_assignee_disambig`.`sequence` AS `sequence`,
+`pregrant_publications`.`persistent_assignee_disambig`.`sequence` AS `assignee_sequence`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20201229` AS `disamb_assignee_id_20201229`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20210330` AS `disamb_assignee_id_20210330`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20210930` AS `disamb_assignee_id_20210930`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20211230` AS `disamb_assignee_id_20211230`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20220630` AS `disamb_assignee_id_20220630`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929`,
-`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230330` AS `disamb_assignee_id_20230330`
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230330` AS `disamb_assignee_id_20230330`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230629` AS `disamb_assignee_id_20230629`
 from `pregrant_publications`.`persistent_assignee_disambig` 
 where `pregrant_publications`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_persistent_inventor` AS 
 select `pregrant_publications`.`persistent_inventor_disambig`.`document_number` AS `pgpub_id`,
-`pregrant_publications`.`persistent_inventor_disambig`.`sequence` AS `sequence`,
+`pregrant_publications`.`persistent_inventor_disambig`.`sequence` AS `inventor_sequence`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20210330` AS `disamb_inventor_id_20210330`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20210629` AS `disamb_inventor_id_20210629`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20210930` AS `disamb_inventor_id_20210930`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20211230` AS `disamb_inventor_id_20211230`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20220630` AS `disamb_inventor_id_20220630`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929`,
-`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230330` AS `disamb_inventor_id_20230330` 
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230330` AS `disamb_inventor_id_20230330`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230629` AS `disamb_inventor_id_20230629` 
 from `pregrant_publications`.`persistent_inventor_disambig` 
 where `pregrant_publications`.`persistent_inventor_disambig`.`version_indicator` <= '{{datestring}}';
 
