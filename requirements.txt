@@ -8,6 +8,7 @@ SQLAlchemy
 Unidecode
 absl-py
 beautifulsoup4
+billiard
 boto3
 clint
 dotenv
