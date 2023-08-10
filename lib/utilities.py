@@ -55,12 +55,14 @@ def load_table_config(config, db='patent'):
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_granted"]}'
     elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'
-    elif db == 'Reporting_DB':
+    elif db == config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]:
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'
     elif db == 'bulk_exp_granted':
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'
     elif db == 'bulk_exp_pgpubs':
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'
+    elif db == 'PatentsView_20230330':
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'
 
     print(f"reading table config from {config_file}")
     with open(config_file) as file:
@@ -143,6 +145,14 @@ def get_relevant_attributes(self, class_called, database_section, config):
     elif class_called == "CPCTest":
         # self.patent_exclusion_list.extend(['cpc_group', 'cpc_subgroup', 'cpc_subsection', 'wipo_field'])
         self.table_config = load_table_config(config, db='patent')
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
+        self.exclusion_list = []
+
+    elif class_called == "ReportingDBTester":
+        self.table_config = load_table_config(config, db = config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]) #db should be parameterized later, not hard-coded
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
