@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 from tqdm import tqdm
 
 from updater.xml_to_sql.parser import queue_parsers
-from lib.configuration import get_current_config, get_config
+from lib.configuration import get_config
 
 def reparse(start, end, clearfirst = True, pubtype = 'pgpubs', raisefail=True):
     """
@@ -30,17 +30,20 @@ def reparse(start, end, clearfirst = True, pubtype = 'pgpubs', raisefail=True):
     assert re.fullmatch('[0-9]{6}', start) and re.fullmatch('[0-9]{6}',end), 'enter start and end dates as "yymmdd" or "yyyymmdd" (punctuation separators allowed)'
     assert pubtype in ('pgpubs','granted_patent'), f"pubtype must be either 'pgpubs'(default) or 'granted_patent'; {pubtype} provided" 
 
-    # config = get_current_config(pubtype, **{"execution_date": date.today()})
     config = get_config()
     folder_files = os.listdir(config['FOLDERS'][f'{pubtype}_bulk_xml_location'])
 
-    usefiles = [fnam for fnam in folder_files if 
+    # find the set of available USPTO data files within the given date range
+    datafiles = [fnam for fnam in folder_files if 
                         re.fullmatch(r"i?p[ag]([0-9]{6})(_r\d)?\.xml",fnam) is not None          and
                         re.fullmatch(r"i?p[ag]([0-9]{6})(_r\d)?\.xml",fnam).group(1) <= end      and
                         re.fullmatch(r"i?p[ag]([0-9]{6})(_r\d)?\.xml",fnam).group(1) >= start]
+    # find the set of unique file dates
+    dateset = {re.fullmatch(r"i?p[ag]([0-9]{6})(_r\d)?\.xml", file).group(1) for file in datafiles}
+    # for each date get the latest (highest revision version) file available
+    usefiles = [max([filename for filename in datafiles if datestring in filename]) for datestring in dateset]
+    # order the files for tracking progress
     usefiles.sort()
-    # revision files should be recognized and included, but all versions will be parsed in order
-    # TODO: recognize when a revision file exists for a date and skip versions before the most recent
 
     if clearfirst:
         import json
