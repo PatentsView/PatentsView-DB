@@ -99,8 +99,8 @@ select `a`.`id` AS `cpc_subclass`,
 `c`.`id` AS `cpc_class`,
 `c`.`title` AS `cpc_class_title` 
 from ((`patent`.`cpc_group` `a` 
-join `patent`.`cpc_subgroup` `b` on(`a`.`id` = left(`b`.`id`, 4))) 
-join `patent`.`cpc_subsection` `c` on(left(`b`.`id`, 3) = `c`.`id`));
+left join `patent`.`cpc_subgroup` `b` on(`a`.`id` = left(`b`.`id`, 4))) 
+left join `patent`.`cpc_subsection` `c` on(left(`b`.`id`, 3) = `c`.`id`));
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_examiner_not_disambiguated` AS 
 select `patent`.`rawexaminer`.`patent_id` AS `patent_id`,
@@ -406,8 +406,8 @@ select `a`.`patent_id` AS `patent_id`,
 `a`.`subclass_id` AS `uspc_subclass_id`,
 `c`.`title` AS `uspc_subclass_title` 
 from ((`patent`.`uspc` `a` 
-join `patent`.`mainclass_current` `b` on(`a`.`mainclass_id` = `b`.`id`)) 
-join `patent`.`subclass_current` `c` on(`a`.`subclass_id` = `c`.`id`)) 
+left join `patent`.`mainclass_current` `b` on(`a`.`mainclass_id` = `b`.`id`)) 
+left join `patent`.`subclass_current` `c` on(`a`.`subclass_id` = `c`.`id`)) 
 where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_wipo_technology` AS 
@@ -417,7 +417,7 @@ select `a`.`patent_id` AS `patent_id`,
 `b`.`sector_title` AS `wipo_sector_title`,
 `b`.`field_title` AS `wipo_field_title` 
 from (`patent`.`wipo` `a` 
-join `patent`.`wipo_field` `b` on(`a`.`field_id` = `b`.`id`)) 
+left join `patent`.`wipo_field` `b` on(`a`.`field_id` = `b`.`id`)) 
 where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_applicant_not_disambiguated` AS 
@@ -491,8 +491,8 @@ select `a`.`id` AS `cpc_subclass`,
 `c`.`id` AS `cpc_class`,
 `c`.`title` AS `cpc_class_title` 
 from ((`patent`.`cpc_group` `a` 
-join `patent`.`cpc_subgroup` `b` on(`a`.`id` = left(`b`.`id`, 4))) 
-join `patent`.`cpc_subsection` `c` on(left(`b`.`id`, 3) = `c`.`id`));
+left join `patent`.`cpc_subgroup` `b` on(`a`.`id` = left(`b`.`id`, 4))) 
+left join `patent`.`cpc_subsection` `c` on(left(`b`.`id`, 3) = `c`.`id`));
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_foreign_priority` AS 
 select `a`.`document_number` AS `pgpub_id`,
@@ -687,8 +687,8 @@ select `a`.`document_number` AS `pgpub_id`,
 `a`.`subclass_id` AS `uspc_subclass_id`,
 `c`.`title` AS `uspc_subclass_title` 
 from ((`pregrant_publications`.`uspc` `a` 
-join `patent`.`mainclass_current` `b` on(`a`.`mainclass_id` = `b`.`id`)) 
-join `patent`.`subclass_current` `c` on(`a`.`subclass_id` = `c`.`id`)) 
+left join `patent`.`mainclass_current` `b` on(`a`.`mainclass_id` = `b`.`id`)) 
+left join `patent`.`subclass_current` `c` on(`a`.`subclass_id` = `c`.`id`)) 
 where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_wipo_technology` AS 
@@ -698,6 +698,6 @@ select `a`.`document_number` AS `pgpub_id`,
 `b`.`sector_title` AS `wipo_sector_title`,
 `b`.`field_title` AS `wipo_field_title` 
 from (`pregrant_publications`.`wipo` `a` 
-join `patent`.`wipo_field` `b` on(`a`.`field_id` = `b`.`id`)) 
+left join `patent`.`wipo_field` `b` on(`a`.`field_id` = `b`.`id`)) 
 where `a`.`version_indicator` <= '{{datestring}}';
 
