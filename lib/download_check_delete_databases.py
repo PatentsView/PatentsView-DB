@@ -303,7 +303,7 @@ def run_table_archive(config_db, table_list, output_path):
 
     if table_list.isempty():
         raise Exception("Add Table List to DAG")
-    # backup_tables(db,output_path, table_list)
+    backup_tables(db, output_path, table_list)
     # table_list remains the same if you want to review all tables
     upload_tables_for_testing(config, db, output_path, table_list)
     # Compare archived DB to Original
@@ -316,40 +316,22 @@ def run_table_archive(config_db, table_list, output_path):
     delete_tables(prod_connection_string, db, table_list)
 
 
-# if __name__ == '__main__':
-    # type = 'pgpubs'
-    # output_path ='/PatentDataVolume/DatabaseBackups/PregrantPublications'
-    # config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
-    # for i in range(1, 24):
-    #     print("--------------------------------------------------------------")
-    #     print(f"RUNNING ITERATION: {i}")
-    #     print("--------------------------------------------------------------")
-    #     run_database_archive(type=type)
-        # run_table_archive(config)
-
 if __name__ == '__main__':
-    # b_list = []
-    # for i in range(1976, 2022):
-    #     temp = f'brf_sum_text_{i}'
-    #     b_list.append(temp)
-    # dr_list = []
-    # for i in range(1976, 2022):
-    #     temp = f'draw_desc_text_{i}'
-    #     dr_list.append(temp)
-    # c_list = []
-    # for i in range(1976, 2022):
-    #     temp = f'claims_{i}'
-    #     c_list.append(temp)
-    # de_list = []
-    # for i in range(1976, 2022):
-    #     temp = f'detail_desc_text_{i}'
-    #     de_list.append(temp)
-    # tab_list = b_list + dr_list + c_list + de_list
-    type = 'granted_patent'
+    type = 'pgpubs'
+    output_path ='/DatabaseBackups/PregrantPublications'
+    config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
+    for i in range(1, 2):
+        print("--------------------------------------------------------------")
+        print(f"RUNNING ITERATION: {i}")
+        print("--------------------------------------------------------------")
+        run_database_archive(type=type)
+
+# if __name__ == '__main__':
+#     type = 'granted_patent'
     # output_path = "/text_output/20220630/patent/download/"
     ### OUTPUT FOR PATENT DB TABLES:
-    output_path = "/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables"
-    run_table_archive(type, ['persistent_assignee_disambig_long_updated','rawlocation_before_fixes_20220929', 'cpc_current_20210930', 'inventor_20210930'] ,output_path)
+    # output_path = "/DatabaseBackups/RawDatabase/patent_db_tables"
+    # run_table_archive(type, ['cpc_current_20230330'] ,output_path)
 
     # config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
     # upload_tsv_backup_files(config, output_path, 'patent_text', tab_list)
