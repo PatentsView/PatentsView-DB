@@ -71,6 +71,21 @@ def backup_db(config, output_path, db):
     print(bash_command1)
     subprocess_cmd(bash_command1)
 
+def find_data_collection_server_path(db_type, data_type):
+    if db_type == 'pgpubs':
+        if data_type == 'database':
+            output_path = '/DatabaseBackups/PregrantPublications/pregrant_publications'
+        elif data_type == 'table':
+            output_path = '/DatabaseBackups/PregrantPublications/pgpubs_db_tables'
+    elif db_type == 'granted_patent':
+        if data_type == 'database':
+            output_path = 'DatabaseBackups/patent_'
+        elif data_type == 'table':
+            output_path = '/DatabaseBackups/RawDatabase/patent_db_tables'
+    return output_path
+
+
+
 
 def backup_tables(db, output_path, table_list):
     # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
@@ -256,15 +271,6 @@ def clean_up_backups(db, output_path):
         subprocess_cmd(i)
 
 def run_database_archive(type, output_override=None):
-    # LOOPING THROUGH MANY
-    # for i in range(0, 16):
-    #     print(f"We are on Iteration {i} of 16 or {i/16} %")
-    # if type == 'patent' or type[:6] == 'upload':
-    #     output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'
-    # elif type == 'pregrant_publications' or type[:6] == 'pgpubs':
-    #     output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
-    # else:
-    #     raise NotImplementedError
     config = get_current_config(type=type, **{"execution_date": datetime.date(2022, 1, 1)})
 
     # Create Archive SQL FILE
@@ -272,10 +278,8 @@ def run_database_archive(type, output_override=None):
 
     if output_override is not None:
         output_path = output_override
-    elif type in ('pgpubs','pregrant'):
-        output_path = '/archive/PregrantPublications/pregrant_publications'
     else:
-        output_path = '/archive/patent_'
+        output_path= find_data_collection_server_path(db_type=type, data_type="database")
 
     backup_db(config, output_path, old_db)
     upload_tables_for_testing(config, old_db, output_path, table_list)
@@ -318,7 +322,6 @@ def run_table_archive(config_db, table_list, output_path):
 
 if __name__ == '__main__':
     type = 'pgpubs'
-    output_path ='/DatabaseBackups/PregrantPublications'
     config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
     for i in range(1, 2):
         print("--------------------------------------------------------------")
@@ -328,9 +331,7 @@ if __name__ == '__main__':
 
 # if __name__ == '__main__':
 #     type = 'granted_patent'
-    # output_path = "/text_output/20220630/patent/download/"
-    ### OUTPUT FOR PATENT DB TABLES:
-    # output_path = "/DatabaseBackups/RawDatabase/patent_db_tables"
+#     output_path = find_data_collection_server_path(db_type=type, data_type="table")
     # run_table_archive(type, ['cpc_current_20230330'] ,output_path)
 
     # config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
