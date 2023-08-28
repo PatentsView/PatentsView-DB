@@ -1,0 +1,14 @@
+version: '3'
+services:
+  mydumper_service:
+    image: mydumper/mydumper
+    environment:
+     - S3_ACCESS_KEY_ID
+     - S3_SECRET_ACCESS_KEY
+     - S3_ENDPOINT_URL
+     - S3_BUCKET
+    volumes:
+     - /Users/bcard/DatabaseBackups:/DatabaseBackups
+     - /Users/bcard/projects/patentsview/PatentsView-DB:/project
+    command:
+      - mydumper --defaults-file="/Users/bcard/projects/patentsview/PatentsView-DB/resources/sql.conf"
