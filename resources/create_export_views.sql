@@ -80,6 +80,19 @@ select `patent`.`botanic`.`patent_id` AS `patent_id`,
 from `patent`.`botanic` 
 where `patent`.`botanic`.`version_indicator` <= '{{datestring}}';
 
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_cpc_at_issue` AS 
+select `patent`.`cpc`.`patent_id` AS `patent_id`,
+`patent`.`cpc`.`sequence` AS `cpc_sequence`,
+`patent`.`cpc`.`version` AS `cpc_version_indicator`,
+`patent`.`cpc`.`section_id` AS `cpc_section`,
+`patent`.`cpc`.`subsection_id` AS `cpc_class`,
+`patent`.`cpc`.`group_id` AS `cpc_subclass`,
+`patent`.`cpc`.`subgroup_id` AS `cpc_group`,
+`patent`.`cpc`.`category` AS `cpc_type`,
+`patent`.`cpc`.`action_date` AS `cpc_action_date` 
+from `patent`.`cpc` 
+where `patent`.`cpc`.`version_indicator` <= '{{datestring}}';
+
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_cpc_current` AS 
 select `patent`.`cpc_current`.`patent_id` AS `patent_id`,
 `patent`.`cpc_current`.`sequence` AS `cpc_sequence`,

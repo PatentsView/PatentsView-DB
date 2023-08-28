@@ -227,8 +227,7 @@ def consolidate_granted_cpc(config):
     engine = create_engine(cstr)
     engine.execute(
             """
-INSERT INTO cpc (uuid, patent_id, section_id, subsection_id, group_id, subgroup_id, category, sequence,
-                 version_indicator)
+INSERT INTO cpc (uuid, patent_id, section_id, subsection_id, group_id, subgroup_id, category, action_date, sequence, symbol_position, version_indicator)
 SELECT uuid,
        patent_id,
        section,
@@ -236,14 +235,14 @@ SELECT uuid,
        concat(section, class, subclass),
        concat(section, class, subclass, main_group, '/', subgroup),
        IF(value = 'I', 'inventional', 'additional'),
+       action_date,
        sequence,
+       symbol_position,
        version_indicator
-from main_cpc;
-            """)
+from main_cpc;""")
     engine.execute(
             """
-INSERT INTO cpc (uuid, patent_id, section_id, subsection_id, group_id, subgroup_id, category, sequence,
-                 version_indicator)
+INSERT INTO cpc (uuid, patent_id, section_id, subsection_id, group_id, subgroup_id, category, action_date, sequence, symbol_position, version_indicator)
 SELECT uuid,
        patent_id,
        section,
@@ -251,10 +250,19 @@ SELECT uuid,
        concat(section, class, subclass),
        concat(section, class, subclass, main_group, '/', subgroup),
        IF(value = 'I', 'inventional', 'additional'),
-       sequence,
+       action_date,
+       sequence + 1,
+       symbol_position,
        version_indicator
-from further_cpc;
-            """)
+from further_cpc
+WHERE NOT (
+        section IS NULL
+    AND class IS NULL
+    AND subclass IS NULL
+    AND main_group IS NULL
+    AND subgroup IS NULL
+    AND symbol_position IS NULL
+);""")
 
 def trim_rawassignee(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
