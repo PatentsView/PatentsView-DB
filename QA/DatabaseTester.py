@@ -59,6 +59,9 @@ class DatabaseTester(ABC):
         self.database_type = database_type
         utilities.class_db_specific_config(self, self.table_config, class_called)
 
+        #set a break point to check stuff
+
+
     def init_qa_dict(self):
         # Place Holder for saving QA counts - keys map to table names in patent_QA
         self.qa_data = {
@@ -316,6 +319,16 @@ f"HERE CHAR_LENGTH(`{field}`) != CHAR_LENGTH(TRIM(`{field}`))"
             raise Exception(
                 f"print({self.database_section}.{table}.{field} needs trimming")
 
+    def check_for_indexes(self, table):
+        if table not in ["patent_lawyer_unique", "webtool_comparison_countryI", "webtool_comparison_countryIA", "webtool_comparison_countryIAsector", "webtool_comparison_countryIsector", "webtool_comparison_stateA", "webtool_comparison_stateAsector", "webtool_comparison_stateI", "webtool_comparison_stateIA", "webtool_comparison_stateIsector", "webtool_comparison_wipoA", "webtool_comparison_wipoI"]:
+            index_query = \
+    f"""select count(*) from information_schema.statistics where table_name = '{table}' and table_schema = '{self.database_section}' """
+            count_value = self.query_runner(index_query, single_value_return=True)
+            if count_value == 0:
+                print(index_query)
+                raise Exception(
+                    f"print({self.database_section}.{table} has no indexes")
+
     def test_rawassignee_org(self, table, where_vi=False):
         rawassignee_q = """
 SELECT count(*) 
@@ -544,14 +557,15 @@ where invention_abstract is null """
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()
         for table in self.table_config:
-            # if table[:2] >= 'pa':
+            self.check_for_indexes(table)
+            # if table[:2] >= 'pa': maybe try using this
             print(" -------------------------------------------------- ")
             print(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table}")
             print(" -------------------------------------------------- ")
             if self.class_called != "ReportingDBTester" and "PostProcessingQC" not in self.class_called:
                 self.test_null_version_indicator(table)
             self.load_table_row_count(table, where_vi=False)
-            if table in 'rawassignee':
+            if table == 'rawassignee':
                 self.test_rawassignee_org(table, where_vi=False)
             self.test_blank_count(table, self.table_config[table], where_vi=False)
             self.load_nulls(table, self.table_config[table], where_vi=False)
@@ -601,6 +615,6 @@ if __name__ == '__main__':
     })
     # fill with correct run_id
     run_id = "backfill__2020-12-29T00:00:00+00:00"
-    pt = DatabaseTester(config, 'patent', datetime.date(2021, 12, 7), datetime.date(2022, 1, 19))
+    pt = DatabaseTester(config, 'PatentsView_20230330', datetime.date(2023, 1, 1), datetime.date(2023, 3, 30))
     pt.runTests()
 
