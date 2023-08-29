@@ -19,14 +19,16 @@ class ReportingDBTester(DatabaseTester):
         self.init_qa_dict()
         for table in self.table_config:
             self.load_table_row_count(table, where_vi=False)
+            self.check_for_indexes(table)
             self.load_nulls(table, self.table_config[table], where_vi=False)
+            self.test_blank_count(table, self.table_config[table], where_vi=False)
             self.save_qa_data()
             self.init_qa_dict()
-            print(" -------------------------------------------------- ")
-            print(f"FINISHED WITH TABLE: {table}")
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
+            logger.info(f"==============================================================================")
             logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
+            logger.info(f"==============================================================================")
 
 
 def run_reporting_db_qa():

@@ -10,6 +10,11 @@ from time import time
 import os
 import re
 
+import logging
+
+logging.basicConfig(level=logging.INFO)  # Set the logging level
+logger = logging.getLogger(__name__)
+
 from lib.configuration import get_connection_string
 from lib.configuration import get_current_config
 from lib import utilities
@@ -559,9 +564,9 @@ where invention_abstract is null """
         for table in self.table_config:
             self.check_for_indexes(table)
             # if table[:2] >= 'pa': maybe try using this
-            print(" -------------------------------------------------- ")
-            print(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table}")
-            print(" -------------------------------------------------- ")
+            logger.info(f"==============================================================================")
+            logger.info(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table} %")
+            logger.info(f"==============================================================================")
             if self.class_called != "ReportingDBTester" and "PostProcessingQC" not in self.class_called:
                 self.test_null_version_indicator(table)
             self.load_table_row_count(table, where_vi=False)
@@ -579,9 +584,9 @@ where invention_abstract is null """
             if table == self.central_entity:
                 self.test_patent_abstract_null(table)
             for field in self.table_config[table]["fields"]:
-                print("\t -------------------------------------------------- ")
-                print(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
-                print("\t -------------------------------------------------- ")
+                logger.info(f"==============================================================================")
+                logger.info(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
+                logger.info(f"==============================================================================")
                 if self.table_config[table]["fields"][field]["data_type"] == 'date':
                     self.test_zero_dates(table, field, where_vi=False)
                 if self.table_config[table]["fields"][field]["category"]:
@@ -600,13 +605,11 @@ where invention_abstract is null """
             else:
                 self.save_qa_data()
                 self.init_qa_dict()
+            logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
-            print(" -------------------------------------------------- ")
-            print(f"FINISHED WITH TABLE: {table}")
-            print(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
-            print(" -------------------------------------------------- ")
-
-
+            logger.info(f"==============================================================================")
+            logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
+            logger.info(f"==============================================================================")
 
 if __name__ == '__main__':
     # config = get_config()
