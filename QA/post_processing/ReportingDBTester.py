@@ -26,9 +26,7 @@ class ReportingDBTester(DatabaseTester):
             self.init_qa_dict()
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
-            logger.info(f"==============================================================================")
             logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
-            logger.info(f"==============================================================================")
 
 
 def run_reporting_db_qa():
