@@ -89,7 +89,7 @@ def parse_single_xml_to_dfs(xml_file:str, parse_type:str, logging:bool=False) ->
     from lib.configuration import get_current_config
     # set dates based on file name for accurate version_indicator
     config = get_current_config(type=parse_type, **{"execution_date": date.today()})
-    filedate = '20' + re.fullmatch('i?p[ag]([0-9]{6}).xml', xml_file).group(1)
+    filedate = '20' + re.fullmatch(r"i?p[ag]([0-9]{6})(_r\d)?\.xml", xml_file.split('/')[-1]).group(1)
     config['DATES']['END_DATE'] = filedate
     config['DATES']['START_DATE'] = (datetime.strptime(filedate, "%Y%m%d") + timedelta(-6)).strftime("%Y%m%d")
 
