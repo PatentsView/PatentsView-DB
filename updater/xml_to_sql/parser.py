@@ -210,8 +210,8 @@ def extract_field_data(field_element, field, attribute, description, flag, tag):
         return field_element.tag
         # For all other fields get the text value
     else:
-        if field_element.text is not None:
-            return field_element.text.strip()
+        if field.get('trim',True) and (field_element.text is not None): # allows bypassing the whitespace trim by adjusting the parsing JSON
+            return field_element.text.strip() # e.g. USPC uses spaces to pad classifications to a standard length, which should be preserved for processing
         else: return field_element.text
 
 def date_QC(datestring):
@@ -278,7 +278,7 @@ def extract_table_data(tab, patent_doc, doc_number, seq, foreign_key_config):
                 for elem in field_elements:
                     partial_strings += extract_text_from_all_children(elem)
                     data_list[field["field_name"]] = ' '.join(partial_strings)
-                    data_list[field["field_name"]] = re.sub("&lsqb;[0-9]{4}&rsqb;",'',data_list[field["field_name"]])
+                    data_list[field["field_name"]] = re.sub("&lsqb;[0-9]{4}&rsqb;",'',data_list[field["field_name"]]) # removes square bracketed numbers
                     data_list[field["field_name"]] = data_list[field["field_name"]].strip()
             else:
                 # Find all elements in the xml_path for a current field
@@ -622,12 +622,14 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
             dfs[df]['gi_statement'] = dfs[df]['gi_statement'].str.strip()
         elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
             dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
-        elif df == 'rawuspc':
+        elif df in ('rawuspc','main_uspc','further_uspc'):
             from lib.xml_helpers import process_uspc_class_sub
             dfs[df]['mainclass_id'] = dfs[df]['classification'].str[:3].str.replace(' ','') # first three characters, spaces removed
             dfs[df]['processed_sublcass'] = dfs[df]['classification'].apply(process_uspc_class_sub) # subclass cleaning
             dfs[df]['subclass_id'] = dfs[df]['mainclass_id'] + '/' + dfs[df]['processed_sublcass']
             dfs[df].drop(columns=['classification', 'processed_sublcass'], inplace=True)
+            if df == 'main_uspc':
+                dfs[df]['sequence'] = 0
         # add version_indicator
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
     # Load the generated data frames to database

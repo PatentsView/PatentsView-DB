@@ -27,38 +27,57 @@
       "filename": "gi.tsv"
     },
     {
-      "table_name": "rawuspc",
-      "friendly_name": "Raw USPC",
-      "multi_valued": true,
-      "entity_root_path": "us-bibliographic-data-grant/classification-national/",
-      "skip_children": ["country"],
+      "table_name": "main_uspc",
+      "friendly_name": "Raw Main USPC",
+      "multi_valued": false,
       "fields": [
         {
           "field_name": "classification",
           "friendly_name": "Classification",
-          "xml_path": ".",
+          "trim": false,
+          "xml_path": "us-bibliographic-data-grant/classification-national/main-classification",
           "attribute": null,
           "description": null,
           "sequence": false,
           "flag": null,
           "tag": false,
           "data-type": "string"
-        },
-        {
-          "field_name": "sequence",
-          "friendly_name": "Sequence",
-          "xml_path": ".",
-          "attribute": null,
-          "description": null,
-          "sequence": true,
-          "flag": null,
-          "tag": false,
-          "data-type": "string"
         }
       ],
-        "filename": "rawuspc.tsv"
+        "filename": "main_uspc.tsv"
       },
-
+      {
+        "table_name": "further_uspc",
+        "friendly_name": "Raw Further USPC",
+        "multi_valued": true,
+        "entity_root_path": "us-bibliographic-data-grant/classification-national/further-classification",
+        "fields": [
+          {
+            "field_name": "classification",
+            "friendly_name": "Classification",
+            "trim": false,
+            "xml_path": ".",
+            "attribute": null,
+            "description": null,
+            "sequence": false,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+          },
+          {
+            "field_name": "sequence",
+            "friendly_name": "Sequence",
+            "xml_path": ".",
+            "attribute": null,
+            "description": null,
+            "sequence": true,
+            "flag": null,
+            "tag": false,
+            "data-type": "string"
+          }
+        ],
+          "filename": "further_uspc.tsv"
+        },
     {
       "table_name": "rel_app_text",
       "friendly_name": "Related Application Text",
