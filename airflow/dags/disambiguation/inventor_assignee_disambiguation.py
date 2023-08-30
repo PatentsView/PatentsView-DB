@@ -17,7 +17,6 @@ from updater.disambiguation.inventor_disambiguation.inventor_disambiguator impor
     build_canopies, archive_results as archive_inventor_results, build_coinventor_features, build_title_map, \
     run_hierarchical_clustering as run_inventor_hierarchical_clustering, \
     finalize_disambiguation, upload_results as upload_inventor_results, setup_inventor_assignee_disambiguation
-from updater.disambiguation.location_disambiguation.location_disambiguator import *
 from updater.post_processing.post_process_location import post_process_location, post_process_qc, augment_location_fips
 from updater.post_processing.post_process_assignee import additional_post_processing_assignee, \
     post_process_qc as qc_post_process_assignee, \
