@@ -155,6 +155,9 @@ def log_writer(log_queue, log_prefix="uspto_parser"):
             break
         logger.log(message_data["level"], message_data["message"])
 
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+        handler.close()
 
 def save_zip_file(url, name, path, counter=0, log_queue=None):
     os.makedirs(path, exist_ok=True)
