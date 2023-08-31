@@ -302,6 +302,7 @@ def process_publication_document(patent_app_document, patent_config):
             sequence = 1
             # extract all data necessary
             for entity_element in patent_app_document.findall(entity_root_path):
+                if entity_element.tag in table.get('skip_tags',[]): continue # if any specified skippable child elements, skip them
                 table_rows.append(extract_table_data(table, entity_element, document_number, sequence,
                                                      patent_config['foreign_key_config']))
                 sequence += 1
