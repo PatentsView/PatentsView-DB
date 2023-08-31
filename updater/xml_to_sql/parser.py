@@ -18,7 +18,7 @@ from sqlalchemy.dialects import mysql
 from lib.configuration import get_current_config
 from lib.utilities import download_xml_files
 from lib.utilities import log_writer
-from lib.xml_helpers import get_citations, v1_get_citations, process_citations
+from lib.xml_helpers import get_citations, v1_get_citations, process_citations, process_patent_numbers, process_uspc_class_sub
 
 newline_tags = ["p", "heading", "br"]
 
@@ -615,6 +615,8 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
+        if 'patent_id' in dfs[df].columns:
+            dfs[df]['patent_id'] = dfs[df]['patent_id'].apply(process_patent_numbers)
         #table specific post-processing
         if df == 'government_interest':
             narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
@@ -623,7 +625,6 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
         elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
             dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         elif df in ('rawuspc','main_uspc','further_uspc'):
-            from lib.xml_helpers import process_uspc_class_sub
             dfs[df]['mainclass_id'] = dfs[df]['classification'].str[:3].str.replace(' ','') # first three characters, spaces removed
             dfs[df]['processed_sublcass'] = dfs[df]['classification'].apply(process_uspc_class_sub) # subclass cleaning
             dfs[df]['subclass_id'] = dfs[df]['mainclass_id'] + '/' + dfs[df]['processed_sublcass']
