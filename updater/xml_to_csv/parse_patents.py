@@ -380,6 +380,10 @@ def get_results(patents, field_dictionary):
             for uspc in uspcs:
                 main_class = uspc['main-classification'][0][:3].replace(" ", "")
                 results['mainclass'].append(main_class)
+                main_sub_class = xml_helpers.process_uspc_class_sub(uspc['main-classification'][0])
+                results['subclass'].append(main_sub_class)
+                results['uspc'].append([id_generator(), patent_id, main_class, main_sub_class, str(uspc_seq)])
+                uspc_seq += 1
                 if uspc['further-classification']:
                     for further_class in uspc['further-classification']:
                         further_main_class = further_class[:3].replace(" ", "")
@@ -390,12 +394,8 @@ def get_results(patents, field_dictionary):
                             # why do we only do this for further class?
                             further_combined_class = "{0}/{1}".format(further_main_class, further_sub_class)
                             results['subclass'].append(further_combined_class)
-                            results['uspc'].append(
-                                    [id_generator(), patent_id, further_main_class, further_combined_class,
-                                     str(uspc_seq)])
+                            results['uspc'].append([id_generator(), patent_id, further_main_class, further_combined_class, str(uspc_seq)])
                             uspc_seq += 1
-                main_sub_class = xml_helpers.process_uspc_class_sub(uspc['main-classification'][0])
-                results['subclass'].append(main_sub_class)
 
         ipcr_data = xml_helpers.get_entity(patent, 'classifications-ipcr/')
         if ipcr_data[0] is not None:
