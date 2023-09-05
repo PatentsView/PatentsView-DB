@@ -417,7 +417,7 @@ def post_process_assignee(**kwargs):
     create_canonical_assignees(**kwargs)
     create_patent_assignee(**kwargs)
     create_publication_assignee(**kwargs)
-    check_largest_clusters()
+    check_largest_clusters(**kwargs)
 
 def check_largest_clusters(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
@@ -446,7 +446,7 @@ def additional_post_processing_assignee(**kwargs):
 def post_process_qc(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     qc = AssigneePostProcessingQC(config)
-    qc.runTests()
+    qc.run_assignee_disambig_tests()
 
 if __name__ == '__main__':
     date = datetime.date(2023, 1, 1)
