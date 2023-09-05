@@ -45,6 +45,15 @@ def consolidate_rawlocation(config):
             f'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM {applicant_table};')
 
 
+def clean_rawlocation(config):
+    cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
+    engine = create_engine(cstr)
+    engine.execute("""
+    delete
+    from rawlocation 
+    where city is null and state is null and country is null;""")
+
+
 def create_country_transformed(config):
     print('creating country_transformed')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
@@ -367,6 +376,7 @@ def begin_post_processing(**kwargs):
     trim_rawassignee(config)
     fix_rawassignee_wrong_org(config)
     consolidate_rawlocation(config)
+    clean_rawlocation(config)
     create_country_transformed(config)
     create_location_match_table(config)
     consolidate_cpc(config)
