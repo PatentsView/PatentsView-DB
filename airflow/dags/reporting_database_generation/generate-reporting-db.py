@@ -5,11 +5,13 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from slack_sdk import WebClient
+from updater.callbacks import airflow_task_failure, airflow_task_success
 
 from airflow.dags.granted_patent_parser.patentsview_data_updater import operator_settings
 from slack_sdk.errors import SlackApiError
 
 from reporting_database_generator.database import validate_query
+from reporting_database_generator import create_eight_digit_patent_lookup
 from QA.post_processing.ReportingDBTester import run_reporting_db_qa
 
 project_home = os.environ['PACKAGE_HOME']
@@ -76,6 +78,14 @@ db_creation = SQLTemplatedPythonOperator(
     templates_exts=template_extension_config,
     params=database_name_config
 )
+
+rebuild_patent_lookup = PythonOperator(task_id='Inventor_Build_Inventor_Canopies',
+                                    python_callable=create_eight_digit_patent_lookup,
+                                    provide_context=True,
+                                    dag=reporting_db_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure,
+                                    queue='disambiguator', pool='high_memory_pool')
 
 govt_interest = SQLTemplatedPythonOperator(
     task_id='Government_Interest',
@@ -617,6 +627,7 @@ govt_interest.set_upstream(db_creation)
 id_mappings.set_upstream(db_creation)
 application.set_upstream(db_creation)
 wipo.set_upstream(db_creation)
+rebuild_patent_lookup.set_upstream(db_creation)
 
 patent.set_upstream(id_mappings)
 
