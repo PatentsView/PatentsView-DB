@@ -79,7 +79,7 @@ db_creation = SQLTemplatedPythonOperator(
     params=database_name_config
 )
 
-rebuild_patent_lookup = PythonOperator(task_id='Inventor_Build_Inventor_Canopies',
+rebuild_patent_lookup = PythonOperator(task_id='rebuild_patent_lookup',
                                     python_callable=create_eight_digit_patent_lookup,
                                     provide_context=True,
                                     dag=reporting_db_dag,
