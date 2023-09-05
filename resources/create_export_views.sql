@@ -6,6 +6,7 @@ select `a`.`patent_id` AS `patent_id`,
 `a`.`organization` AS `raw_applicant_organization`,
 `a`.`applicant_type` AS `applicant_type`,
 `a`.`designation` AS `applicant_designation`,
+`a`.`applicant_authority` AS `applicant_authority`,
 `a`.`rawlocation_id` AS `rawlocation_id` 
 from `patent`.`non_inventor_applicant` `a` 
 where `a`.`version_indicator` <= '{{datestring}}';
@@ -441,6 +442,7 @@ select `a`.`document_number` AS `pgpub_id`,
 `a`.`organization` AS `raw_applicant_organization`,
 `a`.`type` AS `applicant_type`,
 `a`.`designation` AS `applicant_designation`,
+`a`.`applicant_authority` AS `applicant_authority`,
 `a`.`rawlocation_id` AS `rawlocation_id` 
 from `pregrant_publications`.`us_parties` `a` 
 where `a`.`version_indicator` <= '{{datestring}}';
