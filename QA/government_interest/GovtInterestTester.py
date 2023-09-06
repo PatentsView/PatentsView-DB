@@ -3,7 +3,10 @@ import itertools
 
 from QA.DatabaseTester import DatabaseTester
 from lib.configuration import get_current_config
+import logging
 
+logging.basicConfig(level=logging.INFO)  # Set the logging level
+logger = logging.getLogger(__name__)
 
 class GovtInterestTester(DatabaseTester):
     def __init__(self, config, database = 'TEMP_UPLOAD_DB', id_type = 'patent_id'):
@@ -84,10 +87,34 @@ FROM   `government_interest` gi
                             'organization'          : gov_int_row[3]
                             })
 
-    def runTests(self):
-        super(GovtInterestTester, self).runTests()
+    def run_GI_tests(self):
+        counter = 0
+        total_tables = len(self.table_config.keys())
+        self.init_qa_dict()
         self.generate_govt_int_samples()
-        self.save_qa_data()
+        for table in self.table_config:
+            self.load_table_row_count(table, where_vi=False)
+            self.load_nulls(table, self.table_config[table], where_vi=False)
+            self.test_blank_count(table, self.table_config[table], where_vi=False)
+            self.save_qa_data()
+            self.init_qa_dict()
+            logger.info(f"FINISHED WITH TABLE: {table}")
+            counter += 1
+            logger.info(f"Currently Done With {counter} of {total_tables} | {counter / total_tables} %")
+            for field in self.table_config[table]["fields"]:
+                logger.info(f"==============================================================================")
+                logger.info(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
+                logger.info(f"==============================================================================")
+                if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text', 'varchar']:
+                    self.test_newlines(table, field, where_vi=False)
+                self.test_null_byte(table, field, where_vi=False)
+                self.save_qa_data()
+                self.init_qa_dict()
+            logger.info(f"FINISHED WITH TABLE: {table}")
+            counter += 1
+            logger.info(f"==============================================================================")
+            logger.info(f"Currently Done With {counter} of {total_tables} | {counter / total_tables} %")
+            logger.info(f"==============================================================================")
 
 
 def begin_gi_test(config, database = 'TEMP_UPLOAD_DB', id_type = 'patent_id'):
@@ -96,12 +123,10 @@ def begin_gi_test(config, database = 'TEMP_UPLOAD_DB', id_type = 'patent_id'):
 
 
 if __name__ == '__main__':
+    dbtype = 'granted_patent'
     config = get_current_config('granted_patent', **{
-            "execution_date": datetime.date(2020, 12, 29)
+            "execution_date": datetime.date(2023, 7, 25)
             })
-    config['DATES'] = {
-            "START_DATE": '20201006',
-            "END_DATE":   '20201229'
-            }
-    begin_gi_test(config)
+    qc = GovtInterestTester(config, database="PROD_DB", id_type=('patent_id' if dbtype =='granted_patent' else 'document_number'))
+    qc.run_GI_tests()
 
