@@ -11,7 +11,7 @@ from airflow.dags.granted_patent_parser.patentsview_data_updater import operator
 from slack_sdk.errors import SlackApiError
 
 from reporting_database_generator.database import validate_query
-from reporting_database_generator import create_eight_digit_patent_lookup
+from reporting_database_generator.create_eight_digit_patent_lookup import update_patent_id_in_patent
 from QA.post_processing.ReportingDBTester import run_reporting_db_qa
 
 project_home = os.environ['PACKAGE_HOME']
@@ -80,7 +80,7 @@ db_creation = SQLTemplatedPythonOperator(
 )
 
 rebuild_patent_lookup = PythonOperator(task_id='rebuild_patent_lookup',
-                                    python_callable=create_eight_digit_patent_lookup,
+                                    python_callable=update_patent_id_in_patent,
                                     provide_context=True,
                                     dag=reporting_db_dag,
                                     on_success_callback=airflow_task_success,
