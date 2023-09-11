@@ -99,7 +99,6 @@ FROM   `government_interest` gi
             self.save_qa_data()
             self.init_qa_dict()
             logger.info(f"FINISHED WITH TABLE: {table}")
-            counter += 1
             logger.info(f"Currently Done With {counter} of {total_tables} | {counter / total_tables} %")
             for field in self.table_config[table]["fields"]:
                 logger.info(f"==============================================================================")
@@ -113,7 +112,7 @@ FROM   `government_interest` gi
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
             logger.info(f"==============================================================================")
-            logger.info(f"Currently Done With {counter} of {total_tables} | {counter / total_tables} %")
+            logger.info(f"Currently Done With {counter} of {total_tables} | {(counter / total_tables)*100} %")
             logger.info(f"==============================================================================")
 
 
