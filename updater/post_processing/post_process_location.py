@@ -262,7 +262,6 @@ def update_dis_location_mapping(config):
 def post_process_location(**kwargs):
     patent_config = get_current_config(schedule="quarterly", **kwargs)
     pgpubs_config = get_current_config(type='pgpubs', schedule="quarterly", **kwargs)
-    # Technically we no longer need the location-disambiguation-mapping view anymore because only net new location_id gets mapped
     consolidate_location_disambiguation_quarterly(patent_config, **kwargs)
     consolidate_location_disambiguation_quarterly(pgpubs_config, **kwargs)
     update_dis_location_mapping(patent_config)
