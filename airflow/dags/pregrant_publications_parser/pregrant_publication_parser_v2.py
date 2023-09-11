@@ -90,7 +90,7 @@ post_processing_operator = PythonOperator(task_id='post_process',
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure,
                                           depends_on_past=True,
-                                          pool='database_write_iops_contenders'
+                                          pool = 'elastic_search_pool'
                                           )
 
 qc_upload_operator = PythonOperator(task_id='qc_upload_new',

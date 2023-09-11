@@ -124,8 +124,7 @@ qc_upload_operator = PythonOperator(task_id='qc_upload_new', python_callable=pos
                                     )
 ### new OSM ElasticSearch geocoding
 OSM_geocode_operator = PythonOperator(task_id='geocode_rawlocations', python_callable=geocode_by_osm,
-                                      depends_on_past = True,
-                                      **operator_settings
+                                      **operator_settings, pool = 'elastic_search_pool'
                                       )
 
 ### Location_ID generation
