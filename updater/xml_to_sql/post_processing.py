@@ -48,7 +48,7 @@ def consolidate_rawlocation(config):
             f'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM {applicant_table};')
 
 
-def clean_rawlocation_recursive(config, applicant_table="us_parties"):
+def clean_rawlocation_plus_downstream(config, applicant_table="us_parties"):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     q0 = """
@@ -396,7 +396,7 @@ def begin_post_processing(**kwargs):
     trim_rawassignee(config)
     fix_rawassignee_wrong_org(config)
     consolidate_rawlocation(config)
-    clean_rawlocation_recursive(config, applicant_table="us_parties")
+    clean_rawlocation_plus_downstream(config, applicant_table="us_parties")
     create_country_transformed(config)
     create_location_match_table(config)
     consolidate_cpc(config)
