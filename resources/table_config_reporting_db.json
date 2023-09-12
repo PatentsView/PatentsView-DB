@@ -2326,37 +2326,6 @@
             "ReportingDBTester"
         ]
     },
-    "patent_inventor_old": {
-        "fields": {
-            "patent_id": {
-                "data_type": "varchar",
-                "null_allowed": false,
-                "category": false,
-                "location_field": false
-            },
-            "inventor_id": {
-                "data_type": "int",
-                "null_allowed": false,
-                "category": false,
-                "location_field": false
-            },
-            "location_id": {
-                "data_type": "int",
-                "null_allowed": true,
-                "category": false,
-                "location_field": false
-            },
-            "sequence": {
-                "data_type": "int",
-                "null_allowed": false,
-                "category": false,
-                "location_field": false
-            }
-        },
-        "TestScripts": [
-            "ReportingDBTester"
-        ]
-    },
     "patent_lawyer": {
         "fields": {
             "patent_id": {

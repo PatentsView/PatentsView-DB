@@ -29,10 +29,8 @@ class ReportingDBTester(DatabaseTester):
             logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
 
 
-def run_reporting_db_qa():
-    config = get_current_config('granted_patent', **{
-                    "execution_date": datetime.date(2022, 6, 30)
-                                })
+def run_reporting_db_qa(**kwargs):
+    config = get_current_config('granted_patent', schedule="quarterly", **kwargs)
     qc = ReportingDBTester(config)
     qc.run_reporting_db_tests()
 
