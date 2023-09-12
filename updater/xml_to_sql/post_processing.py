@@ -1,7 +1,7 @@
 import datetime
 import os
 import json
-
+import logging
 import pymysql
 from sqlalchemy import create_engine
 
@@ -9,6 +9,9 @@ from QA.text_parser.AppTest import AppUploadTest
 from lib.configuration import get_connection_string, get_current_config
 from lib import utilities
 from updater.disambiguation.location_disambiguation.osm_location_match import create_location_match_table
+
+logging.basicConfig(level=logging.INFO)  # Set the logging level
+logger = logging.getLogger(__name__)
 
 def pct_data_doc_type(config):
     print('fixing pct doc types')
@@ -45,13 +48,30 @@ def consolidate_rawlocation(config):
             f'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM {applicant_table};')
 
 
-def clean_rawlocation(config):
+def clean_rawlocation_plus_downstream(config, applicant_table="us_parties"):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
-    engine.execute("""
+    q0 = """
+create table null_rawlocations 
+select id
+from rawlocation 
+where city is null and state is null and country is null;"""
+    logger.info(f"{q0}")
+    engine.execute(q0)
+    for table in ['rawinventor','rawassignee', applicant_table]:
+        temp_q = f"""
+update {table}
+set rawlocation_id = null 
+where rawlocation_id in ( select * from null_rawlocations)"""
+        logger.info(f"{temp_q}")
+        engine.execute(temp_q)
+    q1 = """
     delete
     from rawlocation 
-    where city is null and state is null and country is null;""")
+    where city is null and state is null and country is null;"""
+    logger.info(f"{q1}")
+    engine.execute(q1)
+
 
 
 def create_country_transformed(config):
@@ -376,7 +396,7 @@ def begin_post_processing(**kwargs):
     trim_rawassignee(config)
     fix_rawassignee_wrong_org(config)
     consolidate_rawlocation(config)
-    clean_rawlocation(config)
+    clean_rawlocation_plus_downstream(config, applicant_table="us_parties")
     create_country_transformed(config)
     create_location_match_table(config)
     consolidate_cpc(config)
@@ -399,5 +419,5 @@ def post_upload_database(**kwargs):
 
 if __name__ == "__main__":
     begin_post_processing(**{
-            "execution_date": datetime.date(2022, 1, 13)
+            "execution_date": datetime.date(2023, 4, 6)
             })
