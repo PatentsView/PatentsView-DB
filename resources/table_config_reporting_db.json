@@ -2392,7 +2392,7 @@
             },
             "kind": {
                 "data_type": "varchar",
-                "null_allowed": false,
+                "null_allowed": true,
                 "category": true,
                 "location_field": false
             },
