@@ -14,7 +14,7 @@ The color of a task shows the status of a given task for a given week.
 * **Dark green** means the task succeeded
 * **Red** means the task has failed
 * **Yellow** means the task cannot run because a previous task that it relies on has failed
-<br>
+
 If you click on one square in the grid, you'll see details and options for that task. 
 If you click on *Log* (in between *Rendered Template* and *XCom*) you'll see the log messages for that task. **These are important to check to find out why a task failed.** The error messages in logs will tell you a lot about why a certain task failed, and where to begin degugging, if need be. <br>
 <br>
@@ -24,7 +24,7 @@ Note that the graph view will always default to showing you the most recent run 
 If you want to try running a task again, then go back to the grid view, click on the task and respective week you want to rerun, and click *Clear* with *Downstream* and *Recursive* selected. Airflow will give you a warning message about the tasks you're about to clear to confirm.
 
 ## Logging Changes and Fixes
-When a task fails, you may have to fix data in a table. When you do, it's important to make note of these changes so others can see what went wrong and what you changed. We keep text files outlining our changes in [this GitHub](https://github.com/PatentsView/daily-analysis-logs/tree/main). <br>
+When a task fails, you may have to fix data in a table. When you do, it's important to make note of these changes so others can see what went wrong and what you changed. We keep text files outlining our changes in the [daily-analysis-logs GitHub](https://github.com/PatentsView/daily-analysis-logs/tree/main). <br>
 <br>
 When you create a text file to note your changes, you may want to follow a consistent format, such as this: <br>
 *qc_parse_text_data_correction.txt*
@@ -53,6 +53,11 @@ Once all the tasks in a given week run successfully, you can upload your text fi
 This weekly parser handles new weekly data for patents. It runs every Tuesday at 9:00 UTC.
 
 ## Common issues
+### Needs trimming
+This error happens during the *qc_parse_text_data* task. It happens when a row in the data has at least one leading or trailing white space in it. <br>
+For example, if the `dependent` column in an upload table has one row that looks like 'claim ' or ' claim 10' or 'claim 18 ', then this eror will occur. <br>
+**IMPORTANT NOTE:** If a row in `dependent` has a trailing space that looks like 'claim 1 ', then it's possible that the space is actually a missing number. For example, if there is a row with the value 'claim 1 ', then it might actually be 'claim 12' or something similar. 
+In this case, it's best to check the data for clues. Usually, the `claim_text` will mention any dependencies. Read the `claim_text` of the problematic row to see if there are any references to claims that the row depends on. If the `claim_text` mentions dependency on 'claim 13', for example, then you know that `dependent` should be set to 'claim 13'. <br>
 
 # pregrant_publication_updater_v2
 ## Description
