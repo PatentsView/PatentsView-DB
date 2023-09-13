@@ -3,8 +3,8 @@
 
 ################################################################################################################################################
 
-drop table if exists `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_counts`;
-create table `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_counts`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_nber_subcategory_aggregate_counts`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_nber_subcategory_aggregate_counts`
 (
   `subcategory_id` varchar(20) not null,
   `num_assignees` int unsigned not null,
@@ -18,7 +18,7 @@ create table `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_co
 engine=InnoDB;
 
 
-insert into `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_counts`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_nber_subcategory_aggregate_counts`
 (
   `subcategory_id`, `num_assignees`, `num_inventors`, `num_patents`,
   `first_seen_date`, `last_seen_date`, `actual_years_active`
@@ -31,16 +31,16 @@ select
   min(p.`date`), max(p.`date`),
   ifnull(round(timestampdiff(day, min(p.`date`), max(p.`date`)) / 365), 0)
 from
-  `{{params.raw_database}}`.`nber` n
-  left outer join `{{params.raw_database}}`.`patent_assignee` pa on pa.`patent_id` = n.`patent_id`
-  left outer join `{{params.raw_database}}`.`patent_inventor` pii on pii.`patent_id` = n.`patent_id`
-  left outer join `{{params.reporting_database}}`.`patent` p on p.`patent_id` = n.`patent_id`  where n.version_indicator<= '{{ params.version_indicator }}'
+  `patent`.`nber` n
+  left outer join `patent`.`patent_assignee` pa on pa.`patent_id` = n.`patent_id`
+  left outer join `patent`.`patent_inventor` pii on pii.`patent_id` = n.`patent_id`
+  left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p on p.`patent_id` = n.`patent_id`  where n.version_indicator<= '{{ params.version_indicator }}'
 group by
   n.`subcategory_id`;
 
 
-drop table if exists `{{params.reporting_database}}`.`nber`;
-create table `{{params.reporting_database}}`.`nber`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber`
 (
   `patent_id` varchar(20) not null,
   `category_id` varchar(20) null,
@@ -58,7 +58,7 @@ create table `{{params.reporting_database}}`.`nber`
 engine=InnoDB;
 
 
-insert into `{{params.reporting_database}}`.`nber`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber`
 (
   `patent_id`, `category_id`, `category_title`, `subcategory_id`,
   `subcategory_title`,
@@ -75,11 +75,11 @@ select
   tnsac.`first_seen_date`, tnsac.`last_seen_date`,
   case when tnsac.`actual_years_active` < 1 then 1 else tnsac.`actual_years_active` end
 from
-  `{{params.reporting_database}}`.`patent` p
-  inner join `{{params.raw_database}}`.`nber` n on p.`patent_id` = n.`patent_id`
-  left outer join `{{params.raw_database}}`.`nber_category` c on c.`id` = n.`category_id`
-  left outer join `{{params.raw_database}}`.`nber_subcategory` s on s.`id` = n.`subcategory_id`
-  left outer join `{{params.reporting_database}}`.`temp_nber_subcategory_aggregate_counts` tnsac on tnsac.`subcategory_id` = n.`subcategory_id`;
+  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p
+  inner join `patent`.`nber` n on p.`patent_id` = n.`patent_id`
+  left outer join `patent`.`nber_category` c on c.`id` = n.`category_id`
+  left outer join `patent`.`nber_subcategory` s on s.`id` = n.`subcategory_id`
+  left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_nber_subcategory_aggregate_counts` tnsac on tnsac.`subcategory_id` = n.`subcategory_id`;
 
 
 # END nber 
@@ -94,8 +94,8 @@ from
 ##########################################################################################################################
 
 
-drop table if exists `{{params.reporting_database}}`.`nber_subcategory_patent_year`;
-create table `{{params.reporting_database}}`.`nber_subcategory_patent_year`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber_subcategory_patent_year`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber_subcategory_patent_year`
 (
   `subcategory_id` varchar(20) not null,
   `patent_year` smallint unsigned not null,
@@ -105,13 +105,13 @@ create table `{{params.reporting_database}}`.`nber_subcategory_patent_year`
 engine=InnoDB;
 
 
-insert into `{{params.reporting_database}}`.`nber_subcategory_patent_year`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber_subcategory_patent_year`
   (`subcategory_id`, `patent_year`, `num_patents`)
 select
   n.`subcategory_id`, year(p.`date`), count(distinct n.`patent_id`)
 from
-  `{{params.raw_database}}`.`nber` n
-  inner join `{{params.reporting_database}}`.`patent` p on p.`patent_id` = n.`patent_id` and p.`date` is not null
+  `patent`.`nber` n
+  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p on p.`patent_id` = n.`patent_id` and p.`date` is not null
 where
   n.`subcategory_id` is not null and n.`subcategory_id` != ''  and n.version_indicator<= '{{ params.version_indicator }}'
 group by

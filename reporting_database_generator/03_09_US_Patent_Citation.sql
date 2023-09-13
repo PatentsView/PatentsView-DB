@@ -4,8 +4,8 @@
 ######################################################################################################################################
 
 
-drop table if exists `{{params.reporting_database}}`.`uspatentcitation`;
-create table `{{params.reporting_database}}`.`uspatentcitation`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspatentcitation`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspatentcitation`
 (
   `citing_patent_id` varchar(20) not null,
   `sequence` int not null,
@@ -15,13 +15,13 @@ create table `{{params.reporting_database}}`.`uspatentcitation`
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-insert into `{{params.reporting_database}}`.`uspatentcitation`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspatentcitation`
   (`citing_patent_id`, `sequence`, `cited_patent_id`, `category`)
 select
   pc.`patent_id`, pc.`sequence`, nullif(trim(pc.`citation_id`), ''), nullif(trim(pc.`category`), '')
 from
-  `{{params.reporting_database}}`.`patent` p
-  inner join `{{params.raw_database}}`.`uspatentcitation` pc on pc.`patent_id` = p.`patent_id`;
+  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p
+  inner join `patent`.`uspatentcitation` pc on pc.`patent_id` = p.`patent_id`;
 
 
 # END uspatentcitation 

@@ -58,24 +58,24 @@ reporting_db_dag = DAG("reporting_database_generation"
                        , schedule_interval='@quarterly'
                        , template_searchpath="/project/reporting_database_generator/")
 
-# db_creation = SQLTemplatedPythonOperator(
-#     task_id='Database_Creation',
-#     provide_context=True,
-#     python_callable=validate_query.validate_and_execute,
-#     dag=reporting_db_dag,
-#     op_kwargs={
-#         'filename': '00_Creation',
-#     },
-#     templates_dict={
-#         'source_sql': '00_Creation.sql'
-#     },
-# )
-db_creation = PythonOperator(task_id='Database_Creation',
-                                    python_callable=reporting_db_creation,
-                                    provide_context=True,
-                                    dag=reporting_db_dag,
-                                    on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure)
+db_creation = SQLTemplatedPythonOperator(
+    task_id='Database_Creation',
+    provide_context=True,
+    python_callable=validate_query.validate_and_execute,
+    dag=reporting_db_dag,
+    op_kwargs={
+        'filename': '00_Creation',
+    },
+    templates_dict={
+        'source_sql': '00_Creation.sql'
+    },
+)
+# db_creation = PythonOperator(task_id='Database_Creation',
+#                                     python_callable=reporting_db_creation,
+#                                     provide_context=True,
+#                                     dag=reporting_db_dag,
+#                                     on_success_callback=airflow_task_success,
+#                                     on_failure_callback=airflow_task_failure)
 
 rebuild_patent_lookup = PythonOperator(task_id='rebuild_patent_lookup',
                                     python_callable=update_patent_id_in_patent,
