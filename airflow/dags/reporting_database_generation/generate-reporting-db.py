@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
+from airflow.sensors.external_task import ExternalTaskSensor
 from slack_sdk import WebClient
 from updater.callbacks import airflow_task_failure, airflow_task_success
 
@@ -57,6 +58,26 @@ reporting_db_dag = DAG("reporting_database_generation"
                        , end_date=datetime(2022, 7, 1)
                        , schedule_interval='@quarterly'
                        , template_searchpath="/project/reporting_database_generator/")
+
+assignee_disambiguation_finished = ExternalTaskSensor(
+    task_id="assignee_disambiguation_finished",
+    external_dag_id="inventor_assignee_disambiguation",
+    external_task_id="qc_post_process_assignee",
+    timeout=600,
+    allowed_states=['success'],
+    failed_states=['failed', 'skipped'],
+    mode="reschedule",
+)
+
+inventor_disambiguation_finished = ExternalTaskSensor(
+    task_id="inventor_disambiguation_finished",
+    external_dag_id="inventor_assignee_disambiguation",
+    external_task_id="qc_post_process_inventor",
+    timeout=600,
+    allowed_states=['success'],
+    failed_states=['failed', 'skipped'],
+    mode="reschedule",
+)
 
 db_creation = SQLTemplatedPythonOperator(
     task_id='Database_Creation',
@@ -517,6 +538,9 @@ reporting_db_qa = PythonOperator(task_id='reporting_DB_QA',
 
 # MAPPING DEPENDENCY
 
+db_creation.set_upstream(inventor_disambiguation_finished)
+db_creation.set_upstream(assignee_disambiguation_finished)
+
 govt_interest.set_upstream(db_creation)
 # claims.set_upstream(db_creation)
 id_mappings.set_upstream(db_creation)
@@ -584,4 +608,5 @@ idx_12.set_downstream(rep_tbl_2)
 reporting_db_qa.set_upstream(rep_tbl_2)
 web_tools.set_upstream(rep_tbl_2)
 web_tools_2.set_upstream(web_tools)
+
 
