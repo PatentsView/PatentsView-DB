@@ -491,32 +491,6 @@ rep_tbl_2 = SQLTemplatedPythonOperator(
     }
 )
 
-web_tools = SQLTemplatedPythonOperator(
-    task_id='Web_Tool',
-    provide_context=True,
-    python_callable=validate_query.validate_and_execute,
-    dag=reporting_db_dag,
-    op_kwargs={
-        'filename': 'webtool_tables',
-    },
-    templates_dict={
-        'source_sql': 'webtool_tables.sql'
-    }
-)
-
-web_tools_2 = SQLTemplatedPythonOperator(
-    task_id='Web_Tool_2',
-    provide_context=True,
-    python_callable=validate_query.validate_and_execute,
-    dag=reporting_db_dag,
-    op_kwargs={
-        'filename': 'webtool2_tables',
-        'host': 'APP_DATABASE_SETUP'
-    },
-    templates_dict={
-        'source_sql': 'webtool2_tables.sql'
-    }
-)
 
 reporting_db_qa = PythonOperator(task_id='reporting_DB_QA',
                                           python_callable=run_reporting_db_qa,
@@ -606,7 +580,5 @@ idx_11.set_downstream(rep_tbl_2)
 idx_12.set_downstream(rep_tbl_2)
 
 reporting_db_qa.set_upstream(rep_tbl_2)
-web_tools.set_upstream(rep_tbl_2)
-web_tools_2.set_upstream(web_tools)
 
 
