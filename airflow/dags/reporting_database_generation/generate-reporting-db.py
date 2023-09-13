@@ -70,7 +70,7 @@ reporting_db_dag = DAG("reporting_database_generation"
 #         'source_sql': '00_Creation.sql'
 #     },
 # )
-db_creation = PythonOperator(task_id='rebuild_patent_lookup',
+db_creation = PythonOperator(task_id='Database_Creation',
                                     python_callable=reporting_db_creation,
                                     provide_context=True,
                                     dag=reporting_db_dag,
