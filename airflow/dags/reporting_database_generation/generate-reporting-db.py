@@ -12,7 +12,9 @@ from slack_sdk.errors import SlackApiError
 
 from reporting_database_generator.database import validate_query
 from reporting_database_generator.create_eight_digit_patent_lookup import update_patent_id_in_patent
+from reporting_database_generator.create_reporting_db import reporting_db_creation
 from QA.post_processing.ReportingDBTester import run_reporting_db_qa
+from lib.configuration import get_connection_string, get_required_tables, get_current_config
 
 project_home = os.environ['PACKAGE_HOME']
 config = configparser.ConfigParser()
@@ -21,19 +23,14 @@ config.read(project_home + '/config.ini')
 slack_token = config["SLACK"]["API_TOKEN"]
 slack_client = WebClient(slack_token)
 slack_channel = config["SLACK"]["CHANNEL"]
-schema_only = config["REPORTING_DATABASE_OPTIONS"]["SCHEMA_ONLY"]
-if schema_only == "TRUE":
-    schema_only = True
-else:
-    schema_only = False
 
 template_extension_config = [".sql"]
-database_name_config = {
-    'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-    'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME'],
-    'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR'],
-    'last_reporting_database': config['REPORTING_DATABASE_OPTIONS']['LAST_REPORTING_DATABASE_NAME'],
-}
+# database_name_config = {
+#     'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
+#     'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME'],
+#     'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR'],
+#     'last_reporting_database': config['REPORTING_DATABASE_OPTIONS']['LAST_REPORTING_DATABASE_NAME'],
+# }
 
 
 class SQLTemplatedPythonOperator(PythonOperator):
@@ -49,43 +46,43 @@ default_args = {
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
     'concurrency': 4,
-    'queue': 'disambiguator'
-    # 'pool': 'backfill',
-    # 'priority_weight': 10,
-    # 'end_date': datetime(2016, 1, 1),
+    'queue': 'data_collector'
 }
 
 # REPORTING DB
 
 reporting_db_dag = DAG("reporting_database_generation"
                        , default_args=default_args
-                       , start_date=datetime(2022, 6, 30)
-                       , schedule_interval=None
+                       , start_date=datetime(2022, 1, 1)
+                       , end_date=datetime(2022, 7, 1)
+                       , schedule_interval='@quarterly'
                        , template_searchpath="/project/reporting_database_generator/")
 
-db_creation = SQLTemplatedPythonOperator(
-    task_id='Database_Creation',
-    provide_context=True,
-    python_callable=validate_query.validate_and_execute,
-    dag=reporting_db_dag,
-    op_kwargs={
-        'filename': '00_Creation',
-        "schema_only": schema_only
-    },
-    templates_dict={
-        'source_sql': '00_Creation.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
-)
+# db_creation = SQLTemplatedPythonOperator(
+#     task_id='Database_Creation',
+#     provide_context=True,
+#     python_callable=validate_query.validate_and_execute,
+#     dag=reporting_db_dag,
+#     op_kwargs={
+#         'filename': '00_Creation',
+#     },
+#     templates_dict={
+#         'source_sql': '00_Creation.sql'
+#     },
+# )
+db_creation = PythonOperator(task_id='rebuild_patent_lookup',
+                                    python_callable=reporting_db_creation,
+                                    provide_context=True,
+                                    dag=reporting_db_dag,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure)
 
 rebuild_patent_lookup = PythonOperator(task_id='rebuild_patent_lookup',
                                     python_callable=update_patent_id_in_patent,
                                     provide_context=True,
                                     dag=reporting_db_dag,
                                     on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure,
-                                    queue='disambiguator', pool='high_memory_pool')
+                                    on_failure_callback=airflow_task_failure)
 
 govt_interest = SQLTemplatedPythonOperator(
     task_id='Government_Interest',
@@ -94,14 +91,11 @@ govt_interest = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '01_01_Govt_Interest',
-        "schema_only": schema_only,
         "fk_check": False
     },
     templates_dict={
         'source_sql': '01_01_Govt_Interest.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 id_mappings = SQLTemplatedPythonOperator(
     task_id='ID_Mappings',
@@ -110,13 +104,10 @@ id_mappings = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '01_03_ID_Mappings',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '01_03_ID_Mappings.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 application = SQLTemplatedPythonOperator(
     task_id='Application',
@@ -125,13 +116,10 @@ application = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '01_04_Application',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '01_04_Application.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 wipo = SQLTemplatedPythonOperator(
     task_id='WIPO',
@@ -140,13 +128,10 @@ wipo = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '01_05_Wipo',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '01_05_Wipo.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 patent = SQLTemplatedPythonOperator(
     task_id='Patent',
@@ -155,13 +140,10 @@ patent = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '02_Patent',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '02_Patent.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 location = SQLTemplatedPythonOperator(
     task_id='Location',
@@ -170,13 +152,10 @@ location = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_01_Location',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_01_Location.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 assignee = SQLTemplatedPythonOperator(
     task_id='Assignee',
@@ -185,13 +164,10 @@ assignee = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_02_Assignee',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_02_Assignee.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 inventor = SQLTemplatedPythonOperator(
     task_id='Inventor',
@@ -200,13 +176,10 @@ inventor = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_03_Inventor',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_03_Inventor.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 lawyer = SQLTemplatedPythonOperator(
     task_id='Lawyer',
@@ -215,13 +188,10 @@ lawyer = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_04_Lawyer',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_04_Lawyer.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 examiner = SQLTemplatedPythonOperator(
     task_id='Examiner',
@@ -230,13 +200,10 @@ examiner = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_05_Examiner',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_05_Examiner.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 forprior = SQLTemplatedPythonOperator(
     task_id='Foreign_Priority',
@@ -245,13 +212,10 @@ forprior = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_06_Foreign_Priority',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_06_Foreign_Priority.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 pct = SQLTemplatedPythonOperator(
     task_id='PCT',
@@ -260,13 +224,10 @@ pct = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_07_PCT',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_07_PCT.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 us_appcit = SQLTemplatedPythonOperator(
     task_id='US_Application_Citation',
@@ -275,13 +236,10 @@ us_appcit = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_08_US_App_Citation',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_08_US_App_Citation.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 us_patcit = SQLTemplatedPythonOperator(
     task_id='US_Patent_Citation',
@@ -290,13 +248,10 @@ us_patcit = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_09_US_Patent_Citation',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_09_US_Patent_Citation.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 cpc = SQLTemplatedPythonOperator(
     task_id='CPC',
@@ -305,13 +260,10 @@ cpc = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_10_CPC',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_10_CPC.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 ipcr = SQLTemplatedPythonOperator(
     task_id='ipcr',
@@ -320,13 +272,10 @@ ipcr = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_11_IPCR',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_11_IPCR.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 nber = SQLTemplatedPythonOperator(
     task_id='NBER',
@@ -335,13 +284,10 @@ nber = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_12_Nber',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_12_Nber.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 uspc = SQLTemplatedPythonOperator(
     task_id='USPC',
@@ -350,13 +296,10 @@ uspc = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '03_13_uspc',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '03_13_uspc.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 rep_tbl_1 = SQLTemplatedPythonOperator(
     task_id='Reporting_Tables_1',
@@ -365,13 +308,10 @@ rep_tbl_1 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '04_Support',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '04_Support.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_1 = SQLTemplatedPythonOperator(
     task_id='Indexes-01',
@@ -380,13 +320,10 @@ idx_1 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_01_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_2 = SQLTemplatedPythonOperator(
     task_id='Indexes-02',
@@ -395,13 +332,10 @@ idx_2 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_02_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_3 = SQLTemplatedPythonOperator(
     task_id='Indexes-03',
@@ -410,13 +344,10 @@ idx_3 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_03_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_4 = SQLTemplatedPythonOperator(
     task_id='Indexes-04',
@@ -425,13 +356,10 @@ idx_4 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_04_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_5 = SQLTemplatedPythonOperator(
     task_id='Indexes-05',
@@ -440,13 +368,10 @@ idx_5 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_05_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_6 = SQLTemplatedPythonOperator(
     task_id='Indexes-06',
@@ -455,13 +380,10 @@ idx_6 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_06_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_7 = SQLTemplatedPythonOperator(
     task_id='Indexes-07',
@@ -470,13 +392,10 @@ idx_7 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_07_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_8 = SQLTemplatedPythonOperator(
     task_id='Indexes-08',
@@ -485,13 +404,10 @@ idx_8 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_08_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_9 = SQLTemplatedPythonOperator(
     task_id='Indexes-09',
@@ -500,13 +416,10 @@ idx_9 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_09_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_10 = SQLTemplatedPythonOperator(
     task_id='Indexes-10',
@@ -515,13 +428,10 @@ idx_10 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_10_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_11 = SQLTemplatedPythonOperator(
     task_id='Indexes-11',
@@ -530,13 +440,10 @@ idx_11 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_11_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 idx_12 = SQLTemplatedPythonOperator(
     task_id='Indexes-12',
@@ -545,13 +452,10 @@ idx_12 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '05_Indexes',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '05_12_index.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 rep_tbl_2 = SQLTemplatedPythonOperator(
     task_id='Reporting_Tables_2',
@@ -560,13 +464,10 @@ rep_tbl_2 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': '06_Reporting_Tables',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': '06_Reporting_Tables.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 
 web_tools = SQLTemplatedPythonOperator(
@@ -576,13 +477,10 @@ web_tools = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': 'webtool_tables',
-        "schema_only": schema_only
     },
     templates_dict={
         'source_sql': 'webtool_tables.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 
 web_tools_2 = SQLTemplatedPythonOperator(
@@ -592,14 +490,11 @@ web_tools_2 = SQLTemplatedPythonOperator(
     dag=reporting_db_dag,
     op_kwargs={
         'filename': 'webtool2_tables',
-        "schema_only": schema_only,
         'host': 'APP_DATABASE_SETUP'
     },
     templates_dict={
         'source_sql': 'webtool2_tables.sql'
-    },
-    templates_exts=template_extension_config,
-    params=database_name_config
+    }
 )
 
 reporting_db_qa = PythonOperator(task_id='reporting_DB_QA',
