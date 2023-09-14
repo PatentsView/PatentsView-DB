@@ -283,6 +283,7 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
             working_folder=config['FOLDERS']['WORKING_FOLDER'])
         config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'patent'
         config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'patent_text'
+        config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
 
     latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
     latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
