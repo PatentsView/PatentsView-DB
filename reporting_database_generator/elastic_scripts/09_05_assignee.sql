@@ -1,8 +1,6 @@
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
-{% set reporting_database = params.reporting_database %}
-use `{{elastic_target_database}}`;
+use `PatentsView_{{ dag_run.logical_date | ds_nodash }}`;
 
-CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`assignees` (
+CREATE TABLE IF NOT EXISTS `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignees` (
   `assignee_id` int(10) unsigned NOT NULL,
   `type` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name_first` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -34,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`assignees` (
   KEY `ix_assignee_persistent_assignee_id` (`persistent_assignee_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`assignee_years` (
+CREATE TABLE IF NOT EXISTS `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_years` (
   `assignee_id` int(10) unsigned NOT NULL,
   `patent_year` smallint(6) NOT NULL,
   `num_patents` int(10) unsigned NOT NULL,
@@ -43,8 +41,8 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`assignee_years` (
   KEY `ix_assignee_year_assignee_id` (`assignee_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `{{elastic_target_database}}`.assignees;
-INSERT INTO `{{elastic_target_database}}`.assignees( assignee_id, type, name_first, name_last, organization, num_patents
+TRUNCATE TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.assignees;
+INSERT INTO `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.assignees( assignee_id, type, name_first, name_last, organization, num_patents
                                      , num_inventors, lastknown_location_id, lastknown_persistent_location_id
                                      , lastknown_city, lastknown_state, lastknown_country, lastknown_latitude
                                      , lastknown_longitude, first_seen_date, last_seen_date, years_active
@@ -75,14 +73,14 @@ from
 
 
 
-TRUNCATE TABLE `{{elastic_target_database}}`.assignee_years;
-INSERT INTO `{{elastic_target_database}}`.assignee_years(assignee_id, patent_year, num_patents)
+TRUNCATE TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.assignee_years;
+INSERT INTO `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.assignee_years(assignee_id, patent_year, num_patents)
 select
     ay.assignee_id
   , patent_year
   , ay.num_patents
 from
     `{{reporting_database}}`.`assignee_year` ay
-        join `{{elastic_target_database}}`.assignees a
+        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.assignees a
 where
     a.assignee_id = ay.assignee_id;

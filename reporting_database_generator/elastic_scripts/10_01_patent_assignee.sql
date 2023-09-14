@@ -1,9 +1,7 @@
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
-{% set reporting_database = params.reporting_database %}
-use `{{elastic_target_database}}`;
+use `elastic_search_{{ dag_run.logical_date | ds_nodash }}`;
 
 
-CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patent_assignee`
+CREATE TABLE IF NOT EXISTS `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee`
 (
     `assignee_id`            int(10) unsigned NOT NULL,
     `persistent_assignee_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -23,8 +21,8 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patent_assignee`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `{{elastic_target_database}}`.`patent_assignee`;
-INSERT INTO `{{elastic_target_database}}`.`patent_assignee`( assignee_id, type, name_first, name_last, organization, city, state
+TRUNCATE TABLE `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee`;
+INSERT INTO `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee`( assignee_id, type, name_first, name_last, organization, city, state
                                               , country, sequence, location_id, patent_id, persistent_location_id
                                               , persistent_assignee_id)
 
@@ -41,9 +39,9 @@ select pa.assignee_id
      , pa.patent_id
      , timl.old_location_id
      , tima.old_assignee_id
-from `{{reporting_database}}`.patent_assignee pa
-         join `{{elastic_target_database}}`.patents p on p.patent_id = pa.patent_id
-         join `{{reporting_database}}`.assignee a on a.assignee_id = pa.assignee_id
-         join `{{reporting_database}}`.temp_id_mapping_assignee tima on tima.new_assignee_id = a.assignee_id
-         left join `{{reporting_database}}`.location l on l.location_id = pa.location_id
-         left join `{{reporting_database}}`.temp_id_mapping_location timl on timl.new_location_id = l.location_id;
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_assignee pa
+         join `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = pa.patent_id
+         join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.assignee a on a.assignee_id = pa.assignee_id
+         join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_assignee tima on tima.new_assignee_id = a.assignee_id
+         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.location l on l.location_id = pa.location_id
+         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_location timl on timl.new_location_id = l.location_id;

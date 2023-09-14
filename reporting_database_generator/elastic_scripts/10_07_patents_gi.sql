@@ -1,9 +1,6 @@
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
-{% set reporting_database = params.reporting_database %}
-use `{{elastic_target_database}}`;
+use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
 
-
-CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patent_gov_contract`
+CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_gov_contract`
 (
     `patent_id`    varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
     `award_number` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -12,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patent_gov_contract`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patent_gov_interest_organizations`
+CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_gov_interest_organizations`
 (
     `patent_id`   varchar(32) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
     `name`        varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -27,9 +24,9 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patent_gov_interest_or
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `{{elastic_target_database}}`.`patent_gov_interest_organizations`;
+TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_gov_interest_organizations`;
 
-insert into `{{elastic_target_database}}`.patent_gov_interest_organizations(patent_id, name, level_one, level_two, level_three)
+insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_gov_interest_organizations(patent_id, name, level_one, level_two, level_three)
 select
     pgi.patent_id
   , name
@@ -37,17 +34,17 @@ select
   , level_two
   , level_three
 from
-    `{{reporting_database}}`.government_organization go
-        join `{{reporting_database}}`.patent_govintorg pgi
+    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.government_organization go
+        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_govintorg pgi
 on pgi.organization_id = go.organization_id
-    join `{{elastic_target_database}}`.patents p on p.patent_id = pgi.patent_id;
+    join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = pgi.patent_id;
 
-TRUNCATE TABLE `{{elastic_target_database}}`.`patent_gov_contract`;
+TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_gov_contract`;
 
-insert into `{{elastic_target_database}}`.patent_gov_contract(patent_id, award_number)
+insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_gov_contract(patent_id, award_number)
 select
     c.patent_id
   , contract_award_number
 from
-    `{{reporting_database}}`.patent_contractawardnumber c
-        join `{{elastic_target_database}}`.patents p on p.patent_id = c.patent_id;
+    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_contractawardnumber c
+        join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = c.patent_id;

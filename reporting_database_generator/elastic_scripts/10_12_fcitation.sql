@@ -1,11 +1,6 @@
+use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
 
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
-{% set reporting_database = params.reporting_database %}
-use `{{elastic_target_database}}`;
-
-
-
-create or replace sql security invoker view `{{elastic_target_database}}`.foreign_citations as
+create or replace sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.foreign_citations as
 select
     fc.uuid
   , fc.patent_id
@@ -18,4 +13,4 @@ select
 
 from
     patent.foreigncitation fc
-        join `{{elastic_target_database}}`.patents p on p.patent_id = fc.patent_id;
+        join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = fc.patent_id;

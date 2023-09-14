@@ -25,15 +25,6 @@ slack_token = config["SLACK"]["API_TOKEN"]
 slack_client = WebClient(slack_token)
 slack_channel = config["SLACK"]["CHANNEL"]
 
-template_extension_config = [".sql"]
-# database_name_config = {
-#     'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-#     'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME'],
-#     'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR'],
-#     'last_reporting_database': config['REPORTING_DATABASE_OPTIONS']['LAST_REPORTING_DATABASE_NAME'],
-# }
-
-
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
@@ -54,8 +45,8 @@ default_args = {
 
 reporting_db_dag = DAG("reporting_database_generation"
                        , default_args=default_args
-                       , start_date=datetime(2022, 1, 1)
-                       , end_date=datetime(2022, 7, 1)
+                       , start_date=datetime(2023, 4, 1)
+                       # , end_date=datetime(2022, 7, 1)
                        , schedule_interval='@quarterly'
                        , template_searchpath="/project/reporting_database_generator/")
 
