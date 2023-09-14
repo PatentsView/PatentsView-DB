@@ -3,8 +3,8 @@
 ##############################################################################################################################################
 
 
-drop table if exists `{{params.reporting_database}}`.`temp_location_num_assignees`;
-create table `{{params.reporting_database}}`.`temp_location_num_assignees`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_assignees`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_assignees`
 (
     `location_id`   int unsigned not null,
     `num_assignees` int unsigned not null,
@@ -13,17 +13,17 @@ create table `{{params.reporting_database}}`.`temp_location_num_assignees`
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `{{params.reporting_database}}`.`temp_location_num_assignees`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_assignees`
     (`location_id`, `num_assignees`)
 select timl.`new_location_id`,
        count(distinct la.`assignee_id`)
-from `{{params.reporting_database}}`.`temp_id_mapping_location` timl
-         inner join `{{params.raw_database}}`.`location_assignee` la on la.`location_id` = timl.`old_location_id`
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` timl
+         inner join `patent`.`location_assignee` la on la.`location_id` = timl.`old_location_id`
 group by timl.`new_location_id`;
 
 
-drop table if exists `{{params.reporting_database}}`.`temp_location_num_inventors`;
-create table `{{params.reporting_database}}`.`temp_location_num_inventors`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_inventors`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_inventors`
 (
     `location_id`   int unsigned not null,
     `num_inventors` int unsigned not null,
@@ -33,12 +33,12 @@ create table `{{params.reporting_database}}`.`temp_location_num_inventors`
 
 
 # 94,350 @ 0:50
-insert into `{{params.reporting_database}}`.`temp_location_num_inventors`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_inventors`
     (`location_id`, `num_inventors`)
 select timl.`new_location_id`,
        count(distinct li.`inventor_id`)
-from `{{params.reporting_database}}`.`temp_id_mapping_location` timl
-         inner join `{{params.raw_database}}`.`location_inventor` li on li.`location_id` = timl.`old_location_id`
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` timl
+         inner join `patent`.`location_inventor` li on li.`location_id` = timl.`old_location_id`
 group by timl.`new_location_id`;
 
 
@@ -55,8 +55,8 @@ group by timl.`new_location_id`;
 */
 
 
-drop table if exists `{{params.reporting_database}}`.`temp_location_patent`;
-create table `{{params.reporting_database}}`.`temp_location_patent`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent`
 (
     `location_id` int unsigned not null,
     `patent_id`   varchar(20)  not null
@@ -64,32 +64,32 @@ create table `{{params.reporting_database}}`.`temp_location_patent`
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `{{params.reporting_database}}`.`temp_location_patent`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent`
     (`location_id`, `patent_id`)
 select timl.`new_location_id`,
        ri.`patent_id`
-from `{{params.reporting_database}}`.`temp_id_mapping_location` timl
-         inner join `{{params.raw_database}}`.`rawlocation` rl on rl.`location_id` = timl.`old_location_id`
-         inner join `{{params.raw_database}}`.`rawinventor` ri on ri.`rawlocation_id` = rl.`id`;
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` timl
+         inner join `patent`.`rawlocation` rl on rl.`location_id` = timl.`old_location_id`
+         inner join `patent`.`rawinventor` ri on ri.`rawlocation_id` = rl.`id`;
 
 
-insert into `{{params.reporting_database}}`.`temp_location_patent`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent`
     (`location_id`, `patent_id`)
 select timl.`new_location_id`,
        ra.`patent_id`
-from `{{params.reporting_database}}`.`temp_id_mapping_location` timl
-         inner join `{{params.raw_database}}`.`rawlocation` rl on rl.`location_id` = timl.`old_location_id`
-         inner join `{{params.raw_database}}`.`rawassignee` ra on ra.`rawlocation_id` = rl.`id`;
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` timl
+         inner join `patent`.`rawlocation` rl on rl.`location_id` = timl.`old_location_id`
+         inner join `patent`.`rawassignee` ra on ra.`rawlocation_id` = rl.`id`;
 
 
-alter table `{{params.reporting_database}}`.`temp_location_patent`
+alter table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent`
     add index (`location_id`, `patent_id`);
-alter table `{{params.reporting_database}}`.`temp_location_patent`
+alter table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent`
     add index (`patent_id`, `location_id`);
 
 
-drop table if exists `{{params.reporting_database}}`.`temp_location_num_patents`;
-create table `{{params.reporting_database}}`.`temp_location_num_patents`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_patents`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_patents`
 (
     `location_id` int unsigned not null,
     `num_patents` int unsigned not null,
@@ -98,16 +98,16 @@ create table `{{params.reporting_database}}`.`temp_location_num_patents`
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `{{params.reporting_database}}`.`temp_location_num_patents`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_patents`
     (`location_id`, `num_patents`)
 select `location_id`,
        count(distinct patent_id)
-from `{{params.reporting_database}}`.`temp_location_patent`
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent`
 group by `location_id`;
 
 
-drop table if exists `{{params.reporting_database}}`.`location`;
-create table `{{params.reporting_database}}`.`location`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location`
 (
     `location_id`            int unsigned not null,
     `city`                   varchar(256) null,
@@ -127,7 +127,7 @@ create table `{{params.reporting_database}}`.`location`
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `{{params.reporting_database}}`.`location`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location`
 (`location_id`, `city`, `state`, `country`,
  `county`, `state_fips`, `county_fips`,
  `latitude`, `longitude`, `num_assignees`, `num_inventors`,
@@ -145,13 +145,13 @@ select timl.`new_location_id`,
        ifnull(tlni.`num_inventors`, 0),
        ifnull(tlnp.`num_patents`, 0),
        timl.`old_location_id_transformed`
-from `{{params.raw_database}}`.`location` l
-         inner join `{{params.reporting_database}}`.`temp_id_mapping_location` timl on timl.`old_location_id` = l.`id`
-         left outer join `{{params.reporting_database}}`.`temp_location_num_assignees` tlna
+from `patent`.`location` l
+         inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` timl on timl.`old_location_id` = l.`id`
+         left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_assignees` tlna
                          on tlna.`location_id` = timl.`new_location_id`
-         left outer join `{{params.reporting_database}}`.`temp_location_num_inventors` tlni
+         left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_inventors` tlni
                          on tlni.`location_id` = timl.`new_location_id`
-         left outer join `{{params.reporting_database}}`.`temp_location_num_patents` tlnp
+         left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_num_patents` tlnp
                          on tlnp.`location_id` = timl.`new_location_id`;
 
 

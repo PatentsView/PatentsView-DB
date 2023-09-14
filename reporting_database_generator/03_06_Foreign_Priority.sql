@@ -4,8 +4,8 @@
 #################################################################################################################################
 
 
-drop table if exists `{{params.reporting_database}}`.`foreignpriority`;
-create table `{{params.reporting_database}}`.`foreignpriority`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`foreignpriority`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`foreignpriority`
 (
   `patent_id` varchar(20) not null,
   `sequence` int not null,
@@ -18,7 +18,7 @@ create table `{{params.reporting_database}}`.`foreignpriority`
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `{{params.reporting_database}}`.`foreignpriority`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`foreignpriority`
 (
   `patent_id`, `sequence`, `foreign_doc_number`,
   `date`, `country`, `kind`
@@ -29,8 +29,8 @@ select
   nullif(trim(ac.`country_transformed`), ''),
   nullif(trim(ac.`kind`), '')
 from
-  `{{params.reporting_database}}`.`patent` p
-  inner join `{{params.raw_database}}`.`foreign_priority` ac on ac.`patent_id` = p.`patent_id`;
+  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p
+  inner join `patent`.`foreign_priority` ac on ac.`patent_id` = p.`patent_id`;
 
 
 # END foreignpriority

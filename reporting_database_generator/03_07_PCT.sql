@@ -4,8 +4,8 @@
 #################################################################################################################################
 
 
-drop table if exists `{{params.reporting_database}}`.`pctdata`;
-create table `{{params.reporting_database}}`.`pctdata`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`pctdata`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`pctdata`
 ( `uuid` varchar(36) not null,
   `patent_id` varchar(20) not null,
   `doc_type` varchar(20) not null,
@@ -19,7 +19,7 @@ create table `{{params.reporting_database}}`.`pctdata`
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `{{params.reporting_database}}`.`pctdata`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`pctdata`
 (
   `uuid`, `patent_id`, `doc_type`, `kind`, `doc_number`, `date`, `102_date`, `371_date`
 )
@@ -29,8 +29,8 @@ select ac.`uuid`,
   case when ac.`102_date` > date('1899-12-31') and ac.`102_date` < date_add(current_date, interval 10 year) then ac.`102_date` else null end,
   case when ac.`371_date` > date('1899-12-31') and ac.`371_date` < date_add(current_date, interval 10 year) then ac.`371_date` else null end
 from
-  `{{params.reporting_database}}`.`patent` p
-  inner join `{{params.raw_database}}`.`pct_data` ac on ac.`patent_id` = p.`patent_id`;
+  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p
+  inner join `patent`.`pct_data` ac on ac.`patent_id` = p.`patent_id`;
 
 
 # END pctdata

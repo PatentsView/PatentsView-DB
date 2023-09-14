@@ -78,6 +78,7 @@ def db_and_table_as_array(single_line_query):
 
 
 def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk_check=True, section=None, host = 'DATABASE_SETUP', **context):
+    breakpoint()
     print(f'filename: {filename}')
     print(f'schema_only: {schema_only}')
     project_home = os.environ['PACKAGE_HOME']

@@ -3,8 +3,8 @@
 ###########################################################################################################################################
 
 
-drop table if exists `{{params.reporting_database}}`.`application`;
-create table `{{params.reporting_database}}`.`application`
+drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`application`;
+create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`application`
 (
   `application_id` varchar(36) not null,
   `patent_id` varchar(20) not null,
@@ -17,14 +17,14 @@ create table `{{params.reporting_database}}`.`application`
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `{{params.reporting_database}}`.`application`
+insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`application`
   (`application_id`, `patent_id`, `type`, `number`, `country`, `date`)
 select
   `id_transformed`, `patent_id`, nullif(trim(`type`), ''),
   nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''),
   case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end
 from
-  `{{params.raw_database}}`.`application`  where version_indicator<='{{params.version_indicator}}';
+  `patent`.`application`  where version_indicator<='{{ dag_run.logical_date | ds_nodash }}';
 
 
 # END application 
