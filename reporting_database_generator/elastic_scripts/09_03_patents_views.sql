@@ -1,9 +1,9 @@
 {% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
 {% set reporting_database = params.reporting_database %}
-use `{{elastic_target_database}}`;
+use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
 
 create
-or replace sql security invoker view `{{elastic_target_database}}`.patent_cpc_current as
+or replace sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_cpc_current as
 select c.patent_id
      , c.sequence
      , c.section_id    as cpc_section
@@ -11,10 +11,10 @@ select c.patent_id
      , c.group_id      as cpc_subclass
      , c.subgroup_id   as cpc_group
      , c.category         cpc_type
-from `{{reporting_database}}`.cpc_current c;
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.cpc_current c;
 
 create or replace
-sql security invoker view  `{{elastic_target_database}}`.granted_pregrant_crosswalk as
+sql security invoker view  `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.granted_pregrant_crosswalk as
 
 select gpc.patent_id as patent_id
      , gpc.document_number
@@ -22,7 +22,7 @@ select gpc.patent_id as patent_id
 from pregrant_publications.granted_patent_crosswalk gpc;
 
 create or replace
-sql security invoker view `{{elastic_target_database}}`.patent_foreign_priority as
+sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_foreign_priority as
 
 select f.patent_id
      , f.sequence
@@ -30,10 +30,10 @@ select f.patent_id
      , f.date
      , f.country
      , f.kind
-from `{{reporting_database}}`.foreignpriority f;
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.foreignpriority f;
 
 create
-or replace sql security invoker view `{{elastic_target_database}}`.ipcr as
+or replace sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.ipcr as
 select
     ipcr_id
   , section
@@ -47,7 +47,7 @@ order by
   , subclass;
 
 create
-or replace sql security invoker view `{{elastic_target_database}}`.patent_ipcr as
+or replace sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_ipcr as
 select i.patent_id
      , i2.ipcr_id as ipcr_id
      , i.sequence
@@ -60,14 +60,14 @@ select i.patent_id
      , i.classification_value
      , i.classification_data_source
      , i.action_date
-from `{{reporting_database}}`.ipcr i
-         join `{{elastic_target_database}}`.ipcr i2
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.ipcr i
+         join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.ipcr i2
               on i2.ipc_class = i.ipc_class and i2.section = i.section and i2.subclass = i.subclass;
 
 
 
 create or replace
-sql security invoker view `{{elastic_target_database}}`.patent_pct_data as
+sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_pct_data as
 select p.patent_id
      , p.doc_type
      , p.kind
@@ -75,11 +75,11 @@ select p.patent_id
      , p.date
      , p.`102_date`
      , p.`371_date`
-from `{{reporting_database}}`.pctdata p;
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.pctdata p;
 
 
 create or replace
-sql security invoker view `{{elastic_target_database}}`.patent_uspc_at_issue as
+sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_uspc_at_issue as
 select u.patent_id
      , sequence
      , mainclass_id
@@ -88,15 +88,15 @@ from patent.uspc u;
 
 
 create or replace
-sql security invoker view `{{elastic_target_database}}`.patent_wipo as
+sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_wipo as
 select w.patent_id
      , w.field_id
      , w.sequence
-from `{{reporting_database}}`.wipo w;
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.wipo w;
 
 
 create or replace
-sql security invoker view `{{elastic_target_database}}`.patent_botanic as
+sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_botanic as
 select b.patent_id
      , b.latin_name
      , b.variety
@@ -105,14 +105,14 @@ from patent.botanic b;
 
 
 create or replace
-sql security invoker view `{{elastic_target_database}}`.patent_figures as
+sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_figures as
 select f.patent_id
      , f.num_figures
      , f.num_sheets
 from patent.figures f
 ;
 create or replace
-sql security invoker view `{{elastic_target_database}}`.patent_us_term_of_grant as
+sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_us_term_of_grant as
 select u.patent_id
      , u.disclaimer_date
      , u.term_disclaimer
@@ -120,7 +120,7 @@ select u.patent_id
      , u.term_extension
 from patent.us_term_of_grant u;
 create or replace
-sql security invoker view `{{elastic_target_database}}`.patent_us_related_documents as
+sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_us_related_documents as
 select
     u.patent_id
   , doctype

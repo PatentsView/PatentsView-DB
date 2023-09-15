@@ -1,9 +1,7 @@
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace('-','') %}
-{% set reporting_database = params.reporting_database %}
-use `{{elastic_target_database}}`;
+use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
 
 
-CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patents`
+CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patents`
 (
     `patent_id`                                             varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
     `type`                                                  varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -42,9 +40,9 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patents`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `{{elastic_target_database}}`.`patents`;
+TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patents`;
 
-insert into `{{elastic_target_database}}`.patents ( patent_id, type, number, country, date, year, abstract, title
+insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents ( patent_id, type, number, country, date, year, abstract, title
                                                   , kind, num_claims
                                                   , num_foreign_documents_cited, num_us_applications_cited
                                                   , num_us_patents_cited
@@ -77,8 +75,8 @@ select p.patent_id
      , detail_desc_length
      , gi_statement
      , pe.patent_id_eight_char
-from `{{reporting_database}}`.patent p
-    left join `{{reporting_database}}`.government_interest gi
+from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent p
+    left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.government_interest gi
 on gi.patent_id = p.patent_id
     join patent.patent_to_eight_char pe on pe.id = p.patent_id;
 

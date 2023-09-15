@@ -1,8 +1,6 @@
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
-{% set reporting_database = params.reporting_database %}
-use `{{elastic_target_database}}`;
+use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
 
-CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patent_examiner`
+CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_examiner`
 (
     `patent_id`              varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
     `examiner_id`            int(10) unsigned NOT NULL,
@@ -22,9 +20,9 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patent_examiner`
 
 
 
-TRUNCATE TABLE `{{elastic_target_database}}`.`patent_examiner`;
+TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_examiner`;
 
-insert into `{{elastic_target_database}}`.patent_examiner( patent_id, examiner_id, name_first, name_last, role, `group`
+insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_examiner( patent_id, examiner_id, name_first, name_last, role, `group`
                                               , persistent_examiner_id)
 select
     pe.patent_id
@@ -35,8 +33,8 @@ select
   , e.`group`
   , `time`.old_examiner_id
 from
-    `{{reporting_database}}`.patent_examiner pe
-        join `{{reporting_database}}`.examiner e on pe.examiner_id = e.examiner_id
-        join `{{reporting_database}}`.temp_id_mapping_examiner `time` on `time`.new_examiner_id = e.examiner_id
-        join `{{elastic_target_database}}`.patents p on p.patent_id = pe.patent_id;
+    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_examiner pe
+        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.examiner e on pe.examiner_id = e.examiner_id
+        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_examiner `time` on `time`.new_examiner_id = e.examiner_id
+        join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = pe.patent_id;
 

@@ -1,8 +1,6 @@
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
-{% set reporting_database = params.reporting_database %}
-use `{{elastic_target_database}}`;
+use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
 
-CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`attorneys`
+CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`attorneys`
 (
     `lawyer_id`            int(10) unsigned                       NOT NULL,
     `name_first`           varchar(64) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
@@ -29,13 +27,13 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`attorneys`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `{{elastic_target_database}}`.attorneys;
-INSERT INTO `{{elastic_target_database}}`.attorneys ( lawyer_id, name_first, name_last, organization, num_patents, num_assignees
+TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.attorneys;
+INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.attorneys ( lawyer_id, name_first, name_last, organization, num_patents, num_assignees
                                          , num_inventors, first_seen_date, last_seen_date, years_active
                                          , persistent_lawyer_id)
 select distinct
     l.*
 
 from
-    `{{reporting_database}}`.`lawyer` l
-        join `{{reporting_database}}`.`patent_lawyer` pl on pl.lawyer_id = l.lawyer_id;
+    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`lawyer` l
+        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_lawyer` pl on pl.lawyer_id = l.lawyer_id;

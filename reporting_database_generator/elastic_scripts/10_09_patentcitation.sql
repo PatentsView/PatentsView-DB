@@ -1,8 +1,6 @@
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
-{% set reporting_database = params.reporting_database %}
-use `{{elastic_target_database}}`;
+use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
 
-CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`us_patent_citations`
+CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`us_patent_citations`
 (
     `uuid`               varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
     `patent_id`          varchar(20) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
@@ -22,8 +20,8 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`us_patent_citations`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `{{elastic_target_database}}`.us_patent_citations;
-INSERT INTO `{{elastic_target_database}}`.us_patent_citations( uuid, patent_id, citation_id, date, name, kind, category
+TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.us_patent_citations;
+INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.us_patent_citations( uuid, patent_id, citation_id, date, name, kind, category
                                                , sequence, patent_zero_prefix)
 
 select
@@ -39,5 +37,5 @@ select
 
 from
     patent.uspatentcitation u2
-        join `{{elastic_target_database}}`.patents p on p.patent_id = u2.patent_id
+        join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = u2.patent_id
         join patent.patent p2 on p2.id = u2.citation_id;

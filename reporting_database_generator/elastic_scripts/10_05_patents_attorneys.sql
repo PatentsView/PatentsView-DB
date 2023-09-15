@@ -1,8 +1,6 @@
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
-{% set reporting_database = params.reporting_database %}
-use `{{elastic_target_database}}`;
+use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
 
-CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patent_attorneys`
+CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_attorneys`
 (
     `patent_id`            varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
     `lawyer_id`            int(10) unsigned NOT NULL,
@@ -19,9 +17,9 @@ CREATE TABLE IF NOT EXISTS `{{elastic_target_database}}`.`patent_attorneys`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `{{elastic_target_database}}`.`patent_attorneys`;
+TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_attorneys`;
 
-insert into `{{elastic_target_database}}`.patent_attorneys( patent_id, lawyer_id, sequence, name_first, name_last, organization
+insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_attorneys( patent_id, lawyer_id, sequence, name_first, name_last, organization
                                                , persistent_lawyer_id)
 select
     pl.patent_id
@@ -32,8 +30,8 @@ select
   , l.organization
   , timl.old_lawyer_id
 from
-    `{{reporting_database}}`.patent_lawyer pl
-        join `{{reporting_database}}`.lawyer l on pl.lawyer_id = l.lawyer_id
-        join `{{reporting_database}}`.temp_id_mapping_lawyer timl on timl.new_lawyer_id = l.lawyer_id
-        join `{{elastic_target_database}}`.patents p on pl.patent_id = p.patent_id;
+    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_lawyer pl
+        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.lawyer l on pl.lawyer_id = l.lawyer_id
+        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_lawyer timl on timl.new_lawyer_id = l.lawyer_id
+        join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on pl.patent_id = p.patent_id;
 
