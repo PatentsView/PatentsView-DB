@@ -75,8 +75,8 @@ select p.patent_id
      , detail_desc_length
      , gi_statement
      , pe.patent_id_eight_char
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent p
-    left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.government_interest gi
+from `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.patent p
+    left join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.government_interest gi
 on gi.patent_id = p.patent_id
     join patent.patent_to_eight_char pe on pe.id = p.patent_id;
 

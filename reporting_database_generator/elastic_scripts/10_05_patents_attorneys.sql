@@ -30,8 +30,8 @@ select
   , l.organization
   , timl.old_lawyer_id
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_lawyer pl
-        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.lawyer l on pl.lawyer_id = l.lawyer_id
-        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_lawyer timl on timl.new_lawyer_id = l.lawyer_id
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.patent_lawyer pl
+        join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.lawyer l on pl.lawyer_id = l.lawyer_id
+        join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.temp_id_mapping_lawyer timl on timl.new_lawyer_id = l.lawyer_id
         join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on pl.patent_id = p.patent_id;
 

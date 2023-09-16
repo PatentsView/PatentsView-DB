@@ -4,8 +4,8 @@
 #################################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`foreignpriority`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`foreignpriority`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`foreignpriority`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`foreignpriority`
 (
   `patent_id` varchar(20) not null,
   `sequence` int not null,
@@ -18,7 +18,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`foreignpriori
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`foreignpriority`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`foreignpriority`
 (
   `patent_id`, `sequence`, `foreign_doc_number`,
   `date`, `country`, `kind`
@@ -29,7 +29,7 @@ select
   nullif(trim(ac.`country_transformed`), ''),
   nullif(trim(ac.`kind`), '')
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p
   inner join `patent`.`foreign_priority` ac on ac.`patent_id` = p.`patent_id`;
 
 

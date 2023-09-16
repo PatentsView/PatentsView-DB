@@ -17,7 +17,7 @@ TRUNCATE TABLE  `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.wipo
 insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.wipo_field
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`wipo_field`;
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`wipo_field`;
 
 
 CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`cpc_class`
@@ -41,7 +41,7 @@ TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_c
 INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_class
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_subsection`;
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_subsection`;
 CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`cpc_subclass`
 (
     `id`              varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -64,7 +64,7 @@ TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_s
 INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_subclass
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_group`;
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_group`;
 
 CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`cpc_group`
 (
@@ -79,7 +79,7 @@ TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_g
 insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_group
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_subgroup`;
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_subgroup`;
 
 
 
@@ -105,7 +105,7 @@ TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.uspc_
 insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.uspc_mainclass
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_mainclass`;
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_mainclass`;
 
 
 CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`uspc_subclass`
@@ -121,5 +121,5 @@ TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.uspc_
 insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.uspc_subclass
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_subclass`;
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_subclass`;
 

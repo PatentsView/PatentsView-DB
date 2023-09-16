@@ -33,7 +33,7 @@ select a.application_id
      , a.date
      , pa.series_code_transformed_from_type
      , x.rule_47_flag
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.application a
+from `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.application a
          join patent.application pa on pa.patent_id = a.patent_id
          join (select patent_id
                     , case

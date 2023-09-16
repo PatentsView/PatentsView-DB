@@ -67,8 +67,8 @@ select
   , years_active
   , persistent_assignee_id
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee` a
-        left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` timl on timl.new_location_id = a.lastknown_location_id;
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee` a
+        left join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location` timl on timl.new_location_id = a.lastknown_location_id;
 
 
 TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.assignee_years;
@@ -78,7 +78,7 @@ select
   , patent_year
   , ay.num_patents
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_year` ay
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_year` ay
         join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.assignees a
 where
     a.assignee_id = ay.assignee_id;

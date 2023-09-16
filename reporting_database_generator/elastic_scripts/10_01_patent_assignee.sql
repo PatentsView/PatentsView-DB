@@ -39,9 +39,9 @@ select pa.assignee_id
      , pa.patent_id
      , timl.old_location_id
      , tima.old_assignee_id
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_assignee pa
+from `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.patent_assignee pa
          join `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = pa.patent_id
-         join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.assignee a on a.assignee_id = pa.assignee_id
-         join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_assignee tima on tima.new_assignee_id = a.assignee_id
-         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.location l on l.location_id = pa.location_id
-         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_location timl on timl.new_location_id = l.location_id;
+         join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.assignee a on a.assignee_id = pa.assignee_id
+         join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.temp_id_mapping_assignee tima on tima.new_assignee_id = a.assignee_id
+         left join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.location l on l.location_id = pa.location_id
+         left join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.temp_id_mapping_location timl on timl.new_location_id = l.location_id;

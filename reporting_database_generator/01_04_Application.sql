@@ -3,8 +3,8 @@
 ###########################################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`application`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`application`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`application`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`application`
 (
   `application_id` varchar(36) not null,
   `patent_id` varchar(20) not null,
@@ -17,7 +17,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`application`
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`application`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`application`
   (`application_id`, `patent_id`, `type`, `number`, `country`, `date`)
 select
   `id_transformed`, `patent_id`, nullif(trim(`type`), ''),

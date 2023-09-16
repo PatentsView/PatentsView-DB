@@ -11,7 +11,7 @@ select c.patent_id
      , c.group_id      as cpc_subclass
      , c.subgroup_id   as cpc_group
      , c.category         cpc_type
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.cpc_current c;
+from `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.cpc_current c;
 
 create or replace
 sql security invoker view  `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.granted_pregrant_crosswalk as
@@ -30,7 +30,7 @@ select f.patent_id
      , f.date
      , f.country
      , f.kind
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.foreignpriority f;
+from `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.foreignpriority f;
 
 create
 or replace sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.ipcr as
@@ -60,7 +60,7 @@ select i.patent_id
      , i.classification_value
      , i.classification_data_source
      , i.action_date
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.ipcr i
+from `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.ipcr i
          join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.ipcr i2
               on i2.ipc_class = i.ipc_class and i2.section = i.section and i2.subclass = i.subclass;
 
@@ -75,7 +75,7 @@ select p.patent_id
      , p.date
      , p.`102_date`
      , p.`371_date`
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.pctdata p;
+from `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.pctdata p;
 
 
 create or replace
@@ -92,7 +92,7 @@ sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodas
 select w.patent_id
      , w.field_id
      , w.sequence
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.wipo w;
+from `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.wipo w;
 
 
 create or replace

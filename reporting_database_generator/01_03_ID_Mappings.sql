@@ -5,8 +5,8 @@
 
 
 # We need this early for firstnamed stuff.
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_assignee`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_assignee`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_assignee`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_assignee`
 (
   `old_assignee_id` varchar(72) not null,
   `new_assignee_id` int unsigned not null auto_increment,
@@ -19,7 +19,7 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # There are assignees in the raw data that are not linked to anything so we will take our
 # assignee ids from the patent_assignee table to ensure we dont copy any unused assignees over.
 insert ignore into
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_assignee` (`old_assignee_id`)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_assignee` (`old_assignee_id`)
 select
   pa.`assignee_id`
 from
@@ -37,8 +37,8 @@ from
 
 
 # We need this early for firstnamed stuff.
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_inventor`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_inventor`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_inventor`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_inventor`
 (
   `old_inventor_id` varchar(256) not null,
   `new_inventor_id` int unsigned not null auto_increment,
@@ -51,7 +51,7 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # There are inventors in the raw data that are not linked to anything so we will take our
 # inventor ids from the patent_inventor table to ensure we dont copy any unused inventors over.
 insert ignore into
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_inventor` (`old_inventor_id`)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_inventor` (`old_inventor_id`)
 select
   `inventor_id`
 from
@@ -69,8 +69,8 @@ from
 
 
 # We need this early for firstnamed stuff.
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_lawyer`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_lawyer`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_lawyer`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_lawyer`
 (
   `old_lawyer_id` varchar(36) not null,
   `new_lawyer_id` int unsigned not null auto_increment,
@@ -84,7 +84,7 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # lawyer ids from the patent_lawyer table to ensure we dont copy any unused lawyers over.
 
 insert ignore into
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_lawyer` (`old_lawyer_id`)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_lawyer` (`old_lawyer_id`)
 select
   `lawyer_id`
 from
@@ -103,8 +103,8 @@ from
 
 
 # We need this early for firstnamed stuff.
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_examiner`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_examiner`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_examiner`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_examiner`
 (
   `old_examiner_id` varchar(36) not null,
   `new_examiner_id` int unsigned not null auto_increment,
@@ -118,7 +118,7 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # lawyer ids from the patent_lawyer table to ensure we dont copy any unused lawyers over.
 
 insert into
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_examiner` (`old_examiner_id`)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_examiner` (`old_examiner_id`)
 select distinct
   `uuid`
 from
@@ -150,11 +150,11 @@ from
 # rather than having to drag rawlocation into all queries.
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location_transformed`;
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location_transformed`;
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location`
 (
   `old_location_id` varchar(128) not null,
   `old_location_id_transformed` varchar(128) null,
@@ -167,7 +167,7 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 insert into
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` (`old_location_id`,`old_location_id_transformed`)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location` (`old_location_id`,`old_location_id_transformed`)
 select
       `id`,concat(latitude,'|',longitude)
 from

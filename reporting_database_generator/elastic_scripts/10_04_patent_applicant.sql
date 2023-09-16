@@ -33,6 +33,6 @@ select nia.patent_id
 from patent.non_inventor_applicant nia
          join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on nia.patent_id = p.patent_id
          left join patent.rawlocation rl on rl.id = nia.rawlocation_id
-         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_location timl on timl.old_location_id = rl.location_id
-         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.location l on l.location_id = timl.new_location_id
+         left join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.temp_id_mapping_location timl on timl.old_location_id = rl.location_id
+         left join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.location l on l.location_id = timl.new_location_id
 

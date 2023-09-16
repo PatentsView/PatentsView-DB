@@ -72,8 +72,8 @@ select distinct
   , i2.male_flag
   , i2.attribution_status
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor` i
-        lEft join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor` i
+        lEft join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
         left join patent.inventor_20211230 i2 on i2.id = i.persistent_inventor_id;
 
 
@@ -85,7 +85,7 @@ select
   , patent_year
   , ay.num_patents
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_year` ay
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_year` ay
         join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.inventors a
 where
     a.inventor_id = ay.inventor_id;

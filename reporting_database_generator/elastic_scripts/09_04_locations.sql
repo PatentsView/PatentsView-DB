@@ -56,7 +56,7 @@ select
   , timl.old_location_id
   , cl.place
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location` l
-        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` timl on timl.new_location_id = l.location_id
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location` l
+        join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location` timl on timl.new_location_id = l.location_id
         left join patent.location l2 on l2.id = timl.old_location_id
         left join geo_data.curated_locations cl on cl.id = l2.curated_location_id;

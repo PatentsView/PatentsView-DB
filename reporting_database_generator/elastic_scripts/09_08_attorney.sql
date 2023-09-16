@@ -35,5 +35,5 @@ select distinct
     l.*
 
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`lawyer` l
-        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_lawyer` pl on pl.lawyer_id = l.lawyer_id;
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`lawyer` l
+        join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_lawyer` pl on pl.lawyer_id = l.lawyer_id;

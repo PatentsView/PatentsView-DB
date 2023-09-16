@@ -34,8 +34,8 @@ select
   , level_two
   , level_three
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.government_organization go
-        join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_govintorg pgi
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.government_organization go
+        join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.patent_govintorg pgi
 on pgi.organization_id = go.organization_id
     join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = pgi.patent_id;
 
@@ -46,5 +46,5 @@ select
     c.patent_id
   , contract_award_number
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_contractawardnumber c
+    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.patent_contractawardnumber c
         join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = c.patent_id;

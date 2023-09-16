@@ -1,7 +1,7 @@
 -- Index on patent_id and inventor_key_id
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_entity`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_entity`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_entity`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_entity`
 (`patent_id` varchar(20) not null,
    	`inventor_city` varchar(256) null,
     `inventor_country` varchar(10) null,
@@ -29,7 +29,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_enti
 )
 engine=InnoDB;
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_entity`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_entity`
 (
   	`patent_id`, `inventor_city`, `inventor_country`,
     `inventor_county`, `inventor_county_fips`, `inventor_first_name`,
@@ -67,17 +67,17 @@ select
     i.`num_assignees`,
     i.`num_patents`
 from
- 	`PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor` p
- 	left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor` i ON p.`inventor_id`=i.`inventor_id`
-    left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location` as `locationI` on p.`location_id`= locationI.`location_id`;
+ 	`PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_inventor` p
+ 	left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor` i ON p.`inventor_id`=i.`inventor_id`
+    left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location` as `locationI` on p.`location_id`= locationI.`location_id`;
 
-ALTER TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_entity` ADD INDEX `patent_id` (`patent_id` ASC);
-ALTER TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_entity` ADD INDEX `inventor_key_id` (`inventor_key_id` ASC);
+ALTER TABLE `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_entity` ADD INDEX `inventor_key_id` (`inventor_key_id` ASC);
 
 --  Index on patent_id and assignee_key_id
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_entity`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_entity`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_entity`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_entity`
 (
 	`patent_id` varchar(20) not null,
 	`assignee_county` varchar(60) null,
@@ -109,7 +109,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_enti
 )
 engine=InnoDB;
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_entity`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_entity`
 (
       `patent_id`,`assignee_county`,`assignee_county_fips`,`assignee_state_fips`,`assignee_city`,
     `assignee_country`,`assignee_first_name`,`assignee_first_seen_date`,`assignee_id`,
@@ -150,18 +150,18 @@ select
     a.`num_inventors`,
     a.`type`
 from
-	`PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee` pa
-	left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee` a ON pa.`assignee_id`=a.`assignee_id`
-    left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location` as `locationA` on pa.`location_id`= locationA.`location_id`;
+	`PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_assignee` pa
+	left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee` a ON pa.`assignee_id`=a.`assignee_id`
+    left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location` as `locationA` on pa.`location_id`= locationA.`location_id`;
 
 
-ALTER TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_entity` ADD INDEX `patent_id` (`patent_id` ASC);
-ALTER TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_entity` ADD INDEX `assignee_key_id` (`assignee_key_id` ASC);
+ALTER TABLE `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_entity` ADD INDEX `assignee_key_id` (`assignee_key_id` ASC);
 
 
 -- Index on patent_id
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_entity`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_entity`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_entity`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_entity`
 (
 	`patent_id` varchar(20) not null, 
    	`uspc_first_seen_date` date null, 
@@ -177,7 +177,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_entity`
 )
 engine=InnoDB;
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_entity`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_entity`
 (
 
 	`patent_id`, `uspc_first_seen_date` , `uspc_last_seen_date` ,`uspc_mainclass_id` ,
@@ -200,18 +200,18 @@ select
     um.`num_inventors`, 
   	um.`num_patents`
 from
-	`PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_current_mainclass_copy` ucm
-	left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_current_copy` uc on ucm.`patent_id`=uc.`patent_id`
+	`PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass_copy` ucm
+	left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_copy` uc on ucm.`patent_id`=uc.`patent_id`
 		and ucm.`mainclass_id`=uc.`mainclass_id` 
-	left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_mainclass` um on ucm.`mainclass_id`=um.`id` 
-    left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_subclass` us on uc.`subclass_id`=us.`id`;
+	left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_mainclass` um on ucm.`mainclass_id`=um.`id`
+    left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_subclass` us on uc.`subclass_id`=us.`id`;
 
-ALTER TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
 
 -- Index on patent_id
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_entity`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_entity`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_entity`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_entity`
 (
 	`patent_id` varchar(20) not null, 
     `cpc_category` varchar(36) null, 
@@ -233,7 +233,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_entity`
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_entity`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_entity`
 (
   `patent_id` ,`cpc_category` ,`cpc_first_seen_date` ,
     `cpc_group_id` ,`cpc_group_title` ,`cpc_last_seen_date` ,
@@ -262,17 +262,17 @@ select
     cpc_subsection.`num_patents`, 
     cpc_subsection.`num_assignees`
 FROM 
-	`PatentsView_{{ dag_run.logical_date | ds_nodash }}`.cpc_current_subsection_copy left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.cpc_subsection on cpc_current_subsection_copy.`subsection_id`=cpc_subsection.`id`
-    left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.cpc_current_copy on cpc_current_subsection_copy.`patent_id`=cpc_current_copy.`patent_id`
+	`PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.cpc_current_subsection_copy left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.cpc_subsection on cpc_current_subsection_copy.`subsection_id`=cpc_subsection.`id`
+    left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.cpc_current_copy on cpc_current_subsection_copy.`patent_id`=cpc_current_copy.`patent_id`
 		and cpc_subsection.`id`=cpc_current_copy.`subsection_id`
-	left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.cpc_group on cpc_current_copy.`group_id`=cpc_group.`id` 
-    left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.cpc_subgroup on cpc_current_copy.`subgroup_id`=cpc_subgroup.`id`;
+	left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.cpc_group on cpc_current_copy.`group_id`=cpc_group.`id`
+    left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.cpc_subgroup on cpc_current_copy.`subgroup_id`=cpc_subgroup.`id`;
     
-ALTER TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
 -- Index on patent_id
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber_entity`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber_entity`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`nber_entity`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`nber_entity`
 (
  	`patent_id` varchar(20) not null, 
    	`nber_category_id` varchar(20) null, 
@@ -288,7 +288,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber_entity`
 
 engine=InnoDB;
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber_entity`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`nber_entity`
 (
    `patent_id`, `nber_category_id` ,`nber_category_title`, `nber_first_seen_date`,
     `nber_last_seen_date` ,	`nber_subcategory_id`,`nber_subcategory_title` ,
@@ -309,15 +309,15 @@ select
     nber_subcategory.`num_patents` 
     
 FROM 
-	`PatentsView_{{ dag_run.logical_date | ds_nodash }}`.nber_copy left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.nber_category on nber_copy.`category_id`=nber_category.`id` 
-    left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.nber_subcategory on nber_copy.`subcategory_id`=nber_subcategory.`id`;
+	`PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.nber_copy left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.nber_category on nber_copy.`category_id`=nber_category.`id`
+    left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.nber_subcategory on nber_copy.`subcategory_id`=nber_subcategory.`id`;
     
-ALTER TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`nber_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
 
 -- Index on patent_id
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`wipo_entity`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`wipo_entity`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`wipo_entity`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`wipo_entity`
 (
 	`patent_id` varchar(20) not null, 
    	`wipo_field_id` varchar(3) null, 
@@ -329,7 +329,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`wipo_entity`
 
 engine=InnoDB;
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`wipo_entity`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`wipo_entity`
 (
   `patent_id`,	`wipo_field_id` , `wipo_field_title` ,`wipo_sector_title` ,
     `wipo_sequence`
@@ -344,13 +344,13 @@ select
     wipo_field.`sector_title`,
     wipo.`sequence`
     
-FROM `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.wipo left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.wipo_field on wipo.`field_id`=wipo_field.`id`;
+FROM `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.wipo left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.wipo_field on wipo.`field_id`=wipo_field.`id`;
     
-ALTER TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`wipo_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`wipo_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
 -- Index on patent_id  
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`examiner_entity`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`examiner_entity`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`examiner_entity`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`examiner_entity`
 (
 	`patent_id` varchar(20) not null, 
 	`examiner_first_name` varchar(64) null, 
@@ -363,7 +363,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`examiner_enti
 
 engine=InnoDB;
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`examiner_entity`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`examiner_entity`
 (
  `patent_id`,`examiner_first_name` ,`examiner_id` , `examiner_key_id`,
 	`examiner_last_name` , `examiner_role` , `examiner_group`
@@ -379,13 +379,13 @@ select
     patent_examiner.`role`, 
     examiner.`group`
     
-FROM `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_examiner left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.examiner on examiner.`examiner_id`=patent_examiner.`examiner_id`;
+FROM `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.patent_examiner left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.examiner on examiner.`examiner_id`=patent_examiner.`examiner_id`;
     
-ALTER TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`examiner_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`examiner_entity` ADD INDEX `patent_id` (`patent_id` ASC);
 
 -- Index on patent_id
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`lawyer_entity`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`lawyer_entity`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`lawyer_entity`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`lawyer_entity`
 (
 	`patent_id` varchar(20) not null,
 	`lawyer_first_name` varchar(64) null, 
@@ -403,7 +403,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`lawyer_entity
 
 engine=InnoDB;
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`lawyer_entity`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`lawyer_entity`
 (
  `patent_id` , `lawyer_first_name`, `lawyer_first_seen_date`, `lawyer_id`  ,
 	`lawyer_key_id` ,	`lawyer_last_name` ,`lawyer_last_seen_date` , `lawyer_organization`,
@@ -425,6 +425,6 @@ select
     lawyer.`num_patents`, 
     lawyer.`num_assignees`,
     lawyer.`num_inventors`
-FROM `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_lawyer left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.lawyer on lawyer.`lawyer_id`=patent_lawyer.`lawyer_id`;
+FROM `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.patent_lawyer left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.lawyer on lawyer.`lawyer_id`=patent_lawyer.`lawyer_id`;
     
-ALTER TABLE `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`lawyer_entity` ADD INDEX `patent_id` (`patent_id` ASC);
+ALTER TABLE `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`lawyer_entity` ADD INDEX `patent_id` (`patent_id` ASC);

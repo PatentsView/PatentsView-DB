@@ -2,8 +2,8 @@
 # BEGIN assignee_inventor ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_inventor`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_inventor`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_inventor`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_inventor`
 (
   `assignee_id` int unsigned not null,
   `inventor_id` int unsigned not null,
@@ -12,13 +12,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_inve
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_inventor`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_inventor`
   (`assignee_id`, `inventor_id`, `num_patents`)
 select
   pa.assignee_id, pi.inventor_id, count(distinct pa.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee` pa
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor` pi using(patent_id)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_assignee` pa
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_inventor` pi using(patent_id)
 group by
   pa.assignee_id, pi.inventor_id;
 
@@ -31,8 +31,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_coinventor`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_coinventor`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_coinventor`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_coinventor`
 (
   `inventor_id` int unsigned not null,
   `coinventor_id` int unsigned not null,
@@ -41,13 +41,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_coin
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_coinventor`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_coinventor`
   (`inventor_id`, `coinventor_id`, `num_patents`)
 select
   pi.inventor_id, copi.inventor_id, count(distinct copi.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor` pi
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor` copi on pi.patent_id=copi.patent_id and pi.inventor_id<>copi.inventor_id
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_inventor` pi
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_inventor` copi on pi.patent_id=copi.patent_id and pi.inventor_id<>copi.inventor_id
 group by
   pi.inventor_id, copi.inventor_id;
 
@@ -60,8 +60,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_cpc_subsection`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_cpc_subsection`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_cpc_subsection`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_cpc_subsection`
 (
   `inventor_id` int unsigned not null,
   `subsection_id` varchar(20) not null,
@@ -70,13 +70,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_cpc_
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_cpc_subsection`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_cpc_subsection`
   (`inventor_id`, `subsection_id`, `num_patents`)
 select
   pi.inventor_id, c.subsection_id, count(distinct c.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor` pi
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_current_subsection` c using(patent_id)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_inventor` pi
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_current_subsection` c using(patent_id)
 where
   c.subsection_id is not null and c.subsection_id != ''
 group by
@@ -93,8 +93,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_cpc_group`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_cpc_group`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_cpc_group`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_cpc_group`
 (
   `inventor_id` int unsigned not null,
   `group_id` varchar(20) not null,
@@ -103,13 +103,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_cpc_
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_cpc_group`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_cpc_group`
   (`inventor_id`, `group_id`, `num_patents`)
 select
   pi.inventor_id, c.group_id, count(distinct c.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor` pi
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_current_group` c using(patent_id)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_inventor` pi
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_current_group` c using(patent_id)
 where
   c.group_id is not null and c.group_id != ''
 group by
@@ -126,8 +126,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_nber_subcategory`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_nber_subcategory`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_nber_subcategory`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_nber_subcategory`
 (
   `inventor_id` int unsigned not null,
   `subcategory_id` varchar(20) not null,
@@ -136,13 +136,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_nber
 engine=InnoDB;
 
 #
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_nber_subcategory`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_nber_subcategory`
   (`inventor_id`, `subcategory_id`, `num_patents`)
 select
   pi.inventor_id, n.subcategory_id, count(distinct n.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber` n
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor` pi using(patent_id)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`nber` n
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_inventor` pi using(patent_id)
 where
   n.subcategory_id is not null and n.subcategory_id != ''
 group by
@@ -159,8 +159,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_uspc_mainclass`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_uspc_mainclass`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_uspc_mainclass`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_uspc_mainclass`
 (
   `inventor_id` int unsigned not null,
   `mainclass_id` varchar(20) not null,
@@ -169,13 +169,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_uspc
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_uspc_mainclass`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_uspc_mainclass`
   (`inventor_id`, `mainclass_id`, `num_patents`)
 select
   pi.inventor_id, u.mainclass_id, count(distinct pi.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor` pi
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_current_mainclass` u on pi.patent_id=u.patent_id
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_inventor` pi
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass` u on pi.patent_id=u.patent_id
 group by
   pi.inventor_id, u.mainclass_id;
 
@@ -187,8 +187,8 @@ group by
 
 # BEGIN inventor_year ######################################################################################################################
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_year`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_year`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_year`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_year`
 (
   `inventor_id` int unsigned not null,
   `patent_year` smallint not null,
@@ -197,13 +197,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_year
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_year`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_year`
 (`inventor_id`, `patent_year`, `num_patents`)
 select
   pi.inventor_id, p.year, count(distinct pi.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor` pi
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p using(patent_id)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_inventor` pi
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p using(patent_id)
 group by
   pi.inventor_id, p.year;
 
@@ -216,8 +216,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_cpc_subsection`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_cpc_subsection`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_cpc_subsection`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_cpc_subsection`
 (
   `assignee_id` int unsigned not null,
   `subsection_id` varchar(20) not null,
@@ -227,13 +227,13 @@ engine=InnoDB;
 
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_cpc_subsection`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_cpc_subsection`
   (`assignee_id`, `subsection_id`, `num_patents`)
 select
   pa.assignee_id, c.subsection_id, count(distinct c.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee` pa
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_current_subsection` c using(patent_id)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_assignee` pa
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_current_subsection` c using(patent_id)
 where
   c.subsection_id is not null and c.subsection_id != ''
 group by
@@ -250,8 +250,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_cpc_group`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_cpc_group`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_cpc_group`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_cpc_group`
 (
   `assignee_id` int unsigned not null,
   `group_id` varchar(20) not null,
@@ -261,13 +261,13 @@ engine=InnoDB;
 
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_cpc_group`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_cpc_group`
   (`assignee_id`, `group_id`, `num_patents`)
 select
   pa.assignee_id, c.group_id, count(distinct c.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee` pa
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_current_group` c using(patent_id)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_assignee` pa
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_current_group` c using(patent_id)
 where
   c.group_id is not null and c.group_id != ''
 group by
@@ -283,8 +283,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_nber_subcategory`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_nber_subcategory`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_nber_subcategory`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_nber_subcategory`
 (
   `assignee_id` int unsigned not null,
   `subcategory_id` varchar(20) not null,
@@ -293,13 +293,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_nber
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_nber_subcategory`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_nber_subcategory`
   (`assignee_id`, `subcategory_id`, `num_patents`)
 select
   pa.assignee_id, n.subcategory_id, count(distinct n.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee` pa
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber` n using(patent_id)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_assignee` pa
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`nber` n using(patent_id)
 where
   n.subcategory_id is not null and n.subcategory_id != ''
 group by
@@ -316,8 +316,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_uspc_mainclass`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_uspc_mainclass`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_uspc_mainclass`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_uspc_mainclass`
 (
   `assignee_id` int unsigned not null,
   `mainclass_id` varchar(20) not null,
@@ -326,13 +326,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_uspc
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_uspc_mainclass`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_uspc_mainclass`
   (`assignee_id`, `mainclass_id`, `num_patents`)
 select
   pa.assignee_id, u.mainclass_id, count(distinct pa.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee` pa
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_current_mainclass` u on pa.patent_id=u.patent_id
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_assignee` pa
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass` u on pa.patent_id=u.patent_id
 group by
   pa.assignee_id, u.mainclass_id;
 
@@ -345,8 +345,8 @@ group by
 # BEGIN assignee_year ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_year`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_year`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_year`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_year`
 (
   `assignee_id` int unsigned not null,
   `patent_year` smallint not null,
@@ -354,13 +354,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_year
 )
 engine=InnoDB;
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee_year`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`assignee_year`
   (`assignee_id`, `patent_year`, `num_patents`)
 select
   pa.assignee_id, p.year, count(distinct pa.patent_id)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee` pa
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p using(patent_id)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_assignee` pa
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p using(patent_id)
 group by
   pa.assignee_id, p.year;
 
@@ -374,13 +374,13 @@ group by
 
 
 update
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_assignee` la
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_assignee` la
   inner join
   (
     select
       `location_id`, `assignee_id`, count(distinct `patent_id`) num_patents
     from
-      `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee`
+      `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_assignee`
     group by
       `location_id`, `assignee_id`
   ) pa on pa.`location_id` = la.`location_id` and pa.`assignee_id` = la.`assignee_id`
@@ -399,13 +399,13 @@ set
 
 
 update
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_inventor` li
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_inventor` li
   inner join
   (
     select
       `location_id`, `inventor_id`, count(distinct `patent_id`) num_patents
     from
-      `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor`
+      `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_inventor`
     group by
       `location_id`, `inventor_id`
   ) pii on pii.`location_id` = li.`location_id` and pii.`inventor_id` = li.`inventor_id`
@@ -423,8 +423,8 @@ set
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_cpc_subsection`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_cpc_subsection`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_cpc_subsection`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_cpc_subsection`
 (
   `location_id` int unsigned not null,
   `subsection_id` varchar(20) not null,
@@ -433,13 +433,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_cpc_
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_cpc_subsection`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_cpc_subsection`
   (`location_id`, `subsection_id`, `num_patents`)
 select
   tlp.`location_id`, cpc.`subsection_id`, count(distinct tlp.`patent_id`)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent` tlp
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_current_subsection` cpc using(`patent_id`)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_location_patent` tlp
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_current_subsection` cpc using(`patent_id`)
 group by
   tlp.`location_id`, cpc.`subsection_id`;
 
@@ -453,8 +453,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_cpc_group`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_cpc_group`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_cpc_group`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_cpc_group`
 (
   `location_id` int unsigned not null,
   `group_id` varchar(20) not null,
@@ -463,13 +463,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_cpc_
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_cpc_group`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_cpc_group`
   (`location_id`, `group_id`, `num_patents`)
 select
   tlp.`location_id`, cpc.`group_id`, count(distinct tlp.`patent_id`)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent` tlp
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_current_group` cpc using(`patent_id`)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_location_patent` tlp
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`cpc_current_group` cpc using(`patent_id`)
 group by
   tlp.`location_id`, cpc.`group_id`;
 
@@ -484,8 +484,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_uspc_mainclass`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_uspc_mainclass`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_uspc_mainclass`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_uspc_mainclass`
 (
   `location_id` int unsigned not null,
   `mainclass_id` varchar(20) not null,
@@ -494,13 +494,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_uspc
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_uspc_mainclass`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_uspc_mainclass`
   (`location_id`, `mainclass_id`, `num_patents`)
 select
   tlp.`location_id`, uspc.`mainclass_id`, count(distinct tlp.`patent_id`)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent` tlp
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_current_mainclass` uspc using(`patent_id`)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_location_patent` tlp
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass` uspc using(`patent_id`)
 group by
   tlp.`location_id`, uspc.`mainclass_id`;
 
@@ -515,8 +515,8 @@ group by
 ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_nber_subcategory`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_nber_subcategory`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_nber_subcategory`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_nber_subcategory`
 (
   `location_id` int unsigned not null,
   `subcategory_id` varchar(20) not null,
@@ -525,13 +525,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_nber
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_nber_subcategory`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_nber_subcategory`
   (`location_id`, `subcategory_id`, `num_patents`)
 select
   tlp.`location_id`, nber.`subcategory_id`, count(distinct tlp.`patent_id`)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent` tlp
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`nber` nber using(`patent_id`)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_location_patent` tlp
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`nber` nber using(`patent_id`)
 group by
   tlp.`location_id`, nber.`subcategory_id`;
 
@@ -544,8 +544,8 @@ group by
 # BEGIN location_year ######################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_year`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_year`
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_year`;
+create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_year`
 (
   `location_id` int unsigned not null,
   `year` smallint not null,
@@ -554,13 +554,13 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_year
 engine=InnoDB;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_year`
+insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location_year`
   (`location_id`, `year`, `num_patents`)
 select
   tlp.`location_id`, p.`year`, count(distinct tlp.`patent_id`)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_location_patent` tlp
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p using(`patent_id`)
+  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_location_patent` tlp
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p using(`patent_id`)
 group by
   tlp.`location_id`, p.`year`;
 
@@ -570,19 +570,19 @@ group by
 # BEGIN inventor_rawinventor alias 
 
 ###############################################################################################################################
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_rawinventor`;
-create table if not exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_rawinventor` (uuid int(10) unsigned AUTO_INCREMENT PRIMARY KEY,name_first varchar(128),name_last varchar(128),patent_id varchar(20),inventor_id int(10) unsigned);
+drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_rawinventor`;
+create table if not exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_rawinventor` (uuid int(10) unsigned AUTO_INCREMENT PRIMARY KEY,name_first varchar(128),name_last varchar(128),patent_id varchar(20),inventor_id int(10) unsigned);
 
-INSERT INTO `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id)
+INSERT INTO `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_rawinventor` (name_first,name_last,patent_id,inventor_id)
 SELECT DISTINCT ri.name_first,ri.name_last,ri.patent_id,repi.inventor_id
-FROM `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor` repi
+FROM `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor` repi
 left join `patent`.`rawinventor` ri
 on ri.inventor_id = repi.persistent_inventor_id;
 
-alter table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_first` (`name_first`);
-alter table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_last` (`name_last`);
-alter table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_inventor_id` (`inventor_id`);
-alter table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_patent_id` (`patent_id`);
+alter table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_first` (`name_first`);
+alter table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_name_last` (`name_last`);
+alter table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_inventor_id` (`inventor_id`);
+alter table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_rawinventor` add index `ix_inventor_rawinventor_patent_id` (`patent_id`);
 
 # END inventor_rawinventor alias 
 
