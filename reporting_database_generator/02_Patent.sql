@@ -46,7 +46,7 @@ from
   left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location` tl on l.`id` =  tl.`old_location_id`
 where
   (ta.`new_assignee_id` is not null or
-  tl.`new_location_id` is not null) and  p.version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`;
+  tl.`new_location_id` is not null) and  p.version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_patent_firstnamed_inventor`;
@@ -91,7 +91,7 @@ from
   left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location` tli on tli.`old_location_id` =  l.`id`
 where
   (ti.`new_inventor_id` is not null or
-  tli.`new_location_id` is not null)and  p.version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`;
+  tli.`new_location_id` is not null)and  p.version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_num_foreign_documents_cited`;
@@ -109,7 +109,7 @@ insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval
 select
   `patent_id`, count(*)
 from
-  `patent`.`foreigncitation`  where version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`
+  `patent`.`foreigncitation`  where version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   `patent_id`;
 
@@ -129,7 +129,7 @@ insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval
 select
   `patent_id`, count(*)
 from
-  `patent`.`usapplicationcitation`  where version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`
+  `patent`.`usapplicationcitation`  where version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   `patent_id`;
 
@@ -150,7 +150,7 @@ insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval
 select
   `patent_id`, count(*)
 from
-  `patent`.`uspatentcitation`  where version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`
+  `patent`.`uspatentcitation`  where version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   `patent_id`;
 
@@ -172,7 +172,7 @@ select
 from
   `patent`.`uspatentcitation`
 where
-  `citation_id` is not null and `citation_id` != ''  and version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`
+  `citation_id` is not null and `citation_id` != ''  and version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   `citation_id`;
 
@@ -209,7 +209,7 @@ from
   left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_num_foreign_documents_cited` t1 on t1.`patent_id` = p.`id`
   left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_num_us_applications_cited` t2 on t2.`patent_id` = p.`id`
   left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_num_us_patents_cited` t3 on t3.`patent_id` = p.`id`
-  left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_num_times_cited_by_us_patents` t4 on t4.`patent_id` = p.`id`  where version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`;
+  left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_num_times_cited_by_us_patents` t4 on t4.`patent_id` = p.`id`  where version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_patent_earliest_application_date`;
@@ -229,7 +229,7 @@ select
 from
   `patent`.`application` a
 where
-  a.`date` is not null and a.`date` > date('1899-12-31') and a.`date` < date_add(current_date, interval 10 year)  and version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`
+  a.`date` is not null and a.`date` > date('1899-12-31') and a.`date` < date_add(current_date, interval 10 year)  and version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   a.`patent_id`;
 
@@ -251,7 +251,7 @@ select
 from
   `patent`.`patent` p
 where
-  p.`date` is not null and p.`date` > date('1899-12-31') and p.`date` < date_add(current_date, interval 10 year) and version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`;
+  p.`date` is not null and p.`date` > date('1899-12-31') and p.`date` < date_add(current_date, interval 10 year) and version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent`;
@@ -351,7 +351,7 @@ from
   left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_patent_earliest_application_date` tpead on tpead.`patent_id` = p.`id`
   left outer join `patent`.`us_term_of_grant` ustog on ustog.`patent_id`=p.`id`
   left outer join `patent`.`detail_desc_length` ddl on ddl.`patent_id` = p.`id`
- where  p.version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`;
+ where  p.version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 # END patent 
 

@@ -24,7 +24,7 @@ select
   nullif(trim(`number_transformed`), ''), nullif(trim(`country`), ''),
   case when `date` > date('1899-12-31') and `date` < date_add(current_date, interval 10 year) then `date` else null end
 from
-  `patent`.`application`  where version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`;
+  `patent`.`application`  where version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 # END application 

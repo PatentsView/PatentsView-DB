@@ -23,7 +23,7 @@ insert ignore into
 select
   pa.`assignee_id`
 from
-  `patent`.`rawassignee` pa where assignee_id is not null and  version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`;
+  `patent`.`rawassignee` pa where assignee_id is not null and  version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 # END assignee id mapping
@@ -55,7 +55,7 @@ insert ignore into
 select
   `inventor_id`
 from
-  `patent`.`rawinventor` where inventor_id is not null and version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`;
+  `patent`.`rawinventor` where inventor_id is not null and version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 # END inventor id mapping
@@ -89,7 +89,7 @@ select
   `lawyer_id`
 from
   `patent`.`rawlawyer`
-  where lawyer_id is not null and lawyer_id !=  ''  and version_indicator<=`{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`;
+  where lawyer_id is not null and lawyer_id !=  ''  and version_indicator<='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 # END lawyer id mapping
@@ -122,7 +122,7 @@ insert into
 select distinct
   `uuid`
 from
-  `patent`.`rawexaminer` where version_indicator<= `{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}`;
+  `patent`.`rawexaminer` where version_indicator<= '{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 # END examiner id mapping
