@@ -43,7 +43,7 @@ default_args = {
 
 # REPORTING DB
 
-reporting_db_dag = DAG("reporting_database_generation"
+reporting_db_dag = DAG("reporting_database_generation_quarterly"
                        , default_args=default_args
                        , start_date=datetime(2023, 1, 1)
                        # , end_date=datetime(2022, 7, 1)
