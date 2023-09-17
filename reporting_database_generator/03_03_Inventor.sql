@@ -83,7 +83,7 @@ insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval
 select
   `inventor_id`, count(distinct `patent_id`)
 from
-  `patent`.`patent_inventor`  pi join `{{ params.raw_database }}`.`patent` p on p.id=pi.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
+  `patent`.`patent_inventor`  pi join `patent`.`patent` p on p.id=pi.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   `inventor_id`;
 
@@ -104,7 +104,7 @@ select
 from
   `patent`.`patent_inventor` ii
   join `patent`.`patent_assignee` aa
-  on aa.`patent_id` = ii.`patent_id`  join `{{ params.raw_database }}`.`patent` p on p.id=ii.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
+  on aa.`patent_id` = ii.`patent_id`  join `patent`.`patent` p on p.id=ii.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   ii.`inventor_id`;
 

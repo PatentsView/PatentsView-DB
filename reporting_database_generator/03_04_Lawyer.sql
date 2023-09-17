@@ -19,7 +19,7 @@ insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval
 select
   `lawyer_id`, count(distinct `patent_id`)
 from
-  `patent`.`patent_lawyer`  pl join `{{ params.raw_database }}`.`patent` p on p.id=pl.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}' and
+  `patent`.`patent_lawyer`  pl join `patent`.`patent` p on p.id=pl.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}' and
    `lawyer_id` is not null
 group by
   `lawyer_id`;
@@ -41,7 +41,7 @@ select
 from
   `patent`.`patent_lawyer` ii
   join `patent`.`patent_assignee` aa
-  on aa.`patent_id` = ii.`patent_id`  join `{{ params.raw_database }}`.`patent` p on p.id=ii.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
+  on aa.`patent_id` = ii.`patent_id`  join `patent`.`patent` p on p.id=ii.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
   and `lawyer_id` is not null
 group by
   ii.`lawyer_id`;
@@ -63,7 +63,7 @@ select
   count(distinct ii.`inventor_id`)
 from
   `patent`.`patent_lawyer` aa
-  join `patent`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `{{ params.raw_database }}`.`patent` p on p.id=aa.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
+  join `patent`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `patent`.`patent` p on p.id=aa.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
    and `lawyer_id` is not null
 group by
   aa.`lawyer_id`;

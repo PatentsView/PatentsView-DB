@@ -74,7 +74,7 @@ insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval
     (`assignee_id`, `num_patents`)
 select `assignee_id`,
        count(distinct `patent_id`)
-from `patent`.`patent_assignee` pa join `{{ params.raw_database }}`.`patent` p on p.id=pa.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
+from `patent`.`patent_assignee` pa join `patent`.`patent` p on p.id=pa.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by `assignee_id`;
 
 drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_assignee_num_inventors`;
@@ -91,7 +91,7 @@ insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval
 select aa.`assignee_id`,
        count(distinct ii.`inventor_id`)
 from `patent`.`patent_assignee` aa
-         join `patent`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `{{ params.raw_database }}`.`patent` p on p.id=aa.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
+         join `patent`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `patent`.`patent` p on p.id=aa.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by aa.`assignee_id`;
 
 drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_assignee_years_active`;
