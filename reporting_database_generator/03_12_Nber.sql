@@ -34,7 +34,7 @@ from
   `patent`.`nber` n
   left outer join `patent`.`patent_assignee` pa on pa.`patent_id` = n.`patent_id`
   left outer join `patent`.`patent_inventor` pii on pii.`patent_id` = n.`patent_id`
-  left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p on p.`patent_id` = n.`patent_id`  where n.version_indicator<= '{{ params.version_indicator }}'
+  left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p on p.`patent_id` = n.`patent_id`  where n.version_indicator<= '{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   n.`subcategory_id`;
 
@@ -113,7 +113,7 @@ from
   `patent`.`nber` n
   inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p on p.`patent_id` = n.`patent_id` and p.`date` is not null
 where
-  n.`subcategory_id` is not null and n.`subcategory_id` != ''  and n.version_indicator<= '{{ params.version_indicator }}'
+  n.`subcategory_id` is not null and n.`subcategory_id` != ''  and n.version_indicator<= '{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   n.`subcategory_id`, year(p.`date`);
 

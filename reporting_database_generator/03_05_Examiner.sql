@@ -26,7 +26,7 @@ select
   i.`uuid`
 from
   `patent`.`rawexaminer` i
-  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_examiner` t on t.`old_examiner_id` = i.`uuid` where i.version_indicator<= '{{ params.version_indicator }}';
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_examiner` t on t.`old_examiner_id` = i.`uuid` where i.version_indicator<= '{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_examiner`;
@@ -49,7 +49,7 @@ select distinct
   ri.`patent_id`, t.`new_examiner_id`, ri.`role`
 from
   `patent`.`rawexaminer` ri
-  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_examiner` t on t.`old_examiner_id` = ri.`uuid`  where ri.version_indicator<= '{{ params.version_indicator }}';
+  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_examiner` t on t.`old_examiner_id` = ri.`uuid`  where ri.version_indicator<= '{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 # END examiner
 

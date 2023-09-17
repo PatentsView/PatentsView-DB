@@ -17,10 +17,6 @@ from reporting_database_generator.create_reporting_db import reporting_db_creati
 from QA.post_processing.ReportingDBTester import run_reporting_db_qa
 from lib.configuration import get_connection_string, get_required_tables, get_current_config
 
-project_home = os.environ['PACKAGE_HOME']
-config = configparser.ConfigParser()
-config.read(project_home + '/config.ini')
-
 slack_token = config["SLACK"]["API_TOKEN"]
 slack_client = WebClient(slack_token)
 slack_channel = config["SLACK"]["CHANNEL"]

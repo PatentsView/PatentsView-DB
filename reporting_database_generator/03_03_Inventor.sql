@@ -57,7 +57,7 @@ select
               inner join `patent`.`rawlocation` rl on rl.`id` = ri.`rawlocation_id`
             where
               ri.`inventor_id` is not null and
-              rl.`location_id` is not null and ri.version_indicator <='{{ params.version_indicator }}'
+              rl.`location_id` is not null and ri.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
             order by
               ri.`inventor_id`,
               p.`date` desc,
@@ -83,7 +83,7 @@ insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval
 select
   `inventor_id`, count(distinct `patent_id`)
 from
-  `patent`.`patent_inventor`  pi join `{{ params.raw_database }}`.`patent` p on p.id=pi.patent_id where p.version_indicator <='{{ params.version_indicator }}'
+  `patent`.`patent_inventor`  pi join `{{ params.raw_database }}`.`patent` p on p.id=pi.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   `inventor_id`;
 
@@ -104,7 +104,7 @@ select
 from
   `patent`.`patent_inventor` ii
   join `patent`.`patent_assignee` aa
-  on aa.`patent_id` = ii.`patent_id`  join `{{ params.raw_database }}`.`patent` p on p.id=ii.patent_id where p.version_indicator <='{{ params.version_indicator }}'
+  on aa.`patent_id` = ii.`patent_id`  join `{{ params.raw_database }}`.`patent` p on p.id=ii.patent_id where p.version_indicator <='{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   ii.`inventor_id`;
 

@@ -25,7 +25,7 @@ select
 from
   `patent`.`ipcr` i
   left outer join `patent`.`patent_assignee` pa on pa.`patent_id` = i.`patent_id`
-  left outer join `patent`.`patent_inventor` pii on pii.`patent_id` = i.`patent_id`  where i.version_indicator<= '{{ params.version_indicator }}'
+  left outer join `patent`.`patent_inventor` pii on pii.`patent_id` = i.`patent_id`  where i.version_indicator<= '{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   i.`section`, i.`ipc_class`, i.`subclass`;
 
@@ -57,7 +57,7 @@ from
   `patent`.`ipcr` i
   inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p on p.`patent_id`= i.`patent_id`
 where
-  p.`date` is not null  and i.version_indicator<= '{{ params.version_indicator }}'
+  p.`date` is not null  and i.version_indicator<= '{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}'
 group by
   i.`section`, i.`ipc_class`, i.`subclass`;
 
@@ -111,7 +111,7 @@ from
 tia.`subclass` = i.`subclass`
   left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_ipcr_years_active` tiya on tiya.`section` = i.`section` and tiya.`ipc_class` = i.`ipc_class` and
 
-tiya.`subclass` = i.`subclass` where i.version_indicator<= '{{ params.version_indicator }}';
+tiya.`subclass` = i.`subclass` where i.version_indicator<= '{{ macros.ds_add(dag_run.data_interval_end | ds, -1) }}';
 
 
 # END ipcr 
