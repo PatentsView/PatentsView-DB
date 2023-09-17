@@ -270,8 +270,8 @@ def clean_up_backups(db, output_path):
         print(i)
         subprocess_cmd(i)
 
-def run_database_archive(type, output_override=None):
-    config = get_current_config(type=type, **{"execution_date": datetime.date(2022, 1, 1)})
+def run_database_archive(type, output_override=None, **kwargs):
+    config = get_current_config(type=type, **kwargs)
 
     # Create Archive SQL FILE
     old_db, table_list = get_oldest_databases(config, db_type=type)
@@ -299,10 +299,10 @@ def run_database_archive(type, output_override=None):
     delete_databases(prod_connection_string, old_db)
     clean_up_backups(old_db, output_path)
 
-def run_table_archive(config_db, table_list, output_path):
+def run_table_archive(dbtype, table_list, output_path, **kwargs):
     # db = 'pregrant_publications'
     # NO SPACES ALLOWED IN TABLE_LIST
-    config = get_current_config(type=config_db, **{"execution_date": datetime.date(2022, 1, 1)})
+    config = get_current_config(type=dbtype, **kwargs)
     db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
 
     if table_list.isempty():
