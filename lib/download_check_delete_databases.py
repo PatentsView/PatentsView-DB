@@ -79,7 +79,7 @@ def find_data_collection_server_path(db_type, data_type):
             output_path = '/DatabaseBackups/PregrantPublications/pgpubs_db_tables'
     elif db_type == 'granted_patent':
         if data_type == 'database':
-            output_path = 'DatabaseBackups/patent_'
+            output_path = '/DatabaseBackups/patent_'
         elif data_type == 'table':
             output_path = '/DatabaseBackups/RawDatabase/patent_db_tables'
     return output_path

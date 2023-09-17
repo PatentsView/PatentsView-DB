@@ -289,3 +289,4 @@ for dependency_group in operator_sequence_groups:
 
 qc_merge_operator.set_upstream(merge_new_operator)
 qc_text_merge_operator.set_upstream(merge_text_operator)
+backup_data.set_upstream(download_xml_operator)
