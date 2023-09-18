@@ -83,7 +83,8 @@ where a.country = 'US' or a.country = 'CA'"""
     query6 = f""" 
 update patent.location_{end_date} a 
 inner join geo_data.county_lookup coun on a.state=coun.state and a.city=coun.city
-set a.county_fips = coun.county_fips, a.county = coun.county
+set a.county_fips = RIGHT(coun.county_fips, 3), 
+a.county = coun.county
 where a.country = 'US'
      """
     for q in [query0, query1, query2, query3, query4, query5, query6]:
