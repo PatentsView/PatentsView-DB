@@ -39,7 +39,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "assignee": {
@@ -154,7 +154,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "assignee_cpc_group": {
@@ -179,7 +179,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "assignee_cpc_subsection": {
@@ -204,7 +204,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "assignee_inventor": {
@@ -229,7 +229,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "assignee_nber_subcategory": {
@@ -254,7 +254,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "assignee_uspc_mainclass": {
@@ -279,7 +279,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "assignee_year": {
@@ -304,7 +304,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_current": {
@@ -443,7 +443,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_current_copy": {
@@ -492,7 +492,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_current_group": {
@@ -559,7 +559,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_current_group_application_year": {
@@ -590,7 +590,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_current_group_copy": {
@@ -615,7 +615,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_current_group_patent_year": {
@@ -640,7 +640,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_current_subsection": {
@@ -707,7 +707,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_current_subsection_copy": {
@@ -732,7 +732,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_current_subsection_patent_year": {
@@ -757,7 +757,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_group": {
@@ -812,7 +812,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_subgroup": {
@@ -831,7 +831,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "cpc_subsection": {
@@ -886,7 +886,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "examiner": {
@@ -929,7 +929,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "foreignpriority": {
@@ -972,7 +972,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "government_interest": {
@@ -991,7 +991,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "government_organization": {
@@ -1028,7 +1028,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "inventor": {
@@ -1131,7 +1131,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "inventor_coinventor": {
@@ -1156,7 +1156,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "inventor_cpc_group": {
@@ -1181,7 +1181,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "inventor_cpc_subsection": {
@@ -1206,7 +1206,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "inventor_nber_subcategory": {
@@ -1231,7 +1231,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "inventor_rawinventor": {
@@ -1268,7 +1268,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "inventor_uspc_mainclass": {
@@ -1293,7 +1293,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "inventor_year": {
@@ -1318,7 +1318,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "ipcr": {
@@ -1427,7 +1427,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "lawyer": {
@@ -1500,7 +1500,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "location": {
@@ -1585,7 +1585,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "location_assignee": {
@@ -1610,7 +1610,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "location_cpc_group": {
@@ -1635,7 +1635,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "location_cpc_subsection": {
@@ -1660,7 +1660,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "location_inventor": {
@@ -1685,7 +1685,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "location_nber_subcategory": {
@@ -1710,7 +1710,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "location_uspc_mainclass": {
@@ -1735,7 +1735,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "location_year": {
@@ -1760,7 +1760,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "nber": {
@@ -1833,7 +1833,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "nber_category": {
@@ -1852,7 +1852,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "nber_copy": {
@@ -1877,7 +1877,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "nber_subcategory": {
@@ -1932,7 +1932,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "nber_subcategory_patent_year": {
@@ -1957,7 +1957,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "patent": {
@@ -2198,7 +2198,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "patent_assignee": {
@@ -2229,7 +2229,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "patent_contractawardnumber": {
@@ -2248,7 +2248,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "patent_examiner": {
@@ -2273,7 +2273,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "patent_govintorg": {
@@ -2292,7 +2292,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "patent_inventor": {
@@ -2323,7 +2323,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "patent_lawyer": {
@@ -2348,7 +2348,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "patent_lawyer_unique": {
@@ -2373,7 +2373,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "pctdata": {
@@ -2422,7 +2422,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_assignee_lastknown_location": {
@@ -2477,7 +2477,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_assignee_num_inventors": {
@@ -2496,7 +2496,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_assignee_num_patents": {
@@ -2515,7 +2515,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_assignee_years_active": {
@@ -2546,7 +2546,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_cpc_current_group_aggregate_counts": {
@@ -2595,7 +2595,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_cpc_current_subsection_aggregate_counts": {
@@ -2644,7 +2644,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_cpc_group_title": {
@@ -2663,7 +2663,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_cpc_subgroup_title": {
@@ -2682,7 +2682,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_cpc_subsection_title": {
@@ -2701,7 +2701,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_id_mapping_assignee": {
@@ -2720,7 +2720,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_id_mapping_examiner": {
@@ -2739,7 +2739,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_id_mapping_inventor": {
@@ -2758,7 +2758,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_id_mapping_lawyer": {
@@ -2777,7 +2777,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_id_mapping_location": {
@@ -2802,7 +2802,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_inventor_lastknown_location": {
@@ -2857,7 +2857,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_inventor_num_assignees": {
@@ -2876,7 +2876,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_inventor_num_patents": {
@@ -2895,7 +2895,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_inventor_years_active": {
@@ -2926,7 +2926,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_ipcr_aggregations": {
@@ -2963,7 +2963,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_ipcr_years_active": {
@@ -3006,7 +3006,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_lawyer_num_assignees": {
@@ -3025,7 +3025,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_lawyer_num_inventors": {
@@ -3044,7 +3044,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_lawyer_num_patents": {
@@ -3063,7 +3063,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_lawyer_years_active": {
@@ -3094,7 +3094,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_location_num_assignees": {
@@ -3113,7 +3113,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_location_num_inventors": {
@@ -3132,7 +3132,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_location_num_patents": {
@@ -3151,7 +3151,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_location_patent": {
@@ -3170,7 +3170,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_mainclass_current_aggregate_counts": {
@@ -3219,7 +3219,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_mainclass_current_title": {
@@ -3238,7 +3238,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_nber_subcategory_aggregate_counts": {
@@ -3287,7 +3287,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_num_foreign_documents_cited": {
@@ -3306,7 +3306,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_num_times_cited_by_us_patents": {
@@ -3325,7 +3325,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_num_us_applications_cited": {
@@ -3344,7 +3344,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_num_us_patents_cited": {
@@ -3363,7 +3363,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_patent_aggregations": {
@@ -3406,7 +3406,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_patent_date": {
@@ -3425,7 +3425,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_patent_earliest_application_date": {
@@ -3444,7 +3444,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_patent_firstnamed_assignee": {
@@ -3511,7 +3511,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_patent_firstnamed_inventor": {
@@ -3578,7 +3578,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "temp_subclass_current_title": {
@@ -3597,7 +3597,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "usapplicationcitation": {
@@ -3646,7 +3646,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "uspatentcitation": {
@@ -3677,7 +3677,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "uspc_current": {
@@ -3756,7 +3756,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "uspc_current_copy": {
@@ -3787,7 +3787,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "uspc_current_mainclass": {
@@ -3848,7 +3848,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "uspc_current_mainclass_application_year": {
@@ -3879,7 +3879,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "uspc_current_mainclass_copy": {
@@ -3898,7 +3898,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "uspc_current_mainclass_patent_year": {
@@ -3923,7 +3923,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "uspc_mainclass": {
@@ -3978,7 +3978,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "uspc_subclass": {
@@ -3997,7 +3997,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "wipo": {
@@ -4022,7 +4022,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     },
     "wipo_field": {
@@ -4047,7 +4047,7 @@
             }
         },
         "TestScripts": [
-            "ReportingDBTester"
+            "ReportingDBTester", "ProdDBTester"
         ]
     }
 }

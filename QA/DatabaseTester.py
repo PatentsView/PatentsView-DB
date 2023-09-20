@@ -78,6 +78,7 @@ class DatabaseTester(ABC):
             'DataMonitor_maxtextlength': [],
             'DataMonitor_prefixedentitycount': [],
             'DataMonitor_locationcount': [],
+            'DataMonitor_indexcount': []
         }
 
     def query_runner(self, query, single_value_return=True, where_vi=False, vi_comparison = '='):
@@ -325,7 +326,7 @@ f"HERE CHAR_LENGTH(`{field}`) != CHAR_LENGTH(TRIM(`{field}`))"
                 f"print({self.database_section}.{table}.{field} needs trimming")
 
     def check_for_indexes(self, table):
-        if table not in ["patent_lawyer_unique", "webtool_comparison_countryI", "webtool_comparison_countryIA", "webtool_comparison_countryIAsector", "webtool_comparison_countryIsector", "webtool_comparison_stateA", "webtool_comparison_stateAsector", "webtool_comparison_stateI", "webtool_comparison_stateIA", "webtool_comparison_stateIsector", "webtool_comparison_wipoA", "webtool_comparison_wipoI"]:
+        if "webtool" not in table and table not in ["patent_lawyer_unique"]:
             index_query = \
     f"""select count(*) from information_schema.statistics where table_name = '{table}' and table_schema = '{self.database_section}' """
             count_value = self.query_runner(index_query, single_value_return=True)
@@ -333,6 +334,14 @@ f"HERE CHAR_LENGTH(`{field}`) != CHAR_LENGTH(TRIM(`{field}`))"
                 print(index_query)
                 raise Exception(
                     f"print({self.database_section}.{table} has no indexes")
+            self.qa_data['DataMonitor_indexcount'].append(
+                {
+                    "database_type": self.database_type,
+                    'table_name': table,
+                    'update_version': self.version,
+                    'index_count': count_value,
+                    'quarter': self.quarter
+                })
 
     def test_rawassignee_org(self, table, where_vi=False):
         rawassignee_q = """

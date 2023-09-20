@@ -20,8 +20,6 @@ class ReportingDBTester(DatabaseTester):
         for table in self.table_config:
             self.load_table_row_count(table, where_vi=False)
             self.check_for_indexes(table)
-            # self.load_nulls(table, self.table_config[table], where_vi=False)
-            # self.test_blank_count(table, self.table_config[table], where_vi=False)
             self.save_qa_data()
             self.init_qa_dict()
             logger.info(f"FINISHED WITH TABLE: {table}")
@@ -36,7 +34,6 @@ def run_reporting_db_qa(**kwargs):
 
 
 if __name__ == '__main__':
-    # check_reporting_db_row_count()
-    config = get_current_config('granted_patent', schedule='quarterly', **{"execution_date": datetime.date(2023, 4, 1)})
+    config = get_current_config('granted_patent', schedule='quarterly', **{"execution_date": datetime.date(2023, 1, 1)})
     qc = ReportingDBTester(config)
     qc.run_reporting_db_tests()
