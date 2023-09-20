@@ -33,9 +33,9 @@ default_args = {
 
 # REPORTING DB
 
-elastic_prep_dag = DAG("elastic_data_preparation"
+elastic_prep_dag = DAG("elastic_data_preparation_quarterly"
                        , default_args=default_args
-                       , start_date=datetime(2023, 4, 1)
+                       , start_date=datetime(2023, 1, 1)
                        , schedule_interval='@quarterly'
                        , template_searchpath="/project/reporting_database_generator/elastic_scripts/")
 
