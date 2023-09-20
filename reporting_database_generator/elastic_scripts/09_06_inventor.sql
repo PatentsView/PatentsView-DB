@@ -1,6 +1,9 @@
-use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`inventor_years`
+use `{{elastic_db}}`;
+
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventor_years`
 (
     `inventor_id` int(10) unsigned NOT NULL,
     `patent_year` smallint(6)      NOT NULL,
@@ -11,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`inventors`
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventors`
 (
     `inventor_id`                      int(10) unsigned                        NOT NULL,
     `name_first`                       varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -45,8 +48,8 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.inventors;
-INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.inventors( inventor_id, name_first, name_last, num_patents, num_assignees
+TRUNCATE TABLE `{{elastic_db}}`.inventors;
+INSERT INTO `{{elastic_db}}`.inventors( inventor_id, name_first, name_last, num_patents, num_assignees
                                         , lastknown_location_id, lastknown_persistent_location_id, lastknown_city
                                         , lastknown_state, lastknown_country, lastknown_latitude, lastknown_longitude
                                         , first_seen_date, last_seen_date, years_active, persistent_inventor_id
@@ -72,20 +75,20 @@ select distinct
   , i2.male_flag
   , i2.attribution_status
 from
-    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor` i
-        lEft join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
+    `{{reporting_db}}`.`inventor` i
+        lEft join `{{reporting_db}}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
         left join patent.inventor_20211230 i2 on i2.id = i.persistent_inventor_id;
 
 
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.inventor_years;
-INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.inventor_years(inventor_id, patent_year, num_patents)
+TRUNCATE TABLE `{{elastic_db}}`.inventor_years;
+INSERT INTO `{{elastic_db}}`.inventor_years(inventor_id, patent_year, num_patents)
 select
     ay.inventor_id
   , patent_year
   , ay.num_patents
 from
-    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`inventor_year` ay
-        join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.inventors a
+    `{{reporting_db}}`.`inventor_year` ay
+        join `{{elastic_db}}`.inventors a
 where
     a.inventor_id = ay.inventor_id;

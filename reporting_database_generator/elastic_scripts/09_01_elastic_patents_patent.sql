@@ -1,7 +1,9 @@
-use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
+use `{{elastic_db}}`;
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patents`
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patents`
 (
     `patent_id`                                             varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
     `type`                                                  varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -40,9 +42,9 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patents`;
+TRUNCATE TABLE `{{elastic_db}}`.`patents`;
 
-insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents ( patent_id, type, number, country, date, year, abstract, title
+insert into `{{elastic_db}}`.patents ( patent_id, type, number, country, date, year, abstract, title
                                                   , kind, num_claims
                                                   , num_foreign_documents_cited, num_us_applications_cited
                                                   , num_us_patents_cited
@@ -75,8 +77,8 @@ select p.patent_id
      , detail_desc_length
      , gi_statement
      , pe.patent_id_eight_char
-from `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.patent p
-    left join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.government_interest gi
+from `{{reporting_db}}`.patent p
+    left join `{{reporting_db}}`.government_interest gi
 on gi.patent_id = p.patent_id
     join patent.patent_to_eight_char pe on pe.id = p.patent_id;
 

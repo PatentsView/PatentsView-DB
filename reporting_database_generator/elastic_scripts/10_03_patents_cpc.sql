@@ -1,6 +1,9 @@
-use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_cpc_at_issue`
+use `{{elastic_db}}`;
+
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patent_cpc_at_issue`
 (
     `patent_id`    varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
     `sequence`     int(10) unsigned NOT NULL,
@@ -18,9 +21,9 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   COLLATE = utf8mb4_unicode_ci;
 
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_cpc_at_issue;
+TRUNCATE TABLE `{{elastic_db}}`.patent_cpc_at_issue;
 
-insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_cpc_at_issue( patent_id, sequence, cpc_section, cpc_class, cpc_subclass
+insert into `{{elastic_db}}`.patent_cpc_at_issue( patent_id, sequence, cpc_section, cpc_class, cpc_subclass
                                                              , cpc_group
                                                              , cpc_type)
 select *
@@ -52,7 +55,7 @@ from (select x.patent_id
                  , 'main' as source
             from
                 patent.main_cpc c
-                join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p
+                join `{{elastic_db}}`.patents p
             on p.patent_id = c.patent_id
             union
             SELECT
@@ -77,6 +80,6 @@ from (select x.patent_id
                     , 'further' as source
             from
                 patent.further_cpc c
-                join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p
+                join `{{elastic_db}}`.patents p
             on p.patent_id = c.patent_id) x) y;
 

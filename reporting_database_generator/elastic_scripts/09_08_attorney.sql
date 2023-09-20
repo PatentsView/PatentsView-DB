@@ -1,6 +1,9 @@
-use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`attorneys`
+use `{{elastic_db}}`;
+
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`attorneys`
 (
     `lawyer_id`            int(10) unsigned                       NOT NULL,
     `name_first`           varchar(64) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
@@ -27,13 +30,13 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.attorneys;
-INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.attorneys ( lawyer_id, name_first, name_last, organization, num_patents, num_assignees
+TRUNCATE TABLE `{{elastic_db}}`.attorneys;
+INSERT INTO `{{elastic_db}}`.attorneys ( lawyer_id, name_first, name_last, organization, num_patents, num_assignees
                                          , num_inventors, first_seen_date, last_seen_date, years_active
                                          , persistent_lawyer_id)
 select distinct
     l.*
 
 from
-    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`lawyer` l
-        join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent_lawyer` pl on pl.lawyer_id = l.lawyer_id;
+    `{{reporting_db}}`.`lawyer` l
+        join `{{reporting_db}}`.`patent_lawyer` pl on pl.lawyer_id = l.lawyer_id;

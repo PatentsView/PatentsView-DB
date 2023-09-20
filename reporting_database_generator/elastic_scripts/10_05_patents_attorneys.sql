@@ -1,6 +1,9 @@
-use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_attorneys`
+use `{{elastic_db}}`;
+
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patent_attorneys`
 (
     `patent_id`            varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
     `lawyer_id`            int(10) unsigned NOT NULL,
@@ -17,9 +20,9 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_attorneys`;
+TRUNCATE TABLE `{{elastic_db}}`.`patent_attorneys`;
 
-insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_attorneys( patent_id, lawyer_id, sequence, name_first, name_last, organization
+insert into `{{elastic_db}}`.patent_attorneys( patent_id, lawyer_id, sequence, name_first, name_last, organization
                                                , persistent_lawyer_id)
 select
     pl.patent_id
@@ -30,8 +33,8 @@ select
   , l.organization
   , timl.old_lawyer_id
 from
-    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.patent_lawyer pl
-        join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.lawyer l on pl.lawyer_id = l.lawyer_id
-        join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.temp_id_mapping_lawyer timl on timl.new_lawyer_id = l.lawyer_id
-        join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on pl.patent_id = p.patent_id;
+    `{{reporting_db}}`.patent_lawyer pl
+        join `{{reporting_db}}`.lawyer l on pl.lawyer_id = l.lawyer_id
+        join `{{reporting_db}}`.temp_id_mapping_lawyer timl on timl.new_lawyer_id = l.lawyer_id
+        join `{{elastic_db}}`.patents p on pl.patent_id = p.patent_id;
 

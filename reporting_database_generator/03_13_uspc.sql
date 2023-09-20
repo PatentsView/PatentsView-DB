@@ -1,11 +1,12 @@
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
 # BEGIN uspc_current 
 
 ##########################################################################################################################################
 
 
-drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_mainclass_current_aggregate_counts`;
-create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_mainclass_current_aggregate_counts`
+drop table if exists `{{reporting_db}}`.`temp_mainclass_current_aggregate_counts`;
+create table `{{reporting_db}}`.`temp_mainclass_current_aggregate_counts`
 (
   `mainclass_id` varchar(20) not null,
   `num_assignees` int unsigned not null,
@@ -19,7 +20,7 @@ create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interva
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_mainclass_current_aggregate_counts`
+insert into `{{reporting_db}}`.`temp_mainclass_current_aggregate_counts`
 (
   `mainclass_id`, `num_assignees`, `num_inventors`, `num_patents`,
   `first_seen_date`, `last_seen_date`, `actual_years_active`
@@ -35,15 +36,15 @@ from
   `patent`.`uspc_current` u
   left outer join `patent`.`patent_assignee` pa on pa.`patent_id` = u.`patent_id`
   left outer join `patent`.`patent_inventor` pii on pii.`patent_id` = u.`patent_id`
-  left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p on p.`patent_id` = u.`patent_id` and p.`date` is not null
+  left outer join `{{reporting_db}}`.`patent` p on p.`patent_id` = u.`patent_id` and p.`date` is not null
 where
   u.`mainclass_id` is not null and u.`mainclass_id` != ''
 group by
   u.`mainclass_id`;
 
 
-drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_mainclass_current_title`;
-create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_mainclass_current_title`
+drop table if exists `{{reporting_db}}`.`temp_mainclass_current_title`;
+create table `{{reporting_db}}`.`temp_mainclass_current_title`
 (
   `id` varchar(20) not null,
   `title` varchar(512) null,
@@ -52,7 +53,7 @@ create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interva
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_mainclass_current_title`
+insert into `{{reporting_db}}`.`temp_mainclass_current_title`
   (`id`, `title`)
 select
   `id`,
@@ -65,8 +66,8 @@ from
 
 
 # Fix casing of subclass_current.
-drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_subclass_current_title`;
-create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_subclass_current_title`
+drop table if exists `{{reporting_db}}`.`temp_subclass_current_title`;
+create table `{{reporting_db}}`.`temp_subclass_current_title`
 (
   `id` varchar(20) not null,
   `title` varchar(512) null,
@@ -75,7 +76,7 @@ create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interva
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_subclass_current_title`
+insert into `{{reporting_db}}`.`temp_subclass_current_title`
   (`id`, `title`)
 select
   `id`,
@@ -87,8 +88,8 @@ from
   `patent`.`subclass_current`;
 
 
-drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current`;
-create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current`
+drop table if exists `{{reporting_db}}`.`uspc_current`;
+create table `{{reporting_db}}`.`uspc_current`
 (
   `patent_id` varchar(20) not null,
   `sequence` int unsigned not null,
@@ -107,7 +108,7 @@ create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interva
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert ignore into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current`
+insert ignore into `{{reporting_db}}`.`uspc_current`
 (
   `patent_id`, `sequence`, `mainclass_id`,
   `mainclass_title`, `subclass_id`, `subclass_title`,
@@ -124,15 +125,15 @@ select
   tmcac.`first_seen_date`, tmcac.`last_seen_date`,
   ifnull(case when tmcac.`actual_years_active` < 1 then 1 else tmcac.`actual_years_active` end, 0)
 from
-  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p
+  `{{reporting_db}}`.`patent` p
   inner join `patent`.`uspc_current` u on u.`patent_id` = p.`patent_id`
-  left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_mainclass_current_title` m on m.`id` = u.`mainclass_id`
-  left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_subclass_current_title` s on s.`id` = u.`subclass_id`
-  left outer join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_mainclass_current_aggregate_counts` tmcac on tmcac.`mainclass_id` = u.`mainclass_id`;
+  left outer join `{{reporting_db}}`.`temp_mainclass_current_title` m on m.`id` = u.`mainclass_id`
+  left outer join `{{reporting_db}}`.`temp_subclass_current_title` s on s.`id` = u.`subclass_id`
+  left outer join `{{reporting_db}}`.`temp_mainclass_current_aggregate_counts` tmcac on tmcac.`mainclass_id` = u.`mainclass_id`;
 
 
-drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass`;
-create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass`
+drop table if exists `{{reporting_db}}`.`uspc_current_mainclass`;
+create table `{{reporting_db}}`.`uspc_current_mainclass`
 (
   `patent_id` varchar(20) not null,
   `mainclass_id` varchar(20) null,
@@ -148,7 +149,7 @@ create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interva
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass`
+insert into `{{reporting_db}}`.`uspc_current_mainclass`
 (
   `patent_id`, `mainclass_id`, `mainclass_title`,
   `num_assignees`, `num_inventors`, `num_patents`,
@@ -162,9 +163,9 @@ select
   tmcac.`first_seen_date`, tmcac.`last_seen_date`,
   ifnull(case when tmcac.`actual_years_active` < 1 then 1 else tmcac.`actual_years_active` end, 0)
 from
-  (select distinct `patent_id`, `mainclass_id` from `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current`) u
-  left join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_mainclass_current_title` m on m.`id` = u.`mainclass_id`
-  left join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_mainclass_current_aggregate_counts` tmcac on tmcac.`mainclass_id` = u.`mainclass_id`;
+  (select distinct `patent_id`, `mainclass_id` from `{{reporting_db}}`.`uspc_current`) u
+  left join `{{reporting_db}}`.`temp_mainclass_current_title` m on m.`id` = u.`mainclass_id`
+  left join `{{reporting_db}}`.`temp_mainclass_current_aggregate_counts` tmcac on tmcac.`mainclass_id` = u.`mainclass_id`;
 
 
 # END uspc_current 
@@ -177,8 +178,8 @@ from
 ###############################################################################################################
 
 
-drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass_application_year`;
-create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass_application_year`
+drop table if exists `{{reporting_db}}`.`uspc_current_mainclass_application_year`;
+create table `{{reporting_db}}`.`uspc_current_mainclass_application_year`
 (
   `mainclass_id` varchar(20) not null,
   `application_year` smallint unsigned not null,
@@ -189,7 +190,7 @@ create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interva
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass_application_year`
+insert into `{{reporting_db}}`.`uspc_current_mainclass_application_year`
   (`mainclass_id`, `application_year`, `sample_size`, `average_patent_processing_days`)
 select
   u.`mainclass_id`,
@@ -197,8 +198,8 @@ select
   count(*),
   round(avg(p.`patent_processing_days`))
 from
-  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p
-  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current` u on u.`patent_id` = p.`patent_id`
+  `{{reporting_db}}`.`patent` p
+  inner join `{{reporting_db}}`.`uspc_current` u on u.`patent_id` = p.`patent_id`
 where
   p.`patent_processing_days` is not null and u.`sequence` = 0
 group by
@@ -207,10 +208,10 @@ group by
 
 # Update the patent with the average mainclass processing days.
 update
-  `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p
-  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current` u on
+  `{{reporting_db}}`.`patent` p
+  inner join `{{reporting_db}}`.`uspc_current` u on
     u.`patent_id` = p.`patent_id` and u.`sequence` = 0
-  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass_application_year` c on
+  inner join `{{reporting_db}}`.`uspc_current_mainclass_application_year` c on
     c.`mainclass_id` = u.`mainclass_id` and c.`application_year` = year(p.`earliest_application_date`)
 set
   p.`uspc_current_mainclass_average_patent_processing_days` = c.`average_patent_processing_days`;
@@ -225,8 +226,8 @@ set
 ####################################################################################################################
 
 
-drop table if exists `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass_patent_year`;
-create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass_patent_year`
+drop table if exists `{{reporting_db}}`.`uspc_current_mainclass_patent_year`;
+create table `{{reporting_db}}`.`uspc_current_mainclass_patent_year`
 (
   `mainclass_id` varchar(20) not null,
   `patent_year` smallint unsigned not null,
@@ -236,13 +237,13 @@ create table `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interva
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`uspc_current_mainclass_patent_year`
+insert into `{{reporting_db}}`.`uspc_current_mainclass_patent_year`
   (`mainclass_id`, `patent_year`, `num_patents`)
 select
   u.`mainclass_id`, year(p.`date`), count(distinct u.`patent_id`)
 from
   `patent`.`uspc_current` u
-  inner join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`patent` p on p.`patent_id` = u.`patent_id` and p.`date` is not null
+  inner join `{{reporting_db}}`.`patent` p on p.`patent_id` = u.`patent_id` and p.`date` is not null
 where
   u.`mainclass_id` is not null and u.`mainclass_id` != ''
 group by

@@ -1,8 +1,8 @@
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
-{% set reporting_database = params.reporting_database %}
-use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+use `{{elastic_db}}`;
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`locations`
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`locations`
 (
     `location_id`            int(10) unsigned                        NOT NULL,
     `city`                   varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
 
 
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.locations;
-INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.locations( location_id, city, state, country, county, state_fips, county_fips, latitude
+TRUNCATE TABLE `{{elastic_db}}`.locations;
+INSERT INTO `{{elastic_db}}`.locations( location_id, city, state, country, county, state_fips, county_fips, latitude
                                         , longitude, num_assignees, num_inventors, num_patents, persistent_location_id
                                         , locations.place_type)
 select
@@ -56,7 +56,7 @@ select
   , timl.old_location_id
   , cl.place
 from
-    `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`location` l
-        join `PatentsView_{{ macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") }}`.`temp_id_mapping_location` timl on timl.new_location_id = l.location_id
+    `{{reporting_db}}`.`location` l
+        join `{{reporting_db}}`.`temp_id_mapping_location` timl on timl.new_location_id = l.location_id
         left join patent.location l2 on l2.id = timl.old_location_id
         left join geo_data.curated_locations cl on cl.id = l2.curated_location_id;
