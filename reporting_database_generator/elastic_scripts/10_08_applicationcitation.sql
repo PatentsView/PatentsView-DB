@@ -1,6 +1,9 @@
-use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`us_application_citations`
+use `{{elastic_db}}`;
+
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`us_application_citations`
 (
     `uuid`               varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
     `patent_id`          varchar(20) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
@@ -17,8 +20,8 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.us_application_citations;
-INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.us_application_citations ( uuid, patent_id, document_number, date, name, kind, category
+TRUNCATE TABLE `{{elastic_db}}`.us_application_citations;
+INSERT INTO `{{elastic_db}}`.us_application_citations ( uuid, patent_id, document_number, date, name, kind, category
                                                      , sequence, patent_zero_prefix)
  select
     uuid
@@ -32,4 +35,4 @@ INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.us_appli
   , patent_zero_prefix
 from
     patent.usapplicationcitation u
-        join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = u.patent_id;
+        join `{{elastic_db}}`.patents p on p.patent_id = u.patent_id;

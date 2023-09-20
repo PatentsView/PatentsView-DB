@@ -1,11 +1,12 @@
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
 # BEGIN pctdata
 
 #################################################################################################################################
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`pctdata`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`pctdata`
+drop table if exists `{{reporting_db}}`.`pctdata`;
+create table `{{reporting_db}}`.`pctdata`
 ( `uuid` varchar(36) not null,
   `patent_id` varchar(20) not null,
   `doc_type` varchar(20) not null,
@@ -19,7 +20,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`pctdata`
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`pctdata`
+insert into `{{reporting_db}}`.`pctdata`
 (
   `uuid`, `patent_id`, `doc_type`, `kind`, `doc_number`, `date`, `102_date`, `371_date`
 )
@@ -29,7 +30,7 @@ select ac.`uuid`,
   case when ac.`102_date` > date('1899-12-31') and ac.`102_date` < date_add(current_date, interval 10 year) then ac.`102_date` else null end,
   case when ac.`371_date` > date('1899-12-31') and ac.`371_date` < date_add(current_date, interval 10 year) then ac.`371_date` else null end
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p
+  `{{reporting_db}}`.`patent` p
   inner join `patent`.`pct_data` ac on ac.`patent_id` = p.`patent_id`;
 
 

@@ -1,5 +1,7 @@
-use `elastic_search_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
+use `elastic_search_{{ dag_run.logical_date | ds_nodash }}`;
 
 CREATE TABLE IF NOT EXISTS `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee`
 (
@@ -39,9 +41,9 @@ select pa.assignee_id
      , pa.patent_id
      , timl.old_location_id
      , tima.old_assignee_id
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_assignee pa
+from `{{reporting_db}}`.patent_assignee pa
          join `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = pa.patent_id
-         join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.assignee a on a.assignee_id = pa.assignee_id
-         join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_assignee tima on tima.new_assignee_id = a.assignee_id
-         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.location l on l.location_id = pa.location_id
-         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_location timl on timl.new_location_id = l.location_id;
+         join `{{reporting_db}}`.assignee a on a.assignee_id = pa.assignee_id
+         join `{{reporting_db}}`.temp_id_mapping_assignee tima on tima.new_assignee_id = a.assignee_id
+         left join `{{reporting_db}}`.location l on l.location_id = pa.location_id
+         left join `{{reporting_db}}`.temp_id_mapping_location timl on timl.new_location_id = l.location_id;

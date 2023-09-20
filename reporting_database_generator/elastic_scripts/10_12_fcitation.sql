@@ -1,6 +1,9 @@
-use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
-create or replace sql security invoker view `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.foreign_citations as
+use `{{elastic_db}}`;
+
+create or replace sql security invoker view `{{elastic_db}}`.foreign_citations as
 select
     fc.uuid
   , fc.patent_id
@@ -13,4 +16,4 @@ select
 
 from
     patent.foreigncitation fc
-        join `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = fc.patent_id;
+        join `{{elastic_db}}`.patents p on p.patent_id = fc.patent_id;

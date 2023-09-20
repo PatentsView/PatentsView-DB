@@ -1,7 +1,9 @@
-use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
+use `{{elastic_db}}`;
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`wipo_field`
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`wipo_field`
 (
     `id`           varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
     `sector_title` varchar(60) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
@@ -13,14 +15,14 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE  `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.wipo_field;
-insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.wipo_field
+TRUNCATE TABLE  `{{elastic_db}}`.wipo_field;
+insert into `{{elastic_db}}`.wipo_field
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`wipo_field`;
+    `{{reporting_db}}`.`wipo_field`;
 
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`cpc_class`
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`cpc_class`
 (
     `id`              varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
     `title`           varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -37,12 +39,12 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_class;
-INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_class
+TRUNCATE TABLE `{{elastic_db}}`.cpc_class;
+INSERT INTO `{{elastic_db}}`.cpc_class
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_subsection`;
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`cpc_subclass`
+    `{{reporting_db}}`.`cpc_subsection`;
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`cpc_subclass`
 (
     `id`              varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
     `title`           varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -60,13 +62,13 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_subclass;
-INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_subclass
+TRUNCATE TABLE `{{elastic_db}}`.cpc_subclass;
+INSERT INTO `{{elastic_db}}`.cpc_subclass
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_group`;
+    `{{reporting_db}}`.`cpc_group`;
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`cpc_group`
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`cpc_group`
 (
     `id`    varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
     `title` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -75,15 +77,15 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_group;
-insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.cpc_group
+TRUNCATE TABLE `{{elastic_db}}`.cpc_group;
+insert into `{{elastic_db}}`.cpc_group
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`cpc_subgroup`;
+    `{{reporting_db}}`.`cpc_subgroup`;
 
 
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`uspc_mainclass`
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`uspc_mainclass`
 (
     `id`              varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
     `title`           varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -101,14 +103,14 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.uspc_mainclass;
-insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.uspc_mainclass
+TRUNCATE TABLE `{{elastic_db}}`.uspc_mainclass;
+insert into `{{elastic_db}}`.uspc_mainclass
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_mainclass`;
+    `{{reporting_db}}`.`uspc_mainclass`;
 
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`uspc_subclass`
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`uspc_subclass`
 (
     `id`    varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
     `title` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -117,9 +119,9 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.uspc_subclass;
-insert into `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.uspc_subclass
+TRUNCATE TABLE `{{elastic_db}}`.uspc_subclass;
+insert into `{{elastic_db}}`.uspc_subclass
 select *
 from
-    `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`uspc_subclass`;
+    `{{reporting_db}}`.`uspc_subclass`;
 

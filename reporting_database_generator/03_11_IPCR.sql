@@ -1,10 +1,12 @@
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set version_indicator = macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
 # BEGIN ipcr 
 
 ################################################################################################################################################
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_ipcr_aggregations`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_ipcr_aggregations`
+drop table if exists `{{reporting_db}}`.`temp_ipcr_aggregations`;
+create table `{{reporting_db}}`.`temp_ipcr_aggregations`
 (
   `section` varchar(20) null,
   `ipc_class` varchar(20) null,
@@ -16,7 +18,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_ipcr_agg
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_ipcr_aggregations`
+insert into `{{reporting_db}}`.`temp_ipcr_aggregations`
   (`section`, `ipc_class`, `subclass`, `num_assignees`, `num_inventors`)
 select
   i.`section`, i.`ipc_class`, i.`subclass`,
@@ -25,13 +27,13 @@ select
 from
   `patent`.`ipcr` i
   left outer join `patent`.`patent_assignee` pa on pa.`patent_id` = i.`patent_id`
-  left outer join `patent`.`patent_inventor` pii on pii.`patent_id` = i.`patent_id`  where i.version_indicator<= '{{ params.version_indicator }}'
+  left outer join `patent`.`patent_inventor` pii on pii.`patent_id` = i.`patent_id`  where i.version_indicator<= '{{version_indicator}}'
 group by
   i.`section`, i.`ipc_class`, i.`subclass`;
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_ipcr_years_active`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_ipcr_years_active`
+drop table if exists `{{reporting_db}}`.`temp_ipcr_years_active`;
+create table `{{reporting_db}}`.`temp_ipcr_years_active`
 (
   `section` varchar(20) null,
   `ipc_class` varchar(20) null,
@@ -44,7 +46,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_ipcr_yea
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_ipcr_years_active`
+insert into `{{reporting_db}}`.`temp_ipcr_years_active`
 (
   `section`, `ipc_class`, `subclass`, `first_seen_date`,
   `last_seen_date`, `actual_years_active`
@@ -55,15 +57,15 @@ select
   ifnull(round(timestampdiff(day, min(p.`date`), max(p.`date`)) / 365), 0)
 from
   `patent`.`ipcr` i
-  inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p on p.`patent_id`= i.`patent_id`
+  inner join `{{reporting_db}}`.`patent` p on p.`patent_id`= i.`patent_id`
 where
-  p.`date` is not null  and i.version_indicator<= '{{ params.version_indicator }}'
+  p.`date` is not null  and i.version_indicator<= '{{version_indicator}}'
 group by
   i.`section`, i.`ipc_class`, i.`subclass`;
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`ipcr`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`ipcr`
+drop table if exists `{{reporting_db}}`.`ipcr`;
+create table `{{reporting_db}}`.`ipcr`
 (
   `patent_id` varchar(20) not null,
   `sequence` int not null,
@@ -86,7 +88,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`ipcr`
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`ipcr`
+insert into `{{reporting_db}}`.`ipcr`
 (
   `patent_id`, `sequence`, `section`, `ipc_class`, `subclass`, `main_group`, `subgroup`,
   `symbol_position`, `classification_value`, `classification_data_source`,
@@ -104,14 +106,14 @@ select
   tia.`num_assignees`, tia.`num_inventors`, tiya.`first_seen_date`, tiya.`last_seen_date`,
   ifnull(case when tiya.`actual_years_active` < 1 then 1 else tiya.`actual_years_active` end, 0)
 from
-  `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p
+  `{{reporting_db}}`.`patent` p
   inner join `patent`.`ipcr` i on i.`patent_id` = p.`patent_id`
-  left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_ipcr_aggregations` tia on tia.`section` = i.`section` and tia.`ipc_class` = i.`ipc_class` and 
+  left outer join `{{reporting_db}}`.`temp_ipcr_aggregations` tia on tia.`section` = i.`section` and tia.`ipc_class` = i.`ipc_class` and
 
 tia.`subclass` = i.`subclass`
-  left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_ipcr_years_active` tiya on tiya.`section` = i.`section` and tiya.`ipc_class` = i.`ipc_class` and 
+  left outer join `{{reporting_db}}`.`temp_ipcr_years_active` tiya on tiya.`section` = i.`section` and tiya.`ipc_class` = i.`ipc_class` and
 
-tiya.`subclass` = i.`subclass` where i.version_indicator<= '{{ params.version_indicator }}';
+tiya.`subclass` = i.`subclass` where i.version_indicator<= '{{version_indicator}}';
 
 
 # END ipcr 

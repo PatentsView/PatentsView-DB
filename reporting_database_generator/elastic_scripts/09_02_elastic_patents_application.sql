@@ -1,8 +1,9 @@
-{% set elastic_target_database = params.elastic_database_prefix + params.version_indicator.replace("-","") %}
-{% set reporting_database = params.reporting_database %}
-use `elastic_production_{{ dag_run.logical_date | ds_nodash }}`;
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
-CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_application`
+use `{{elastic_db}}`;
+
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patent_application`
 (
 
     `application_id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -20,9 +21,9 @@ CREATE TABLE IF NOT EXISTS `elastic_production_{{ dag_run.logical_date | ds_noda
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.`patent_application`;
+TRUNCATE TABLE `{{elastic_db}}`.`patent_application`;
 
-INSERT INTO `elastic_production_{{ dag_run.logical_date | ds_nodash }}`.patent_application( application_id, patent_id, type, number, country, date
+INSERT INTO `{{elastic_db}}`.patent_application( application_id, patent_id, type, number, country, date
                                                             , series_code
                                                             , rule_47_flag)
 select a.application_id
@@ -33,7 +34,7 @@ select a.application_id
      , a.date
      , pa.series_code_transformed_from_type
      , x.rule_47_flag
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.application a
+from `{{reporting_db}}`.application a
          join patent.application pa on pa.patent_id = a.patent_id
          join (select patent_id
                     , case

@@ -1,3 +1,6 @@
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set version_indicator = macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+
 # BEGIN assignee
 
 ##############################################################################################################################################
@@ -5,9 +8,9 @@
 #this is necessary because otherwise the subqueries wierdly have a different collation
 SET collation_connection = 'utf8mb4_unicode_ci';
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_lastknown_location`;
+drop table if exists `{{reporting_db}}`.`temp_assignee_lastknown_location`;
 
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_lastknown_location`
+create table `{{reporting_db}}`.`temp_assignee_lastknown_location`
 (
     `assignee_id`            varchar(64)  not null,
     `location_id`            int unsigned null,
@@ -26,7 +29,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee
 # with the most recent patent associated with the assignee.  It is possible for a patent/assignee
 # combination not to have a location, so we will grab the most recent KNOWN location.
 # 320,156 @ 3:51
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_lastknown_location`
+insert into `{{reporting_db}}`.`temp_assignee_lastknown_location`
 (`assignee_id`, `location_id`, `persistent_location_id`, `city`, `state`, `country`, `latitude`, `longitude`)
 select lastknown.`assignee_id`,
        tl.`new_location_id`,
@@ -50,18 +53,18 @@ from (
                         from `patent`.`rawassignee` ra
                                  inner join `patent`.`patent` p on p.`id` = ra.`patent_id`
                                  inner join `patent`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
-                          and ra.`assignee_id` is not null and ra.version_indicator <='{{ params.version_indicator }}'
+                          and ra.`assignee_id` is not null and ra.version_indicator <='{{version_indicator}}'
                         order by ra.`assignee_id`,
                                  p.`date` desc,
                                  p.`id` desc
                     ) rw) srw
          where rownum = 1) lastknown
          left join `patent`.`location` l on l.`id` = lastknown.`location_id`
-         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` tl
+         left join `{{reporting_db}}`.`temp_id_mapping_location` tl
                    on tl.`old_location_id` = lastknown.`location_id`;
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_num_patents`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_num_patents`
+drop table if exists `{{reporting_db}}`.`temp_assignee_num_patents`;
+create table `{{reporting_db}}`.`temp_assignee_num_patents`
 (
     `assignee_id` varchar(64)  not null,
     `num_patents` int unsigned not null,
@@ -70,15 +73,15 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_num_patents`
+insert into `{{reporting_db}}`.`temp_assignee_num_patents`
     (`assignee_id`, `num_patents`)
 select `assignee_id`,
        count(distinct `patent_id`)
-from `patent`.`patent_assignee` pa join `{{ params.raw_database }}`.`patent` p on p.id=pa.patent_id where p.version_indicator <='{{ params.version_indicator }}'
+from `patent`.`patent_assignee` pa join `patent`.`patent` p on p.id=pa.patent_id where p.version_indicator <='{{version_indicator}}'
 group by `assignee_id`;
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_num_inventors`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_num_inventors`
+drop table if exists `{{reporting_db}}`.`temp_assignee_num_inventors`;
+create table `{{reporting_db}}`.`temp_assignee_num_inventors`
 (
     `assignee_id`   varchar(64)  not null,
     `num_inventors` int unsigned not null,
@@ -86,16 +89,16 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee
 )
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_num_inventors`
+insert into `{{reporting_db}}`.`temp_assignee_num_inventors`
     (`assignee_id`, `num_inventors`)
 select aa.`assignee_id`,
        count(distinct ii.`inventor_id`)
 from `patent`.`patent_assignee` aa
-         join `patent`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `{{ params.raw_database }}`.`patent` p on p.id=aa.patent_id where p.version_indicator <='{{ params.version_indicator }}'
+         join `patent`.`patent_inventor` ii on ii.patent_id = aa.patent_id  join `patent`.`patent` p on p.id=aa.patent_id where p.version_indicator <='{{version_indicator}}'
 group by aa.`assignee_id`;
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_years_active`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_years_active`
+drop table if exists `{{reporting_db}}`.`temp_assignee_years_active`;
+create table `{{reporting_db}}`.`temp_assignee_years_active`
 (
     `assignee_id`         varchar(64)       not null,
     `first_seen_date`     date              null,
@@ -107,19 +110,19 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee
 
 
 # Years active is essentially the number of years difference between first associated patent and last.
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_years_active`
+insert into `{{reporting_db}}`.`temp_assignee_years_active`
 (`assignee_id`, `first_seen_date`, `last_seen_date`, `actual_years_active`)
 select pa.`assignee_id`,
        min(p.`date`),
        max(p.`date`),
        ifnull(round(timestampdiff(day, min(p.`date`), max(p.`date`)) / 365), 0)
 from `patent`.`patent_assignee` pa
-         inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent` p on p.`patent_id` = pa.`patent_id`
+         inner join `{{reporting_db}}`.`patent` p on p.`patent_id` = pa.`patent_id`
 where p.`date` is not null
 group by pa.`assignee_id`;
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee`
+drop table if exists `{{reporting_db}}`.`patent_assignee`;
+create table `{{reporting_db}}`.`patent_assignee`
 (
     `patent_id`   varchar(20)       not null,
     `assignee_id` int unsigned      not null,
@@ -131,14 +134,14 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assign
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`patent_assignee`
+insert into `{{reporting_db}}`.`patent_assignee`
 (`patent_id`, `assignee_id`, `location_id`, `sequence`)
 select distinct pa.`patent_id`,
                 t.`new_assignee_id`,
                 tl.`new_location_id`,
                 ra.`sequence`
 from `patent`.`patent_assignee` pa
-         inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_assignee` t
+         inner join `{{reporting_db}}`.`temp_id_mapping_assignee` t
                     on t.`old_assignee_id` = pa.`assignee_id`
          left join (select patent_id, assignee_id, min(sequence) sequence
                     from `patent`.`rawassignee`
@@ -149,13 +152,13 @@ from `patent`.`patent_assignee` pa
                    on ra.`patent_id` = t.`patent_id` and ra.`assignee_id` = t.`assignee_id` and ra.`sequence`
                        = t.`sequence`
          left join `patent`.`rawlocation` rl on rl.`id` = ra.`rawlocation_id`
-         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` tl
+         left join `{{reporting_db}}`.`temp_id_mapping_location` tl
                    on tl.`old_location_id` = rl.`location_id`;
 
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_assignee`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_assignee`
+drop table if exists `{{reporting_db}}`.`location_assignee`;
+create table `{{reporting_db}}`.`location_assignee`
 (
     `location_id` int unsigned not null,
     `assignee_id` int unsigned not null,
@@ -165,20 +168,20 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_assi
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`location_assignee`
+insert into `{{reporting_db}}`.`location_assignee`
     (`location_id`, `assignee_id`, `num_patents`)
 select distinct timl.`new_location_id`,
                 tima.`new_assignee_id`,
                 null
 from `patent`.`location_assignee` la
-         inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_location` timl
+         inner join `{{reporting_db}}`.`temp_id_mapping_location` timl
                     on timl.`old_location_id` = la.`location_id`
-         inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_assignee` tima
+         inner join `{{reporting_db}}`.`temp_id_mapping_assignee` tima
                     on tima.`old_assignee_id` = la.`assignee_id`;
 
 
-drop table if exists `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee`;
-create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee`
+drop table if exists `{{reporting_db}}`.`assignee`;
+create table `{{reporting_db}}`.`assignee`
 (
     `assignee_id`                      int unsigned      not null,
     `type`                             varchar(10)       null,
@@ -203,7 +206,7 @@ create table `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee`
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`assignee`
+insert into `{{reporting_db}}`.`assignee`
 (`assignee_id`, `type`, `name_first`, `name_last`, `organization`,
  `num_patents`, `num_inventors`, `lastknown_location_id`, `lastknown_persistent_location_id`, `lastknown_city`,
  `lastknown_state`, `lastknown_country`, `lastknown_latitude`, `lastknown_longitude`,
@@ -227,13 +230,13 @@ select t.`new_assignee_id`,
        ifnull(case when tafls.`actual_years_active` < 1 then 1 else tafls.`actual_years_active` end, 0),
        a.`id`
 from `patent`.`assignee` a
-         inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_id_mapping_assignee` t on t.`old_assignee_id` = a.`id`
-         left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_lastknown_location` talkl
+         inner join `{{reporting_db}}`.`temp_id_mapping_assignee` t on t.`old_assignee_id` = a.`id`
+         left outer join `{{reporting_db}}`.`temp_assignee_lastknown_location` talkl
                          on talkl.`assignee_id` = a.`id`
-         inner join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_num_patents` tanp on tanp.`assignee_id` = a.`id`
-         left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_years_active` tafls
+         inner join `{{reporting_db}}`.`temp_assignee_num_patents` tanp on tanp.`assignee_id` = a.`id`
+         left outer join `{{reporting_db}}`.`temp_assignee_years_active` tafls
                          on tafls.`assignee_id` = a.`id`
-         left outer join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.`temp_assignee_num_inventors` tani
+         left outer join `{{reporting_db}}`.`temp_assignee_num_inventors` tani
                          on tani.`assignee_id` = a.`id`;
 
 

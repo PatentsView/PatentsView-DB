@@ -1,3 +1,6 @@
+{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+
 use `elastic_search_{{ dag_run.logical_date | ds_nodash }}`;
 
 CREATE TABLE IF NOT EXISTS `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor`
@@ -38,10 +41,10 @@ select pi.inventor_id
      , pi.location_id
      , timi.old_inventor_id
      , timl.old_location_id
-from `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.patent_inventor pi
-         join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.inventor i on i.inventor_id = pi.inventor_id
-         join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_inventor timi on timi.new_inventor_id = i.inventor_id
-         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.location l on l.location_id = pi.location_id
-         left join `PatentsView_{{ dag_run.logical_date | ds_nodash }}`.temp_id_mapping_location timl on timl.new_location_id = l.location_id
+from `{{reporting_db}}`.patent_inventor pi
+         join `{{reporting_db}}`.inventor i on i.inventor_id = pi.inventor_id
+         join `{{reporting_db}}`.temp_id_mapping_inventor timi on timi.new_inventor_id = i.inventor_id
+         left join `{{reporting_db}}`.location l on l.location_id = pi.location_id
+         left join `{{reporting_db}}`.temp_id_mapping_location timl on timl.new_location_id = l.location_id
          join `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = pi.patent_id;
 

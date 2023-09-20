@@ -45,7 +45,7 @@ default_args = {
 
 reporting_db_dag = DAG("reporting_database_generation_quarterly"
                        , default_args=default_args
-                       , start_date=datetime(2023, 1, 1)
+                       , start_date=datetime(2022, 10, 1)
                        # , end_date=datetime(2022, 7, 1)
                        , schedule_interval='@quarterly'
                        , template_searchpath="/project/reporting_database_generator/")
