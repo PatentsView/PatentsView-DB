@@ -5,6 +5,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from lib.configuration import get_current_config, get_section, get_today_dict
+from lib.download_check_delete_databases import run_table_archive, run_database_archive
 from lib.utilities import chain_operators
 from reporting_database_generator.database.validate_query import validate_and_execute
 from updater.callbacks import airflow_task_failure, airflow_task_success
@@ -74,6 +75,11 @@ operator_sequence_groups = {}
 # ##### Start Instance #####
 # instance_starter = PythonOperator(task_id='start_data_collector', python_callable=start_data_collector_instance,
 #                                   **operator_settings)
+###### BACKUP OLDEST DATABASE #######
+backup_data = PythonOperator(task_id='backup_oldest_database'
+                             , python_callable=run_database_archive
+                             , op_kwargs={'type': 'granted_patent'}
+                             , **operator_settings)
 ###### Download & Parse #######
 download_xml_operator = PythonOperator(task_id='download_xml', python_callable=bulk_download,
                                        **operator_settings)
@@ -283,3 +289,4 @@ for dependency_group in operator_sequence_groups:
 
 qc_merge_operator.set_upstream(merge_new_operator)
 qc_text_merge_operator.set_upstream(merge_text_operator)
+backup_data.set_upstream(download_xml_operator)

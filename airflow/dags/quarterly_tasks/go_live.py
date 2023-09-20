@@ -8,6 +8,7 @@ from airflow.sensors.external_task import ExternalTaskSensor
 from slack_sdk import WebClient
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from reporting_database_generator.database import validate_query
+from QA.production.ProdDBTester import run_prod_db_qa
 
 default_args = {
     'owner': 'airflow',
@@ -42,18 +43,8 @@ web_tools = SQLTemplatedPythonOperator(
     }
 )
 
-web_tools_2 = SQLTemplatedPythonOperator(
-    task_id='Web_Tool_2',
-    provide_context=True,
-    python_callable=validate_query.validate_and_execute,
-    dag=go_live_dag,
-    op_kwargs={
-        'filename': 'webtool2_tables',
-        'host': 'APP_DATABASE_SETUP'
-    },
-    templates_dict={
-        'source_sql': 'webtool2_tables.sql'
-    }
-)
+qa_production_data = PythonOperator(task_id='QA_PROD_DB'
+                             , python_callable=run_prod_db_qa
+                             , op_kwargs={'type': 'granted_patent'})
 
-web_tools_2.set_upstream(web_tools)
+qa_production_data.set_upstream(web_tools)

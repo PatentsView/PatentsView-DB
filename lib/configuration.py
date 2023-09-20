@@ -261,8 +261,8 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
         start_date = (execution_date + current_week_start)
         end_date = (execution_date + current_week_end)
     else:
-        from lib.is_it_update_time import get_update_range
-        start_date, end_date = get_update_range(execution_date)
+        from lib.is_it_update_time import get_update_range_full_quarter
+        start_date, end_date = get_update_range_full_quarter(execution_date)
     temp_date = end_date.strftime('%Y%m%d')
 
     config['DATES'] = {

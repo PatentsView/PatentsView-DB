@@ -1,5 +1,6 @@
 import calendar
-from datetime import datetime, timedelta, date
+# from datetime import datetime, timedelta, date
+import datetime
 
 import pandas as pd
 import pendulum
@@ -13,27 +14,27 @@ local_tz = pendulum.timezone("America/New_York")
 
 def previous_quarter(ref):
     if ref.month < 4:
-        return date(ref.year - 1, 12, 31)
+        return datetime.date(ref.year - 1, 12, 31)
     elif ref.month < 7:
-        return date(ref.year, 3, 31)
+        return datetime.date(ref.year, 3, 31)
     elif ref.month < 10:
-        return date(ref.year, 6, 30)
-    return date(ref.year, 9, 30)
+        return datetime.date(ref.year, 6, 30)
+    return datetime.date(ref.year, 9, 30)
 
 
 def next_quarter(ref):
     if ref.month < 4:
-        return date(ref.year, 6, 30)
+        return datetime.date(ref.year, 6, 30)
     elif ref.month < 7:
-        return date(ref.year, 9, 30)
+        return datetime.date(ref.year, 9, 30)
     elif ref.month < 10:
-        return date(ref.year, 12, 31)
-    return date(ref.year, 3, 31)
+        return datetime.date(ref.year, 12, 31)
+    return datetime.date(ref.year, 3, 31)
 
 
 def get_most_recent_x_day(ref, x=calendar.TUESDAY):
     offset = (ref.weekday() - x) % 7
-    last_x_day = ref - timedelta(days=offset)
+    last_x_day = ref - datetime.timedelta(days=offset)
     return last_x_day
 
 
@@ -49,8 +50,22 @@ def get_update_range(ref: DateTime):
     # if exec_date < quarter_latest_x_day:
     #     quarter_latest_x_day = get_update_x_day(previous_quarter(exec_date))
     previous_quarter_latest_x_day = get_update_x_day(previous_quarter(quarter_latest_x_day))
-    return previous_quarter_latest_x_day + timedelta(days=1), quarter_latest_x_day
+    return previous_quarter_latest_x_day + datetime.timedelta(days=1), quarter_latest_x_day
 
+def get_update_range_full_quarter(input_date):
+    # Calculate the current quarter
+    quarter = (input_date.month - 1) // 3 + 1
+
+    # Calculate the first day of the next quarter
+    next_quarter_month = quarter * 3 + 1
+    first_day_next_quarter = datetime.date(input_date.year, next_quarter_month, 1)
+
+    # Subtract one day from the first day of the next quarter to get the last day of the current quarter
+    last_day_current_quarter = first_day_next_quarter - datetime.timedelta(days=1)
+    first_day_current_quarter = datetime.date(input_date.year, (quarter - 1) * 3 + 1, 1)
+
+
+    return first_day_current_quarter, last_day_current_quarter
 
 #
 # class DataUpdateTimeTable(Timetable):
@@ -137,4 +152,9 @@ def trigger_bulk_processing(execution_date):
 
 
 if __name__ == '__main__':
-    pass
+    # date = datetime.date(2023, 4, 1)
+    f, last_q_date = get_update_range_full_quarter(datetime.date(2023, 7, 21))
+    print(f, last_q_date)
+    a, b = get_update_range(datetime.date(2023, 7, 21))
+    print(a, b)
+    breakpoint()

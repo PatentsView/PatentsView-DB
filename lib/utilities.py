@@ -67,8 +67,6 @@ def load_table_config(config, db='patent'):
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'
     elif db == 'bulk_exp_pgpubs':
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'
-    elif db == 'PatentsView_20230330':
-        config_file = f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'
 
     print(f"reading table config from {config_file}")
     with open(config_file) as file:
@@ -157,7 +155,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.f_key = ""
         self.exclusion_list = []
 
-    elif class_called == "ReportingDBTester":
+    elif class_called == "ReportingDBTester" or "ProdDBTester":
         self.table_config = load_table_config(config, db = config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]) #db should be parameterized later, not hard-coded
         self.category = ""
         self.central_entity = ""
@@ -222,14 +220,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
             self.table_config = load_table_config(config, db=database_section)
         else:
             raise NotImplementedError
-
-    elif class_called == 'ReportingDBTester':
-        self.table_config = load_table_config(config, db='Reporting_DB')
-        self.category = ""
-        self.central_entity = ""
-        self.p_key = ""
-        self.f_key = ""
-        self.exclusion_list = []
 
     elif class_called[:19] == 'BulkDownloadsTester':
         if 'granted' in database_section:
