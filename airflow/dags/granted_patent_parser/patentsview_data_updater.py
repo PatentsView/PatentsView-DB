@@ -79,6 +79,7 @@ operator_sequence_groups = {}
 backup_data = PythonOperator(task_id='backup_oldest_database'
                              , python_callable=run_database_archive
                              , op_kwargs={'type': 'granted_patent'}
+                             , queue= 'mydumper'
                              , **operator_settings)
 ###### Download & Parse #######
 download_xml_operator = PythonOperator(task_id='download_xml', python_callable=bulk_download,
