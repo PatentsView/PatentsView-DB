@@ -7,8 +7,7 @@ venv
 .idea
 docker-compose.yaml
 docker-compose-debug.yaml
-mydumper/docker-compose-mydumper.yaml
-mydumper/mydumper.cnf
+mydumper/
 Development/config.ini
 airflow/airflow-webserver.pid
 airflow/airflow.db
