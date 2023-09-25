@@ -85,8 +85,6 @@ def find_data_collection_server_path(db_type, data_type):
     return output_path
 
 
-
-
 def backup_tables(db, output_path, table_list):
     # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     bash_command1 = f"mydumper -B {db} -T {table_list} -o {output_path}  -c --long-query-guard=9000000 -v 3"
@@ -297,7 +295,7 @@ def run_database_archive(type, output_override=None, **kwargs):
 
     # DELETE DB
     delete_databases(prod_connection_string, old_db)
-    clean_up_backups(old_db, output_path)
+    # clean_up_backups(old_db, output_path)
 
 def run_table_archive(dbtype, table_list, output_path, **kwargs):
     # db = 'pregrant_publications'
