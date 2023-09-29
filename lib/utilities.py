@@ -155,7 +155,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.f_key = ""
         self.exclusion_list = []
 
-    elif class_called == "ReportingDBTester" or "ProdDBTester":
+    elif class_called == "ReportingDBTester" or class_called == "ProdDBTester":
         self.table_config = load_table_config(config, db = config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]) #db should be parameterized later, not hard-coded
         self.category = ""
         self.central_entity = ""
