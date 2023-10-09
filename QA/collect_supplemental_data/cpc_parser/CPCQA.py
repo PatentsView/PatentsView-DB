@@ -41,6 +41,7 @@ def qa_cpc_current(**kwargs):
         where version_indicator >= DATE({sd}) and version_indicator <= DATE({ed})
         group by 1
                 """
+        print(patent_cq_query)
         with connection.cursor() as generic_cursor:
             query_start_time = time()
             generic_cursor.execute(patent_cq_query)
