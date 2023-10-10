@@ -226,11 +226,11 @@ select `location`.`id` AS `location_id`,
 `location`.`longitude` AS `longitude`,
 `location`.`county` AS `county`,
 `location`.`state_fips` AS `state_fips`,
-RIGHT(`location`.`county_fips`,3) AS `county_fips` 
+RIGHT(`location`.`county_fips`, 3) AS `county_fips` 
 from `patent`.`location` 
 where `location`.`id` in (select distinct `patent`.`rawlocation`.`location_id` 
-from `patent`.`rawlocation`) 
-and `location`.`version_indicator` <= '{{datestring}}';
+from `patent`.`rawlocation`
+where `patent`.`rawlocation`.`version_indicator` <= '{{datestring}}');
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_location_not_disambiguated` AS 
 select `a`.`id` AS `rawlocation_id`,
@@ -607,8 +607,8 @@ select `location`.`id` AS `location_id`,
 RIGHT(`location`.`county_fips`, 3) AS `county_fips` 
 from `patent`.`location` 
 where `location`.`id` in (select distinct `pregrant_publications`.`rawlocation`.`location_id` 
-from `pregrant_publications`.`rawlocation`) 
-and `location`.`version_indicator` <= '{{datestring}}';
+from `pregrant_publications`.`rawlocation`
+where `pregrant_publications`.`rawlocation`.`version_indicator` <= '{{datestring}}') ;
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_location_not_disambiguated` AS 
 select `a`.`id` AS `rawlocation_id`,
