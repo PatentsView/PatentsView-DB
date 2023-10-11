@@ -326,7 +326,7 @@ assignee_cpc = SQLTemplatedPythonOperator(
     }
 )
 assignee_inventor = SQLTemplatedPythonOperator(
-    task_id='Indexes-01',
+    task_id='assignee_inventor',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
@@ -338,7 +338,7 @@ assignee_inventor = SQLTemplatedPythonOperator(
     }
 )
 assignee_nber_uspc = SQLTemplatedPythonOperator(
-    task_id='Indexes-02',
+    task_id='assignee_nber_uspc',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
