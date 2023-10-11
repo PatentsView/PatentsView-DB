@@ -214,21 +214,22 @@ insert into `{{reporting_db}}`.`inventor`
   `inventor_id`, `name_first`, `name_last`, `num_patents`, `num_assignees`,
   `lastknown_location_id`, `lastknown_persistent_location_id`, `lastknown_city`,
   `lastknown_state`, `lastknown_country`, `lastknown_latitude`, `lastknown_longitude`,
-  `first_seen_date`, `last_seen_date`, `years_active`, `persistent_inventor_id`
+  `first_seen_date`, `last_seen_date`, `years_active`, `persistent_inventor_id`, `gender_code`
 )
 select
   t.`new_inventor_id`, nullif(trim(i.`name_first`), ''), nullif(trim(i.`name_last`), ''),
   tinp.`num_patents`, ifnull(tina.`num_assignees`, 0), tilkl.`location_id`, tilkl.`persistent_location_id`, tilkl.`city`, tilkl.`state`,
   tilkl.`country`, tilkl.`latitude`, tilkl.`longitude`, tifls.`first_seen_date`, tifls.`last_seen_date`,
   ifnull(case when tifls.`actual_years_active` < 1 then 1 else tifls.`actual_years_active` end, 0),
-  i.`id`
+  i.`id`, gender_code
 from
   `patent`.`inventor` i
   inner join `{{reporting_db}}`.`temp_id_mapping_inventor` t on t.`old_inventor_id` = i.`id`
   left outer join `{{reporting_db}}`.`temp_inventor_lastknown_location` tilkl on tilkl.`inventor_id` = i.`id`
   inner join `{{reporting_db}}`.`temp_inventor_num_patents` tinp on tinp.`inventor_id` = i.`id`
   left outer join `{{reporting_db}}`.`temp_inventor_years_active` tifls on tifls.`inventor_id` = i.`id`
-  left outer join `{{reporting_db}}`.`temp_inventor_num_assignees` tina on tina.`inventor_id` = i.`id`;
+  left outer join `{{reporting_db}}`.`temp_inventor_num_assignees` tina on tina.`inventor_id` = i.`id`
+  left join gender_attribution.inventor_gender_{{version_indicator}} ig on i.id=ig.inventor_id;
 
 # BEGIN inventor_year ######################################################################################################################
 
