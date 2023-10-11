@@ -362,7 +362,7 @@ inventor_step2 = SQLTemplatedPythonOperator(
     }
 )
 inventor_cpc = SQLTemplatedPythonOperator(
-    task_id='inventor_step2',
+    task_id='inventor_cpc',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
