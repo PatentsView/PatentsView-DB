@@ -15,8 +15,8 @@ create table `{{reporting_db}}`.`temp_patent_firstnamed_assignee`
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
   `city` varchar(256) null,
-  `state` varchar(20) null,
-  `country` varchar(40) null,
+  `state` varchar(50) null,
+  `country` varchar(50) null,
   `latitude` float null,
   `longitude` float null,
   primary key (`patent_id`)
@@ -60,8 +60,8 @@ create table `{{reporting_db}}`.`temp_patent_firstnamed_inventor`
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
   `city` varchar(256) null,
-  `state` varchar(20) null,
-  `country` varchar(10) null,
+  `state` varchar(50) null,
+  `country` varchar(50) null,
   `latitude` float null,
   `longitude` float null,
   primary key (`patent_id`)
