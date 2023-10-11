@@ -249,6 +249,13 @@ where
 group by
   u.`mainclass_id`, year(p.`date`);
 
+alter table `{{reporting_db}}`.`uspc_current_mainclass_patent_year` add index `ix_uspc_current_mainclass_patent_year_num_patents`(`num_patents`);
+alter table `{{reporting_db}}`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`uspc_current_mainclass` add fulltext index `fti_uspc_current_mainclass_mainclass_title` (`mainclass_title`);
+alter table `{{reporting_db}}`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_mainclass_title` (`mainclass_title`);
+alter table `{{reporting_db}}`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_num_assignees` (`num_assignees`);
+alter table `{{reporting_db}}`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_num_inventors` (`num_inventors`);
+alter table `{{reporting_db}}`.`uspc_current_mainclass` add index `ix_uspc_current_mainclass_mainclass_id` (`mainclass_id`);
 
 # END uspc_current_mainclass_patent_year 
 

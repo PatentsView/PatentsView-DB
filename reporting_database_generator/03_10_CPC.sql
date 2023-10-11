@@ -400,6 +400,30 @@ update
 set p.`cpc_current_group_average_patent_processing_days` = c.`average_patent_processing_days`
 where  u.`sequence` = 0
 
+
+alter table `{{reporting_db}}`.`cpc_current` add index `ix_cpc_current_num_assignees` (`num_assignees`);
+alter table `{{reporting_db}}`.`cpc_current` add index `ix_cpc_current_num_inventors` (`num_inventors`);
+alter table `{{reporting_db}}`.`cpc_current` add index `ix_cpc_current_num_inventors_group` (`num_inventors_group`);
+alter table `{{reporting_db}}`.`cpc_current` add index `ix_cpc_current_num_assignees_group` (`num_assignees_group`);
+alter table `{{reporting_db}}`.`cpc_current` add index `ix_cpc_current_subsection_id` (`subsection_id`);
+alter table `{{reporting_db}}`.`cpc_current` add index `ix_cpc_current_num_patents_group` (`num_patents_group`);
+alter table `{{reporting_db}}`.`cpc_current` add index `ix_cpc_current_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`cpc_current` add index `ix_cpc_current_group_id` (`group_id`);
+alter table `{{reporting_db}}`.`cpc_current` add index `ix_cpc_current_subgroup_id` (`subgroup_id`);
+
+alter table `{{reporting_db}}`.`cpc_current_group_patent_year` add index `ix_cpc_current_group_patent_year_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`cpc_current_group` add index `ix_cpc_current_group_title` (`group_title`);
+alter table `{{reporting_db}}`.`cpc_current_group` add index `ix_cpc_current_group_num_inventors` (`num_inventors`);
+alter table `{{reporting_db}}`.`cpc_current_group` add index `ix_cpc_current_group_num_assignees` (`num_assignees`);
+alter table `{{reporting_db}}`.`cpc_current_group` add index `ix_cpc_current_group_group_id` (`group_id`);
+alter table `{{reporting_db}}`.`cpc_current_group` add index `ix_cpc_current_group_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`cpc_current_subsection_patent_year` add index `ix_cpc_current_subsection_patent_year_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`cpc_current_subsection` add index `ix_cpc_current_subsection_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`cpc_current_subsection` add index `ix_cpc_current_subsection_num_inventors` (`num_inventors`);
+alter table `{{reporting_db}}`.`cpc_current_subsection` add index `ix_cpc_current_subsection_title` (`subsection_title`);
+alter table `{{reporting_db}}`.`cpc_current_subsection` add index `ix_cpc_current_subsection_num_assignees` (`num_assignees`);
+alter table `{{reporting_db}}`.`cpc_current_subsection` add index `ix_cpc_current_subsection_subsection_id` (`subsection_id`);
+
 # END cpc_current_group_application_year 
 
 #################################################################################################################

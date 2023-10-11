@@ -29,6 +29,8 @@ select
 from
   `patent`.`application`  where version_indicator<='{{version_indicator}}';
 
+alter table `{{reporting_db}}`.`application` add index `ix_application_number` (`number`);
+alter table `{{reporting_db}}`.`application` add index `ix_application_patent_id` (`patent_id`);
 
 # END application 
 

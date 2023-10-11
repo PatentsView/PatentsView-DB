@@ -33,6 +33,10 @@ from
   `{{reporting_db}}`.`patent` p
   inner join `patent`.`foreign_priority` ac on ac.`patent_id` = p.`patent_id`;
 
+alter table `{{reporting_db}}`.`foreignpriority` add index `ix_foreignpriority_foreign_doc_number` (`foreign_doc_number`);
+alter table `{{reporting_db}}`.`foreignpriority` add index `ix_foreignpriority_date` (`date`);
+alter table `{{reporting_db}}`.`foreignpriority` add index `ix_foreignpriority_kind` (`kind`);
+alter table `{{reporting_db}}`.`foreignpriority` add index `ix_foreignpriority_country` (`country`);
 
 # END foreignpriority
 

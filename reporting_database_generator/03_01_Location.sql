@@ -157,6 +157,16 @@ from `patent`.`location` l
                          on tlnp.`location_id` = timl.`new_location_id`;
 
 
+alter table `{{reporting_db}}`.`location` add index `ix_location_state_fips` (`state_fips`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_county_fips` (`county_fips`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_num_inventors` (`num_inventors`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_city` (`city`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_country` (`country`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_persistent_location_id` (`persistent_location_id`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_state` (`state`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_num_assignees` (`num_assignees`);
+
 # END location 
 
 ################################################################################################################################################

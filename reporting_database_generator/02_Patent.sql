@@ -355,6 +355,24 @@ from
   left outer join `patent`.`detail_desc_length` ddl on ddl.`patent_id` = p.`id`
  where  p.version_indicator<='{{version_indicator}}';
 
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_inventor_location_id` (`firstnamed_inventor_location_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_number` (`number`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_title` (`title`(128));
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_type` (`type`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_year` (`year`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_date` (`date`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_inventor_persistent_location_id`(`firstnamed_inventor_persistent_location_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_inventor_persistent_id` (`firstnamed_inventor_persistent_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_assignee_location_id` (`firstnamed_assignee_location_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_assignee_persistent_location_id`(`firstnamed_assignee_persistent_location_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_assignee_persistent_id` (`firstnamed_assignee_persistent_id`);
+alter table `{{reporting_db}}`.`patent` add fulltext index `fti_patent_title` (`title`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_inventor_id` (`firstnamed_inventor_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_assignee_id` (`firstnamed_assignee_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_num_claims` (`num_claims`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_country` (`country`);
+alter table `{{reporting_db}}`.`patent` add fulltext index `fti_patent_abstract` (`abstract`);
+
 # END patent 
 
 ################################################################################################################################################

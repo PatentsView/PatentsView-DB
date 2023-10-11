@@ -54,6 +54,12 @@ from
   `patent`.`rawexaminer` ri
   inner join `{{reporting_db}}`.`temp_id_mapping_examiner` t on t.`old_examiner_id` = ri.`uuid`  where ri.version_indicator<= '{{version_indicator}}';
 
+alter table `{{reporting_db}}`.`examiner` add index `ix_examiner_name_first` (`name_first`);
+alter table `{{reporting_db}}`.`examiner` add index `ix_examiner_name_last` (`name_last`);
+alter table `{{reporting_db}}`.`examiner` add index `ix_examiner_role` (`role`);
+alter table `{{reporting_db}}`.`examiner` add index `ix_examiner_group` (`group`);
+alter table `{{reporting_db}}`.`examiner` add index `ix_examiner_persistent_examiner_id` (`persistent_examiner_id`);
+
 # END examiner
 
 ################################################################################################################################################

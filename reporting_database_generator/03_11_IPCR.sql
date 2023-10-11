@@ -115,6 +115,9 @@ tia.`subclass` = i.`subclass`
 
 tiya.`subclass` = i.`subclass` where i.version_indicator<= '{{version_indicator}}';
 
+alter table `{{reporting_db}}`.`ipcr` add index `ix_ipcr_ipc_class` (`ipc_class`);
+alter table `{{reporting_db}}`.`ipcr` add index `ix_ipcr_num_assignees` (`num_assignees`);
+alter table `{{reporting_db}}`.`ipcr` add index `ix_ipcr_num_inventors` (`num_inventors`);
 
 # END ipcr 
 

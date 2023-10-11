@@ -313,201 +313,136 @@ uspc = SQLTemplatedPythonOperator(
         'source_sql': '03_13_uspc.sql'
     }
 )
-rep_tbl_1 = SQLTemplatedPythonOperator(
-    task_id='Reporting_Tables_1',
+assignee_cpc = SQLTemplatedPythonOperator(
+    task_id='assignee_cpc',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={
-        'filename': '04_Support',
+        'filename': '04_assignee_cpc',
     },
     templates_dict={
-        'source_sql': '04_Support.sql'
+        'source_sql': '04_assignee_cpc.sql'
     }
 )
-idx_1 = SQLTemplatedPythonOperator(
+assignee_inventor = SQLTemplatedPythonOperator(
     task_id='Indexes-01',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={
-        'filename': '05_Indexes',
+        'filename': '04_assignee_inventor',
     },
     templates_dict={
-        'source_sql': '05_01_index.sql'
+        'source_sql': '04_assignee_inventor.sql'
     }
 )
-idx_2 = SQLTemplatedPythonOperator(
+assignee_nber_uspc = SQLTemplatedPythonOperator(
     task_id='Indexes-02',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={
-        'filename': '05_Indexes',
+        'filename': '04_assignee_nber_uspc',
     },
     templates_dict={
-        'source_sql': '05_02_index.sql'
+        'source_sql': '04_assignee_nber_uspc.sql'
     }
 )
-idx_3 = SQLTemplatedPythonOperator(
-    task_id='Indexes-03',
+inventor_step2 = SQLTemplatedPythonOperator(
+    task_id='inventor_step2',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={
-        'filename': '05_Indexes',
+        'filename': '04_inventor',
     },
     templates_dict={
-        'source_sql': '05_03_index.sql'
+        'source_sql': '04_inventor.sql'
     }
 )
-idx_4 = SQLTemplatedPythonOperator(
-    task_id='Indexes-04',
+inventor_cpc = SQLTemplatedPythonOperator(
+    task_id='inventor_step2',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={
-        'filename': '05_Indexes',
+        'filename': '04_inventor_cpc',
     },
     templates_dict={
-        'source_sql': '05_04_index.sql'
+        'source_sql': '04_inventor_cpc.sql'
     }
 )
-idx_5 = SQLTemplatedPythonOperator(
-    task_id='Indexes-05',
+inventor_nber_uspc = SQLTemplatedPythonOperator(
+    task_id='inventor_nber_uspc',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={
-        'filename': '05_Indexes',
+        'filename': '04_inventor_nber_uspc',
     },
     templates_dict={
-        'source_sql': '05_05_index.sql'
+        'source_sql': '04_inventor_nber_uspc.sql'
     }
 )
-idx_6 = SQLTemplatedPythonOperator(
-    task_id='Indexes-06',
+location_cpc = SQLTemplatedPythonOperator(
+    task_id='location_cpc',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={
-        'filename': '05_Indexes',
+        'filename': '04_location_cpc',
     },
     templates_dict={
-        'source_sql': '05_06_index.sql'
+        'source_sql': '04_location_cpc.sql'
     }
 )
-idx_7 = SQLTemplatedPythonOperator(
-    task_id='Indexes-07',
+location_nber_uspc_year = SQLTemplatedPythonOperator(
+    task_id='location_nber_uspc_year',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={
-        'filename': '05_Indexes',
+        'filename': '04_location_nber_uspc_year',
     },
     templates_dict={
-        'source_sql': '05_07_index.sql'
+        'source_sql': '04_location_nber_uspc_year.sql'
     }
 )
-idx_8 = SQLTemplatedPythonOperator(
-    task_id='Indexes-08',
+cpc_step2 = SQLTemplatedPythonOperator(
+    task_id='cpc_step2',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={
-        'filename': '05_Indexes',
+        'filename': '05_cpc',
     },
     templates_dict={
-        'source_sql': '05_08_index.sql'
+        'source_sql': '05_cpc.sql'
     }
 )
-idx_9 = SQLTemplatedPythonOperator(
-    task_id='Indexes-09',
+nber_uspc_step2 = SQLTemplatedPythonOperator(
+    task_id='nber_uspc_step2',
     provide_context=True,
     python_callable=validate_query.validate_and_execute,
     dag=reporting_db_dag,
     op_kwargs={
-        'filename': '05_Indexes',
+        'filename': '05_nber_uspc',
     },
     templates_dict={
-        'source_sql': '05_09_index.sql'
+        'source_sql': '05_nber_uspc.sql'
     }
 )
-idx_10 = SQLTemplatedPythonOperator(
-    task_id='Indexes-10',
-    provide_context=True,
-    python_callable=validate_query.validate_and_execute,
-    dag=reporting_db_dag,
-    op_kwargs={
-        'filename': '05_Indexes',
-    },
-    templates_dict={
-        'source_sql': '05_10_index.sql'
-    }
-)
-idx_11 = SQLTemplatedPythonOperator(
-    task_id='Indexes-11',
-    provide_context=True,
-    python_callable=validate_query.validate_and_execute,
-    dag=reporting_db_dag,
-    op_kwargs={
-        'filename': '05_Indexes',
-    },
-    templates_dict={
-        'source_sql': '05_11_index.sql'
-    }
-)
-idx_12 = SQLTemplatedPythonOperator(
-    task_id='Indexes-12',
-    provide_context=True,
-    python_callable=validate_query.validate_and_execute,
-    dag=reporting_db_dag,
-    op_kwargs={
-        'filename': '05_Indexes',
-    },
-    templates_dict={
-        'source_sql': '05_12_index.sql'
-    }
-)
-rep_tbl_2 = SQLTemplatedPythonOperator(
-    task_id='Reporting_Tables_2',
-    provide_context=True,
-    python_callable=validate_query.validate_and_execute,
-    dag=reporting_db_dag,
-    op_kwargs={
-        'filename': '06_Reporting_Tables',
-    },
-    templates_dict={
-        'source_sql': '06_Reporting_Tables.sql'
-    }
-)
-
-
 reporting_db_qa = PythonOperator(task_id='reporting_DB_QA',
                                           python_callable=run_reporting_db_qa,
                                           dag=reporting_db_dag
                                           )
-
-
-# half_join_table = SQLTemplatedPythonOperator(
-#     task_id='half_join_table',
-#     provide_context=True,
-#     python_callable=validate_query.validate_and_execute,
-#     dag=reporting_db_dag,
-#     op_kwargs={'filename': '07_half_join',
-#                "schema_only": schema_only},
-#     templates_dict={'source_sql': '07_half_join.sql'},
-#     templates_exts=template_extension_config,
-#     params=database_name_config
-# )
-
 # MAPPING DEPENDENCY
 
 db_creation.set_upstream(inventor_disambiguation_finished)
 db_creation.set_upstream(assignee_disambiguation_finished)
 
 govt_interest.set_upstream(db_creation)
-# claims.set_upstream(db_creation)
 id_mappings.set_upstream(db_creation)
 application.set_upstream(db_creation)
 wipo.set_upstream(db_creation)
@@ -527,49 +462,46 @@ us_patcit.set_upstream(patent)
 ipcr.set_upstream(patent)
 nber.set_upstream(patent)
 
-uspc.set_upstream(cpc)
-
-cpc.set_upstream(location)
+uspc.set_upstream(assignee)
+uspc.set_upstream(inventor)
 cpc.set_upstream(assignee)
 cpc.set_upstream(inventor)
-cpc.set_upstream(lawyer)
-cpc.set_upstream(examiner)
-cpc.set_upstream(forprior)
-cpc.set_upstream(pct)
-cpc.set_upstream(us_appcit)
-cpc.set_upstream(us_patcit)
 
-cpc.set_upstream(ipcr)
-cpc.set_upstream(nber)
+assignee_cpc.set_upstream(assignee)
+assignee_cpc.set_upstream(cpc)
+assignee_inventor.set_upstream(assignee)
+assignee_nber_uspc.set_upstream(assignee)
+assignee_nber_uspc.set_upstream(nber)
+assignee_nber_uspc.set_upstream(uspc)
 
-rep_tbl_1.set_upstream(uspc)
+inventor_step2.set_upstream(inventor)
+inventor_cpc.set_upstream(inventor)
+inventor_cpc.set_upstream(cpc)
+inventor_nber_uspc.set_upstream(inventor)
+inventor_nber_uspc.set_upstream(nber)
+inventor_nber_uspc.set_upstream(uspc)
 
-idx_1.set_upstream(rep_tbl_1)
-idx_2.set_upstream(rep_tbl_1)
-idx_3.set_upstream(rep_tbl_1)
-idx_4.set_upstream(rep_tbl_1)
-idx_5.set_upstream(rep_tbl_1)
-idx_6.set_upstream(rep_tbl_1)
-idx_7.set_upstream(rep_tbl_1)
-idx_8.set_upstream(rep_tbl_1)
-idx_9.set_upstream(rep_tbl_1)
-idx_10.set_upstream(rep_tbl_1)
-idx_11.set_upstream(rep_tbl_1)
-idx_12.set_upstream(rep_tbl_1)
+location_cpc.set_upstream(location)
+location_cpc.set_upstream(cpc)
+location_nber_uspc_year.set_upstream(nber)
+location_nber_uspc_year.set_upstream(uspc)
+location_nber_uspc_year.set_upstream(location)
 
-idx_1.set_downstream(rep_tbl_2)
-idx_2.set_downstream(rep_tbl_2)
-idx_3.set_downstream(rep_tbl_2)
-idx_4.set_downstream(rep_tbl_2)
-idx_5.set_downstream(rep_tbl_2)
-idx_6.set_downstream(rep_tbl_2)
-idx_7.set_downstream(rep_tbl_2)
-idx_8.set_downstream(rep_tbl_2)
-idx_9.set_downstream(rep_tbl_2)
-idx_10.set_downstream(rep_tbl_2)
-idx_11.set_downstream(rep_tbl_2)
-idx_12.set_downstream(rep_tbl_2)
+cpc_step2.set_upstream(cpc)
+nber_uspc_step2.set_upstream(nber)
+nber_uspc_step2.set_upstream(uspc)
 
-reporting_db_qa.set_upstream(rep_tbl_2)
+# THE END OF EACH STRING OF STEPS
+reporting_db_qa.set_upstream(nber_uspc_step2)
+reporting_db_qa.set_upstream(cpc_step2)
+reporting_db_qa.set_upstream(location_nber_uspc_year)
+reporting_db_qa.set_upstream(location_cpc)
+reporting_db_qa.set_upstream(inventor_nber_uspc)
+reporting_db_qa.set_upstream(inventor_cpc)
+reporting_db_qa.set_upstream(inventor_step2)
+
+reporting_db_qa.set_upstream(assignee_cpc)
+reporting_db_qa.set_upstream(assignee_inventor)
+reporting_db_qa.set_upstream(assignee_nber_uspc)
 
 

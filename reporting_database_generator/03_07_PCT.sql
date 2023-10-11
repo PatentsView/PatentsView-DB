@@ -33,6 +33,11 @@ from
   `{{reporting_db}}`.`patent` p
   inner join `patent`.`pct_data` ac on ac.`patent_id` = p.`patent_id`;
 
+alter table `{{reporting_db}}`.`pctdata` add index `ix_pctdata_102_date` (`102_date`);
+alter table `{{reporting_db}}`.`pctdata` add index `ix_pctdata_date` (`date`);
+alter table `{{reporting_db}}`.`pctdata` add index `ix_pctdata_doc_number` (`doc_number`);
+alter table `{{reporting_db}}`.`pctdata` add index `ix_pctdata_doc_type` (`doc_type`);
+alter table `{{reporting_db}}`.`pctdata` add index `ix_pctdata_371_date` (`371_date`);
 
 # END pctdata
 

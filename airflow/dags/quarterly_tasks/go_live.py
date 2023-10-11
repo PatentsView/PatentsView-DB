@@ -26,7 +26,7 @@ class SQLTemplatedPythonOperator(PythonOperator):
 
 go_live_dag = DAG("GO_LIVE"
                        , default_args=default_args
-                       , start_date=datetime(2023, 10, 1)
+                       , start_date=datetime(2023, 4, 1)
                        , schedule_interval='@quarterly'
                        , template_searchpath="/project/go_live/")
 
