@@ -22,6 +22,8 @@ from clint.textui import progress
 from sqlalchemy import create_engine
 from lib.xml_helpers import process_date
 from lib.notifications import send_slack_notification
+from lib.configuration import get_connection_string, get_current_config
+
 
 def with_keys(d, keys):
     return {x: d[x] for x in d if x in keys}
@@ -371,41 +373,41 @@ def write_csv(rows, outputdir, filename):
     writer.writerows(rows)
 
 
-def generate_index_statements(config, database_section, table):
-    from lib.configuration import get_connection_string
-    engine = create_engine(get_connection_string(config, database_section))
-    db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
-    add_indexes_query = f"""
-        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', 'ADD ', IF(NON_UNIQUE = 1, 
-        CASE UPPER(INDEX_TYPE) WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME,'` USING ', INDEX_TYPE) END,
-        IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE))),
-        '(', GROUP_CONCAT(DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', '), ');') AS 'Show_Add_Indexes'
-        FROM information_schema.STATISTICS
-        WHERE TABLE_SCHEMA = '{db}'
-          AND TABLE_NAME = '{table}'
-          and UPPER(INDEX_NAME) <> 'PRIMARY'
-        GROUP BY TABLE_NAME, INDEX_NAME, NON_UNIQUE, INDEX_TYPE
-        ORDER BY TABLE_NAME ASC, INDEX_NAME ASC;
-"""
-    print(add_indexes_query)
-    add_indexes_fetcher = engine.execute(add_indexes_query)
-    add_indexes = add_indexes_fetcher.fetchall()
-    drop_indexes_query = f"""
-        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT(DISTINCT CONCAT('DROP ', IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`'))) SEPARATOR ', '), ';')
-        FROM information_schema.STATISTICS
-        WHERE TABLE_SCHEMA = '{db}'
-          AND TABLE_NAME = '{table}'
-          and UPPER(INDEX_NAME) <> 'PRIMARY'
-        GROUP BY TABLE_NAME
-        ORDER BY TABLE_NAME ASC
-            """
-    print(drop_indexes_query)
-    drop_indexes_fetcher = engine.execute(drop_indexes_query)
-    drop_indexes = drop_indexes_fetcher.fetchall()
-    print(add_indexes)
-    print(drop_indexes)
-
-    return add_indexes, drop_indexes
+# def generate_index_statements(config, database_section, table):
+#     from lib.configuration import get_connection_string
+#     engine = create_engine(get_connection_string(config, database_section))
+#     db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+#     add_indexes_query = f"""
+#         SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', 'ADD ', IF(NON_UNIQUE = 1,
+#         CASE UPPER(INDEX_TYPE) WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME,'` USING ', INDEX_TYPE) END,
+#         IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE))),
+#         '(', GROUP_CONCAT(DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', '), ');') AS 'Show_Add_Indexes'
+#         FROM information_schema.STATISTICS
+#         WHERE TABLE_SCHEMA = '{db}'
+#           AND TABLE_NAME = '{table}'
+#           and UPPER(INDEX_NAME) <> 'PRIMARY'
+#         GROUP BY TABLE_NAME, INDEX_NAME, NON_UNIQUE, INDEX_TYPE
+#         ORDER BY TABLE_NAME ASC, INDEX_NAME ASC;
+# """
+#     print(add_indexes_query)
+#     add_indexes_fetcher = engine.execute(add_indexes_query)
+#     add_indexes = add_indexes_fetcher.fetchall()
+#     drop_indexes_query = f"""
+#         SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT(DISTINCT CONCAT('DROP ', IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`'))) SEPARATOR ', '), ';')
+#         FROM information_schema.STATISTICS
+#         WHERE TABLE_SCHEMA = '{db}'
+#           AND TABLE_NAME = '{table}'
+#           and UPPER(INDEX_NAME) <> 'PRIMARY'
+#         GROUP BY TABLE_NAME
+#         ORDER BY TABLE_NAME ASC
+#             """
+#     print(drop_indexes_query)
+#     drop_indexes_fetcher = engine.execute(drop_indexes_query)
+#     drop_indexes = drop_indexes_fetcher.fetchall()
+#     print(add_indexes)
+#     print(drop_indexes)
+#
+#     return add_indexes, drop_indexes
 
 
 def mp_csv_writer(write_queue, target_file, header):
@@ -716,4 +718,6 @@ set update_table.version_indicator={ed}
 if __name__ == "__main__":
     # update_to_granular_version_indicator('uspc_current', 'granted_patent')
     print("HI")
-    breakpoint()
+    config = get_current_config("granted_patent", schedule='quarterly',  **{"execution_date": datetime.date(2022, 6, 30)})
+    generate_index_statements(config, "PROD_DB", "cpc_current_20230330")
+
