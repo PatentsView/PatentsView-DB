@@ -466,6 +466,8 @@ uspc.set_upstream(assignee)
 uspc.set_upstream(inventor)
 cpc.set_upstream(assignee)
 cpc.set_upstream(inventor)
+nber.set_upstream(assignee)
+nber.set_upstream(inventor)
 
 assignee_cpc.set_upstream(assignee)
 assignee_cpc.set_upstream(cpc)
