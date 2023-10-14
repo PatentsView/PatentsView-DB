@@ -16,8 +16,8 @@ create table `{{reporting_db}}`.`temp_assignee_lastknown_location`
     `location_id`            int unsigned null,
     `persistent_location_id` varchar(128) null,
     `city`                   varchar(128) null,
-    `state`                  varchar(20)  null,
-    `country`                varchar(10)  null,
+    `state`                  varchar(128)  null,
+    `country`                varchar(128)  null,
     `latitude`               float        null,
     `longitude`              float        null,
     primary key (`assignee_id`)

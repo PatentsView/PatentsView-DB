@@ -113,8 +113,8 @@ create table `{{reporting_db}}`.`location`
 (
     `location_id`            int unsigned not null,
     `city`                   varchar(256) null,
-    `state`                  varchar(20)  null,
-    `country`                varchar(10)  null,
+    `state`                  varchar(256)  null,
+    `country`                varchar(256)  null,
     `county`                 varchar(60)  null,
     `state_fips`             varchar(2)   null,
     `county_fips`            varchar(6)   null,
