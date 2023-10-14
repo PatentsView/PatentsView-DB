@@ -194,7 +194,7 @@ create table `{{reporting_db}}`.`assignee`
     `lastknown_persistent_location_id` varchar(128)      null,
     `lastknown_city`                   varchar(128)      null,
     `lastknown_state`                  varchar(20)       null,
-    `lastknown_country`                varchar(10)       null,
+    `lastknown_country`                varchar(128)       null,
     `lastknown_latitude`               float             null,
     `lastknown_longitude`              float             null,
     `first_seen_date`                  date              null,
