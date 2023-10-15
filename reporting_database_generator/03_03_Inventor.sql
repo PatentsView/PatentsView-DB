@@ -204,6 +204,7 @@ create table `{{reporting_db}}`.`inventor`
   `last_seen_date` date null,
   `years_active` smallint unsigned not null,
   `persistent_inventor_id` varchar(256) not null,
+  `gender_code` varchar(10) null
   primary key (`inventor_id`)
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -221,7 +222,7 @@ select
   tinp.`num_patents`, ifnull(tina.`num_assignees`, 0), tilkl.`location_id`, tilkl.`persistent_location_id`, tilkl.`city`, tilkl.`state`,
   tilkl.`country`, tilkl.`latitude`, tilkl.`longitude`, tifls.`first_seen_date`, tifls.`last_seen_date`,
   ifnull(case when tifls.`actual_years_active` < 1 then 1 else tifls.`actual_years_active` end, 0),
-  i.`id`, gender_code
+  i.`id`, gender_flag
 from
   `patent`.`inventor` i
   inner join `{{reporting_db}}`.`temp_id_mapping_inventor` t on t.`old_inventor_id` = i.`id`
@@ -289,7 +290,5 @@ alter table `{{reporting_db}}`.`inventor_year` add index `ix_inventor_year_num_p
 
 alter table `{{reporting_db}}`.`location_inventor` add index `ix_location_inventor_num_patents` (`num_patents`);
 alter table `{{reporting_db}}`.`location_inventor` add index `ix_location_inventor_inventor_id` (`inventor_id`);
-
-# END inventor
 
 ################################################################################################################################################
