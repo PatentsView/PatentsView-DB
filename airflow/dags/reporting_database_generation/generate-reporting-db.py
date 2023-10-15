@@ -462,7 +462,7 @@ us_patcit.set_upstream(patent)
 ipcr.set_upstream(patent)
 nber.set_upstream(patent)
 uspc.set_upstream(patent)
-uspc.set_upstream(patent)
+cpc.set_upstream(patent)
 
 assignee_cpc.set_upstream(assignee)
 assignee_cpc.set_upstream(cpc)
