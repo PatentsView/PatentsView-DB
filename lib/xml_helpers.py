@@ -454,12 +454,13 @@ def process_uspc_class_sub(classification):
     :params classification:  a uspc classification entry
     :returns cleaned up version of the classification entry
     '''
-    crossrefsub = classification[3:].replace(" ","") 
-    if len(crossrefsub) > 3 and re.search('^[A-Z]',crossrefsub[3:]) is None: 
+    # most un-processed uspc class text is 6 characters
+    crossrefsub = classification[3:].replace(" ","") # the back 3 characters, spaces removed
+    if len(crossrefsub) > 3 and re.search('^[A-Z]',crossrefsub[3:]) is None: # if the classification was longer than 6 characters and starts with a letter
         crossrefsub = crossrefsub[:3]+'.'+crossrefsub[3:] 
-    crossrefsub = re.sub('^0+','',crossrefsub) 
+    crossrefsub = re.sub('^0+','',crossrefsub) # delete leading zeros
     if re.search('[A-Z]{3}',crossrefsub[:3]): 
-        crossrefsub = crossrefsub.replace(".","")
+        crossrefsub = crossrefsub.replace(".","") # remove periods from classes with letters in the front half
     return crossrefsub
     
 def clean_country(country):
