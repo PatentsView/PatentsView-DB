@@ -398,7 +398,7 @@ update
   inner join `{{reporting_db}}`.`cpc_current_group_application_year` c on
     c.`group_id` = u.`group_id` and c.`application_year` = year(p.`earliest_application_date`)
 set p.`cpc_current_group_average_patent_processing_days` = c.`average_patent_processing_days`
-where  u.`sequence` = 0
+where  u.`sequence` = 0;
 
 
 alter table `{{reporting_db}}`.`cpc_current` add index `ix_cpc_current_num_assignees` (`num_assignees`);
