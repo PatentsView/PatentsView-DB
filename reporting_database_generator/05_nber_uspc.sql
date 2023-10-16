@@ -23,7 +23,6 @@ insert into `{{reporting_db}}`.`uspc_mainclass` select mainclass_id,mainclass_ti
 insert into `{{reporting_db}}`.`uspc_subclass` select subclass_id,subclass_title from `{{reporting_db}}`.`uspc_current` group by subclass_id;
 insert into `{{reporting_db}}`.`uspc_current_mainclass_copy` select distinct patent_id,mainclass_id from `{{reporting_db}}`.`uspc_current_mainclass`;
 insert into `{{reporting_db}}`.`uspc_current_copy` select distinct patent_id,sequence,mainclass_id,subclass_id from `{{reporting_db}}`.`uspc_current`;
-insert into `{{reporting_db}}`.`cpc_current_copy` select distinct patent_id,sequence,section_id,subsection_id,group_id,subgroup_id,category from `{{reporting_db}}`.`cpc_current`;
 insert into `{{reporting_db}}`.`nber_copy` select distinct patent_id,category_id,subcategory_id from `{{reporting_db}}`.`nber`;
 
 

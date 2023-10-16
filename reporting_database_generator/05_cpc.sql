@@ -24,6 +24,7 @@ insert into `{{reporting_db}}`.`cpc_group` select group_id,group_title,num_paten
 insert into `{{reporting_db}}`.`cpc_subgroup` select subgroup_id,subgroup_title from `{{reporting_db}}`.`cpc_current` group by subgroup_id;
 insert into `{{reporting_db}}`.`cpc_current_subsection_copy` select distinct patent_id,section_id,subsection_id from `{{reporting_db}}`.`cpc_current_subsection`;
 insert into `{{reporting_db}}`.`cpc_current_group_copy` select distinct patent_id,section_id,group_id from `{{reporting_db}}`.`cpc_current_group`;
+insert into `{{reporting_db}}`.`cpc_current_copy` select distinct patent_id,sequence,section_id,subsection_id,group_id,subgroup_id,category from `{{reporting_db}}`.`cpc_current`;
 
 
 alter table `{{reporting_db}}`.`cpc_subsection` add index `ix_cpc_subsection_num_inventors` (`num_inventors`);
