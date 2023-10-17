@@ -15,8 +15,8 @@ create table `{{reporting_db}}`.`temp_inventor_lastknown_location`
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
   `city` varchar(256) null,
-  `state` varchar(20) null,
-  `country` varchar(10) null,
+  `state` varchar(256) null,
+  `country` varchar(256) null,
   `latitude` float null,
   `longitude` float null,
   primary key (`inventor_id`)
@@ -196,14 +196,15 @@ create table `{{reporting_db}}`.`inventor`
   `lastknown_location_id` int unsigned null,
   `lastknown_persistent_location_id` varchar(128) null,
   `lastknown_city` varchar(256) null,
-  `lastknown_state` varchar(20) null,
-  `lastknown_country` varchar(10) null,
+  `lastknown_state` varchar(256) null,
+  `lastknown_country` varchar(256) null,
   `lastknown_latitude` float null,
   `lastknown_longitude` float null,
   `first_seen_date` date null,
   `last_seen_date` date null,
   `years_active` smallint unsigned not null,
   `persistent_inventor_id` varchar(256) not null,
+  `gender_code` varchar(10) null
   primary key (`inventor_id`)
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -214,23 +215,80 @@ insert into `{{reporting_db}}`.`inventor`
   `inventor_id`, `name_first`, `name_last`, `num_patents`, `num_assignees`,
   `lastknown_location_id`, `lastknown_persistent_location_id`, `lastknown_city`,
   `lastknown_state`, `lastknown_country`, `lastknown_latitude`, `lastknown_longitude`,
-  `first_seen_date`, `last_seen_date`, `years_active`, `persistent_inventor_id`
+  `first_seen_date`, `last_seen_date`, `years_active`, `persistent_inventor_id`, `gender_code`
 )
 select
   t.`new_inventor_id`, nullif(trim(i.`name_first`), ''), nullif(trim(i.`name_last`), ''),
   tinp.`num_patents`, ifnull(tina.`num_assignees`, 0), tilkl.`location_id`, tilkl.`persistent_location_id`, tilkl.`city`, tilkl.`state`,
   tilkl.`country`, tilkl.`latitude`, tilkl.`longitude`, tifls.`first_seen_date`, tifls.`last_seen_date`,
   ifnull(case when tifls.`actual_years_active` < 1 then 1 else tifls.`actual_years_active` end, 0),
-  i.`id`
+  i.`id`, gender_flag
 from
   `patent`.`inventor` i
   inner join `{{reporting_db}}`.`temp_id_mapping_inventor` t on t.`old_inventor_id` = i.`id`
   left outer join `{{reporting_db}}`.`temp_inventor_lastknown_location` tilkl on tilkl.`inventor_id` = i.`id`
   inner join `{{reporting_db}}`.`temp_inventor_num_patents` tinp on tinp.`inventor_id` = i.`id`
   left outer join `{{reporting_db}}`.`temp_inventor_years_active` tifls on tifls.`inventor_id` = i.`id`
-  left outer join `{{reporting_db}}`.`temp_inventor_num_assignees` tina on tina.`inventor_id` = i.`id`;
+  left outer join `{{reporting_db}}`.`temp_inventor_num_assignees` tina on tina.`inventor_id` = i.`id`
+  left join gender_attribution.inventor_gender_{{version_indicator}} ig on i.id=ig.inventor_id;
+
+# BEGIN inventor_year ######################################################################################################################
+
+drop table if exists `{{reporting_db}}`.`inventor_year`;
+create table `{{reporting_db}}`.`inventor_year`
+(
+  `inventor_id` int unsigned not null,
+  `patent_year` smallint not null,
+  `num_patents` int unsigned not null,
+   unique (`inventor_id`, `patent_year`)
+)
+engine=InnoDB;
 
 
-# END inventor
+insert into `{{reporting_db}}`.`inventor_year`
+(`inventor_id`, `patent_year`, `num_patents`)
+select
+  pi.inventor_id, p.year, count(distinct pi.patent_id)
+from
+  `{{reporting_db}}`.`patent_inventor` pi
+  inner join `{{reporting_db}}`.`patent` p using(patent_id)
+group by
+  pi.inventor_id, p.year;
+
+# END inventor_year ######################################################################################################################
+
+update
+  `{{reporting_db}}`.`location_inventor` li
+  inner join
+  (
+    select
+      `location_id`, `inventor_id`, count(distinct `patent_id`) num_patents
+    from
+      `{{reporting_db}}`.`patent_inventor`
+    group by
+      `location_id`, `inventor_id`
+  ) pii on pii.`location_id` = li.`location_id` and pii.`inventor_id` = li.`inventor_id`
+set
+  li.`num_patents` = pii.`num_patents`;
+
+
+
+alter table `{{reporting_db}}`.`inventor` add index `ix_inventor_lastknown_location_id` (`lastknown_location_id`);
+alter table `{{reporting_db}}`.`inventor` add index `ix_inventor_first_seen_date` (`first_seen_date`);
+alter table `{{reporting_db}}`.`inventor` add index `ix_inventor_last_seen_date` (`last_seen_date`);
+alter table `{{reporting_db}}`.`inventor` add index `ix_inventor_lastknown_persistent_location_id` (`lastknown_persistent_location_id`);
+alter table `{{reporting_db}}`.`inventor` add index `ix_inventor_num_assignees` (`num_assignees`);
+alter table `{{reporting_db}}`.`inventor` add index `ix_inventor_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`inventor` add index `ix_inventor_name_first` (`name_first`);
+alter table `{{reporting_db}}`.`inventor` add index `ix_inventor_name_last` (`name_last`);
+alter table `{{reporting_db}}`.`inventor` add index `ix_inventor_persistent_inventor_id` (`persistent_inventor_id`);
+
+alter table `{{reporting_db}}`.`patent_inventor` add index `ix_patent_inventor_location_id` (`location_id`);
+alter table `{{reporting_db}}`.`inventor_year` add index `ix_inventor_year_inventor_id` (`inventor_id`);
+alter table `{{reporting_db}}`.`inventor_year` add index `ix_inventor_year_year` (`patent_year`);
+alter table `{{reporting_db}}`.`inventor_year` add index `ix_inventor_year_num_patents` (`num_patents`);
+
+alter table `{{reporting_db}}`.`location_inventor` add index `ix_location_inventor_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`location_inventor` add index `ix_location_inventor_inventor_id` (`inventor_id`);
 
 ################################################################################################################################################

@@ -46,12 +46,13 @@ CREATE TABLE `{{reporting_db}}`.`patent_govintorg` (
 INSERT INTO `{{reporting_db}}`.`government_interest` SELECT `patent_id`, `gi_statement` FROM `patent`.`government_interest` where version_indicator<='{{version_indicator}}';
 INSERT INTO `{{reporting_db}}`.`government_organization` SELECT `organization_id`, `name`, `level_one`, `level_two`, `level_three` FROM `patent`.`government_organization`;
 INSERT INTO `{{reporting_db}}`.`patent_contractawardnumber` SELECT `patent_id`, `contract_award_number` FROM `patent`.`patent_contractawardnumber`  where version_indicator<='{{version_indicator}}';
-
 INSERT INTO `{{reporting_db}}`.`patent_govintorg` SELECT `patent_id`, `organization_id` FROM `patent`.`patent_govintorg`  where version_indicator<='{{version_indicator}}';
 
 ALTER TABLE `{{reporting_db}}`.`government_organization` ADD INDEX `ix_government_organization_name`(`name`);
 ALTER TABLE `{{reporting_db}}`.`government_organization` ADD INDEX `ix_government_organization_level_one`(`level_one`);
 ALTER TABLE `{{reporting_db}}`.`government_organization` ADD INDEX `ix_government_organization_level_two`(`level_two`);
 ALTER TABLE `{{reporting_db}}`.`government_organization` ADD INDEX `ix_government_organization_level_three`(`level_three`);
+ALTER TABLE `{{reporting_db}}`.`government_interest` ADD FULLTEXT INDEX `fti_government_interest_gi_statement` (`gi_statement`);
+
 
 # END Government interest tables

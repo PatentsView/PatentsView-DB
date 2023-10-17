@@ -15,9 +15,9 @@ create table `{{reporting_db}}`.`temp_assignee_lastknown_location`
     `assignee_id`            varchar(64)  not null,
     `location_id`            int unsigned null,
     `persistent_location_id` varchar(128) null,
-    `city`                   varchar(128) null,
-    `state`                  varchar(20)  null,
-    `country`                varchar(10)  null,
+    `city`                   varchar(256) null,
+    `state`                  varchar(256)  null,
+    `country`                varchar(256)  null,
     `latitude`               float        null,
     `longitude`              float        null,
     primary key (`assignee_id`)
@@ -192,9 +192,9 @@ create table `{{reporting_db}}`.`assignee`
     `num_inventors`                    int unsigned      not null,
     `lastknown_location_id`            int unsigned      null,
     `lastknown_persistent_location_id` varchar(128)      null,
-    `lastknown_city`                   varchar(128)      null,
-    `lastknown_state`                  varchar(20)       null,
-    `lastknown_country`                varchar(10)       null,
+    `lastknown_city`                   varchar(256)      null,
+    `lastknown_state`                  varchar(256)       null,
+    `lastknown_country`                varchar(256)       null,
     `lastknown_latitude`               float             null,
     `lastknown_longitude`              float             null,
     `first_seen_date`                  date              null,
@@ -239,6 +239,62 @@ from `patent`.`assignee` a
          left outer join `{{reporting_db}}`.`temp_assignee_num_inventors` tani
                          on tani.`assignee_id` = a.`id`;
 
+# BEGIN assignee_year ######################################################################################################################
+
+
+drop table if exists `{{reporting_db}}`.`assignee_year`;
+create table `{{reporting_db}}`.`assignee_year`
+(
+  `assignee_id` int unsigned not null,
+  `patent_year` smallint not null,
+  `num_patents` int unsigned not null,
+   unique (`assignee_id`, `patent_year`)
+)
+engine=InnoDB;
+
+insert into `{{reporting_db}}`.`assignee_year`
+  (`assignee_id`, `patent_year`, `num_patents`)
+select
+  pa.assignee_id, p.year, count(distinct pa.patent_id)
+from
+  `{{reporting_db}}`.`patent_assignee` pa
+  inner join `{{reporting_db}}`.`patent` p using(patent_id)
+group by
+  pa.assignee_id, p.year;
+
+
+update
+  `{{reporting_db}}`.`location_assignee` la
+  inner join
+  (
+    select
+      `location_id`, `assignee_id`, count(distinct `patent_id`) num_patents
+    from
+      `{{reporting_db}}`.`patent_assignee`
+    group by
+      `location_id`, `assignee_id`
+  ) pa on pa.`location_id` = la.`location_id` and pa.`assignee_id` = la.`assignee_id`
+set
+  la.`num_patents` = pa.`num_patents`;
+
+alter table `{{reporting_db}}`.`assignee` add index `ix_assignee_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`assignee` add index `ix_assignee_first_seen_date` (`first_seen_date`);
+alter table `{{reporting_db}}`.`assignee` add index `ix_assignee_last_seen_date` (`last_seen_date`);
+alter table `{{reporting_db}}`.`assignee` add index `ix_assignee_lastknown_persistent_location_id` (`lastknown_persistent_location_id`);
+alter table `{{reporting_db}}`.`assignee` add index `ix_assignee_lastknown_location_id` (`lastknown_location_id`);
+alter table `{{reporting_db}}`.`assignee` add index `ix_assignee_name_first` (`name_first`);
+alter table `{{reporting_db}}`.`assignee` add index `ix_assignee_name_last` (`name_last`);
+alter table `{{reporting_db}}`.`assignee` add index `ix_assignee_organization` (`organization`);
+alter table `{{reporting_db}}`.`assignee` add index `ix_assignee_num_inventors` (`num_inventors`);
+alter table `{{reporting_db}}`.`assignee` add index `ix_assignee_persistent_assignee_id` (`persistent_assignee_id`);
+
+alter table `{{reporting_db}}`.`patent_assignee` add index `ix_patent_assignee_location_id` (`location_id`);
+alter table `{{reporting_db}}`.`assignee_year` add index `ix_assignee_year_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`assignee_year` add index `ix_assignee_year_year` (`patent_year`);
+alter table `{{reporting_db}}`.`assignee_year` add index `ix_assignee_year_assignee_id` (`assignee_id`);
+
+alter table `{{reporting_db}}`.`location_assignee` add index `ix_location_assignee_assignee_id` (`assignee_id`);
+alter table `{{reporting_db}}`.`location_assignee` add index `ix_location_assignee_num_patents` (`num_patents`);
 
 # END assignee
 

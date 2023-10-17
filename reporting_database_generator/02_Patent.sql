@@ -15,8 +15,8 @@ create table `{{reporting_db}}`.`temp_patent_firstnamed_assignee`
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
   `city` varchar(256) null,
-  `state` varchar(20) null,
-  `country` varchar(10) null,
+  `state` varchar(256) null,
+  `country` varchar(256) null,
   `latitude` float null,
   `longitude` float null,
   primary key (`patent_id`)
@@ -60,8 +60,8 @@ create table `{{reporting_db}}`.`temp_patent_firstnamed_inventor`
   `location_id` int unsigned null,
   `persistent_location_id` varchar(128) null,
   `city` varchar(256) null,
-  `state` varchar(20) null,
-  `country` varchar(10) null,
+  `state` varchar(256) null,
+  `country` varchar(256) null,
   `latitude` float null,
   `longitude` float null,
   primary key (`patent_id`)
@@ -274,8 +274,8 @@ create table `{{reporting_db}}`.`patent`
   `firstnamed_assignee_location_id` int unsigned null,
   `firstnamed_assignee_persistent_location_id` varchar(128) null,
   `firstnamed_assignee_city` varchar(256) null,
-  `firstnamed_assignee_state` varchar(20) null,
-  `firstnamed_assignee_country` varchar(10) null,
+  `firstnamed_assignee_state` varchar(256) null,
+  `firstnamed_assignee_country` varchar(256) null,
   `firstnamed_assignee_latitude` float null,
   `firstnamed_assignee_longitude` float null,
   `firstnamed_inventor_id` int unsigned null,
@@ -354,6 +354,24 @@ from
   left outer join `patent`.`us_term_of_grant` ustog on ustog.`patent_id`=p.`id`
   left outer join `patent`.`detail_desc_length` ddl on ddl.`patent_id` = p.`id`
  where  p.version_indicator<='{{version_indicator}}';
+
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_inventor_location_id` (`firstnamed_inventor_location_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_number` (`number`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_title` (`title`(128));
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_type` (`type`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_year` (`year`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_date` (`date`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_inventor_persistent_location_id`(`firstnamed_inventor_persistent_location_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_inventor_persistent_id` (`firstnamed_inventor_persistent_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_assignee_location_id` (`firstnamed_assignee_location_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_assignee_persistent_location_id`(`firstnamed_assignee_persistent_location_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_assignee_persistent_id` (`firstnamed_assignee_persistent_id`);
+alter table `{{reporting_db}}`.`patent` add fulltext index `fti_patent_title` (`title`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_inventor_id` (`firstnamed_inventor_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_assignee_id` (`firstnamed_assignee_id`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_num_claims` (`num_claims`);
+alter table `{{reporting_db}}`.`patent` add index `ix_patent_country` (`country`);
+alter table `{{reporting_db}}`.`patent` add fulltext index `fti_patent_abstract` (`abstract`);
 
 # END patent 
 

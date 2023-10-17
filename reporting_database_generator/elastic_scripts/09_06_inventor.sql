@@ -53,8 +53,7 @@ INSERT INTO `{{elastic_db}}`.inventors( inventor_id, name_first, name_last, num_
                                         , lastknown_location_id, lastknown_persistent_location_id, lastknown_city
                                         , lastknown_state, lastknown_country, lastknown_latitude, lastknown_longitude
                                         , first_seen_date, last_seen_date, years_active, persistent_inventor_id
-                                        , male_flag
-                                        , attribution_status)
+                                        , gender_code)
 select distinct
     i.inventor_id
   , i.name_first
@@ -72,13 +71,10 @@ select distinct
   , i.last_seen_date
   , i.years_active
   , i.persistent_inventor_id
-  , i2.male_flag
-  , i2.attribution_status
+  , i.gender_code
 from
     `{{reporting_db}}`.`inventor` i
         lEft join `{{reporting_db}}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
-        left join patent.inventor_20211230 i2 on i2.id = i.persistent_inventor_id;
-
 
 
 TRUNCATE TABLE `{{elastic_db}}`.inventor_years;

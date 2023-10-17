@@ -113,9 +113,9 @@ create table `{{reporting_db}}`.`location`
 (
     `location_id`            int unsigned not null,
     `city`                   varchar(256) null,
-    `state`                  varchar(20)  null,
-    `country`                varchar(10)  null,
-    `county`                 varchar(60)  null,
+    `state`                  varchar(256)  null,
+    `country`                varchar(256)  null,
+    `county`                 varchar(256)  null,
     `state_fips`             varchar(2)   null,
     `county_fips`            varchar(6)   null,
     `latitude`               float        null,
@@ -156,6 +156,16 @@ from `patent`.`location` l
          left outer join `{{reporting_db}}`.`temp_location_num_patents` tlnp
                          on tlnp.`location_id` = timl.`new_location_id`;
 
+
+alter table `{{reporting_db}}`.`location` add index `ix_location_state_fips` (`state_fips`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_county_fips` (`county_fips`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_num_inventors` (`num_inventors`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_city` (`city`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_country` (`country`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_persistent_location_id` (`persistent_location_id`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_state` (`state`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`location` add index `ix_location_num_assignees` (`num_assignees`);
 
 # END location 
 

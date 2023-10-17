@@ -24,6 +24,8 @@ from
   `{{reporting_db}}`.`patent` p
   inner join `patent`.`uspatentcitation` pc on pc.`patent_id` = p.`patent_id`;
 
+alter table `{{reporting_db}}`.`uspatentcitation` add index `ix_uspatentcitation_cited_patent_id` (`cited_patent_id`);
+
 
 # END uspatentcitation 
 

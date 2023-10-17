@@ -35,6 +35,8 @@ from
   `{{reporting_db}}`.`patent` p
   inner join `patent`.`usapplicationcitation` ac on ac.`patent_id` = p.`patent_id`;
 
+alter table `{{reporting_db}}`.`usapplicationcitation` add index `ix_usapplicationcitation_cited_application_id` (`cited_application_id`);
+
 
 # END usapplicationcitation 
 

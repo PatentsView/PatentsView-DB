@@ -1,5 +1,6 @@
 {% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 {% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set version_indicator = macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
 use `{{elastic_db}}`;
 
@@ -20,7 +21,10 @@ sql security invoker view  `{{elastic_db}}`.granted_pregrant_crosswalk as
 select gpc.patent_id as patent_id
      , gpc.document_number
      , gpc.application_number
-from pregrant_publications.granted_patent_crosswalk gpc;
+     , gpc.current_pgpub_id_flag
+     , gpc.current_patent_id_flag
+from pregrant_publications.granted_patent_crosswalk_{{version_indicator}} gpc;
+
 
 create or replace
 sql security invoker view `{{elastic_db}}`.patent_foreign_priority as

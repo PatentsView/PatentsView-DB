@@ -167,6 +167,15 @@ from
   left outer join `{{reporting_db}}`.`temp_lawyer_num_assignees` tina on tina.`lawyer_id` = i.`id`
   left outer join `{{reporting_db}}`.`temp_lawyer_num_inventors` tini on tini.`lawyer_id` = i.`id`;
 
+alter table `{{reporting_db}}`.`lawyer` add index `ix_lawyer_name_last` (`name_last`);
+alter table `{{reporting_db}}`.`lawyer` add index `ix_lawyer_organization` (`organization`);
+alter table `{{reporting_db}}`.`lawyer` add index `ix_lawyer_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`lawyer` add index `ix_lawyer_name_first` (`name_first`);
+alter table `{{reporting_db}}`.`lawyer` add index `ix_lawyer_num_assignees` (`num_assignees`);
+alter table `{{reporting_db}}`.`lawyer` add index `ix_lawyer_num_inventors` (`num_inventors`);
+alter table `{{reporting_db}}`.`lawyer` add index `ix_lawyer_first_seen_date` (`first_seen_date`);
+alter table `{{reporting_db}}`.`lawyer` add index `ix_lawyer_last_seen_date` (`last_seen_date`);
+alter table `{{reporting_db}}`.`lawyer` add index `ix_lawyer_persistent_lawyer_id` (`persistent_lawyer_id`);
 
 # END lawyer
 

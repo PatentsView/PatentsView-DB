@@ -119,6 +119,13 @@ where
 group by
   n.`subcategory_id`, year(p.`date`);
 
+alter table `{{reporting_db}}`.`nber_subcategory_patent_year` add index `ix_nber_subcategory_patent_year_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`nber` add index `ix_nber_subcategory_id` (`subcategory_id`);
+alter table `{{reporting_db}}`.`nber` add index `ix_nber_num_inventors` (`num_inventors`);
+alter table `{{reporting_db}}`.`nber` add index `ix_nber_num_patents` (`num_patents`);
+alter table `{{reporting_db}}`.`nber` add index `ix_nber_num_assignees` (`num_assignees`);
+alter table `{{reporting_db}}`.`nber` add index `ix_nber_category_id` (`category_id`);
+alter table `{{reporting_db}}`.`nber` add index `ix_nber_subcategory_title` (`subcategory_title`);
 
 # END nber_subcategory_patent_year 
 
