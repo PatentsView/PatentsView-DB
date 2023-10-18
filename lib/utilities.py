@@ -21,6 +21,9 @@ from bs4 import BeautifulSoup
 from clint.textui import progress
 from sqlalchemy import create_engine
 from lib.xml_helpers import process_date
+from lib.notifications import send_slack_notification
+from lib.configuration import get_connection_string, get_current_config
+
 
 def with_keys(d, keys):
     return {x: d[x] for x in d if x in keys}
@@ -39,6 +42,12 @@ def class_db_specific_config(self, table_config, class_called):
     if class_called[:4] == 'Text':
         pass
     else:
+        if "PostProcessing" in str(self):
+            tables_list = list(self.table_config.keys())
+            quarter_date = self.end_date.strftime("%Y%m%d")
+            for table in tables_list:
+                if table in ['assignee', 'location', 'inventor']:
+                    self.table_config[f'{table}_{quarter_date}'] = self.table_config.pop(f'{table}')
         print(f"The following list of tables are run for {class_called}:")
         print(self.table_config.keys())
 
@@ -54,7 +63,7 @@ def load_table_config(config, db='patent'):
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_granted"]}'
     elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'
-    elif db == 'Reporting_DB':
+    elif db == config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]:
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'
     elif db == 'bulk_exp_granted':
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'
@@ -148,6 +157,14 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.f_key = ""
         self.exclusion_list = []
 
+    elif class_called == "ReportingDBTester" or class_called == "ProdDBTester":
+        self.table_config = load_table_config(config, db = config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]) #db should be parameterized later, not hard-coded
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
+        self.exclusion_list = []
+
     elif database_section == "patent" or (
             database_section[:6] == 'upload' and class_called[:6] in ('Upload','GovtIn')):
         self.exclusion_list = ['assignee',
@@ -205,14 +222,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
             self.table_config = load_table_config(config, db=database_section)
         else:
             raise NotImplementedError
-
-    elif class_called == 'ReportingDBTester':
-        self.table_config = load_table_config(config, db='Reporting_DB')
-        self.category = ""
-        self.central_entity = ""
-        self.p_key = ""
-        self.f_key = ""
-        self.exclusion_list = []
 
     elif class_called[:19] == 'BulkDownloadsTester':
         if 'granted' in database_section:
@@ -364,41 +373,41 @@ def write_csv(rows, outputdir, filename):
     writer.writerows(rows)
 
 
-def generate_index_statements(config, database_section, table):
-    from lib.configuration import get_connection_string
-    engine = create_engine(get_connection_string(config, database_section))
-    db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
-    add_indexes_query = f"""
-        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', 'ADD ', IF(NON_UNIQUE = 1, 
-        CASE UPPER(INDEX_TYPE) WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME,'` USING ', INDEX_TYPE) END,
-        IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE))),
-        '(', GROUP_CONCAT(DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', '), ');') AS 'Show_Add_Indexes'
-        FROM information_schema.STATISTICS
-        WHERE TABLE_SCHEMA = '{db}'
-          AND TABLE_NAME = '{table}'
-          and UPPER(INDEX_NAME) <> 'PRIMARY'
-        GROUP BY TABLE_NAME, INDEX_NAME, NON_UNIQUE, INDEX_TYPE
-        ORDER BY TABLE_NAME ASC, INDEX_NAME ASC;
-"""
-    print(add_indexes_query)
-    add_indexes_fetcher = engine.execute(add_indexes_query)
-    add_indexes = add_indexes_fetcher.fetchall()
-    drop_indexes_query = f"""
-        SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT(DISTINCT CONCAT('DROP ', IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`'))) SEPARATOR ', '), ';')
-        FROM information_schema.STATISTICS
-        WHERE TABLE_SCHEMA = '{db}'
-          AND TABLE_NAME = '{table}'
-          and UPPER(INDEX_NAME) <> 'PRIMARY'
-        GROUP BY TABLE_NAME
-        ORDER BY TABLE_NAME ASC
-            """
-    print(drop_indexes_query)
-    drop_indexes_fetcher = engine.execute(drop_indexes_query)
-    drop_indexes = drop_indexes_fetcher.fetchall()
-    print(add_indexes)
-    print(drop_indexes)
-
-    return add_indexes, drop_indexes
+# def generate_index_statements(config, database_section, table):
+#     from lib.configuration import get_connection_string
+#     engine = create_engine(get_connection_string(config, database_section))
+#     db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+#     add_indexes_query = f"""
+#         SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', 'ADD ', IF(NON_UNIQUE = 1,
+#         CASE UPPER(INDEX_TYPE) WHEN 'FULLTEXT' THEN 'FULLTEXT INDEX' WHEN 'SPATIAL' THEN 'SPATIAL INDEX' ELSE CONCAT('INDEX `', INDEX_NAME,'` USING ', INDEX_TYPE) END,
+#         IF(UPPER(INDEX_NAME) = 'PRIMARY', CONCAT('PRIMARY KEY USING ', INDEX_TYPE), CONCAT('UNIQUE INDEX `', INDEX_NAME, '` USING ', INDEX_TYPE))),
+#         '(', GROUP_CONCAT(DISTINCT CONCAT('`', COLUMN_NAME, '`') ORDER BY SEQ_IN_INDEX ASC SEPARATOR ', '), ');') AS 'Show_Add_Indexes'
+#         FROM information_schema.STATISTICS
+#         WHERE TABLE_SCHEMA = '{db}'
+#           AND TABLE_NAME = '{table}'
+#           and UPPER(INDEX_NAME) <> 'PRIMARY'
+#         GROUP BY TABLE_NAME, INDEX_NAME, NON_UNIQUE, INDEX_TYPE
+#         ORDER BY TABLE_NAME ASC, INDEX_NAME ASC;
+# """
+#     print(add_indexes_query)
+#     add_indexes_fetcher = engine.execute(add_indexes_query)
+#     add_indexes = add_indexes_fetcher.fetchall()
+#     drop_indexes_query = f"""
+#         SELECT CONCAT('ALTER TABLE `', TABLE_NAME, '` ', GROUP_CONCAT(DISTINCT CONCAT('DROP ', IF(UPPER(INDEX_NAME) = 'PRIMARY', 'PRIMARY KEY', CONCAT('INDEX `', INDEX_NAME, '`'))) SEPARATOR ', '), ';')
+#         FROM information_schema.STATISTICS
+#         WHERE TABLE_SCHEMA = '{db}'
+#           AND TABLE_NAME = '{table}'
+#           and UPPER(INDEX_NAME) <> 'PRIMARY'
+#         GROUP BY TABLE_NAME
+#         ORDER BY TABLE_NAME ASC
+#             """
+#     print(drop_indexes_query)
+#     drop_indexes_fetcher = engine.execute(drop_indexes_query)
+#     drop_indexes = drop_indexes_fetcher.fetchall()
+#     print(add_indexes)
+#     print(drop_indexes)
+#
+#     return add_indexes, drop_indexes
 
 
 def mp_csv_writer(write_queue, target_file, header):
@@ -463,9 +472,22 @@ def save_zip_file(url, name, path, counter=0, log_queue=None):
                     f.write(chunk)
 
     with zipfile.ZipFile(path + name, 'r') as zip_ref:
-        zip_ref.extractall(path)
+        zipinfo = zip_ref.infolist()
+        for _file in zipinfo:
+            z_nm, z_ext = os.path.splitext(name)
+            f_nm, f_ext = os.path.splitext(_file.filename)
+            if re.match(f"{f_nm}_r\d",z_nm):
+                # revision file - can't be renamed inside the zip archive, so will extract to a temporary location and rename
+                os.mkdir(f"{path}/tmp")
+                zip_ref.extract(_file.filename, f"{path}/tmp")
+                os.rename(f"{path}/tmp/{_file.filename}",f"{path}/{z_nm}{f_ext}")
+                os.rmdir(f"{path}/tmp")
+            else:
+                zip_ref.extract(_file.filename, path)
 
     os.remove(path + name)
+    print(f"{name} downloaded and extracted to {path}")
+    print(f"{path} contains {os.listdir(path)}")
 
 
 def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
@@ -482,25 +504,46 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
         log_queue = manager.Queue()
     else:
         log_queue = Queue()
+    print(f"Start date: {config['DATES']['START_DATE']}")
+    print(f"End date: {config['DATES']['END_DATE']}")
     files_to_download = []
 
-    for year in range(start_year, end_year + 1):
+    #starting one year early to check for revisions to old files (particularly important at the start of a new calendar year) - should add negligible time to typical runs
+    for year in range(start_year - 1, end_year + 1): 
         year_xml_page = xml_path_template.format(year=year)
         print(year_xml_page)
         r = requests.get(year_xml_page)
         soup = BeautifulSoup(r.content, "html.parser")
-        links = soup.find_all("a", href=re.compile("[0-9]{6}\.zip"))
+        links = soup.find_all("a", href=re.compile(r"[0-9]{6}(_r\d)?\.zip"))
         idx_counter = 0
         for link in links:
             href = link.attrs['href']
-            href_match = re.match(r".*([0-9]{6})", href)
+            href_match = re.match(r".*([0-9]{6})(_r\d)?\.zip", href)
             if href_match is not None:
-                file_date = datetime.datetime.strptime(href_match.group(1), '%y%m%d')
+                file_datestring = href_match.group(1)
+                file_date = datetime.datetime.strptime(file_datestring, '%y%m%d')
                 if end_date >= file_date >= start_date:
+                    # should apply to original and revised versions
                     files_to_download.append(
                         (xml_path_template.format(year=year) + href, href, config["FOLDERS"][xml_download_setting],
                          idx_counter, log_queue))
                 idx_counter += 1
+                if (href_match.group(2) is not None) and (file_date < start_date): # has a revision suffix and past date
+                    # check if the file has already been downloaded to the matching folder
+                    old_download_path = config["FOLDERS"][xml_download_setting].replace(config['DATES']['END_DATE'], f"20{file_datestring}") #path uses YYYY, file uses YY
+                    downloaded_files = os.listdir(old_download_path)
+                    matching_files = [f for f in downloaded_files if re.match(f'i?p[ag]{file_datestring}', f)]
+                    if (len(matching_files) == 0): # no files downloaded for week matching revised file
+                        revised_file_message = f"""
+revized XML file available for download: {href}
+no files identified as downloaded for {file_datestring} in directory {old_download_path}."""
+                        send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
+                    elif(href[:-4] > max(matching_files)[:-4]): # more recent file than is downloaded for week matching revised file
+                        # if the file has not already been downloaded to the matching folder, send slack message indicating unparsed revision
+                        revised_file_message = f"""
+revized XML file available for download: {href}
+latest version downloaded for {file_datestring} in {old_download_path}: {max(matching_files)}"""
+                        send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
     watcher = None
     pool = None
     if parallelism > 1:
@@ -509,6 +552,7 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
 
     p_list = []
     idx_counter = 0
+    print(f"{len(files_to_download)} files found to download: {[_file[1] for _file in files_to_download]}")
     for file_to_download in files_to_download:
         if parallelism > 1:
             p = pool.apply_async(save_zip_file, file_to_download)
@@ -672,4 +716,8 @@ set update_table.version_indicator={ed}
 
 
 if __name__ == "__main__":
-    update_to_granular_version_indicator('uspc_current', 'granted_patent')
+    # update_to_granular_version_indicator('uspc_current', 'granted_patent')
+    print("HI")
+    config = get_current_config("granted_patent", schedule='quarterly',  **{"execution_date": datetime.date(2022, 6, 30)})
+    generate_index_statements(config, "PROD_DB", "cpc_current_20230330")
+

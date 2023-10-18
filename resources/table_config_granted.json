@@ -131,7 +131,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["AssigneePostProcessingQC"]
   },
   "botanic": {
     "fields": {
@@ -765,6 +765,13 @@
         "location_field": false
       }
     },
+    "related_entities": [
+      {
+      "related_table": "patent_govintorg",
+      "main_table_id": "organization_id",
+      "related_table_id": "organization_id"
+      }
+    ],
     "TestScripts": ["GovtInterestTester"]
   },
   "inventor": {
@@ -786,26 +793,9 @@
         "null_allowed": true,
         "category": false,
         "location_field": false
-      },
-      "male_flag": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "attribution_status": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
       }
     },
       "related_entities": [
-      {
-        "related_table": "patent_inventor",
-        "main_table_id": "id",
-        "related_table_id": "inventor_id"
-      },
         {
         "related_table": "rawinventor",
         "main_table_id": "id",
@@ -836,7 +826,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["InventorPostProcessingQC"]
   },
   "inventor_gender": {
     "fields": {
@@ -1024,11 +1014,6 @@
     },
       "related_entities": [
       {
-        "related_table": "patent_lawyer",
-        "main_table_id": "id",
-        "related_table_id": "lawyer_id"
-      },
-      {
         "related_table": "rawlawyer",
         "main_table_id": "id",
         "related_table_id": "lawyer_id"
@@ -1038,7 +1023,7 @@
   },
   "location": {
     "fields": {
-      "id": {
+      "location_id": {
         "data_type": "varchar",
         "null_allowed": false,
         "category": false,
@@ -1151,15 +1136,9 @@
   },
   "location_disambiguation_mapping": {
     "fields": {
-      "uuid": {
+      "id": {
         "data_type": "varchar",
         "null_allowed": false,
-        "category": false,
-        "location_field": false
-      },
-      "old_location_id": {
-        "data_type": "varchar",
-        "null_allowed": true,
         "category": false,
         "location_field": false
       },
@@ -1177,7 +1156,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["LocationPostProcessingQC"]
   },
   "location_fips": {
     "fields": {
@@ -1652,11 +1631,6 @@
         "related_table_id": "patent_id"
       },
       {
-        "related_table": "patent_lawyer",
-        "main_table_id": "id",
-        "related_table_id": "patent_id"
-      },
-      {
         "related_table": "pct_data",
         "main_table_id": "id",
         "related_table_id": "patent_id"
@@ -1830,12 +1804,6 @@
       },
       "lawyer_id": {
         "data_type": "varchar",
-        "null_allowed": false,
-        "category": false,
-        "location_field": false
-      },
-      "sequence": {
-        "data_type": "int",
         "null_allowed": false,
         "category": false,
         "location_field": false

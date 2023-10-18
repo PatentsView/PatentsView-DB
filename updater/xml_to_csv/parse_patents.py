@@ -146,10 +146,10 @@ def get_results(patents, field_dictionary):
                         [rawlocid, None, inventor['address-city'], inventor['address-state'],
                          inventor['address-country'],
                          xml_helpers.clean_country(inventor['address-country'])])
-                deceased = False
+                deceased = 'FALSE'
                 if 'deceased' in output_helper.get_alt_tags(inventor,
                                                             ['addressbook-lastname', 'addressbook-last-name']):
-                    deceased = True
+                    deceased = 'TRUE'
                 results['rawinventor'].append([id_generator(), patent_id, None, rawlocid,
                                                output_helper.get_alt_tags(inventor,
                                                                           ['addressbook-firstname',
@@ -317,6 +317,12 @@ def get_results(patents, field_dictionary):
 
                 is_app = True  # indicator for whether something being cited is a patent application
 
+                # stating in December 2022, application IDs in application citations are formatted as 11 digits (4 for year, 7 for ID)
+                # previously the year and ID digits were separated by a slash.
+                # reformatting those IDs here for consistency and compatibility with prior versions
+                if re.match(r"(19|20)\d{9}", cited_doc_num):
+                    cited_doc_num = f"{cited_doc_num[:4]}/{cited_doc_num[4:]}"
+
                 if cited_doc_num:
                     # basically if there is anything other than number and digits its an application
                     if re.match(r'^[A-Z]*\.?\s?\d+$', cited_doc_num):
@@ -374,6 +380,10 @@ def get_results(patents, field_dictionary):
             for uspc in uspcs:
                 main_class = uspc['main-classification'][0][:3].replace(" ", "")
                 results['mainclass'].append(main_class)
+                main_sub_class = xml_helpers.process_uspc_class_sub(uspc['main-classification'][0])
+                results['subclass'].append(main_sub_class)
+                results['uspc'].append([id_generator(), patent_id, main_class, main_sub_class, str(uspc_seq)])
+                uspc_seq += 1
                 if uspc['further-classification']:
                     for further_class in uspc['further-classification']:
                         further_main_class = further_class[:3].replace(" ", "")
@@ -384,12 +394,8 @@ def get_results(patents, field_dictionary):
                             # why do we only do this for further class?
                             further_combined_class = "{0}/{1}".format(further_main_class, further_sub_class)
                             results['subclass'].append(further_combined_class)
-                            results['uspc'].append(
-                                    [id_generator(), patent_id, further_main_class, further_combined_class,
-                                     str(uspc_seq)])
+                            results['uspc'].append([id_generator(), patent_id, further_main_class, further_combined_class, str(uspc_seq)])
                             uspc_seq += 1
-                main_sub_class = xml_helpers.process_uspc_class_sub(uspc['main-classification'][0])
-                results['subclass'].append(main_sub_class)
 
         ipcr_data = xml_helpers.get_entity(patent, 'classifications-ipcr/')
         if ipcr_data[0] is not None:
@@ -509,7 +515,7 @@ def main_process(data_file, outloc, field_dictionary):
     local_logger.info("Completed {file}, output sent to {outloc}".format(file=data_file, outloc=outloc))
 
 
-def begin_parsing(update_config):
+def begin_parsing(update_config, parse_all_versions=False):
     # TO run Everything:
     with open('{}/field_dict.json'.format(update_config['FOLDERS']['PERSISTENT_FILES'])) as myfile:
         field_dictionary = json.load(myfile)
@@ -520,13 +526,16 @@ def begin_parsing(update_config):
     in_files = ['{0}/{1}'.format(input_folder, item) for item in os.listdir(input_folder)]
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
-    out_files = ['{0}/{1}'.format(output_folder, item[-16:-10])
-                 for item in in_files]
-    fields = [field_dictionary for item in in_files]
-    files = zip(in_files, out_files, fields)
-
-    for f in files:
-        main_process(*f)
+        
+    out_files = ['{0}/{1}'.format(output_folder, re.match(".*i?p[ag](\d{6}(_r\d)?)_clean.xml", item).group(1)) for item in in_files]
+    
+    if parse_all_versions:
+        fields = [field_dictionary for item in in_files]
+        files = zip(in_files, out_files, fields)
+        for f in files:
+            main_process(*f)
+    else:
+        main_process(max(in_files), max(out_files), field_dictionary)
 
     logger.info("finished processing")
 

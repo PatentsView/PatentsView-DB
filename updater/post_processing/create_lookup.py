@@ -56,9 +56,9 @@ where {ef} is not null {add_filter}
     engine = create_engine(get_connection_string(update_config, database))
     with engine.begin() as cursor:
         print(delete_query)
-        # cursor.execute(delete_query)
+        cursor.execute(delete_query)
         print(insert_query)
-        # cursor.execute(insert_query)
+        cursor.execute(insert_query)
 
 
 if __name__ == '__main__':

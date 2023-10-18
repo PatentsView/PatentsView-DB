@@ -1,7 +1,7 @@
 import datetime
 import os
 import json
-
+import logging
 import pymysql
 from sqlalchemy import create_engine
 
@@ -10,19 +10,23 @@ from lib.configuration import get_connection_string, get_current_config
 from lib import utilities
 from updater.disambiguation.location_disambiguation.osm_location_match import create_location_match_table
 
+logging.basicConfig(level=logging.INFO)  # Set the logging level
+logger = logging.getLogger(__name__)
+
 def pct_data_doc_type(config):
-    print('fixing pct doc types')
+    logger.info('fixing pct doc types')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
 
-    engine.execute(
-            'UPDATE pct_data SET doc_type = "pct_application" WHERE kind = "00";')
-    engine.execute(
-            'UPDATE pct_data SET doc_type = "wo_grant" WHERE kind = "A";')
+    if config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'][:7] == 'pgpubs_':
+        engine.execute('UPDATE pct_data SET kind = "00" WHERE `kind` IS NULL;') # for pgpubs this should generally be all records
+
+    engine.execute('UPDATE pct_data SET doc_type = "pct_application" WHERE kind = "00";')
+    engine.execute('UPDATE pct_data SET doc_type = "wo_grant" WHERE kind = "A";')
 
 
 def consolidate_uspc(config):
-    print('consolidating rawuspc into uspc')
+    logger.info('consolidating rawuspc into uspc')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
@@ -32,7 +36,7 @@ def consolidate_uspc(config):
 
 
 def consolidate_rawlocation(config):
-    print('consolidating rawlocations from inventors, assignees, and applicants')
+    logger.info('consolidating rawlocations from inventors, assignees, and applicants')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     applicant_table = 'non_inventor_applicant' if config['PATENTSVIEW_DATABASES']['PROD_DB'] == 'patent' else 'us_parties'
     engine = create_engine(cstr)
@@ -44,8 +48,34 @@ def consolidate_rawlocation(config):
             f'INSERT IGNORE INTO rawlocation (id, city, state, country, filename, version_indicator) SELECT rawlocation_id, city, state, country, filename, version_indicator FROM {applicant_table};')
 
 
+def clean_rawlocation_plus_downstream(config, applicant_table="us_parties"):
+    cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
+    engine = create_engine(cstr)
+    q0 = """
+create table null_rawlocations 
+select id
+from rawlocation 
+where city is null and state is null and country is null;"""
+    logger.info(f"{q0}")
+    engine.execute(q0)
+    for table in ['rawinventor','rawassignee', applicant_table]:
+        temp_q = f"""
+update {table}
+set rawlocation_id = null 
+where rawlocation_id in ( select * from null_rawlocations)"""
+        logger.info(f"{temp_q}")
+        engine.execute(temp_q)
+    q1 = """
+    delete
+    from rawlocation 
+    where city is null and state is null and country is null;"""
+    logger.info(f"{q1}")
+    engine.execute(q1)
+
+
+
 def create_country_transformed(config):
-    print('creating country_transformed')
+    logger.info('creating country_transformed')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
@@ -54,7 +84,7 @@ def create_country_transformed(config):
 
 
 def consolidate_cpc(config):
-    print('consolidating cpc main and further into cpc')
+    logger.info('consolidating cpc main and further into cpc')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
@@ -68,9 +98,11 @@ def consolidate_cpc(config):
 
 
 def consolidate_usreldoc(config):
-    print('consolidating usreldoc from parent_child, single, and related tables')
+    logger.info('consolidating usreldoc from parent_child, single, and related tables')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
+    engine.execute(
+            'DELETE FROM usreldoc') # should be empty before being populated below. In some instances of repeated post-processing, duplicates were created.
     engine.execute(
             'DELETE FROM usreldoc_single WHERE related_doc_number IS NULL;')
     engine.execute(
@@ -82,7 +114,7 @@ def consolidate_usreldoc(config):
 
 
 def consolidate_claim(config):
-    print('cleaning claims dependent text')
+    logger.info('cleaning claims dependent text')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
@@ -105,7 +137,7 @@ def consolidate_claim(config):
 
 
 def detail_desc_length(config):
-    print('measuring detail description text length')
+    logger.info('measuring detail description text length')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
     engine.execute(
@@ -113,7 +145,7 @@ def detail_desc_length(config):
 
 
 def yearly_claim(config):
-    print('migrating claims to yearly tables')
+    logger.info('migrating claims to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
@@ -134,13 +166,13 @@ def yearly_claim(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into claims_{} select * from claims c where substring(c.pgpub_id, 1, 4) = '{}';".format(
+                "insert ignore into claims_{} select * from claims c where substring(c.pgpub_id, 1, 4) = '{}';".format(
                         year,
                         year))
 
 
 def yearly_brf_sum_text(config):
-    print('migrating brief summary texts to yearly tables')
+    logger.info('migrating brief summary texts to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
@@ -161,12 +193,12 @@ def yearly_brf_sum_text(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into brf_sum_text_{} select * from brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
+                "insert ignore into brf_sum_text_{} select * from brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
                         year, year))
 
 
 def yearly_draw_desc_text(config):
-    print('migrating drawing descriptions to yearly tables')
+    logger.info('migrating drawing descriptions to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
@@ -187,12 +219,12 @@ def yearly_draw_desc_text(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into draw_desc_text_{} select * from draw_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
+                "insert ignore into draw_desc_text_{} select * from draw_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
                         year, year))
 
 
 def yearly_detail_desc_text(config):
-    print('migrating detail description texts to yearly tables')
+    logger.info('migrating detail description texts to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
@@ -213,19 +245,17 @@ def yearly_detail_desc_text(config):
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
         engine.execute(
-                "insert into detail_desc_text_{} select * from detail_desc_text d where substring(d.pgpub_id, "
+                "insert ignore into detail_desc_text_{} select * from detail_desc_text d where substring(d.pgpub_id, "
                 "1, 4) = '{}';".format(
                         year, year))
 
 
 def consolidate_granted_cpc(config):
-    print('consolidating cpc from main and further cpc tables')
+    logger.info('consolidating cpc from main and further cpc tables')
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
-    engine.execute(
-            """
-INSERT INTO cpc (uuid, patent_id, section_id, subsection_id, group_id, subgroup_id, category, sequence,
-                 version_indicator)
+    q_main = """
+INSERT INTO cpc (uuid, patent_id, section_id, subsection_id, group_id, subgroup_id, category, action_date, version, sequence, symbol_position, version_indicator)
 SELECT uuid,
        patent_id,
        section,
@@ -233,14 +263,14 @@ SELECT uuid,
        concat(section, class, subclass),
        concat(section, class, subclass, main_group, '/', subgroup),
        IF(value = 'I', 'inventional', 'additional'),
+       action_date,
+       version,
        sequence,
+       symbol_position,
        version_indicator
-from main_cpc;
-            """)
-    engine.execute(
-            """
-INSERT INTO cpc (uuid, patent_id, section_id, subsection_id, group_id, subgroup_id, category, sequence,
-                 version_indicator)
+from main_cpc;"""
+    q_further = """
+INSERT INTO cpc (uuid, patent_id, section_id, subsection_id, group_id, subgroup_id, category, action_date, version, sequence, symbol_position, version_indicator)
 SELECT uuid,
        patent_id,
        section,
@@ -248,15 +278,28 @@ SELECT uuid,
        concat(section, class, subclass),
        concat(section, class, subclass, main_group, '/', subgroup),
        IF(value = 'I', 'inventional', 'additional'),
-       sequence,
+       action_date,
+       version,
+       sequence + 1,
+       symbol_position,
        version_indicator
-from further_cpc;
-            """)
+from further_cpc
+WHERE NOT (
+        section IS NULL
+    AND class IS NULL
+    AND subclass IS NULL
+    AND main_group IS NULL
+    AND subgroup IS NULL
+    AND symbol_position IS NULL
+);"""
+    for q in (q_main, q_further):
+        logger.info(q)
+        engine.execute(q)
 
 def trim_rawassignee(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     engine = create_engine(cstr)
-    print("Removing NULLS from rawassignee")
+    logger.info("Removing NULLS from rawassignee")
     engine.execute(
         """DELETE FROM rawassignee WHERE
         (name_first IS NULL) AND
@@ -267,7 +310,7 @@ def fix_rawassignee_wrong_org(config):
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
 #     print(cstr)
     engine = create_engine(cstr)
-    print("Fixing Wrong Organization Landing")
+    logger.info("Fixing Wrong Organization Landing")
     # remove tables first in event of rerun.
     engine.execute("DROP TABLE IF EXISTS temp_rawassignee_org_fixes_nf;")
     engine.execute("DROP TABLE IF EXISTS temp_rawassignee_org_fixes_nl;")
@@ -354,6 +397,7 @@ def begin_post_processing(**kwargs):
     trim_rawassignee(config)
     fix_rawassignee_wrong_org(config)
     consolidate_rawlocation(config)
+    clean_rawlocation_plus_downstream(config, applicant_table="us_parties")
     create_country_transformed(config)
     create_location_match_table(config)
     consolidate_cpc(config)
@@ -376,5 +420,5 @@ def post_upload_database(**kwargs):
 
 if __name__ == "__main__":
     begin_post_processing(**{
-            "execution_date": datetime.date(2022, 1, 13)
+            "execution_date": datetime.date(2023, 4, 6)
             })

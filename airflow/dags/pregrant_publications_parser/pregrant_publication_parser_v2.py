@@ -55,7 +55,7 @@ app_xml_dag = DAG(
     dag_id='pregrant_publication_updater_v2',
     default_args=default_args,
     description='Download and process application patent data and corresponding classifications data',
-    start_date=datetime(2022, 3, 31, hour=5, minute=0, second=0, tzinfo=local_tz),
+    start_date=datetime(2022, 9, 29, hour=5, minute=0, second=0, tzinfo=local_tz),
     schedule_interval=timedelta(weeks=1),
     catchup=True,
     template_searchpath=templates_searchpath
@@ -68,13 +68,6 @@ create_database_operator = PythonOperator(task_id='create_pgpubs_database',
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure
                                           )
-# create_database_operator = PythonOperator(task_id='create_pgpubs_database',
-#                                           python_callable=begin_database_setup,
-#                                           op_kwargs={'dbtype': 'pgpubs'},
-#                                           dag=app_xml_dag,
-#                                           on_success_callback=airflow_task_success,
-#                                           on_failure_callback=airflow_task_failure
-#                                           )
 
 qc_database_operator = PythonOperator(task_id='qc_database_setup',
                                       python_callable=qc_database_pgpubs,
@@ -96,7 +89,8 @@ post_processing_operator = PythonOperator(task_id='post_process',
                                           dag=app_xml_dag,
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure,
-                                          pool='database_write_iops_contenders'
+                                          depends_on_past=True,
+                                          pool = 'elastic_search_pool'
                                           )
 
 qc_upload_operator = PythonOperator(task_id='qc_upload_new',
@@ -172,7 +166,6 @@ gi_qc_operator = PythonOperator(task_id='GI_QC',
                                 on_success_callback=airflow_task_success,
                                 on_failure_callback=airflow_task_failure)
 
-
 merge_database_operator = SQLTemplatedPythonOperator(
     task_id='merge_database',
     provide_context=True,
@@ -192,7 +185,8 @@ merge_database_operator = SQLTemplatedPythonOperator(
     params={
         'database': 'pgpubs_',
         'add_suffix': True
-    }
+    },
+    depends_on_past = True
 )
 
 # merge_text_database_operator = PythonOperator(task_id='merge_text_database',

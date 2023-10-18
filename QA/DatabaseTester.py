@@ -10,6 +10,11 @@ from time import time
 import os
 import re
 
+import logging
+
+logging.basicConfig(level=logging.INFO)  # Set the logging level
+logger = logging.getLogger(__name__)
+
 from lib.configuration import get_connection_string
 from lib.configuration import get_current_config
 from lib import utilities
@@ -59,6 +64,9 @@ class DatabaseTester(ABC):
         self.database_type = database_type
         utilities.class_db_specific_config(self, self.table_config, class_called)
 
+        #set a break point to check stuff
+
+
     def init_qa_dict(self):
         # Place Holder for saving QA counts - keys map to table names in patent_QA
         self.qa_data = {
@@ -70,6 +78,7 @@ class DatabaseTester(ABC):
             'DataMonitor_maxtextlength': [],
             'DataMonitor_prefixedentitycount': [],
             'DataMonitor_locationcount': [],
+            'DataMonitor_indexcount': []
         }
 
     def query_runner(self, query, single_value_return=True, where_vi=False, vi_comparison = '='):
@@ -147,19 +156,43 @@ SELECT count(*) as count
 from `{table}`
 where INSTR(`{field}`, CHAR(0x00)) > 0"""
         count_value = self.query_runner(nul_byte_query, single_value_return=True, where_vi=where_vi)
-        if count_value > 1:
-            exception_message = """
-{count} rows with NUL Byte found in {field} of {table_name} for {db}""".format(count=count_value, field=field, table_name=table,
-                       db=self.database_section)
-            raise Exception(exception_message)
+        if count_value > 0:
+        # attempt automatic correction
+            bad_char_fix_query = f"""
+            UPDATE `{table}`
+            SET `{field}` = REPLACE(REPLACE(REPLACE(`{field}`, CHAR(0x00), ''), CHAR(0x08), ' b'), CHAR(0x1A), 'Z')
+            WHERE INSTR(`{field}`, CHAR(0x00)) > 0
+            """
+            try:
+                if not self.connection.open:
+                    self.connection.connect()
+                with self.connection.cursor() as generic_cursor:
+                    print(bad_char_fix_query)
+                    generic_cursor.execute(bad_char_fix_query)
+                print(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
+                print(nul_byte_query)
+                count_value = self.query_runner(nul_byte_query, single_value_return=True, where_vi=where_vi)
+                if count_value > 0:
+                    exception_message = f"{count_value} rows with NUL Byte found in `{field}` of `{self.database_section}`.`{table}` after attempted correction."
+                    raise Exception(exception_message)
+            finally:
+                if self.connection.open:
+                    self.connection.close()
+        
 
 
     def test_newlines(self, table, field, where_vi):
         skip = False
         allowables = { # set of tables and fields where newlines are allowable in the field content
             'brf_sum_text' : ['summary_text'], 
-            'detail_desc_text' : ['description_text']
+            'detail_desc_text' : ['description_text'],
+            'claims' : ['claim_text'],
+            'rel_app_text' : ['text']
         }
+        # autofixes = {
+        #     'draw_desc_text' : ['draw_desc_text'],
+        #     'rawassignee': ['orgnaization']
+        # }
         if table in allowables: #non-text tables
             if field in allowables[table]:
                 skip = True
@@ -175,11 +208,31 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
             from `{table}`
             where INSTR(`{field}`, '\n') > 0"""
             count_value = self.query_runner(newline_query, single_value_return=True, where_vi=where_vi)
-            if count_value > 1:
-                exception_message = """
-    {count} rows with unwanted newlines found in {field} of {table_name} for {db}""".format(count=count_value, field=field, table_name=table,
-                        db=self.database_section)
-                raise Exception(exception_message)
+            if count_value > 0:
+                print(f"{count_value} rows with unwanted newlines found in {field} of {table} for {self.database_section}. Correcting records ...")
+                makelogquery = f"CREATE TABLE IF NOT EXISTS `{table}_newline_log` LIKE {table}"
+                filllogquery = f"INSERT INTO `{table}_newline_log` SELECT * FROM `{table}` WHERE `{field}` LIKE '%\n%'"
+                fixquery = f"""
+                UPDATE `{table}`
+                SET {field} = REPLACE(REPLACE({field}, '\n', ' '), '  ', ' ')
+                WHERE `{field}` LIKE '%\n%';
+                """
+                try:
+                    if not self.connection.open:
+                        self.connection.connect()
+                    with self.connection.cursor() as generic_cursor:
+                        for query in [makelogquery, filllogquery, fixquery]:
+                            print(query)
+                            generic_cursor.execute(query)
+                    print(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
+                    print(newline_query)
+                    count_value = self.query_runner(newline_query, single_value_return=True, where_vi=where_vi)
+                    if count_value > 0:
+                        exception_message = f"{count_value} rows with unwanted and unfixed newlines found in {field} of {table} for {self.database_section}"
+                        raise Exception(exception_message)
+                finally:
+                    if self.connection.open:
+                        self.connection.close()
 
 
     def load_category_counts(self, table, field):
@@ -272,6 +325,24 @@ f"HERE CHAR_LENGTH(`{field}`) != CHAR_LENGTH(TRIM(`{field}`))"
             raise Exception(
                 f"print({self.database_section}.{table}.{field} needs trimming")
 
+    def check_for_indexes(self, table):
+        if "webtool" not in table and table not in ["patent_lawyer_unique"]:
+            index_query = \
+    f"""select count(*) from information_schema.statistics where table_name = '{table}' and table_schema = '{self.database_section}' """
+            count_value = self.query_runner(index_query, single_value_return=True)
+            if count_value == 0:
+                print(index_query)
+                raise Exception(
+                    f"print({self.database_section}.{table} has no indexes")
+            self.qa_data['DataMonitor_indexcount'].append(
+                {
+                    "database_type": self.database_type,
+                    'table_name': table,
+                    'update_version': self.version,
+                    'index_count': count_value,
+                    'quarter': self.quarter
+                })
+
     def test_rawassignee_org(self, table, where_vi=False):
         rawassignee_q = """
 SELECT count(*) 
@@ -318,8 +389,7 @@ where main_table.{main_table_id} is null and related_table.{related_table_id} is
         if table_name not in self.exclusion_list and 'related_entities' in table_config:
             for related_entity_config in table_config['related_entities']:
                 ###### CHECKING IF THE RELATED TABLE HAS DATA
-                exists_query = \
-f"""SHOW TABLES LIKE '{related_entity_config["related_table"]}'; """
+                exists_query = f"""SHOW TABLES LIKE '{related_entity_config["related_table"]}'; """
                 exists_table_count = self.query_runner(exists_query, single_value_return=False, where_vi=False)
                 if not exists_table_count:
                     continue
@@ -426,8 +496,35 @@ group by t.`{field}`"""
         qa_engine = create_engine(self.qa_connection_string)
         for qa_table in self.qa_data:
             qa_table_data = self.qa_data[qa_table]
+            if len(qa_table_data) == 0: 
+                continue
             table_frame = pd.DataFrame(qa_table_data)
+            if qa_table == 'DataMonitor_topnentities': 
+                entity_set = f"""('{"', '".join(table_frame.entity_name.unique())}')"""
+                table_col = 'entity_name'
+                addl_condition = f"AND `{table_col}` IN {entity_set}"
+                print_condition = f"for {entity_set} "
+            elif qa_table in ['DataMonitor_govtinterestsampler']: # table-specific QA tables that just identify records by update_version and db_type
+                addl_condition = ""
+                print_condition = ""
+            elif 'table_name' in table_frame.columns:
+                table_set = f"""('{"', '".join(table_frame.table_name.unique())}')"""
+                table_col = "table_name"
+                addl_condition = f"AND `{table_col}` IN {table_set}"
+                print_condition = f"for {table_set} "
+            elif 'main_table' in table_frame.columns: # for floating entity table
+                table_set = f"""('{"', '".join(table_frame.main_table.unique())}')"""
+                table_col = "main_table"
+                addl_condition = f"AND `{table_col}` IN {table_set}"
+                print_condition = f"for {table_set} "
+            else:
+                raise NotImplementedError(f"specification of existing rows to remove not implemented for {qa_table}.\ncolumns available: `{'`,`'.join(table_frame.columns)}`")
             try:
+                print(f'removing prior {qa_table} {self.database_type} records {print_condition}on {self.version}')
+                clean_prior = f"DELETE FROM {qa_table} WHERE `update_version` = '{self.version}' AND `database_type` = '{self.database_type}' {addl_condition}"
+                print(clean_prior)
+                qa_engine.execute(clean_prior)
+                print(f'inserting new {qa_table} records for {self.version} and {self.database_type}')
                 table_frame.to_sql(name=qa_table, if_exists='append', con=qa_engine, index=False)
             except SQLAlchemyError as e:
                 table_frame.to_csv("errored_qa_data" + qa_table, index=False)
@@ -474,29 +571,31 @@ where invention_abstract is null """
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()
         for table in self.table_config:
-            # if table[:2] >= 'pa':
-            print(" -------------------------------------------------- ")
-            print(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table}")
-            print(" -------------------------------------------------- ")
-            if self.class_called != "ReportingDBTester":
+            self.check_for_indexes(table)
+            # if table[:2] >= 'pa': maybe try using this
+            logger.info(f"==============================================================================")
+            logger.info(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table} %")
+            logger.info(f"==============================================================================")
+            if self.class_called != "ReportingDBTester" and "PostProcessingQC" not in self.class_called:
                 self.test_null_version_indicator(table)
             self.load_table_row_count(table, where_vi=False)
-            if table in 'rawassignee':
+            if table == 'rawassignee':
                 self.test_rawassignee_org(table, where_vi=False)
             self.test_blank_count(table, self.table_config[table], where_vi=False)
             self.load_nulls(table, self.table_config[table], where_vi=False)
             vi_cutoff_classes = ['DisambiguationTester', 'LawyerPostProcessingQC']
-            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table],
-                        where_vi=(True if self.class_called in vi_cutoff_classes else False),
-                        vi_comparison=('<=' if self.class_called in vi_cutoff_classes else '='))
-            self.load_main_floating_entity_count(table, self.table_config[table])
+            if "PostProcessingQC" not in self.class_called:
+                self.test_related_floating_entities(table_name=table, table_config=self.table_config[table],
+                            where_vi=(True if self.class_called in vi_cutoff_classes else False),
+                            vi_comparison=('<=' if self.class_called in vi_cutoff_classes else '='))
+                self.load_main_floating_entity_count(table, self.table_config[table])
             self.load_entity_category_counts(table)
             if table == self.central_entity:
                 self.test_patent_abstract_null(table)
             for field in self.table_config[table]["fields"]:
-                print("\t -------------------------------------------------- ")
-                print(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
-                print("\t -------------------------------------------------- ")
+                logger.info(f"==============================================================================")
+                logger.info(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
+                logger.info(f"==============================================================================")
                 if self.table_config[table]["fields"][field]["data_type"] == 'date':
                     self.test_zero_dates(table, field, where_vi=False)
                 if self.table_config[table]["fields"][field]["category"]:
@@ -515,13 +614,11 @@ where invention_abstract is null """
             else:
                 self.save_qa_data()
                 self.init_qa_dict()
+            logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
-            print(" -------------------------------------------------- ")
-            print(f"FINISHED WITH TABLE: {table}")
-            print(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
-            print(" -------------------------------------------------- ")
-
-
+            logger.info(f"==============================================================================")
+            logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
+            logger.info(f"==============================================================================")
 
 if __name__ == '__main__':
     # config = get_config()
@@ -530,6 +627,6 @@ if __name__ == '__main__':
     })
     # fill with correct run_id
     run_id = "backfill__2020-12-29T00:00:00+00:00"
-    pt = DatabaseTester(config, 'patent', datetime.date(2021, 12, 7), datetime.date(2022, 1, 19))
+    pt = DatabaseTester(config, 'PatentsView_20230330', datetime.date(2023, 1, 1), datetime.date(2023, 3, 30))
     pt.runTests()
 

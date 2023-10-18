@@ -7,6 +7,7 @@ venv
 .idea
 docker-compose.yaml
 docker-compose-debug.yaml
+mydumper/
 Development/config.ini
 airflow/airflow-webserver.pid
 airflow/airflow.db
@@ -41,3 +42,5 @@ scratch
 **/*.out
 **/*.err
 pgpubs_*
+resources/sql.conf
+config.ini

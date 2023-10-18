@@ -24,16 +24,17 @@ def update_long_entity(entity, database_type='granted_patent', **kwargs):
                                  cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
     update_version = config['DATES']['END_DATE']
     version_indicator = process_date(update_version, as_string=True)
-    source_entity_table = '{entity}_disambiguation_mapping'.format(entity=entity)
+    source_entity_table = 'raw_{entity}'.format(entity=entity)
     source_entity_field = '{entity}_id'.format(entity=entity)
 
+    id = 'document_number'
+    if database_type == 'granted_patent':
+        id = 'patent_id'
     target_persistent_table = 'persistent_{entity}_disambig_long'.format(entity=entity)
 
-    entity_update_query = """
-    INSERT INTO {target_table} (uuid, database_update, {entity_id}, version_indicator) SELECT uuid, {db_version},{entity_id}, {version_indicator} from {source_table}
-    """.format(
-            target_table=target_persistent_table, source_table=source_entity_table, entity_id=source_entity_field,
-            db_version=update_version, version_indicator=version_indicator)
+    entity_update_query = f"""
+    INSERT INTO {target_persistent_table} (uuid, database_update, {source_entity_field}, version_indicator, {id}) SELECT uuid, {update_version},{source_entity_field}, {version_indicator}, {id} from {source_entity_table}
+    """
     print(entity_update_query)
     if not connection.open:
         connection.connect()
@@ -115,19 +116,28 @@ def write_wide_table(entity, database_type='granted_patent', **kwargs):
                                  charset='utf8mb4',
                                  cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
     update_version = config['DATES']['END_DATE']
-    source_entity_table = '{entity}_disambiguation_mapping'.format(entity=entity)
+    source_entity_table = 'raw{entity}'.format(entity=entity)
     source_entity_field = '{entity}_id'.format(entity=entity)
     # fixed
     current_rawentity = 'current_raw{0}_id'.format(entity)
     disamb_col = 'disamb_{}_id_{}'.format(entity, update_version)
     persistent_wide_table = 'persistent_{0}_disambig'.format(entity)
     id_col = '{0}_id'.format(entity)
-    upsert_query = """
-    INSERT INTO {wide_table} ({current_id},{disambig_id},version_indicator) select uuid,{entity_id},'{version_indicator}' from {source_entity} ON DUPLICATE  
-    KEY UPDATE {disambig_id} = VALUES({disambig_id})
-    """.format(wide_table=persistent_wide_table, current_id=current_rawentity, disambig_id=disamb_col, entity_id=id_col,
-               source_entity=source_entity_table, version_indicator=update_version)
-    # fixed
+    uuid = 'id'
+    id = 'document_number'
+    if database_type == 'granted_patent':
+        id = 'patent_id'
+        uuid = 'uuid'
+    upsert_query = f"""
+    INSERT INTO {persistent_wide_table} 
+    ({current_rawentity},{disamb_col},version_indicator, {id}, sequence) 
+    select 
+    {uuid}, {id_col},'{update_version}', {id}, sequence 
+    from {source_entity_table} 
+    ON DUPLICATE  
+    KEY UPDATE {disamb_col} = VALUES({disamb_col})
+    """
+    print(upsert_query)
 
     cstr = get_connection_string(config, database=section)
     engine = create_engine(cstr)

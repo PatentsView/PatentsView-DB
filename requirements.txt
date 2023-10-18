@@ -8,8 +8,10 @@ SQLAlchemy
 Unidecode
 absl-py
 beautifulsoup4
+billiard
 boto3
 clint
+dotenv
 editdistance
 lxml
 matplotlib
@@ -24,13 +26,13 @@ python_dateutil
 requests
 scikit-learn
 scipy
+seaborn
 pyshp
-shapely
+shapely<2
 slack_sdk
 sqlparse
 tabulate
 textdistance
-thebrainfuck
 thefuzz
 torch
 tqdm

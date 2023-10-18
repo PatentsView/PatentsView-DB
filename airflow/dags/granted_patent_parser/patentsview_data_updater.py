@@ -5,6 +5,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from lib.configuration import get_current_config, get_section, get_today_dict
+from lib.download_check_delete_databases import run_table_archive, run_database_archive
 from lib.utilities import chain_operators
 from reporting_database_generator.database.validate_query import validate_and_execute
 from updater.callbacks import airflow_task_failure, airflow_task_success
@@ -60,7 +61,7 @@ granted_patent_parser = DAG(
     dag_id='granted_patent_updater',
     default_args=default_args,
     description='Download and process granted patent data and corresponding classifications data',
-    start_date=datetime(2021, 7, 1, hour=5, minute=0, second=0, tzinfo=local_tz),
+    start_date=datetime(2022, 9, 27, hour=5, minute=0, second=0, tzinfo=local_tz),
     schedule_interval=timedelta(weeks=1), catchup=True,
     template_searchpath=templates_searchpath,
 )
@@ -74,6 +75,12 @@ operator_sequence_groups = {}
 # ##### Start Instance #####
 # instance_starter = PythonOperator(task_id='start_data_collector', python_callable=start_data_collector_instance,
 #                                   **operator_settings)
+###### BACKUP OLDEST DATABASE #######
+backup_data = PythonOperator(task_id='backup_oldest_database'
+                             , python_callable=run_database_archive
+                             , op_kwargs={'type': 'granted_patent'}
+                             , queue= 'mydumper'
+                             , **operator_settings)
 ###### Download & Parse #######
 download_xml_operator = PythonOperator(task_id='download_xml', python_callable=bulk_download,
                                        **operator_settings)
@@ -82,7 +89,7 @@ upload_setup_operator = PythonOperator(task_id='upload_database_setup', python_c
 
 process_xml_operator = PythonOperator(task_id='process_xml',
                                       python_callable=preprocess_xml,
-                                      **operator_settings, pool='memory_intensive_pool')
+                                      **operator_settings, pool='high_memory_pool')
 
 parse_xml_operator = PythonOperator(task_id='parse_xml',
                                     python_callable=patent_parser,
@@ -124,7 +131,7 @@ qc_upload_operator = PythonOperator(task_id='qc_upload_new', python_callable=pos
                                     )
 ### new OSM ElasticSearch geocoding
 OSM_geocode_operator = PythonOperator(task_id='geocode_rawlocations', python_callable=geocode_by_osm,
-                                      **operator_settings
+                                      **operator_settings, pool = 'elastic_search_pool'
                                       )
 
 ### Location_ID generation
@@ -248,6 +255,7 @@ merge_text_operator = PythonOperator(task_id='merge_text_db',
 
 qc_text_merge_operator = PythonOperator(task_id='qc_merge_text_db',
                                         python_callable=post_text_merge_granted,
+                                        depends_on_past=True,
                                         **operator_settings
                                         )
 
@@ -282,3 +290,4 @@ for dependency_group in operator_sequence_groups:
 
 qc_merge_operator.set_upstream(merge_new_operator)
 qc_text_merge_operator.set_upstream(merge_text_operator)
+backup_data.set_upstream(download_xml_operator)

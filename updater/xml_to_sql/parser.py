@@ -280,6 +280,8 @@ def process_publication_document(patent_app_document, patent_config):
     """
     # Get the document number for the given input
     document_number = patent_app_document.findall(patent_config['foreign_key_config']['xml_path'])[0].text
+    if len(document_number) == 13 and document_number.endswith('A1'):
+        document_number = document_number[:-2] # cleaning exception found in 2023-03-23
     # Get the table_xml_map element from the JSON file
     table_xml_map = patent_config['table_xml_map']
     # Loop through the tables in the table_xml_map to extract all data that is present
@@ -300,6 +302,7 @@ def process_publication_document(patent_app_document, patent_config):
             sequence = 1
             # extract all data necessary
             for entity_element in patent_app_document.findall(entity_root_path):
+                if entity_element.tag in table.get('skip_tags',[]): continue # if any specified skippable child elements, skip them
                 table_rows.append(extract_table_data(table, entity_element, document_number, sequence,
                                                      patent_config['foreign_key_config']))
                 sequence += 1
@@ -361,18 +364,25 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
 
 
 def extract_document(xml_file):
-    xml_marker = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml_marker = '<?xml version="1.0"'
     current_document_lines = []
     with open(xml_file, "r") as freader:
         # Loop through all the lines in the file
         for line in freader:
             # Determine the start of a new document
-            if line == xml_marker:
+            # some of the early documents are marked by just '<?xml version="1.0"?>' - this caused inadvertent merging of documents
+            #some documents split on the middle of a line - mostly in 2002-04, but some observed in 2023
+            if xml_marker in line:
+                current_document_lines.append(line.split(xml_marker)[0])
                 # Join all lines for a given document
                 current_xml = "".join(current_document_lines)
-                yield current_xml
+                if current_xml.strip() != '':
+                    yield current_xml
                 current_document_lines = []
-            current_document_lines.append(line)
+                current_document_lines.append(xml_marker)
+                current_document_lines.append(line.split(xml_marker)[-1])
+            else:
+                current_document_lines.append(line)
         current_xml = "".join(current_document_lines)
         yield current_xml
 
@@ -427,29 +437,37 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
             if debug and counter > 250:
                 break
             # Create an etree element for the current document
-            parser = etree.XMLParser(load_dtd=True, no_network=False)
-            patent_app_document = etree.XML(current_xml.encode('utf-8'), parser=parser)
-            if patent_app_document.tag == 'sequence-cwu':
-                continue
-            else:
-                # Extract the data fields
-                data = process_publication_document(patent_app_document, table_xml_map)
-                # Add the data to the proper dataframe
-                try:
-                    for table_name, extracted_data in data:
-                        if not len(table_name) > 0:
-                            continue
-                        else:
-                            current_data_frame = pd.DataFrame(extracted_data)
-                            dfs[table_name] = dfs[table_name].append(current_data_frame)
-                except IndexError as e:
-                    log_queue.put(
-                            {
-                                    "level":   logging.DEBUG,
-                                    "message": "{xml_file}: {document}".format(xml_file=xml_file_name,
-                                                                               document=pprint.pformat(
-                                                                                       patent_app_document.getchildren()))
-                                    })
+            try:
+                parser = etree.XMLParser(load_dtd=True, no_network=False)
+                patent_app_document = etree.XML(current_xml.encode('utf-8'), parser=parser)
+                if patent_app_document.tag == 'sequence-cwu':
+                    continue
+                else:
+                    # Extract the data fields
+                    data = process_publication_document(patent_app_document, table_xml_map)
+                    # Add the data to the proper dataframe
+                    try:
+                        for table_name, extracted_data in data:
+                            if not len(table_name) > 0:
+                                continue
+                            else:
+                                current_data_frame = pd.DataFrame(extracted_data)
+                                # dfs[table_name] = dfs[table_name].append(current_data_frame) 
+                                # FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead
+                                dfs[table_name] = pd.concat((dfs[table_name],current_data_frame), axis=0)
+                    except IndexError as e:
+                        log_queue.put(
+                                {
+                                        "level":   logging.DEBUG,
+                                        "message": "{xml_file}: {document}".format(xml_file=xml_file_name,
+                                                                                document=pprint.pformat(
+                                                                                        patent_app_document.getchildren()))
+                                        })
+            except Exception as e:
+                print(f'xml failed to parse on document number {counter} within file {xml_file}')
+                print(f"xml text begins: {current_xml[:min(len(current_xml), 350)]}")
+                raise(e)
+
     log_queue.put({
             "level":   logging.INFO,
             "message": "XML Document {xml_file} took {duration} seconds to parse".format(
@@ -498,26 +516,36 @@ def get_filenames_to_parse(config, type='granted_patent'):
     xml_directory = config['FOLDERS'][xml_directory_setting]
 
     xml_files = []
+    file_dates = set()
     start_date_string = '{}'.format(config['DATES']['START_DATE'])
     start_date = datetime.strptime(start_date_string, '%Y%m%d')
     end_date_string = '{}'.format(config['DATES']['END_DATE'])
     end_date = datetime.strptime(end_date_string, '%Y%m%d')
-    for file_name in os.listdir(xml_directory):
+    allfiles = os.listdir(xml_directory)
+    for file_name in allfiles:
         # print(file_name)
         if file_name.endswith(".xml"):
             file_date_string = re.match(".*([0-9]{6}).*", file_name).group(1)
             file_date = datetime.strptime(file_date_string, '%y%m%d')
 
-            # file_date = file_name.split("_")[-1].split(".")[0]
-            # file_date = file_name[3:-4]
             # print(file_date)
             # print(start_date)
             # print(end_date)
             if start_date <= file_date <= end_date:
-                xml_files.append(xml_directory + "/" + file_name)
-    print(f"files identified for parsing: {xml_files}")
+                xml_files.append(file_name)
+                file_dates.add(file_date_string)
+    # if only one file, no need to bother checking for revisions
+    if len(xml_files) > 1:
+        #for each date on the list, keep only the most recent file
+        xml_files = [max([file for file in xml_files if re.match(f'i?p[ag]{datestring}',file)]) for datestring in file_dates] 
+        # this will fail if there are ever more than ten revisions of a single file, but this seems highly unlikely
+        
 
-    return xml_files
+    print(f"files identified for parsing in directory {xml_directory}: {xml_files}")
+
+    parse_list = [f"{xml_directory}/{file_name}" for file_name in xml_files]
+
+    return parse_list
 
 
 def queue_parsers(config, type='granted_patent'):

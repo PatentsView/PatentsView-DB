@@ -1231,6 +1231,7 @@
       "friendly_name": "Raw USPC",
       "multi_valued": true,
       "entity_root_path": "us-bibliographic-data-application/classification-national/",
+      "skip_tags": ["country"],
       "fields": [
         {
           "field_name": "classification",

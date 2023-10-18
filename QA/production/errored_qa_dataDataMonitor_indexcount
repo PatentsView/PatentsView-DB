@@ -1,0 +1,2 @@
+database_type,table_name,update_version,index_count,quarter
+PROD_PatentsView_20230629,application,2023-06-29,4,2023-2

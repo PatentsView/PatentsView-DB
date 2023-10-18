@@ -1,11 +1,12 @@
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
 # BEGIN foreignpriority 
 
 #################################################################################################################################
 
 
-drop table if exists `{{params.reporting_database}}`.`foreignpriority`;
-create table `{{params.reporting_database}}`.`foreignpriority`
+drop table if exists `{{reporting_db}}`.`foreignpriority`;
+create table `{{reporting_db}}`.`foreignpriority`
 (
   `patent_id` varchar(20) not null,
   `sequence` int not null,
@@ -18,7 +19,7 @@ create table `{{params.reporting_database}}`.`foreignpriority`
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into `{{params.reporting_database}}`.`foreignpriority`
+insert into `{{reporting_db}}`.`foreignpriority`
 (
   `patent_id`, `sequence`, `foreign_doc_number`,
   `date`, `country`, `kind`
@@ -29,9 +30,13 @@ select
   nullif(trim(ac.`country_transformed`), ''),
   nullif(trim(ac.`kind`), '')
 from
-  `{{params.reporting_database}}`.`patent` p
-  inner join `{{params.raw_database}}`.`foreign_priority` ac on ac.`patent_id` = p.`patent_id`;
+  `{{reporting_db}}`.`patent` p
+  inner join `patent`.`foreign_priority` ac on ac.`patent_id` = p.`patent_id`;
 
+alter table `{{reporting_db}}`.`foreignpriority` add index `ix_foreignpriority_foreign_doc_number` (`foreign_doc_number`);
+alter table `{{reporting_db}}`.`foreignpriority` add index `ix_foreignpriority_date` (`date`);
+alter table `{{reporting_db}}`.`foreignpriority` add index `ix_foreignpriority_kind` (`kind`);
+alter table `{{reporting_db}}`.`foreignpriority` add index `ix_foreignpriority_country` (`country`);
 
 # END foreignpriority
 

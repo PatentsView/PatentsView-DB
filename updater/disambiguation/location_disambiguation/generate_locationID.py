@@ -9,6 +9,27 @@ from sqlalchemy.exc import SQLAlchemyError
 from math import radians, cos, sin, asin, sqrt
 from QA.post_processing.LocationUploadQA import LocationUploadTest
 
+def fix_incorrect_us_territories(config):
+    engine, db = get_temp_db_config(config)
+    total_rows = engine.execute(f"""
+select *
+from rawlocation
+where country in ('AS','GU','MH','MP','PR','VI','UM');""").rowcount
+    if total_rows > 0:
+        with engine.connect() as connection:
+            query1 = "create table if not exists incorrect_us_territories_rawlocations like rawlocation"
+            query2 = """
+    insert into incorrect_us_territories_rawlocations
+    select *
+    from rawlocation
+    where country in ('AS','GU','MH','MP','PR','VI','UM')"""
+            query3 = """
+    update rawlocation 
+    set state = country, country = 'US', country_transformed = 'US'
+    where country in ('AS','GU','MH','MP','PR','VI','UM')"""
+            for q in [query1, query2, query3]:
+                print(q)
+                connection.execute(q)
 
 def get_temp_db_config(config):
     """ Gets database credentials for read/write connection
@@ -27,24 +48,30 @@ def get_exact_match_update_query(geo_type):
         :return: query to update rawlocation records based on canonical locations, '=' or '!=' for later use filtering to U.S. locations or non-U.S. locations
     """
     if geo_type == 'domestic':
+        filter = '='
         query_string = """
 update {db}.rawlocation a 
 inner join geo_data.curated_locations b on a.city=b.location_name
-inner join geo_data.state_codes d on b.state=d.`State/Possession`
-inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
-        and b.`country` = c.name and a.state = d.Abbreviation
+inner join geo_data.state_codes d on b.state=d.`State/Possession` and a.state = d.Abbreviation
+inner join (
+    select location_name, `state`, count(*)
+    from geo_data.curated_locations b 
+    where place= '{loc}' and b.`country` {filter} 'United States of America' 
+    group by 1, 2
+    having count(*)=1                 
+    ) as dedup on b.location_name=dedup.location_name and b.state=dedup.state 
 set location_id= b.uuid
-where b.place= '{loc}'"""
-        filter = '='
+where location_id is null"""
     elif geo_type == 'foreign':
+        filter = '!='
         query_string = """
 update {db}.rawlocation a 
 inner join geo_data.non_us_unique_city_countries b on a.city=b.location_name
 inner join geo_data.country_codes c on a.`country`=c.`alpha-2`
         and b.`country` = c.name
 set location_id= b.uuid
-where b.place= '{loc}'"""
-        filter = '!='
+where b.place= '{loc}' and location_id is null and state is null and b.`country` {filter} 'United States of America' """
+
     else:
         raise Exception("geography type not recognized")
     return query_string, filter
@@ -66,6 +93,7 @@ def generate_locationID_exactmatch(config, geo_type='domestic'):
     for loc in location_types:
         with engine.connect() as connection:
             exactmatch_query = eval(f'f"""{query}"""')
+            print(exactmatch_query)
             connection.execute(exactmatch_query)
             rows_affected = connection.execute(
                 f"""SELECT count(*) from rawlocation where location_id is not null and country {filter} 'US';""")
@@ -73,11 +101,11 @@ def generate_locationID_exactmatch(config, geo_type='domestic'):
                 previous = 0
             # Cumulative Rows Affected Over the 4 location Types
             notnull_rows = rows_affected.first()[0]
-            previous = notnull_rows
             new_rows_affected = (notnull_rows - previous)
             perc = notnull_rows / total_rows_affected
             print(f"{new_rows_affected} Rows Have Been Updated from {loc}")
             print(f"A Total of {notnull_rows} OUT OF {total_rows_affected} or {perc} of {geo_type} Rawlocations have Been Updated")
+            previous = notnull_rows
             save_aggregate_results_to_qa_table(config, loc, db, "", geo_type, new_rows_affected)
 
 
@@ -104,7 +132,7 @@ from rawlocation a
     inner join geo_data.country_codes b on a.country=b.`alpha-2` 
 where location_id is null and country != 'US';""", con=engine)
         geo_list = df['country'].unique()
-    print(f"There are {len(geo_list)} Entities To Process")
+    print(f"There are {len(geo_list)} {geo_type} Entities To Process")
     return geo_list
 
 def get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type, geo):
@@ -235,6 +263,7 @@ def find_nearest_latlong(config, geo_type='domestic'):
     geo_list = get_unique_list_of_geos(config, geo_type)
     geo_counter = 1
     for geo in geo_list:
+        print(geo)
         rawlocations, canonical_locations = get_rawlocations_and_canonical_locations_for_NN_comparison(config, geo_type, geo)
         total_rawloc = rawlocations.shape[0]
         print(f"There are {total_rawloc} rawlocations to process for {geo}")
@@ -312,27 +341,30 @@ def location_disambig_mapping_update(config, dbtype, **kwargs):
         :keyword dbtype: granted_patent or pgpubs
         :keyword kwargs: execution_date (the last day in a weeks worth of parsed data)
     """
-    weekly_config = get_current_config('granted_patent', **kwargs)
+    weekly_config = get_current_config(dbtype, **kwargs)
     cstr = get_connection_string(weekly_config, "PROD_DB")
     engine = create_engine(cstr)
-    current_end_date = weekly_config["DATES"]["END_DATE"]
-    db = config["PATENTSVIEW_DATABASES"]["PROD_DB"]
+    temp_db = weekly_config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"]
+    # db = config["PATENTSVIEW_DATABASES"]["PROD_DB"]
 
-    from lib.is_it_update_time import get_update_range
-    q_start_date, q_end_date = get_update_range(kwargs['execution_date'] + datetime.timedelta(days=7))
-    end_of_quarter = q_end_date.strftime('%Y%m%d')
+    # from lib.is_it_update_time import get_update_range
+    # q_start_date, q_end_date = get_update_range(kwargs['execution_date'] + datetime.timedelta(days=7))
+    # end_of_quarter = q_end_date.strftime('%Y%m%d')
 
     with engine.connect() as connection:
         query = f"""
-CREATE TABLE if not exists {db}.`location_disambiguation_mapping_{end_of_quarter}` (
+CREATE TABLE if not exists {temp_db}.`location_disambiguation_mapping` (
   `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `location_id` varchar(256) COLLATE utf8mb4_unicode_ci,
+  `version_indicator` DATE NOT NULL,
+  `created_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `location_id_2` (`location_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"""
         query2 = f"""
-insert into {db}.location_disambiguation_mapping_{end_of_quarter} (id, location_id)
-select id, location_id from {dbtype}_{current_end_date}.rawlocation
+replace into {temp_db}.`location_disambiguation_mapping` (id, location_id, version_indicator)
+select id, location_id, version_indicator from {temp_db}.rawlocation
         """
         for q in [query, query2]:
             print(q)
@@ -340,11 +372,13 @@ select id, location_id from {dbtype}_{current_end_date}.rawlocation
 
 def run_location_disambiguation(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
+    fix_incorrect_us_territories(config)
     generate_locationID_exactmatch(config, geo_type='domestic')
     generate_locationID_exactmatch(config, geo_type='foreign')
     find_nearest_latlong(config, geo_type='domestic')
     find_nearest_latlong(config, geo_type='foreign')
     location_disambig_mapping_update(config, dbtype, **kwargs)
+
 
 def run_location_disambiguation_tests(dbtype, **kwargs):
     config = get_current_config(dbtype, **kwargs)
@@ -352,7 +386,10 @@ def run_location_disambiguation_tests(dbtype, **kwargs):
     tests.runTests()
 
 if __name__ == "__main__":
-    d = datetime.date(2022, 11, 1)
-    run_location_disambiguation("granted_patent", **{
-            "execution_date": d
-        })
+    d = datetime.date(2022, 10, 20)
+    while d < datetime.date(2023, 4, 20):
+        run_location_disambiguation("pgpubs", **{
+                "execution_date": d
+            })
+        d =  d + datetime.timedelta(days=7)
+

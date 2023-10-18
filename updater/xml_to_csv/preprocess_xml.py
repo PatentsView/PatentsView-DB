@@ -81,7 +81,7 @@ def begin_xml_cleaning(config):
 
     in_files = ['{0}/{1}'.format(infolder, f) for f in os.listdir(infolder) if
                 os.path.isfile(os.path.join(infolder, f))]
-    out_files = ['{}/{}_clean.xml'.format(outfolder, raw_file[-13:-4]) for raw_file in in_files]
+    out_files = ['{}/{}_clean.xml'.format(outfolder, os.path.splitext(os.path.split(raw_file)[-1])[0]) for raw_file in in_files]
     files = zip(in_files, out_files)
 
     for f in files:

@@ -190,7 +190,7 @@ def process_post_manual(dbtype='granted_patent',database='TEMP_UPLOAD_DB', **kwa
 def qc_gi(dbtype='granted_patent', database='TEMP_UPLOAD_DB',**kwargs):
     config = get_current_config(type=dbtype, **kwargs)
     qc = GovtInterestTester(config, database=database, id_type=('patent_id' if dbtype =='granted_patent' else 'document_number'))
-    qc.runTests()
+    qc.run_GI_tests()
 
 
 if __name__ == '__main__':

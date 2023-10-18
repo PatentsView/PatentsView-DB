@@ -8,7 +8,8 @@ import pymysql.cursors
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
 
-def qa_cpc_current(db, **kwargs):
+def qa_cpc_current(**kwargs):
+    db = kwargs['db']
     config = get_current_config(db, schedule="quarterly", **kwargs)
     sd = config['DATES']["start_date"]
     ed = config['DATES']["end_date"]
@@ -40,6 +41,7 @@ def qa_cpc_current(db, **kwargs):
         where version_indicator >= DATE({sd}) and version_indicator <= DATE({ed})
         group by 1
                 """
+        print(patent_cq_query)
         with connection.cursor() as generic_cursor:
             query_start_time = time()
             generic_cursor.execute(patent_cq_query)
@@ -69,8 +71,9 @@ def qa_cpc_current(db, **kwargs):
     return qa_data
 
 
-def qa_wipo(db, **kwargs):
-    config = get_current_config(db, schedule="quarterly", **kwargs)
+def qa_wipo(**kwargs):
+    db = kwargs['db']
+    config = get_current_config(type = db, schedule="quarterly", **kwargs)
     if db=='granted_patent':
         id = 'patent_id'
     else:
@@ -129,7 +132,8 @@ def qa_wipo(db, **kwargs):
     return qa_data
 
 
-def save_qa_data(qa_data, db, **kwargs):
+def save_qa_data(qa_data, **kwargs):
+    db = kwargs['db']
     config = get_current_config(db, schedule="quarterly", **kwargs)
     qa_connection_string = get_connection_string(config, database='QA_DATABASE', connection='APP_DATABASE_SETUP')
     qa_engine = create_engine(qa_connection_string)

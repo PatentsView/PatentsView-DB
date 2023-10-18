@@ -454,6 +454,13 @@
         "location_field": false
       }
     },
+    "related_entities": [
+      {
+      "related_table": "government_organization",
+      "main_table_id": "organization_id",
+      "related_table_id": "organization_id"
+      }
+    ],
     "TestScripts": ["GovtInterestTester"]
   },
   "granted_patent_crosswalk": {
@@ -899,11 +906,6 @@
       },
       {
         "related_table": "further_cpc",
-        "main_table_id": "document_number",
-        "related_table_id": "document_number"
-      },
-      {
-        "related_table": "granted_patent_crosswalk",
         "main_table_id": "document_number",
         "related_table_id": "document_number"
       },

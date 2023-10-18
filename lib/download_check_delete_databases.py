@@ -42,6 +42,7 @@ where left(table_schema, 6) ='upload'
 select table_name 
 from information_schema.tables
 where table_schema = '{db}'
+and table_type = 'BASE TABLE'
             """
         print(q2)
         with connection.cursor() as generic_cursor2:
@@ -69,6 +70,19 @@ def backup_db(config, output_path, db):
     bash_command1 = f"mydumper --defaults-file={defaults_file} -B {db} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
     subprocess_cmd(bash_command1)
+
+def find_data_collection_server_path(db_type, data_type):
+    if db_type == 'pgpubs':
+        if data_type == 'database':
+            output_path = '/DatabaseBackups/PregrantPublications/pregrant_publications'
+        elif data_type == 'table':
+            output_path = '/DatabaseBackups/PregrantPublications/pgpubs_db_tables'
+    elif db_type == 'granted_patent':
+        if data_type == 'database':
+            output_path = '/DatabaseBackups/patent_'
+        elif data_type == 'table':
+            output_path = '/DatabaseBackups/RawDatabase/patent_db_tables'
+    return output_path
 
 
 def backup_tables(db, output_path, table_list):
@@ -176,7 +190,7 @@ def get_count_for_all_tables(connection_string, df, raise_exception=False):
             if num_rows == 0 or table_vi.empty == True:
                 raise Exception(f"{t} IS EMPTY!!!! ")
         final_dataset_local = pd.concat([final_dataset_local, table_vi])
-        print(f"We are {counter / total} % Done with the Queries for this DB")
+        print(f"We are {counter / total:.2%} Done with the Queries for this DB")
         counter = counter + 1
     print(final_dataset_local)
     return final_dataset_local
@@ -254,25 +268,16 @@ def clean_up_backups(db, output_path):
         print(i)
         subprocess_cmd(i)
 
-def run_database_archive(type):
-    # LOOPING THROUGH MANY
-    # for i in range(0, 16):
-    #     print(f"We are on Iteration {i} of 16 or {i/16} %")
-    # if type == 'patent' or type[:6] == 'upload':
-    #     output_path = '/PatentDataVolume/DatabaseBackups/RawDatabase/patent_db_tables'
-    # elif type == 'pregrant_publications' or type[:6] == 'pgpubs':
-    #     output_path = "/PatentDataVolume/DatabaseBackups/PregrantPublications/pgpubs_db_tables"
-    # else:
-    #     raise NotImplementedError
-    config = get_current_config(type=type, **{"execution_date": datetime.date(2022, 1, 1)})
+def run_database_archive(type, output_override=None, **kwargs):
+    config = get_current_config(type=type, **kwargs)
 
     # Create Archive SQL FILE
     old_db, table_list = get_oldest_databases(config, db_type=type)
 
-    if type == 'pgpubs':
-        output_path = '/archive/PregrantPublications/pregrant_publications'
+    if output_override is not None:
+        output_path = output_override
     else:
-        output_path = '/archive/patent_'
+        output_path= find_data_collection_server_path(db_type=type, data_type="database")
 
     backup_db(config, output_path, old_db)
     upload_tables_for_testing(config, old_db, output_path, table_list)
@@ -290,17 +295,17 @@ def run_database_archive(type):
 
     # DELETE DB
     delete_databases(prod_connection_string, old_db)
-    clean_up_backups(old_db, output_path)
+    # clean_up_backups(old_db, output_path)
 
-def run_table_archive(config_db, table_list, output_path):
+def run_table_archive(dbtype, table_list, output_path, **kwargs):
     # db = 'pregrant_publications'
     # NO SPACES ALLOWED IN TABLE_LIST
-    config = get_current_config(type=config_db, **{"execution_date": datetime.date(2022, 1, 1)})
+    config = get_current_config(type=dbtype, **kwargs)
     db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
 
     if table_list.isempty():
         raise Exception("Add Table List to DAG")
-    # backup_tables(db,output_path, table_list)
+    backup_tables(db, output_path, table_list)
     # table_list remains the same if you want to review all tables
     upload_tables_for_testing(config, db, output_path, table_list)
     # Compare archived DB to Original
@@ -313,40 +318,24 @@ def run_table_archive(config_db, table_list, output_path):
     delete_tables(prod_connection_string, db, table_list)
 
 
-# if __name__ == '__main__':
-    # type = 'pgpubs'
-    # output_path ='/PatentDataVolume/DatabaseBackups/PregrantPublications'
-    # config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
-    # for i in range(1, 24):
-    #     print("--------------------------------------------------------------")
-    #     print(f"RUNNING ITERATION: {i}")
-    #     print("--------------------------------------------------------------")
-    #     run_database_archive(type=type)
-        # run_table_archive(config)
-
 if __name__ == '__main__':
-    b_list = []
-    for i in range(1976, 2022):
-        temp = f'brf_sum_text_{i}'
-        b_list.append(temp)
-    dr_list = []
-    for i in range(1976, 2022):
-        temp = f'draw_desc_text_{i}'
-        dr_list.append(temp)
-    c_list = []
-    for i in range(1976, 2022):
-        temp = f'claims_{i}'
-        c_list.append(temp)
-    de_list = []
-    for i in range(1976, 2022):
-        temp = f'detail_desc_text_{i}'
-        de_list.append(temp)
-    tab_list = b_list + dr_list + c_list + de_list
-    type = 'granted_patent'
-    output_path = "/text_output/20220630/patent/download/"
+    type = 'pgpubs'
     config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
+    for i in range(1, 2):
+        print("--------------------------------------------------------------")
+        print(f"RUNNING ITERATION: {i}")
+        print("--------------------------------------------------------------")
+        run_database_archive(type=type)
+
+# if __name__ == '__main__':
+#     type = 'granted_patent'
+#     output_path = find_data_collection_server_path(db_type=type, data_type="table")
+    # run_table_archive(type, ['cpc_current_20230330'] ,output_path)
+
+    # config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
     # upload_tsv_backup_files(config, output_path, 'patent_text', tab_list)
-    upload_tsv_backup_files(config, output_path, 'patent_text', ['brf_sum_text_2022', 'draw_desc_text_2022', 'claims_2022', 'detail_desc_text_2022'])
+    # upload_tsv_backup_files(config, output_path, 'patent_text', ['brf_sum_text_2022', 'draw_desc_text_2022', 'claims_2022', 'detail_desc_text_2022'])
+
 
 
 

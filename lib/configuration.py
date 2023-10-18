@@ -250,14 +250,19 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     if type == 'pgpubs':
         config_prefix = 'pgpubs_'
     execution_date: DateTime = kwargs['execution_date']
+    print(f"""
+    generating config with parameters: 
+    type: {type}
+    schedule: {schedule}
+    execution date: {execution_date.strftime('%Y-%m-%d')}""")
     if schedule == 'weekly':
         current_week_start = datetime.timedelta(days=1)
         current_week_end = datetime.timedelta(days=7)
         start_date = (execution_date + current_week_start)
         end_date = (execution_date + current_week_end)
     else:
-        from lib.is_it_update_time import get_update_range
-        start_date, end_date = get_update_range(execution_date)
+        from lib.is_it_update_time import get_update_range_full_quarter
+        start_date, end_date = get_update_range_full_quarter(execution_date)
     temp_date = end_date.strftime('%Y%m%d')
 
     config['DATES'] = {
@@ -278,6 +283,7 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
             working_folder=config['FOLDERS']['WORKING_FOLDER'])
         config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'patent'
         config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'patent_text'
+        config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
 
     latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
     latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)

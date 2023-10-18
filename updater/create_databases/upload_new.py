@@ -13,7 +13,7 @@ from lib.utilities import load_table_config, class_db_specific_config
 
 def upload_table(table_name, filepath, connection_string, version_indicator):
     engine = create_engine(connection_string)
-    data = pd.read_csv(filepath, delimiter='\t', index_col=False)
+    data = pd.read_csv(filepath, delimiter='\t', index_col=False, keep_default_na=False, na_values=['','NULL','null'])
     data = data.assign(version_indicator=version_indicator)
     if table_name in ['mainclass', 'subclass']:
         table_name = "temp_" + table_name
@@ -42,7 +42,7 @@ def setup_database(update_config, drop=True, cpc_only=False):
     raw_database = update_config["PATENTSVIEW_DATABASES"]["PROD_DB"]
     temp_upload_database = update_config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"]
     if cpc_only:
-        required_tables = ['cpc_current']
+        required_tables = ['cpc_current', 'cpc_group', 'cpc_subgroup', 'cpc_subsection']
     else:
         required_tables = get_required_tables(update_config)
     print("Required tables are {tlist}".format(tlist=", ".join(required_tables)))
@@ -59,23 +59,30 @@ def setup_database(update_config, drop=True, cpc_only=False):
                 default collate=utf8mb4_unicode_ci
             """)
         for table in required_tables:
-            print("Creating Table : {tbl}".format(tbl=table))
-            if drop:
-                con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
-            if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee', 'location', 'patent_assignee'] and raw_database=='patent':
-                # tables with version-specific base tables (will need quarterly updating)
-                query = "create table if not exists {0}.{2} like {1}.{2}_{3}".format(temp_upload_database, raw_database, table, '20211230') 
-                print(query)
-                con.execute(query)
-            elif table == 'patent_lawyer' and raw_database=='patent':
-                # special case similar to above
-                query = "create table if not exists {0}.{2} like {1}.patent_lawyer_old".format(temp_upload_database, raw_database, table) 
-                print(query)
-                con.execute(query)
+            if cpc_only:
+                if drop:
+                    if table == 'cpc_current' and raw_database == 'pregrant_publications':
+                        query = f"create table if not exists {temp_upload_database}.{table} like {raw_database}.{table}"
+                    else:
+                        query = f"create table if not exists {temp_upload_database}.{table} like patent.{table}"
+                    con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
+                    print(query)
+                    con.execute(query)
             else:
-                query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
-            print(query)
-            con.execute(query)
+                print("Creating Table : {tbl}".format(tbl=table))
+                if drop:
+                    con.execute("drop table if exists {0}.{1}".format(temp_upload_database, table))
+                if table in ['inventor', 'assignee_disambiguation_mapping', 'inventor_disambiguation_mapping', 'assignee', 'location', 'location_disambiguation_mapping'] and raw_database=='patent':
+                    # tables with version-specific base tables (will need quarterly updating)
+                    query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
+                    print(query)
+                    con.execute(query)
+                elif table in ['government_organization']: #set any tables that should be defined as views of the production version.
+                    query = f"CREATE SQL SECURITY INVOKER VIEW IF NOT EXISTS {temp_upload_database}.{table} AS SELECT * FROM {raw_database}.{table}"
+                else:
+                    query = "create table if not exists {0}.{2} like {1}.{2}".format(temp_upload_database, raw_database, table)
+                print(query)
+                con.execute(query)
     engine.dispose()
 
 
@@ -84,12 +91,16 @@ def generate_timestamp_uploads(update_config):
     connection_string = get_connection_string(update_config, "TEMP_UPLOAD_DB")
     parsed_data_folder = "{working_folder}/{parsed_folder}".format(working_folder=working_folder,
                                                                    parsed_folder="parsed_data")
-    print(parsed_data_folder)
-    for timestamp_folder in os.listdir(parsed_data_folder):
-        timestamp_folder_full_path = "{source_root}/{folder_name}/".format(source_root=parsed_data_folder,
-                                                                           folder_name=timestamp_folder)
-        upload_from_timestamp_folder(timestamp_folder_full_path, connection_string,
-                                     version_indicator=update_config['DATES']['END_DATE'])
+    print(f"checking for parsed data in {parsed_data_folder}...")
+    parse_folders = os.listdir(parsed_data_folder)
+    print(f"{len(parse_folders)} parse(s) found: {parse_folders}")
+    latest_parse_folder = max(parse_folders)
+    # for timestamp_folder in parse_folders:
+    timestamp_folder_full_path = "{source_root}/{folder_name}/".format(source_root=parsed_data_folder,
+                                                                        folder_name=latest_parse_folder)
+    print(f"beginning upload of data from {timestamp_folder_full_path}...")
+    upload_from_timestamp_folder(timestamp_folder_full_path, connection_string,
+                                    version_indicator=update_config['DATES']['END_DATE'])
 
 
 def begin_database_setup(dbtype='granted_patent' , **kwargs):
@@ -133,20 +144,18 @@ if __name__ == '__main__':
     # post_upload(**{
     #         "execution_date": datetime.date(2020, 12, 1)
     #         })
-    # config = get_current_config('pgpubs', **{
-    #     "execution_date": datetime.date(2022, 6, 2)
-    # })
-    # setup_database(config, **{
-    #         "execution_date": datetime.date(2020, 12, 14)
-    #         })
+    config = get_current_config('pgpubs', schedule="quarterly", **{
+        "execution_date": datetime.date(2023, 4, 1)
+    })
+    setup_database(config, drop=False, cpc_only=True)
     # generate_timestamp_uploads(config)
-    for month, day in [
-(3, 24),
-(1, 27),
-(1, 20),
-(1, 13)
-    ]:
-        post_upload_pgpubs(**{
-            "execution_date": datetime.date(2022, month, day)
-        })
+#     for month, day in [
+# (3, 24),
+# (1, 27),
+# (1, 20),
+# (1, 13)
+#     ]:
+#         post_upload_pgpubs(**{
+#             "execution_date": datetime.date(2022, month, day)
+#         })
 

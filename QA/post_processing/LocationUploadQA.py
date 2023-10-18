@@ -43,7 +43,11 @@ select count(*)
 from rawlocation a
         left join geo_data.curated_locations b on a.location_id=b.uuid
         left join patent.country_codes c on b.`country`=c.`name`
-where a.country is not null and a.country <> `alpha-2`;"""
+where a.country is not null 
+and a.country <> `alpha-2`
+and NOT a.qa_override <=> 1;"""
+# note use of MySQL null-safe equals operator <=>
+# returns 0 rather than NULL for "SELECT NULL <=> 1"
             ,
             "State": """
 select count(*)
@@ -51,7 +55,9 @@ from rawlocation a
         left join geo_data.curated_locations b on a.location_id=b.uuid
         inner join patent.state_codes d on b.state=d.`State/Possession`
         left join patent.country_codes c on b.`country`=c.`name`
-where a.country is not null and a.state <> `Abbreviation`;"""
+where a.country is not null 
+and a.state <> `Abbreviation`
+and NOT a.qa_override <=> 1;"""
         }
         with engine.connect() as connection:
             for q in query_dict:
@@ -61,7 +67,10 @@ where a.country is not null and a.state <> `Abbreviation`;"""
                 q_rows = rows.first()[0]
                 print(q_rows)
                 if q_rows > 0:
-                    raise Exception(f"{q} MISMATCH for {q_rows}")
+                    raise Exception(f"""
+                        {q} MISMATCH for {q_rows} rows. 
+                        Please individually review each row in question to determine whether location mapping is incorrect or may be flagged for override
+                        """)
 
 
     def no_location_id(self):
@@ -141,10 +150,10 @@ from rawlocation;""")
                 raise Exception(f"{q_rows} % of NULL LOCATION IDs -- TOO HIGH")
 
     def check_disambig_mapping_updated(self):
-        from lib.is_it_update_time import get_update_range
-        sd = datetime.datetime.strptime(self.config['DATES']['START_DATE'], '%Y%m%d')
-        q_start_date, q_end_date = get_update_range(sd + datetime.timedelta(days=6))
-        end_of_quarter = q_end_date.strftime('%Y%m%d')
+        # from lib.is_it_update_time import get_update_range
+        # sd = datetime.datetime.strptime(self.config['DATES']['START_DATE'], '%Y%m%d')
+        # q_start_date, q_end_date = get_update_range(sd + datetime.timedelta(days=6))
+        # end_of_quarter = q_end_date.strftime('%Y%m%d')
 
         cstr = get_connection_string(self.config, 'TEMP_UPLOAD_DB')
         engine = create_engine(cstr)
@@ -152,9 +161,9 @@ from rawlocation;""")
             query = connection.execute(f"""
 select count(*)
 from rawlocation a 
-	inner join {config['PATENTSVIEW_DATABASES']['PROD_DB']}.location_disambiguation_mapping_{end_of_quarter} b on a.id=b.id""")
+	inner join location_disambiguation_mapping b on a.id=b.id""")
             q_rows = query.first()[0]
-            print(f"""{q_rows} Updated In the Location Disambiguation Table""")
+            print(f"""{q_rows} Updated In the Weekly Location Disambiguation Table""")
             if q_rows == 0:
                 raise Exception(f"LOCATION DISAMBIGUATION MAPPING NOT UPDATED FOR THE CURRENT WEEK")
 

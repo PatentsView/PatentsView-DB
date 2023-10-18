@@ -129,7 +129,7 @@ def normalize_exemplary(config):
         (~melted_exemplary.exemplary.isnull())
         & (melted_exemplary.exemplary.str.len() > 0)]
 
-    normalized_exemplary.to_sql(name='temp_normalized_claim_exemplary', index=False, con=engine, if_exists='append')
+    normalized_exemplary.to_sql(name='temp_normalized_claim_exemplary', index=False, con=engine, if_exists='replace')
 
 
 def update_text_data(table, update_config):

@@ -7,3 +7,6 @@
 [submodule "updater/disambiguation/hierarchical_clustering_disambiguation"]
 	path = updater/disambiguation/hierarchical_clustering_disambiguation
 	url = git@github.com:PatentsView/PatentsView-Disambiguation.git
+[submodule "gender_it"]
+	path = gender_it
+	url = https://github.com/PatentsView/gender_it.git

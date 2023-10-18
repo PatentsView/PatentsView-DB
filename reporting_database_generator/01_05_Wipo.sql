@@ -1,19 +1,20 @@
+{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
 # BEGIN WIPO fields tables 
 
 ###############################################################################################################################
 
 
-DROP TABLE IF EXISTS `{{params.reporting_database}}`.`wipo`;
-CREATE TABLE  `{{params.reporting_database}}`.`wipo` (
+DROP TABLE IF EXISTS `{{reporting_db}}`.`wipo`;
+CREATE TABLE  `{{reporting_db}}`.`wipo` (
    `patent_id` varchar(20) NOT NULL,
    `field_id` varchar(3) DEFAULT NULL,
    `sequence` int(10) unsigned NOT NULL,
    PRIMARY KEY (`patent_id`,`sequence`),
    KEY `ix_wipo_field_id` (`field_id`)
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
- DROP TABLE IF EXISTS `{{params.reporting_database}}`.`wipo_field`;
-CREATE TABLE `{{params.reporting_database}}`.`wipo_field` (
+ DROP TABLE IF EXISTS `{{reporting_db}}`.`wipo_field`;
+CREATE TABLE `{{reporting_db}}`.`wipo_field` (
    `id` varchar(3) NOT NULL,
    `sector_title` varchar(60) DEFAULT NULL,
    `field_title` varchar(255) DEFAULT NULL,
@@ -22,8 +23,8 @@ CREATE TABLE `{{params.reporting_database}}`.`wipo_field` (
    KEY `ix_wipo_field_field_title` (`field_title`)
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `{{params.reporting_database}}`.`wipo` SELECT `patent_id`, `field_id`, `sequence` FROM `{{params.raw_database}}`.`wipo`;
-INSERT INTO `{{params.reporting_database}}`.`wipo_field` SELECT `id`, `sector_title`, `field_title` FROM `{{params.raw_database}}`.`wipo_field`;
+INSERT INTO `{{reporting_db}}`.`wipo` SELECT `patent_id`, `field_id`, `sequence` FROM `patent`.`wipo`;
+INSERT INTO `{{reporting_db}}`.`wipo_field` SELECT `id`, `sector_title`, `field_title` FROM `patent`.`wipo_field`;
 
 # END WIPO fields tables
 

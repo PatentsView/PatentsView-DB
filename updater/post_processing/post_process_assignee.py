@@ -348,11 +348,11 @@ def generate_combinations(gp):
                 {'org': comparison_org, 'org_std': comparison_org_std, 'comparison_idx': b, 'overlap': overlap})
     return distances
 
-def load_granted_lookup(**kwargs):
-    config = get_current_config(schedule='quarterly', **kwargs)
-    load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
-                      parent_entity_id='patent_id', entity='assignee',
-                      include_location=True, location_strict=False)
+# def load_granted_lookup(**kwargs):
+#     config = get_current_config(schedule='quarterly', **kwargs)
+#     load_lookup_table(update_config=config, database='RAW_DB', parent_entity='patent',
+#                       parent_entity_id='patent_id', entity='assignee',
+#                       include_location=True, location_strict=False)
 
 def load_granted_location_assignee(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
@@ -360,11 +360,11 @@ def load_granted_location_assignee(**kwargs):
                       parent_entity_id='location_id', entity='assignee',
                       include_location=True, location_strict=True)
 
-def load_pregranted_lookup(**kwargs):
-    config = get_current_config(schedule='quarterly', **kwargs)
-    load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
-                      parent_entity_id='document_number', entity="assignee",
-                      include_location=True)
+# def load_pregranted_lookup(**kwargs):
+#     config = get_current_config(schedule='quarterly', **kwargs)
+#     load_lookup_table(update_config=config, database='PGPUBS_DATABASE', parent_entity='publication',
+#                       parent_entity_id='document_number', entity="assignee",
+#                       include_location=True)
 
 def load_pregranted_location_assignee(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
@@ -372,14 +372,69 @@ def load_pregranted_location_assignee(**kwargs):
                       parent_entity_id='location_id', entity='assignee',
                       include_location=True, location_strict=True)
 
+def create_patent_assignee(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    q_list = []
+    engine = create_engine(get_connection_string(config, 'RAW_DB'))
+    q0 = """
+    truncate table patent_assignee"""
+    q_list.append(q0)
+    q1 = """
+INSERT IGNORE INTO patent_assignee 
+(patent_id, assignee_id, sequence, location_id, version_indicator) 
+SELECT patent_id, et.assignee_id, et.sequence,  location_id, et.version_indicator 
+    from rawassignee et left join rawlocation rl on rl.id = et.rawlocation_id 
+where assignee_id is not null;
+    """
+    q_list.append(q1)
+    for q in q_list:
+        print(q)
+        engine.execute(q)
+
+def create_publication_assignee(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    q_list = []
+    engine = create_engine(get_connection_string(config, 'PGPUBS_DATABASE'))
+    q0 = """
+    truncate table publication_assignee"""
+    q_list.append(q0)
+    q1 = """
+INSERT IGNORE INTO publication_assignee 
+(document_number, assignee_id, sequence, location_id, version_indicator) 
+SELECT document_number, et.assignee_id, et.sequence, location_id,  et.version_indicator 
+    from rawassignee et left join rawlocation rl on rl.id = et.rawlocation_id 
+where assignee_id is not null; 
+    """
+    q_list.append(q1)
+    for q in q_list:
+        print(q)
+        engine.execute(q)
 
 def post_process_assignee(**kwargs):
     update_granted_rawassignee(**kwargs)
     update_pregranted_rawassignee(**kwargs)
     precache_assignees(**kwargs)
     create_canonical_assignees(**kwargs)
-    load_granted_lookup(**kwargs)
-    load_pregranted_lookup(**kwargs)
+    create_patent_assignee(**kwargs)
+    create_publication_assignee(**kwargs)
+    check_largest_clusters(**kwargs)
+
+def check_largest_clusters(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    engine = create_engine(get_connection_string(config, 'RAW_DB'))
+    cluster_query = """
+select assignee_id, count(*) as records
+from rawassignee
+group by 1
+order by 2 desc
+limit 25;
+    """
+    df = pd.read_sql(cluster_query, con=engine)
+    print(df)
+    if df['records'][0] > 150000:
+        raise Exception(f"ASSIGNEE DISAMBIGUATION OVER-CLUSTERED")
+    if df['records'][0] < 50000:
+        raise Exception(f"ASSIGNEE DISAMBIGUATION UNDER-CLUSTERED")
 
 
 def additional_post_processing_assignee(**kwargs):
@@ -388,19 +443,20 @@ def additional_post_processing_assignee(**kwargs):
     precache_assignees(**kwargs)
     create_canonical_assignees(**kwargs)
 
-
 def post_process_qc(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     qc = AssigneePostProcessingQC(config)
-    qc.runTests()
-
+    qc.run_assignee_disambig_tests()
 
 if __name__ == '__main__':
-    date = datetime.date(2022, 7, 1)
-    load_granted_lookup(**{
-        "execution_date": date
-    })
-    load_pregranted_location_assignee(**{
+    date = datetime.date(2023, 1, 1)
+    # load_granted_lookup(**{
+    #     "execution_date": date
+    # })
+    # load_pregranted_location_assignee(**{
+    #     "execution_date": date
+    # })
+    check_largest_clusters(**{
         "execution_date": date
     })
 

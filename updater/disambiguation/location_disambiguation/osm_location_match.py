@@ -21,40 +21,44 @@ def generate_es_query(row):
     musts = []
     shoulds = []
     search_string = None
+    # store city, state, and country outside of the row to prevent overwriting
+    country = row['country']
+    state = row['state']
+    city = row['city']
     
-    if row['country'] is not None and len(row['country'].strip()) > 0 and row['country'].strip().lower() not in ('unknown','omitted'):
-        if len(row['country'].strip()) > 2:
+    if country is not None and len(country.strip()) > 0 and country.strip().lower() not in ('unknown','omitted'):
+        if len(country.strip()) > 2:
             try:
-                row['country'] = iso3_to_iso2[row['country']]
+                country = iso3_to_iso2[country]
             except:
-                row['country'] = row['country'][:2] # many length 3 codes in historical data are the ISO-2 code plus 'X' rather than the ISO-3 code
-        if row['country'] == 'HK':
+                country = country[:2] # many length 3 codes in historical data are the ISO-2 code plus 'X' rather than the ISO-3 code
+        if country == 'HK':
             musts.append({'match': {'country_code': {'query': 'CN'}}})
             musts.append({'match': {'state': {'query': 'Hong Kong'}}})
             search_string = 'Hong Kong'
-        elif row['country'] in osm_codes_names:
-            musts.append({'match': {'country_code': {'query': row['country']}}})
-            search_string = osm_codes_names[row['country']]
+        elif country in osm_codes_names:
+            musts.append({'match': {'country_code': {'query': country}}})
+            search_string = osm_codes_names[country]
 
-    if row['state'] is not None and len(row['state'].strip()) > 0:        
-        if row['country'] is None and row['state'].strip().upper() in st_ab_to_nm: #in US or Canada but country omitted
-            if row['state'].strip().upper() in ['ON', 'QC','NS','NB','MB','BC','PE','SK','AB','NL']: #Canada
-                row['country'] = 'CA'
+    if state is not None and len(state.strip()) > 0:
+        if country is None and state.strip().upper() in st_ab_to_nm: #in US or Canada but country omitted
+            if state.strip().upper() in ['ON', 'QC','NS','NB','MB','BC','PE','SK','AB','NL']: #Canada
+                country = 'CA'
                 musts.append({'match': {'country_code': {'query': 'CA'}}})
             else: # US
-                row['country'] = 'US'
+                country = 'US'
                 musts.append({'match': {'country_code': {'query': 'US'}}})
         try:
-            if row['country'].strip().upper() in ['US','CA']:
-                musts.append({'match': {'state': {'query': st_ab_to_nm[row['state']]}}})
-                search_string = st_ab_to_nm[row['state']]
+            if country.strip().upper() in ['US','CA']:
+                musts.append({'match': {'state': {'query': st_ab_to_nm[state]}}})
+                search_string = st_ab_to_nm[state]
         except KeyError: # if state is invalid
             pass
         except AttributeError: # if country is None and no US/Canadian state
             pass
 
-    if row['city'] is not None and len(row['city'].strip()) > 0:
-        search_string = row['city']
+    if city is not None and len(city.strip()) > 0:
+        search_string = city
         
     if search_string is not None:
         shoulds.append({"match": {"name": {"query": search_string}}})
@@ -72,7 +76,9 @@ def generate_es_query(row):
 
     return esqry
 
-def match_locations(locations_to_search, es_con, chunksize = 100):
+def match_locations(locations_to_search, es_con, **kwargs):
+    chunksize = kwargs.get('chunksize', 100)
+    verbose = kwargs.get('verbose', False)
     unique_locations = locations_to_search[['city','state','country']].drop_duplicates(ignore_index=True)
     unique_locations['query'] = unique_locations.apply(generate_es_query, axis=1)
     unique_locations.dropna(subset=['query'], inplace=True) # don't bother searching null queries
@@ -80,10 +86,16 @@ def match_locations(locations_to_search, es_con, chunksize = 100):
 
     print(f'matching {unique_locations.shape[0]} unique locations...')
 
+    if verbose: 
+        print("unique locations details:")
+        print(unique_locations.info())
+
     # search locations individually (slow)
     if chunksize in [0,1,None]:
+        if verbose:
+            print('matching locations individually...')
         tophits = []
-        for qry in unique_locations['query']:
+        for qry in (tqdm(unique_locations['query']) if verbose else unique_locations['query']):
             res = es_con.search(index='locations', body=qry)
             if res['hits']['total']['value'] > 0:
                 tophits.append({'matched_name': res['hits']['hits'][0]['_source']['name'], 
@@ -125,9 +137,7 @@ def match_locations(locations_to_search, es_con, chunksize = 100):
         divs = [chunksize * n for n in range(ceil(unique_locations.shape[0]/chunksize))]
         divs.append(unique_locations.shape[0])
         hitframe = pd.DataFrame()
-        for i in tqdm(range(len(divs)-1)):
-        # for i in range(len(divs)-1):
-            # print(f"matching chunk {i+1} of {len(divs)-1}")
+        for i in (tqdm(range(len(divs)-1)) if verbose else range(len(divs)-1)):
             chunk = unique_locations[divs[i]:divs[i+1]]
             search_bodies = []
             for qry in chunk['query']:
@@ -150,6 +160,10 @@ def match_locations(locations_to_search, es_con, chunksize = 100):
                                                     'longitude': None
                                                     } for res in results])
             
+            if verbose: 
+                print("chunk results details:")
+                print(hit_temp.info())
+
             hitframe = pd.concat((hitframe,hit_temp), axis = 0, ignore_index=True)
 
     assert unique_locations.shape[0] == hitframe.shape[0], f"""number of results mismatch: 
@@ -157,14 +171,26 @@ def match_locations(locations_to_search, es_con, chunksize = 100):
                 {hitframe.shape[0]} results returned"""
 
     # hitframe['location_id_transformed'] = [f"{row['latitude']}|{row['longitude']}" if row['latitude'] is not None else None for i,row in hitframe.iterrows()]
+    if verbose: 
+        print("total match data details:")
+        print(hitframe.info())
 
     hitframe = pd.concat((unique_locations, hitframe),axis=1)
+    if verbose: 
+        print("unique data details:")
+        print(hitframe.info())
 
-    # merge deduplicated ES results with parse results (many to one)
-    return(locations_to_search.merge(hitframe, on=['city','state','country'], how='left'))
+    return(hitframe)
+    # # merge deduplicated ES results with parse results (many to one)
+    # mergeframe = locations_to_search.merge(hitframe, on=['city','state','country'], how='left')
+    # if verbose: 
+    #     print("mapped data details:")
+    #     print(mergeframe.info())
+
+    # return(mergeframe)
 
 
-def create_location_match_table(config):
+def create_location_match_table(config, **kwargs):
     database = config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB']
 
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
@@ -179,9 +205,10 @@ def create_location_match_table(config):
     es_hostname = config['ELASTICSEARCH']['HOST']
     es_username = config['ELASTICSEARCH']['USER']
     es_password = config['ELASTICSEARCH']['PASSWORD']
-    es_con = Elasticsearch(hosts=es_hostname, http_auth=(es_username, es_password), timeout=45)
+    es_con = Elasticsearch(hosts=es_hostname, http_auth=(es_username, es_password), timeout=100)
 
-    matched_data = match_locations(locations_to_search, es_con)
+    matched_locations = match_locations(locations_to_search, es_con, **kwargs)
+    matched_data = locations_to_search.merge(matched_locations, on=['city','state','country'], how='left')
 
     # recreate engine because match_locations() can take long enough for the mysql connection to reset.
     engine = create_engine('mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database)) 
@@ -198,12 +225,12 @@ def create_location_match_table(config):
     print(create_sql)
     engine.execute(create_sql)
     print('populating match table...')
-    matched_data[['id','matched_name','latitude','longitude']].to_sql(name='matched_rawlocation' ,schema=database ,con=engine, if_exists='append', index=False)
+    matched_data[['id','matched_name','latitude','longitude']].to_sql(name='matched_rawlocation' ,schema=database ,con=engine, if_exists='replace', index=False)
 
     print('propagating match results to rawlocation...')
     update_sql = """
     UPDATE `rawlocation` r 
-    LEFT JOIN `matched_rawlocation` mr ON (r.id = mr.id)
+    JOIN `matched_rawlocation` mr ON (r.id = mr.id)
     SET r.latitude = mr.latitude,
     r.longitude = mr.longitude
     WHERE mr.latitude IS NOT NULL

@@ -6,28 +6,9 @@
         "bulk_generated": false,
         "direct_load": false
       },
-      "assignee": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false,
-        "processed": true
-      },
-      "assignee_disambiguation_mapping": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
       "botanic": {
         "raw_data": true,
         "lookup": false,
-        "bulk_generated": false,
-        "direct_load": false
-      },
-      "country_codes": {
-        "raw_data": false,
-        "lookup": true,
         "bulk_generated": false,
         "direct_load": false
       },
@@ -48,36 +29,6 @@
         "lookup": false,
         "bulk_generated": false,
         "direct_load": true
-      },
-      "cpc_current": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
-      "cpc_group": {
-        "raw_data": false,
-        "lookup": true,
-        "bulk_generated": false,
-        "direct_load": false
-      },
-      "cpc_subgroup": {
-        "raw_data": false,
-        "lookup": true,
-        "bulk_generated": false,
-        "direct_load": false
-      },
-      "cpc_subsection": {
-        "raw_data": false,
-        "lookup": true,
-        "bulk_generated": false,
-        "direct_load": false
-      },
-      "detail_desc_length": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": false,
-        "direct_load": false
       },
       "figures": {
         "raw_data": true,
@@ -107,48 +58,13 @@
         "raw_data": false,
         "lookup": false,
         "bulk_generated": false,
-        "direct_load": false
-      },
-      "inventor": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
-      "inventor_disambiguation_mapping": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": false,
-        "direct_load": false
-      },
-      "inventor_gender": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": false,
-        "direct_load": false
+        "direct_load": false,
+        "tmp_view": true
       },
       "ipcr": {
         "raw_data": true,
         "lookup": false,
         "bulk_generated": false,
-        "direct_load": false
-      },
-      "lawyer": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
-      "location": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
-      "location_assignee": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
         "direct_load": false
       },
       "location_disambiguation_mapping": {
@@ -157,38 +73,8 @@
         "bulk_generated": true,
         "direct_load": false
       },
-      "location_inventor": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
       "mainclass": {
         "raw_data": true,
-        "lookup": true,
-        "bulk_generated": false,
-        "direct_load": false
-      },
-      "mainclass_current": {
-        "raw_data": false,
-        "lookup": true,
-        "bulk_generated": false,
-        "direct_load": false
-      },
-      "nber": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": false,
-        "direct_load": false
-      },
-      "nber_category": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": false,
-        "direct_load": false
-      },
-      "nber_subcategory": {
-        "raw_data": false,
         "lookup": true,
         "bulk_generated": false,
         "direct_load": false
@@ -211,12 +97,6 @@
         "bulk_generated": false,
         "direct_load": false
       },
-      "patent_assignee": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
       "patent_contractawardnumber": {
         "raw_data": true,
         "lookup": false,
@@ -229,32 +109,8 @@
         "bulk_generated": false,
         "direct_load": true
       },
-      "patent_inventor": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": false,
-        "direct_load": false
-      },
-      "patent_lawyer": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
       "pct_data": {
         "raw_data": true,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
-      "persistent_assignee_disambig": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
-      "persistent_assignee_disambig_long": {
-        "raw_data": false,
         "lookup": false,
         "bulk_generated": true,
         "direct_load": false
@@ -301,12 +157,6 @@
         "bulk_generated": false,
         "direct_load": false
       },
-      "subclass_current": {
-        "raw_data": false,
-        "lookup": true,
-        "bulk_generated": false,
-        "direct_load": false
-      },
       "us_term_of_grant": {
         "raw_data": true,
         "lookup": false,
@@ -331,22 +181,10 @@
         "bulk_generated": false,
         "direct_load": false
       },
-      "uspc_current": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
-        "direct_load": false
-      },
       "usreldoc": {
         "raw_data": true,
         "lookup": false,
         "bulk_generated": false,
-        "direct_load": false
-      },
-      "wipo": {
-        "raw_data": false,
-        "lookup": false,
-        "bulk_generated": true,
         "direct_load": false
       },
       "wipo_field": {
