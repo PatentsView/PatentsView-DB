@@ -84,31 +84,32 @@ class DatabaseTester(ABC):
     def query_runner(self, query, single_value_return=True, where_vi=False, vi_comparison = '='):
         vi_comparison = vi_comparison.strip()
         assert vi_comparison in ['=', '<', '>', '<=', '>=', '<>', '!=']
+        if where_vi:
+            vi_date = self.end_date.strftime('%Y-%m-%d')
+            if 'where' and 'main_table' in query:
+                where_statement = f" and main_table.version_indicator {vi_comparison} '{vi_date}'"
+            elif 'where' in query:
+                where_statement = f" and version_indicator {vi_comparison} '{vi_date}'"
+            else:
+                where_statement = f" where version_indicator {vi_comparison} '{vi_date}'"
+            q = query+where_statement
+        else:
+            q = query
+        print(q)
         try:
             if not self.connection.open:
                 self.connection.connect()
-            if where_vi:
-                vi_date = self.end_date.strftime('%Y-%m-%d')
-                if 'where' and 'main_table' in query:
-                    where_statement = f" and main_table.version_indicator {vi_comparison} '{vi_date}'"
-                elif 'where' in query:
-                    where_statement = f" and version_indicator {vi_comparison} '{vi_date}'"
-                else:
-                    where_statement = f" where version_indicator {vi_comparison} '{vi_date}'"
-                q = query+where_statement
-            else:
-                q = query
-            print(q)
-            with self.connection.cursor() as generic_cursor:
-                query_start_time = time()
-                generic_cursor.execute(q)
-                query_end_time = time()
-                print("\t\tThis query took:", query_end_time - query_start_time, "seconds")
-                if single_value_return:
-                    count_value = generic_cursor.fetchall()[0][0]
-                else:
-                    count_value = generic_cursor.fetchall()
-
+            with self.connection as connection:
+                with connection.cursor() as generic_cursor:
+                    query_start_time = time()
+                    generic_cursor.execute(q)
+                    query_end_time = time()
+                    print("\t\tThis query took:", query_end_time - query_start_time, "seconds")
+                    if single_value_return:
+                        count_value = generic_cursor.fetchall()[0][0]
+                    else:
+                        count_value = generic_cursor.fetchall()
+                connection.commit()
         finally:
             if self.connection.open:
                 self.connection.close()
@@ -166,18 +167,20 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
             try:
                 if not self.connection.open:
                     self.connection.connect()
-                with self.connection.cursor() as generic_cursor:
-                    print(bad_char_fix_query)
-                    generic_cursor.execute(bad_char_fix_query)
-                print(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
-                print(nul_byte_query)
-                count_value = self.query_runner(nul_byte_query, single_value_return=True, where_vi=where_vi)
-                if count_value > 0:
-                    exception_message = f"{count_value} rows with NUL Byte found in `{field}` of `{self.database_section}`.`{table}` after attempted correction."
-                    raise Exception(exception_message)
+                with self.connection as connection:
+                    with connection.cursor() as generic_cursor:
+                        print(bad_char_fix_query)
+                        generic_cursor.execute(bad_char_fix_query)
+                    connection.commit()
             finally:
                 if self.connection.open:
                     self.connection.close()
+            print(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
+            print(nul_byte_query)
+            count_value = self.query_runner(nul_byte_query, single_value_return=True, where_vi=where_vi)
+            if count_value > 0:
+                exception_message = f"{count_value} rows with NUL Byte found in `{field}` of `{self.database_section}`.`{table}` after attempted correction."
+                raise Exception(exception_message)
         
 
 
@@ -220,19 +223,20 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
                 try:
                     if not self.connection.open:
                         self.connection.connect()
-                    with self.connection.cursor() as generic_cursor:
-                        for query in [makelogquery, filllogquery, fixquery]:
-                            print(query)
-                            generic_cursor.execute(query)
-                    print(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
-                    print(newline_query)
-                    count_value = self.query_runner(newline_query, single_value_return=True, where_vi=where_vi)
-                    if count_value > 0:
-                        exception_message = f"{count_value} rows with unwanted and unfixed newlines found in {field} of {table} for {self.database_section}"
-                        raise Exception(exception_message)
+                    with self.connection as connection:
+                        with connection.cursor() as generic_cursor:
+                            for query in [makelogquery, filllogquery, fixquery]:
+                                print(query)
+                                generic_cursor.execute(query)
+                        connection.commit()
                 finally:
                     if self.connection.open:
                         self.connection.close()
+                print(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
+                count_value = self.query_runner(newline_query, single_value_return=True, where_vi=where_vi)
+                if count_value > 0:
+                    exception_message = f"{count_value} rows with unwanted and unfixed newlines found in {field} of {table} for {self.database_section}"
+                    raise Exception(exception_message)
 
 
     def load_category_counts(self, table, field):
