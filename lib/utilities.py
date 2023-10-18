@@ -23,11 +23,27 @@ from sqlalchemy import create_engine
 from lib.xml_helpers import process_date
 from lib.notifications import send_slack_notification
 
+from typing import Dict, Iterable, List, Tuple
+
 def with_keys(d, keys):
+    """
+    takes a dictionary and a list of keys, and returns a new dictionary containing only 
+        the key-value pairs matching the provided keys.
+    :param d: A dictionary 
+    :param keys: an iterable containing keys that you want to keep in the dictionary `d`
+    :return: a filtered dictionary
+    """
     return {x: d[x] for x in d if x in keys}
 
 
 def class_db_specific_config(self, table_config, class_called):
+    """
+    filters and modifies a table configuration based on the class called and prints the list of tables that will be used.
+    :param table_config: a dictionary used to retrieve information for different tables in a database. 
+        Each key in the dictionary represents a table name, and the corresponding value is another dictionary that 
+        contains specific configuration details for that table.
+    :param class_called: a string that represents the name of the class that is being called
+    """
     keep_tables = []
     for i in table_config.keys():
         if class_called == 'DatabaseTester':
@@ -50,7 +66,13 @@ def class_db_specific_config(self, table_config, class_called):
         print(self.table_config.keys())
 
 
-def load_table_config(config, db='patent'):
+def load_table_config(config, db:str='patent'):
+    """
+    loads a table configuration file based on the specified database and returns the loaded configuration.
+    :param config: a ConfigParser object with sections "FOLDERS" and "FILES" containing directory and file paths, respectively.
+    :param db: the name of the database for which the table configuration is being loaded. defaults to "patent" (optional)
+    :return: a dictionary loaded from a JSON file determined by the `db` parameter and the `config` object
+    """
     root = config["FOLDERS"]["project_root"]
     resources = config["FOLDERS"]["resources_folder"]
     if db == 'patent':
@@ -75,6 +97,16 @@ def load_table_config(config, db='patent'):
 
 
 def get_relevant_attributes(self, class_called, database_section, config):
+    """
+    The function assigns class variables based on the input class name and database section.
+    
+    :param class_called: a string that represents the name of the class that is calling the `get_relevant_attributes` method. 
+        It is used to determine which set of attributes should be assigned
+    :param database_section: the name of the schema within the ingest database being modified. 
+        acceptable values: "patent", "pregrant_publications", "upload_{date}", "pgpubs_{date}", "pgpubs_text", "patent_text"
+    :param config: a configuration object passed through to the `load_table_config` method. 
+        Must contin the "FILES" and "FOLDERS" sections.
+    """
     print(f"assigning class variables based on class {class_called} and database section {database_section}.")
     if class_called == "AssigneePostProcessingQC":
         self.database_section = database_section
@@ -236,19 +268,27 @@ def get_relevant_attributes(self, class_called, database_section, config):
     else:
         raise NotImplementedError
 
-def update_to_granular_version_indicator(table, db):
+def update_to_granular_version_indicator(table, dbtype):
+    """
+    Sets the `version_indicator` field in the sepcified table based on the `date` field on the primary table for the database schema.
+    
+    :param table: the name of the table to update version_indicator on
+    :param dbtype: indicates whether the data concerns granted patents or pgpubs
+        interprets data as concerning granted patents if `dbtype` equals "patent" or "granted_patent".
+        interprets data as concerning pgpubs if any other value
+    """
     from lib.configuration import get_current_config, get_connection_string
-    config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
+    config = get_current_config(type=dbtype, **{"execution_date": datetime.date(2000, 1, 1)})
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
-    if db == 'granted_patent':
+    if dbtype in ('granted_patent', 'patent'):
         id = 'id'
         fk = 'patent_id'
         fact_table = 'patent'
     else:
         id = 'document_number'
         fk = 'document_number'
-        fact_table = 'publications'
+        fact_table = 'publication'
     query = f"""
 update {table} update_table 
 	inner join {fact_table} p on update_table.{fk}=p.{id}
@@ -261,33 +301,38 @@ set update_table.version_indicator=p.version_indicator
     print("This query took:", query_end_time - query_start_time, "seconds")
 
 # Moved from AssigneePostProcessing - unused for now
-def add_persistent_table_to_config(self, database_section):
-    columns_query = f"""
-    select COLUMN_NAME,
-        case when DATA_TYPE in ('varchar', 'tinytext', 'text', 'mediumtext', 'longtext') then 'varchar' else 'int' end,                                           data_type,
-        case when COLUMN_KEY = 'PRI' then 'False' else 'True' end as null_allowed, 
-        'False' as category,    
-    from information_schema.COLUMNS
-    where TABLE_NAME = 'persistent_assignee_disambig'
-      and TABLE_SCHEMA = '{database_section}'
-      and column_name not in ('updated_date','created_date', 'version_indicator');
-    """
-    if not self.connection.open:
-        self.connection.connect()
-    with self.connection.cursor() as crsr:
-        crsr.execute(columns_query)
-        column_data = pd.DataFrame.from_records(
-            crsr.fetchall(),
-            columns=['column', 'data_type', 'null_allowed', 'category'])
-        table_config = {
-            'persistent_assignee_disambig': {
-                'fields': column_data.set_index('column').to_dict(orient='index')
-            }
-        }
-        self.table_config.update(table_config)
+# def add_persistent_table_to_config(self, database_section):
+#     columns_query = f"""
+#     select COLUMN_NAME,
+#         case when DATA_TYPE in ('varchar', 'tinytext', 'text', 'mediumtext', 'longtext') then 'varchar' else 'int' end, data_type,
+#         case when COLUMN_KEY = 'PRI' then 'False' else 'True' end as null_allowed, 
+#         'False' as category,    
+#     from information_schema.COLUMNS
+#     where TABLE_NAME = 'persistent_assignee_disambig'
+#       and TABLE_SCHEMA = '{database_section}'
+#       and column_name not in ('updated_date','created_date', 'version_indicator');
+#     """
+#     if not self.connection.open:
+#         self.connection.connect()
+#     with self.connection.cursor() as crsr:
+#         crsr.execute(columns_query)
+#         column_data = pd.DataFrame.from_records(
+#             crsr.fetchall(),
+#             columns=['column', 'data_type', 'null_allowed', 'category'])
+#         table_config = {
+#             'persistent_assignee_disambig': {
+#                 'fields': column_data.set_index('column').to_dict(orient='index')
+#             }
+#         }
+#         self.table_config.update(table_config)
 
 
 def trim_whitespace(config):
+    """
+    removes leading and trailing whitespace from text columns in a database table.
+    
+    :param config: a ConfigParser object used to identify the active weekly database and the location of resource files
+    """
     from lib.configuration import get_connection_string
     cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
     db_type = config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"][:6]
@@ -311,12 +356,22 @@ def trim_whitespace(config):
 
 
 def xstr(s):
+    """
+    converts a value `s` to a string, returning an empty string if the value is None.
+    """
     if s is None:
         return ''
     return str(s)
 
 
-def weekday_count(start_date, end_date):
+def weekday_count(start_date:datetime, end_date:datetime) -> Dict[str,int]:
+    """ 
+    counts the number of occurrences of each weekday between a given start and end date, inclusive
+    
+    :param start_date: the first date in the range to count weekdays
+    :param end_date: the last date in the range to count weekdays
+    :return: a dictionary containing the count of each weekday between the start_date and end_date, inclusive
+    """
     week = {}
     for i in range((end_date - start_date).days + 1):
         day = calendar.day_name[(start_date + datetime.timedelta(days=i)).weekday()]
@@ -324,12 +379,26 @@ def weekday_count(start_date, end_date):
     return week
 
 
-def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
+def id_generator(size:int=25, chars:Iterable=string.ascii_lowercase + string.digits) -> str:
+    """
+    generates a string of specified length consisting of characters randomly selected from a specified set.
+    
+    :param size: determines the length of the generated ID. By default, defaults to 25 (optional)
+    :param chars: an iterable containing the characters that can be used to generate the random ID. 
+        defaults to the union of the lowercase english alphabet and digits 0-9
+    :return: a randomly generated string of characters with a specified length and character set.
+    """
     return ''.join(random.choice(chars) for _ in range(size))
 
 
 def download(url, filepath):
-    """ Download data from a URL with a handy progress bar """
+    """
+    downloads a file from a given URL and saves it to a specified file path,
+    displaying a progress bar if the content length is available.
+    
+    :param url: the URL of the resource to download
+    :param filepath: a string or other PathLike object representing where you want to save the downloaded file
+    """
 
     print("Downloading: {}".format(url))
     r = requests.get(url, stream=True)
@@ -347,8 +416,10 @@ def download(url, filepath):
                 f.flush()
 
 
-def chunks(l, n):
-    '''Yield successive n-sized chunks from l. Useful for multi-processing'''
+def chunks(l:Iterable, n:int) -> List[Iterable]:
+    """
+    breaks a subscriptable iterable (e.g. a list or string) `l` into a list of iterables of the same kind, with max size `n`
+    """
     chunk_list = []
     for i in range(0, len(l), n):
         chunk_list.append(l[i:i + n])
@@ -357,21 +428,39 @@ def chunks(l, n):
 
 
 def better_title(text):
+    """
+    re-formats a string, converting common particles to lowercase, all other words to Title Case, and removing punctuation
+    
+    :param text: The input text that you want to convert to a better title format
+    :return: The formatted sring
+    """
     title = " ".join(
         [item if item not in ["Of", "The", "For", "And", "On"] else item.lower() for item in
          str(text).title().split()])
     return re.sub('[' + string.punctuation + ']', '', title)
 
 
-def write_csv(rows, outputdir, filename):
+def write_csv(rows, outputdir, filename): 
     """ Write a list of lists to a csv file """
     print(outputdir)
     print(os.path.join(outputdir, filename))
-    writer = csv.writer(open(os.path.join(outputdir, filename), 'w', encoding='utf-8'))
-    writer.writerows(rows)
+    with open(os.path.join(outputdir, filename), 'w', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(rows)
 
 
-def generate_index_statements(config, database_section, table):
+# previously used for cpc_current processing. unused as of October 2023, but may be useful again later
+def generate_index_statements(config, database_section:str, table:str) -> Tuple[List[str], List[str]]:
+    """
+    generates SQL statements to add and drop indexes on a specified table in a database.
+    
+    :param config: a ConfigParser object containing the section 'PATENTSVIEW_DATABASES', 
+        used to construct connection strings and determine production schema name
+    :param database_section: the active weekly schema - determines the section of the config object used to construct a connection string
+    :param table: the name of the table for which to generate index-modifying SQL statements
+    :return: lists `add_indexes` and `drop_indexes` containing string SQL statements for adding and 
+        removing indices, respectively, from the specified table and schema
+    """
     from lib.configuration import get_connection_string
     engine = create_engine(get_connection_string(config, database_section))
     db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
@@ -409,6 +498,14 @@ def generate_index_statements(config, database_section, table):
 
 
 def mp_csv_writer(write_queue, target_file, header):
+    """
+    writes data from a queue to a CSV file, ensuring that the length of each row matches the length of the header.
+    
+    :param write_queue: a queue object that contains the data to be written to the CSV file. 
+        each item in the queue should be a list of values representing a row in the CSV file.
+    :param target_file: a string or other PathLike object indicating where the CSV file will be created or overwritten.
+    :param header: The `header` parameter is a list that contains the column names for the CSV file.
+    """
     with open(target_file, 'w', newline='') as writefile:
         filtered_writer = csv.writer(writefile,
                                      delimiter=',',
@@ -423,9 +520,7 @@ def mp_csv_writer(write_queue, target_file, header):
                     break
                 else:
                     print(message_data)
-                    raise Exception("Header and data length don't match :{header}/{data_ln}".format(header=len(header),
-                                                                                                    data_ln=len(
-                                                                                                        message_data)))
+                    raise Exception(f"Header and data length don't match :{len(header)}/{len(message_data)}")
             filtered_writer.writerow(message_data)
 
 
@@ -461,6 +556,15 @@ def log_writer(log_queue, log_prefix="uspto_parser"):
 
 
 def save_zip_file(url, name, path, counter=0, log_queue=None):
+    """
+    downloads a zip file from a given URL, extracts its contents to a specified path, and renames any revision files within the zip archive.
+    
+    :param url: The URL of the zip file you want to download and extract
+    :param name: the name of the zip file that will be downloaded and saved
+    :param path: the directory where the downloaded and extracted files will be saved
+    :param counter: unused.
+    :param log_queue: unused.
+    """
     os.makedirs(path, exist_ok=True)
     with requests.get(url, stream=True) as downloader:
         downloader.raise_for_status()
@@ -489,6 +593,14 @@ def save_zip_file(url, name, path, counter=0, log_queue=None):
 
 
 def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
+    """
+    downloads XML files within a specified date range, with the option to run in parallel.
+    Will also notify via slack if it detects that revised files for previous weeks are available that have not already been downloaded.
+    :param config: a ConfigParser object used to retrieve values such as USPTO links, dates, folders, and parallelism settings. 
+    :param xml_template_setting_prefix: a string prefix used to construct the names of two settings in the 
+        `config` object. These settings are used to determine the XML template and XML download location 
+        for the files, defaults to pgpubs (optional)
+    """
     xml_template_setting = "{prefix}_bulk_xml_template".format(prefix=xml_template_setting_prefix)
     xml_download_setting = "{prefix}_bulk_xml_location".format(prefix=xml_template_setting_prefix)
     xml_path_template = config["USPTO_LINKS"][xml_template_setting]
@@ -576,6 +688,15 @@ latest version downloaded for {file_datestring} in {old_download_path}: {max(mat
 
 
 def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
+    """
+    starts or stops an EC2 instance based on the provided config object and button state.
+    
+    :param config: A ConfigParser object containing the AWS credentials and the EC2 instance names.
+    :param button: Specifies whether to turn the EC2 instance ON or OFF. defaults to ON (optional)
+    :param identifier: The `identifier` parameter is used to retrieve the instance ID
+        from the `config` dictionary, defaults to xml_collector (optional)
+    :return: a boolean value indicating whether the EC2 instance was successfully started or stopped.
+    """
     instance_id = config['AWS_WORKER'][identifier]
     ec2 = boto3.client('ec2', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
                        aws_secret_access_key=config['AWS']['SECRET_KEY'],
@@ -588,6 +709,13 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
 
 
 def rds_free_space(config, identifier):
+    """
+    retrieves the free storage space metric for a specified RDS (Relational Database Service) instance using the AWS CloudWatch API.
+    
+    :param config: A ConfigParser object containing AWS access credentials.
+    :param identifier: The unique identifier of the RDS instance for which you want to fetch the free storage space
+    :return: the mean value of the 'FreeStorageSpace' metric for the specified RDS instance within the last 15 minutes.
+    """
     cloudwatch = boto3.client('cloudwatch', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
                               aws_secret_access_key=config['AWS']['SECRET_KEY'],
                               region_name='us-east-1')
@@ -613,7 +741,7 @@ def rds_free_space(config, identifier):
                 }
             }
         ],
-        StartTime=(datetime.now() - timedelta(seconds=300 * 3)).timestamp(),
+        StartTime=(datetime.now() - timedelta(seconds=300 * 3)).timestamp(), # 15 minutes ago
         EndTime=datetime.now().timestamp(),
         ScanBy='TimestampDescending'
     )
@@ -621,6 +749,15 @@ def rds_free_space(config, identifier):
 
 
 def get_host_name(local=True):
+    """
+    retrieves the local (default) or public hostname of a server using the AWS metadata service or 
+        falls back to the server's IP address if the metadata service is not available.
+    
+    :param local: a boolean value that determines whether to retrieve the local hostname or the public hostname. 
+        If `local` is set to `True`, the function will retrieve the local hostname. If `local` is set to `False`, 
+        the function will retrieve the public hostname, defaults to True (optional)
+    :return: the specified local or public hostname or the IP address of the host machine if a connection error occurs.
+    """
     import requests
     from requests.exceptions import ConnectionError
     from airflow.utils import net
@@ -628,33 +765,49 @@ def get_host_name(local=True):
         host_key = 'local-hostname'
         if not local:
             host_key = 'public-hostname'
-        r = requests.get("http://169.254.169.254/latest/meta-data/{hkey}".format(hkey=host_key))
+        r = requests.get(f"http://169.254.169.254/latest/meta-data/{host_key}")
         return r.text
     except ConnectionError:
         return net.get_host_ip_address()
 
 
-def chain_operators(chain):
+def chain_operators(chain:List) -> None:
+    """
+    iterates through a list of airflow operators, setting each successive operator upstream of the next operator.
+    
+    :param chain: A list of airflow operator objects ordered such that each operator should be set directly upstream of the next.
+    """
     for upstream, downstream in zip(chain[:-1], chain[1:]):
         downstream.set_upstream(upstream)
 
 
-def archive_folder(source_folder, targets: list):
+def archive_folder(source_folder, targets: List[str]):
+    """
+    Copies all files from a source folder any number of target folders.
+    
+    :param source_folder: The path to the folder that you want to archive
+    :param targets: A list of target folders where the files from the `source_folder` will be copied to
+    """
     files = os.listdir(source_folder)
-    for target_folder in targets[0:-1]:
+    for target_folder in targets:
         print(target_folder)
+        # create folder if it doesn't exist
         os.makedirs(target_folder, exist_ok=True)
         for file_name in files:
             print(file_name)
             shutil.copy(os.path.join(source_folder, file_name), target_folder)
-    print(targets[-1])
-    os.makedirs(targets[-1], exist_ok=True)
-    for file_name in files:
-        print(file_name)
-        shutil.copy(os.path.join(source_folder, file_name), targets[-1])
 
 
 def link_view_to_new_disambiguation_table(connection, table_name, disambiguation_type):
+    """
+    sets the uuid field on the specified disambiguation table as the primary key and replaces the current 
+    disambiguation mapping view with one based on the given specific disambiguation table.
+    
+    :param connection: A connection object used to connect to the database. 
+        created by `pv.disambiguation.util.db.connect_to_disambiguation_database()`
+    :param table_name: The name of the table on which to base the view. generally of the form {entity_type}_disambiguation_mapping_{date}.
+    :param disambiguation_type: "inventor" or "assignee", indicating which disambiguation process is being recorded.
+    """
     from mysql.connector.errors import ProgrammingError
     g_cursor = connection.cursor()
     index_query = 'alter table {table_name} add primary key (uuid)'.format(
@@ -672,33 +825,17 @@ def link_view_to_new_disambiguation_table(connection, table_name, disambiguation
     print(replace_view_query)
     g_cursor.execute(replace_view_query)
 
-def update_to_granular_version_indicator(table, db):
-    from lib.configuration import get_current_config, get_connection_string
-    config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
-    cstr = get_connection_string(config, 'PROD_DB')
-    engine = create_engine(cstr)
-    if db == 'granted_patent':
-        id = 'id'
-        fk = 'patent_id'
-        fact_table = 'patent'
-    else:
-        id = 'document_number'
-        fk = 'document_number'
-        fact_table = 'publication'
-    query = f"""
-update {table} update_table 
-	inner join {fact_table} p on update_table.{fk}=p.{id}
-set update_table.version_indicator=p.version_indicator     
+def update_version_indicator(table, dbtype, **kwargs):
     """
-    print(query)
-    query_start_time = time()
-    engine.execute(query)
-    query_end_time = time()
-    print("This query took:", query_end_time - query_start_time, "seconds")
-
-def update_version_indicator(table, db, **kwargs):
+    sets the version_indicator value for all records in the given table and database to the end date 
+    determined by the "execution_date" and "schedule" kwargs passed to get_current_config
+    
+    :param table: the name of the table in the database to update the version indicator for
+    :param db: either "granted_patent" or "pgpubs", indicating whether to update granted or pregrant data, respectively
+    :param kwargs: additional keyword arguments used for config generation. Must include "execution_date".
+    """
     from lib.configuration import get_current_config, get_connection_string
-    config = get_current_config(type=db, schedule="quarterly", **kwargs)
+    config = get_current_config(type=dbtype, schedule="quarterly", **kwargs)
     ed = process_date(config['DATES']["end_date"], as_string=True)
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
@@ -715,5 +852,4 @@ set update_table.version_indicator={ed}
 
 if __name__ == "__main__":
     # update_to_granular_version_indicator('uspc_current', 'granted_patent')
-    print("HI")
-    breakpoint()
+    raise NotImplementedError()
