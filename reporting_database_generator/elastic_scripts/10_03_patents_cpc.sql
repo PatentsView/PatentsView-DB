@@ -27,4 +27,4 @@ insert into `{{elastic_db}}`.patent_cpc_at_issue
 SELECT 
     c.patent_id, c.sequence, c.section_id, c.subsection_id, c.group_id, c.subgroup_id, c.category
 FROM patent.cpc c
-JOIN `{{elastic_db}}`.patents p on p.patent_id = c.patent_id
+JOIN `{{elastic_db}}`.patents p on p.patent_id = c.patent_id;
