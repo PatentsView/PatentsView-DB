@@ -1434,6 +1434,12 @@
         "null_allowed": true,
         "category": true,
         "location_field": false
+      },
+      "applicant_authority": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
       }
     },
     "TestScripts": [
