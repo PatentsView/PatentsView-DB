@@ -602,6 +602,7 @@ CREATE TABLE `us_parties` (
   `name_last` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `organization` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `type` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `applicant_authority` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `designation` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sequence` int(11) DEFAULT NULL,
   `rawlocation_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
