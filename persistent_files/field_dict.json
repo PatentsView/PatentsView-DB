@@ -5,7 +5,7 @@
                    "rawinventor": ["uuid","patent_id", "inventor_id","rawlocation_id","name_first","name_last", "sequence", "rule_47", "deceased"],
                    "rawassignee": ["uuid","patent_id","assignee_id","rawlocation_id","type","name_first","name_last","organization","sequence"],
                     "rawlawyer" :["uuid", "lawyer_id","patent_id","name_first","name_last","organization","country","sequence"],
-                    "non_inventor_applicant": ["uuid", "patent_id", "rawlocation_id", "fname", "lname", "organization", "sequence", "designation", "applicant_type"],
+                    "non_inventor_applicant": ["uuid", "patent_id", "rawlocation_id", "fname", "lname", "organization", "sequence", "designation", "applicant_type", "applicant_authority"],
                     "rawexaminer": ["uuid","patent_id","name_first","name_last","role","group"],
                     "rawlocation": ["id","location_id","city","state","country", "country_transformed"],
                     "foreigncitation": ["uuid","patent_id","date","number","country","category","sequence"],
