@@ -576,7 +576,7 @@ where invention_abstract is null """
         self.init_qa_dict()
         for table in self.table_config:
             self.check_for_indexes(table)
-            if table[:2] >= 'pc': # TEMPORARY FOR QUARTERLY MERGE. REMOVE LATER!!!!!!!
+            if table[:2] < 'pc': # TEMPORARY FOR QUARTERLY MERGE.
                 logger.info(f"==============================================================================")
                 logger.info(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table} %")
                 logger.info(f"==============================================================================")
