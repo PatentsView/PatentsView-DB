@@ -8,15 +8,10 @@ class TextQuarterlyMergeTest(DatabaseTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, config['PATENTSVIEW_DATABASES']["TEXT_DB"], datetime.date(year=1976, month=1, day=1), end_date)
-        brf_key = "brf_sum_text_{year}".format(year=end_date.year)
-        clm_key = "claims_{year}".format(year=end_date.year)
-        ddr_key = "draw_desc_text_{year}".format(year=end_date.year)
-        ddt_key = "detail_desc_text_{year}".format(year=end_date.year)
-        keep_tables = []
-        for i in self.table_config.keys():
-            if i in [brf_key, clm_key, ddr_key, ddt_key]:
-                keep_tables.append(i)
-        self.table_config = utilities.with_keys(self.table_config, keep_tables)
+        original_config = list(self.table_config.keys())
+        for table in original_config:
+            table_year = table + "_" + str(end_date.year)
+            self.table_config[table_year] = self.table_config.pop(table)
         print(f"The following list of tables are run for {self.__class__.__name__}:")
         print(self.table_config.keys())
 
