@@ -103,7 +103,7 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config, uniq
                                             dtypedict={"patent_id": types.NVARCHAR(length=20)
                                                        , "field_id": types.INTEGER()
                                                        , "sequence": types.INTEGER()
-                                                       , "version_indicator": types.NVARCHAR(length=11)
+                                                       , "version_indicator": types.Date()
                                                 }
                                             )
 
