@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta, date
 
-
 import pandas as pd
 from sqlalchemy import create_engine, inspect
 import re
@@ -195,7 +194,9 @@ def consolidate_location_disambiguation_quarterly(config, **kwargs):
     engine = create_engine(get_connection_string(config, "PROD_DB"))
     dbtype = 'pgpubs' if prod_db=='pregrant_publications' else 'granted_patent'
     inspector = inspect(engine)
-    quarter_start, quarter_end = get_update_range(kwargs['execution_date'])
+    quarter_end = config['DATES']['END_DATE']
+    quarter_start = config['DATES']['START_DATE']
+    # quarter_start, quarter_end = get_update_range(kwargs['execution_date'])
     print(f"consolidating location disambiguation tables for date range {quarter_start.strftime('%Y-%m-%d')} to {quarter_end.strftime('%Y-%m-%d')}")
     weekly_prefix = config['PATENTSVIEW_DATABASES'][f"{dbtype}_upload_db"]
     db_list = [db for db in inspector.get_schema_names() if re.fullmatch(f"{weekly_prefix}\\d{{8}}", db) and 
@@ -265,8 +266,8 @@ def post_process_location(**kwargs):
     pgpubs_config = get_current_config(type='pgpubs', schedule="quarterly", **kwargs)
     consolidate_location_disambiguation_quarterly(patent_config, **kwargs)
     consolidate_location_disambiguation_quarterly(pgpubs_config, **kwargs)
-    update_dis_location_mapping(patent_config)
-    update_dis_location_mapping(pgpubs_config)
+    # update_dis_location_mapping(patent_config)
+    # update_dis_location_mapping(pgpubs_config)
     update_rawlocation(patent_config)
     update_rawlocation(pgpubs_config)
     precache_locations(patent_config)
@@ -287,6 +288,6 @@ if __name__ == '__main__':
     #         "execution_date": date(2023, 1, 1)
     #         })
     post_process_location(**{
-            "execution_date": date(2023, 4, 1)
+            "execution_date": date(2023, 7, 1)
             })
 
