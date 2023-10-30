@@ -46,7 +46,7 @@ def class_db_specific_config(self, table_config, class_called):
             tables_list = list(self.table_config.keys())
             quarter_date = self.end_date.strftime("%Y%m%d")
             for table in tables_list:
-                if table in ['assignee', "assignee_disambiguation_mapping" 'location', "location_disambiguation_mapping", 'inventor',  "inventor_disambiguation_mapping"]:
+                if table in ['assignee', "assignee_disambiguation_mapping", 'location', "location_disambiguation_mapping", 'inventor',  "inventor_disambiguation_mapping"]:
                     self.table_config[f'{table}_{quarter_date}'] = self.table_config.pop(f'{table}')
         print(f"The following list of tables are run for {class_called}:")
         print(self.table_config.keys())
