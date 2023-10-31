@@ -15,11 +15,10 @@ def update_rawinventor_for_type(update_config, incremental="1", database='RAW_DB
     filter = '1=1'
     if incremental == "1":
         filter = 'ri.inventor_id is null'
-    update_statement = """
-        UPDATE rawinventor ri join inventor_disambiguation_mapping idm
+    update_statement = f"""
+        UPDATE rawinventor ri join {update_config["DISAMBIG_TABLES"]["INVENTOR"]} idm
             on idm.uuid =  ri.{uuid_field}
-        set ri.inventor_id=idm.inventor_id where {filter} 
-    """.format(uuid_field=uuid_field, filter=filter)
+        set ri.inventor_id=idm.inventor_id where {filter} """
     print(update_statement)
     engine.execute(update_statement)
 

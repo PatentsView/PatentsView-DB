@@ -201,11 +201,15 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
     else:
         from lib.is_it_update_time import get_update_range_full_quarter
         start_date, end_date = get_update_range_full_quarter(execution_date)
-    temp_date = end_date.strftime('%Y%m%d')
-
+    start_date = start_date.strftime('%Y%m%d')
+    end_date = end_date.strftime('%Y%m%d')
     config['DATES'] = {
-        "START_DATE": start_date.strftime('%Y-%m-%d'),
-        "END_DATE": end_date.strftime('%Y-%m-%d')
+        "START_DATE": start_date,
+        "END_DATE": end_date
+    }
+    config['DISAMBIG_TABLES'] = {
+        "INVENTOR": f"inventor_disambiguation_mapping_{end_date}",
+        "ASSIGNEE": f"assignee_disambiguation_mapping_{end_date}",
     }
     print("Start Date is {start}".format(start=config['DATES']['START_DATE']))
     print("End date is {end}".format(end=config['DATES']['END_DATE']))
