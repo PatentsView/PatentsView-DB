@@ -11,8 +11,8 @@ def get_data_for_inventor_summary_stats(config):
     engine = create_engine(get_connection_string(config, "RAW_DB"))
     pquery = "select * from patentsview_export_granted.g_persistent_inventor"
     print(pquery)
-    patent = pd.read_sql_query(sql=pquery, con=engine)
-    patent.to_csv("patent.csv")
+    patent = pd.read_sql_query(sql=pquery, con=engine, chunksize=150000)
+    # patent.to_csv("patent.csv")
     iquery = "select patent_id, inventor_sequence, raw_inventor_name_first, raw_inventor_name_last from patentsview_export_granted.g_inventor_not_disambiguated "
     print(iquery)
     persistent_inventor = pd.read_sql_query(sql=pquery, con=engine)
@@ -94,7 +94,7 @@ def evaluate_inventor_precision_recall(config):
 
 
 if __name__ == '__main__':
-    d = datetime.date(2023, 1, 1)
+    d = datetime.date(2023, 7, 1)
     config = get_disambig_config(schedule='quarterly', **{
         "execution_date": d
     })
