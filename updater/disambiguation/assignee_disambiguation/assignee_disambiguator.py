@@ -3,7 +3,7 @@ from pendulum import DateTime
 
 import pv
 from lib.configuration import get_disambig_config
-from lib.utilities import archive_folder, link_view_to_new_disambiguation_table
+from lib.utilities import archive_folder, add_index_new_disambiguation_table
 from pv.QA.AssigneeDisambiguationPipelineTester import AssigneeDisambiguationPipelineTester
 from pv.disambiguation.util.config_util import prepare_config
 
@@ -57,22 +57,15 @@ def upload_results(**kwargs):
 
 
 def archive_results(**kwargs):
+    # This now adds index to disambiguation_mapping table rather than creating a new view
     config = get_disambig_config(schedule='quarterly',
                                  supplemental_configs=['config/new_consolidated_config.ini'],
                                  **kwargs)
-    # print("Archiving files")
-    config = prepare_config(config)
-    # folder = config['DATES']['END_DATE']
-    # source_folder = "data/current/assignee"
-    # targets = ["data/{folder}/assignee/".format(folder=folder)]
-    # archive_folder(source_folder, targets)
-    print("Mapping tables")
+    ass_disambig_table = config["DISAMBIG_TABLES"]["ASSIGNEE"]
     cnx_g = pv.disambiguation.util.db.connect_to_disambiguation_database(config, dbtype='granted_patent_database')
-    link_view_to_new_disambiguation_table(connection=cnx_g, table_name=config['ASSIGNEE_UPLOAD']['target_table'],
-                                          disambiguation_type='assignee')
+    add_index_new_disambiguation_table(connection=cnx_g, table_name=ass_disambig_table)
     cnx_pg = pv.disambiguation.util.db.connect_to_disambiguation_database(config, dbtype='pregrant_database')
-    link_view_to_new_disambiguation_table(connection=cnx_pg, table_name=config['ASSIGNEE_UPLOAD']['target_table'],
-                                          disambiguation_type='assignee')
+    add_index_new_disambiguation_table(connection=cnx_pg, table_name=ass_disambig_table)
 
 
 if __name__ == '__main__':

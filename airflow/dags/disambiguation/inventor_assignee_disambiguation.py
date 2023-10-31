@@ -563,3 +563,5 @@ run_patent_gender.set_upstream(post_process_create_canonical_inventors)
 inventor_gender_post_processing.set_upstream(run_patent_gender)
 inventor_gender_post_processing.set_upstream(run_pgpubs_gender)
 inventor_gender_post_processing.set_upstream(inv_upload_results)
+qc_post_process_inventor_operator.set_upstream(inventor_gender_post_processing)
+

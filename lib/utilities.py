@@ -655,6 +655,18 @@ def archive_folder(source_folder, targets: list):
         print(file_name)
         shutil.copy(os.path.join(source_folder, file_name), targets[-1])
 
+def add_index_new_disambiguation_table(connection, table_name):
+    from mysql.connector.errors import ProgrammingError
+    g_cursor = connection.cursor()
+    index_query = 'alter table {table_name} add primary key (uuid)'.format(
+        table_name=table_name)
+    print(index_query)
+    try:
+        g_cursor.execute(index_query)
+    except ProgrammingError as e:
+        from mysql.connector import errorcode
+        if not e.errno == errorcode.ER_MULTIPLE_PRI_KEY:
+            raise
 
 def link_view_to_new_disambiguation_table(connection, table_name, disambiguation_type):
     from mysql.connector.errors import ProgrammingError
@@ -719,5 +731,4 @@ if __name__ == "__main__":
     # update_to_granular_version_indicator('uspc_current', 'granted_patent')
     print("HI")
     config = get_current_config("granted_patent", schedule='quarterly',  **{"execution_date": datetime.date(2022, 6, 30)})
-    generate_index_statements(config, "PROD_DB", "cpc_current_20230330")
 
