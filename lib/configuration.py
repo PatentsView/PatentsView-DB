@@ -200,12 +200,13 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
         end_date = (execution_date + current_week_end)
     else:
         from lib.is_it_update_time import get_update_range_full_quarter
-        start_date, end_date = get_update_range_full_quarter(execution_date)
+        start_date, end_date_dash = get_update_range_full_quarter(execution_date)
     start_date = start_date.strftime('%Y%m%d')
-    end_date = end_date.strftime('%Y%m%d')
+    end_date = end_date_dash.strftime('%Y%m%d')
     config['DATES'] = {
         "START_DATE": start_date,
-        "END_DATE": end_date
+        "END_DATE": end_date,
+        "END_DATE_DASH": end_date_dash
     }
     config['DISAMBIG_TABLES'] = {
         "INVENTOR": f"inventor_disambiguation_mapping_{end_date}",
@@ -271,7 +272,8 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
 
     config['DATES'] = {
         "START_DATE": start_date.strftime('%Y%m%d'),
-        "END_DATE": end_date.strftime('%Y%m%d')
+        "END_DATE": end_date.strftime('%Y%m%d'),
+        "END_DATE_DASH": end_date
     }
     prefixed_string = "{prfx}{date}".format(prfx=config_prefix, date=temp_date)
     config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"] = prefixed_string
