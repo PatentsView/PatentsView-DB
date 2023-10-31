@@ -1108,7 +1108,7 @@
         "location_field": false
       }
     },
-    "TestScripts": ["LocationPostProcessingQC"]
+    "TestScripts": ["AssigneePostProcessingQC"]
   },
   "location_by_lat_long": {
     "fields": {
@@ -1156,7 +1156,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": ["LocationPostProcessingQC"]
+    "TestScripts": []
   },
   "location_fips": {
     "fields": {
@@ -1238,7 +1238,7 @@
         "location_field": false
       }
     },
-    "TestScripts": ["LocationPostProcessingQC"]
+    "TestScripts": ["InventorPostProcessingQC"]
   },
   "location_lat_lon": {
     "fields": {
