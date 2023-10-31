@@ -19,7 +19,7 @@ import numpy as np
 from itertools import combinations
 
 from QA.post_processing.AssigneePostProcessing import AssigneePostProcessingQC
-from lib.configuration import get_connection_string, get_current_config
+from lib.configuration import get_connection_string, get_current_config, get_disambig_config
 from updater.post_processing.create_lookup import load_lookup_table
 
 
@@ -192,12 +192,12 @@ def assignee_reduce(assignee_data):
 
 
 def update_granted_rawassignee(**kwargs):
-    config = get_current_config(schedule='quarterly',**kwargs)
+    config = get_disambig_config(schedule='quarterly', **kwargs)
     update_rawassignee_for_type(config, database='RAW_DB', uuid_field='uuid')
 
 
 def update_pregranted_rawassignee(**kwargs):
-    config = get_current_config(schedule='quarterly',**kwargs)
+    config = get_disambig_config(schedule='quarterly',**kwargs)
     update_rawassignee_for_type(config, database='PGPUBS_DATABASE', uuid_field='id')
 
 
