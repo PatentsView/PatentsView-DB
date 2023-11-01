@@ -255,7 +255,7 @@ run_patent_gender = PythonOperator(task_id='patent_inventor_gender',
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
                                                    queue='data_collector',
-                                                   op_kwargs={'type': 'patent'})
+                                                   op_kwargs={'type': 'granted_patent'})
 run_pgpubs_gender = PythonOperator(task_id='pgpubs_inventor_gender',
                                                    python_callable=run_genderit,
                                                    dag=disambiguation,
