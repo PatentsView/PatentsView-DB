@@ -217,7 +217,7 @@ def generate_cpc_current_index_statements(config):
          'ALTER TABLE `cpc_current` ADD UNIQUE INDEX `patent_id_sequence` USING BTREE(`patent_id`, `sequence`);',),
          ('ALTER TABLE `cpc_current` ADD INDEX `subsection_id` USING BTREE(`subsection_id`);',)]
         drop_indexes = [('ALTER TABLE `cpc_current` DROP INDEX `cpc_current_group_id_index`, DROP INDEX `cpc_current_patent_id_index`, DROP INDEX `patent_id_2`, DROP INDEX `patent_id_sequence`, DROP INDEX `subsection_id`;',)]
-    elif config['PATENTSVIEW_DATABASES']["PROD_DB"] == 'pregrant_publication':
+    elif config['PATENTSVIEW_DATABASES']["PROD_DB"] == 'pregrant_publications':
         add_indexes = [('ALTER TABLE `cpc_current_20230330` ADD INDEX `cpc_current_version_indicator_index` USING BTREE(`version_indicator`);',),
          ('ALTER TABLE `cpc_current_20230330` ADD INDEX `document_number` USING BTREE(`document_number`);',), (
          'ALTER TABLE `cpc_current_20230330` ADD INDEX `document_number_seq` USING BTREE(`document_number`, `sequence`);',)]
