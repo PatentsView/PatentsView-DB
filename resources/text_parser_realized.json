@@ -13,7 +13,7 @@
             "entity_root_path": "claims/",
             "fields": [
                 {
-                    "field_name": "text",
+                    "field_name": "claim_text",
                     "friendly_name": "Text",
                     "xml_path": "claim-text",
                     "attribute": null,
@@ -24,7 +24,7 @@
                     "data-type": "fulltext"
                 },
                 {
-                    "field_name": "sequence",
+                    "field_name": "claim_sequence",
                     "friendly_name": "Sequence",
                     "xml_path": ".",
                     "attribute": null,
@@ -35,7 +35,7 @@
                     "data-type": "string"
                 },
                 {
-                    "field_name": "num",
+                    "field_name": "claim_number",
                     "friendly_name": "num",
                     "xml_path": ".",
                     "attribute": "num",
@@ -58,7 +58,7 @@
                 }
             ],
             "filename": "claims.tsv",
-            "table_name": "claims_2021"
+            "table_name": "claims_2023"
         },
         {
             "table_prefix": "brf_sum_text",
@@ -66,7 +66,7 @@
             "multi_valued": false,
             "fields": [
                 {
-                    "field_name": "text",
+                    "field_name": "summary_text",
                     "friendly_name": "Text",
                     "xml_path": "description",
                     "description": "Brief Summary",
@@ -78,7 +78,7 @@
                 }
             ],
             "filename": "brf_sum_text.tsv",
-            "table_name": "brf_sum_text_2021"
+            "table_name": "brf_sum_text_2023"
         },
         {
             "table_prefix": "claim_exemplary",
@@ -98,7 +98,7 @@
                 }
             ],
             "filename": "exemplary_claim.tsv",
-            "table_name": "claim_exemplary_2021"
+            "table_name": "claim_exemplary_2023"
         },
         {
             "table_prefix": "draw_desc_text",
@@ -107,7 +107,7 @@
             "entity_root_path": "description/description-of-drawings/",
             "fields": [
                 {
-                    "field_name": "text",
+                    "field_name": "draw_desc_text",
                     "friendly_name": "Text",
                     "xml_path": ".",
                     "description": "Brief Description of Drawings",
@@ -118,7 +118,7 @@
                     "data-type": "fulltext"
                 },
                 {
-                    "field_name": "sequence",
+                    "field_name": "draw_desc_sequence",
                     "friendly_name": "Sequence",
                     "xml_path": ".",
                     "attribute": null,
@@ -130,7 +130,7 @@
                 }
             ],
             "filename": "draw_desc_text.tsv",
-            "table_name": "draw_desc_text_2021"
+            "table_name": "draw_desc_text_2023"
         },
         {
             "table_prefix": "detail_desc_text",
@@ -138,7 +138,7 @@
             "multi_valued": false,
             "fields": [
                 {
-                    "field_name": "text",
+                    "field_name": "description_text",
                     "friendly_name": "Text",
                     "xml_path": "description",
                     "description": "Detailed Description",
@@ -150,7 +150,7 @@
                 }
             ],
             "filename": "detail_desc_text.tsv",
-            "table_name": "detail_desc_text_2021"
+            "table_name": "detail_desc_text_2023"
         }
     ]
 }
