@@ -106,7 +106,7 @@ There are at least 6 containers with unique services running:
 
 - docker-compose-admin-worker.yml, docker-compose-disambiguator.yaml, docker-compose-worker.yaml all have the same
   configuration as other `patentsview/airflow` image, again, except for the command and port numbers
-  - The worker `queues` execute the python code in Airflow. Different DAGs run using different workers and are controlled using different pools. For the latest configuration, see the [DAGS](airflow/dags) folder
+  - The worker `queues` execute the python code in Airflow. Different DAGs run using different workers and are controlled using different pools. For the latest configuration, see the [DAGS](../airflow/dags) folder
 - Note that all DAG processes listed below also need to have `PVGP server` running to run airflow
 
 | DAG                                | Worker (Queue)                 | Pools                                                         | Servers                             | 
