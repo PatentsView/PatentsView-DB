@@ -150,9 +150,12 @@ def find_ipc_url():
     for link in tree.xpath('//a/@href'):
         print(link)
         # if (link.lstrip('.').lstrip("/").startswith("cpc/concordances/cpc-ipc-concordance")
-        if ("cpc/concordances/cpc-ipc-concordance" in link.lstrip('.').lstrip("/")
-                and link.endswith(".txt")):
-            potential_links.append(link)
+    for link in tree.xpath('//a/@href'):
+        if (link.endswith(".txt") and (link.split('/')[-1].startswith("cpc-ipc-concordance"))):
+            if not link.startswith("http"):
+                potential_links.append(base_url + link.replace('..',''))
+            else:
+                potential_links.append(link)
 
     # There should be exactly one link to the CPC to IPC concordance.
     # Since files are not formatted nicely, we can't sort alphabetically to
@@ -160,7 +163,7 @@ def find_ipc_url():
     print(potential_links)
     assert (len(set(potential_links)) == 1), "Unsure which URL to use of: " \
                                              "{}".format(potential_links)
-    return base_url + '/' + potential_links[0]
+    return potential_links[0]
 
 
 ############################################
