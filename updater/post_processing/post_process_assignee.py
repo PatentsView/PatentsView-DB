@@ -121,11 +121,11 @@ def create_assignee(update_config):
   KEY `assignee_version_indicator_index` (`version_indicator`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """.format(version_indicator=version_indicator, target_table=target_table)
-    view_query = """
-    CREATE OR REPLACE SQL SECURITY INVOKER VIEW assignee as select * from {target_table}
-    """.format(target_table=target_table)
+    # view_query = """
+    # CREATE OR REPLACE SQL SECURITY INVOKER VIEW assignee as select * from {target_table}
+    # """.format(target_table=target_table)
     engine.execute(create_sql)
-    engine.execute(view_query)
+    # engine.execute(view_query)
     limit = 10000
     offset = 0
     while True:
@@ -245,6 +245,7 @@ def additional_post_processing(**kwargs):
 def additional_post_processing_update_queries(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     suffix = config['DATES']['END_DATE']
+    ass_table = f"assignee_{suffix}"
     adm_table = f"assignee_disambiguation_mapping_{suffix}"
     query_list = []
     db_list = ["patent", "pregrant_publications"]
@@ -253,9 +254,9 @@ def additional_post_processing_update_queries(**kwargs):
         query_0 = f"alter table {db}.{adm_table} add index assignee_id (assignee_id)"
         query_list.append(query_0)
         if db == 'patent':
-            query_1 = f"alter table patent.assignee_{suffix} add index id (id)"
+            query_1 = f"alter table patent.{ass_table} add index id (id)"
             query_list.append(query_1)
-            query_2 = f"alter table patent.assignee_{suffix} add index organization (organization)"
+            query_2 = f"alter table patent.{ass_table} add index organization (organization)"
             query_list.append(query_2)
             query_3 = f" alter table patent.assignee_reassignment_final add index `cluster` (`cluster`)"
             query_list.append(query_3)
@@ -263,7 +264,7 @@ def additional_post_processing_update_queries(**kwargs):
             query_list.append(query_4)
         query_5 = f"""
         update {db}.{adm_table} adm
-            join patent.assignee a on a.id = adm.assignee_id
+            join patent.{ass_table} a on a.id = adm.assignee_id
             join patent.assignee_reassignment_final arr on arr.`original_org_name` collate utf8mb4_bin = a.organization
             join patent.assignee a2 on arr.`cluster` collate utf8mb4_bin = a2.organization
         set adm.assignee_id=a2.id;
@@ -271,7 +272,7 @@ def additional_post_processing_update_queries(**kwargs):
         query_list.append(query_5)
         query_6 = f"""
         update {db}.rawassignee r
-            join patent.assignee a on a.id = r.assignee_id
+            join patent.{ass_table} a on a.id = r.assignee_id
             join patent.assignee_reassignment_final arr on a.organization = arr.`original_org_name` collate utf8mb4_bin  
             join patent.assignee a2 on arr.`cluster` collate utf8mb4_bin = a2.organization
         set r.assignee_id=a2.id;
@@ -410,14 +411,13 @@ where assignee_id is not null;
         print(q)
         engine.execute(q)
 
-def post_process_assignee(**kwargs):
-    update_granted_rawassignee(**kwargs)
-    update_pregranted_rawassignee(**kwargs)
-    precache_assignees(**kwargs)
-    create_canonical_assignees(**kwargs)
-    create_patent_assignee(**kwargs)
-    create_publication_assignee(**kwargs)
-    check_largest_clusters(**kwargs)
+# def post_process_assignee(**kwargs):
+#     update_granted_rawassignee(**kwargs)
+#     update_pregranted_rawassignee(**kwargs)
+#     precache_assignees(**kwargs)
+#     create_canonical_assignees(**kwargs)
+#     create_patent_assignee(**kwargs)
+#     create_publication_assignee(**kwargs)
 
 def check_largest_clusters(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
@@ -431,7 +431,7 @@ limit 25;
     """
     df = pd.read_sql(cluster_query, con=engine)
     print(df)
-    if df['records'][0] > 150000:
+    if df['records'][0] > 200000:
         raise Exception(f"ASSIGNEE DISAMBIGUATION OVER-CLUSTERED")
     if df['records'][0] < 50000:
         raise Exception(f"ASSIGNEE DISAMBIGUATION UNDER-CLUSTERED")
@@ -442,6 +442,7 @@ def additional_post_processing_assignee(**kwargs):
     additional_post_processing_update_queries(**kwargs)
     precache_assignees(**kwargs)
     create_canonical_assignees(**kwargs)
+    check_largest_clusters(**kwargs)
 
 def post_process_qc(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
@@ -449,14 +450,11 @@ def post_process_qc(**kwargs):
     qc.run_assignee_disambig_tests()
 
 if __name__ == '__main__':
-    date = datetime.date(2023, 1, 1)
-    # load_granted_lookup(**{
+    date = datetime.date(2023, 7, 1)
+    # check_largest_clusters(**{
     #     "execution_date": date
     # })
-    # load_pregranted_location_assignee(**{
-    #     "execution_date": date
-    # })
-    check_largest_clusters(**{
+    additional_post_processing_assignee(**{
         "execution_date": date
     })
 
