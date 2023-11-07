@@ -283,13 +283,13 @@ qc_post_process_inventor_pgpubs_operator = PythonOperator(task_id='qc_post_proce
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
                                                    queue='data_collector')
-post_process_patent_phase2_qc_operator = PythonOperator(task_id='qc_post_process_inventor_patent_phase2',
+post_process_inventor_patent_phase2_qc_operator = PythonOperator(task_id='qc_post_process_inventor_patent_phase2',
                                                    python_callable=post_process_inventor_patent_phase2_qc,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
                                                    queue='data_collector')
-post_process_pgpubs_phase2_qc_operator = PythonOperator(task_id='qc_post_process_inventor_pgpubs_phase2',
+post_process_inventor_pgpubs_phase2_qc_operator = PythonOperator(task_id='qc_post_process_inventor_pgpubs_phase2',
                                                    python_callable=post_process_inventor_pgpubs_phase2_qc,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
@@ -426,13 +426,13 @@ qc_post_process_assignee_pgpubs_operator = PythonOperator(task_id='qc_post_proce
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
                                                    queue='data_collector')
-post_process_patent_phase2_qc_operator = PythonOperator(task_id='qc_post_process_assignee_patent_phase2',
+post_process_assignee_patent_phase2_qc_operator = PythonOperator(task_id='qc_post_process_assignee_patent_phase2',
                                                    python_callable=post_process_assignee_patent_phase2_qc,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
                                                    queue='data_collector')
-post_process_pgpubs_phase2_qc_operator = PythonOperator(task_id='qc_post_process_assignee_pgpubs_phase2',
+post_process_assignee_pgpubs_phase2_qc_operator = PythonOperator(task_id='qc_post_process_assignee_pgpubs_phase2',
                                                    python_callable=post_process_assignee_pgpubs_phase2_qc,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
@@ -542,14 +542,14 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                                                     prepare_granted_persistent_wide_inventor,
                                                     create_granted_persistent_wide_inventor,
                                                     # update_granted_persistent_long_inventor,
-                                                    post_process_patent_phase2_qc_operator],
+                                                    post_process_inventor_patent_phase2_qc_operator],
                      'inventor_post_processing_2': [qc_post_process_inventor_pgpubs_operator,
                                                     post_process_create_pgpubs_inventor,
                                                     post_process_create_pgpubs_loc_inventor,
                                                     prepare_pregranted_persistent_wide_inventor,
                                                     create_pregranted_persistent_wide_inventor,
                                                     # update_pregranted_persistent_long_inventor,
-                                                    post_process_pgpubs_phase2_qc_operator],
+                                                    post_process_inventor_pgpubs_phase2_qc_operator],
                      'assignee_mention': [assignee_build_assignee_features, qc_assignee_build_assignee_features,
                                           assignee_run_clustering],
                      'cross_link_1': [inv_build_coinventor_features, assignee_run_clustering],
@@ -569,7 +569,7 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                                             prepare_granted_persistent_wide_assignee,
                                             create_granted_persistent_wide_assignee,
                                             #update_granted_persistent_long_assignee,
-                                            post_process_patent_phase2_qc_operator
+                                            post_process_assignee_patent_phase2_qc_operator
                                             ],
                      'pgpubs_persistent': [post_process_assignees,
                          qc_post_process_assignee_pgpubs_operator,
@@ -578,7 +578,7 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                          prepare_pregrant_persistent_wide_assignee,
                          create_pregrant_persistent_wide_assignee,
                          #update_pregrant_persistent_long_assignee,
-                         post_process_pgpubs_phase2_qc_operator
+                         post_process_assignee_pgpubs_phase2_qc_operator
                      ],
                      'location_post_processing': [post_process_location_operator, qc_post_process_location_operator],
                      'location_assignee_link': [qc_post_process_location_operator, assignee_build_assignee_features],
@@ -605,11 +605,8 @@ run_patent_gender.set_upstream(post_process_create_canonical_inventors)
 
 inventor_gender_post_processing.set_upstream(run_patent_gender)
 inventor_gender_post_processing.set_upstream(run_pgpubs_gender)
-inventor_gender_post_processing.set_upstream(inv_upload_results)
 
 qc_post_process_inventor_operator.set_upstream(inventor_gender_post_processing)
-qc_post_process_inventor_operator.set_upstream(post_process_create_canonical_inventors)
 qc_post_process_inventor_pgpubs_operator.set_upstream(inventor_gender_post_processing)
-qc_post_process_inventor_pgpubs_operator.set_upstream(post_process_create_canonical_inventors)
 
 
