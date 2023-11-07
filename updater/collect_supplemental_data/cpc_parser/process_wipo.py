@@ -100,7 +100,7 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config, uniq
     engine = create_engine(cstr)
     with engine.begin() as conn:
         wipo_filtered_data_sequenced.to_sql('wipo', conn, if_exists='append', index=False, method="multi",
-                                            dtypedict={"patent_id": types.NVARCHAR(length=20)
+                                            dtype={"patent_id": types.NVARCHAR(length=20)
                                                        , "field_id": types.INTEGER()
                                                        , "sequence": types.INTEGER()
                                                        , "version_indicator": types.Date()
