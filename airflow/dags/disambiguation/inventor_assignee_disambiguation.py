@@ -420,19 +420,19 @@ qc_post_process_assignee_operator = PythonOperator(task_id='qc_post_process_assi
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
                                                    queue='data_collector')
-qc_post_process_assignee_pgpubs_operator = PythonOperator(task_id='qc_post_process_assignee',
+qc_post_process_assignee_pgpubs_operator = PythonOperator(task_id='qc_post_process_assignee_pgpubs',
                                                    python_callable=post_process_assignee_qc_pgpubs,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
                                                    queue='data_collector')
-post_process_patent_phase2_qc_operator = PythonOperator(task_id='qc_post_process_assignee',
+post_process_patent_phase2_qc_operator = PythonOperator(task_id='qc_post_process_assignee_patent_phase2',
                                                    python_callable=post_process_assignee_patent_phase2_qc,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
                                                    queue='data_collector')
-post_process_pgpubs_phase2_qc_operator = PythonOperator(task_id='qc_post_process_assignee',
+post_process_pgpubs_phase2_qc_operator = PythonOperator(task_id='qc_post_process_assignee_pgpubs_phase2',
                                                    python_callable=post_process_assignee_pgpubs_phase2_qc,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
