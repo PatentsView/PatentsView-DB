@@ -277,7 +277,7 @@ qc_post_process_inventor_operator = PythonOperator(task_id='qc_post_process_inve
                                                    on_success_callback=airflow_task_success,
                                                    on_failure_callback=airflow_task_failure,
                                                    queue='data_collector')
-qc_post_process_inventor_pgpubs_operator = PythonOperator(task_id='qc_post_process_inventor',
+qc_post_process_inventor_pgpubs_operator = PythonOperator(task_id='qc_post_process_inventor_pgpubs',
                                                    python_callable= post_process_inventor_qc_pgpubs,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
