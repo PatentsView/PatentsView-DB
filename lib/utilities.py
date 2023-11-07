@@ -78,7 +78,7 @@ def load_table_config(config, db='patent'):
 
 def get_relevant_attributes(self, class_called, database_section, config):
     print(f"assigning class variables based on class {class_called} and database section {database_section}.")
-    if class_called == "AssigneePostProcessingQC":
+    if (class_called == "AssigneePostProcessingQC") or (class_called == "AssigneePostProcessingQCPhase2") :
         self.database_section = database_section
         self.table_config = load_table_config(config, db='patent')
         self.entity_table = 'rawassignee'
@@ -98,7 +98,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.f_key = ""
         self.exclusion_list = []
 
-    elif class_called == "InventorPostProcessingQC":
+    elif (class_called == "InventorPostProcessingQC") or (class_called == "InventorPostProcessingQCPhase2") :
         self.database_section = database_section
         self.table_config = load_table_config(config, db='patent')
         self.entity_table = 'rawinventor'
