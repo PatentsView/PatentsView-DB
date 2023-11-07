@@ -544,6 +544,30 @@
         "location_field": false
       }
     },
+    "TestScripts": []
+  },
+    "inventor_disambiguation_mapping": {
+    "fields": {
+      "uuid": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "inventor_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "inventor",
+        "main_table_id": "inventor_id",
+        "related_table_id": "id"
+      }
+    ],
     "TestScripts": ["InventorPostProcessingQC"]
   },
   "ipcr": {
@@ -709,7 +733,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": ["InventorPostProcessingQCPGPUBSPhase2"]
+    "TestScripts": ["InventorPostProcessingQCPhase2"]
   },
   "main_cpc": {
     "fields": {
@@ -1070,7 +1094,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": ["InventorPostProcessingQCPGPUBSPhase2"]
+    "TestScripts": ["InventorPostProcessingQCPhase2"]
   },
   "rawassignee": {
     "fields": {
