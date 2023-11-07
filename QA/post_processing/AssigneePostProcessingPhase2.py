@@ -13,16 +13,13 @@ class AssigneePostProcessingQCPhase2(DisambiguationTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, config['PATENTSVIEW_DATABASES']["PROD_DB"], datetime.date(year=1976, month=1, day=1), end_date)
 
-    # def runTests(self):
-        # Runs all Disambiguation Tests
     def run_assignee_disambig_tests(self):
-        # Runs all Disambiguation Tests
-        super(AssigneePostProcessingQCPhase2, self).runTests()
         counter = 0
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()
         for table in self.table_config:
             print(table)
+            self.check_for_indexes(self, table)
             self.load_table_row_count(table, where_vi=False)
             self.load_nulls(table, self.table_config[table], where_vi=False)
             self.test_blank_count(table, self.table_config[table], where_vi=False)
