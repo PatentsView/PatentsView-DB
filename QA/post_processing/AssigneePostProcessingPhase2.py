@@ -19,7 +19,7 @@ class AssigneePostProcessingQCPhase2(DisambiguationTester):
         self.init_qa_dict()
         for table in self.table_config:
             print(table)
-            self.check_for_indexes(self, table)
+            self.check_for_indexes(table)
             self.load_table_row_count(table, where_vi=False)
             self.load_nulls(table, self.table_config[table], where_vi=False)
             self.test_blank_count(table, self.table_config[table], where_vi=False)
