@@ -19,6 +19,8 @@ import numpy as np
 from itertools import combinations
 
 from QA.post_processing.AssigneePostProcessing import AssigneePostProcessingQC
+from QA.post_processing.AssigneePostProcessingPhase2 import AssigneePostProcessingQCPhase2
+
 from lib.configuration import get_connection_string, get_current_config, get_disambig_config
 from updater.post_processing.create_lookup import load_lookup_table
 
@@ -447,6 +449,21 @@ def additional_post_processing_assignee(**kwargs):
 def post_process_qc(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     qc = AssigneePostProcessingQC(config)
+    qc.run_assignee_disambig_tests()
+
+def post_process_assignee_qc_pgpubs(**kwargs):
+    config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
+    qc = AssigneePostProcessingQC(config)
+    qc.run_assignee_disambig_tests()
+
+def post_process_assignee_patent_phase2_qc(**kwargs):
+    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
+    qc = AssigneePostProcessingQCPhase2(config)
+    qc.run_assignee_disambig_tests()
+
+def post_process_assignee_pgpubs_phase2_qc(**kwargs):
+    config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
+    qc = AssigneePostProcessingQCPhase2(config)
     qc.run_assignee_disambig_tests()
 
 if __name__ == '__main__':

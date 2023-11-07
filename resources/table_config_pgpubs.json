@@ -109,6 +109,30 @@
     },
     "TestScripts": []
   },
+    "assignee_disambiguation_mapping": {
+    "fields": {
+      "uuid": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "assignee_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "assignee",
+        "main_table_id": "assignee_id",
+        "related_table_id": "id"
+      }
+    ],
+    "TestScripts": ["AssigneePostProcessingQC"]
+  },
   "cpc": {
     "fields": {
       "id": {
@@ -520,7 +544,7 @@
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["InventorPostProcessingQC"]
   },
   "ipcr": {
     "fields": {
@@ -655,7 +679,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["AssigneePostProcessingQCPhase2"]
   },
   "location_inventor": {
     "fields": {
@@ -685,7 +709,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["InventorPostProcessingQCPGPUBSPhase2"]
   },
   "main_cpc": {
     "fields": {
@@ -1010,7 +1034,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["AssigneePostProcessingQCPhase2"]
   },
   "publication_inventor": {
     "fields": {
@@ -1046,7 +1070,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["InventorPostProcessingQCPGPUBSPhase2"]
   },
   "rawassignee": {
     "fields": {
@@ -1132,7 +1156,8 @@
     "TestScripts": [
       "MergeTestWeekly",
       "MergeTestQuarterly",
-      "UploadTest"
+      "UploadTest",
+      "AssigneePostProcessingQC"
     ]
   },
   "rawinventor": {
@@ -1219,7 +1244,8 @@
     "TestScripts": [
       "MergeTestWeekly",
       "MergeTestQuarterly",
-      "UploadTest"
+      "UploadTest",
+      "InventorPostProcessingQC"
     ]
   },
   "rawlocation": {

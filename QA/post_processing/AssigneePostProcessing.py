@@ -17,6 +17,7 @@ class AssigneePostProcessingQC(DisambiguationTester):
         # Runs all Disambiguation Tests
     def run_assignee_disambig_tests(self):
         # Runs all Disambiguation Tests
+        super(AssigneePostProcessingQC, self).runTests()
         counter = 0
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()
@@ -32,9 +33,10 @@ class AssigneePostProcessingQC(DisambiguationTester):
             logger.info(f"Currently Done With {counter} of {total_tables} | {(counter/total_tables)*100} %")
 
 if __name__ == '__main__':
-    config = get_current_config('granted_patent', schedule='quarterly', **{
-            "execution_date": datetime.date(2023, 1, 1)
-            })
-    # print({section: dict(config[section]) for section in config.sections()})
-    qc = AssigneePostProcessingQC(config)
-    qc.run_assignee_disambig_tests()
+    for d in [datetime.date(2022, 1, 1), datetime.date(2022, 4, 1), datetime.date(2022, 7, 1), datetime.date(2022, 10, 1)]:
+        config = get_current_config('granted_patent', schedule='quarterly', **{
+                "execution_date": d
+                })
+        # print({section: dict(config[section]) for section in config.sections()})
+        qc = AssigneePostProcessingQC(config)
+        qc.run_assignee_disambig_tests()

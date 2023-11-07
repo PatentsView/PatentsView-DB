@@ -6,6 +6,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
+from QA.post_processing.InventorPostProcessingPhase2 import InventorPostProcessingQCPhase2
 from lib.configuration import get_connection_string, get_current_config, get_disambig_config, get_unique_connection_string
 from updater.post_processing.create_lookup import load_lookup_table
 from gender_it.patentsview_gender_attribution import get_disambiguated_inventor_batch, run_AIR_genderit
@@ -388,6 +389,21 @@ def post_process_qc(**kwargs):
     qc = InventorPostProcessingQC(config)
     qc.runTests()
 
+def post_process_inventor_qc_pgpubs(**kwargs):
+    config = get_current_config('pgpubs',schedule='quarterly', **kwargs)
+    qc = InventorPostProcessingQC(config)
+    qc.runTests()
+
+def post_process_inventor_patent_phase2_qc(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    qc = InventorPostProcessingQCPhase2(config)
+    qc.runTests()
+
+def post_process_inventor_pgpubs_phase2_qc(**kwargs):
+    config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
+    qc = InventorPostProcessingQCPhase2(config)
+    qc.runTests()
+
 def evaluate_inventor_clustering(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     engine = create_engine(get_connection_string(config, "RAW_DB"))
@@ -418,22 +434,9 @@ if __name__ == '__main__':
     # post_process_inventor(**{
     #     "execution_date": datetime.date(2020, 12, 29)
     # })
-    # post_process_qc(**{
-    #         "execution_date": datetime.date(2020, 12, 29)
-    #         })
-    # evaluate_inventor_clustering(**{
-    #     "execution_date": datetime.date(2020, 12, 29)
-    # })
-    # config = get_disambig_config(schedule='quarterly', **{
-    #     "execution_date": datetime.date(2023, 1, 1)
-    # })
-    # create_inventor(config)
-    # run_genderit("granted_patent", **{
-    #     "execution_date": datetime.date(2023, 4, 1)
-    # })
-    # run_genderit("pgpubs", **{
-    #     "execution_date": datetime.date(2023, 4, 1)
-    # })
-    post_process_inventor_gender(**{
-        "execution_date": datetime.date(2023, 4, 1)
+    run_genderit("granted_patent", **{
+        "execution_date": datetime.date(2023, 7, 1)
     })
+    # post_process_inventor_gender(**{
+    #     "execution_date": datetime.date(2023, 4, 1)
+    # })
