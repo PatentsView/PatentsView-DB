@@ -174,19 +174,19 @@ class LawyerDisambiguator:
             if freq[k]:
                 param[k] = freq[k].most_common(1)[0][0]
         if 'organization' not in param:
-            param['organization'] = ''
+            param['organization'] = None
         if 'type' not in param:
-            param['type'] = ''
+            param['type'] = None
         if 'name_last' not in param:
-            param['name_last'] = ''
+            param['name_last'] = None
         if 'name_first' not in param:
-            param['name_first'] = ''
+            param['name_first'] = None
         if 'residence' not in param:
-            param['residence'] = ''
+            param['residence'] = None
         if 'nationality' not in param:
-            param['nationality'] = ''
+            param['nationality'] = None
         if 'country' not in param:
-            param['country'] = ''
+            param['country'] = None
 
         if param["organization"]:
             param["id"] = md5(unidecode(param["organization"]).encode('utf-8')).hexdigest()
@@ -338,6 +338,11 @@ class LawyerDisambiguator:
 
         for t in p_list:
             t.get()
+        # note for future pipeline debugging - when you get the error message `Table 'lawyer_disambiguation_results' already exists`,
+        # don't delete `lawyer_disambiguation_results`, just run again - 
+        # fetch_session checks if a table exists and generates "CREATE TABLE" commands if a table doesn't exist; 
+        # but it doesn't generate "CREATE TABLE IF NOT EXISTS" commands, so when two commands are generated in parallel, they clash with each other.
+        # - Jack, November 2023
 
         log_queue.put({
             "level": logging.INFO,
