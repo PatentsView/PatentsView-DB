@@ -588,8 +588,8 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                                                            post_process_create_pgpubs_loc_assignee],
                      'location_inventor_granted_link': [qc_post_process_location_operator,
                                                         post_process_create_patent_loc_inventor],
-                     'location_inventor_pregranted_link': [post_process_create_pgpubs_loc_inventor,
-                                                           post_process_create_pgpubs_inventor]
+                     'location_inventor_pregranted_link': [qc_post_process_location_operator,
+                                                           post_process_create_pgpubs_loc_inventor]
                      }
 
 
