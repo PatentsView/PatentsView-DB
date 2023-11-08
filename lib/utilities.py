@@ -80,7 +80,10 @@ def get_relevant_attributes(self, class_called, database_section, config):
     print(f"assigning class variables based on class {class_called} and database section {database_section}.")
     if (class_called == "AssigneePostProcessingQC") or (class_called == "AssigneePostProcessingQCPhase2") :
         self.database_section = database_section
-        self.table_config = load_table_config(config, db='patent')
+        if self.database_section == 'patent':
+            self.table_config = load_table_config(config, db='patent')
+        else:
+            self.table_config = load_table_config(config, db='pgpubs')
         self.entity_table = 'rawassignee'
         self.entity_id = 'uuid'
         self.disambiguated_id = 'assignee_id'
@@ -100,7 +103,10 @@ def get_relevant_attributes(self, class_called, database_section, config):
 
     elif (class_called == "InventorPostProcessingQC") or (class_called == "InventorPostProcessingQCPhase2") :
         self.database_section = database_section
-        self.table_config = load_table_config(config, db='patent')
+        if self.database_section == 'patent':
+            self.table_config = load_table_config(config, db='patent')
+        else:
+            self.table_config = load_table_config(config, db='pgpubs')
         self.entity_table = 'rawinventor'
         self.entity_id = 'uuid'
         self.disambiguated_id = 'inventor_id'
