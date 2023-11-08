@@ -13,11 +13,12 @@ class AssigneePostProcessingQC(DisambiguationTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, config['PATENTSVIEW_DATABASES']["PROD_DB"], datetime.date(year=1976, month=1, day=1), end_date)
 
-    # def runTests(self):
-        # Runs all Disambiguation Tests
     def run_assignee_disambig_tests(self):
-        # Runs all Disambiguation Tests
         super(AssigneePostProcessingQC, self).runTests()
+        self.run_assignee_disambig_tests_pgpubs()
+
+    def run_assignee_disambig_tests_pgpubs(self):
+        # Runs all Disambiguation Tests
         counter = 0
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()

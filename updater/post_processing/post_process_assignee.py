@@ -454,7 +454,7 @@ def post_process_qc(**kwargs):
 def post_process_assignee_qc_pgpubs(**kwargs):
     config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     qc = AssigneePostProcessingQC(config)
-    qc.run_assignee_disambig_tests()
+    qc.run_assignee_disambig_tests_pgpubs()
 
 def post_process_assignee_patent_phase2_qc(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)

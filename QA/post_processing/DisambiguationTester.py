@@ -130,8 +130,8 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
         else:
             invalid_query = f"""
             SELECT count(*)
-            from {self.disambiguated_table} dt
-                left join {self.entity_table} et on et.{self.disambiguated_id} = dt.id
+            from patent.{self.disambiguated_table} dt
+                left join patent.{self.entity_table} et on et.{self.disambiguated_id} = dt.id
                 left join {self.config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE']}.{self.entity_table} et2 on et2.{self.disambiguated_id} = dt.id
             where et.{self.disambiguated_id} is null
                 and et2.{self.disambiguated_id} is null
