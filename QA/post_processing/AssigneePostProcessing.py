@@ -18,7 +18,6 @@ class AssigneePostProcessingQC(DisambiguationTester):
         self.run_assignee_disambig_tests_pgpubs()
 
     def run_assignee_disambig_tests_pgpubs(self):
-        # Runs all Disambiguation Tests
         counter = 0
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()

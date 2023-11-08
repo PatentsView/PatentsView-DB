@@ -387,12 +387,12 @@ add KEY `inventor_id` (`inventor_id`)"""
 def post_process_qc(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQC(config)
-    qc.runTests()
+    qc.run_inventor_disambig_tests()
 
 def post_process_inventor_qc_pgpubs(**kwargs):
     config = get_current_config('pgpubs',schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQC(config)
-    qc.runTests()
+    qc.run_inventor_disambig_tests_pgpubs()
 
 def post_process_inventor_patent_phase2_qc(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
