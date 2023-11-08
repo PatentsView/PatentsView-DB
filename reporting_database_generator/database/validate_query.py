@@ -33,7 +33,7 @@ def nextword(target, source):
 
 def db_and_table_as_array(single_line_query):
     # Identify all tables used in the query for collation check
-    single_line_query = single_line_query.lower()
+    # single_line_query = single_line_query.lower()
     single_line_query = single_line_query.replace('`', '')
     print(f"examining table schema for query: {single_line_query}")
     single_line_query_words = single_line_query.split(" ")
