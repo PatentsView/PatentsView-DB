@@ -616,7 +616,7 @@ def parse_publication_xml(xml_file, dtd_file, table_xml_map, config, log_queue, 
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
         if 'patent_id' in dfs[df].columns:
-            dfs[df]['patent_id'] = dfs[df]['patent_id'].apply(process_patent_numbers)
+            dfs[df]['patent_id'] = dfs[df]['patent_id'].astype(str).apply(process_patent_numbers)
         #table specific post-processing
         if df == 'government_interest':
             narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
