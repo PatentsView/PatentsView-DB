@@ -204,7 +204,7 @@ create table `{{reporting_db}}`.`inventor`
   `last_seen_date` date null,
   `years_active` smallint unsigned not null,
   `persistent_inventor_id` varchar(256) not null,
-  `gender_code` varchar(10) null
+  `gender_code` varchar(10) null,
   primary key (`inventor_id`)
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

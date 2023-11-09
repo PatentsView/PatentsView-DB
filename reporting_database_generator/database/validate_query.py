@@ -38,8 +38,8 @@ def db_and_table_as_array(single_line_query):
     print(f"examining table schema for query: {single_line_query}")
     single_line_query_words = single_line_query.split(" ")
     # print(single_line_query_words)
-    after_into = nextword('into', single_line_query_words)
-    after_from = nextword('from', single_line_query_words)
+    after_into = nextword('into', single_line_query_words.lower())
+    after_from = nextword('from', single_line_query_words.lower())
     if '(' in after_from:
         after_from = nextword('join', single_line_query_words)
     if after_into is None or after_from is None:
