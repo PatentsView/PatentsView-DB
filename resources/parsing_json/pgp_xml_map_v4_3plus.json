@@ -1371,7 +1371,7 @@
           "data-type": "string"
         },
         {
-          "field_name": "authority_category",
+          "field_name": "applicant_authority",
           "friendly_name": "Authority Category",
           "xml_path": ".",
           "attribute": "applicant-authority-category",

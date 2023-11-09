@@ -334,6 +334,92 @@
         }
       ],
       "filename": "further_cpc.tsv"
+    },
+    {
+      "table_name": "non_inventor_applicant",
+      "friendly_name": "US Parties",
+      "multi_valued": true,
+      "entity_root_path": "us-bibliographic-data-grant/us-parties/us-applicants/",
+      "fields": [
+        {
+          "field_name": "fname",
+          "friendly_name": "Name first",
+          "xml_path": "addressbook/first-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "lname",
+          "friendly_name": "Name Last",
+          "xml_path": "addressbook/last-name",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "organization",
+          "friendly_name": "Organization",
+          "xml_path": "addressbook/orgname",
+          "attribute": null,
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "designation",
+          "friendly_name": "Designation",
+          "xml_path": ".",
+          "attribute": "designation",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "applicant_type",
+          "friendly_name": "Type",
+          "xml_path": ".",
+          "attribute": "app-type",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "applicant_authority",
+          "friendly_name": "Authority Category",
+          "xml_path": ".",
+          "attribute": "applicant-authority-category",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
+          "field_name": "sequence",
+          "friendly_name": "Sequence",
+          "xml_path": ".",
+          "attribute": "sequence",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        }
+      ],
+      "filename": "non_inventor_applicant.tsv"
     }
   ]
 }
