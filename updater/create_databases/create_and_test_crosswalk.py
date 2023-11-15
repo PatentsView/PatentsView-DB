@@ -15,9 +15,9 @@ from lib.configuration import get_connection_string, get_current_config
 #   `patent_id` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 #   `application_number` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 #   `g_version_indicator` date DEFAULT NULL,
-#   `latest_pat_flag` tinyint(1) DEFAULT NULL,
+#   `current_patent_id_flag` tinyint(1) DEFAULT NULL,
 #   `pg_version_indicator` date DEFAULT NULL,
-#   `latest_pub_flag` tinyint(1) DEFAULT NULL,
+#   `current_pgpub_id_flag` tinyint(1) DEFAULT NULL,
 #   `created_date` timestamp NULL DEFAULT current_timestamp(),
 #   `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
 #   PRIMARY KEY (`id`),
@@ -161,14 +161,14 @@ def create_outer_patent_publication_crosswalk(**kwargs):
     -- setting latest patent flag...
     UPDATE `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}` xw
     LEFT JOIN `pregrant_publications`.`temp_xwalk_pat_latest` pat ON (xw.application_number = pat.application_number AND xw.g_version_indicator = pat.g_max_vi)
-    SET xw.latest_pat_flag = CASE WHEN pat.g_max_vi IS NOT NULL THEN 1 ELSE 0 END
+    SET xw.current_patent_id_flag = CASE WHEN pat.g_max_vi IS NOT NULL THEN 1 ELSE 0 END
     """
 
     query_dict['pub_flag_update_query'] = f"""
     -- setting latest publication flag...
     UPDATE `pregrant_publications`.`granted_patent_crosswalk_{end_date.replace('-','')}` xw
     LEFT JOIN `pregrant_publications`.`temp_xwalk_pub_latest` pub ON (xw.application_number = pub.application_number AND xw.pg_version_indicator = pub.pg_max_vi)
-    SET xw.latest_pub_flag = CASE WHEN pub.pg_max_vi IS NOT NULL THEN 1 ELSE 0 END
+    SET xw.current_pgpub_id_flag = CASE WHEN pub.pg_max_vi IS NOT NULL THEN 1 ELSE 0 END
     """
 
     #instantiating session to use temporary tables and cause rollback on error
@@ -357,8 +357,8 @@ def check_unique_current_ids(table, engine):
     FROM (
         SELECT application_number, patent_id, document_number, COUNT(*) 
         FROM `pregrant_publications`.`{table}`
-        WHERE latest_pat_flag = 1
-        AND latest_pub_flag = 1
+        WHERE current_patent_id_flag = 1
+        AND current_pgpub_id_flag = 1
         GROUP BY 1,2,3
         HAVING COUNT(*) > 1
     ) sq

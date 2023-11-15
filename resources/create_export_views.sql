@@ -547,8 +547,8 @@ SELECT
 `xw`.`document_number` AS `pgpub_id`,
 `xw`.`patent_id` AS `patent_id`,
 `xw`.`application_number` AS `application_id`,
-CASE WHEN `xw`.`latest_pub_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS `current_pgpub_id_flag`,
-CASE WHEN `xw`.`latest_pat_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS `current_patent_id_flag`
+CASE WHEN `xw`.`current_pgpub_id_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS `current_pgpub_id_flag`,
+CASE WHEN `xw`.`current_patent_id_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS `current_patent_id_flag`
 FROM `pregrant_publications`.`granted_patent_crosswalk_{{datestring}}` `xw`
 WHERE (`xw`.`g_version_indicator` <= '{{datestring}}' or `xw`.`g_version_indicator` is null) 
 AND (`xw`.`pg_version_indicator` <= '{{datestring}}' or `xw`.`pg_version_indicator` is null);
