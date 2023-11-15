@@ -72,7 +72,7 @@ select distinct
   , i.last_seen_date
   , i.years_active
   , i.persistent_inventor_id
-  , i.gender_flag
+  , gender_flag
 from
     `{{reporting_db}}`.`inventor` i
         lEft join `{{reporting_db}}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
