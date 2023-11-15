@@ -8,10 +8,13 @@ from sqlalchemy import create_engine
 from time import time
 
 def export_parquet_file(rawassignee_records, letter):
+    query_start_time = time()
     export_name = f"rawassignee_{letter}.parquet"
     table = pa.Table.from_pandas(rawassignee_records)
     try:
         pq.write_table(table, export_name)
+        query_end_time = time()
+        print("\t\tThis export took:", (query_end_time-query_start_time)/60, "minutes")
     except:
         print(f"writing {export_name} failed")
 
@@ -45,7 +48,6 @@ def get_rawassignee_data(config):
         export_parquet_file(rawassignee_records, letter)
 
 def get_rawassignee_null_orgs_data(config):
-    from string import ascii_lowercase as alc
     cstr = get_connection_string(config, 'PROD_DB')
     quarter_ed = config["DATES"]["END_DATE"]
     engine = create_engine(cstr)
@@ -71,8 +73,35 @@ def get_rawassignee_null_orgs_data(config):
     print("\t\tThis query took:", (query_end_time-query_start_time)/60, "minutes")
     export_parquet_file(rawassignee_records, "null_org")
 
+def get_rawassignee_else(config):
+    cstr = get_connection_string(config, 'PROD_DB')
+    quarter_ed = config["DATES"]["END_DATE"]
+    engine = create_engine(cstr)
+    q = f"""
+    select uuid
+        , name_first
+         , name_last
+         , organization
+         , c.city as disambig_city
+         , c.state as disambig_state
+         , c.country as disambig_country
+         , c.latitude as disambig_lat
+         , c.longitude as disambig_long
+    from rawassignee a 
+        inner join rawlocation b on a.rawlocation_id =b.id
+        inner join location_{quarter_ed} c on b.location_id=c.location_id
+        where organization is not null and left(organization, 1) NOT RLIKE '^[A-Z]'
+        """
+    query_start_time = time()
+    rawassignee_records = pd.read_sql_query(sql=q, con=engine)
+    print(q)
+    query_end_time = time()
+    print("\t\tThis query took:", (query_end_time-query_start_time)/60, "minutes")
+    export_parquet_file(rawassignee_records, "else")
+
 if __name__ == '__main__':
     type = 'granted_patent'
     config = get_current_config(type, schedule="quarterly", **{"execution_date": datetime.date(2023, 7, 1)})
     get_rawassignee_data(config)
     get_rawassignee_null_orgs_data(config)
+    get_rawassignee_else(config)
