@@ -76,7 +76,7 @@ select distinct
 from
     `{{reporting_db}}`.`inventor` i
         lEft join `{{reporting_db}}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
-        left join gender_attribution.inventor_gender_{{version_indicator}} ig on i.id=ig.inventor_id;;
+        left join gender_attribution.inventor_gender_{{version_indicator}} ig on i.inventor_id=ig.inventor_id;;
 
 
 TRUNCATE TABLE `{{elastic_db}}`.inventor_years;
