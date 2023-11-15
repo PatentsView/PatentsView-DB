@@ -21,8 +21,8 @@ sql security invoker view  `{{elastic_db}}`.granted_pregrant_crosswalk as
 select gpc.patent_id as patent_id
      , gpc.document_number
      , gpc.application_number
-     , gpc.current_pgpub_id_flag
-     , gpc.current_patent_id_flag
+     , gpc.latest_pub_flag
+     , gpc.latest_pat_flag
 from pregrant_publications.granted_patent_crosswalk_{{version_indicator}} gpc;
 
 
