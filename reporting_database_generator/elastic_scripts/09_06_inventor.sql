@@ -15,9 +15,10 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventor_years`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventors`
 (
-    `inventor_id`                      int(10) unsigned                        NOT NULL,
+    `inventor_id`                      varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
     `name_first`                       varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `name_last`                        varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `num_patents`                      int(10) unsigned                        NOT NULL,
