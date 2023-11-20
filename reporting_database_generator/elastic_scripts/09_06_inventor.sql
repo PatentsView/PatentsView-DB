@@ -6,7 +6,7 @@ use `{{elastic_db}}`;
 
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventor_years`
 (
-    `inventor_id` int(10) unsigned NOT NULL,
+    `inventor_id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
     `patent_year` smallint(6)      NOT NULL,
     `num_patents` int(10) unsigned NOT NULL,
     KEY `ix_inventor_year_inventor_id` (`inventor_id`),
@@ -55,8 +55,7 @@ INSERT INTO `{{elastic_db}}`.inventors( inventor_id, name_first, name_last, num_
                                         , lastknown_state, lastknown_country, lastknown_latitude, lastknown_longitude
                                         , first_seen_date, last_seen_date, years_active, persistent_inventor_id
                                         , gender_code)
-select distinct
-    i.inventor_id
+select distinct i.inventor_id
   , i.name_first
   , i.name_last
   , i.num_patents
@@ -75,7 +74,8 @@ select distinct
   , gender_flag
 from
     `{{reporting_db}}`.`inventor` i
-        lEft join `{{reporting_db}}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
+        left join `{{reporting_db}}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
+        left join `PatentsView_{{version_indicator}}`.`temp_id_mapping_inventor` timi on i.inventor_id = timi.new_inventor_id
         left join gender_attribution.inventor_gender_{{version_indicator}} ig on i.inventor_id=ig.inventor_id;;
 
 
