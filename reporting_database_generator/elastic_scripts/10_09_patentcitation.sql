@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`us_patent_citations`
     `kind`               varchar(10) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
     `category`           varchar(64) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
     `sequence`           bigint(22)                             NOT NULL,
-    `patent_zero_prefix` varchar(32) COLLATE utf8mb4_unicode_ci,
+    `patent_zero_prefix` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     PRIMARY KEY (`uuid`),
     KEY `patent_id` (`patent_id`),
     KEY `citation_id` (`citation_id`),
