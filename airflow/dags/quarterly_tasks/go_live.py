@@ -13,18 +13,18 @@ from QA.production.ProdDBTester import run_prod_db_qa
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'email': ['bcard@air.org'],
+    'email': ['contact@patentsview.org'],
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
-    'concurrency': 4,
+    'concurrency': 40,
     'queue': 'data_collector'
 }
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
-go_live_dag = DAG("GO_LIVE"
+go_live_dag = DAG(dag_id="GO_LIVE"
                        , default_args=default_args
                        , start_date=datetime(2023, 4, 1)
                        , schedule_interval='@quarterly'
