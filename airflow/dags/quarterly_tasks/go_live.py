@@ -50,6 +50,7 @@ PVSupport = SQLTemplatedPythonOperator(
     dag=go_live_dag,
     op_kwargs={
         'filename': 'PVSupport_webtool',
+        'host':'PROD_DATABASE_SETUP'
     },
     templates_dict={
         'source_sql': 'PVSupport_webtool.sql'
