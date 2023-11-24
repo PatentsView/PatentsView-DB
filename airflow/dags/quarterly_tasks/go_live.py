@@ -43,8 +43,22 @@ web_tools = SQLTemplatedPythonOperator(
     }
 )
 
+PVSupport = SQLTemplatedPythonOperator(
+    task_id='Web_Tool',
+    provide_context=True,
+    python_callable=validate_query.validate_and_execute,
+    dag=go_live_dag,
+    op_kwargs={
+        'filename': 'PVSupport_webtool',
+    },
+    templates_dict={
+        'source_sql': 'PVSupport_webtool.sql'
+    }
+)
+
 qa_production_data = PythonOperator(task_id='QA_PROD_DB'
                              , python_callable=run_prod_db_qa
                              , op_kwargs={'type': 'granted_patent'})
 
-qa_production_data.set_upstream(web_tools)
+PVSupport.set_upstream(web_tools)
+qa_production_data.set_upstream(PVSupport)
