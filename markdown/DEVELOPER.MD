@@ -137,7 +137,7 @@ An [Airflow Pool](https://airflow.apache.org/docs/apache-airflow/stable/administ
    3. guest:guest
 
 ## Updating SSL
-1. Allow access to the world (0.0.0.0) for http port on the GP Linux server in AWS
+1. Allow access to the world (`0.0.0.0/0`) for http port on the GP Linux server in AWS
 2. `SSH PVGP`
 3. `sudo -i`
 4. `certbot` 
