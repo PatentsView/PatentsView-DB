@@ -280,53 +280,36 @@ from {temp_db}.detail_desc_text_{year}
             }
     merge_text_data(text_table_config, config)
 
-
-
 def post_merge_weekly_granted(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
     run_id = kwargs.get('run_id')
-    # if run_id.startswith("backfill"):
-    #     print("Skipping QC")
-    # else:
     qc = MergeTestWeekly(config, run_id=kwargs['run_id'])
-    qc.runTests()
+    qc.runStandardTests()
 
 def post_merge_quarterly_granted(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     run_id = kwargs.get('run_id')
-    # if run_id.startswith("backfill"):
-    #     print("Skipping QC")
-    # else:
     qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
-    qc.runTests()
+    qc.runStandardTests()
 
 def post_merge_weekly_pgpubs(**kwargs):
     config = get_current_config('pgpubs', **kwargs)
     run_id = kwargs.get('run_id')
-    # if run_id.startswith("backfill"):
-    #     print("Skipping QC")
-    # else:
     qc = MergeTestWeekly(config, run_id=kwargs['run_id'])
-    qc.runTests()
+    qc.runStandardTests()
 
 def post_merge_quarterly_pgpubs(**kwargs):
     config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     run_id = kwargs.get('run_id')
-    # if run_id.startswith("backfill"):
-    #     print("Skipping QC")
-    # else:
     qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
-    qc.runTests()
+    qc.runStandardTests()
 
 
 def post_text_merge(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
     run_id = kwargs.get('run_id')
-    # if run_id.startswith("backfill"):
-    #     print("Skipping QC")
-    # else:
     qc = TextMergeTest(config)
-    qc.runTests()
+    qc.runStandardTests()
 
 
 if __name__ == '__main__':

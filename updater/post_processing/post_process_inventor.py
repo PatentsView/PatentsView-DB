@@ -392,17 +392,17 @@ def post_process_qc(**kwargs):
 def post_process_inventor_qc_pgpubs(**kwargs):
     config = get_current_config('pgpubs',schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQC(config)
-    qc.run_inventor_disambig_tests_pgpubs()
+    qc.runInventorAssigneeTests()
 
 def post_process_inventor_patent_phase2_qc(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQCPhase2(config)
-    qc.run_inventor_disambig_tests()
+    qc.runInventorAssigneeTests()
 
 def post_process_inventor_pgpubs_phase2_qc(**kwargs):
     config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQCPhase2(config)
-    qc.run_inventor_disambig_tests()
+    qc.runInventorAssigneeTests()
 
 def evaluate_inventor_clustering(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)

@@ -6,6 +6,7 @@ from airflow.operators.python_operator import PythonOperator
 from slack_sdk import WebClient
 from airflow import DAG
 from reporting_database_generator.database import validate_query
+from QA.post_processing.ElasticDBTester import run_elastic_db_qa
 
 # project_home = os.environ['PACKAGE_HOME']
 # config = configparser.ConfigParser()
@@ -90,6 +91,11 @@ endpoint_patent_views = SQLTemplatedPythonOperator(
 )
 endpoint_patent_views.set_upstream(db_creation)
 
+elastic_db_qa = PythonOperator(task_id='elastic_DB_QA',
+                                          python_callable=run_elastic_db_qa,
+                                          dag=elastic_prep_dag
+                                          )
+
 endpoint_patent_assignee_table = SQLTemplatedPythonOperator(
     task_id='Patent_Endpoint_Assignee_Table',
     python_callable=validate_query.validate_and_execute,
@@ -102,6 +108,8 @@ endpoint_patent_assignee_table = SQLTemplatedPythonOperator(
     }
 )
 endpoint_patent_assignee_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(endpoint_patent_assignee_table)
+
 endpoint_patent_inventor_table = SQLTemplatedPythonOperator(
     task_id='Patent_Endpoint_Inventor_Table',
     python_callable=validate_query.validate_and_execute,
@@ -114,6 +122,7 @@ endpoint_patent_inventor_table = SQLTemplatedPythonOperator(
     }
 )
 endpoint_patent_inventor_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(endpoint_patent_inventor_table)
 
 endpoint_patent_cpc_table = SQLTemplatedPythonOperator(
     task_id='Patent_Endpoint_CPC_Table',
@@ -127,6 +136,7 @@ endpoint_patent_cpc_table = SQLTemplatedPythonOperator(
     }
 )
 endpoint_patent_cpc_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(endpoint_patent_cpc_table)
 
 endpoint_patent_applicant_table = SQLTemplatedPythonOperator(
     task_id='Patent_Endpoint_Applicant_Table',
@@ -140,6 +150,7 @@ endpoint_patent_applicant_table = SQLTemplatedPythonOperator(
     }
 )
 endpoint_patent_applicant_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(endpoint_patent_applicant_table)
 
 endpoint_patent_attorneys_table = SQLTemplatedPythonOperator(
     task_id='Patent_Endpoint_Attorneys_Table',
@@ -153,6 +164,7 @@ endpoint_patent_attorneys_table = SQLTemplatedPythonOperator(
     }
 )
 endpoint_patent_attorneys_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(endpoint_patent_attorneys_table)
 
 endpoint_patent_examiner_table = SQLTemplatedPythonOperator(
     task_id='Patent_Endpoint_Examiner_Table',
@@ -166,6 +178,7 @@ endpoint_patent_examiner_table = SQLTemplatedPythonOperator(
     }
 )
 endpoint_patent_examiner_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(endpoint_patent_examiner_table)
 
 endpoint_patent_GI_table = SQLTemplatedPythonOperator(
     task_id='Patent_Endpoint_GI_Table',
@@ -179,6 +192,8 @@ endpoint_patent_GI_table = SQLTemplatedPythonOperator(
     }
 )
 endpoint_patent_GI_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(endpoint_patent_GI_table)
+
 locations_endpoint_locations_table = SQLTemplatedPythonOperator(
     task_id='locations_Endpoint_locations_Table',
     python_callable=validate_query.validate_and_execute,
@@ -230,6 +245,7 @@ fcitation_endpoint_fcitation_table = SQLTemplatedPythonOperator(
     }
 )
 fcitation_endpoint_fcitation_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(fcitation_endpoint_fcitation_table)
 
 attorney_endpoint_attorney_table = SQLTemplatedPythonOperator(
     task_id='attorney_Endpoint_attorney_Table',
@@ -256,6 +272,7 @@ otherreference_endpoint_otherreference_table = SQLTemplatedPythonOperator(
     }
 )
 otherreference_endpoint_otherreference_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(otherreference_endpoint_otherreference_table)
 
 relapptext_endpoint_relapptext_table = SQLTemplatedPythonOperator(
     task_id='relapptext_Endpoint_relapptext_Table',
@@ -269,6 +286,7 @@ relapptext_endpoint_relapptext_table = SQLTemplatedPythonOperator(
     }
 )
 relapptext_endpoint_relapptext_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(relapptext_endpoint_relapptext_table)
 
 patentcitation_endpoint_patentcitation_table = SQLTemplatedPythonOperator(
     task_id='patentcitation_Endpoint_patentcitation_Table',
@@ -282,6 +300,7 @@ patentcitation_endpoint_patentcitation_table = SQLTemplatedPythonOperator(
     }
 )
 patentcitation_endpoint_patentcitation_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(patentcitation_endpoint_patentcitation_table)
 
 applicationcitation_endpoint_applicationcitation_table = SQLTemplatedPythonOperator(
     task_id='applicationcitation_Endpoint_applicationcitation_Table',
@@ -295,6 +314,7 @@ applicationcitation_endpoint_applicationcitation_table = SQLTemplatedPythonOpera
     }
 )
 applicationcitation_endpoint_applicationcitation_table.set_upstream(endpoint_patent_patents_table)
+elastic_db_qa.set_upstream(applicationcitation_endpoint_applicationcitation_table)
 
 classifications_endpoint_classifications_table = SQLTemplatedPythonOperator(
     task_id='classifications_Endpoint_classifications_Table',
@@ -308,3 +328,4 @@ classifications_endpoint_classifications_table = SQLTemplatedPythonOperator(
     }
 )
 classifications_endpoint_classifications_table.set_upstream(db_creation)
+
