@@ -6,6 +6,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
+from QA.post_processing.InventorGenderPostProcessing import InventorGenderPostProcessingQC
 from QA.post_processing.InventorPostProcessingPhase2 import InventorPostProcessingQCPhase2
 from lib.configuration import get_connection_string, get_current_config, get_disambig_config, get_unique_connection_string
 from updater.post_processing.create_lookup import load_lookup_table
@@ -388,21 +389,23 @@ def post_process_qc(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQC(config)
     qc.run_inventor_disambig_tests()
+    gc_ig = InventorPostProcessingQC(config)
+    gc_ig.rawinventor_gender()
 
 def post_process_inventor_qc_pgpubs(**kwargs):
     config = get_current_config('pgpubs',schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQC(config)
-    qc.runInventorAssigneeTests()
+    qc.runDisambiguationTests()
 
 def post_process_inventor_patent_phase2_qc(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQCPhase2(config)
-    qc.runInventorAssigneeTests()
+    qc.runDisambiguationTests()
 
 def post_process_inventor_pgpubs_phase2_qc(**kwargs):
     config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQCPhase2(config)
-    qc.runInventorAssigneeTests()
+    qc.runDisambiguationTests()
 
 def evaluate_inventor_clustering(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)

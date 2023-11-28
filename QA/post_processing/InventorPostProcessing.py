@@ -13,7 +13,7 @@ class InventorPostProcessingQC(DisambiguationTester):
 
     def run_inventor_disambig_tests(self):
         super(InventorPostProcessingQC, self).runTests()
-        self.runInventorAssigneeTests()
+        self.runDisambiguationTests()
 
 
 if __name__ == '__main__':

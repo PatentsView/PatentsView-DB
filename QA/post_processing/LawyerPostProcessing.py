@@ -11,8 +11,7 @@ class LawyerPostProcessingQC(DisambiguationTester):
 
     def runTests(self):
         super(LawyerPostProcessingQC, self).runTests()
-        super(DisambiguationTester, self).runTests()
-
+        super(DisambiguationTester, self).runDisambiguationTests()
 
 if __name__ == '__main__':
     config = get_current_config('granted_patent',schedule='quarterly', **{

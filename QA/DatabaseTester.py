@@ -610,7 +610,7 @@ where invention_abstract is null """
             logger.info(f"Currently Done With {counter} of {total_tables} | {counter / total_tables} %")
             logger.info(f"==============================================================================")
 
-    def runInventorAssigneeTests(self):
+    def runDisambiguationTests(self):
         counter = 0
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()

@@ -21,4 +21,4 @@ if __name__ == '__main__':
                 })
         # print({section: dict(config[section]) for section in config.sections()})
         qc = AssigneePostProcessingQCPhase2(config)
-        qc.runInventorAssigneeTests()
+        qc.runDisambiguationTests()

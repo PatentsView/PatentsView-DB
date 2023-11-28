@@ -46,7 +46,7 @@ def class_db_specific_config(self, table_config, class_called):
             tables_list = list(self.table_config.keys())
             quarter_date = self.end_date.strftime("%Y%m%d")
             for table in tables_list:
-                if table in ['assignee', "assignee_disambiguation_mapping", 'location', "location_disambiguation_mapping", 'inventor',  "inventor_disambiguation_mapping", "gender_attribution.inventor_gender"]:
+                if table in ['assignee', "assignee_disambiguation_mapping", 'location', "location_disambiguation_mapping", 'inventor',  "inventor_disambiguation_mapping", "inventor_gender", "rawinventor_gender", "rawinventor_gender_agg"]:
                     self.table_config[f'{table}_{quarter_date}'] = self.table_config.pop(f'{table}')
         print(f"The following list of tables are run for {class_called}:")
         print(self.table_config.keys())
@@ -65,6 +65,8 @@ def load_table_config(config, db='patent'):
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'
     elif db == config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]:
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'
+    elif db == "gender_attribution":
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_inventor_gender"]}'
     elif db == 'bulk_exp_granted':
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'
     elif db == 'bulk_exp_pgpubs':
@@ -100,6 +102,8 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.p_key = ""
         self.f_key = ""
         self.exclusion_list = []
+    elif (class_called == "InventorGenderPostProcessingQC"):
+        self.table_config = load_table_config(config, db='gender_attribution')
 
     elif (class_called == "InventorPostProcessingQC") or (class_called == "InventorPostProcessingQCPhase2") :
         self.database_section = database_section
