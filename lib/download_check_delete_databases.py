@@ -294,12 +294,12 @@ def clean_up_backups(db, output_path):
         subprocess_cmd(i)
 
 def check_table_exists(database, table_name):
-    query = f"""
+    q = f"""
 SELECT * FROM information_schema.tables
 WHERE table_name = '{table_name}' and database_schema = '{database}'
 """
     qc = DatabaseTester
-    count_value = qc.query_runner(query, single_value_return=True)
+    count_value = qc.query_runner(query=q, single_value_return=True)
     if count_value < 1:
         return False
     else:
@@ -325,7 +325,7 @@ def run_database_archive(type, output_override=None, **kwargs):
         else:
             output_path = find_data_collection_server_path(db_type=type, data_type="database")
 
-        db_archive_list = pd.date_range(start=oldest_db, end=first_day_last_quarter, inclusive="left", freq="W").tolist()
+        db_archive_list = pd.date_range(start=oldest_db, end=first_day_last_quarter, inclusive="left", freq="7D").tolist()
         db_archive_list_clean = [db_type + "_" + i.strftime('%Y%m%d') for i in db_archive_list]
         print(f"These databases will be archived:  {db_archive_list_clean}")
 
@@ -392,8 +392,8 @@ def run_table_archive(type, tablename, **kwargs):
 if __name__ == '__main__':
     type = 'granted_patent'
     # config = get_current_config(type, **{"execution_date": datetime.date(2023, 10, 1)})
-    # run_database_archive(type=type, **{"execution_date": datetime.date(2023, 10, 1)})
-    run_table_archive("granted_patent", "assignee_disambiguation_mapping_", **{"execution_date": datetime.date(2023, 10, 1)})
+    run_database_archive(type=type, **{"execution_date": datetime.date(2023, 10, 10)})
+    # run_table_archive("granted_patent", "assignee_disambiguation_mapping_", **{"execution_date": datetime.date(2023, 5, 2)})
 
 
 
