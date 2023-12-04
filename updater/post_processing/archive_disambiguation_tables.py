@@ -16,4 +16,4 @@ def archive_inventor_tables(**kwargs):
 def archive_location_tables(**kwargs):
     for db_type in ['granted_patent', "pgpubs"]:
         run_table_archive(db_type, "location_disambiguation_mapping_", **kwargs)
-    run_table_archive("granted_patent", "inventor_", **kwargs)
+    run_table_archive("granted_patent", "location_", **kwargs)
