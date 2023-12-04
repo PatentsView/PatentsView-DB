@@ -1,10 +1,38 @@
 import subprocess
+import mysql.connector
 import datetime
 from lib.configuration import get_connection_string, get_current_config, get_unique_connection_string
 import pymysql
 from sqlalchemy import create_engine
 import pandas as pd
 from dateutil.relativedelta import relativedelta
+from QA.DatabaseTester import DatabaseTester
+
+def get_oldest_table(config, table_type):
+    current_db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+    connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
+                                 user=config['DATABASE_SETUP']['USERNAME'],
+                                 password=config['DATABASE_SETUP']['PASSWORD'],
+                                 db=current_db,
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
+    table_type_length = len(table_type)
+    q = f"""
+    select  min(table_name)
+    from information_schema.tables
+    where table_schema = "{current_db}" and left(table_name, {table_type_length}) = '{table_type}' and table_type = "BASE TABLE"
+    """
+    print(q)
+    try:
+        if not connection.open:
+            connection.connect()
+        with connection.cursor() as generic_cursor:
+            generic_cursor.execute(q)
+            db = generic_cursor.fetchall()[0][0]
+    finally:
+        if connection.open:
+            connection.close()
+    return db, table_type_length
 
 
 def get_oldest_databases(config, db_type='granted_patent'):
@@ -265,6 +293,18 @@ def clean_up_backups(db, output_path):
         print(i)
         subprocess_cmd(i)
 
+def check_table_exists(database, table_name):
+    query = f"""
+SELECT * FROM information_schema.tables
+WHERE table_name = '{table_name}' and database_schema = '{database}'
+"""
+    qc = DatabaseTester
+    count_value = qc.query_runner(query, single_value_return=True)
+    if count_value < 1:
+        return False
+    else:
+        return True
+
 def date_fun(date):
     current_quarter = (date.month - 1) // 3 + 1
     first_day_current_quarter = datetime.date(date.year, (current_quarter - 1) * 3 + 1, 1)
@@ -311,31 +351,49 @@ def run_database_archive(type, output_override=None, **kwargs):
     else:
         print("Nothing to Archive this run")
 
-def run_table_archive(dbtype, table_list, output_path, **kwargs):
+def run_table_archive(type, tablename, **kwargs):
     # db = 'pregrant_publications'
     # NO SPACES ALLOWED IN TABLE_LIST
-    config = get_current_config(type=dbtype, **kwargs)
+    config = get_current_config(type=type, **kwargs)
     db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
-
-    if table_list.isempty():
+    if not tablename:
         raise Exception("Add Table List to DAG")
-    backup_tables(db, output_path, table_list)
-    # table_list remains the same if you want to review all tables
-    upload_tables_for_testing(config, db, output_path, table_list)
-    # Compare archived DB to Original
-    prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
-    prod_count_df = get_count_for_all_tables(prod_connection_string, table_list)
+    output_path = find_data_collection_server_path(db_type=type, data_type="table")
 
-    backup_connection_string = get_unique_connection_string(config, database= f"archive_temp_{db}", connection='DATABASE_SETUP')
-    backup_count_df = get_count_for_all_tables(backup_connection_string, table_list)
-    compare_results_dfs(prod_count_df, backup_count_df)
-    delete_tables(prod_connection_string, db, table_list)
+    oldest_table, length = get_oldest_table(config, tablename)
+    oldest_table_date = datetime.datetime.strptime(oldest_table[length:], '%Y%m%d').date()
+    first_day_last_quarter = date_fun(kwargs['execution_date']) - datetime.timedelta(weeks=1)
+    if oldest_table_date < first_day_last_quarter:
+        table_archive_list = pd.date_range(start=oldest_table_date, end=first_day_last_quarter, inclusive="left", freq="Q").tolist()
+        table_archive_list_clean = [tablename + i.strftime('%Y%m%d') for i in table_archive_list]
+        print(f"These databases will be archived:  {table_archive_list_clean}")
+
+        for archive_table_candidate in table_archive_list_clean:
+            table_exists = check_table_exists(db, archive_table_candidate)
+            if table_exists:
+                backup_tables(db, output_path, archive_table_candidate)
+                # table_list remains the same if you want to review all tables
+                upload_tables_for_testing(config, db, output_path, archive_table_candidate)
+                # Compare archived DB to Original
+                prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
+                prod_count_df = get_count_for_all_tables(prod_connection_string, archive_table_candidate)
+
+                backup_connection_string = get_unique_connection_string(config, database= f"archive_temp_{db}", connection='DATABASE_SETUP')
+                backup_count_df = get_count_for_all_tables(backup_connection_string, archive_table_candidate)
+                compare_results_dfs(prod_count_df, backup_count_df)
+                delete_tables(prod_connection_string, db, archive_table_candidate)
+                print("---------------------------------------------------------------")
+                print(f"FINISHED ARCHIVING {archive_table_candidate} !!!")
+                print("---------------------------------------------------------------")
+            else:
+                continue
 
 
 if __name__ == '__main__':
     type = 'granted_patent'
     # config = get_current_config(type, **{"execution_date": datetime.date(2023, 10, 1)})
-    run_database_archive(type=type, **{"execution_date": datetime.date(2023, 10, 1)})
+    # run_database_archive(type=type, **{"execution_date": datetime.date(2023, 10, 1)})
+    run_table_archive("granted_patent", "assignee_disambiguation_mapping_", **{"execution_date": datetime.date(2023, 10, 1)})
 
 
 

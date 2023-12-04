@@ -28,7 +28,7 @@ from updater.post_processing.post_process_inventor import update_granted_rawinve
     post_process_qc as qc_inventor_post_processing, load_granted_location_inventor, load_pregranted_location_inventor, run_genderit, \
     post_process_inventor_gender, post_process_inventor_patent_phase2_qc, post_process_inventor_pgpubs_phase2_qc, post_process_inventor_qc_pgpubs
 from updater.post_processing.post_process_persistent import prepare_wide_table, update_long_entity, write_wide_table
-
+from updater.post_processing.archive_disambiguation_tables import archive_assignee_tables, archive_inventor_tables, archive_location_tables
 
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
@@ -71,13 +71,42 @@ quarterly_merge_completed = ExternalTaskSensor(
     mode="reschedule",
 )
 
+# mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+# mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+# mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+# SET UP TASKS
+
 assignee_inventor_disambig_setup = PythonOperator(task_id='Inventor_Assignee_Disambiguation_Setup',
                                              python_callable=setup_inventor_assignee_disambiguation,
                                              provide_context=True,
                                              dag=disambiguation,
                                              on_success_callback=airflow_task_success,
                                              on_failure_callback=airflow_task_failure,
-                                             queue='disambiguator')
+                                             queue='data_collector')
+
+archive_assignee_tables = PythonOperator(task_id='archive_assignee_tables',
+                                             python_callable=archive_assignee_tables,
+                                             provide_context=True,
+                                             dag=disambiguation,
+                                             on_success_callback=airflow_task_success,
+                                             on_failure_callback=airflow_task_failure,
+                                             queue='data_collector')
+
+archive_location_tables = PythonOperator(task_id='archive_location_tables',
+                                             python_callable=archive_location_tables,
+                                             provide_context=True,
+                                             dag=disambiguation,
+                                             on_success_callback=airflow_task_success,
+                                             on_failure_callback=airflow_task_failure,
+                                             queue='data_collector')
+
+archive_inventor_tables = PythonOperator(task_id='archive_inventor_tables',
+                                             python_callable=archive_inventor_tables,
+                                             provide_context=True,
+                                             dag=disambiguation,
+                                             on_success_callback=airflow_task_success,
+                                             on_failure_callback=airflow_task_failure,
+                                             queue='data_collector')
 
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
@@ -592,6 +621,11 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
                                                            post_process_create_pgpubs_loc_inventor]
                      }
 
+
+# SETUP
+archive_location_tables.set_upstream(assignee_inventor_disambig_setup)
+archive_inventor_tables.set_upstream(archive_location_tables)
+archive_assignee_tables.set_upstream(archive_inventor_tables)
 
 for dependency_group in operator_sequence:
     dependency_sequence = operator_sequence[dependency_group]
