@@ -23,7 +23,7 @@ select gpc.patent_id as patent_id
      , gpc.application_number
      , gpc.current_pgpub_id_flag
      , gpc.current_patent_id_flag
-from `{{elastic_db}}`.granted_patent_crosswalk_{{version_indicator}} gpc;
+from `{{reporting_db}}`.granted_patent_crosswalk_{{version_indicator}} gpc;
 
 
 create or replace
@@ -67,7 +67,7 @@ select i.document_number
      , i.action_date
 from `{{reporting_db}}`.ipcr i
          join `{{elastic_db}}`.ipcr i2
-              on i2.ipc_class = i.ipc_class and i2.section = i.section and i2.subclass = i.subclass;
+              on i2.ipc_class = i.class and i2.section = i.section and i2.subclass = i.subclass;
 
 
 
@@ -104,13 +104,13 @@ create or replace
 sql security invoker view `{{elastic_db}}`.publication_us_related_documents as
 select
     u.document_number
-  , doctype
+  , doc_type
   , relkind
-  , reldocno
+  , related_doc_number
   , u.country
   , u.date
-  , status
-  , sequence
-  , u.kind
+--   , status
+--   , sequence
+--   , u.kind
 from
     `{{reporting_db}}`.usreldoc u;

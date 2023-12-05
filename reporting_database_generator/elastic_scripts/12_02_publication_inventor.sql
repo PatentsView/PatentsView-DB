@@ -4,7 +4,7 @@
 
 use `{{elastic_db}}`;
 
-CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patent_inventor`
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_inventor`
 (
     `inventor_id`            int(10) unsigned                       NOT NULL,
     `document_number`        varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -22,9 +22,9 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patent_inventor`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `{{elastic_db}}`.`patent_inventor`;
+TRUNCATE TABLE `{{elastic_db}}`.`publication_inventor`;
 
-insert into `{{elastic_db}}`.patent_inventor ( inventor_id, document_number, sequence, name_first, name_last
+insert into `{{elastic_db}}`.publication_inventor ( inventor_id, document_number, sequence, name_first, name_last
                                                           , city, state
                                                           , country, location_id)
 
@@ -38,7 +38,7 @@ select pi.inventor_id
      , l.country
      , pi.location_id
 from `{{reporting_db}}`.publication_inventor pi
-         join patent.inventor_{{version_indicator}} i on i.inventor_id = pi.inventor_id
+         join patent.inventor_{{version_indicator}} i on i.id = pi.inventor_id
          left join patent.location_{{version_indicator}} l on l.location_id = pi.location_id
-         join `{{elastic_db}}`.publication p on p.patent_id = pi.patent_id;
+         join `{{elastic_db}}`.publication p on p.document_number = pi.document_number;
 

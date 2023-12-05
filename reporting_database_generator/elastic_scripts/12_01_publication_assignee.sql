@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_assignee`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `{{elastic_db}}`.`patent_assignee`;
-INSERT INTO `{{elastic_db}}`.`patent_assignee`( assignee_id, type, name_first, name_last, organization, city, state
+TRUNCATE TABLE `{{elastic_db}}`.`publication_assignee`;
+INSERT INTO `{{elastic_db}}`.`publication_assignee`( assignee_id, type, name_first, name_last, organization, city, state
                                               , country, sequence, location_id, document_number)
 
 select pa.assignee_id
