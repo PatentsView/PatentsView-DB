@@ -308,3 +308,29 @@ classifications_endpoint_classifications_table = SQLTemplatedPythonOperator(
     }
 )
 classifications_endpoint_classifications_table.set_upstream(db_creation)
+
+endpoint_publications_publication = SQLTemplatedPythonOperator(
+    task_id='Publications_Endpoint_Publications_Table',
+    python_callable=validate_query.validate_and_execute,
+    dag=elastic_prep_dag,
+    op_kwargs={
+        'filename': '09_13_elastic_publication_publication.sql'
+    },
+    templates_dict={
+        'source_sql': '09_13_elastic_publication_publication.sql'
+    }
+)
+endpoint_publications_publication.set_upstream(db_creation)
+
+endpoint_publications_us_parties = SQLTemplatedPythonOperator(
+    task_id='Publications_Endpoint_US_Parties_Table',
+    python_callable=validate_query.validate_and_execute,
+    dag=elastic_prep_dag,
+    op_kwargs={
+        'filename': '10_15_us_parties.sql'
+    },
+    templates_dict={
+        'source_sql': '10_15_us_parties.sql'
+    }
+)
+endpoint_publications_us_parties.set_upstream(endpoint_publications_publication)
