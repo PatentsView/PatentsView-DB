@@ -13,18 +13,18 @@ from QA.production.ProdDBTester import run_prod_db_qa
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'email': ['bcard@air.org'],
+    'email': ['contact@patentsview.org'],
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
-    'concurrency': 4,
+    'concurrency': 40,
     'queue': 'data_collector'
 }
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
-go_live_dag = DAG("GO_LIVE"
+go_live_dag = DAG(dag_id="GO_LIVE"
                        , default_args=default_args
                        , start_date=datetime(2023, 4, 1)
                        , schedule_interval='@quarterly'
@@ -43,8 +43,23 @@ web_tools = SQLTemplatedPythonOperator(
     }
 )
 
+PVSupport = SQLTemplatedPythonOperator(
+    task_id='PVSupport',
+    provide_context=True,
+    python_callable=validate_query.validate_and_execute,
+    dag=go_live_dag,
+    op_kwargs={
+        'filename': 'PVSupport_webtool',
+        'host':'PROD_DATABASE_SETUP'
+    },
+    templates_dict={
+        'source_sql': 'PVSupport_webtool.sql'
+    }
+)
+
 qa_production_data = PythonOperator(task_id='QA_PROD_DB'
                              , python_callable=run_prod_db_qa
                              , op_kwargs={'type': 'granted_patent'})
 
-qa_production_data.set_upstream(web_tools)
+PVSupport.set_upstream(web_tools)
+qa_production_data.set_upstream(PVSupport)

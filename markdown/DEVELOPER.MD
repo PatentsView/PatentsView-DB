@@ -137,10 +137,10 @@ An [Airflow Pool](https://airflow.apache.org/docs/apache-airflow/stable/administ
    3. guest:guest
 
 ## Updating SSL
-1. Allow access to the world (0.0.0.0) for http port on the GP Linux server in AWS
+1. Allow access to the world (`0.0.0.0/0`) for http port on the GP Linux server in AWS
 2. `SSH PVGP`
 3. `sudo -i`
-4. `certbot.` 
+4. `certbot` 
 Output below:
 
 ```[root@ip-172-31-8-197 ~]# certbot
@@ -188,7 +188,6 @@ IMPORTANT NOTES:
  - If you like Certbot, please consider supporting our work by:
    Donating to ISRG / Let's Encrypt:   
 https://letsencrypt.org/donate
-   Donating to EFF:  https://eff.org/donate-le```
-
-
+   Donating to EFF:  https://eff.org/donate-le
+```
 5. Remove SG rule from #1 in AWS
