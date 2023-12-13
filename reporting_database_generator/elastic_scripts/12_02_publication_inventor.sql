@@ -6,7 +6,7 @@ use `{{elastic_db}}`;
 
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_inventor`
 (
-    `inventor_id`            int(10) unsigned                       NOT NULL,
+    `inventor_id`            varchar(128) NOT NULL,
     `document_number`        varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
     `sequence`               int(11)                                NOT NULL,
     `name_first`             varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_inventor`
     `city`                   varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `state`                  varchar(20) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
     `country`                varchar(10) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
-    `location_id`            int(11)                                 DEFAULT NULL,
+    `location_id`            varchar(64)                                 DEFAULT NULL,
     PRIMARY KEY (`document_number`, `inventor_id`, `sequence`),
     KEY `ix_inventor_name_first` (`name_first`),
     KEY `ix_inventor_name_last` (`name_last`)
