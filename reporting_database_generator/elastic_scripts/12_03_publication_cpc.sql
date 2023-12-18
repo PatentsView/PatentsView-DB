@@ -5,7 +5,7 @@ use `{{elastic_db}}`;
 
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_cpc_at_issue`
 (
-    `document_number`    varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `document_number`    bigint NOT NULL,
     `sequence`     int(10) unsigned NOT NULL,
     `cpc_section`  varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `cpc_class`    varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,

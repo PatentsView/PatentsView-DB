@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_assignee`
     `country`                varchar(10) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
     `sequence`               int(11) DEFAULT NULL,
     `location_id`            varchar(64) DEFAULT NULL,
-    `document_number`              varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `document_number`        bigint NOT NULL,
     PRIMARY KEY (`document_number`, `assignee_id`, `sequence`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4

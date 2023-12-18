@@ -6,7 +6,7 @@ use `{{elastic_db}}`;
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication`
 (
     `id`                                                    varchar(128) NOT NULL,
-    `document_number`                                     varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `document_number`                                       bigint NOT NULL,
     `type`                                                  varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `application_number`                                    varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
     `country`                                               varchar(20) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,

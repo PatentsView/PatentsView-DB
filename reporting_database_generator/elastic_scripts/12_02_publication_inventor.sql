@@ -7,7 +7,7 @@ use `{{elastic_db}}`;
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_inventor`
 (
     `inventor_id`            varchar(128) NOT NULL,
-    `document_number`        varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `document_number`        bigint NOT NULL,
     `sequence`               int(11)                                NOT NULL,
     `name_first`             varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `name_last`              varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
