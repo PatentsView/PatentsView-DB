@@ -1,11 +1,11 @@
 {% set elastic_db = "elastic_production_pgpub_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
-{% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set reporting_db = "pregrant_publications" %}
 
 use `{{elastic_db}}`;
 
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_gov_contract`
 (
-    `document_number`    varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `document_number`    bigint NOT NULL,
     `award_number` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
     PRIMARY KEY (`document_number`, `award_number`)
 ) ENGINE = InnoDB

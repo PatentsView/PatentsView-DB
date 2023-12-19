@@ -6,7 +6,7 @@ use `{{elastic_db}}`;
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication`
 (
     `id`                                                    varchar(128) NOT NULL,
-    `pgpubs_document_number`                                varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `document_number`                                       bigint NOT NULL,
     `type`                                                  varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `application_number`                                    varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
     `country`                                               varchar(20) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication`
     `title`                                                 text COLLATE utf8mb4_unicode_ci         DEFAULT NULL,
     `kind`                                                  varchar(10) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
     `series_code`                                           varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `rule_47_flag`                                          boolean NOT NULL,
+    `rule_47_flag`                                          varchar(5) NOT NULL,
     PRIMARY KEY (`id`),
     KEY                                                     `ix_publication_number` (`pgpubs_document_number`),
     KEY                                                     `ix_publication_application_number` (`application_number`),
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication`
 
 TRUNCATE TABLE `{{elastic_db}}`.`publication`;
 
-insert into `{{elastic_db}}`.publication ( id, pgpubs_document_number, type, application_number, country, date, year, abstract, title, kind, series_code, rule_47_flag)
+insert into `{{elastic_db}}`.publication ( id, document_number, type, application_number, country, date, year, abstract, title, kind, series_code, rule_47_flag)
 select p.id
      , p.document_number
      , a.type

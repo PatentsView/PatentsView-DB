@@ -30,7 +30,6 @@ create or replace
 sql security invoker view `{{elastic_db}}`.foreign_priority as
 
 select f.document_number
-     -- , f.sequence
      , f.foreign_doc_number
      , f.date
      , f.country
@@ -109,8 +108,5 @@ select
   , related_doc_number
   , u.country
   , u.date
---   , status
---   , sequence
---   , u.kind
 from
     `{{reporting_db}}`.usreldoc u;
