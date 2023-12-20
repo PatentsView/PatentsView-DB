@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication`
     `series_code`                                           varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
     `rule_47_flag`                                          varchar(5) NOT NULL,
     PRIMARY KEY (`id`),
-    KEY                                                     `ix_publication_number` (`pgpubs_document_number`),
+    KEY                                                     `ix_publication_number` (`document_number`),
     KEY                                                     `ix_publication_application_number` (`application_number`),
     KEY                                                     `ix_publication_title` (`title`(128)),
     KEY                                                     `ix_publication_type` (`type`),
