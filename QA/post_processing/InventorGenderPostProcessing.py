@@ -41,13 +41,13 @@ group by 1;
         """
         q_list = [query1,query2]
         for query in q_list:
-            print(query)
+            logger.info(query)
             query_start_time = time()
             engine.execute(query)
             query_end_time = time()
             t = query_end_time - query_start_time
             m, s = divmod(t, 60)
-            print(f"This query took {m:02.0f}:{s:04.1f} (m:s)")
+            logger.info(f"This query took {m:02.0f}:{s:04.1f} (m:s)")
 
     def runInventorGenderTests(self):
         self.rawinventor_gender(config)

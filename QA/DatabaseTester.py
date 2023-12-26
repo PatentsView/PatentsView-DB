@@ -95,7 +95,7 @@ class DatabaseTester(ABC):
             q = query+where_statement
         else:
             q = query
-        print(q)
+        logger.info(q)
         try:
             if not self.connection.open:
                 self.connection.connect()
@@ -104,7 +104,7 @@ class DatabaseTester(ABC):
                     query_start_time = time()
                     generic_cursor.execute(q)
                     query_end_time = time()
-                    print("\t\tThis query took:", query_end_time - query_start_time, "seconds")
+                    logger.info(f"\t\tThis query took {query_end_time - query_start_time:.3f} seconds")
                     if single_value_return:
                         count_value = generic_cursor.fetchall()[0][0]
                     else:
@@ -169,14 +169,14 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
                     self.connection.connect()
                 with self.connection as connection:
                     with connection.cursor() as generic_cursor:
-                        print(bad_char_fix_query)
+                        logger.info(bad_char_fix_query)
                         generic_cursor.execute(bad_char_fix_query)
                     connection.commit()
             finally:
                 if self.connection.open:
                     self.connection.close()
-            print(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
-            print(nul_byte_query)
+            logger.info(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
+            logger.info(nul_byte_query)
             count_value = self.query_runner(nul_byte_query, single_value_return=True, where_vi=where_vi)
             if count_value > 0:
                 exception_message = f"{count_value} rows with NUL Byte found in `{field}` of `{self.database_section}`.`{table}` after attempted correction."
@@ -204,7 +204,7 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
                 skip = True
 
         if skip:
-            print('newlines marked as permitted for this field. skipping newline test')
+            logger.info('newlines marked as permitted for this field. skipping newline test')
         else: 
             newline_query = f"""
             SELECT count(*) as count
@@ -212,7 +212,7 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
             where INSTR(`{field}`, '\n') > 0"""
             count_value = self.query_runner(newline_query, single_value_return=True, where_vi=where_vi)
             if count_value > 0:
-                print(f"{count_value} rows with unwanted newlines found in {field} of {table} for {self.database_section}. Correcting records ...")
+                logger.info(f"{count_value} rows with unwanted newlines found in {field} of {table} for {self.database_section}. Correcting records ...")
                 makelogquery = f"CREATE TABLE IF NOT EXISTS `{table}_newline_log` LIKE {table}"
                 filllogquery = f"INSERT INTO `{table}_newline_log` SELECT * FROM `{table}` WHERE `{field}` LIKE '%\n%'"
                 fixquery = f"""
@@ -226,13 +226,13 @@ where INSTR(`{field}`, CHAR(0x00)) > 0"""
                     with self.connection as connection:
                         with connection.cursor() as generic_cursor:
                             for query in [makelogquery, filllogquery, fixquery]:
-                                print(query)
+                                logger.info(query)
                                 generic_cursor.execute(query)
                         connection.commit()
                 finally:
                     if self.connection.open:
                         self.connection.close()
-                print(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
+                logger.info(f"attempted to correct newlines in {table}.{field}. re-performing newline detection query:")
                 count_value = self.query_runner(newline_query, single_value_return=True, where_vi=where_vi)
                 if count_value > 0:
                     exception_message = f"{count_value} rows with unwanted and unfixed newlines found in {field} of {table} for {self.database_section}"
@@ -324,10 +324,9 @@ f"from {table} W" \
 f"HERE CHAR_LENGTH(`{field}`) != CHAR_LENGTH(TRIM(`{field}`))"
         count_value = self.query_runner(white_space_query, single_value_return=True)
         if count_value != 0:
-            print("THE FOLLOWING QUERY NEEDS ADDRESSING")
-            print(white_space_query)
-            raise Exception(
-                f"print({self.database_section}.{table}.{field} needs trimming")
+            logger.info("THE FOLLOWING QUERY NEEDS ADDRESSING")
+            logger.info(white_space_query)
+            raise Exception(f"{self.database_section}.{table}.{field} needs trimming")
 
     def check_for_indexes(self, table):
         if "webtool" not in table and table not in ["patent_lawyer_unique"]:
@@ -335,9 +334,8 @@ f"HERE CHAR_LENGTH(`{field}`) != CHAR_LENGTH(TRIM(`{field}`))"
     f"""select count(*) from information_schema.statistics where table_name = '{table}' and table_schema = '{self.database_section}' """
             count_value = self.query_runner(index_query, single_value_return=True)
             if count_value == 0:
-                print(index_query)
-                raise Exception(
-                    f"print({self.database_section}.{table} has no indexes")
+                logger.info(index_query)
+                raise Exception(f"{self.database_section}.{table} has no indexes")
             self.qa_data['DataMonitor_indexcount'].append(
                 {
                     "database_type": self.database_type,
@@ -354,9 +352,9 @@ FROM rawassignee
 where name_first is not null and name_last is null"""
         count_value = self.query_runner(rawassignee_q, single_value_return=True, where_vi=where_vi)
         if count_value != 0:
-            print("THE FOLLOWING QUERY NEEDS ADDRESSING")
-            print(rawassignee_q)
-            raise Exception(print(f"{self.database_section}.{table} Has Wrong Organization values"))
+            logger.info("THE FOLLOWING QUERY NEEDS ADDRESSING")
+            logger.info(rawassignee_q)
+            raise Exception(f"{self.database_section}.{table} Has Wrong Organization values")
 
 
     def test_related_floating_entities(self, table_name, table_config, where_vi=False, vi_comparison = '='):
@@ -524,11 +522,11 @@ group by t.`{field}`"""
             else:
                 raise NotImplementedError(f"specification of existing rows to remove not implemented for {qa_table}.\ncolumns available: `{'`,`'.join(table_frame.columns)}`")
             try:
-                print(f'removing prior {qa_table} {self.database_type} records {print_condition}on {self.version}')
+                logger.info(f'removing prior {qa_table} {self.database_type} records {print_condition}on {self.version}')
                 clean_prior = f"DELETE FROM {qa_table} WHERE `update_version` = '{self.version}' AND `database_type` = '{self.database_type}' {addl_condition}"
-                print(clean_prior)
+                logger.info(clean_prior)
                 qa_engine.execute(clean_prior)
-                print(f'inserting new {qa_table} records for {self.version} and {self.database_type}')
+                logger.info(f'inserting new {qa_table} records for {self.version} and {self.database_type}')
                 table_frame.to_sql(name=qa_table, if_exists='append', con=qa_engine, index=False)
             except SQLAlchemyError as e:
                 table_frame.to_csv("errored_qa_data" + qa_table, index=False)
@@ -572,9 +570,9 @@ where invention_abstract is null """
         counter = 0
         total_tables = len(self.table_config.keys())
         for table in self.table_config:
-            print(" -------------------------------------------------- ")
-            print(f"BEGINNING TESTS FOR {self.database_section}.{table}")
-            print(" -------------------------------------------------- ")
+            logger.info(" -------------------------------------------------- ")
+            logger.info(f"BEGINNING TESTS FOR {self.database_section}.{table}")
+            logger.info(" -------------------------------------------------- ")
             self.test_blank_count(table, self.table_config[table], where_vi=True)
             self.test_related_floating_entities(table, table_config=self.table_config[table], where_vi=True)
             self.load_nulls(table, self.table_config[table], where_vi=True)
@@ -607,7 +605,7 @@ where invention_abstract is null """
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
             logger.info(f"==============================================================================")
-            logger.info(f"Currently Done With {counter} of {total_tables} | {counter / total_tables} %")
+            logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables:.2%}")
             logger.info(f"==============================================================================")
 
     def runDisambiguationTests(self):
@@ -615,7 +613,7 @@ where invention_abstract is null """
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()
         for table in self.table_config:
-            print(table)
+            logger.info(table)
             self.check_for_indexes(table)
             self.load_table_row_count(table, where_vi=False)
             self.load_nulls(table, self.table_config[table], where_vi=False)
@@ -624,7 +622,9 @@ where invention_abstract is null """
             self.init_qa_dict()
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
-            logger.info(f"Currently Done With {counter} of {total_tables} | {(counter/total_tables)*100} %")
+            logger.info(f"==============================================================================")
+            logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables:.2%}")
+            logger.info(f"==============================================================================")
 
     def runReportingTests(self):
         counter = 0
@@ -637,7 +637,9 @@ where invention_abstract is null """
             self.init_qa_dict()
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
-            logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
+            logger.info(f"==============================================================================")
+            logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables:.2%}")
+            logger.info(f"==============================================================================")
 
     ####### WANT TO DEPRECATE THIS FUNCTION !!!!!
     # def runTests(self):
