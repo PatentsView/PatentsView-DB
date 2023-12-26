@@ -316,16 +316,16 @@ def run_database_archive(type, output_override=None, **kwargs):
     db_type = "upload" if type == "granted_patent" else "pgpubs"
     # Create Archive SQL FILE
     old_db, table_list = get_oldest_databases(config, db_type=type)
-    oldest_db = datetime.datetime.strptime(old_db[7:], '%Y%m%d').date()
+    oldest_db_date = datetime.datetime.strptime(old_db[7:], '%Y%m%d').date()
 
     first_day_last_quarter = date_fun(kwargs['execution_date'])
-    if oldest_db < first_day_last_quarter:
+    if oldest_db_date < first_day_last_quarter:
         if output_override is not None:
             output_path = output_override
         else:
             output_path = find_data_collection_server_path(db_type=type, data_type="database")
 
-        db_archive_list = pd.date_range(start=oldest_db, end=first_day_last_quarter, inclusive="left", freq="7D").tolist()
+        db_archive_list = pd.date_range(start=oldest_db_date, end=first_day_last_quarter, inclusive="left", freq="7D").tolist()
         db_archive_list_clean = [db_type + "_" + i.strftime('%Y%m%d') for i in db_archive_list]
         print(f"These databases will be archived:  {db_archive_list_clean}")
 
