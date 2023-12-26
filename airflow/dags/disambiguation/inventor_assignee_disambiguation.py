@@ -84,7 +84,7 @@ assignee_inventor_disambig_setup = PythonOperator(task_id='Inventor_Assignee_Dis
                                              on_failure_callback=airflow_task_failure,
                                              queue='data_collector')
 
-archive_assignee_tables = PythonOperator(task_id='archive_assignee_tables',
+archive_assignee_tables_task = PythonOperator(task_id='archive_assignee_tables',
                                              python_callable=archive_assignee_tables,
                                              provide_context=True,
                                              dag=disambiguation,
@@ -92,7 +92,7 @@ archive_assignee_tables = PythonOperator(task_id='archive_assignee_tables',
                                              on_failure_callback=airflow_task_failure,
                                              queue='data_collector')
 
-archive_location_tables = PythonOperator(task_id='archive_location_tables',
+archive_location_tables_task = PythonOperator(task_id='archive_location_tables',
                                              python_callable=archive_location_tables,
                                              provide_context=True,
                                              dag=disambiguation,
@@ -100,7 +100,7 @@ archive_location_tables = PythonOperator(task_id='archive_location_tables',
                                              on_failure_callback=airflow_task_failure,
                                              queue='data_collector')
 
-archive_inventor_tables = PythonOperator(task_id='archive_inventor_tables',
+archive_inventor_tables_task = PythonOperator(task_id='archive_inventor_tables',
                                              python_callable=archive_inventor_tables,
                                              provide_context=True,
                                              dag=disambiguation,
@@ -623,9 +623,9 @@ operator_sequence = {'assignee_feat_setup': [assignee_inventor_disambig_setup, i
 
 
 # SETUP
-archive_location_tables.set_upstream(assignee_inventor_disambig_setup)
-archive_inventor_tables.set_upstream(archive_location_tables)
-archive_assignee_tables.set_upstream(archive_inventor_tables)
+archive_location_tables_task.set_upstream(assignee_inventor_disambig_setup)
+archive_inventor_tables_task.set_upstream(archive_location_tables_task)
+archive_assignee_tables_task.set_upstream(archive_inventor_tables_task)
 
 for dependency_group in operator_sequence:
     dependency_sequence = operator_sequence[dependency_group]
