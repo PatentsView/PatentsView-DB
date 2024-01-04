@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_gov_contract`
 
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_gov_interest_organizations`
 (
-    `document_number`   varchar(32) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
+    `document_number`   bigint DEFAULT NULL,
     `name`        varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `level_one`   varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `level_two`   varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,

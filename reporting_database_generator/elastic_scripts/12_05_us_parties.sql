@@ -29,17 +29,19 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`us_parties`
 TRUNCATE TABLE `{{elastic_db}}`.`us_parties`;
 
 insert into `{{elastic_db}}`.us_parties ( id, document_number, name_first, name_last, organization, type, designation, sequence, rawlocation_id, city, state, country, version_indicator)
-select id
-     , document_number
-     , name_first
-     , name_last
-     , organization
-     , type
-     , designation
-     , sequence
-     , rawlocation_id
-     , city
-     , state
-     , country
-     , version_indicator
-from `{{reporting_db}}`.`us_parties`;
+select up.id
+     , up.document_number
+     , up.name_first
+     , up.name_last
+     , up.organization
+     , up.type
+     , up.designation
+     , up.sequence
+     , up.rawlocation_id
+     , up.city
+     , up.state
+     , up.country
+     , up.version_indicator
+from `{{reporting_db}}`.`us_parties` up
+join `{{elastic_db}}`.publication p on p.document_number = up.document_number;
+
