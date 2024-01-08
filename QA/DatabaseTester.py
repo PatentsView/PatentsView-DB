@@ -576,7 +576,7 @@ where invention_abstract is null """
         self.init_qa_dict()
         for table in self.table_config:
             self.check_for_indexes(table)
-            if table[:2] > 'pa': # Use this to skip certain tables. Comment out when not in use.
+            if table[:2] > 'ot': # Use this to skip certain tables. Comment out when not in use.
                 logger.info(f"==============================================================================")
                 logger.info(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table} %")
                 logger.info(f"==============================================================================")
