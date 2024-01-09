@@ -35,7 +35,7 @@ def get_oldest_table(config, table_type):
     return db, table_type_length
 
 
-def get_oldest_databases(config, db_type='granted_patent'):
+def get_oldest_database(config, db_type='granted_patent'):
     print(f"Running {db_type}")
     if db_type == 'granted_patent':
         q = """
@@ -50,7 +50,7 @@ where left(table_schema, 6) ='upload'
         where left(table_schema, 6) ='pgpubs'
         """
     else:
-        print(f"Database {db_type} not Configured")
+        raise NotImplementedError(f"Database type {db_type} not Configured")
     print(q)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
@@ -305,7 +305,7 @@ WHERE table_name = '{table_name}' and database_schema = '{database}'
     else:
         return True
 
-def date_fun(date):
+def get_prior_quarter_start(date):
     current_quarter = (date.month - 1) // 3 + 1
     first_day_current_quarter = datetime.date(date.year, (current_quarter - 1) * 3 + 1, 1)
     first_day_last_quarter = first_day_current_quarter - datetime.timedelta(weeks=13)
@@ -315,10 +315,10 @@ def run_database_archive(type, output_override=None, **kwargs):
     config = get_current_config(type=type, **kwargs)
     db_type = "upload" if type == "granted_patent" else "pgpubs"
     # Create Archive SQL FILE
-    old_db, table_list = get_oldest_databases(config, db_type=type)
+    old_db, table_list = get_oldest_database(config, db_type=type)
     oldest_db_date = datetime.datetime.strptime(old_db[7:], '%Y%m%d').date()
 
-    first_day_last_quarter = date_fun(kwargs['execution_date'])
+    first_day_last_quarter = get_prior_quarter_start(kwargs['execution_date'])
     if oldest_db_date < first_day_last_quarter:
         if output_override is not None:
             output_path = output_override
@@ -352,36 +352,59 @@ def run_database_archive(type, output_override=None, **kwargs):
         print("Nothing to Archive this run")
 
 def run_table_archive(type, tablename, **kwargs):
-    # db = 'pregrant_publications'
-    # NO SPACES ALLOWED IN TABLE_LIST
+    """
+    This function archives old tables in a database.
+
+    Parameters:
+    type (str): The type of the database.
+    tablename (str): The name of the table to be archived. 
+        for datestamped tables (e.g. inventor_YYYYMMDD), 
+        this name should include the underscore, but exclude the date code.
+    **kwargs: Additional keyword arguments for configuration.
+
+    Raises:
+    Exception: If no table name is provided.
+    """
     config = get_current_config(type=type, **kwargs)
+    # Get the production database from the configuration
     db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+    # Raise an exception if no table name is provided
     if not tablename:
         raise Exception("Add Table List to DAG")
     output_path = find_data_collection_server_path(db_type=type, data_type="table")
 
+    # Get the oldest table and its length
     oldest_table, length = get_oldest_table(config, tablename)
+    # Convert the date string in the oldest table name to a date object
     oldest_table_date = datetime.datetime.strptime(oldest_table[length:], '%Y%m%d').date()
-    first_day_last_quarter = date_fun(kwargs['execution_date']) - datetime.timedelta(weeks=1)
+    first_day_last_quarter = get_prior_quarter_start(kwargs['execution_date']) - datetime.timedelta(weeks=1)
     if oldest_table_date < first_day_last_quarter:
+        # Create a list of dates from the oldest table date to the start of the last quarter
         table_archive_list = pd.date_range(start=oldest_table_date, end=first_day_last_quarter, inclusive="left", freq="Q").tolist()
+        # Append the date to the table name for each date in the list
         table_archive_list_clean = [tablename + i.strftime('%Y%m%d') for i in table_archive_list]
         print(f"These databases will be archived:  {table_archive_list_clean}")
 
         for archive_table_candidate in table_archive_list_clean:
             table_exists = check_table_exists(db, archive_table_candidate)
             if table_exists:
+                # Backup the table
                 backup_tables(db, output_path, archive_table_candidate)
-                # table_list remains the same if you want to review all tables
+                # Upload the table for testing
                 upload_tables_for_testing(config, db, output_path, archive_table_candidate)
+
                 # Compare archived DB to Original
                 prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
                 prod_count_df = get_count_for_all_tables(prod_connection_string, archive_table_candidate)
 
                 backup_connection_string = get_unique_connection_string(config, database= f"archive_temp_{db}", connection='DATABASE_SETUP')
                 backup_count_df = get_count_for_all_tables(backup_connection_string, archive_table_candidate)
+
+                # Compare the count dataframes of the production and backup databases
                 compare_results_dfs(prod_count_df, backup_count_df)
+                # Delete the table from the production database
                 delete_tables(prod_connection_string, db, archive_table_candidate)
+                
                 print("---------------------------------------------------------------")
                 print(f"FINISHED ARCHIVING {archive_table_candidate} !!!")
                 print("---------------------------------------------------------------")
