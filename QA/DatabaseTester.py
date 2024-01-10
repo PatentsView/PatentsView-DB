@@ -586,9 +586,9 @@ where invention_abstract is null """
             if table == self.central_entity:
                 self.test_patent_abstract_null(table)
             for field in self.table_config[table]["fields"]:
-                logger.info(f"==============================================================================")
+                logger.info("==============================================================================")
                 logger.info(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
-                logger.info(f"==============================================================================")
+                logger.info("==============================================================================")
                 if self.table_config[table]["fields"][field]["data_type"] == 'date':
                     self.test_zero_dates(table, field, where_vi=False)
                 if self.table_config[table]["fields"][field]["category"]:
@@ -604,9 +604,9 @@ where invention_abstract is null """
                 self.test_null_byte(table, field, where_vi=False)
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
-            logger.info(f"==============================================================================")
+            logger.info("==============================================================================")
             logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables:.2%}")
-            logger.info(f"==============================================================================")
+            logger.info("==============================================================================")
 
     def runDisambiguationTests(self):
         counter = 0
@@ -622,9 +622,9 @@ where invention_abstract is null """
             self.init_qa_dict()
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
-            logger.info(f"==============================================================================")
+            logger.info("==============================================================================")
             logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables:.2%}")
-            logger.info(f"==============================================================================")
+            logger.info("==============================================================================")
 
     def runReportingTests(self):
         counter = 0
@@ -637,12 +637,13 @@ where invention_abstract is null """
             self.init_qa_dict()
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
-            logger.info(f"==============================================================================")
+            logger.info("==============================================================================")
             logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables:.2%}")
-            logger.info(f"==============================================================================")
+            logger.info("==============================================================================")
 
     ####### WANT TO DEPRECATE THIS FUNCTION !!!!!
-    # def runTests(self):
+    def runTests(self):
+        raise Exception("runTests() has been retired. One of the newer test collections should be used instead.")
     #     counter = 0
     #     total_tables = len(self.table_config.keys())
     #     self.init_qa_dict()
