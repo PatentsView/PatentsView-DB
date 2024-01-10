@@ -15,18 +15,17 @@ class InventorGenderPostProcessingQC(DisambiguationTester):
         super().__init__(config, "gender_attribution", datetime.date(year=1976, month=1, day=1), end_date)
         self.connection = get_unique_connection_string(config, connection='DATABASE_SETUP', database="gender_attribution")
 
-    def rawinventor_gender(self, config):
+    def summarize_rawinventor_gender(self, config):
         cstr = get_unique_connection_string(config, connection='DATABASE_SETUP', database="gender_attribution")
         engine = create_engine(cstr)
         e_date = config["DATES"]["END_DATE"]
         # Takes ~10 minutes
         query1= f"""
 create table gender_attribution.rawinventor_gender_{e_date}
-select p.id as patent_id, r.inventor_id, p.date, gender_flag
+select p.id as patent_id, r.inventor_id, p.date, g.gender_flag
 from patent.rawinventor r 
-	inner join patent.patent_inventor ip on r.patent_id=ip.patent_id and r.inventor_id=ip.inventor_id
     inner join gender_attribution.inventor_gender_{e_date} g on r.inventor_id = g.inventor_id
-    inner join patent.patent p on ip.patent_id=p.id;
+    inner join patent.patent p on r.patent_id=p.id;
 """
         query2= f"""
 create table gender_attribution.rawinventor_gender_agg_{e_date}
@@ -50,7 +49,7 @@ group by 1;
             logger.info(f"This query took {m:02.0f}:{s:04.1f} (m:s)")
 
     def runInventorGenderTests(self):
-        self.rawinventor_gender(config)
+        self.summarize_rawinventor_gender(config)
         super(DisambiguationTester, self).runDisambiguationTests()
 
 if __name__ == '__main__':
