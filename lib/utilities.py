@@ -228,13 +228,16 @@ def get_relevant_attributes(self, class_called, database_section, config):
     elif class_called[:19] == 'BulkDownloadsTester':
         if 'granted' in database_section:
             self.table_config = load_table_config(config, db='bulk_exp_granted')
+            self.central_entity = "patent"
+            self.p_key = "patent_id"
+            self.f_key = "patent_id"
         else:
             self.table_config = load_table_config(config, db='bulk_exp_pgpubs')
+            self.central_entity = "publication"
+            self.p_key = "pgpub_id"
+            self.f_key = "pgpub_id"
         
         self.category = ""
-        self.central_entity = ""
-        self.p_key = ""
-        self.f_key = ""
         self.exclusion_list = []
 
     else:

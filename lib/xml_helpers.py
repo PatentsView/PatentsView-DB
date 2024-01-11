@@ -27,7 +27,7 @@ def get_entity(patent, entity_name, attribute_list=None):
         data=defaultdict(lambda : None)
         if attribute_list:
             for attribute in attribute_list:
-                data[attribute]=field.attrib[attribute]
+                data[attribute]=field.get(attribute) # allows for attributes to be absent. extra care must be taken to avoid attribute typos
         #recursive function modifies data dictionary defined above
         results_list = recursive_children(field)
         data.update(dict(results_list))

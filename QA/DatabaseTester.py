@@ -577,6 +577,24 @@ where invention_abstract is null """
             self.test_null_version_indicator(table)
             self.load_table_row_count(table, where_vi=self.where_vi)
             self.load_main_floating_entity_count(table, self.table_config[table])
+            self.check_for_indexes(table)
+            #if table[:2] <= 'ot': # Use this to skip certain tables. Comment out when not in use.
+            logger.info(f"==============================================================================")
+            logger.info(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table} %")
+            logger.info(f"==============================================================================")
+            if self.class_called != "ReportingDBTester" and "PostProcessingQC" not in self.class_called:
+                self.test_null_version_indicator(table)
+            self.load_table_row_count(table, where_vi=False)
+            if table == 'rawassignee':
+                self.test_rawassignee_org(table, where_vi=False)
+            self.test_blank_count(table, self.table_config[table], where_vi=False)
+            self.load_nulls(table, self.table_config[table], where_vi=False)
+            vi_cutoff_classes = ['DisambiguationTester', 'LawyerPostProcessingQC']
+            if "PostProcessingQC" not in self.class_called:
+                self.test_related_floating_entities(table_name=table, table_config=self.table_config[table],
+                            where_vi=(True if self.class_called in vi_cutoff_classes else False),
+                            vi_comparison=('<=' if self.class_called in vi_cutoff_classes else '='))
+                self.load_main_floating_entity_count(table, self.table_config[table])
             self.load_entity_category_counts(table)
             if table == 'rawassignee':
                 self.test_rawassignee_org(table, where_vi=self.where_vi)
