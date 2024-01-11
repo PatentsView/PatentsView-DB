@@ -90,7 +90,7 @@ archive_assignee_tables_task = PythonOperator(task_id='archive_assignee_tables',
                                              dag=disambiguation,
                                              on_success_callback=airflow_task_success,
                                              on_failure_callback=airflow_task_failure,
-                                             queue='data_collector')
+                                             queue='mydumper')
 
 archive_location_tables_task = PythonOperator(task_id='archive_location_tables',
                                              python_callable=archive_location_tables,
@@ -98,7 +98,7 @@ archive_location_tables_task = PythonOperator(task_id='archive_location_tables',
                                              dag=disambiguation,
                                              on_success_callback=airflow_task_success,
                                              on_failure_callback=airflow_task_failure,
-                                             queue='data_collector')
+                                             queue='mydumper')
 
 archive_inventor_tables_task = PythonOperator(task_id='archive_inventor_tables',
                                              python_callable=archive_inventor_tables,
@@ -106,7 +106,7 @@ archive_inventor_tables_task = PythonOperator(task_id='archive_inventor_tables',
                                              dag=disambiguation,
                                              on_success_callback=airflow_task_success,
                                              on_failure_callback=airflow_task_failure,
-                                             queue='data_collector')
+                                             queue='mydumper')
 
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
