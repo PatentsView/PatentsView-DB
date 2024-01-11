@@ -132,7 +132,7 @@ def upload_tables_for_testing(config, db, output_path, table_list):
         for table in table_list.split(","):
             # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
             bash_command1 = f"gunzip -d {output_path}/{db}.{table}-schema.sql.gz"
-            bash_command2 = f"gunzip -d {output_path}/{db}.{table}.sql.gz"
+            bash_command2 = f"gunzip -d {output_path}/{db}.{table}.00000.sql.gz"
             bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
             bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table}.00000.sql"
             bash_command5 = f"gzip {output_path}/{db}.{table}.sql"
