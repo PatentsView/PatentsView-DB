@@ -125,14 +125,14 @@ def post_upload_granted(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
     qc = UploadTest(config)
-    qc.runTests()
+    qc.runStandardTests()
 
 
 def post_upload_pgpubs(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('pgpubs', **kwargs)
     qc = UploadTest(config)
-    qc.runTests()
+    qc.runStandardTests()
 
 if __name__ == '__main__':
     # begin_database_setup(**{
