@@ -6,6 +6,7 @@ import logging
 
 from QA.DatabaseTester import DatabaseTester
 from lib.configuration import get_current_config
+from lib.utilities import class_db_specific_config, load_table_config
 
 logging.basicConfig(level=logging.INFO)  # Set the logging level
 logger = logging.getLogger(__name__)
@@ -25,4 +26,4 @@ if __name__ == '__main__':
     # })
     run_id = "scheduled__2021-12-11T09:00:00+00:00"
     mc = MergeTestWeekly(config, run_id)
-    mc.runTests()
+    mc.runStandardTests()

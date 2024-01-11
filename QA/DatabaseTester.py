@@ -21,14 +21,14 @@ from lib import utilities
 
 
 class DatabaseTester(ABC):
-    def __init__(self, config, database_section, start_date, end_date):
+    def __init__(self, config, database_section, start_date, end_date, where_vi=True):
         # super().__init__(config, database_section, start_date, end_date)
-
         class_called = self.__class__.__name__
         utilities.get_relevant_attributes(self, class_called, database_section, config)
         # Update start and end date
         self.start_date = start_date
         self.end_date = end_date
+        self.where_vi = where_vi
 
         # Indicator for Upload/Patents database
         self.qa_connection_string = get_connection_string(config, database='QA_DATABASE', connection='APP_DATABASE_SETUP')
@@ -63,8 +63,6 @@ class DatabaseTester(ABC):
 
         self.database_type = database_type
         utilities.class_db_specific_config(self, self.table_config, class_called)
-
-        #set a break point to check stuff
 
 
     def init_qa_dict(self):
@@ -573,16 +571,15 @@ where invention_abstract is null """
             logger.info(" -------------------------------------------------- ")
             logger.info(f"BEGINNING TESTS FOR {self.database_section}.{table}")
             logger.info(" -------------------------------------------------- ")
-            self.test_blank_count(table, self.table_config[table], where_vi=True)
-            self.test_related_floating_entities(table, table_config=self.table_config[table], where_vi=True)
-            self.load_nulls(table, self.table_config[table], where_vi=True)
+            self.test_blank_count(table, self.table_config[table], where_vi=self.where_vi)
+            self.test_related_floating_entities(table, table_config=self.table_config[table], where_vi=self.where_vi)
+            self.load_nulls(table, self.table_config[table], where_vi=self.where_vi)
             self.test_null_version_indicator(table)
-            self.load_table_row_count(table, where_vi=True)
-            self.test_related_floating_entities(table_name=table, table_config=self.table_config[table], where_vi=False, vi_comparison='=')
+            self.load_table_row_count(table, where_vi=self.where_vi)
             self.load_main_floating_entity_count(table, self.table_config[table])
             self.load_entity_category_counts(table)
             if table == 'rawassignee':
-                self.test_rawassignee_org(table, where_vi=True)
+                self.test_rawassignee_org(table, where_vi=self.where_vi)
             if table == self.central_entity:
                 self.test_patent_abstract_null(table)
             for field in self.table_config[table]["fields"]:
@@ -590,18 +587,18 @@ where invention_abstract is null """
                 logger.info(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
                 logger.info("==============================================================================")
                 if self.table_config[table]["fields"][field]["data_type"] == 'date':
-                    self.test_zero_dates(table, field, where_vi=False)
+                    self.test_zero_dates(table, field, where_vi=self.where_vi)
                 if self.table_config[table]["fields"][field]["category"]:
                     self.load_category_counts(table, field)
                 if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
                     self.load_text_length(table, field)
                 if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text', 'varchar']:
-                    self.test_newlines(table, field, where_vi=False)
+                    self.test_newlines(table, field, where_vi=self.where_vi)
                 if self.table_config[table]["fields"][field]["location_field"]:
                     self.load_counts_by_location(table, field)
                 if self.table_config[table]["fields"][field]['data_type'] == 'varchar' and 'id' not in field:
                     self.test_white_space(table, field)
-                self.test_null_byte(table, field, where_vi=False)
+                self.test_null_byte(table, field, where_vi=self.where_vi)
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
             logger.info("==============================================================================")
@@ -640,61 +637,6 @@ where invention_abstract is null """
             logger.info("==============================================================================")
             logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables:.2%}")
             logger.info("==============================================================================")
-
-    ####### WANT TO DEPRECATE THIS FUNCTION !!!!!
-    def runTests(self):
-        raise Exception("runTests() has been retired. One of the newer test collections should be used instead.")
-    #     counter = 0
-    #     total_tables = len(self.table_config.keys())
-    #     self.init_qa_dict()
-    #     for table in self.table_config:
-    #         self.check_for_indexes(table)
-    #         logger.info(f"==============================================================================")
-    #         logger.info(f"BEGINNING TESTS FOR TABLE: {self.database_section}.{table} %")
-    #         logger.info(f"==============================================================================")
-    #         if self.class_called != "ReportingDBTester" and "PostProcessingQC" not in self.class_called:
-    #             self.test_null_version_indicator(table)
-    #         self.load_table_row_count(table, where_vi=False)
-    #         if table == 'rawassignee':
-    #             self.test_rawassignee_org(table, where_vi=False)
-    #         self.test_blank_count(table, self.table_config[table], where_vi=False)
-    #         self.load_nulls(table, self.table_config[table], where_vi=False)
-    #         vi_cutoff_classes = ['DisambiguationTester', 'LawyerPostProcessingQC']
-    #         if "PostProcessingQC" not in self.class_called:
-    #             self.test_related_floating_entities(table_name=table, table_config=self.table_config[table],
-    #                         where_vi=(True if self.class_called in vi_cutoff_classes else False),
-    #                         vi_comparison=('<=' if self.class_called in vi_cutoff_classes else '='))
-    #             self.load_main_floating_entity_count(table, self.table_config[table])
-    #         self.load_entity_category_counts(table)
-    #         if table == self.central_entity:
-    #             self.test_patent_abstract_null(table)
-    #         for field in self.table_config[table]["fields"]:
-    #             logger.info(f"==============================================================================")
-    #             logger.info(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
-    #             logger.info(f"==============================================================================")
-    #             if self.table_config[table]["fields"][field]["data_type"] == 'date':
-    #                 self.test_zero_dates(table, field, where_vi=False)
-    #             if self.table_config[table]["fields"][field]["category"]:
-    #                 self.load_category_counts(table, field)
-    #             if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text']:
-    #                 self.load_text_length(table, field)
-    #             if self.table_config[table]["fields"][field]['data_type'] in ['mediumtext', 'longtext', 'text', 'varchar']:
-    #                 self.test_newlines(table,field, where_vi=False)
-    #             if self.table_config[table]["fields"][field]["location_field"]:
-    #                 self.load_counts_by_location(table, field)
-    #             if self.table_config[table]["fields"][field]['data_type'] == 'varchar' and 'id' not in field and (self.class_called == 'UploadTest' or self.class_called == 'TextUploadTest'):
-    #                 self.test_white_space(table, field)
-    #             self.test_null_byte(table, field, where_vi=False)
-    #         if self.class_called == "TextMergeTest":
-    #             continue
-    #         else:
-    #             self.save_qa_data()
-    #             self.init_qa_dict()
-    #         logger.info(f"FINISHED WITH TABLE: {table}")
-    #         counter += 1
-    #         logger.info(f"==============================================================================")
-    #         logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
-    #         logger.info(f"==============================================================================")
 
 if __name__ == '__main__':
     # config = get_config()

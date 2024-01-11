@@ -91,11 +91,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.disambiguated_id = 'assignee_id'
         self.disambiguated_table = 'assignee'
         self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
-        # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
-        # self.add_persistent_table_to_config(database_section)
-        # self.category = ""
-        # self.p_key = "id"
-        # self.f_key = "assignee_id"
         self.aggregator = 'main.organization'
         self.category = ""
         self.central_entity = ""
@@ -134,7 +129,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.disambiguated_id = 'lawyer_id'
         self.disambiguated_table = 'lawyer'
         self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
-        # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
         self.aggregator = 'case when main.organization is null then concat(main.name_last,", ",main.name_first) else main.organization end'
         self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
         self.category = ""
@@ -151,7 +145,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.entity_id = 'id'
         self.disambiguated_id = 'location_id'
         self.disambiguated_table = 'location'
-        # self.patent_exclusion_list.extend(['location', 'rawlocation','location_assignee','location_inventor'])
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
@@ -159,7 +152,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.exclusion_list = []
 
     elif class_called == "CPCTest":
-        # self.patent_exclusion_list.extend(['cpc_group', 'cpc_subgroup', 'cpc_subsection', 'wipo_field'])
         self.table_config = load_table_config(config, db='patent')
         self.category = ""
         self.central_entity = ""

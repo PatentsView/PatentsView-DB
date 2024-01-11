@@ -1683,11 +1683,6 @@
         "related_table": "usreldoc",
         "main_table_id": "id",
         "related_table_id": "patent_id"
-      },
-      {
-        "related_table": "wipo",
-        "main_table_id": "id",
-        "related_table_id": "patent_id"
       }
     ],
     "TestScripts": [

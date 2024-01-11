@@ -2,6 +2,7 @@ import datetime
 
 from QA.DatabaseTester import DatabaseTester
 from lib.configuration import get_current_config
+from lib.utilities import class_db_specific_config, load_table_config
 
 import logging
 logging.basicConfig(level=logging.INFO)  # Set the logging level
@@ -18,8 +19,8 @@ if __name__ == '__main__':
     # config = get_current_config('granted_patent', **{
     #     "execution_date": datetime.date(2021, 10, 5)
     # })
-    config = get_current_config('pgpubs', **{
-        "execution_date": datetime.date(2022, 1, 6)
+    config = get_current_config('granted_patent', **{
+        "execution_date": datetime.date(2024, 1, 2)
     })
     upt = UploadTest(config)
-    upt.runTests()
+    upt.runStandardTests()
