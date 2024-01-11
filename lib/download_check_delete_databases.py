@@ -296,7 +296,7 @@ def clean_up_backups(db, output_path):
 def check_table_exists(config, database, table_name):
     q = f"""
 SELECT * FROM information_schema.tables
-WHERE table_name = '{table_name}' and database_schema = '{database}'
+WHERE table_name = '{table_name}' and table_schema = '{database}'
 """
     connection_string = get_connection_string(config, database='PROD_DB')
     engine = create_engine(connection_string)
