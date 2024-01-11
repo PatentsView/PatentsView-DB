@@ -82,7 +82,7 @@ assignee_inventor_disambig_setup = PythonOperator(task_id='Inventor_Assignee_Dis
                                              dag=disambiguation,
                                              on_success_callback=airflow_task_success,
                                              on_failure_callback=airflow_task_failure,
-                                             queue='disambiguator')
+                                             queue='data_collector')
 
 archive_assignee_tables_task = PythonOperator(task_id='archive_assignee_tables',
                                              python_callable=archive_assignee_tables,
@@ -343,7 +343,7 @@ qc_assignee_build_assignee_features = PythonOperator(task_id='QA_Assignee_Name_M
                                                      dag=disambiguation,
                                                      on_success_callback=airflow_task_success,
                                                      on_failure_callback=airflow_task_failure,
-                                                     queue='disambiguator', pool='high_memory_pool')
+                                                     queue='disambiguator')
 
 assignee_run_clustering = PythonOperator(task_id='Assignee_Run_Clustering',
                                          python_callable=run_assignee_hierarchical_clustering,

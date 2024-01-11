@@ -298,7 +298,7 @@ def check_table_exists(config, database, table_name):
 SELECT * FROM information_schema.tables
 WHERE table_name = '{table_name}' and database_schema = '{database}'
 """
-    connection_string = get_unique_connection_string(config,database)
+    connection_string = get_connection_string(config, database='PROD_DB')
     engine = create_engine(connection_string)
     count_value = len(pd.read_sql_query(sql=q, con=engine))
     if count_value < 1:
