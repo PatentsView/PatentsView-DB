@@ -111,11 +111,10 @@ def find_data_collection_server_path(db_type, data_type):
 
 
 def backup_tables(db, output_path, table_list):
-    # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-    bash_command1 = f"mydumper -B {db} -T {table_list} -o {output_path}  -c --long-query-guard=9000000 -v 3"
+    defaults_file = "resources/sql.conf"
+    bash_command1 = f"mydumper --defaults-file={defaults_file} -B {db} -T {table_list} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
     subprocess_cmd(bash_command1)
-
 
 def upload_tables_for_testing(config, db, output_path, table_list):
     print("--------------------------------------------------------------")
