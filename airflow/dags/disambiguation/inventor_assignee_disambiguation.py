@@ -82,7 +82,7 @@ assignee_inventor_disambig_setup = PythonOperator(task_id='Inventor_Assignee_Dis
                                              dag=disambiguation,
                                              on_success_callback=airflow_task_success,
                                              on_failure_callback=airflow_task_failure,
-                                             queue='data_collector')
+                                             queue='disambiguator')
 
 archive_assignee_tables_task = PythonOperator(task_id='archive_assignee_tables',
                                              python_callable=archive_assignee_tables,
