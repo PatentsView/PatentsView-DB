@@ -293,13 +293,14 @@ def clean_up_backups(db, output_path):
         print(i)
         subprocess_cmd(i)
 
-def check_table_exists(database, table_name):
+def check_table_exists(config, database, table_name):
     q = f"""
 SELECT * FROM information_schema.tables
 WHERE table_name = '{table_name}' and database_schema = '{database}'
 """
-    qc = DatabaseTester
-    count_value = qc.query_runner(query=q, single_value_return=True)
+    connection_string = get_unique_connection_string(config,database)
+    engine = create_engine(connection_string)
+    count_value = len(pd.read_sql_query(sql=q, con=engine))
     if count_value < 1:
         return False
     else:
@@ -386,7 +387,7 @@ def run_table_archive(type, tablename, **kwargs):
         print(f"These databases will be archived:  {table_archive_list_clean}")
 
         for archive_table_candidate in table_archive_list_clean:
-            table_exists = check_table_exists(db, archive_table_candidate)
+            table_exists = check_table_exists(config, db, archive_table_candidate)
             if table_exists:
                 # Backup the table
                 backup_tables(db, output_path, archive_table_candidate)
