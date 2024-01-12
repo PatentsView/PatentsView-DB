@@ -115,6 +115,10 @@ def backup_tables(db, output_path, table_list):
     bash_command1 = f"mydumper --defaults-file={defaults_file} -B {db} -T {table_list} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
     subprocess_cmd(bash_command1)
+    from os import listdir
+    from os.path import isfile, join
+    files_in_output_path = [f for f in listdir(output_path) if isfile(join(output_path, f))]
+    assert table_list in files_in_output_path
 
 def upload_tables_for_testing(config, db, output_path, table_list):
     print("--------------------------------------------------------------")
@@ -130,13 +134,14 @@ def upload_tables_for_testing(config, db, output_path, table_list):
     defaults_file = "resources/sql.conf"
     if isinstance(table_list, str):
         for table in table_list.split(","):
-            # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-            bash_command1 = f"gunzip -d {output_path}/{db}.{table}-schema.sql.gz"
-            bash_command2 = f"gunzip -d {output_path}/{db}.{table}.00000.sql.gz"
-            bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
-            bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table}.00000.sql"
-            bash_command5 = f"gzip {output_path}/{db}.{table}.00000.sql"
-            bash_command6 = f"gzip {output_path}/{db}.{table}-schema.sql"
+            schema_file_path = f"{output_path}/{db}.{table}-schema.sql"
+            data_file_path = f"{output_path}/{db}.{table}.00000.sql"
+            bash_command1 = f"gunzip -d {schema_file_path}.gz"
+            bash_command2 = f"gunzip -d {data_file_path}.gz"
+            bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {schema_file_path}"
+            bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {data_file_path}"
+            bash_command5 = f"gzip {data_file_path}"
+            bash_command6 = f"gzip {schema_file_path}"
             for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
                 print(i)
                 subprocess_cmd(i)
