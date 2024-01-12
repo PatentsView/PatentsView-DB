@@ -120,7 +120,10 @@ def backup_tables(db, output_path, table_list):
     files_in_output_path = [f for f in listdir(output_path) if isfile(join(output_path, f))]
     print(table_list)
     print(files_in_output_path)
-    assert table_list in files_in_output_path
+    files_to_backup = [f for f in files_in_output_path if table_list in f and "schema" not in f ]
+    file = files_to_backup[0].replace(".sql.gz", "")
+    assert len(files_to_backup)>=1
+    return file
 
 def upload_tables_for_testing(config, db, output_path, table_list):
     print("--------------------------------------------------------------")
@@ -137,12 +140,12 @@ def upload_tables_for_testing(config, db, output_path, table_list):
     if isinstance(table_list, str):
         for table in table_list.split(","):
             schema_file_path = f"{output_path}/{db}.{table}-schema.sql"
-            data_file_path = f"{output_path}/{db}.{table}.00000.sql"
+            sql_data_file_path = f"{output_path}/{db}.{table}.sql"
             bash_command1 = f"gunzip -d {schema_file_path}.gz"
-            bash_command2 = f"gunzip -d {data_file_path}.gz"
+            bash_command2 = f"gunzip -d {sql_data_file_path}.gz"
             bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {schema_file_path}"
-            bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {data_file_path}"
-            bash_command5 = f"gzip {data_file_path}"
+            bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {sql_data_file_path}"
+            bash_command5 = f"gzip {sql_data_file_path}"
             bash_command6 = f"gzip {schema_file_path}"
             for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
                 print(i)
@@ -396,9 +399,9 @@ def run_table_archive(type, tablename, **kwargs):
             table_exists = check_table_exists(config, db, archive_table_candidate)
             if table_exists:
                 # Backup the table
-                backup_tables(db, output_path, archive_table_candidate)
+                file = backup_tables(db, output_path, archive_table_candidate)
                 # Upload the table for testing
-                upload_tables_for_testing(config, db, output_path, archive_table_candidate)
+                upload_tables_for_testing(config, db, output_path, file)
 
                 # Compare archived DB to Original
                 prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
