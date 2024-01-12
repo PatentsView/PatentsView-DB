@@ -118,6 +118,8 @@ def backup_tables(db, output_path, table_list):
     from os import listdir
     from os.path import isfile, join
     files_in_output_path = [f for f in listdir(output_path) if isfile(join(output_path, f))]
+    print(table_list)
+    print(files_in_output_path)
     assert table_list in files_in_output_path
 
 def upload_tables_for_testing(config, db, output_path, table_list):
