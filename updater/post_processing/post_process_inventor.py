@@ -389,8 +389,8 @@ def post_process_qc(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQC(config)
     qc.run_inventor_disambig_tests()
-    gc_ig = InventorPostProcessingQC(config)
-    gc_ig.rawinventor_gender()
+    gc_ig = InventorGenderPostProcessingQC(config)
+    gc_ig.runInventorGenderTests()
 
 def post_process_inventor_qc_pgpubs(**kwargs):
     config = get_current_config('pgpubs',schedule='quarterly', **kwargs)

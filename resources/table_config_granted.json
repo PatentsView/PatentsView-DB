@@ -828,7 +828,7 @@
     ],
     "TestScripts": ["InventorPostProcessingQC"]
   },
-  "gender_attribution.inventor_gender": {
+  "inventor_gender": {
     "fields": {
       "inventor_id": {
         "data_type": "varchar",
@@ -843,7 +843,7 @@
         "location_field": false
       }
     },
-    "TestScripts": ["InventorPostProcessingQC"]
+    "TestScripts": ["InventorGenderPostProcessingQC"]
   },
   "ipcr": {
     "fields": {
