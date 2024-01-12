@@ -139,8 +139,8 @@ def upload_tables_for_testing(config, db, output_path, table_list):
     defaults_file = "resources/sql.conf"
     if isinstance(table_list, str):
         for table in table_list.split(","):
-            schema_file_path = f"{output_path}/{db}.{table}-schema.sql"
-            sql_data_file_path = f"{output_path}/{db}.{table}.sql"
+            schema_file_path = f"{output_path}/{table}-schema.sql"
+            sql_data_file_path = f"{output_path}/{table}.sql"
             bash_command1 = f"gunzip -d {schema_file_path}.gz"
             bash_command2 = f"gunzip -d {sql_data_file_path}.gz"
             bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {schema_file_path}"
