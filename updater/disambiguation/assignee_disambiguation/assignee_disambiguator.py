@@ -69,4 +69,4 @@ def archive_results(**kwargs):
 
 
 if __name__ == '__main__':
-    build_assignee_name_mentions(**{'execution_date': DateTime(year=2022, month=7, day=1)})
+    qc_build_assignee_name_mentions(**{'execution_date': DateTime(year=2023, month=7, day=1)})
