@@ -381,6 +381,8 @@ where total_count = 0 and gender_flag is null"""
 alter table gender_attribution.inventor_gender_{end_date} 
 add KEY `inventor_id` (`inventor_id`)"""
     q_list.append(q12)
+    q13 = f"alter table gender_attribution.rawinventor_gender_{end_date} add index patent_id (patent_id)"
+    q_list.append(q13)
     for q in q_list:
         print(q)
         engine.execute(q)
@@ -407,39 +409,15 @@ def post_process_inventor_pgpubs_phase2_qc(**kwargs):
     qc = InventorPostProcessingQCPhase2(config)
     qc.runDisambiguationTests()
 
-def evaluate_inventor_clustering(**kwargs):
-    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
-    pquery = "select patent_id, patent_date from patentsview_export_granted.g_patent"
-    print(pquery)
-    patent = pd.read_sql_query(sql=pquery, con=engine)
-    rquery = "select patent_id, sequence, inventor_id from patent.rawinventor "
-    print(rquery)
-    rawinventor = pd.read_sql_query(sql=rquery, con=engine)
-    patent_date = pd.DatetimeIndex(patent.patent_date)
-    patent["patent_date"] = patent_date.year.astype(int)
-    joined = rawinventor.merge(patent, on="patent_id", how="left")
-    joined["mention_id"] = "US" + joined.patent_id + "-" + joined.sequence
-    breakpoint()
-    joined = joined.query('patent_date >= 1975 and patent_date <= 2022')
-    current_disambiguation = joined.set_index("mention_id")["inventor_id"]
-
-    from er_evaluation.estimators import pairwise_precision_design_estimate, pairwise_recall_design_estimate
-    from er_evaluation.summary import cluster_sizes
-    from pv_evaluation.benchmark import load_binette_2022_inventors_benchmark
-    pairwise_precision_design_estimate(current_disambiguation, load_binette_2022_inventors_benchmark(),
-                                       weights=1 / cluster_sizes(load_binette_2022_inventors_benchmark()))
-
-
 
 if __name__ == '__main__':
     # post_process_inventor(config)
-    # post_process_inventor(**{
-    #     "execution_date": datetime.date(2020, 12, 29)
-    # })
-    run_genderit("granted_patent", **{
-        "execution_date": datetime.date(2023, 7, 1)
+    post_process_qc(**{
+        "execution_date": datetime.date(2023, 10, 1)
     })
+    # run_genderit("granted_patent", **{
+    #     "execution_date": datetime.date(2023, 7, 1)
+    # })
     # post_process_inventor_gender(**{
     #     "execution_date": datetime.date(2023, 4, 1)
     # })

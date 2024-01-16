@@ -189,7 +189,7 @@ def fips_geo_patch(config):
         print("no locations required geographic FIPS assignment.")
 
 
-def consolidate_location_disambiguation_quarterly(config, **kwargs):
+def consolidate_location_disambiguation_quarterly(config):
     prod_db = config["PATENTSVIEW_DATABASES"]['PROD_DB']
     engine = create_engine(get_connection_string(config, "PROD_DB"))
     dbtype = 'pgpubs' if prod_db=='pregrant_publications' else 'granted_patent'
@@ -272,7 +272,8 @@ if __name__ == '__main__':
     # post_process_location(**{
     #         "execution_date": date(2023, 1, 1)
     #         })
-    post_process_location(**{
-            "execution_date": date(2023, 7, 1)
+    config = get_current_config(schedule="quarterly", **{
+            "execution_date": date(2023, 10, 1)
             })
+    consolidate_location_disambiguation_quarterly(config)
 

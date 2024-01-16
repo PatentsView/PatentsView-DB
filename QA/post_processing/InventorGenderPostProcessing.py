@@ -13,7 +13,6 @@ class InventorGenderPostProcessingQC(DisambiguationTester):
     def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, "gender_attribution", datetime.date(year=1976, month=1, day=1), end_date)
-        self.connection = get_unique_connection_string(config, connection='DATABASE_SETUP', database="gender_attribution")
 
     def summarize_rawinventor_gender(self, config):
         cstr = get_unique_connection_string(config, connection='DATABASE_SETUP', database="gender_attribution")
@@ -38,7 +37,8 @@ select date
 from gender_attribution.rawinventor_gender_{e_date}
 group by 1;
         """
-        q_list = [query1,query2]
+        query3 = f"alter table gender_attribution.rawinventor_gender_agg_{e_date} add index `date` (`date`)"
+        q_list = [query1,query2,query3]
         for query in q_list:
             logger.info(query)
             query_start_time = time()
@@ -49,12 +49,12 @@ group by 1;
             logger.info(f"This query took {m:02.0f}:{s:04.1f} (m:s)")
 
     def runInventorGenderTests(self):
-        self.summarize_rawinventor_gender(config)
+        # self.summarize_rawinventor_gender(self.config)
         super(DisambiguationTester, self).runDisambiguationTests()
 
 if __name__ == '__main__':
     config = get_current_config('granted_patent', schedule="quarterly", **{
-                    "execution_date": datetime.date(2023, 7, 1)
+                    "execution_date": datetime.date(2023, 10, 1)
                                 })
     qc = InventorGenderPostProcessingQC(config)
     qc.runInventorGenderTests()

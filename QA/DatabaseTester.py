@@ -328,9 +328,11 @@ f"HERE CHAR_LENGTH(`{field}`) != CHAR_LENGTH(TRIM(`{field}`))"
 
     def check_for_indexes(self, table):
         if "webtool" not in table and table != "patent_lawyer_unique":
-            db = "inventor_gender" if table == "gender_attribution" else self.database_section
-            index_query = \
-    f"""select count(*) from information_schema.statistics where table_name = '{table}' and table_schema = '{db}' """
+            if table == "gender_attribution":
+                db = "inventor_gender"
+            else:
+                db = self.database_section
+            index_query = f"""select count(*) from information_schema.statistics where table_name = '{table}' and table_schema = '{db}'"""
             count_value = self.query_runner(index_query, single_value_return=True)
             if count_value == 0:
                 logger.info(index_query)
