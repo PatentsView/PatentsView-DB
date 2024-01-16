@@ -268,7 +268,7 @@ def additional_post_processing_update_queries(**kwargs):
         update {db}.{adm_table} adm
             join patent.{ass_table} a on a.id = adm.assignee_id
             join patent.assignee_reassignment_final arr on arr.`original_org_name` collate utf8mb4_bin = a.organization
-            join patent.assignee a2 on arr.`cluster` collate utf8mb4_bin = a2.organization
+            join patent.{ass_table} a2 on arr.`cluster` collate utf8mb4_bin = a2.organization
         set adm.assignee_id=a2.id;
         """
         query_list.append(query_5)
@@ -276,7 +276,7 @@ def additional_post_processing_update_queries(**kwargs):
         update {db}.rawassignee r
             join patent.{ass_table} a on a.id = r.assignee_id
             join patent.assignee_reassignment_final arr on a.organization = arr.`original_org_name` collate utf8mb4_bin  
-            join patent.assignee a2 on arr.`cluster` collate utf8mb4_bin = a2.organization
+            join patent.{ass_table} a2 on arr.`cluster` collate utf8mb4_bin = a2.organization
         set r.assignee_id=a2.id;
             """
         query_list.append(query_6)
@@ -449,12 +449,12 @@ def additional_post_processing_assignee(**kwargs):
 def post_process_qc(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     qc = AssigneePostProcessingQC(config)
-    qc.runDisambiguationTests()
+    qc.run_assignee_disambig_tests()
 
 def post_process_assignee_qc_pgpubs(**kwargs):
     config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     qc = AssigneePostProcessingQC(config)
-    qc.runDisambiguationTests()
+    qc.run_assignee_disambig_tests()
 
 def post_process_assignee_patent_phase2_qc(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
@@ -467,11 +467,11 @@ def post_process_assignee_pgpubs_phase2_qc(**kwargs):
     qc.runDisambiguationTests()
 
 if __name__ == '__main__':
-    date = datetime.date(2023, 7, 1)
+    date = datetime.date(2023, 10, 1)
     # check_largest_clusters(**{
     #     "execution_date": date
     # })
-    additional_post_processing_assignee(**{
+    post_process_qc(**{
         "execution_date": date
     })
 
