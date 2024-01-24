@@ -8,8 +8,8 @@
 DROP TABLE IF EXISTS `{{reporting_db}}`.`wipo`;
 CREATE TABLE  `{{reporting_db}}`.`wipo` (
    `patent_id` varchar(20) NOT NULL,
-   `field_id` varchar(3) DEFAULT NULL,
-   `sequence` int(10) unsigned NOT NULL,
+   `field_id` int(11) DEFAULT NULL,
+   `sequence` int(11) unsigned NOT NULL,
    PRIMARY KEY (`patent_id`,`sequence`),
    KEY `ix_wipo_field_id` (`field_id`)
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
