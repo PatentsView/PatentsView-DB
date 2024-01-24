@@ -19,6 +19,11 @@ class InventorGenderPostProcessingQC(DisambiguationTester):
         engine = create_engine(cstr)
         e_date = config["DATES"]["END_DATE"]
         # Takes ~10 minutes
+
+        query0 = f"""
+drop table gender_attribution.rawinventor_gender_agg
+"""
+
         query1= f"""
 create table gender_attribution.rawinventor_gender_{e_date}
 select p.id as patent_id, r.inventor_id, p.date, g.gender_flag
@@ -27,7 +32,7 @@ from patent.rawinventor r
     inner join patent.patent p on r.patent_id=p.id;
 """
         query2= f"""
-create table gender_attribution.rawinventor_gender_agg_{e_date}
+create table gender_attribution.rawinventor_gender_agg
 select date
 	, count(distinct inventor_id)  as unique_inventors
 	, count(distinct patent_id) as unique_patents
@@ -37,8 +42,8 @@ select date
 from gender_attribution.rawinventor_gender_{e_date}
 group by 1;
         """
-        query3 = f"alter table gender_attribution.rawinventor_gender_agg_{e_date} add index `date` (`date`)"
-        q_list = [query1,query2,query3]
+        query3 = f"alter table gender_attribution.rawinventor_gender_agg add index `date` (`date`)"
+        q_list = [query0,query1,query2,query3]
         for query in q_list:
             logger.info(query)
             query_start_time = time()
