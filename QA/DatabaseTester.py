@@ -332,6 +332,8 @@ f"HERE CHAR_LENGTH(`{field}`) != CHAR_LENGTH(TRIM(`{field}`))"
                 db = "inventor_gender"
             else:
                 db = self.database_section
+            print("this is the database")
+            print({db})
             index_query = f"""select count(*) from information_schema.statistics where table_name = '{table}' and table_schema = '{db}'"""
             count_value = self.query_runner(index_query, single_value_return=True)
             if count_value == 0:
@@ -649,6 +651,7 @@ where invention_abstract is null """
         total_tables = len(self.table_config.keys())
         self.init_qa_dict()
         for table in self.table_config:
+            print(table)
             self.check_for_indexes(table)
             self.load_table_row_count(table, where_vi=False)
             self.save_qa_data()
@@ -662,10 +665,10 @@ where invention_abstract is null """
 if __name__ == '__main__':
     # config = get_config()
     config = get_current_config('granted_patent', **{
-        "execution_date": datetime.date(2022, 5, 31)
+        "execution_date": datetime.date(2023, 12, 31)
     })
     # fill with correct run_id
     run_id = "backfill__2020-12-29T00:00:00+00:00"
-    pt = DatabaseTester(config, 'PatentsView_20230330', datetime.date(2023, 1, 1), datetime.date(2023, 3, 30))
+    pt = DatabaseTester(config, 'PatentsView_20231231', datetime.date(2023, 9, 30), datetime.date(2023, 12, 31))
     pt.runTests()
 
