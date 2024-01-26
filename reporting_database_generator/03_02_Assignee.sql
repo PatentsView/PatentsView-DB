@@ -229,7 +229,7 @@ select t.`new_assignee_id`,
        tafls.`last_seen_date`,
        ifnull(case when tafls.`actual_years_active` < 1 then 1 else tafls.`actual_years_active` end, 0),
        a.`id`
-from `patent`.`assignee` a
+from `patent`.`assignee_{{version_indicator}}` a
          inner join `{{reporting_db}}`.`temp_id_mapping_assignee` t on t.`old_assignee_id` = a.`id`
          left outer join `{{reporting_db}}`.`temp_assignee_lastknown_location` talkl
                          on talkl.`assignee_id` = a.`id`
