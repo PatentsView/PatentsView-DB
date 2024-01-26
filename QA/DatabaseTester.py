@@ -80,6 +80,7 @@ class DatabaseTester(ABC):
         }
 
     def query_runner(self, query, single_value_return=True, where_vi=False, vi_comparison = '='):
+        query = query.lower()
         vi_comparison = vi_comparison.strip()
         assert vi_comparison in ['=', '<', '>', '<=', '>=', '<>', '!=']
         if where_vi:
