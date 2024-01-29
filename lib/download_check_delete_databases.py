@@ -386,6 +386,7 @@ def run_table_archive(type, tablename, **kwargs):
     # Get the oldest table and its length
     oldest_table, length = get_oldest_table(config, tablename)
     # Convert the date string in the oldest table name to a date object
+    print(f'this is the oldest table and length: {oldest_table}, {length}')
     oldest_table_date = datetime.datetime.strptime(oldest_table[length:], '%Y%m%d').date()
     first_day_last_quarter = get_prior_quarter_start(kwargs['execution_date']) - datetime.timedelta(weeks=1)
     if oldest_table_date < first_day_last_quarter:
@@ -423,10 +424,11 @@ def run_table_archive(type, tablename, **kwargs):
 
 
 if __name__ == '__main__':
-    type = 'granted_patent'
+    type = 'pgpubs'
     # config = get_current_config(type, **{"execution_date": datetime.date(2023, 10, 1)})
-    run_database_archive(type=type, **{"execution_date": datetime.date(2023, 10, 10)})
-    # run_table_archive("granted_patent", "assignee_disambiguation_mapping_", **{"execution_date": datetime.date(2023, 5, 2)})
+    #run_database_archive(type=type, **{"execution_date": datetime.date(2023, 10, 1)})
+    run_table_archive("granted_patent", "assignee_disambiguation_mapping_", **{"execution_date": datetime.date(2023, 10, 1)})
+
 
 
 
