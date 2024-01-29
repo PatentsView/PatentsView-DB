@@ -41,31 +41,31 @@ def post_text_parsing_pgpubs(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('pgpubs', **kwargs)
     tpt = TextUploadTest(config)
-    tpt.runTests()
+    tpt.runStandardTests()
 
 def post_text_merge_granted(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
     tpt = TextMergeTest(config)
-    tpt.runTests()
+    tpt.runStandardTests()
 
 def post_text_merge_pgpubs(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('pgpubs', **kwargs)
     tpt = TextMergeTest(config)
-    tpt.runTests()
+    tpt.runStandardTests()
 
 def post_text_merge_quarterly_granted(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('granted_patent', schedule="quarterly", **kwargs)
     tpt = TextQuarterlyMergeTest(config)
-    tpt.runTests()
+    tpt.runStandardTests()
 
 def post_text_merge_quarterly_pgpubs(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('pgpubs', schedule="quarterly", **kwargs)
     tpt = TextQuarterlyMergeTest(config)
-    tpt.runTests()
+    tpt.runStandardTests()
 
 
 if __name__ == '__main__':
