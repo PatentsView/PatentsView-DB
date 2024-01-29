@@ -35,7 +35,7 @@ def post_text_parsing_granted(**kwargs):
     from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
     tpt = TextUploadTest(config)
-    tpt.runTests()
+    tpt.runStandardTests()
 
 def post_text_parsing_pgpubs(**kwargs):
     from lib.configuration import get_current_config
