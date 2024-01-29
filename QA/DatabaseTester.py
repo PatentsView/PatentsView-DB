@@ -11,6 +11,7 @@ import os
 import re
 
 import logging
+import sqlparse
 
 logging.basicConfig(level=logging.INFO)  # Set the logging level
 logger = logging.getLogger(__name__)
@@ -80,7 +81,7 @@ class DatabaseTester(ABC):
         }
 
     def query_runner(self, query, single_value_return=True, where_vi=False, vi_comparison = '='):
-        # query = query.lower()
+        query = sqlparse.format(query, reindent = True, keyword_case ='lower')
         vi_comparison = vi_comparison.strip()
         assert vi_comparison in ['=', '<', '>', '<=', '>=', '<>', '!=']
         if where_vi:
@@ -666,7 +667,7 @@ where invention_abstract is null """
 if __name__ == '__main__':
     # config = get_config()
     config = get_current_config('granted_patent', **{
-        "execution_date": datetime.date(2023, 12, 31)
+        "execution_date": datetime.date(2023, 10, 31)
     })
     # fill with correct run_id
     run_id = "backfill__2020-12-29T00:00:00+00:00"
