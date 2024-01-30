@@ -76,7 +76,7 @@ from
     `{{reporting_db}}`.`inventor` i
         left join `{{reporting_db}}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
         left join `PatentsView_{{version_indicator}}`.`temp_id_mapping_inventor` timi on i.inventor_id = timi.new_inventor_id
-        left join gender_attribution.inventor_gender_{{version_indicator}} ig on i.inventor_id=ig.inventor_id;;
+        left join gender_attribution.inventor_gender_{{version_indicator}} ig on timi.old_inventor_id=ig.inventor_id;
 
 
 TRUNCATE TABLE `{{elastic_db}}`.inventor_years;
