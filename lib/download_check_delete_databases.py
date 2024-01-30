@@ -427,7 +427,7 @@ if __name__ == '__main__':
     type = 'pgpubs'
     # config = get_current_config(type, **{"execution_date": datetime.date(2023, 10, 1)})
     #run_database_archive(type=type, **{"execution_date": datetime.date(2023, 10, 1)})
-    run_table_archive("granted_patent", "assignee_disambiguation_mapping_", **{"execution_date": datetime.date(2023, 10, 1)})
+    run_table_archive("pgpubs", "disambiguated_inventor_ids_", **{"execution_date": datetime.date(2023, 10, 1)})
 
 
 
