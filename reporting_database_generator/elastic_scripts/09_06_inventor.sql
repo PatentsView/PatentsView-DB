@@ -18,12 +18,12 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventor_years`
 
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventors`
 (
-    `inventor_id`                      varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `inventor_id`                      int(10) COLLATE utf8mb4_unicode_ci NOT NULL,
     `name_first`                       varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `name_last`                        varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `num_patents`                      int(10) unsigned                        NOT NULL,
     `num_assignees`                    int(10) unsigned                        NOT NULL,
-    `lastknown_location_id`            varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `lastknown_location_id`            int(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `lastknown_persistent_location_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `lastknown_city`                   varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `lastknown_state`                  varchar(20) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventors`
     `last_seen_date`                   date                                    DEFAULT NULL,
     `years_active`                     smallint(5) unsigned                    NOT NULL,
     `persistent_inventor_id`           varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `gender_code`                      varchar(5) COLLATE utf8mb4_unicode_ci,
+    `gender_code`                      varchar(10) COLLATE utf8mb4_unicode_ci,
     PRIMARY KEY (`inventor_id`),
     KEY `ix_inventor_lastknown_location_id` (`lastknown_location_id`),
     KEY `ix_inventor_first_seen_date` (`first_seen_date`),
