@@ -35,7 +35,7 @@ select `a`.`patent_id` AS `patent_id`,
 `b`.`type` AS `assignee_type`,
 `c`.`location_id` AS `location_id` 
 from ((`patent`.`rawassignee` `a` 
-left join `patent`.`assignee` `b` on(`a`.`assignee_id` = `b`.`id`)) 
+left join `patent`.`assignee_{{datestring}}` `b` on(`a`.`assignee_id` = `b`.`id`)) 
 left join `patent`.`rawlocation` `c` on(`a`.`rawlocation_id` = `c`.`id`)) 
 where `a`.`version_indicator` <= '{{datestring}}';
 
@@ -184,7 +184,7 @@ select `a`.`patent_id` AS `patent_id`,
 `c`.`gender_flag` AS `gender_code`,
 `d`.`location_id` AS `location_id` 
 from (`patent`.`rawinventor` `a` 
-    LEFT JOIN `patent`.`inventor` `b` ON (`a`.`inventor_id` = `b`.`id`)
+    LEFT JOIN `patent`.`inventor_{{datestring}}` `b` ON (`a`.`inventor_id` = `b`.`id`)
     LEFT JOIN `gender_attribution`.`inventor_gender_{{datestring}}` `c` ON (`a`.`inventor_id` = `c`.`inventor_id`)) 
     LEFT JOIN `patent`.`rawlocation` `d` ON (`a`.`rawlocation_id` = `d`.`id`)
 where `a`.`version_indicator` <= '{{datestring}}';
@@ -459,7 +459,7 @@ select `a`.`document_number` AS `pgpub_id`,
 `b`.`type` AS `assignee_type`,
 `c`.`location_id` AS `location_id` 
 from ((`pregrant_publications`.`rawassignee` `a` 
-left join `patent`.`assignee` `b` on(`a`.`assignee_id` = `b`.`id`)) 
+left join `patent`.`assignee_{{datestring}}` `b` on(`a`.`assignee_id` = `b`.`id`)) 
 left join `pregrant_publications`.`rawlocation` `c` on(`a`.`rawlocation_id` = `c`.`id`)) 
 where `a`.`version_indicator` <= '{{datestring}}';
 
@@ -564,7 +564,7 @@ select `a`.`document_number` AS `pgpub_id`,
 `c`.`gender_flag` AS `gender_code`,
 `d`.`location_id` AS `location_id` 
 from (`pregrant_publications`.`rawinventor` `a` 
-    LEFT JOIN `patent`.`inventor` `b` ON (`a`.`inventor_id` = `b`.`id`)
+    LEFT JOIN `patent`.`inventor_{{datestring}}` `b` ON (`a`.`inventor_id` = `b`.`id`)
     LEFT JOIN `gender_attribution`.`inventor_gender_{{datestring}}` `c` ON (`a`.`inventor_id` = `c`.`inventor_id`)) 
     LEFT JOIN `pregrant_publications`.`rawlocation` `d` ON (`a`.`rawlocation_id` = `d`.`id`)
 where `a`.`version_indicator` <= '{{datestring}}';
