@@ -1345,7 +1345,6 @@
       }
     },
     "TestScripts": [
-      "MergeTestWeekly",
       "UploadTest",
       "MergeTestQuarterly"
     ]
@@ -2392,7 +2391,6 @@
       }
     },
     "TestScripts": [
-      "MergeTestWeekly",
       "UploadTest",
       "MergeTestQuarterly"
     ]
