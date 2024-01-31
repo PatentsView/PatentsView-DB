@@ -110,6 +110,8 @@ create table `{{reporting_db}}`.`patent_lawyer`
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+drop table if exists `{{reporting_db}}`.`patent_lawyer_unique`;
 create table `{{reporting_db}}`.`patent_lawyer_unique` (
 select rl.patent_id, lawyer_id, min(sequence) sequence
 from `patent`.`rawlawyer` rl
