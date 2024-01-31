@@ -1353,14 +1353,8 @@
           "category": false,
           "location_field": false
         },
-        "male_flag": {
-          "data_type": "int",
-          "null_allowed": true,
-          "category": false,
-          "location_field": false
-        },
-        "attribution_status": {
-          "data_type": "int",
+        "gender_code": {
+          "data_type": "varchar",
           "null_allowed": true,
           "category": false,
           "location_field": false

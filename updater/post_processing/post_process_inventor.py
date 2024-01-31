@@ -119,8 +119,6 @@ def create_inventor(update_config):
             `id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
             `name_first` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
             `name_last` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-            `male_flag` int(11) DEFAULT NULL,
-            `attribution_status` int(11) DEFAULT NULL,
             `version_indicator` date NOT NULL DEFAULT '2020-09-29',
             `created_date` timestamp NOT NULL DEFAULT current_timestamp(),
             `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
