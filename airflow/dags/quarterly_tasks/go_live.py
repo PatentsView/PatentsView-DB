@@ -37,6 +37,7 @@ web_tools = SQLTemplatedPythonOperator(
     dag=go_live_dag,
     op_kwargs={
         'filename': 'webtool_tables',
+        'host': 'PROD_DATABASE_SETUP'
     },
     templates_dict={
         'source_sql': 'webtool_tables.sql'
