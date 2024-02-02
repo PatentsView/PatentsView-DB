@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventors`
     `name_last`                        varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `num_patents`                      int(10) unsigned                        NOT NULL,
     `num_assignees`                    int(10) unsigned                        NOT NULL,
-    `lastknown_location_id`            int(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `lastknown_location_id`            varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `lastknown_persistent_location_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `lastknown_city`                   varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `lastknown_state`                  varchar(20) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
