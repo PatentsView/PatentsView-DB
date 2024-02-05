@@ -36,8 +36,7 @@ web_tools = SQLTemplatedPythonOperator(
     python_callable=validate_query.validate_and_execute,
     dag=go_live_dag,
     op_kwargs={
-        'filename': 'webtool_tables',
-        'host': 'PROD_DATABASE_SETUP'
+        'filename': 'webtool_tables'
     },
     templates_dict={
         'source_sql': 'webtool_tables.sql'
@@ -62,5 +61,5 @@ qa_production_data = PythonOperator(task_id='QA_PROD_DB'
                              , python_callable=run_prod_db_qa
                              , op_kwargs={'type': 'granted_patent'})
 
-PVSupport.set_upstream(web_tools)
-qa_production_data.set_upstream(PVSupport)
+# PVSupport.set_upstream(web_tools)
+# qa_production_data.set_upstream(PVSupport)
