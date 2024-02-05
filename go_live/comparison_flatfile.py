@@ -2,9 +2,10 @@ import configparser
 import pandas as pd
 import numpy as np
 import json
+import datetime
 import argparse
 from sqlalchemy import create_engine
-from lib.utils import get_connection_string
+from lib.utilities import get_connection_string, get_current_config
 
 def set_dataframe(query, con):
     cursor = con.cursor()
@@ -36,12 +37,16 @@ def set_dataframe(query, con):
 #     args = parser.parse_args()
 #     config = configparser.ConfigParser()
 #     config.read(args.c[0])
-#     datadir = args.d[0]
+#     go_live_path = args.d[0]
 #     environment_type = "DEV"
 #     if args.e[0] == 1:
 #         environment_type = "PROD"
 
-def run_comparison_flatfile():
+def run_comparison_flatfile(**kwargs):
+    go_live_path = "/project/go_live"
+    config = get_current_config('granted_patent', **{
+        "execution_date": kwargs['execution_date']
+    })
     engine = create_engine(get_connection_string(config))
     ## Countries
     countryI = pd.read_sql_table('webtool_comparison_countryI', con=engine)
@@ -91,7 +96,7 @@ def run_comparison_flatfile():
 
     # Import state and country table
     countryNames = pd.read_excel(
-        datadir + "/State+Country Codes.xlsx", engine="openpyxl",
+        go_live_path + "/State+Country Codes.xlsx", engine="openpyxl",
         sheet_name="Country", header=None, names=["code", "countryName"])
     countryNames["code"] = np.where(countryNames["code"].isnull(), "NA", countryNames["code"])
 
@@ -144,7 +149,7 @@ def run_comparison_flatfile():
     stateA1["assiCount"] = stateA1["assiCount"].astype("int64")
     stateA1["assiSubCount"] = stateA1["assiSubCount"].astype("int64")
 
-    stateNames = pd.read_excel(datadir + "/State+Country Codes.xlsx", sheet_name="State", header=None,
+    stateNames = pd.read_excel(go_live_path + "/State+Country Codes.xlsx", sheet_name="State", header=None,
                                names=["stateName", "code"])
     addon = pd.DataFrame([["District of Columbia", "DC"]], columns=["stateName", "code"])
     # stateNames = stateNames.append(addon, ignore_index=True)
@@ -396,7 +401,7 @@ def run_comparison_flatfile():
     output["states"] = states_tojson
     output["techSectors"] = wipo_tojson
 
-    f = open(datadir + "/comparison_data.json", "w",
+    f = open(go_live_path + "/comparison_data.json", "w",
              encoding="utf-8")
     f.write(json.dumps(output, default=str))
     f.close()
