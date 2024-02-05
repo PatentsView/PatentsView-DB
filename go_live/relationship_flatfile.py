@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import json
 from sqlalchemy import create_engine
-from lib.utils import get_connection_string
+from lib.utilities import get_connection_string, get_current_config
 
 def set_dataframe(minyear, con):
     # cursor = con.cursor()
@@ -34,35 +34,39 @@ def set_dataframe(minyear, con):
     return data
 
 
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(
-        description='Process table parameters')
-    parser.add_argument(
-        '-c',
-        type=str,
-        nargs=1,
-        help='File containing database config in INI format')
-    parser.add_argument(
-        '-d',
-        type=str,
-        nargs=1,
-        help='Destination directory for data output')
-
-    parser.add_argument(
-        '-e',
-        type=str,
-        nargs=1,
-        help='Environment Type')
-
-    args = parser.parse_args()
-    config = configparser.ConfigParser()
-    config.read(args.c[0])
-    datadir = args.d[0]
-    environment_type = "DEV"
-    if args.e[0] == 1:
-        environment_type = "PROD"
-
+# if __name__ == "__main__":
+#
+#     parser = argparse.ArgumentParser(
+#         description='Process table parameters')
+#     parser.add_argument(
+#         '-c',
+#         type=str,
+#         nargs=1,
+#         help='File containing database config in INI format')
+#     parser.add_argument(
+#         '-d',
+#         type=str,
+#         nargs=1,
+#         help='Destination directory for data output')
+#
+#     parser.add_argument(
+#         '-e',
+#         type=str,
+#         nargs=1,
+#         help='Environment Type')
+#
+#     args = parser.parse_args()
+#     config = configparser.ConfigParser()
+#     config.read(args.c[0])
+#     datadir = args.d[0]
+#     environment_type = "DEV"
+#     if args.e[0] == 1:
+#         environment_type = "PROD"
+def run_relationship_flatfile(**kwargs):
+    go_live_path = "/project/go_live"
+    config = get_current_config('granted_patent', **{
+        "execution_date": kwargs['execution_date']
+    })
     engine = create_engine(get_connection_string(config, database="cred_database"))
     root_engine = create_engine(get_connection_string(config, database="app_database"))
 

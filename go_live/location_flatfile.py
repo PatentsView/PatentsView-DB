@@ -5,7 +5,7 @@ import argparse
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
-from lib.utils import get_connection_string
+from lib.utilities import get_connection_string, get_current_config
 
 def set_dataframe(startyear, endyear, engine):
     # cursor = con.cursor()
@@ -71,40 +71,44 @@ def cleaning(data):
     return data1
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description='Process table parameters')
-    parser.add_argument(
-        '-c',
-        type=str,
-        nargs=1,
-        help='File containing database config in INI format')
-    parser.add_argument(
-        '-d',
-        type=str,
-        nargs=1,
-        help='Destination directory for data output')
-
-    parser.add_argument(
-        '-e',
-        type=str,
-        nargs=1,
-        help='Environment Type')
-
-    args = parser.parse_args()
-    config = configparser.ConfigParser()
-    config.read(args.c[0])
-
-    access_user = config["cred_database"]["mysql_db_user"]
-    access_passwd = config["cred_database"]["mysql_db_password"]
-    access_mydb = config["cred_database"]["mysql_db_host"]
-    access_port = config["cred_database"]["mysql_db_port"]
-    access_db = config["cred_database"]["mysql_db_name"]
-    datadir = args.d[0]
-    environment_type = "DEV"
-    if args.e[0] == 1:
-        environment_type = "PROD"
-
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser(
+#         description='Process table parameters')
+#     parser.add_argument(
+#         '-c',
+#         type=str,
+#         nargs=1,
+#         help='File containing database config in INI format')
+#     parser.add_argument(
+#         '-d',
+#         type=str,
+#         nargs=1,
+#         help='Destination directory for data output')
+#
+#     parser.add_argument(
+#         '-e',
+#         type=str,
+#         nargs=1,
+#         help='Environment Type')
+#
+#     args = parser.parse_args()
+#     config = configparser.ConfigParser()
+#     config.read(args.c[0])
+#
+#     access_user = config["cred_database"]["mysql_db_user"]
+#     access_passwd = config["cred_database"]["mysql_db_password"]
+#     access_mydb = config["cred_database"]["mysql_db_host"]
+#     access_port = config["cred_database"]["mysql_db_port"]
+#     access_db = config["cred_database"]["mysql_db_name"]
+#     datadir = args.d[0]
+#     environment_type = "DEV"
+#     if args.e[0] == 1:
+#         environment_type = "PROD"
+def run_location_flatfile(**kwargs):
+    go_live_path = "/project/go_live"
+    config = get_current_config('granted_patent', **{
+        "execution_date": kwargs['execution_date']
+    })
     engine = create_engine(get_connection_string(config))
     root_engine = create_engine(get_connection_string(config, database="app_database"))
 
