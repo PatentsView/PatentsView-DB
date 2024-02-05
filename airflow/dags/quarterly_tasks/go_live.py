@@ -9,6 +9,7 @@ from slack_sdk import WebClient
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from reporting_database_generator.database import validate_query
 from QA.production.ProdDBTester import run_prod_db_qa
+from go_live.comparison_flatfile import run_comparison_flatfile
 
 default_args = {
     'owner': 'airflow',
@@ -49,11 +50,11 @@ PVSupport = SQLTemplatedPythonOperator(
     python_callable=validate_query.validate_and_execute,
     dag=go_live_dag,
     op_kwargs={
-        'filename': 'PVSupport_webtool',
+        'filename': 'PVSupport',
         'host':'PROD_DATABASE_SETUP'
     },
     templates_dict={
-        'source_sql': 'PVSupport_webtool.sql'
+        'source_sql': 'PVSupport.sql'
     }
 )
 
@@ -61,5 +62,9 @@ qa_production_data = PythonOperator(task_id='QA_PROD_DB'
                              , python_callable=run_prod_db_qa
                              , op_kwargs={'type': 'granted_patent'})
 
-# PVSupport.set_upstream(web_tools)
-# qa_production_data.set_upstream(PVSupport)
+data_viz_comparison_ff = PythonOperator(task_id='data_viz_comparison_ff'
+                             , python_callable=run_comparison_flatfile)
+
+PVSupport.set_upstream(qa_production_data)
+web_tools.set_upstream(qa_production_data)
+data_viz_comparison_ff.set_upstream(qa_production_data)
