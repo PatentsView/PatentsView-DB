@@ -65,7 +65,6 @@ PVSupport = SQLTemplatedPythonOperator(
 
 qa_production_data = PythonOperator(task_id='QA_PROD_DB'
                              , python_callable=run_prod_db_qa
-                             , op_kwargs={'type': 'granted_patent'}
                              , dag=go_live_dag)
 
 data_viz_comparison_ff = PythonOperator(
