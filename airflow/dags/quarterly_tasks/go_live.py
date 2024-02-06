@@ -70,19 +70,22 @@ qa_production_data = PythonOperator(task_id='QA_PROD_DB'
 data_viz_comparison_ff = PythonOperator(
     task_id='data_viz_comparison_ff',
     python_callable=run_comparison_flatfile,
-    dag=go_live_dag
+    dag=go_live_dag,
+    queue= 'admin'
 )
 
 data_viz_location_ff = PythonOperator(
     task_id='data_viz_location_ff',
     python_callable=run_location_flatfile,
-    dag = go_live_dag
+    dag = go_live_dag,
+    queue= 'admin'
 )
 
 data_viz_relationship_ff = PythonOperator(
     task_id='data_viz_relationship_ff',
     python_callable=run_relationship_flatfile,
-    dag=go_live_dag
+    dag=go_live_dag,
+    queue= 'admin'
 )
 
 PVSupport.set_upstream(qa_production_data)
