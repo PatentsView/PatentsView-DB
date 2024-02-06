@@ -100,16 +100,16 @@ def cleaning(data):
 #     access_mydb = config["cred_database"]["mysql_db_host"]
 #     access_port = config["cred_database"]["mysql_db_port"]
 #     access_db = config["cred_database"]["mysql_db_name"]
-#     datadir = args.d[0]
+#     go_live_path = args.d[0]
 #     environment_type = "DEV"
 #     if args.e[0] == 1:
 #         environment_type = "PROD"
 def run_location_flatfile(**kwargs):
     go_live_path = "/project/go_live"
-    config = get_current_config('granted_patent', **{
+    config = get_current_config('granted_patent', schedule='quarterly', **{
         "execution_date": kwargs['execution_date']
     })
-    engine = create_engine(get_connection_string(config))
+    engine = create_engine(get_connection_string(config, database='REPORTING_DATABASE'))
     root_engine = create_engine(get_connection_string(config, database="app_database"))
 
     start_end = pd.read_sql("select `key`, `value` from config where `key` in ('webtool_location_start_year', 'webtool_location_end_year')", con=root_engine)
@@ -120,9 +120,9 @@ def run_location_flatfile(**kwargs):
     locdata1 = cleaning(locdata)
 
     # Create Dataframes of "State+Country Codes.xlsx"
-    code_file = datadir + "/State+Country Codes.xlsx"
+    code_file = go_live_path + "/State+Country Codes.xlsx"
     countryNames = pd.read_excel(
-        datadir + "/State+Country Codes.xlsx", \
+        go_live_path + "/State+Country Codes.xlsx", \
         sheet_name="Country", header=None, names=["code", "countryName"])
     countryNames["code"] = np.where(countryNames["code"].isnull(), "NA", countryNames["code"])
     stateNames = pd.read_excel(code_file, sheet_name="State", header=None, names=["stateName", "code"])
@@ -144,5 +144,5 @@ def run_location_flatfile(**kwargs):
     ranked = ranked.drop("index", axis=1)
     payload1 = ranked[:1000]
     payload2 = ranked[1000:]
-    payload1.to_csv(datadir + "/location_data_payload1.csv", sep=" ", header=False, encoding="utf-8", index=False)
-    payload2.to_csv(datadir + "/location_data_payload2.csv", sep=" ", header=False, encoding="utf-8", index=False)
+    payload1.to_csv(go_live_path + "/location_data_payload1.csv", sep=" ", header=False, encoding="utf-8", index=False)
+    payload2.to_csv(go_live_path + "/location_data_payload2.csv", sep=" ", header=False, encoding="utf-8", index=False)

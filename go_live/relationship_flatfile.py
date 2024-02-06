@@ -58,16 +58,16 @@ def set_dataframe(minyear, con):
 #     args = parser.parse_args()
 #     config = configparser.ConfigParser()
 #     config.read(args.c[0])
-#     datadir = args.d[0]
+#     go_live_path = args.d[0]
 #     environment_type = "DEV"
 #     if args.e[0] == 1:
 #         environment_type = "PROD"
 def run_relationship_flatfile(**kwargs):
     go_live_path = "/project/go_live"
-    config = get_current_config('granted_patent', **{
+    config = get_current_config('granted_patent', schedule='quarterly', **{
         "execution_date": kwargs['execution_date']
     })
-    engine = create_engine(get_connection_string(config, database="cred_database"))
+    engine = create_engine(get_connection_string(config, database='REPORTING_DATABASE'))
     root_engine = create_engine(get_connection_string(config, database="app_database"))
 
 
@@ -79,10 +79,10 @@ def run_relationship_flatfile(**kwargs):
 
     # Import state and country names
     countryNames = pd.read_excel(
-        datadir + "/State+Country Codes.xlsx", \
+        go_live_path + "/State+Country Codes.xlsx", \
         sheet_name="Country", header=None, names=["code", "countryName"])
     countryNames["code"] = np.where(countryNames["code"].isnull(), "NA", countryNames["code"])
-    stateNames = pd.read_excel(datadir + "/State+Country Codes.xlsx", sheet_name="State", header=None,
+    stateNames = pd.read_excel(go_live_path + "/State+Country Codes.xlsx", sheet_name="State", header=None,
                                names=["stateName", "code"])
     addon = pd.DataFrame([["District of Columbia", "DC"]], columns=["stateName", "code"])
     # stateNames = stateNames.append(addon, ignore_index=True)
@@ -283,7 +283,7 @@ def run_relationship_flatfile(**kwargs):
     countries_json = json.loads(countries[["name"]].to_json(orient="records"))
     output["countries"] = countries_json
 
-    f = open(datadir + "/relationship_data.json", "w",
+    f = open(go_live_path + "/relationship_data.json", "w",
              encoding="utf-8")
     f.write(json.dumps(output, indent=4))
     f.close()

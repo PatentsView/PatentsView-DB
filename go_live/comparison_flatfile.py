@@ -6,6 +6,7 @@ import datetime
 import argparse
 from sqlalchemy import create_engine
 from lib.utilities import get_connection_string, get_current_config
+from lib.configuration import get_unique_connection_string
 
 def set_dataframe(query, con):
     cursor = con.cursor()
@@ -44,10 +45,10 @@ def set_dataframe(query, con):
 
 def run_comparison_flatfile(**kwargs):
     go_live_path = "/project/go_live"
-    config = get_current_config('granted_patent', **{
+    config = get_current_config('granted_patent', schedule='quarterly', **{
         "execution_date": kwargs['execution_date']
     })
-    engine = create_engine(get_connection_string(config))
+    engine = create_engine(get_connection_string(config, database='REPORTING_DATABASE'))
     ## Countries
     countryI = pd.read_sql_table('webtool_comparison_countryI', con=engine)
     countryI_sector = pd.read_sql_table('webtool_comparison_countryIsector', engine)
@@ -405,3 +406,8 @@ def run_comparison_flatfile(**kwargs):
              encoding="utf-8")
     f.write(json.dumps(output, default=str))
     f.close()
+
+if __name__ == "__main__":
+    run_comparison_flatfile(**{
+        "execution_date": datetime.date(2023, 10, 1)
+    })
