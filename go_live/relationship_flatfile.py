@@ -68,7 +68,7 @@ def run_relationship_flatfile(**kwargs):
         "execution_date": kwargs['execution_date']
     })
     engine = create_engine(get_connection_string(config, database='REPORTING_DATABASE'))
-    root_engine = create_engine(get_connection_string(config, database="app_database"))
+    root_engine = create_engine(get_unique_connection_string(config, database="_root", connection="APP_DATABASE_SETUP"))
 
 
     start_end = pd.read_sql("select `key`, `value` from config where `key` = 'webtool_relationship_start_year'", con=root_engine)

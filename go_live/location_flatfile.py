@@ -3,9 +3,11 @@ import pymysql
 import configparser
 import argparse
 import pandas as pd
+import datetime
 import numpy as np
 from sqlalchemy import create_engine
 from lib.utilities import get_connection_string, get_current_config
+from lib.configuration import get_unique_connection_string
 
 def set_dataframe(startyear, endyear, engine):
     # cursor = con.cursor()
@@ -110,11 +112,12 @@ def run_location_flatfile(**kwargs):
         "execution_date": kwargs['execution_date']
     })
     engine = create_engine(get_connection_string(config, database='REPORTING_DATABASE'))
-    root_engine = create_engine(get_connection_string(config, database="app_database"))
+    root_engine = create_engine(get_unique_connection_string(config, database="_root" ,connection="APP_DATABASE_SETUP"))
 
     start_end = pd.read_sql("select `key`, `value` from config where `key` in ('webtool_location_start_year', 'webtool_location_end_year')", con=root_engine)
     start = list(start_end[start_end['key'] =='webtool_location_start_year']['value'])[0]
     end = list(start_end[start_end['key'] =='webtool_location_end_year']['value'])[0]
+    breakpoint()
 
     locdata = set_dataframe(start, end, engine)
     locdata1 = cleaning(locdata)
@@ -146,3 +149,9 @@ def run_location_flatfile(**kwargs):
     payload2 = ranked[1000:]
     payload1.to_csv(go_live_path + "/location_data_payload1.csv", sep=" ", header=False, encoding="utf-8", index=False)
     payload2.to_csv(go_live_path + "/location_data_payload2.csv", sep=" ", header=False, encoding="utf-8", index=False)
+
+
+if __name__ == "__main__":
+    run_location_flatfile(**{
+        "execution_date": datetime.date(2023, 10, 1)
+    })
