@@ -9,6 +9,9 @@ from slack_sdk import WebClient
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from reporting_database_generator.database import validate_query
 from QA.production.ProdDBTester import run_prod_db_qa
+from go_live.comparison_flatfile import run_comparison_flatfile
+from go_live.relationship_flatfile import run_relationship_flatfile
+from go_live.location_flatfile import run_location_flatfile
 
 default_args = {
     'owner': 'airflow',
@@ -21,6 +24,9 @@ default_args = {
     'concurrency': 40,
     'queue': 'data_collector'
 }
+
+
+
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
@@ -36,7 +42,7 @@ web_tools = SQLTemplatedPythonOperator(
     python_callable=validate_query.validate_and_execute,
     dag=go_live_dag,
     op_kwargs={
-        'filename': 'webtool_tables',
+        'filename': 'webtool_tables'
     },
     templates_dict={
         'source_sql': 'webtool_tables.sql'
@@ -49,17 +55,38 @@ PVSupport = SQLTemplatedPythonOperator(
     python_callable=validate_query.validate_and_execute,
     dag=go_live_dag,
     op_kwargs={
-        'filename': 'PVSupport_webtool',
+        'filename': 'PVSupport',
         'host':'PROD_DATABASE_SETUP'
     },
     templates_dict={
-        'source_sql': 'PVSupport_webtool.sql'
+        'source_sql': 'PVSupport.sql'
     }
 )
 
 qa_production_data = PythonOperator(task_id='QA_PROD_DB'
                              , python_callable=run_prod_db_qa
-                             , op_kwargs={'type': 'granted_patent'})
+                             , dag=go_live_dag)
 
-PVSupport.set_upstream(web_tools)
-qa_production_data.set_upstream(PVSupport)
+data_viz_comparison_ff = PythonOperator(
+    task_id='data_viz_comparison_ff',
+    python_callable=run_comparison_flatfile,
+    dag=go_live_dag
+)
+
+data_viz_location_ff = PythonOperator(
+    task_id='data_viz_location_ff',
+    python_callable=run_location_flatfile,
+    dag = go_live_dag
+)
+
+data_viz_relationship_ff = PythonOperator(
+    task_id='data_viz_relationship_ff',
+    python_callable=run_relationship_flatfile,
+    dag=go_live_dag
+)
+
+PVSupport.set_upstream(qa_production_data)
+web_tools.set_upstream(qa_production_data)
+data_viz_comparison_ff.set_upstream(qa_production_data)
+data_viz_location_ff.set_upstream(qa_production_data)
+data_viz_relationship_ff.set_upstream(qa_production_data)

@@ -24,7 +24,7 @@ CREATE TABLE `{{reporting_db}}`.`wipo_field` (
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `{{reporting_db}}`.`wipo` SELECT `patent_id`, `field_id`, `sequence` FROM `patent`.`wipo`;
-INSERT INTO `{{reporting_db}}`.`wipo_field` SELECT `id`, `sector_title`, `field_title` FROM `patent`.`wipo_field`;
+INSERT INTO `{{reporting_db}}`.`wipo_field` SELECT `id`, `sector_title`, `field_title` FROM `patent`.`wipo_field` where `id` not like '%D%';
 
 # END WIPO fields tables
 

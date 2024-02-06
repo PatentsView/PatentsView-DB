@@ -38,7 +38,7 @@ class ProdDBTester(DatabaseTester):
             logger.info(f"==============================================================================")
 
 def run_prod_db_qa(**kwargs):
-    config = get_current_config('granted_patent', schedule="quarterly", **kwargs)
+    config = get_current_config(type='granted_patent', schedule="quarterly", **kwargs)
     qc = ProdDBTester(config)
     qc.run_prod_db_tests()
 

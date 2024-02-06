@@ -125,13 +125,14 @@ An [Airflow Pool](https://airflow.apache.org/docs/apache-airflow/stable/administ
 
 ## ENV
 1. Check if containers are running 
-2. Check which processes are running in each container using `docker top {id}`. This should be some variation of airflow scheduler  for scheduler container, webserver for webserver container so forth
-3. Check the UI to see if there are any python errors
-4. Check UI to see if there are any heartbeat error/warnings
-5. Then check flower UI to see if "clients" are registered. client = each process that runs some version of airflow celery worker command
+2. Make sure the dag parameter is specified in the task definition in the DAG file
+3. Check which processes are running in each container using `docker top {id}`. This should be some variation of airflow scheduler  for scheduler container, webserver for webserver container so forth
+4. Check the UI to see if there are any python errors
+5. Check UI to see if there are any heartbeat error/warnings
+6. Then check flower UI to see if "clients" are registered. client = each process that runs some version of airflow celery worker command
    1. `ssh -L 5555:localhost:5555 PVGP`
    2. http://localhost:5555/
-6. Then check rabbitMQ UI. Particularly the "consumer" section in the queue that you are interested in. For example, if the task is supposed to be under the "data collection" queue, you can see if a consumer is registered under that queue (consumer ~= server/worker process)
+7. Then check rabbitMQ UI. Particularly the "consumer" section in the queue that you are interested in. For example, if the task is supposed to be under the "data collection" queue, you can see if a consumer is registered under that queue (consumer ~= server/worker process)
    1. `ssh -L 8188:localhost:8188 PVGP`
    2. http://localhost:8188/
    3. guest:guest
