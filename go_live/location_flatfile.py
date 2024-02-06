@@ -117,7 +117,6 @@ def run_location_flatfile(**kwargs):
     start_end = pd.read_sql("select `key`, `value` from config where `key` in ('webtool_location_start_year', 'webtool_location_end_year')", con=root_engine)
     start = list(start_end[start_end['key'] =='webtool_location_start_year']['value'])[0]
     end = list(start_end[start_end['key'] =='webtool_location_end_year']['value'])[0]
-    breakpoint()
 
     locdata = set_dataframe(start, end, engine)
     locdata1 = cleaning(locdata)

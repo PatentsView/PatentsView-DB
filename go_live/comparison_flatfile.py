@@ -52,7 +52,6 @@ def run_comparison_flatfile(**kwargs):
     ## Countries
     countryI = pd.read_sql_table('webtool_comparison_countryI', con=engine)
     countryI_sector = pd.read_sql_table('webtool_comparison_countryIsector', engine)
-    print(countryI_sector)
 
     # Complete()
     countryI1 = countryI_sector.set_index(["country", "year", "sector_title"])
@@ -100,7 +99,6 @@ def run_comparison_flatfile(**kwargs):
         go_live_path + "/State+Country Codes.xlsx", engine="openpyxl",
         sheet_name="Country", header=None, names=["code", "countryName"])
     countryNames["code"] = np.where(countryNames["code"].isnull(), "NA", countryNames["code"])
-    print(countryNames)
 
     countries = pd.merge(countryI1, countryA1, how="inner", on=["country", "year", "sector_title"])
     countries = pd.merge(countries, countryNames, left_on="country", right_on="code", how="inner").drop(

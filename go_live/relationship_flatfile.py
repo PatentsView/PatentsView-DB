@@ -7,6 +7,7 @@ import numpy as np
 import json
 from sqlalchemy import create_engine
 from lib.utilities import get_connection_string, get_current_config
+from lib.configuration import get_unique_connection_string
 
 def set_dataframe(minyear, con):
     # cursor = con.cursor()
