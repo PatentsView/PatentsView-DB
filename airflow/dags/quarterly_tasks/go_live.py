@@ -24,6 +24,9 @@ default_args = {
     'concurrency': 40,
     'queue': 'data_collector'
 }
+
+
+
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
 
@@ -62,21 +65,25 @@ PVSupport = SQLTemplatedPythonOperator(
 
 qa_production_data = PythonOperator(task_id='QA_PROD_DB'
                              , python_callable=run_prod_db_qa
-                             , op_kwargs={'type': 'granted_patent'})
+                             , op_kwargs={'type': 'granted_patent'}
+                             , dag=go_live_dag)
 
 data_viz_comparison_ff = PythonOperator(
     task_id='data_viz_comparison_ff',
-    python_callable=run_comparison_flatfile
+    python_callable=run_comparison_flatfile,
+    dag=go_live_dag
 )
 
 data_viz_location_ff = PythonOperator(
     task_id='data_viz_location_ff',
-    python_callable=run_location_flatfile
+    python_callable=run_location_flatfile,
+    dag = go_live_dag
 )
 
 data_viz_relationship_ff = PythonOperator(
     task_id='data_viz_relationship_ff',
-    python_callable=run_relationship_flatfile
+    python_callable=run_relationship_flatfile,
+    dag=go_live_dag
 )
 
 PVSupport.set_upstream(qa_production_data)
