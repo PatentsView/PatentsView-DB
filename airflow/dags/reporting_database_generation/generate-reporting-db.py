@@ -50,24 +50,18 @@ reporting_db_dag = DAG("reporting_database_generation_quarterly"
                        , schedule_interval='@quarterly'
                        , template_searchpath="/project/reporting_database_generator/")
 
-assignee_disambiguation_finished = ExternalTaskSensor(
-    task_id="assignee_disambiguation_finished",
-    external_dag_id="inventor_assignee_disambiguation",
-    external_task_id="qc_post_process_assignee",
-    timeout=600,
-    allowed_states=['success'],
-    failed_states=['failed', 'skipped'],
-    mode="reschedule",
-)
 
-inventor_disambiguation_finished = ExternalTaskSensor(
-    task_id="inventor_disambiguation_finished",
-    external_dag_id="inventor_assignee_disambiguation",
-    external_task_id="qc_post_process_inventor",
-    timeout=600,
-    allowed_states=['success'],
-    failed_states=['failed', 'skipped'],
-    mode="reschedule",
+db_deletion = SQLTemplatedPythonOperator(
+    task_id='Database_Deletion',
+    provide_context=True,
+    python_callable=validate_query.validate_and_execute,
+    dag=reporting_db_dag,
+    op_kwargs={
+        'filename': '00_Deletion',
+    },
+    templates_dict={
+        'source_sql': '00_Deletion.sql'
+    },
 )
 
 db_creation = SQLTemplatedPythonOperator(
@@ -443,8 +437,6 @@ reporting_db_qa = PythonOperator(task_id='reporting_DB_QA',
                                           )
 # MAPPING DEPENDENCY
 
-db_creation.set_upstream(inventor_disambiguation_finished)
-db_creation.set_upstream(assignee_disambiguation_finished)
 
 govt_interest.set_upstream(db_creation)
 id_mappings.set_upstream(db_creation)
@@ -505,5 +497,6 @@ reporting_db_qa.set_upstream(inventor_step2)
 reporting_db_qa.set_upstream(assignee_cpc)
 reporting_db_qa.set_upstream(assignee_inventor)
 reporting_db_qa.set_upstream(assignee_nber_uspc)
+db_deletion.set_upstream(reporting_db_qa)
 
 
