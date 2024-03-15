@@ -192,9 +192,10 @@ def yearly_brf_sum_text(config):
         engine = create_engine(
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
-        engine.execute(
-                "insert ignore into brf_sum_text_{} select * from brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
-                        year, year))
+        q = "insert ignore into brf_sum_text_{} select * from brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
+                        year, year)
+        print(q)
+        engine.execute(q)
 
 
 def yearly_draw_desc_text(config):
@@ -419,6 +420,10 @@ def post_upload_database(**kwargs):
 
 
 if __name__ == "__main__":
-    begin_post_processing(**{
-            "execution_date": datetime.date(2023, 4, 6)
-            })
+    #begin_post_processing(**{
+    #        "execution_date": datetime.date(2023, 4, 6)
+    #})
+    config = get_current_config(type='pgpubs', **{
+            "execution_date": datetime.date(2024, 1, 4)
+    })
+    yearly_brf_sum_text(config)
