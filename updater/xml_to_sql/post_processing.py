@@ -165,10 +165,10 @@ def yearly_claim(config):
         engine = create_engine(
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
-        engine.execute(
-                "insert ignore into claims_{} select * from claims c where substring(c.pgpub_id, 1, 4) = '{}';".format(
-                        year,
-                        year))
+        q = "insert ignore into claims_{} select * from {}.claims c where substring(c.pgpub_id, 1, 4) = '{}';".format(
+                        year, database, year)
+        print(q)
+        engine.execute(q)
 
 
 def yearly_brf_sum_text(config):
@@ -219,9 +219,10 @@ def yearly_draw_desc_text(config):
         engine = create_engine(
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
-        engine.execute(
-                "insert ignore into draw_desc_text_{} select * from draw_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
-                        year, year))
+        q = "insert ignore into draw_desc_text_{} select * from {}.draw_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
+                        year, database, year)
+        print(q)
+        engine.execute(q)
 
 
 def yearly_detail_desc_text(config):
@@ -245,10 +246,10 @@ def yearly_detail_desc_text(config):
         engine = create_engine(
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
-        engine.execute(
-                "insert ignore into detail_desc_text_{} select * from detail_desc_text d where substring(d.pgpub_id, "
-                "1, 4) = '{}';".format(
-                        year, year))
+        q = "insert ignore into detail_desc_text_{} select * from {}.detail_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
+                        year, database, year)
+        print(q)
+        engine.execute(q)
 
 
 def consolidate_granted_cpc(config):
