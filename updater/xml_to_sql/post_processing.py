@@ -192,8 +192,8 @@ def yearly_brf_sum_text(config):
         engine = create_engine(
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
-        q = "insert ignore into brf_sum_text_{} select * from brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
-                        year, year)
+        q = "insert ignore into brf_sum_text_{} select * from {}.brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
+                        year, database, year)
         print(q)
         engine.execute(q)
 
