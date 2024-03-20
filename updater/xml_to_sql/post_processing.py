@@ -147,6 +147,7 @@ def detail_desc_length(config):
 def yearly_claim(config):
     logger.info('migrating claims to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+    text_db = '{}'.format(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -165,8 +166,8 @@ def yearly_claim(config):
         engine = create_engine(
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
-        q = "insert ignore into claims_{} select * from {}.claims c where substring(c.pgpub_id, 1, 4) = '{}';".format(
-                        year, database, year)
+        q = "insert ignore into {}.claims_{} select * from {}.claims c where substring(c.pgpub_id, 1, 4) = '{}';".format(
+                        text_db, year, database, year)
         print(q)
         engine.execute(q)
 
@@ -174,6 +175,7 @@ def yearly_claim(config):
 def yearly_brf_sum_text(config):
     logger.info('migrating brief summary texts to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+    text_db = '{}'.format(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -192,8 +194,8 @@ def yearly_brf_sum_text(config):
         engine = create_engine(
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
-        q = "insert ignore into brf_sum_text_{} select * from {}.brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
-                        year, database, year)
+        q = "insert ignore into {}.brf_sum_text_{} select * from {}.brf_sum_text b where substring(b.pgpub_id, 1, 4) = '{}';".format(
+                        text_db, year, database, year)
         print(q)
         engine.execute(q)
 
@@ -201,6 +203,7 @@ def yearly_brf_sum_text(config):
 def yearly_draw_desc_text(config):
     logger.info('migrating drawing descriptions to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+    text_db = '{}'.format(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -219,8 +222,8 @@ def yearly_draw_desc_text(config):
         engine = create_engine(
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
-        q = "insert ignore into draw_desc_text_{} select * from {}.draw_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
-                        year, database, year)
+        q = "insert ignore into {}.draw_desc_text_{} select * from {}.draw_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
+                        text_db, year, database, year)
         print(q)
         engine.execute(q)
 
@@ -228,6 +231,7 @@ def yearly_draw_desc_text(config):
 def yearly_detail_desc_text(config):
     logger.info('migrating detail description texts to yearly tables')
     database = '{}'.format(config['PATENTSVIEW_DATABASES']['TEMP_UPLOAD_DB'])
+    text_db = '{}'.format(config['PATENTSVIEW_DATABASES']["TEXT_DB"])
     host = '{}'.format(config['DATABASE_SETUP']['HOST'])
     user = '{}'.format(config['DATABASE_SETUP']['USERNAME'])
     password = '{}'.format(config['DATABASE_SETUP']['PASSWORD'])
@@ -246,8 +250,8 @@ def yearly_detail_desc_text(config):
         engine = create_engine(
                 'mysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
-        q = "insert ignore into detail_desc_text_{} select * from {}.detail_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
-                        year, database, year)
+        q = "insert ignore into {}.detail_desc_text_{} select * from {}.detail_desc_text d where substring(d.pgpub_id, 1, 4) = '{}';".format(
+                        text_db, year, database, year)
         print(q)
         engine.execute(q)
 
