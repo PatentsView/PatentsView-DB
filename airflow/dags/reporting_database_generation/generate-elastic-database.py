@@ -441,3 +441,4 @@ for operator in operator_sequence_groups['first_step']:
 for operator in operator_sequence_groups['endpoint_patent_steps']:
     operator.set_upstream(endpoint_patent_patents_table)
 
+endpoint_publications_publication_views.set_upstream(endpoint_publications_publication)
