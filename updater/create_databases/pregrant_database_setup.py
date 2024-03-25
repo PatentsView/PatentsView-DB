@@ -50,7 +50,7 @@ def create_database(**kwargs):
     year = config["DATES"]["END_DATE"][:4]
     for text_table in ['brf_sum_text', "claims", "detail_desc_text", "draw_desc_text"]:
         table = text_table + "_" + year
-        q = f"CREATE TABLE {table} like {text_table};"
+        q = f"CREATE TABLE {temp_db}.{table} like {text_table};"
         print(q)
         conn.cursor().execute(q)
 
