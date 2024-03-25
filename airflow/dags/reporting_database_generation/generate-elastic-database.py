@@ -433,7 +433,7 @@ operator_sequence_groups['endpoint_patent_steps'] = [endpoint_patent_assignee_ta
                                                      relapptext_endpoint_relapptext_table,patentcitation_endpoint_patentcitation_table,applicationcitation_endpoint_applicationcitation_table]
 
 
-operator_sequence_groups['publications_endpoint'] =[endpoint_publications_publication_views, endpoint_publications_assignee,endpoint_publications_assignee,
+operator_sequence_groups['publications_endpoint'] =[endpoint_publications_assignee,endpoint_publications_assignee,
                                                     endpoint_publications_cpc, endpoint_publications_gi,endpoint_publications_us_parties, endpoint_rel_app_text_pgpub]
 
 for operator in operator_sequence_groups['first_step']:
@@ -442,3 +442,18 @@ for operator in operator_sequence_groups['endpoint_patent_steps']:
     operator.set_upstream(endpoint_patent_patents_table)
 
 endpoint_publications_publication_views.set_upstream(endpoint_publications_publication)
+
+for operator in operator_sequence_groups['publications_endpoint']:
+    operator.set_upstream(endpoint_publications_publication_views)
+
+# Set db_deletion upstream to each operator in 'publications_endpoint' group
+for operator in operator_sequence_groups['publications_endpoint']:
+    db_deletion.set_upstream(operator)
+
+# Set db_deletion upstream to each operator in 'endpoint_patent_steps' group
+for operator in operator_sequence_groups['endpoint_patent_steps']:
+    db_deletion.set_upstream(operator)
+
+# Set db_deletion upstream to each operator in 'first_step' group
+for operator in operator_sequence_groups['first_step']:
+    db_deletion.set_upstream(operator)
