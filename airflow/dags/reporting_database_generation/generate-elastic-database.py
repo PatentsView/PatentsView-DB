@@ -446,14 +446,3 @@ endpoint_publications_publication_views.set_upstream(endpoint_publications_publi
 for operator in operator_sequence_groups['publications_endpoint']:
     operator.set_upstream(endpoint_publications_publication_views)
 
-# Set db_deletion upstream to each operator in 'publications_endpoint' group
-for operator in operator_sequence_groups['publications_endpoint']:
-    db_deletion.set_upstream(operator)
-
-# Set db_deletion upstream to each operator in 'endpoint_patent_steps' group
-for operator in operator_sequence_groups['endpoint_patent_steps']:
-    db_deletion.set_upstream(operator)
-
-# Set db_deletion upstream to each operator in 'first_step' group
-for operator in operator_sequence_groups['first_step']:
-    db_deletion.set_upstream(operator)
