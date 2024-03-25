@@ -435,7 +435,7 @@ operator_sequence_groups['endpoint_patent_steps'] = [endpoint_patent_assignee_ta
                                                      relapptext_endpoint_relapptext_table,patentcitation_endpoint_patentcitation_table,applicationcitation_endpoint_applicationcitation_table]
 
 
-operator_sequence_groups['publications_endpoint'] =[endpoint_publications_publication_views, endpoint_publications_assignee,endpoint_publications_assignee
+operator_sequence_groups['publications_endpoint'] =[endpoint_publications_publication_views, endpoint_publications_assignee,endpoint_publications_assignee,
                                                     endpoint_publications_cpc, endpoint_publications_gi,endpoint_publications_us_parties, endpoint_rel_app_text_pgpub]
 
 operator_sequence_groups['first_step'].set_upstream(db_creation)
