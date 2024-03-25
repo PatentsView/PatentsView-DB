@@ -2,7 +2,7 @@ import configparser
 import os
 from datetime import datetime, timedelta
 
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from slack_sdk import WebClient
 from airflow import DAG
 from reporting_database_generator.database import validate_query
