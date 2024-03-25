@@ -47,10 +47,10 @@ def create_database(**kwargs):
     except:
         print('create bash command failed')
         raise
-    year = config["DATES"]["END_DATE"]
+    year = config["DATES"]["END_DATE"][:4]
     for text_table in ['brf_sum_text', "claims", "detail_desc_text", "draw_desc_text"]:
         table = text_table + "_" + year
-        q = f"CREATE TABLE {table} like {text_table} DEFAULT CHARACTER SET = 'utf8mb4' DEFAULT COLLATE 'utf8mb4_unicode_ci';"
+        q = f"CREATE TABLE {table} like {text_table};"
         print(q)
         conn.cursor().execute(q)
 
