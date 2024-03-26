@@ -437,7 +437,7 @@ reporting_db_qa = PythonOperator(task_id='reporting_DB_QA',
                                           )
 # MAPPING DEPENDENCY
 
-
+db_creation.set_upstream(db_deletion)
 govt_interest.set_upstream(db_creation)
 id_mappings.set_upstream(db_creation)
 application.set_upstream(db_creation)
@@ -497,6 +497,6 @@ reporting_db_qa.set_upstream(inventor_step2)
 reporting_db_qa.set_upstream(assignee_cpc)
 reporting_db_qa.set_upstream(assignee_inventor)
 reporting_db_qa.set_upstream(assignee_nber_uspc)
-db_deletion.set_upstream(reporting_db_qa)
+
 
 
