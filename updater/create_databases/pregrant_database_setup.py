@@ -47,6 +47,13 @@ def create_database(**kwargs):
     except:
         print('create bash command failed')
         raise
+    year = config["DATES"]["END_DATE"][:4]
+    for text_table in ['brf_sum_text', "claims", "detail_desc_text", "draw_desc_text"]:
+        table = text_table + "_" + year
+        q = f"CREATE TABLE {temp_db}.{table} like {temp_db}.{text_table};"
+        print(q)
+        conn.cursor().execute(q)
+
 
 
 def merge_database(**kwargs):

@@ -95,8 +95,8 @@ post_processing_operator = PythonOperator(task_id='post_process',
                                           dag=app_xml_dag,
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure,
-                                          depends_on_past=True,
-                                          pool = 'elastic_search_pool'
+                                          pool = 'database_write_iops_contenders',
+                                          depends_on_past = True
                                           )
 
 qc_upload_operator = PythonOperator(task_id='qc_upload_new',
@@ -125,7 +125,8 @@ loc_disambiguation = PythonOperator(task_id='loc_disambiguation',
                                     op_kwargs={'dbtype': 'pgpubs'},
                                     dag=app_xml_dag,
                                     on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure
+                                    on_failure_callback=airflow_task_failure,
+                                    pool = 'three_pool'
                                     )
 
 loc_disambiguation_qc = PythonOperator(task_id='loc_disambiguation_qc',
