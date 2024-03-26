@@ -1,109 +1,4 @@
 {
-  "foreign_priority":{
-    "fields":{
-      "document_number":{
-        "data_type":"int",
-        "null_allowed":false,
-        "category":false,
-        "location_field":false
-      },
-      "foreign_doc_number":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "date":{
-        "data_type":"date",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "country":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":true
-      },
-      "kind":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "TestScripts":[
-        "ElasticQBTester"
-      ]
-    }
-  },
-  "granted_pregrant_crosswalk":{
-    "fields":{
-      "patent_id":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "document_number":{
-        "data_type":"int",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "application_number":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "current_pgpub_id_flag":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "current_patent_id_flag":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "TestScripts":[
-        "ElasticQBTester"
-      ]
-    }
-  },
-  "ipcr":{
-    "fields":{
-      "ipcr_id":{
-        "data_type":"int",
-        "null_allowed":false,
-        "category":false,
-        "location_field":false
-      },
-      "section":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "ipc_class":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "subclass":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "TestScripts":[
-        "ElasticQBTester"
-      ]
-    }
-  },
   "publication":{
     "fields":{
       "id":{
@@ -179,7 +74,7 @@
         "location_field":false
       },
       "TestScripts":[
-        "ElasticQBTester"
+        "ElasticDBTester"
       ]
     }
   },
@@ -252,7 +147,7 @@
         "location_field":false
       },
       "TestScripts":[
-        "ElasticQBTester"
+        "ElasticDBTester"
       ]
     }
   },
@@ -301,56 +196,7 @@
         "location_field":false
       },
       "TestScripts":[
-        "ElasticQBTester"
-      ]
-    }
-  },
-  "publication_cpc_current":{
-    "fields":{
-      "document_number":{
-        "data_type":"int",
-        "null_allowed":false,
-        "category":false,
-        "location_field":false
-      },
-      "sequence":{
-        "data_type":"int",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "cpc_section":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "cpc_class":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "cpc_subclass":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "cpc_group":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "cpc_type":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "TestScripts":[
-        "ElasticQBTester"
+        "ElasticDBTester"
       ]
     }
   },
@@ -369,7 +215,7 @@
         "location_field":false
       },
       "TestScripts":[
-        "ElasticQBTester"
+        "ElasticDBTester"
       ]
     }
   },
@@ -406,7 +252,7 @@
         "location_field":false
       },
       "TestScripts":[
-        "ElasticQBTester"
+        "ElasticDBTester"
       ]
     }
   },
@@ -467,259 +313,7 @@
         "location_field":false
       },
       "TestScripts":[
-        "ElasticQBTester"
-      ]
-    }
-  },
-  "publication_ipcr":{
-    "fields":{
-      "document_number":{
-        "data_type":"int",
-        "null_allowed":false,
-        "category":false,
-        "location_field":false
-      },
-      "ipcr_id":{
-        "data_type":"int",
-        "null_allowed":false,
-        "category":false,
-        "location_field":false
-      },
-      "sequence":{
-        "data_type":"int",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "section":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "class":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "subclass":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "main_group":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "subgroup":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "symbol_position":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "class_value":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "class_data_source":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "action_date":{
-        "data_type":"date",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "TestScripts":[
-        "ElasticQBTester"
-      ]
-    }
-  },
-  "publication_pct_data":{
-    "fields":{
-      "document_number":{
-        "data_type":"int",
-        "null_allowed":false,
-        "category":false,
-        "location_field":false
-      },
-      "doc_type":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "kind":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "pct_doc_number":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "date":{
-        "data_type":"date",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "us_371c124_date":{
-        "data_type":"date",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "us_371c12_date":{
-        "data_type":"date",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "TestScripts":[
-        "ElasticQBTester"
-      ]
-    }
-  },
-  "publication_us_related_documents":{
-    "fields":{
-      "document_number":{
-        "data_type":"int",
-        "null_allowed":false,
-        "category":false,
-        "location_field":false
-      },
-      "doc_type":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "relkind":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "related_doc_number":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "country":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":true
-      },
-      "date":{
-        "data_type":"date",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "TestScripts":[
-        "ElasticQBTester"
-      ]
-    }
-  },
-  "publication_uspc_at_issue":{
-    "fields":{
-      "document_number":{
-        "data_type":"int",
-        "null_allowed":false,
-        "category":false,
-        "location_field":false
-      },
-      "sequence":{
-        "data_type":"int",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "mainclass_id":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "subclass_id":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "TestScripts":[
-        "ElasticQBTester"
-      ]
-    }
-  },
-  "publication_wipo":{
-    "fields":{
-      "document_number":{
-        "data_type":"int",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "field_id":{
-        "data_type":"int",
-        "null_allowed":true,
-        "category":true,
-        "location_field":false
-      },
-      "sequence":{
-        "data_type":"int",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "TestScripts":[
-        "ElasticQBTester"
-      ]
-    }
-  },
-  "rel_app_text":{
-    "fields":{
-      "id":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "document_number":{
-        "data_type":"int",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "text":{
-        "data_type":"varchar",
-        "null_allowed":true,
-        "category":false,
-        "location_field":false
-      },
-      "TestScripts":[
-        "ElasticQBTester"
+        "ElasticDBTester"
       ]
     }
   },
@@ -804,7 +398,7 @@
         "location_field":false
       },
       "TestScripts":[
-        "ElasticQBTester"
+        "ElasticDBTester"
       ]
     }
   }
