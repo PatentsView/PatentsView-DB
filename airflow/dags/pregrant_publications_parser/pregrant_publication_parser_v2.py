@@ -185,8 +185,8 @@ merge_database_operator = SQLTemplatedPythonOperator(
     },
     dag=app_xml_dag,
     templates_dict={
-        'source_sql': 'merge_into_pgpubs.sql',
-        'delete_sql': 'delete_from_pgpubs.sql'
+        'source_sql': 'merge_into_pgpubs_updated.sql',
+        # 'delete_sql': 'delete_from_pgpubs.sql'
     },
     templates_exts=['.sql'],
     params={
