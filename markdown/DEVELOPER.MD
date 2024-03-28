@@ -137,6 +137,12 @@ An [Airflow Pool](https://airflow.apache.org/docs/apache-airflow/stable/administ
    2. http://localhost:8188/
    3. guest:guest
 
+## RESTART SERVER 
+* You have to restart nginx after you re-start the server to keep the URL: 
+* nginx is what converts pipeline.patentsview.org -> docker airflow webserver container
+```sudo service nginx start```
+
+
 ## Updating SSL
 1. Allow access to the world (`0.0.0.0/0`) for http port on the GP Linux server in AWS
 2. `SSH PVGP`
