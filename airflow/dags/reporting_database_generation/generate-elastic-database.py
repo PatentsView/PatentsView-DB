@@ -10,6 +10,8 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.utils.trigger_rule import TriggerRule
 from lib.utilities import chain_operators
 
+from QA.post_processing.ElasticDBTester  import run_elastic_db_qa
+
 # project_home = os.environ['PACKAGE_HOME']
 # config = configparser.ConfigParser()
 # config.read(project_home + '/config.ini')
@@ -408,21 +410,24 @@ endpoint_rel_app_text_pgpub = SQLTemplatedPythonOperator(
     }
 )
 
-db_deletion = SQLTemplatedPythonOperator(
-    task_id='Elastic_Database_Deletion',
-    python_callable=validate_query.validate_and_execute,
-    dag=elastic_prep_dag,
-    op_kwargs={
-        'filename': '07_Deletion_Elasticsearch'
-    },
-    templates_dict={
-        'source_sql': '07_Deletion_Elasticsearch.sql'
-    },
-    trigger_rule=TriggerRule.ALL_SUCCESS
+elastic_patent_db_qa = PythonOperator(
+    task_id='elastic_patent_DB_QA',
+    python_callable=run_elastic_db_qa,
+    op_kwargs={'type': 'granted_patent'},  # Pass 'type' as a variable
+    dag=elastic_prep_dag
+)
+
+elastic_pgpubs_db_qa = PythonOperator(
+    task_id='elastic_pgpubs_DB_QA',
+    python_callable=run_elastic_db_qa,
+    op_kwargs={'type': 'pgpubs'},  # Pass 'type' as a variable
+    dag=elastic_prep_dag
 )
 
 
+
 operator_sequence_groups = {}
+
 operator_sequence_groups['first_step'] = [endpoint_patent_patents_table,endpoint_patent_applications_table,endpoint_patent_views,
                                           locations_endpoint_locations_table,assignee_endpoint_assignee_table, inventor_endpoint_inventor_table,
                                           attorney_endpoint_attorney_table,endpoint_publications_publication,classifications_endpoint_classifications_table ]
@@ -433,6 +438,7 @@ operator_sequence_groups['endpoint_patent_steps'] = [endpoint_patent_assignee_ta
                                                      relapptext_endpoint_relapptext_table,patentcitation_endpoint_patentcitation_table,applicationcitation_endpoint_applicationcitation_table]
 
 
+
 operator_sequence_groups['publications_endpoint'] =[endpoint_publications_assignee,endpoint_publications_inventor,endpoint_publications_cpc,
                                                     endpoint_publications_gi,endpoint_publications_us_parties, endpoint_rel_app_text_pgpub]
 
@@ -440,6 +446,7 @@ for operator in operator_sequence_groups['first_step']:
     operator.set_upstream(db_creation)
 for operator in operator_sequence_groups['endpoint_patent_steps']:
     operator.set_upstream(endpoint_patent_patents_table)
+
 
 endpoint_publications_publication_views.set_upstream(endpoint_publications_publication)
 
@@ -449,14 +456,17 @@ for operator in operator_sequence_groups['publications_endpoint']:
 for operator in operator_sequence_groups['publications_endpoint']:
     operator.set_upstream(endpoint_publications_publication_views)
 
-# Set db_deletion upstream to each operator in 'publications_endpoint' group
+# Set elastic_patent_db_qa upstream to each operator in 'publications_endpoint' group
 for operator in operator_sequence_groups['publications_endpoint']:
-    db_deletion.set_upstream(operator)
+    elastic_patent_db_qa.set_upstream(operator)
 
-# Set db_deletion upstream to each operator in 'endpoint_patent_steps' group
+# Set elastic_patent_db_qa upstream to each operator in 'endpoint_patent_steps' group
 for operator in operator_sequence_groups['endpoint_patent_steps']:
-    db_deletion.set_upstream(operator)
+    elastic_patent_db_qa.set_upstream(operator)
 
-# Set db_deletion upstream to each operator in 'first_step' group
+# Set elastic_patent_db_qa upstream to each operator in 'first_step' group
 for operator in operator_sequence_groups['first_step']:
-    db_deletion.set_upstream(operator)
+    elastic_patent_db_qa.set_upstream(operator)
+ 
+elastic_pgpubs_db_qa.set_upstream(elastic_patent_db_qa)
+

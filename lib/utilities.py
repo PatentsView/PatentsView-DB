@@ -35,6 +35,8 @@ def class_db_specific_config(self, table_config, class_called):
         if class_called == 'DatabaseTester':
             if "UploadTest" in table_config[i]['TestScripts']:
                 keep_tables.append(i)
+        elif class_called == 'ElasticDBTester':
+            keep_tables.append(i)
         else:
             if class_called in table_config[i]['TestScripts']:
                 keep_tables.append(i)
@@ -71,6 +73,10 @@ def load_table_config(config, db='patent'):
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'
     elif db == 'bulk_exp_pgpubs':
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'
+    elif db == 'elasticsearch_patent':
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_elasticsearch_patent"]}'
+    elif db == 'elasticsearch_pgpub':
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_elasticsearch_pgpub"]}'
 
     print(f"reading table config from {config_file}")
     with open(config_file) as file:
@@ -161,6 +167,14 @@ def get_relevant_attributes(self, class_called, database_section, config):
 
     elif class_called == "ReportingDBTester" or class_called == "ProdDBTester":
         self.table_config = load_table_config(config, db = config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]) #db should be parameterized later, not hard-coded
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
+        self.exclusion_list = []
+
+    elif class_called == "ElasticDBTester":
+        self.table_config = load_table_config(config, db = config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"]) #db should be parameterized later, not hard-coded
         self.category = ""
         self.central_entity = ""
         self.p_key = ""

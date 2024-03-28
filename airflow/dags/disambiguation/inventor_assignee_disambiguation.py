@@ -414,7 +414,7 @@ post_process_assignees = PythonOperator(task_id='assignee_additional_post_proces
                                                          dag=disambiguation,
                                                          on_success_callback=airflow_task_success,
                                                          on_failure_callback=airflow_task_failure,
-                                                         queue='data_collector', pool='database_write_iops_contenders')
+                                                         queue='disambiguator')
 post_process_create_patent_assignee = PythonOperator(task_id='assignee_create_patent_assignee',
                                                            python_callable=create_patent_assignee,
                                                            dag=disambiguation,
