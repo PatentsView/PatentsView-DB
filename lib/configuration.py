@@ -283,9 +283,6 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     if type == 'pgpub':
         config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_pgpub_'+ end_date.strftime('%Y%m%d')
         config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_pgpub'
-    if type == 'patent':
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_patent_' + end_date.strftime('%Y%m%d')
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_patent'
     config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(
         prefix=prefixed_string,
         data_root=config['FOLDERS']['data_root'])
@@ -297,7 +294,8 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
         config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'patent'
         config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'patent_text'
         config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
-
+        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_patent_' + end_date.strftime('%Y%m%d')
+        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_patent'
 
     latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
     latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
