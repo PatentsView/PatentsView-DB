@@ -293,7 +293,8 @@ select `patent`.`persistent_assignee_disambig`.`patent_id` AS `patent_id`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230330` AS `disamb_assignee_id_20230330`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230629` AS `disamb_assignee_id_20230629`,
-`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230930` AS `disamb_assignee_id_20230930`
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230930` AS `disamb_assignee_id_20230930`,
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20231231` AS `disamb_assignee_id_20231231`
 from `patent`.`persistent_assignee_disambig` 
 where `patent`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -318,7 +319,8 @@ select `patent`.`persistent_inventor_disambig`.`patent_id` AS `patent_id`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230330` AS `disamb_inventor_id_20230330`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230629` AS `disamb_inventor_id_20230629`,
-`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230930` AS `disamb_inventor_id_20230930`
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230930` AS `disamb_inventor_id_20230930`,
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20231231` AS `disamb_inventor_id_20231231`
 from `patent`.`persistent_inventor_disambig` 
 where `patent`.`persistent_inventor_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -644,7 +646,8 @@ select `pregrant_publications`.`persistent_assignee_disambig`.`document_number` 
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230330` AS `disamb_assignee_id_20230330`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230629` AS `disamb_assignee_id_20230629`,
-`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230930` AS `disamb_assignee_id_20230930`
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230930` AS `disamb_assignee_id_20230930`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20231231` AS `disamb_assignee_id_20231231`
 from `pregrant_publications`.`persistent_assignee_disambig` 
 where `pregrant_publications`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -659,7 +662,8 @@ select `pregrant_publications`.`persistent_inventor_disambig`.`document_number` 
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230330` AS `disamb_inventor_id_20230330`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230629` AS `disamb_inventor_id_20230629`,
-`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230930` AS `disamb_inventor_id_20230930`
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230930` AS `disamb_inventor_id_20230930`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20231231` AS `disamb_inventor_id_20231231`
 from `pregrant_publications`.`persistent_inventor_disambig` 
 where `pregrant_publications`.`persistent_inventor_disambig`.`version_indicator` <= '{{datestring}}';
 

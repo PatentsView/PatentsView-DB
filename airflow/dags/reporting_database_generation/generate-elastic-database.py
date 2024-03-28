@@ -2,12 +2,13 @@ import configparser
 import os
 from datetime import datetime, timedelta
 
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from slack_sdk import WebClient
 from airflow import DAG
 from reporting_database_generator.database import validate_query
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.utils.trigger_rule import TriggerRule
+from lib.utilities import chain_operators
 
 from QA.post_processing.ElasticDBTester  import run_elastic_db_qa
 
@@ -42,9 +43,6 @@ elastic_prep_dag = DAG("elastic_data_preparation_quarterly"
                        , start_date=datetime(2023, 1, 1)
                        , schedule_interval='@quarterly'
                        , template_searchpath="/project/reporting_database_generator/elastic_scripts/")
-
-operator_sequence_groups = {}
-
 
 
 db_creation = SQLTemplatedPythonOperator(
@@ -428,7 +426,7 @@ elastic_pgpubs_db_qa = PythonOperator(
 
 
 
-
+operator_sequence_groups = {}
 
 operator_sequence_groups['first_step'] = [endpoint_patent_patents_table,endpoint_patent_applications_table,endpoint_patent_views,
                                           locations_endpoint_locations_table,assignee_endpoint_assignee_table, inventor_endpoint_inventor_table,
@@ -440,16 +438,35 @@ operator_sequence_groups['endpoint_patent_steps'] = [endpoint_patent_assignee_ta
                                                      relapptext_endpoint_relapptext_table,patentcitation_endpoint_patentcitation_table,applicationcitation_endpoint_applicationcitation_table]
 
 
-operator_sequence_groups['publications_endpoint'] =[endpoint_publications_publication_views, endpoint_publications_assignee,
-                                                    endpoint_publications_assignee, endpoint_publications_cpc,
+
+operator_sequence_groups['publications_endpoint'] =[endpoint_publications_assignee,endpoint_publications_inventor,endpoint_publications_cpc,
                                                     endpoint_publications_gi,endpoint_publications_us_parties, endpoint_rel_app_text_pgpub]
 
-operator_sequence_groups['first_step'].set_upstream(db_creation)
-operator_sequence_groups['endpoint_patent_steps'].set_upstream(endpoint_patent_patents_table)
-endpoint_publications_publication_views.set_upstream(endpoint_publications_publication)
-operator_sequence_groups['publications_endpoint'].set_upstream(endpoint_publications_publication_views)
+for operator in operator_sequence_groups['first_step']:
+    operator.set_upstream(db_creation)
+for operator in operator_sequence_groups['endpoint_patent_steps']:
+    operator.set_upstream(endpoint_patent_patents_table)
 
-elastic_patent_db_qa.set_upstream(operator_sequence_groups['publications_endpoint'])
-elastic_patent_db_qa.set_upstream(operator_sequence_groups['endpoint_patent_steps'])
-elastic_patent_db_qa.set_upstream(operator_sequence_groups['first_step'])
+
+endpoint_publications_publication_views.set_upstream(endpoint_publications_publication)
+
+for operator in operator_sequence_groups['publications_endpoint']:
+    operator.set_upstream(endpoint_publications_publication_views)
+
+for operator in operator_sequence_groups['publications_endpoint']:
+    operator.set_upstream(endpoint_publications_publication_views)
+
+# Set elastic_patent_db_qa upstream to each operator in 'publications_endpoint' group
+for operator in operator_sequence_groups['publications_endpoint']:
+    elastic_patent_db_qa.set_upstream(operator)
+
+# Set elastic_patent_db_qa upstream to each operator in 'endpoint_patent_steps' group
+for operator in operator_sequence_groups['endpoint_patent_steps']:
+    elastic_patent_db_qa.set_upstream(operator)
+
+# Set elastic_patent_db_qa upstream to each operator in 'first_step' group
+for operator in operator_sequence_groups['first_step']:
+    elastic_patent_db_qa.set_upstream(operator)
+ 
 elastic_pgpubs_db_qa.set_upstream(elastic_patent_db_qa)
+
