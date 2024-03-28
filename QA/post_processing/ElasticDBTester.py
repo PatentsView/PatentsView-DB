@@ -21,7 +21,8 @@ def run_elastic_db_qa(db_type = None, **kwargs):
 
 
 if __name__ == '__main__':
-    # config = get_current_config('granted_patent', schedule='quarterly', **{"execution_date": datetime.date(2023, 12, 31)})
-    # print(config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"])
-    # qc = ElasticDBTester(config)
-    # qc.runReportingTests()
+
+    config = get_current_config('pgpubs', schedule='quarterly', **{"execution_date": datetime.date(2023, 12, 31)})
+    print(config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"])
+    qc = ElasticDBTester(config)
+    qc.runReportingTests()
