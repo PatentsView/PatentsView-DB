@@ -147,8 +147,8 @@ def push_orgs(looked_up_data, org_id_mapping, config, version_indicator,database
                 cursor.close()
         if row['contracts'] is not np.nan:
             contracts = ast.literal_eval(row['contracts'])
-            if isinstance(contracts, str):
-                contracts = contracts.replace("'", "")
+            if "'" in str(contracts):
+                contracts = str(contracts).replace("'", "")
             # contracts = list(set(row['contracts'].split('|')))
             for contract_award_no in contracts:
                 if contract_award_no is not None:
