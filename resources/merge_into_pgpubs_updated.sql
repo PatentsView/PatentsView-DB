@@ -29,33 +29,20 @@ ON DUPLICATE KEY UPDATE
     `updated_date` = VALUES(`updated_date`),
     `version_indicator` = VALUES(`version_indicator`);
 
-INSERT INTO pgpubs_text.brf_sum_text_2023 (`id`, `pgpub_id`, `summary_text`, `version_indicator`) 
-    SELECT `id`, `pgpub_id`, `summary_text`, `version_indicator` FROM `{{source_database}}`.brf_sum_text_2023
+INSERT INTO pgpubs_text.brf_sum_text_{{year}} (`id`, `pgpub_id`, `summary_text`, `version_indicator`)
+    SELECT `id`, `pgpub_id`, `summary_text`, `version_indicator` FROM `{{source_database}}`.brf_sum_text_{{year}}
     ON DUPLICATE KEY UPDATE
     `summary_text` = VALUES(`summary_text`),
     `version_indicator` = VALUES(`version_indicator`);
 
-INSERT INTO pgpubs_text.brf_sum_text_2022 (`id`, `pgpub_id`, `summary_text`, `version_indicator`) 
-    SELECT `id`, `pgpub_id`, `summary_text`, `version_indicator` FROM `{{source_database}}`.brf_sum_text_2022
-    ON DUPLICATE KEY UPDATE
-    `summary_text` = VALUES(`summary_text`),
-    `version_indicator` = VALUES(`version_indicator`);
-
-INSERT INTO pgpubs_text.claims_2023 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2023
+INSERT INTO pgpubs_text.claims_{{year}}(`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `version_indicator`, `claim_number`)
+    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_{{year}}
     ON DUPLICATE KEY UPDATE
     `claim_text` = VALUES(`claim_text`),
     `dependent` = VALUES(`dependent`),
     `version_indicator` = VALUES(`version_indicator`),
     `claim_number` = VALUES(`claim_number`);
 
-INSERT INTO pgpubs_text.claims_2022 (`id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `version_indicator`, `claim_number`) 
-    SELECT `id`, `pgpub_id`, `claim_text`, `claim_sequence`, `dependent`, `version_indicator`, `claim_number` FROM `{{source_database}}`.claims_2022
-    ON DUPLICATE KEY UPDATE
-    `claim_text` = VALUES(`claim_text`),
-    `dependent` = VALUES(`dependent`),
-    `version_indicator` = VALUES(`version_indicator`),
-    `claim_number` = VALUES(`claim_number`);
 
 INSERT INTO pregrant_publications.cpc SELECT * FROM `{{source_database}}`.cpc
     ON DUPLICATE KEY UPDATE
@@ -72,28 +59,16 @@ INSERT INTO pregrant_publications.cpc SELECT * FROM `{{source_database}}`.cpc
         `updated_date` = VALUES(`updated_date`),
         `version_indicator` = VALUES(`version_indicator`);
 
-INSERT INTO pgpubs_text.detail_desc_text_2023 (`id`, `pgpub_id`, `description_text`, `description_length`, `version_indicator`) 
-    SELECT `id`, `pgpub_id`, `description_text`, `description_length`, `version_indicator` FROM `{{source_database}}`.detail_desc_text_2023
+INSERT INTO pgpubs_text.detail_desc_text_{{year}} (`id`, `pgpub_id`, `description_text`, `description_length`, `version_indicator`)
+    SELECT `id`, `pgpub_id`, `description_text`, `description_length`, `version_indicator` FROM `{{source_database}}`.detail_desc_text_{{year}}
     ON DUPLICATE KEY UPDATE
     `description_text` = VALUES(`description_text`),
     `description_length` = VALUES(`description_length`),
     `version_indicator` = VALUES(`version_indicator`);
 
-INSERT INTO pgpubs_text.detail_desc_text_2022 (`id`, `pgpub_id`, `description_text`, `description_length`, `version_indicator`) 
-    SELECT `id`, `pgpub_id`, `description_text`, `description_length`, `version_indicator` FROM `{{source_database}}`.detail_desc_text_2022
-    ON DUPLICATE KEY UPDATE
-    `description_text` = VALUES(`description_text`),
-    `description_length` = VALUES(`description_length`),
-    `version_indicator` = VALUES(`version_indicator`);
 
-INSERT INTO pgpubs_text.draw_desc_text_2023 (`id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `version_indicator`) 
-    SELECT `id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `version_indicator` FROM `{{source_database}}`.draw_desc_text_2023
-    ON DUPLICATE KEY UPDATE
-    `draw_desc_text` = VALUES(`draw_desc_text`),
-    `version_indicator` = VALUES(`version_indicator`);
-
-INSERT INTO pgpubs_text.draw_desc_text_2022 (`id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `version_indicator`) 
-    SELECT `id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `version_indicator` FROM `{{source_database}}`.draw_desc_text_2022
+INSERT INTO pgpubs_text.draw_desc_text_{{year}} (`id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `version_indicator`)
+    SELECT `id`, `pgpub_id`, `draw_desc_text`, `draw_desc_sequence`, `version_indicator` FROM `{{source_database}}`.draw_desc_text_{{year}}
     ON DUPLICATE KEY UPDATE
     `draw_desc_text` = VALUES(`draw_desc_text`),
     `version_indicator` = VALUES(`version_indicator`);
