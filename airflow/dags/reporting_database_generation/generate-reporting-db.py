@@ -86,9 +86,11 @@ db_creation = SQLTemplatedPythonOperator(
 rebuild_patent_lookup = PythonOperator(task_id='rebuild_patent_lookup',
                                     python_callable=update_patent_id_in_patent,
                                     provide_context=True,
-                                    dag=reporting_db_dag,
-                                    on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure)
+                                    dag=reporting_db_dag
+                                    #    ,
+                                    # on_success_callback=airflow_task_success,
+                                    # on_failure_callback=airflow_task_failure
+                                       )
 
 govt_interest = SQLTemplatedPythonOperator(
     task_id='Government_Interest',
