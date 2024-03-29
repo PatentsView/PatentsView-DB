@@ -147,7 +147,7 @@ def push_orgs(looked_up_data, org_id_mapping, config, version_indicator,database
                 cursor.close()
         if row['contracts'] is not np.nan:
             contracts = ast.literal_eval(row['contracts'])
-            if "'" in str(contracts):
+            if str(contracts).count("'") % 2 != 0:  # Check if the count of single quotes is odd
                 contracts = str(contracts).replace("'", "")
             # contracts = list(set(row['contracts'].split('|')))
             for contract_award_no in contracts:
@@ -196,10 +196,13 @@ def qc_gi(dbtype='granted_patent', database='TEMP_UPLOAD_DB',**kwargs):
 
 
 if __name__ == '__main__':
-    from dateutil import rrule
+    qc_gi(dbtype = 'granted_patent',**{"execution_date": datetime.date(2024, 2, 1)} )
+    #config = get_current_config('pgpubs', **{"execution_date": datetime.date(2024, 2, 1)})
 
-    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime.date(2020, 12, 29), until=datetime.date(2021, 3, 23)):
-        process_post_manual(**{
-            "execution_date": dt
-        })
-        break
+    # from dateutil import rrule
+    #
+    # for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime.date(2020, 12, 29), until=datetime.date(2021, 3, 23)):
+    #     process_post_manual(**{
+    #         "execution_date": dt
+    #     })
+    #     break
