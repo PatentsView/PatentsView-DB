@@ -591,7 +591,6 @@ where invention_abstract is null """
             logger.info(f"==============================================================================")
             if self.class_called != "ReportingDBTester" and "PostProcessingQC" not in self.class_called:
                 self.test_null_version_indicator(table)
-            self.load_table_row_count(table, where_vi=False)
             if table == 'rawassignee':
                 self.test_rawassignee_org(table, where_vi=False)
             self.test_blank_count(table, self.table_config[table], where_vi=False)
@@ -629,6 +628,9 @@ where invention_abstract is null """
             logger.info("==============================================================================")
             logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables:.2%}")
             logger.info("==============================================================================")
+            self.save_qa_data()
+            self.init_qa_dict()
+
 
     def runDisambiguationTests(self):
         counter = 0

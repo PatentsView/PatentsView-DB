@@ -292,10 +292,10 @@ def post_merge_quarterly_granted(**kwargs):
     qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
     qc.runStandardTests()
 
-def post_merge_weekly_pgpubs(**kwargs):
+def post_merge_weekly_pgpubs( **kwargs):
     config = get_current_config('pgpubs', **kwargs)
-    run_id = kwargs.get('run_id')
-    qc = MergeTestWeekly(config, run_id=kwargs['run_id'])
+    # run_id = kwargs.get('run_id')
+    qc = MergeTestWeekly(config)
     qc.runStandardTests()
 
 def post_merge_quarterly_pgpubs(**kwargs):
@@ -323,10 +323,10 @@ if __name__ == '__main__':
     #         "execution_date": datetime.date(2020, 12, 1),
     #         "run_id":         1
     #         }, )
-    # post_merge_weekly(**{
-    #         "execution_date": datetime.date(2020, 12, 1),
-    #         "run_id":         "testing"
-    #         })
+    post_merge_weekly_pgpubs(**{
+            "execution_date": datetime.date(2024, 1, 11),
+            "run_id" : "scheduled__2024-01-11T09:00:00+00:00"
+            })
     # begin_text_merging(**{
     #         "execution_date": datetime.date(2020, 12, 1),
     #         "run_id":         "testing"

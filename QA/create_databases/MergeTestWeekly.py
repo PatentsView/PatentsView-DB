@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 
 class MergeTestWeekly(DatabaseTester):
     # This test tests new weekly data imported into the production databases
-    def __init__(self, config, run_id):
+    def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-        super().__init__(config, config['PATENTSVIEW_DATABASES']["PROD_DB"], datetime.date(year=1976, month=1, day=1), end_date)
+        super().__init__(config, config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"], datetime.date(year=1976, month=1, day=1), end_date)
 
 if __name__ == '__main__':
     config = get_current_config('granted_patent', **{
