@@ -34,6 +34,7 @@ select f.document_number
      , f.date
      , f.country
      , f.kind
+     , ROW_NUMBER() OVER (PARTITION BY f.document_number ORDER BY f.date) - 1 AS sequence
 from `{{reporting_db}}`.foreign_priority f;
 
 create
@@ -64,6 +65,8 @@ select i.document_number
      , i.class_value
      , i.class_data_source
      , i.action_date
+     , i.class_level
+     , i.class_status
 from `{{reporting_db}}`.ipcr i
          join `{{elastic_db}}`.ipcr i2
               on i2.ipc_class = i.class and i2.section = i.section and i2.subclass = i.subclass;
@@ -77,8 +80,9 @@ select p.document_number
      , p.kind
      , p.pct_doc_number
      , p.date
-     , p.`us_371c124_date`
-     , p.`us_371c12_date`
+     , p.`us_371c124_date` as 371_date
+     , p.`us_371c12_date` as 102_date
+     , p.country
 from `{{reporting_db}}`.pct_data p;
 
 
@@ -95,8 +99,11 @@ create or replace
 sql security invoker view `{{elastic_db}}`.publication_wipo as
 select w.document_number
      , w.field_id
+     , wf.field_title
+     , wf.sector_title
      , w.sequence
-from `{{reporting_db}}`.wipo w;
+from `{{reporting_db}}`.wipo w
+    left join patent.wipo_field wf on wf.id = w.field_id;
 
 
 create or replace
@@ -108,5 +115,6 @@ select
   , related_doc_number
   , u.country
   , u.date
+  , ROW_NUMBER() OVER (PARTITION BY u.document_number ORDER BY u.date) - 1 AS sequence
 from
     `{{reporting_db}}`.usreldoc u;

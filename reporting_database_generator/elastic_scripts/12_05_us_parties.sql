@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`us_parties`
     `city`                                                  varchar(256) DEFAULT NULL,
     `state`                                                 varchar(256) DEFAULT NULL,
     `country`                                               varchar(256) DEFAULT NULL,
+    `applicant_authority`                                   varchar(256) DEFAULT NULL,
     `version_indicator`                                     date DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY                                                     `document_number` (`document_number`),
@@ -28,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`us_parties`
 
 TRUNCATE TABLE `{{elastic_db}}`.`us_parties`;
 
-insert into `{{elastic_db}}`.us_parties ( id, document_number, name_first, name_last, organization, type, designation, sequence, rawlocation_id, city, state, country, version_indicator)
+insert into `{{elastic_db}}`.us_parties ( id, document_number, name_first, name_last, organization, type, designation, sequence, rawlocation_id, city, state, country, applicant_authority, version_indicator)
 select up.id
      , up.document_number
      , up.name_first
@@ -41,6 +42,7 @@ select up.id
      , up.city
      , up.state
      , up.country
+     , up.applicant_authority
      , up.version_indicator
 from `{{reporting_db}}`.`us_parties` up
 join `{{elastic_db}}`.publication p on p.document_number = up.document_number;
