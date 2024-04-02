@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class MergeTestQuarterly(DatabaseTester):
     # This test is run on all data in our production databases to ensure new and old data remain in good quality
-    def __init__(self, config, run_id):
+    def __init__(self, config):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, config['PATENTSVIEW_DATABASES']["PROD_DB"], datetime.date(year=1976, month=1, day=1), end_date, where_vi=False)
 

@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 from lib.configuration import get_connection_string
 from lib.configuration import get_current_config
 from lib import utilities
-
+from datetime import datetime, timedelta
 
 class DatabaseTester(ABC):
     def __init__(self, config, database_section, start_date, end_date, where_vi=True):
@@ -52,7 +52,12 @@ class DatabaseTester(ABC):
             except IndexError:
                 database_type = self.database_section
 
-        self.version = self.end_date.strftime("%Y-%m-%d")
+        if self.class_called == 'TextQuarterlyMergeTest' and database_section == 'patent_text':
+            self.version = self.find_previous_tuesday()
+        elif self.class_called == 'TextQuarterlyMergeTest' and database_section == 'pgpubs_text':
+            self.version = self.find_previous_thursday()
+        else:
+            self.version = self.end_date.strftime("%Y-%m-%d")
 
         # Add Quarter Variable
         df = pd.DataFrame(columns=['date'])
@@ -65,6 +70,17 @@ class DatabaseTester(ABC):
         self.database_type = database_type
         utilities.class_db_specific_config(self, self.table_config, class_called)
 
+    def find_previous_thursday(self):
+        # Subtract days until you reach the previous Thursday
+        while self.end_date.weekday() != 3:  # 3 corresponds to Thursday (0 is Monday, 1 is Tuesday, and so on)
+            self.end_date -= timedelta(days=1)
+        return self.end_date
+
+    def find_previous_tuesday(self):
+        # Subtract days until you reach the previous Tuesday
+        while self.end_date.weekday() != 1:  # 1 corresponds to Tuesday (0 is Monday, 2 is Wednesday, and so on)
+            self.end_date -= timedelta(days=1)
+        return self.end_date.strftime("%Y-%m-%d")
 
     def init_qa_dict(self):
         # Place Holder for saving QA counts - keys map to table names in patent_QA

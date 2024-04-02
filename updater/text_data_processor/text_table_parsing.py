@@ -4,7 +4,7 @@ import sys
 
 from QA.create_databases.TextTest import TextUploadTest, TextMergeTest, TextQuarterlyMergeTest
 
-
+from lib.configuration import get_current_config
 def add_text_table_suffx(config, database_date):
     parsing_file_setting = "{prefix}_parsing_config_template_file".format(prefix='long_text')
     parsing_config_file = config["XML_PARSING"][parsing_file_setting]
@@ -21,7 +21,6 @@ def add_text_table_suffx(config, database_date):
 
 
 def begin_text_parsing(**kwargs):
-    from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
     add_text_table_suffx(config,
                          database_date=datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d'))
@@ -32,43 +31,37 @@ def begin_text_parsing(**kwargs):
 
 
 def post_text_parsing_granted(**kwargs):
-    from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
     tpt = TextUploadTest(config)
     tpt.runStandardTests()
 
 def post_text_parsing_pgpubs(**kwargs):
-    from lib.configuration import get_current_config
     config = get_current_config('pgpubs', **kwargs)
     tpt = TextUploadTest(config)
     tpt.runStandardTests()
 
 def post_text_merge_granted(**kwargs):
-    from lib.configuration import get_current_config
     config = get_current_config('granted_patent', **kwargs)
     tpt = TextMergeTest(config)
     tpt.runStandardTests()
 
 def post_text_merge_pgpubs(**kwargs):
-    from lib.configuration import get_current_config
     config = get_current_config('pgpubs', **kwargs)
     tpt = TextMergeTest(config)
     tpt.runStandardTests()
 
 def post_text_merge_quarterly_granted(**kwargs):
-    from lib.configuration import get_current_config
     config = get_current_config('granted_patent', schedule="quarterly", **kwargs)
     tpt = TextQuarterlyMergeTest(config)
     tpt.runStandardTests()
 
 def post_text_merge_quarterly_pgpubs(**kwargs):
-    from lib.configuration import get_current_config
     config = get_current_config('pgpubs', schedule="quarterly", **kwargs)
     tpt = TextQuarterlyMergeTest(config)
     tpt.runStandardTests()
 
 
 if __name__ == '__main__':
-    begin_text_parsing(**{
-            "execution_date": datetime.date(2020, 12, 29)
+    post_text_merge_quarterly_granted(**{
+            "execution_date": datetime.date(2024, 3, 30)
             })
