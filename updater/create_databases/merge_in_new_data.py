@@ -282,8 +282,8 @@ from {temp_db}.detail_desc_text_{year}
 
 def post_merge_weekly_granted(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
-    run_id = kwargs.get('run_id')
-    qc = MergeTestWeekly(config, run_id=kwargs['run_id'])
+    #run_id = kwargs.get('run_id')
+    qc = MergeTestWeekly(config)
     qc.runStandardTests()
 
 def post_merge_quarterly_granted(**kwargs):
