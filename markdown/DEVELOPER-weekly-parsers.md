@@ -9,7 +9,7 @@ When you click on a DAG, you will see an overview page for it. On the left side 
 This grid is telling you the current status of every task for the past 25 or so weeks. Each **column** is a specific week (or "run") of the DAG, and each **row** is a particular task that takes place during the run. <br>
 <br>
 The color of a task shows the status of a given task for a given week. 
-* **White** means the task hasn't started yet
+* **White** means the task hasn't started yet, it's scheduled
 * **Light green** means the task is in progress
 * **Dark green** means the task succeeded
 * **Red** means the task has failed
@@ -48,11 +48,48 @@ It's best to write your text file as you work in MySQL. Once you're finished run
 <br>
 Once all the tasks in a given week run successfully, you can upload your text files to the main branch in the daily-analysis-logs GitHub, into a new or existing folder that matches the week of the data.
 
+# Common issues for either DAG
+
+### Task stuck on scheduled
+This issue is most often caused by the Airflow Docker container not running. To check if this is the case, log on to the remote server:
+* Open Git Bash (Windows) or whatever software you use for connecting to the remote servers
+* `ssh PVDC` to connect to data connector server
+* `docker ps` to check on what Docker containers are currently running
+* Do you see a container name containing "patentsview/airflow"? If not, the Airflow worker container is not running. To get it back up and running:
+* `cd PatentsView-DB`
+* `ls` to see all files in the directory. There should be one called `docker-compose-worker.yaml`.
+* `docker compose -f docker-compse-worker.yaml up -d` to start the container.
+* Go back to Airflow and make sure the task stuck on scheduled has begun.
+
+### Incorrect character set / collation
+This error happens whenever a column has incorrect collation. For example, a column might be utf8mb3, but usually, we would want utf8mb4. <br>
+To fix this issue, you can use the following query: <br>
+`ALTER TABLE
+    [table name]
+    CONVERT TO CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;`
+
+### XML file issue
+Sometimes, though rare, the original XML file brought into Airflow for disambiguation has issues. In this case, we can edit the XML file to fix the issue. <br>
+Example issue: <br>
+`Exception XML declaration allowed only at the start of the document, line 5399706, column 21 (ipg231107_clean.xml, line 5399706) for /data-volume/upload_20231107/clean_data/ipg231107_clean.xml` <br>
+When this error happens, log into the PVDC remote server and go to the XML file in question by doing the following:
+* `ssh PVDC`
+* `cd PipelineData/DataCollection/upload_20231107/clean_data` Location of original XML file for the given week
+* `vi ipg231107_clean.xml` Open the XML file in question
+* `:5399706` Jump to the line number where the issue is
+* `i` Enable editing of the file
+* Remove this tag: `<?xml version="1.0" encoding="UTF-8"?>` Use your arrow keys to nagivate
+* Press Esc key to finish editing
+* `:wq` To write quit - in other words, exit the file and save your changes
+* Rerun the task in Airflow
+
 # granted_patent_updater
 ## Description
 This weekly parser handles new weekly data for patents. It runs every Tuesday at 9:00 UTC.
 
 ## Common issues
+
 ### Needs trimming
 This error happens during the *qc_parse_text_data* task. It happens when a row in the data has at least one leading or trailing white space in it. <br>
 For example, if the `dependent` column in an upload table has one row that looks like 'claim ' or ' claim 10' or 'claim 18 ', then this eror will occur. <br>
