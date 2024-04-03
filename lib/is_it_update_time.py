@@ -56,9 +56,13 @@ def get_update_range_full_quarter(input_date):
     # Calculate the current quarter
     quarter = (input_date.month - 1) // 3 + 1
 
+    # Calculate the month number of the next quarter start
+    quarter_start_months = [1, 4, 7, 10]
+    next_quarter_month = min(filter(lambda month: month > input_date.month, quarter_start_months), default=1)
+
     # Calculate the first day of the next quarter
-    next_quarter_month = quarter * 3 + 1
-    first_day_next_quarter = datetime.date(input_date.year, next_quarter_month, 1)
+    next_quarter_year = input_date.year if quarter != 4 else input_date.year+1
+    first_day_next_quarter = datetime.date(next_quarter_year, next_quarter_month, 1)
 
     # Subtract one day from the first day of the next quarter to get the last day of the current quarter
     last_day_current_quarter = first_day_next_quarter - datetime.timedelta(days=1)

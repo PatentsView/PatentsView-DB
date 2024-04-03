@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta, date
 
-
 import pandas as pd
 from sqlalchemy import create_engine, inspect
 import re
@@ -190,23 +189,24 @@ def fips_geo_patch(config):
         print("no locations required geographic FIPS assignment.")
 
 
-def consolidate_location_disambiguation_quarterly(config, **kwargs):
+def consolidate_location_disambiguation_quarterly(config):
     prod_db = config["PATENTSVIEW_DATABASES"]['PROD_DB']
     engine = create_engine(get_connection_string(config, "PROD_DB"))
     dbtype = 'pgpubs' if prod_db=='pregrant_publications' else 'granted_patent'
     inspector = inspect(engine)
-    quarter_start, quarter_end = get_update_range(kwargs['execution_date'])
-    print(f"consolidating location disambiguation tables for date range {quarter_start.strftime('%Y-%m-%d')} to {quarter_end.strftime('%Y-%m-%d')}")
+    quarter_end = config['DATES']['END_DATE']
+    quarter_start = config['DATES']['START_DATE']
+    # quarter_start, quarter_end = get_update_range(kwargs['execution_date'])
+    print(f"consolidating location disambiguation tables for date range {quarter_start} to {quarter_end}")
     weekly_prefix = config['PATENTSVIEW_DATABASES'][f"{dbtype}_upload_db"]
-    db_list = [db for db in inspector.get_schema_names() if re.fullmatch(f"{weekly_prefix}\\d{{8}}", db) and 
-                                                            (quarter_start <= datetime.strptime(db[-8:],'%Y%m%d').date() <= quarter_end)]
+    db_list = [db for db in inspector.get_schema_names() if re.fullmatch(f"{weekly_prefix}\\d{{8}}", db) and quarter_start <= db[-8:] <= quarter_end]
     print(f"{len(db_list)} databases identified in range: {db_list}")
-    expected_db_count = weekday_count(quarter_start, quarter_end)['Thursday' if dbtype == 'pgpubs' else 'Tuesday']
+    expected_db_count = weekday_count(datetime.strptime(quarter_start, '%Y%m%d').date(), datetime.strptime(quarter_end, '%Y%m%d').date())['Thursday' if dbtype == 'pgpubs' else 'Tuesday']
     if len(db_list) != expected_db_count:
         raise Exception(f"number of weekly DBs does not match expected value:\n{len(db_list)} weekly DBs observed; {expected_db_count} weekly DBs expected.")
-    
+
     quarter_map_create = f"""
-    CREATE TABLE IF NOT EXISTS {prod_db}.location_disambiguation_mapping_{quarter_end.strftime('%Y%m%d')} (
+    CREATE TABLE IF NOT EXISTS {prod_db}.location_disambiguation_mapping_{quarter_end} (
     `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     `location_id` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `version_indicator` date NOT NULL,
@@ -220,7 +220,7 @@ def consolidate_location_disambiguation_quarterly(config, **kwargs):
 
     for weekly_db in db_list:
         incorporate_week_query = f"""
-            INSERT INTO {prod_db}.location_disambiguation_mapping_{quarter_end.strftime('%Y%m%d')} 
+            INSERT INTO {prod_db}.location_disambiguation_mapping_{quarter_end} 
             (id, location_id, version_indicator)
             SELECT id, location_id, version_indicator
             FROM {weekly_db}.location_disambiguation_mapping"""
@@ -245,28 +245,14 @@ def update_dis_location_mapping(config):
         print(q)
         engine.execute(q)
 
-# VIEW STRUCTURE:
-#     query2 = """ \
-# CREATE table location_disambiguation_mapping as
-# select id, location_id
-# from location_disambiguation_mapping_20220630
-# union all
-# select id, location_id
-# from location_disambiguation_mapping_20220929
-# union all
-# select id, location_id
-# from location_disambiguation_mapping_20221229
-# union all
-# select id, location_id
-# from location_disambiguation_mapping_20230330"""
 
 def post_process_location(**kwargs):
     patent_config = get_current_config(schedule="quarterly", **kwargs)
     pgpubs_config = get_current_config(type='pgpubs', schedule="quarterly", **kwargs)
     consolidate_location_disambiguation_quarterly(patent_config, **kwargs)
     consolidate_location_disambiguation_quarterly(pgpubs_config, **kwargs)
-    update_dis_location_mapping(patent_config)
-    update_dis_location_mapping(pgpubs_config)
+    # update_dis_location_mapping(patent_config)
+    # update_dis_location_mapping(pgpubs_config)
     update_rawlocation(patent_config)
     update_rawlocation(pgpubs_config)
     precache_locations(patent_config)
@@ -286,7 +272,8 @@ if __name__ == '__main__':
     # post_process_location(**{
     #         "execution_date": date(2023, 1, 1)
     #         })
-    post_process_location(**{
-            "execution_date": date(2023, 4, 1)
+    config = get_current_config(schedule="quarterly", **{
+            "execution_date": date(2023, 10, 1)
             })
+    consolidate_location_disambiguation_quarterly(config)
 

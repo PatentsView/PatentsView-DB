@@ -1,9 +1,9 @@
-{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set elastic_db = "elastic_production_patent_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 {% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
-use `elastic_search_{{ dag_run.logical_date | ds_nodash }}`;
+use `{{elastic_db}}`;
 
-CREATE TABLE IF NOT EXISTS `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor`
+CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patent_inventor`
 (
     `inventor_id`            int(10) unsigned                       NOT NULL,
     `persistent_inventor_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS `elastic_search_{{ dag_run.logical_date | ds_nodash }
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-TRUNCATE TABLE `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.`patent_inventor`;
+TRUNCATE TABLE `{{elastic_db}}`.`patent_inventor`;
 
-insert into `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.patent_inventor ( inventor_id, patent_id, sequence, name_first, name_last
+insert into `{{elastic_db}}`.patent_inventor ( inventor_id, patent_id, sequence, name_first, name_last
                                                           , city, state
                                                           , country, location_id, persistent_inventor_id
                                                           , persistent_location_id)
@@ -46,5 +46,5 @@ from `{{reporting_db}}`.patent_inventor pi
          join `{{reporting_db}}`.temp_id_mapping_inventor timi on timi.new_inventor_id = i.inventor_id
          left join `{{reporting_db}}`.location l on l.location_id = pi.location_id
          left join `{{reporting_db}}`.temp_id_mapping_location timl on timl.new_location_id = l.location_id
-         join `elastic_search_{{ dag_run.logical_date | ds_nodash }}`.patents p on p.patent_id = pi.patent_id;
+         join `{{elastic_db}}`.patents p on p.patent_id = pi.patent_id;
 

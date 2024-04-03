@@ -4,6 +4,7 @@ import time
 
 import pandas as pd
 from sqlalchemy import create_engine
+from sqlalchemy import types
 
 from lib.configuration import get_config, get_connection_string, get_current_config
 
@@ -98,7 +99,13 @@ def extract_wipo_data(cpc_chunk, cpc_ipc_concordance, ipc_tech_map, config, uniq
     # print(cstr)
     engine = create_engine(cstr)
     with engine.begin() as conn:
-        wipo_filtered_data_sequenced.to_sql('wipo', conn, if_exists='append', index=False, method="multi")
+        wipo_filtered_data_sequenced.to_sql('wipo', conn, if_exists='append', index=False, method="multi",
+                                            dtype={"patent_id": types.NVARCHAR(length=20)
+                                                       , "field_id": types.INTEGER()
+                                                       , "sequence": types.INTEGER()
+                                                       , "version_indicator": types.Date()
+                                                }
+                                            )
 
 
 def wipo_chunk_processor(cpc_current_data, ipc_tech_field_map, cpc_ipc_concordance_map, config, unique_id):

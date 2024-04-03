@@ -1,5 +1,5 @@
 {
-  "brf_sum_text_2022": {
+  "brf_sum_text": {
     "fields": {
       "pgpub_id": {
         "data_type": "int",
@@ -20,28 +20,7 @@
       "TextQuarterlyMergeTest"
     ]
   },
-  "brf_sum_text_2023": {
-    "fields": {
-      "pgpub_id": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "summary_text": {
-        "data_type": "longtext",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "TestScripts": [
-      "TextMergeTest",
-      "TextUploadTest",
-      "TextQuarterlyMergeTest"
-    ]
-  },
-  "claims_2022": {
+  "claims": {
     "fields": {
       "pgpub_id": {
         "data_type": "int",
@@ -80,46 +59,7 @@
       "TextQuarterlyMergeTest"
     ]
   },
-  "claims_2023": {
-    "fields": {
-      "pgpub_id": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "claim_text": {
-        "data_type": "longtext",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "claim_sequence": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "dependent": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "claim_number": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "TestScripts": [
-      "TextMergeTest",
-      "TextUploadTest",
-      "TextQuarterlyMergeTest"
-    ]
-  },
-  "detail_desc_text_2022": {
+  "detail_desc_text": {
     "fields": {
       "pgpub_id": {
         "data_type": "int",
@@ -146,61 +86,7 @@
       "TextQuarterlyMergeTest"
     ]
   },
-  "detail_desc_text_2023": {
-    "fields": {
-      "pgpub_id": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "description_text": {
-        "data_type": "longtext",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "description_length": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "TestScripts": [
-      "TextMergeTest",
-      "TextUploadTest",
-      "TextQuarterlyMergeTest"
-    ]
-  },
-  "draw_desc_text_2022": {
-    "fields": {
-      "pgpub_id": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "draw_desc_text": {
-        "data_type": "longtext",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "draw_desc_sequence": {
-        "data_type": "int",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "TestScripts": [
-      "TextMergeTest",
-      "TextUploadTest",
-      "TextQuarterlyMergeTest"
-    ]
-  },
-  "draw_desc_text_2023": {
+  "draw_desc_text": {
     "fields": {
       "pgpub_id": {
         "data_type": "int",

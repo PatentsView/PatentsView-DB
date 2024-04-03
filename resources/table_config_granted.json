@@ -830,32 +830,20 @@
   },
   "inventor_gender": {
     "fields": {
-      "id": {
+      "inventor_id": {
         "data_type": "varchar",
         "null_allowed": false,
         "category": false,
         "location_field": false
       },
-      "name_first": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "name_last": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "dumale": {
+      "gender_flag": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": false,
         "location_field": false
       }
     },
-    "TestScripts": []
+    "TestScripts": ["InventorGenderPostProcessingQC"]
   },
   "ipcr": {
     "fields": {
@@ -1108,7 +1096,7 @@
         "location_field": false
       }
     },
-    "TestScripts": ["LocationPostProcessingQC"]
+    "TestScripts": ["AssigneePostProcessingQCPhase2"]
   },
   "location_by_lat_long": {
     "fields": {
@@ -1156,7 +1144,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": ["LocationPostProcessingQC"]
+    "TestScripts": []
   },
   "location_fips": {
     "fields": {
@@ -1238,7 +1226,7 @@
         "location_field": false
       }
     },
-    "TestScripts": ["LocationPostProcessingQC"]
+    "TestScripts": ["InventorPostProcessingQCPhase2"]
   },
   "location_lat_lon": {
     "fields": {
@@ -1357,7 +1345,6 @@
       }
     },
     "TestScripts": [
-      "MergeTestWeekly",
       "UploadTest",
       "MergeTestQuarterly"
     ]
@@ -1430,6 +1417,12 @@
         "location_field": false
       },
       "applicant_type": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "applicant_authority": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": true,
@@ -1689,11 +1682,6 @@
         "related_table": "usreldoc",
         "main_table_id": "id",
         "related_table_id": "patent_id"
-      },
-      {
-        "related_table": "wipo",
-        "main_table_id": "id",
-        "related_table_id": "patent_id"
       }
     ],
     "TestScripts": [
@@ -1729,7 +1717,7 @@
         "location_field": false
       }
     },
-    "TestScripts": ["AssigneePostProcessingQC"]
+    "TestScripts": ["AssigneePostProcessingQCPhase2"]
   },
   "patent_contractawardnumber": {
     "fields": {
@@ -1792,7 +1780,7 @@
         "location_field": false
       }
     },
-    "TestScripts": ["InventorPostProcessingQC"]
+    "TestScripts": ["InventorPostProcessingQCPhase2"]
   },
   "patent_lawyer": {
     "fields": {
@@ -1880,119 +1868,6 @@
       "UploadTest",
       "MergeTestQuarterly"
     ]
-  },
-  "persistent_assignee_disambig": {
-    "fields": {
-      "current_rawassignee_id": {
-        "data_type": "varchar",
-        "null_allowed": false,
-        "category": false,
-        "location_field": false
-      },
-      "old_rawassignee_id": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20181127": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20190312": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20190820": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20191008": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20191231": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20200331": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20200630": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20200929": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20201229": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20210330": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disambig_assignee_id_20210629": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20210930": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-        "disamb_assignee_id_20211230": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      },
-      "disamb_assignee_id_20210708": {
-        "data_type": "varchar",
-        "null_allowed": true,
-        "category": false,
-        "location_field": false
-      }
-    },
-    "related_entities": [
-      {
-        "related_table": "rawassignee",
-        "main_table_id": "current_rawassignee_id",
-        "related_table_id": "uuid"
-      },
-      {
-        "related_table": "assignee",
-        "main_table_id": "disamb_assignee_id_20210930",
-        "related_table_id": "id"
-      }
-    ],
-    "TestScripts": []
   },
   "persistent_assignee_disambig_long": {
     "fields": {
@@ -2516,7 +2391,6 @@
       }
     },
     "TestScripts": [
-      "MergeTestWeekly",
       "UploadTest",
       "MergeTestQuarterly"
     ]

@@ -1,12 +1,41 @@
 import subprocess
+import mysql.connector
 import datetime
 from lib.configuration import get_connection_string, get_current_config, get_unique_connection_string
 import pymysql
 from sqlalchemy import create_engine
 import pandas as pd
+from dateutil.relativedelta import relativedelta
+from QA.DatabaseTester import DatabaseTester
+
+def get_oldest_table(config, table_type):
+    current_db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
+    connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
+                                 user=config['DATABASE_SETUP']['USERNAME'],
+                                 password=config['DATABASE_SETUP']['PASSWORD'],
+                                 db=current_db,
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.SSCursor, defer_connect=True)
+    table_type_length = len(table_type)
+    q = f"""
+    select  min(table_name)
+    from information_schema.tables
+    where table_schema = "{current_db}" and left(table_name, {table_type_length}) = '{table_type}' and table_type = "BASE TABLE"
+    """
+    print(q)
+    try:
+        if not connection.open:
+            connection.connect()
+        with connection.cursor() as generic_cursor:
+            generic_cursor.execute(q)
+            db = generic_cursor.fetchall()[0][0]
+    finally:
+        if connection.open:
+            connection.close()
+    return db, table_type_length
 
 
-def get_oldest_databases(config, db_type='granted_patent'):
+def get_oldest_database(config, db_type='granted_patent'):
     print(f"Running {db_type}")
     if db_type == 'granted_patent':
         q = """
@@ -21,7 +50,7 @@ where left(table_schema, 6) ='upload'
         where left(table_schema, 6) ='pgpubs'
         """
     else:
-        "Database not Configured"
+        raise NotImplementedError(f"Database type {db_type} not Configured")
     print(q)
     connection = pymysql.connect(host=config['DATABASE_SETUP']['HOST'],
                                  user=config['DATABASE_SETUP']['USERNAME'],
@@ -35,9 +64,6 @@ where left(table_schema, 6) ='upload'
         with connection.cursor() as generic_cursor:
             generic_cursor.execute(q)
             db = generic_cursor.fetchall()[0][0]
-            print("--------------------------------------------------------------")
-            print(f"Found Database {db} To Archive!")
-            print("--------------------------------------------------------------")
             q2 = f"""
 select table_name 
 from information_schema.tables
@@ -48,7 +74,6 @@ and table_type = 'BASE TABLE'
         with connection.cursor() as generic_cursor2:
             generic_cursor2.execute(q2)
             table_list = generic_cursor2.fetchall()
-
     finally:
         if connection.open:
             connection.close()
@@ -86,11 +111,19 @@ def find_data_collection_server_path(db_type, data_type):
 
 
 def backup_tables(db, output_path, table_list):
-    # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-    bash_command1 = f"mydumper -B {db} -T {table_list} -o {output_path}  -c --long-query-guard=9000000 -v 3"
+    defaults_file = "resources/sql.conf"
+    bash_command1 = f"mydumper --defaults-file={defaults_file} -B {db} -T {table_list} -o {output_path}  -c --long-query-guard=9000000 -v 3"
     print(bash_command1)
     subprocess_cmd(bash_command1)
-
+    from os import listdir
+    from os.path import isfile, join
+    files_in_output_path = [f for f in listdir(output_path) if isfile(join(output_path, f))]
+    print(table_list)
+    print(files_in_output_path)
+    files_to_backup = [f for f in files_in_output_path if table_list in f and "schema" not in f ]
+    file = files_to_backup[0].replace(".sql.gz", "")
+    assert len(files_to_backup)>=1
+    return file
 
 def upload_tables_for_testing(config, db, output_path, table_list):
     print("--------------------------------------------------------------")
@@ -99,20 +132,21 @@ def upload_tables_for_testing(config, db, output_path, table_list):
     cstr = get_connection_string(config, 'PROD_DB')
     engine = create_engine(cstr)
     archive_db = f"archive_temp_{db}"
-    q = f"create database {archive_db}"
+    q = f"create database if not exists {archive_db}"
     print(q)
     engine.execute(q)
     # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
     defaults_file = "resources/sql.conf"
     if isinstance(table_list, str):
         for table in table_list.split(","):
-            # defaults_file = config['DATABASE_SETUP']['CONFIG_FILE']
-            bash_command1 = f"gunzip -d {output_path}/{db}.{table}-schema.sql.gz"
-            bash_command2 = f"gunzip -d {output_path}/{db}.{table}.sql.gz"
-            bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table}-schema.sql"
-            bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {output_path}/{db}.{table}.sql"
-            bash_command5 = f"gzip {output_path}/{db}.{table}.sql"
-            bash_command6 = f"gzip {output_path}/{db}.{table}-schema.sql"
+            schema_file_path = f"{output_path}/{table}-schema.sql"
+            sql_data_file_path = f"{output_path}/{table}.sql"
+            bash_command1 = f"gunzip -d {schema_file_path}.gz"
+            bash_command2 = f"gunzip -d {sql_data_file_path}.gz"
+            bash_command3 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {schema_file_path}"
+            bash_command4 = f"mysql --defaults-file={defaults_file} -f {archive_db} < {sql_data_file_path}"
+            bash_command5 = f"gzip {sql_data_file_path}"
+            bash_command6 = f"gzip {schema_file_path}"
             for i in [bash_command1, bash_command2, bash_command3, bash_command4, bash_command5, bash_command6]:
                 print(i)
                 subprocess_cmd(i)
@@ -268,73 +302,133 @@ def clean_up_backups(db, output_path):
         print(i)
         subprocess_cmd(i)
 
+def check_table_exists(config, database, table_name):
+    q = f"""
+SELECT * FROM information_schema.tables
+WHERE table_name = '{table_name}' and table_schema = '{database}'
+"""
+    connection_string = get_connection_string(config, database='PROD_DB')
+    engine = create_engine(connection_string)
+    count_value = len(pd.read_sql_query(sql=q, con=engine))
+    if count_value < 1:
+        return False
+    else:
+        return True
+
+def get_prior_quarter_start(date):
+    current_quarter = (date.month - 1) // 3 + 1
+    first_day_current_quarter = datetime.date(date.year, (current_quarter - 1) * 3 + 1, 1)
+    first_day_last_quarter = first_day_current_quarter - datetime.timedelta(weeks=13)
+    return first_day_last_quarter
+
 def run_database_archive(type, output_override=None, **kwargs):
     config = get_current_config(type=type, **kwargs)
-
+    db_type = "upload" if type == "granted_patent" else "pgpubs"
     # Create Archive SQL FILE
-    old_db, table_list = get_oldest_databases(config, db_type=type)
+    old_db, table_list = get_oldest_database(config, db_type=type)
+    oldest_db_date = datetime.datetime.strptime(old_db[7:], '%Y%m%d').date()
 
-    if output_override is not None:
-        output_path = output_override
+    first_day_last_quarter = get_prior_quarter_start(kwargs['execution_date'])
+    if oldest_db_date < first_day_last_quarter:
+        if output_override is not None:
+            output_path = output_override
+        else:
+            output_path = find_data_collection_server_path(db_type=type, data_type="database")
+
+        db_archive_list = pd.date_range(start=oldest_db_date, end=first_day_last_quarter, inclusive="left", freq="7D").tolist()
+        db_archive_list_clean = [db_type + "_" + i.strftime('%Y%m%d') for i in db_archive_list]
+        print(f"These databases will be archived:  {db_archive_list_clean}")
+
+        for archive_database_candidate in db_archive_list_clean:
+            backup_db(config, output_path, archive_database_candidate)
+            upload_tables_for_testing(config, archive_database_candidate, output_path, table_list)
+
+            # QA Backup
+            prod_connection_string = get_unique_connection_string(config, database=f"{archive_database_candidate}", connection='DATABASE_SETUP')
+            prod_data = query_for_all_tables_in_db(prod_connection_string, archive_database_candidate)
+            prod_count_df = get_count_for_all_tables(prod_connection_string, prod_data)
+
+            backup_connection_string = get_unique_connection_string(config, database=f"archive_temp_{archive_database_candidate}",
+                                                                    connection='DATABASE_SETUP')
+            backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_temp_{archive_database_candidate}")
+            backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
+
+            compare_results_dfs(prod_count_df, backup_count_df)
+
+            # DELETE DB
+            delete_databases(prod_connection_string, archive_database_candidate)
+            # clean_up_backups(old_db, output_path)
     else:
-        output_path= find_data_collection_server_path(db_type=type, data_type="database")
+        print("Nothing to Archive this run")
 
-    backup_db(config, output_path, old_db)
-    upload_tables_for_testing(config, old_db, output_path, table_list)
+def run_table_archive(type, tablename, **kwargs):
+    """
+    This function archives old tables in a database.
 
-    # QA Backup
-    prod_connection_string = get_unique_connection_string(config, database=f"{old_db}", connection='DATABASE_SETUP')
-    prod_data = query_for_all_tables_in_db(prod_connection_string, old_db)
-    prod_count_df = get_count_for_all_tables(prod_connection_string, prod_data)
+    Parameters:
+    type (str): The type of the database.
+    tablename (str): The name of the table to be archived. 
+        for datestamped tables (e.g. inventor_YYYYMMDD), 
+        this name should include the underscore, but exclude the date code.
+    **kwargs: Additional keyword arguments for configuration.
 
-    backup_connection_string = get_unique_connection_string(config, database= f"archive_temp_{old_db}", connection='DATABASE_SETUP')
-    backup_data = query_for_all_tables_in_db(backup_connection_string, f"archive_temp_{old_db}")
-    backup_count_df = get_count_for_all_tables(backup_connection_string, backup_data)
-
-    compare_results_dfs(prod_count_df, backup_count_df)
-
-    # DELETE DB
-    delete_databases(prod_connection_string, old_db)
-    # clean_up_backups(old_db, output_path)
-
-def run_table_archive(dbtype, table_list, output_path, **kwargs):
-    # db = 'pregrant_publications'
-    # NO SPACES ALLOWED IN TABLE_LIST
-    config = get_current_config(type=dbtype, **kwargs)
+    Raises:
+    Exception: If no table name is provided.
+    """
+    config = get_current_config(type=type, **kwargs)
+    # Get the production database from the configuration
     db = config['PATENTSVIEW_DATABASES']["PROD_DB"]
-
-    if table_list.isempty():
+    # Raise an exception if no table name is provided
+    if not tablename:
         raise Exception("Add Table List to DAG")
-    backup_tables(db, output_path, table_list)
-    # table_list remains the same if you want to review all tables
-    upload_tables_for_testing(config, db, output_path, table_list)
-    # Compare archived DB to Original
-    prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
-    prod_count_df = get_count_for_all_tables(prod_connection_string, table_list)
+    output_path = find_data_collection_server_path(db_type=type, data_type="table")
 
-    backup_connection_string = get_unique_connection_string(config, database= f"archive_temp_{db}", connection='DATABASE_SETUP')
-    backup_count_df = get_count_for_all_tables(backup_connection_string, table_list)
-    compare_results_dfs(prod_count_df, backup_count_df)
-    delete_tables(prod_connection_string, db, table_list)
+    # Get the oldest table and its length
+    oldest_table, length = get_oldest_table(config, tablename)
+    # Convert the date string in the oldest table name to a date object
+    print(f'this is the oldest table and length: {oldest_table}, {length}')
+    oldest_table_date = datetime.datetime.strptime(oldest_table[length:], '%Y%m%d').date()
+    first_day_last_quarter = get_prior_quarter_start(kwargs['execution_date']) - datetime.timedelta(weeks=1)
+    if oldest_table_date < first_day_last_quarter:
+        # Create a list of dates from the oldest table date to the start of the last quarter
+        table_archive_list = pd.date_range(start=oldest_table_date, end=first_day_last_quarter, inclusive="left", freq="Q").tolist()
+        # Append the date to the table name for each date in the list
+        table_archive_list_clean = [tablename + i.strftime('%Y%m%d') for i in table_archive_list]
+        print(f"These databases will be archived:  {table_archive_list_clean}")
+
+        for archive_table_candidate in table_archive_list_clean:
+            table_exists = check_table_exists(config, db, archive_table_candidate)
+            if table_exists:
+                # Backup the table
+                file = backup_tables(db, output_path, archive_table_candidate)
+                # Upload the table for testing
+                upload_tables_for_testing(config, db, output_path, file)
+
+                # Compare archived DB to Original
+                prod_connection_string = get_unique_connection_string(config, database=f"{db}", connection='DATABASE_SETUP')
+                prod_count_df = get_count_for_all_tables(prod_connection_string, archive_table_candidate)
+
+                backup_connection_string = get_unique_connection_string(config, database= f"archive_temp_{db}", connection='DATABASE_SETUP')
+                backup_count_df = get_count_for_all_tables(backup_connection_string, archive_table_candidate)
+
+                # Compare the count dataframes of the production and backup databases
+                compare_results_dfs(prod_count_df, backup_count_df)
+                # Delete the table from the production database
+                delete_tables(prod_connection_string, db, archive_table_candidate)
+                
+                print("---------------------------------------------------------------")
+                print(f"FINISHED ARCHIVING {archive_table_candidate} !!!")
+                print("---------------------------------------------------------------")
+            else:
+                continue
 
 
 if __name__ == '__main__':
     type = 'pgpubs'
-    config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
-    for i in range(1, 2):
-        print("--------------------------------------------------------------")
-        print(f"RUNNING ITERATION: {i}")
-        print("--------------------------------------------------------------")
-        run_database_archive(type=type)
+    # config = get_current_config(type, **{"execution_date": datetime.date(2023, 10, 1)})
+    #run_database_archive(type=type, **{"execution_date": datetime.date(2023, 10, 1)})
+    run_table_archive("pgpubs", "disambiguated_inventor_ids_", **{"execution_date": datetime.date(2023, 10, 1)})
 
-# if __name__ == '__main__':
-#     type = 'granted_patent'
-#     output_path = find_data_collection_server_path(db_type=type, data_type="table")
-    # run_table_archive(type, ['cpc_current_20230330'] ,output_path)
-
-    # config = get_current_config(type, **{"execution_date": datetime.date(2022, 1, 1)})
-    # upload_tsv_backup_files(config, output_path, 'patent_text', tab_list)
-    # upload_tsv_backup_files(config, output_path, 'patent_text', ['brf_sum_text_2022', 'draw_desc_text_2022', 'claims_2022', 'detail_desc_text_2022'])
 
 
 

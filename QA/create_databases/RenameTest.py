@@ -45,7 +45,7 @@ class DatabaseSetupTest:
         print("Checking database for temporary tables for {db}".format(db=self.database_for_tests))
         connection_string = get_connection_string(self.config, database="PROD_DB")
         engine = create_engine(connection_string)
-        table_query = f"SELECT  count(*) from information_schema.tables where TABLE_SCHEMA='{self.database_for_tests}' and (TABLE_NAME like 'tmp%%' or TABLE_NAME like 'temp%%' or TABLE_NAME like '\_%%') and (TABLE_NAME not in ('temp_mainclass','temp_subclass'))"
+        table_query = f"SELECT  count(*) from information_schema.tables where TABLE_SCHEMA='{self.database_for_tests}' and (TABLE_NAME like 'tmp%%' or TABLE_NAME like 'temp%%' or TABLE_NAME like '\_%%') and (TABLE_NAME not in ('temp_mainclass','temp_subclass', '__assignee', '__inventor'))"
         table_cursor = engine.execute(table_query)
         table_count = table_cursor.fetchall()[0][0]
         if table_count > 0:

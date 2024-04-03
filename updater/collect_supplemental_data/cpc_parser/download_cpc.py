@@ -42,19 +42,22 @@ def find_cpc_schema_url():
     most recent schema is returned.
     """
     base_url = 'http://www.cooperativepatentclassification.org'
-    # page = urllib.request.urlopen(base_url + '/cpcSchemeAndDefinitions/Bulk.html')
     page = urllib.request.urlopen(base_url + '/cpcSchemeAndDefinitions/bulk')
     tree = html.fromstring(page.read())
     potential_links = []
     for link in tree.xpath('//a/@href'):
-        if ("/cpc/bulk/CPCSchemeXML" in link.lstrip(".")
-                and link.endswith(".zip")):
-            potential_links.append(link.replace('..', ''))
+        if (link.endswith(".zip") and (link.split('/')[-1].startswith("CPCSchemeXML"))):
+            if not link.startswith("http"):
+                potential_links.append(base_url + link.replace('..',''))
+            else:
+                potential_links.append(link)
 
     print(potential_links)
     # Since zip files are formatted CPCSchemeXMLYYYYMM.zip,
     # the last sorted url corresponds to the latest version
-    return base_url + sorted(potential_links)[-1]
+    # in the current webpage version there should be just one matching file
+    # specifying sort by last section in case of varying URI structures
+    return sorted(potential_links, key=lambda lnk: lnk.split('/')[-1])[-1]
 
 
 def download_cpc_grant_and_pgpub_classifications(granted_cpc_folder, pgpubs_cpc_folder):
@@ -147,9 +150,12 @@ def find_ipc_url():
     for link in tree.xpath('//a/@href'):
         print(link)
         # if (link.lstrip('.').lstrip("/").startswith("cpc/concordances/cpc-ipc-concordance")
-        if ("cpc/concordances/cpc-ipc-concordance" in link.lstrip('.').lstrip("/")
-                and link.endswith(".txt")):
-            potential_links.append(link)
+    for link in tree.xpath('//a/@href'):
+        if (link.endswith(".txt") and (link.split('/')[-1].startswith("cpc-ipc-concordance"))):
+            if not link.startswith("http"):
+                potential_links.append(base_url + link.replace('..',''))
+            else:
+                potential_links.append(link)
 
     # There should be exactly one link to the CPC to IPC concordance.
     # Since files are not formatted nicely, we can't sort alphabetically to
@@ -157,7 +163,7 @@ def find_ipc_url():
     print(potential_links)
     assert (len(set(potential_links)) == 1), "Unsure which URL to use of: " \
                                              "{}".format(potential_links)
-    return base_url + '/' + potential_links[0]
+    return potential_links[0]
 
 
 ############################################

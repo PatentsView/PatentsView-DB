@@ -1320,6 +1320,17 @@
           "data-type": "string"
         },
         {
+          "field_name": "applicant_authority",
+          "friendly_name": "Applicant Authority",
+          "xml_path": ".",
+          "attribute": "applicant-authority-category",
+          "description": null,
+          "sequence": false,
+          "flag": null,
+          "tag": false,
+          "data-type": "string"
+        },
+        {
             "field_name": "city",
             "friendly_name": "City",
             "xml_path": "addressbook/address/city",

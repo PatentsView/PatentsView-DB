@@ -22,7 +22,7 @@ class GovtInterestTester(DatabaseTester):
         self.qa_data.update(self.extended_qa_data)
 
     def generate_govt_int_samples(self):
-        print("\tGenerating samples for Govt Interest")
+        logger.info("\tGenerating samples for Govt Interest")
         if not self.connection.open:
             self.connection.connect()
         start_dt = datetime.datetime.strptime(self.config['DATES']['START_DATE'], '%Y%m%d')
@@ -73,7 +73,7 @@ FROM   `government_interest` gi
                   id_type = self.id_type,
                   base_id = base_id)
             with self.connection.cursor() as gov_int_cursor:
-                print(sampler_query)
+                logger.info(sampler_query)
                 gov_int_cursor.execute(sampler_query)
                 for gov_int_row in gov_int_cursor:
                     self.qa_data['DataMonitor_govtinterestsampler'].append({
@@ -98,8 +98,6 @@ FROM   `government_interest` gi
             self.test_blank_count(table, self.table_config[table], where_vi=False)
             self.save_qa_data()
             self.init_qa_dict()
-            logger.info(f"FINISHED WITH TABLE: {table}")
-            logger.info(f"Currently Done With {counter} of {total_tables} | {counter / total_tables} %")
             for field in self.table_config[table]["fields"]:
                 logger.info(f"==============================================================================")
                 logger.info(f"\tBEGINNING TESTS FOR COLUMN: {table}.{field}")
@@ -112,7 +110,7 @@ FROM   `government_interest` gi
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
             logger.info(f"==============================================================================")
-            logger.info(f"Currently Done With {counter} of {total_tables} | {(counter / total_tables)*100} %")
+            logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables:.2%}")
             logger.info(f"==============================================================================")
 
 

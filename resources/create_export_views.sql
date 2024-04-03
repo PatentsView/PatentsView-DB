@@ -35,7 +35,7 @@ select `a`.`patent_id` AS `patent_id`,
 `b`.`type` AS `assignee_type`,
 `c`.`location_id` AS `location_id` 
 from ((`patent`.`rawassignee` `a` 
-left join `patent`.`assignee` `b` on(`a`.`assignee_id` = `b`.`id`)) 
+left join `patent`.`assignee_{{datestring}}` `b` on(`a`.`assignee_id` = `b`.`id`)) 
 left join `patent`.`rawlocation` `c` on(`a`.`rawlocation_id` = `c`.`id`)) 
 where `a`.`version_indicator` <= '{{datestring}}';
 
@@ -184,7 +184,7 @@ select `a`.`patent_id` AS `patent_id`,
 `c`.`gender_flag` AS `gender_code`,
 `d`.`location_id` AS `location_id` 
 from (`patent`.`rawinventor` `a` 
-    LEFT JOIN `patent`.`inventor` `b` ON (`a`.`inventor_id` = `b`.`id`)
+    LEFT JOIN `patent`.`inventor_{{datestring}}` `b` ON (`a`.`inventor_id` = `b`.`id`)
     LEFT JOIN `gender_attribution`.`inventor_gender_{{datestring}}` `c` ON (`a`.`inventor_id` = `c`.`inventor_id`)) 
     LEFT JOIN `patent`.`rawlocation` `d` ON (`a`.`rawlocation_id` = `d`.`id`)
 where `a`.`version_indicator` <= '{{datestring}}';
@@ -292,7 +292,9 @@ select `patent`.`persistent_assignee_disambig`.`patent_id` AS `patent_id`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220630` AS `disamb_assignee_id_20220630`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929`,
 `patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230330` AS `disamb_assignee_id_20230330`,
-`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230629` AS `disamb_assignee_id_20230629`
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230629` AS `disamb_assignee_id_20230629`,
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20230930` AS `disamb_assignee_id_20230930`,
+`patent`.`persistent_assignee_disambig`.`disamb_assignee_id_20231231` AS `disamb_assignee_id_20231231`
 from `patent`.`persistent_assignee_disambig` 
 where `patent`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -316,7 +318,9 @@ select `patent`.`persistent_inventor_disambig`.`patent_id` AS `patent_id`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220630` AS `disamb_inventor_id_20220630`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929`,
 `patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230330` AS `disamb_inventor_id_20230330`,
-`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230629` AS `disamb_inventor_id_20230629` 
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230629` AS `disamb_inventor_id_20230629`,
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20230930` AS `disamb_inventor_id_20230930`,
+`patent`.`persistent_inventor_disambig`.`disamb_inventor_id_20231231` AS `disamb_inventor_id_20231231`
 from `patent`.`persistent_inventor_disambig` 
 where `patent`.`persistent_inventor_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -457,7 +461,7 @@ select `a`.`document_number` AS `pgpub_id`,
 `b`.`type` AS `assignee_type`,
 `c`.`location_id` AS `location_id` 
 from ((`pregrant_publications`.`rawassignee` `a` 
-left join `patent`.`assignee` `b` on(`a`.`assignee_id` = `b`.`id`)) 
+left join `patent`.`assignee_{{datestring}}` `b` on(`a`.`assignee_id` = `b`.`id`)) 
 left join `pregrant_publications`.`rawlocation` `c` on(`a`.`rawlocation_id` = `c`.`id`)) 
 where `a`.`version_indicator` <= '{{datestring}}';
 
@@ -547,8 +551,8 @@ SELECT
 `xw`.`document_number` AS `pgpub_id`,
 `xw`.`patent_id` AS `patent_id`,
 `xw`.`application_number` AS `application_id`,
-CASE WHEN `xw`.`latest_pub_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS `current_pgpub_id_flag`,
-CASE WHEN `xw`.`latest_pat_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS `current_patent_id_flag`
+CASE WHEN `xw`.`current_pgpub_id_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS `current_pgpub_id_flag`,
+CASE WHEN `xw`.`current_patent_id_flag` = 1 THEN 'TRUE' ELSE 'FALSE' END AS `current_patent_id_flag`
 FROM `pregrant_publications`.`granted_patent_crosswalk_{{datestring}}` `xw`
 WHERE (`xw`.`g_version_indicator` <= '{{datestring}}' or `xw`.`g_version_indicator` is null) 
 AND (`xw`.`pg_version_indicator` <= '{{datestring}}' or `xw`.`pg_version_indicator` is null);
@@ -562,7 +566,7 @@ select `a`.`document_number` AS `pgpub_id`,
 `c`.`gender_flag` AS `gender_code`,
 `d`.`location_id` AS `location_id` 
 from (`pregrant_publications`.`rawinventor` `a` 
-    LEFT JOIN `patent`.`inventor` `b` ON (`a`.`inventor_id` = `b`.`id`)
+    LEFT JOIN `patent`.`inventor_{{datestring}}` `b` ON (`a`.`inventor_id` = `b`.`id`)
     LEFT JOIN `gender_attribution`.`inventor_gender_{{datestring}}` `c` ON (`a`.`inventor_id` = `c`.`inventor_id`)) 
     LEFT JOIN `pregrant_publications`.`rawlocation` `d` ON (`a`.`rawlocation_id` = `d`.`id`)
 where `a`.`version_indicator` <= '{{datestring}}';
@@ -641,7 +645,9 @@ select `pregrant_publications`.`persistent_assignee_disambig`.`document_number` 
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20220630` AS `disamb_assignee_id_20220630`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20220929` AS `disamb_assignee_id_20220929`,
 `pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230330` AS `disamb_assignee_id_20230330`,
-`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230629` AS `disamb_assignee_id_20230629`
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230629` AS `disamb_assignee_id_20230629`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20230930` AS `disamb_assignee_id_20230930`,
+`pregrant_publications`.`persistent_assignee_disambig`.`disamb_assignee_id_20231231` AS `disamb_assignee_id_20231231`
 from `pregrant_publications`.`persistent_assignee_disambig` 
 where `pregrant_publications`.`persistent_assignee_disambig`.`version_indicator` <= '{{datestring}}';
 
@@ -655,7 +661,9 @@ select `pregrant_publications`.`persistent_inventor_disambig`.`document_number` 
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20220630` AS `disamb_inventor_id_20220630`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20220929` AS `disamb_inventor_id_20220929`,
 `pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230330` AS `disamb_inventor_id_20230330`,
-`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230629` AS `disamb_inventor_id_20230629` 
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230629` AS `disamb_inventor_id_20230629`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20230930` AS `disamb_inventor_id_20230930`,
+`pregrant_publications`.`persistent_inventor_disambig`.`disamb_inventor_id_20231231` AS `disamb_inventor_id_20231231`
 from `pregrant_publications`.`persistent_inventor_disambig` 
 where `pregrant_publications`.`persistent_inventor_disambig`.`version_indicator` <= '{{datestring}}';
 

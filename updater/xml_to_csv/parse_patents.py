@@ -220,7 +220,7 @@ def get_results(patents, field_dictionary):
                                                     applicant['addressbook-orgname']])
 
         non_inventor_app_data = xml_helpers.get_entity(patent, 'us-applicant',
-                                                       attribute_list=['sequence', 'app-type', 'designation'])
+                                                       attribute_list=['sequence', 'app-type', 'designation','applicant-authority-category'])
         if non_inventor_app_data[0] is not None:
             for applicant in non_inventor_app_data:
                 rawlocid = id_generator()
@@ -230,7 +230,8 @@ def get_results(patents, field_dictionary):
                 results['non_inventor_applicant'].append(
                         [id_generator(), patent_id, rawlocid, applicant['addressbook-first-name'],
                          applicant['addressbook-last-name'], applicant['addressbook-orgname'],
-                         str(int(applicant['sequence'])), applicant['designation'], applicant['app-type']])
+                         str(int(applicant['sequence'])), applicant['designation'], applicant['app-type'],
+                         applicant['applicant-authority-category']])
                 output_helper.mandatory_fields('non_inventor_applicant', patent_id, error_log,
                                                [applicant['addressbook-first-name'],
                                                 applicant['addressbook-last-name'], applicant['addressbook-orgname']])

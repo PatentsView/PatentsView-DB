@@ -1,11 +1,12 @@
-{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set elastic_db = "elastic_production_patent_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 {% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set version_indicator = macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
 use `{{elastic_db}}`;
 
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventor_years`
 (
-    `inventor_id` int(10) unsigned NOT NULL,
+    `inventor_id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
     `patent_year` smallint(6)      NOT NULL,
     `num_patents` int(10) unsigned NOT NULL,
     KEY `ix_inventor_year_inventor_id` (`inventor_id`),
@@ -14,14 +15,15 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventor_years`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventors`
 (
-    `inventor_id`                      int(10) unsigned                        NOT NULL,
+    `inventor_id`                      int(10) COLLATE utf8mb4_unicode_ci NOT NULL,
     `name_first`                       varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `name_last`                        varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `num_patents`                      int(10) unsigned                        NOT NULL,
     `num_assignees`                    int(10) unsigned                        NOT NULL,
-    `lastknown_location_id`            varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `lastknown_location_id`            varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `lastknown_persistent_location_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `lastknown_city`                   varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `lastknown_state`                  varchar(20) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
@@ -32,8 +34,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`inventors`
     `last_seen_date`                   date                                    DEFAULT NULL,
     `years_active`                     smallint(5) unsigned                    NOT NULL,
     `persistent_inventor_id`           varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `male_flag`                        int(11)                                 DEFAULT NULL,
-    `attribution_status`               int(11)                                 DEFAULT NULL,
+    `gender_code`                      varchar(10) COLLATE utf8mb4_unicode_ci,
     PRIMARY KEY (`inventor_id`),
     KEY `ix_inventor_lastknown_location_id` (`lastknown_location_id`),
     KEY `ix_inventor_first_seen_date` (`first_seen_date`),
@@ -54,8 +55,7 @@ INSERT INTO `{{elastic_db}}`.inventors( inventor_id, name_first, name_last, num_
                                         , lastknown_state, lastknown_country, lastknown_latitude, lastknown_longitude
                                         , first_seen_date, last_seen_date, years_active, persistent_inventor_id
                                         , gender_code)
-select distinct
-    i.inventor_id
+select distinct i.inventor_id
   , i.name_first
   , i.name_last
   , i.num_patents
@@ -71,10 +71,12 @@ select distinct
   , i.last_seen_date
   , i.years_active
   , i.persistent_inventor_id
-  , i.gender_code
+  , gender_flag
 from
     `{{reporting_db}}`.`inventor` i
-        lEft join `{{reporting_db}}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
+        left join `{{reporting_db}}`.`temp_id_mapping_location` timl on timl.new_location_id = i.lastknown_location_id
+        left join `PatentsView_{{version_indicator}}`.`temp_id_mapping_inventor` timi on i.inventor_id = timi.new_inventor_id
+        left join gender_attribution.inventor_gender_{{version_indicator}} ig on timi.old_inventor_id=ig.inventor_id;
 
 
 TRUNCATE TABLE `{{elastic_db}}`.inventor_years;

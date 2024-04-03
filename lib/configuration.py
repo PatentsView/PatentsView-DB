@@ -199,13 +199,18 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
         start_date = (execution_date + current_week_start)
         end_date = (execution_date + current_week_end)
     else:
-        from lib.is_it_update_time import get_update_range
-        start_date, end_date = get_update_range(execution_date)
-    temp_date = end_date.strftime('%Y%m%d')
-
+        from lib.is_it_update_time import get_update_range_full_quarter
+        start_date, end_date_dash = get_update_range_full_quarter(execution_date)
+    start_date = start_date.strftime('%Y%m%d')
+    end_date = end_date_dash.strftime('%Y%m%d')
     config['DATES'] = {
-        "START_DATE": start_date.strftime('%Y-%m-%d'),
-        "END_DATE": end_date.strftime('%Y-%m-%d')
+        "START_DATE": start_date,
+        "END_DATE": end_date,
+        "END_DATE_DASH": end_date_dash
+    }
+    config['DISAMBIG_TABLES'] = {
+        "INVENTOR": f"inventor_disambiguation_mapping_{end_date}",
+        "ASSIGNEE": f"assignee_disambiguation_mapping_{end_date}",
     }
     print("Start Date is {start}".format(start=config['DATES']['START_DATE']))
     print("End date is {end}".format(end=config['DATES']['END_DATE']))
@@ -267,12 +272,17 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
 
     config['DATES'] = {
         "START_DATE": start_date.strftime('%Y%m%d'),
-        "END_DATE": end_date.strftime('%Y%m%d')
+        "END_DATE": end_date.strftime('%Y%m%d'),
+        "END_DATE_DASH": end_date
     }
     prefixed_string = "{prfx}{date}".format(prfx=config_prefix, date=temp_date)
     config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"] = prefixed_string
     config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'pregrant_publications'
     config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'pgpubs_text'
+
+    if type == 'pgpubs':
+        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_pgpub_'+ end_date.strftime('%Y%m%d')
+        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_pgpub'
     config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(
         prefix=prefixed_string,
         data_root=config['FOLDERS']['data_root'])
@@ -284,6 +294,8 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
         config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'patent'
         config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'patent_text'
         config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
+        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_patent_' + end_date.strftime('%Y%m%d')
+        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_patent'
 
     latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
     latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)

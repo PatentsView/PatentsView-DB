@@ -33,10 +33,12 @@ class ProdDBTester(DatabaseTester):
             self.init_qa_dict()
             logger.info(f"FINISHED WITH TABLE: {table}")
             counter += 1
-            logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables} %")
+            logger.info(f"==============================================================================")
+            logger.info(f"Currently Done With {counter} of {total_tables} | {counter/total_tables:.2%}")
+            logger.info(f"==============================================================================")
 
 def run_prod_db_qa(**kwargs):
-    config = get_current_config('granted_patent', schedule="quarterly", **kwargs)
+    config = get_current_config(type='granted_patent', schedule="quarterly", **kwargs)
     qc = ProdDBTester(config)
     qc.run_prod_db_tests()
 

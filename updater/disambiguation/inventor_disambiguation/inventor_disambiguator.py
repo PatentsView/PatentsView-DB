@@ -3,7 +3,7 @@ from pendulum import DateTime
 import os
 import pv
 from lib.configuration import get_disambig_config
-from lib.utilities import archive_folder, link_view_to_new_disambiguation_table
+from lib.utilities import archive_folder, add_index_new_disambiguation_table
 from pv.disambiguation.util.config_util import prepare_config
 
 
@@ -11,7 +11,7 @@ def setup_inventor_assignee_disambiguation(**kwargs):
     config = get_disambig_config(schedule='quarterly',
                                  supplemental_configs=['config/new_consolidated_config.ini'],
                                  **kwargs)
-    end_date = config['DATES']['END_DATE']
+    end_date = config['DATES']['END_DATE_DASH']
     os.makedirs(os.path.dirname(f"{config['BASE_PATH']['inventor']}".format(end_date=end_date)), exist_ok=True)
     os.makedirs(os.path.dirname(f"{config['BASE_PATH']['assignee']}".format(end_date=end_date)), exist_ok=True)
     print(f"NEW PATH CREATED ---- {config['BASE_PATH']['inventor']}".format(end_date=end_date))
@@ -70,25 +70,15 @@ def upload_results(**kwargs):
 
 
 def archive_results(**kwargs):
+    # This now adds index to disambiguation_mapping table rather than creating a new view
     config = get_disambig_config(schedule='quarterly',
                                  supplemental_configs=['config/new_consolidated_config.ini'],
                                  **kwargs)
-    config = prepare_config(config)
-    # incremental = True if config['DISAMBIGUATION']['INCREMENTAL'] == "1" else False
-    # folders = [config['DATES']['END_DATE']]
-    # if incremental:
-    #     folders.append("full_disambiguation")
-    #     print("Running Full Disambiguation!")
-    # source_folder = "data/current/inventor"
-    # targets = ["data/{folder}/inventor/".format(folder=x) for x in folders]
-    # archive_folder(source_folder, targets)
-    print('Mapping tables')
+    inventor_disambig_table = config["DISAMBIG_TABLES"]["INVENTOR"]
     cnx_g = pv.disambiguation.util.db.connect_to_disambiguation_database(config, dbtype='granted_patent_database')
-    link_view_to_new_disambiguation_table(connection=cnx_g, table_name=config['INVENTOR_UPLOAD']['target_table'],
-                                          disambiguation_type='inventor')
+    add_index_new_disambiguation_table(connection=cnx_g, table_name=inventor_disambig_table)
     cnx_g = pv.disambiguation.util.db.connect_to_disambiguation_database(config, dbtype='pregrant_database')
-    link_view_to_new_disambiguation_table(connection=cnx_g, table_name=config['INVENTOR_UPLOAD']['target_table'],
-                                          disambiguation_type='inventor')
+    add_index_new_disambiguation_table(connection=cnx_g, table_name=inventor_disambig_table)
 
 
 if __name__ == '__main__':

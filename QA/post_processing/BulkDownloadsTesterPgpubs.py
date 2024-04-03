@@ -9,13 +9,10 @@ class BulkDownloadsTesterPgpubs(DatabaseTester):
         end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
         super().__init__(config, config['PATENTSVIEW_DATABASES']["bulk_export_pgpubs"], datetime.date(year=1976, month=1, day=1),end_date)
 
-
-
 def run_bulk_downloads_qa(**kwargs):
     config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     qc = BulkDownloadsTesterPgpubs(config)
-    qc.runTests()
-
+    qc.runStandardTests()
 
 if __name__ == '__main__':
     # check_reporting_db_row_count()

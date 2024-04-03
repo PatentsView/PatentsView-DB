@@ -106,7 +106,7 @@ There are at least 6 containers with unique services running:
 
 - docker-compose-admin-worker.yml, docker-compose-disambiguator.yaml, docker-compose-worker.yaml all have the same
   configuration as other `patentsview/airflow` image, again, except for the command and port numbers
-  - The worker `queues` execute the python code in Airflow. Different DAGs run using different workers and are controlled using different pools. For the latest configuration, see the [DAGS](airflow/dags) folder
+  - The worker `queues` execute the python code in Airflow. Different DAGs run using different workers and are controlled using different pools. For the latest configuration, see the [DAGS](../airflow/dags) folder
 - Note that all DAG processes listed below also need to have `PVGP server` running to run airflow
 
 | DAG                                | Worker (Queue)                 | Pools                                                         | Servers                             | 
@@ -125,22 +125,29 @@ An [Airflow Pool](https://airflow.apache.org/docs/apache-airflow/stable/administ
 
 ## ENV
 1. Check if containers are running 
-2. Check which processes are running in each container using `docker top {id}`. This should be some variation of airflow scheduler  for scheduler container, webserver for webserver container so forth
-3. Check the UI to see if there are any python errors
-4. Check UI to see if there are any heartbeat error/warnings
-5. Then check flower UI to see if "clients" are registered. client = each process that runs some version of airflow celery worker command
+2. Make sure the dag parameter is specified in the task definition in the DAG file
+3. Check which processes are running in each container using `docker top {id}`. This should be some variation of airflow scheduler  for scheduler container, webserver for webserver container so forth
+4. Check the UI to see if there are any python errors
+5. Check UI to see if there are any heartbeat error/warnings
+6. Then check flower UI to see if "clients" are registered. client = each process that runs some version of airflow celery worker command
    1. `ssh -L 5555:localhost:5555 PVGP`
    2. http://localhost:5555/
-6. Then check rabbitMQ UI. Particularly the "consumer" section in the queue that you are interested in. For example, if the task is supposed to be under the "data collection" queue, you can see if a consumer is registered under that queue (consumer ~= server/worker process)
+7. Then check rabbitMQ UI. Particularly the "consumer" section in the queue that you are interested in. For example, if the task is supposed to be under the "data collection" queue, you can see if a consumer is registered under that queue (consumer ~= server/worker process)
    1. `ssh -L 8188:localhost:8188 PVGP`
    2. http://localhost:8188/
    3. guest:guest
 
+## RESTART SERVER 
+* You have to restart nginx after you re-start the server to keep the URL: 
+* nginx is what converts pipeline.patentsview.org -> docker airflow webserver container
+```sudo service nginx start```
+
+
 ## Updating SSL
-1. Allow access to the world (0.0.0.0) for http port on the GP Linux server in AWS
+1. Allow access to the world (`0.0.0.0/0`) for http port on the GP Linux server in AWS
 2. `SSH PVGP`
 3. `sudo -i`
-4. `certbot.` 
+4. `certbot` 
 Output below:
 
 ```[root@ip-172-31-8-197 ~]# certbot
@@ -188,7 +195,6 @@ IMPORTANT NOTES:
  - If you like Certbot, please consider supporting our work by:
    Donating to ISRG / Let's Encrypt:   
 https://letsencrypt.org/donate
-   Donating to EFF:  https://eff.org/donate-le```
-
-
+   Donating to EFF:  https://eff.org/donate-le
+```
 5. Remove SG rule from #1 in AWS

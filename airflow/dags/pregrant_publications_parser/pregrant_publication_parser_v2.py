@@ -5,6 +5,7 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 
 from lib.configuration import get_section
+from lib.download_check_delete_databases import run_table_archive, run_database_archive
 from reporting_database_generator.database.validate_query import validate_and_execute
 from updater.callbacks import airflow_task_failure, airflow_task_success
 from updater.create_databases.pregrant_database_setup import create_database
@@ -68,6 +69,11 @@ create_database_operator = PythonOperator(task_id='create_pgpubs_database',
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure
                                           )
+###### BACKUP OLDEST DATABASE #######
+backup_data = PythonOperator(task_id='backup_oldest_database'
+                             , python_callable=run_database_archive
+                             , op_kwargs={'type': 'pgpubs'}
+                             , queue= 'mydumper')
 
 qc_database_operator = PythonOperator(task_id='qc_database_setup',
                                       python_callable=qc_database_pgpubs,
@@ -89,8 +95,8 @@ post_processing_operator = PythonOperator(task_id='post_process',
                                           dag=app_xml_dag,
                                           on_success_callback=airflow_task_success,
                                           on_failure_callback=airflow_task_failure,
-                                          depends_on_past=True,
-                                          pool = 'elastic_search_pool'
+                                          pool = 'database_write_iops_contenders',
+                                          depends_on_past = True
                                           )
 
 qc_upload_operator = PythonOperator(task_id='qc_upload_new',
@@ -119,7 +125,8 @@ loc_disambiguation = PythonOperator(task_id='loc_disambiguation',
                                     op_kwargs={'dbtype': 'pgpubs'},
                                     dag=app_xml_dag,
                                     on_success_callback=airflow_task_success,
-                                    on_failure_callback=airflow_task_failure
+                                    on_failure_callback=airflow_task_failure,
+                                    pool = 'three_pool'
                                     )
 
 loc_disambiguation_qc = PythonOperator(task_id='loc_disambiguation_qc',
@@ -178,8 +185,8 @@ merge_database_operator = SQLTemplatedPythonOperator(
     },
     dag=app_xml_dag,
     templates_dict={
-        'source_sql': 'merge_into_pgpubs.sql',
-        'delete_sql': 'delete_from_pgpubs.sql'
+        'source_sql': 'merge_into_pgpubs_updated.sql',
+        # 'delete_sql': 'delete_from_pgpubs.sql'
     },
     templates_exts=['.sql'],
     params={
@@ -232,6 +239,7 @@ qc_merge_weekly_text_operator = PythonOperator(task_id='qc_text_merge_weekly',
 
 
 qc_database_operator.set_upstream(create_database_operator)
+backup_data.set_upstream(create_database_operator)
 parse_xml_operator.set_upstream(qc_database_operator)
 post_processing_operator.set_upstream(parse_xml_operator)
 qc_upload_operator.set_upstream(post_processing_operator)

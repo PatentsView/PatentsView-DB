@@ -13,6 +13,7 @@ from lib.configuration import get_section
 from lib.configuration import get_current_config, get_today_dict
 import pymysql.cursors
 import pymysql
+from jinja2 import Environment, FileSystemLoader
 
 def parse_and_format_sql(parsed_statement):
     query_lines = []
@@ -33,15 +34,26 @@ def nextword(target, source):
 
 def db_and_table_as_array(single_line_query):
     # Identify all tables used in the query for collation check
-    single_line_query = single_line_query.lower()
+    # single_line_query = single_line_query.lower()
     single_line_query = single_line_query.replace('`', '')
-    print(f"examining table schema for query: {single_line_query}")
+    # print(f"examining table schema for query: {single_line_query}")
+    #single_line_query_words = single_line_query.lower().split(" ")
     single_line_query_words = single_line_query.split(" ")
-    # print(single_line_query_words)
+    print(single_line_query_words)
+    # Search for lowercase 'into'
     after_into = nextword('into', single_line_query_words)
+    if after_into is None:
+        # Search for uppercase 'Into' if lowercase 'into' is not found
+        after_into = nextword('INTO', single_line_query_words)
+    print(after_into)
     after_from = nextword('from', single_line_query_words)
+    if after_from is None:
+        after_from = nextword('FROM', single_line_query_words)
+    print(after_from)
     if '(' in after_from:
         after_from = nextword('join', single_line_query_words)
+        if after_from is None:
+            after_from = nextword('JOIN', single_line_query_words)
     if after_into is None or after_from is None:
         print("Not set up for schema checks")
         tables_schema = []
@@ -96,9 +108,9 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
     if not fk_check:
         db_con.execute("SET FOREIGN_KEY_CHECKS=0")
     # Send start message
-    send_slack_notification(
-            "Executing Query File: `" + filename + "`", config, section,
-            "info")
+    # send_slack_notification(
+    #         "Executing Query File: `" + filename + "`", config, section,
+    #         "info")
     # when needed, clear out any existing entries in the prod db to make room for inserts - mostly duplicated from insert section below
     if 'delete_sql' in context['templates_dict'] and drop_existing:
         rm_sql_content = context['templates_dict']['delete_sql']
@@ -135,13 +147,13 @@ def validate_and_execute(filename=None, schema_only=False, drop_existing=True,fk
                 print(f"executing query: {single_line_query}")
                 db_con.execute(single_line_query)
             except Exception as e:
-                # send_slack_notification(
-                #         """
-                # Execution of Query failed: ```{single_line_query} ```
-                #     """.format(single_line_query=single_line_query),
-                #         config,
-                #         section,
-                #         "error")
+                send_slack_notification(
+                        """
+                Execution of Query failed: ```{single_line_query} ```
+                    """.format(single_line_query=single_line_query),
+                        config,
+                        section,
+                        "error")
                 raise e
 
             
@@ -231,34 +243,30 @@ if __name__ == '__main__':
     # q = """create table `PatentsView_20230330`.webtool_comparison_countryI SELECT l.country , p.year , COUNT(DISTINCT inventor_id) AS invCount FROM (SELECT location_id, IF(country = 'AN', 'CW', country) AS country FROM location) l LEFT JOIN patent_inventor pi ON l.location_id = pi.location_id LEFT JOIN patent p ON pi.patent_id = p.patent_id WHERE p.year IS NOT NULL AND l.country IS NOT NULL AND l.country REGEXP '^[A-Z]{2}$' AND l.country NOT IN ('US', 'YU', 'SU') GROUP BY l.country , p.year;"""
     # db_and_table_as_array("INSERT INTO pregrant_publications.publication SELECT * FROM pgpubs_20050101.publication")
     # db_and_table_as_array(q)
-    # validate_and_execute(filename='01_04_Application', fk_check=False, source_sql='01_04_Application.sql', **{
-    #     "source_sql": "01_04_Application.sql"
+    # config = get_current_config("granted_patent", **{
+    #     "execution_date": datetime.date(2022, 6, 30)
     # })
-    # from lib.configuration import get_current_config, get_today_dict
-    config = get_current_config("granted_patent", **{
-        "execution_date": datetime.date(2022, 6, 30)
-    })
-    # schema_only = config["REPORTING_DATABASE_OPTIONS"]["SCHEMA_ONLY"]
-    database_name_config = {
-        'raw_database': config['REPORTING_DATABASE_OPTIONS']['RAW_DATABASE_NAME'],
-        'reporting_database': config['REPORTING_DATABASE_OPTIONS']['REPORTING_DATABASE_NAME'],
-        'version_indicator': config['REPORTING_DATABASE_OPTIONS']['VERSION_INDICATOR'],
-        'last_reporting_database': config['REPORTING_DATABASE_OPTIONS']['LAST_REPORTING_DATABASE_NAME'],
-    }
-    validate_and_execute(filename='webtool_tables', fk_check=False, source_sql='webtool_tables.sql',params=database_name_config, schema_only=False)
-# web_tools = SQLTemplatedPythonOperator(
-#     task_id='Web_Tool',
-#     provide_context=True,
-#     python_callable=validate_query.validate_and_execute,
-#     dag=reporting_db_dag,
-#     op_kwargs={
-#         'filename': 'webtool_tables',
-#         "schema_only": schema_only
-#     },
-#     templates_dict={
-#         'source_sql': 'webtool_tables.sql'
-#     },
-#     templates_exts=template_extension_config,
-#     params=database_name_config
-# )
+    # db_and_table_as_array("```INSERT INTO `elastic_production_20230930`.attorneys ( lawyer_id, name_first, name_last, organization, num_patents, num_assignees , num_inventors, first_seen_date, last_seen_date, years_active , persistent_lawyer_id) select distinct l.*  from `PatentsView_20230930`.`lawyer` l join `PatentsView_20230930`.`patent_lawyer` pl on pl.lawyer_id = l.lawyer_id; ```")
+    # validate_and_execute(filename='webtool_tables', fk_check=False, source_sql='webtool_tables.sql',params=database_name_config, schema_only=False)
 
+    # Use this code to run for local testing
+    # Jinja2 environment setup
+    env = Environment(loader=FileSystemLoader('reporting_database_generator/'))
+
+    # Load and render the template
+    template_str = '04_Inventor.sql'
+    template = env.get_template(template_str)
+    rendered_template = template.render()
+
+    # Call your validate_and_execute function
+    validate_and_execute(
+        filename='04_Inventor',
+        schema_only=False,
+        drop_existing=True,
+        fk_check=True,
+        section=None,
+        host='DATABASE_SETUP',
+        **{'templates_dict': {
+            'source_sql': rendered_template
+        }}
+    )

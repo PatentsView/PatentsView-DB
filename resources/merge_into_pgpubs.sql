@@ -54,7 +54,7 @@ INSERT INTO pregrant_publications.rawuspc SELECT * FROM `{{source_database}}`.ra
 
 INSERT INTO pregrant_publications.rel_app_text SELECT * FROM `{{source_database}}`.rel_app_text;
 
-INSERT INTO pregrant_publications.us_parties (id, document_number, name_first, name_last, organization, type, designation, sequence, rawlocation_id, city, state, country, filename, version_indicator) SELECT id, document_number, name_first, name_last, organization, type, designation, sequence, rawlocation_id, city, state, country, filename, version_indicator FROM `{{source_database}}`.us_parties;
+INSERT INTO pregrant_publications.us_parties (id, document_number, name_first, name_last, organization, type, applicant_authority, designation, sequence, rawlocation_id, city, state, country, filename, version_indicator) SELECT id, document_number, name_first, name_last, organization, type, applicant_authority, designation, sequence, rawlocation_id, city, state, country, filename, version_indicator FROM `{{source_database}}`.us_parties;
 
 INSERT INTO pregrant_publications.uspc SELECT * FROM `{{source_database}}`.uspc;
 

@@ -109,6 +109,30 @@
     },
     "TestScripts": []
   },
+    "assignee_disambiguation_mapping": {
+    "fields": {
+      "uuid": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "assignee_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "assignee",
+        "main_table_id": "assignee_id",
+        "related_table_id": "id"
+      }
+    ],
+    "TestScripts": ["AssigneePostProcessingQC"]
+  },
   "cpc": {
     "fields": {
       "id": {
@@ -522,6 +546,30 @@
     },
     "TestScripts": []
   },
+    "inventor_disambiguation_mapping": {
+    "fields": {
+      "uuid": {
+        "data_type": "varchar",
+        "null_allowed": false,
+        "category": false,
+        "location_field": false
+      },
+      "inventor_id": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": false,
+        "location_field": false
+      }
+    },
+    "related_entities": [
+      {
+        "related_table": "inventor",
+        "main_table_id": "inventor_id",
+        "related_table_id": "id"
+      }
+    ],
+    "TestScripts": ["InventorPostProcessingQC"]
+  },
   "ipcr": {
     "fields": {
       "id": {
@@ -655,7 +703,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["AssigneePostProcessingQCPhase2"]
   },
   "location_inventor": {
     "fields": {
@@ -685,7 +733,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["InventorPostProcessingQCPhase2"]
   },
   "main_cpc": {
     "fields": {
@@ -930,11 +978,6 @@
         "related_table_id": "document_number"
       },
       {
-        "related_table": "publication_inventor",
-        "main_table_id": "document_number",
-        "related_table_id": "document_number"
-      },
-      {
        "related_table": "rawassignee",
        "main_table_id": "document_number",
         "related_table_id": "document_number"
@@ -1010,7 +1053,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["AssigneePostProcessingQCPhase2"]
   },
   "publication_inventor": {
     "fields": {
@@ -1046,7 +1089,7 @@
         "related_table_id": "id"
       }
     ],
-    "TestScripts": []
+    "TestScripts": ["InventorPostProcessingQCPhase2"]
   },
   "rawassignee": {
     "fields": {
@@ -1132,7 +1175,8 @@
     "TestScripts": [
       "MergeTestWeekly",
       "MergeTestQuarterly",
-      "UploadTest"
+      "UploadTest",
+      "AssigneePostProcessingQC"
     ]
   },
   "rawinventor": {
@@ -1219,7 +1263,8 @@
     "TestScripts": [
       "MergeTestWeekly",
       "MergeTestQuarterly",
-      "UploadTest"
+      "UploadTest",
+      "InventorPostProcessingQC"
     ]
   },
   "rawlocation": {
@@ -1436,6 +1481,12 @@
         "location_field": false
       },
       "type": {
+        "data_type": "varchar",
+        "null_allowed": true,
+        "category": true,
+        "location_field": false
+      },
+      "applicant_authority": {
         "data_type": "varchar",
         "null_allowed": true,
         "category": true,

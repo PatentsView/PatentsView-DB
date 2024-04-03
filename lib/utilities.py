@@ -35,6 +35,8 @@ def class_db_specific_config(self, table_config, class_called):
         if class_called == 'DatabaseTester':
             if "UploadTest" in table_config[i]['TestScripts']:
                 keep_tables.append(i)
+        elif class_called == 'ElasticDBTester':
+            keep_tables.append(i)
         else:
             if class_called in table_config[i]['TestScripts']:
                 keep_tables.append(i)
@@ -46,7 +48,7 @@ def class_db_specific_config(self, table_config, class_called):
             tables_list = list(self.table_config.keys())
             quarter_date = self.end_date.strftime("%Y%m%d")
             for table in tables_list:
-                if table in ['assignee', 'location', 'inventor']:
+                if table in ['assignee', "assignee_disambiguation_mapping", 'location', "location_disambiguation_mapping", 'inventor',  "inventor_disambiguation_mapping", "inventor_gender", "rawinventor_gender", "rawinventor_gender_agg"]:
                     self.table_config[f'{table}_{quarter_date}'] = self.table_config.pop(f'{table}')
         print(f"The following list of tables are run for {class_called}:")
         print(self.table_config.keys())
@@ -65,10 +67,16 @@ def load_table_config(config, db='patent'):
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'
     elif db == config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]:
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'
+    elif db == "gender_attribution":
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_inventor_gender"]}'
     elif db == 'bulk_exp_granted':
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'
     elif db == 'bulk_exp_pgpubs':
         config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'
+    elif db == 'elasticsearch_patent':
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_elasticsearch_patent"]}'
+    elif db == 'elasticsearch_pgpub':
+        config_file = f'{root}/{resources}/{config["FILES"]["table_config_elasticsearch_pgpub"]}'
 
     print(f"reading table config from {config_file}")
     with open(config_file) as file:
@@ -78,29 +86,32 @@ def load_table_config(config, db='patent'):
 
 def get_relevant_attributes(self, class_called, database_section, config):
     print(f"assigning class variables based on class {class_called} and database section {database_section}.")
-    if class_called == "AssigneePostProcessingQC":
+    if (class_called == "AssigneePostProcessingQC") or (class_called == "AssigneePostProcessingQCPhase2") :
         self.database_section = database_section
-        self.table_config = load_table_config(config, db='patent')
+        if self.database_section == 'patent':
+            self.table_config = load_table_config(config, db='patent')
+        else:
+            self.table_config = load_table_config(config, db='pgpubs')
         self.entity_table = 'rawassignee'
         self.entity_id = 'uuid'
         self.disambiguated_id = 'assignee_id'
         self.disambiguated_table = 'assignee'
         self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
-        # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
-        # self.add_persistent_table_to_config(database_section)
-        # self.category = ""
-        # self.p_key = "id"
-        # self.f_key = "assignee_id"
         self.aggregator = 'main.organization'
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
         self.f_key = ""
         self.exclusion_list = []
+    elif (class_called == "InventorGenderPostProcessingQC"):
+        self.table_config = load_table_config(config, db='gender_attribution')
 
-    elif class_called == "InventorPostProcessingQC":
+    elif (class_called == "InventorPostProcessingQC") or (class_called == "InventorPostProcessingQCPhase2") :
         self.database_section = database_section
-        self.table_config = load_table_config(config, db='patent')
+        if self.database_section == 'patent':
+            self.table_config = load_table_config(config, db='patent')
+        else:
+            self.table_config = load_table_config(config, db='pgpubs')
         self.entity_table = 'rawinventor'
         self.entity_id = 'uuid'
         self.disambiguated_id = 'inventor_id'
@@ -124,7 +135,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.disambiguated_id = 'lawyer_id'
         self.disambiguated_table = 'lawyer'
         self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
-        # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
         self.aggregator = 'case when main.organization is null then concat(main.name_last,", ",main.name_first) else main.organization end'
         self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
         self.category = ""
@@ -141,7 +151,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.entity_id = 'id'
         self.disambiguated_id = 'location_id'
         self.disambiguated_table = 'location'
-        # self.patent_exclusion_list.extend(['location', 'rawlocation','location_assignee','location_inventor'])
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
@@ -149,7 +158,6 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.exclusion_list = []
 
     elif class_called == "CPCTest":
-        # self.patent_exclusion_list.extend(['cpc_group', 'cpc_subgroup', 'cpc_subsection', 'wipo_field'])
         self.table_config = load_table_config(config, db='patent')
         self.category = ""
         self.central_entity = ""
@@ -165,8 +173,16 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.f_key = ""
         self.exclusion_list = []
 
+    elif class_called == "ElasticDBTester":
+        self.table_config = load_table_config(config, db = config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"]) #db should be parameterized later, not hard-coded
+        self.category = ""
+        self.central_entity = ""
+        self.p_key = ""
+        self.f_key = ""
+        self.exclusion_list = []
+
     elif database_section == "patent" or (
-            database_section[:6] == 'upload' and class_called[:6] in ('Upload','GovtIn')):
+            database_section[:6] == 'upload' and class_called[:6] in ('Upload','GovtIn', 'MergeT')):
         self.exclusion_list = ['assignee',
                                'cpc_group',
                                'cpc_subgroup',
@@ -193,7 +209,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.f_key = "patent_id"
 
     elif (database_section == "pregrant_publications") or (
-            database_section[:6] == 'pgpubs' and class_called[:6] in ('Upload','GovtIn')):
+            database_section[:6] == 'pgpubs' and class_called[:6] in ('Upload','GovtIn', 'MergeT')):
         # TABLES WITHOUT DOCUMENT_NUMBER ARE EXCLUDED FROM THE TABLE CONFIG
         self.central_entity = "publication"
         self.category = 'kind'
@@ -226,13 +242,16 @@ def get_relevant_attributes(self, class_called, database_section, config):
     elif class_called[:19] == 'BulkDownloadsTester':
         if 'granted' in database_section:
             self.table_config = load_table_config(config, db='bulk_exp_granted')
+            self.central_entity = "patent"
+            self.p_key = "patent_id"
+            self.f_key = "patent_id"
         else:
             self.table_config = load_table_config(config, db='bulk_exp_pgpubs')
+            self.central_entity = "publication"
+            self.p_key = "pgpub_id"
+            self.f_key = "pgpub_id"
         
         self.category = ""
-        self.central_entity = ""
-        self.p_key = ""
-        self.f_key = ""
         self.exclusion_list = []
 
     else:
@@ -655,6 +674,18 @@ def archive_folder(source_folder, targets: list):
         print(file_name)
         shutil.copy(os.path.join(source_folder, file_name), targets[-1])
 
+def add_index_new_disambiguation_table(connection, table_name):
+    from mysql.connector.errors import ProgrammingError
+    g_cursor = connection.cursor()
+    index_query = 'alter table {table_name} add primary key (uuid)'.format(
+        table_name=table_name)
+    print(index_query)
+    try:
+        g_cursor.execute(index_query)
+    except ProgrammingError as e:
+        from mysql.connector import errorcode
+        if not e.errno == errorcode.ER_MULTIPLE_PRI_KEY:
+            raise
 
 def link_view_to_new_disambiguation_table(connection, table_name, disambiguation_type):
     from mysql.connector.errors import ProgrammingError
@@ -719,5 +750,4 @@ if __name__ == "__main__":
     # update_to_granular_version_indicator('uspc_current', 'granted_patent')
     print("HI")
     config = get_current_config("granted_patent", schedule='quarterly',  **{"execution_date": datetime.date(2022, 6, 30)})
-    generate_index_statements(config, "PROD_DB", "cpc_current_20230330")
 

@@ -1,4 +1,4 @@
-{% set elastic_db = "elastic_production_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set elastic_db = "elastic_production_patent_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 {% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
 use `{{elastic_db}}`;
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patents`
     `term_extension`                                        int(10) unsigned DEFAULT NULL,
     `detail_desc_length`                                    int(10) unsigned DEFAULT NULL,
     `gi_statement`                                          text                                    default null,
-    `patent_zero_prefix`                                    varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `patent_zero_prefix`                                    varchar(20) COLLATE utf8mb4_unicode_ci,
     PRIMARY KEY (`patent_id`),
     KEY                                                     `ix_patent_number` (`number`),
     KEY                                                     `ix_patent_title` (`title`(128)),

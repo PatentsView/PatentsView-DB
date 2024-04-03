@@ -122,6 +122,9 @@ upload_trigger_operator = SQLTemplatedPythonOperator(
         'database': 'upload_',
         'add_suffix': True
     }
+#     ,
+# on_success_callback=airflow_task_success,
+# on_failure_callback=airflow_task_failure
 )
 patent_sql_operator = PythonOperator(task_id='parse_xml_to_sql', python_callable=patent_sql_parser,
                                      **operator_settings
@@ -240,6 +243,9 @@ integrity_check_operator = PythonOperator(task_id='check_prod_integrity',
 merge_new_operator = PythonOperator(task_id='merge_db',
                                     python_callable=begin_merging,
                                     **operator_settings
+                                    # ,
+                                    # on_success_callback=airflow_task_success,
+                                    # on_failure_callback=airflow_task_failure
                                     )
 
 qc_merge_operator = PythonOperator(task_id='qc_merge_db',
@@ -264,7 +270,11 @@ withdrawn_operator = PythonOperator(task_id='withdrawn_processor', python_callab
                                     **operator_settings)
 
 qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_callable=post_withdrawn,
-                                       **operator_settings)
+                                       **operator_settings
+                                       # ,
+                                       # on_success_callback=airflow_task_success,
+                                       # on_failure_callback=airflow_task_failure
+                                       )
 
 operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,
                                             parse_xml_operator, upload_new_operator,

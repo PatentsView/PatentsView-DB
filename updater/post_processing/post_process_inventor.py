@@ -6,6 +6,8 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from QA.post_processing.InventorPostProcessing import InventorPostProcessingQC
+from QA.post_processing.InventorGenderPostProcessing import InventorGenderPostProcessingQC
+from QA.post_processing.InventorPostProcessingPhase2 import InventorPostProcessingQCPhase2
 from lib.configuration import get_connection_string, get_current_config, get_disambig_config, get_unique_connection_string
 from updater.post_processing.create_lookup import load_lookup_table
 from gender_it.patentsview_gender_attribution import get_disambiguated_inventor_batch, run_AIR_genderit
@@ -15,11 +17,10 @@ def update_rawinventor_for_type(update_config, incremental="1", database='RAW_DB
     filter = '1=1'
     if incremental == "1":
         filter = 'ri.inventor_id is null'
-    update_statement = """
-        UPDATE rawinventor ri join inventor_disambiguation_mapping idm
+    update_statement = f"""
+        UPDATE rawinventor ri join {update_config["DISAMBIG_TABLES"]["INVENTOR"]} idm
             on idm.uuid =  ri.{uuid_field}
-        set ri.inventor_id=idm.inventor_id where {filter} 
-    """.format(uuid_field=uuid_field, filter=filter)
+        set ri.inventor_id=idm.inventor_id where {filter} """
     print(update_statement)
     engine.execute(update_statement)
 
@@ -118,8 +119,6 @@ def create_inventor(update_config):
             `id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
             `name_first` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
             `name_last` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-            `male_flag` int(11) DEFAULT NULL,
-            `attribution_status` int(11) DEFAULT NULL,
             `version_indicator` date NOT NULL DEFAULT '2020-09-29',
             `created_date` timestamp NOT NULL DEFAULT current_timestamp(),
             `updated_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
@@ -380,6 +379,8 @@ where total_count = 0 and gender_flag is null"""
 alter table gender_attribution.inventor_gender_{end_date} 
 add KEY `inventor_id` (`inventor_id`)"""
     q_list.append(q12)
+    q13 = f"alter table gender_attribution.rawinventor_gender_{end_date} add index patent_id (patent_id)"
+    q_list.append(q13)
     for q in q_list:
         print(q)
         engine.execute(q)
@@ -387,54 +388,34 @@ add KEY `inventor_id` (`inventor_id`)"""
 def post_process_qc(**kwargs):
     config = get_current_config(schedule='quarterly', **kwargs)
     qc = InventorPostProcessingQC(config)
-    qc.runTests()
+    qc.run_inventor_disambig_tests()
+    gc_ig = InventorGenderPostProcessingQC(config)
+    gc_ig.runInventorGenderTests()
 
-def evaluate_inventor_clustering(**kwargs):
-    config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
-    engine = create_engine(get_connection_string(config, "RAW_DB"))
-    pquery = "select patent_id, patent_date from patentsview_export_granted.g_patent"
-    print(pquery)
-    patent = pd.read_sql_query(sql=pquery, con=engine)
-    rquery = "select patent_id, sequence, inventor_id from patent.rawinventor "
-    print(rquery)
-    rawinventor = pd.read_sql_query(sql=rquery, con=engine)
-    patent_date = pd.DatetimeIndex(patent.patent_date)
-    patent["patent_date"] = patent_date.year.astype(int)
-    joined = rawinventor.merge(patent, on="patent_id", how="left")
-    joined["mention_id"] = "US" + joined.patent_id + "-" + joined.sequence
-    breakpoint()
-    joined = joined.query('patent_date >= 1975 and patent_date <= 2022')
-    current_disambiguation = joined.set_index("mention_id")["inventor_id"]
+def post_process_inventor_qc_pgpubs(**kwargs):
+    config = get_current_config('pgpubs',schedule='quarterly', **kwargs)
+    qc = InventorPostProcessingQC(config)
+    qc.runDisambiguationTests()
 
-    from er_evaluation.estimators import pairwise_precision_design_estimate, pairwise_recall_design_estimate
-    from er_evaluation.summary import cluster_sizes
-    from pv_evaluation.benchmark import load_binette_2022_inventors_benchmark
-    pairwise_precision_design_estimate(current_disambiguation, load_binette_2022_inventors_benchmark(),
-                                       weights=1 / cluster_sizes(load_binette_2022_inventors_benchmark()))
+def post_process_inventor_patent_phase2_qc(**kwargs):
+    config = get_current_config(schedule='quarterly', **kwargs)
+    qc = InventorPostProcessingQCPhase2(config)
+    qc.runDisambiguationTests()
 
+def post_process_inventor_pgpubs_phase2_qc(**kwargs):
+    config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
+    qc = InventorPostProcessingQCPhase2(config)
+    qc.runDisambiguationTests()
 
 
 if __name__ == '__main__':
     # post_process_inventor(config)
-    # post_process_inventor(**{
-    #     "execution_date": datetime.date(2020, 12, 29)
-    # })
-    # post_process_qc(**{
-    #         "execution_date": datetime.date(2020, 12, 29)
-    #         })
-    # evaluate_inventor_clustering(**{
-    #     "execution_date": datetime.date(2020, 12, 29)
-    # })
-    # config = get_disambig_config(schedule='quarterly', **{
-    #     "execution_date": datetime.date(2023, 1, 1)
-    # })
-    # create_inventor(config)
-    # run_genderit("granted_patent", **{
-    #     "execution_date": datetime.date(2023, 4, 1)
-    # })
-    # run_genderit("pgpubs", **{
-    #     "execution_date": datetime.date(2023, 4, 1)
-    # })
-    post_process_inventor_gender(**{
-        "execution_date": datetime.date(2023, 4, 1)
+    post_process_qc(**{
+        "execution_date": datetime.date(2023, 10, 1)
     })
+    # run_genderit("granted_patent", **{
+    #     "execution_date": datetime.date(2023, 7, 1)
+    # })
+    # post_process_inventor_gender(**{
+    #     "execution_date": datetime.date(2023, 4, 1)
+    # })

@@ -204,7 +204,7 @@ create table `{{reporting_db}}`.`inventor`
   `last_seen_date` date null,
   `years_active` smallint unsigned not null,
   `persistent_inventor_id` varchar(256) not null,
-  `gender_code` varchar(10) null
+  `gender_code` varchar(10) null,
   primary key (`inventor_id`)
 )
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -224,7 +224,7 @@ select
   ifnull(case when tifls.`actual_years_active` < 1 then 1 else tifls.`actual_years_active` end, 0),
   i.`id`, gender_flag
 from
-  `patent`.`inventor` i
+  `patent`.`inventor_{{version_indicator}}` i
   inner join `{{reporting_db}}`.`temp_id_mapping_inventor` t on t.`old_inventor_id` = i.`id`
   left outer join `{{reporting_db}}`.`temp_inventor_lastknown_location` tilkl on tilkl.`inventor_id` = i.`id`
   inner join `{{reporting_db}}`.`temp_inventor_num_patents` tinp on tinp.`inventor_id` = i.`id`

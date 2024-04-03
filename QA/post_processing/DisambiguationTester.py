@@ -3,6 +3,11 @@ from time import time
 
 from QA.DatabaseTester import DatabaseTester
 
+import logging
+
+logging.basicConfig(level=logging.INFO)  # Set the logging level
+logger = logging.getLogger(__name__)
+
 
 class DisambiguationTester(DatabaseTester):
     def __init__(self, config, database_section, start_date, end_date):
@@ -26,10 +31,10 @@ class DisambiguationTester(DatabaseTester):
                 disambiguated_id=self.disambiguated_id, entity_table=self.entity_table)
             entity_row_query = "SELECT count(*) from {entity_table} et".format(
                 entity_id=self.disambiguated_id, entity_table=self.entity_table)
-            print(entity_count_query)
+            logger.info(entity_count_query)
             count_cursor.execute(entity_count_query)
             entity_count_value = count_cursor.fetchall()[0][0]
-            print(entity_row_query)
+            logger.info(entity_row_query)
             count_cursor.execute(entity_row_query)
             entity_rows_value = count_cursor.fetchall()[0][0]
             ratio_to_self = round((entity_rows_value * 1.0) / entity_count_value, 3)
@@ -61,7 +66,7 @@ select count(*)
 from {db}.{self.entity_table} a
     inner join {db}.{self.disambiguated_table}_disambiguation_mapping_{self.end_date} b on a.{id}=b.uuid 
 where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
-                print(test_entity_id_updated_query)
+                logger.info(test_entity_id_updated_query)
                 if not self.connection.open:
                     self.connection.connect()
                 with self.connection.cursor() as g_cursor:
@@ -74,7 +79,7 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
         if 'related_entities' in self.table_config[table]:
             related_table_configs = self.table_config[table]["related_entities"]
             for related_table_config in related_table_configs:
-                print(f"\t\t\tLoading Top N Entities for {self.database_section}.{self.disambiguated_table} from {related_table_config['related_table']}")
+                logger.info(f"\t\t\tLoading Top N Entities for {self.database_section}.{self.disambiguated_table} from {related_table_config['related_table']}")
                 self.load_top_entities(table, related_table_config)
 
     def load_top_entities(self, table_name, related_table_config):
@@ -98,7 +103,7 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
             GROUP  BY 1
             ORDER  BY 2 DESC
             LIMIT 100"""
-            print(top_n_data_query)
+            logger.info(top_n_data_query)
             if not self.connection.open:
                 self.connection.connect()
             with self.connection.cursor() as top_cursor:
@@ -119,7 +124,7 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
 
 
     def test_invalid_id(self):
-        print(f"\tTesting Invalid Disambiguation IDs {self.disambiguated_table} in {self.database_section}")
+        logger.info(f"\tTesting Invalid Disambiguation IDs {self.disambiguated_table} in {self.database_section}")
         if self.entity_table == 'rawlawyer':
             invalid_query = f"""
             SELECT count(*)
@@ -130,22 +135,22 @@ where a.{self.disambiguated_id} != b.{self.disambiguated_id};"""
         else:
             invalid_query = f"""
             SELECT count(*)
-            from {self.disambiguated_table} dt
-                left join {self.entity_table} et on et.{self.disambiguated_id} = dt.id
+            from patent.{self.disambiguated_table} dt
+                left join patent.{self.entity_table} et on et.{self.disambiguated_id} = dt.id
                 left join {self.config['PATENTSVIEW_DATABASES']['PGPUBS_DATABASE']}.{self.entity_table} et2 on et2.{self.disambiguated_id} = dt.id
             where et.{self.disambiguated_id} is null
                 and et2.{self.disambiguated_id} is null
                 and et.version_indicator <= '{self.end_date}'
                 and et2.version_indicator <= '{self.end_date}';
             """
-        print(invalid_query)
+        logger.info(invalid_query)
         if not self.connection.open:
             self.connection.connect()
         with self.connection.cursor() as count_cursor:
             count_cursor.execute(invalid_query)
             count_value = count_cursor.fetchall()[0][0]
             if count_value > 0:
-                print(invalid_query)
+                logger.info(invalid_query)
                 raise Exception(f"There are {self.disambiguated_id} in {self.disambiguated_table} table that are not in {self.entity_table}")
 
     def remove_blank_assignees(self, table):
@@ -159,10 +164,10 @@ where organization is null and name_first is null and name_last is null;
         with self.connection.cursor() as cursor:
             cursor.execute(query)
             num_affected_rows = cursor.rowcount
-            print("Number of affected rows: ", num_affected_rows)
+            logger.info("Number of affected rows: ", num_affected_rows)
 
     def runTests(self):
-        print("Beginning Disambiguation Specific Tests")
+        logger.info("Beginning Disambiguation Specific Tests")
         self.test_entity_id_updated()
         self.init_qa_dict_disambig()
         self.test_invalid_id()
@@ -171,7 +176,7 @@ where organization is null and name_first is null and name_last is null;
             if "assignee_" in table and len(table) == 8:
                 self.remove_blank_assignees(table)
             if "disambiguation" not in table and "patent_" not in table:
-                print(f"\t\tBeginning Tests for {table}")
+                logger.info(f"\t\tBeginning Tests for {table}")
                 self.top_n_generator(table)
                 self.save_qa_data()
                 self.init_qa_dict_disambig()
