@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_cpc_at_issue`
     `cpc_subclass` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `cpc_group`    varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `cpc_type`     varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `action_date`  date                                   DEFAULT NULL
     PRIMARY KEY (`document_number`, `sequence`),
     KEY            `ix_cpc_current_subsection_id` (`cpc_class`),
     KEY            `ix_cpc_current_group_id` (`cpc_subclass`),
@@ -24,8 +25,8 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_cpc_at_issue`
 TRUNCATE TABLE `{{elastic_db}}`.publication_cpc_at_issue;
 
 insert into `{{elastic_db}}`.publication_cpc_at_issue
-    (document_number, sequence, cpc_section, cpc_class, cpc_subclass, cpc_group, cpc_type)
+    (document_number, sequence, cpc_section, cpc_class, cpc_subclass, cpc_group, cpc_type, action_date)
 SELECT 
-    c.document_number, c.sequence, c.section_id, c.subsection_id, c.group_id, c.subgroup_id, c.category
+    c.document_number, c.sequence, c.section_id, c.subsection_id, c.group_id, c.subgroup_id, c.category, c.action_date
 FROM `{{reporting_db}}`.cpc c
 JOIN `{{elastic_db}}`.publication p on p.document_number = c.document_number;
