@@ -249,8 +249,8 @@ def update_dis_location_mapping(config):
 def post_process_location(**kwargs):
     patent_config = get_current_config(schedule="quarterly", **kwargs)
     pgpubs_config = get_current_config(type='pgpubs', schedule="quarterly", **kwargs)
-    consolidate_location_disambiguation_quarterly(patent_config, **kwargs)
-    consolidate_location_disambiguation_quarterly(pgpubs_config, **kwargs)
+    consolidate_location_disambiguation_quarterly(patent_config)
+    consolidate_location_disambiguation_quarterly(pgpubs_config)
     # update_dis_location_mapping(patent_config)
     # update_dis_location_mapping(pgpubs_config)
     update_rawlocation(patent_config)
@@ -269,11 +269,14 @@ def post_process_qc(**kwargs):
 
 
 if __name__ == '__main__':
-    # post_process_location(**{
-    #         "execution_date": date(2023, 1, 1)
-    #         })
-    config = get_current_config(schedule="quarterly", **{
-            "execution_date": date(2023, 10, 1)
+    post_process_location(**{
+            "execution_date": date(2024, 4, 5)
             })
-    consolidate_location_disambiguation_quarterly(config)
+    # config = get_current_config(schedule="quarterly", **{
+    #         "execution_date": date(2023, 10, 1)
+    #         })
+    # consolidate_location_disambiguation_quarterly(config)
+
+
+
 
