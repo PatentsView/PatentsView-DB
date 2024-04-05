@@ -95,7 +95,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.entity_table = 'rawassignee'
         self.entity_id = 'uuid'
         self.disambiguated_id = 'assignee_id'
-        self.disambiguated_table = 'assignee'
+        self.disambiguated_table = 'assignee_'+ config['DATES']["END_DATE"]
         self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
         self.aggregator = 'main.organization'
         self.category = ""
