@@ -41,7 +41,7 @@ def find_cpc_schema_url():
     If there are multiple schema urls, sorting alphabetically ensures that the
     most recent schema is returned.
     """
-    base_url = 'http://www.cooperativepatentclassification.org'
+    base_url = 'https://www.cooperativepatentclassification.org'
     page = urllib.request.urlopen(base_url + '/cpcSchemeAndDefinitions/bulk')
     tree = html.fromstring(page.read())
     potential_links = []
@@ -215,6 +215,7 @@ if __name__ == '__main__':
     # collect_cpc_data(**{
     #     "execution_date": datetime.date(2021, 12, 30)
     # })
-    post_download(**{
-        "execution_date": datetime.date(2021, 12, 30)
-    })
+    # post_download(**{
+    #     "execution_date": datetime.date(2021, 12, 30)
+    # })
+    find_cpc_schema_url()
