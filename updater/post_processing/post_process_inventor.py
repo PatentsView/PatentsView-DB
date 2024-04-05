@@ -380,8 +380,8 @@ alter table gender_attribution.inventor_gender_{end_date}
 add KEY `inventor_id` (`inventor_id`)"""
     q_list.append(q12)
 
-    q13 = f"alter table gender_attribution.inventor_gender_{end_date} add index patent_id (patent_id)"
-    q_list.append(q13)
+    # q13 = f"alter table gender_attribution.inventor_gender_{end_date} add index patent_id (patent_id)"
+    # q_list.append(q13)
     for q in q_list:
         print(q)
         engine.execute(q)
