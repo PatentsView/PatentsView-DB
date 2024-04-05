@@ -837,13 +837,13 @@ def post_process_assignee_pgpubs_phase2_qc(**kwargs):
     qc.runDisambiguationTests()
 
 if __name__ == '__main__':
-    date = datetime.date(2023, 12, 31)
+    date = datetime.date(2024, 4, 5)
     # check_largest_clusters(**{
     #     "execution_date": date
     # })
-    # post_process_qc(**{
-    #     "execution_date": date
-    # })
+    post_process_qc(**{
+        "execution_date": date
+    })
 
     # additional_post_processing(**{
     #     "execution_date": date })
