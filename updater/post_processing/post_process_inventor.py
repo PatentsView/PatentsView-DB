@@ -305,6 +305,10 @@ def post_process_inventor_gender(**kwargs):
     q_list = []
     engine = create_engine(get_connection_string(config, 'RAW_DB'))
     # Takes ~21 minutes
+    q00 = f"""
+    DROP TABLE IF EXISTS gender_attribution.inventor_gender_{end_date}
+    """
+    q_list.append(q00)
     q0 = f"""
 create table gender_attribution.inventor_gender_{end_date}
 select inventor_id
