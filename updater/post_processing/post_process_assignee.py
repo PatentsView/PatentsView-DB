@@ -481,7 +481,7 @@ def additional_post_processing(**kwargs):
     suffix = config['DATES']['END_DATE']
     assignee_table = f"assignee_{suffix}"
     engine = create_engine(get_connection_string(config, "RAW_DB"))
-    #engine.execute("Drop table if exists assignee_reassignment_final")
+    engine.execute("Drop table if exists assignee_reassignment_final")
     assignee_data = pd.read_sql_table(assignee_table, con=engine)
     assignee_data = assignee_data.assign(gp=assignee_data.organization.str.lower().str[0:4])
     unique_assignees = assignee_data.gp.unique()
