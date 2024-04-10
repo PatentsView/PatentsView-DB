@@ -4,6 +4,6 @@
 {% set elastic_production_pgpubs_db = "elastic_production_pgpubs_" + prior_quarter_date %}
 
 
-drop database `{{elastic_production_patent_db}}` default character set=utf8mb4 default collate=utf8mb4_unicode_ci;
-drop database `{{elastic_production_pgpubs_db}}` default character set=utf8mb4 default collate=utf8mb4_unicode_ci;
-drop database `{{reporting_db}}` default character set=utf8mb4 default collate=utf8mb4_unicode_ci;
+drop database `{{elastic_production_patent_db}}` ;
+drop database `{{elastic_production_pgpubs_db}}` ;
+drop database `{{reporting_db}}` ;
