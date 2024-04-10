@@ -4,6 +4,6 @@
 {% set elastic_production_pgpub_db = "elastic_production_pgpub_" + prior_quarter_date %}
 
 
-# drop database `{{elastic_production_patent_db}}` ;
+drop database `{{elastic_production_patent_db}}` ;
 drop database `{{elastic_production_pgpub_db}}` ;
 drop database `{{reporting_db}}` ;
