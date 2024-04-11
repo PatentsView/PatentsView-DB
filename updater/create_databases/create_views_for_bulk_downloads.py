@@ -112,12 +112,62 @@ def read_create_view_dictionary(config):
         return json.load(f)
 
 
-# def update_persistent_view_columns(config):
-# 	"""
-# 	To complete - will update views for persistent tables (persistent_inventor, etc) to include new quarterly column names.
-# 	will hand-perform for 20220929 update
-# 	"""
-# 	pass
+def create_persistent_view_definition(view_name:str, engine:sqla.engine.Engine, end_date:str) -> str:
+    """
+    generates the view definition for the bulk download view for persistent entity tables.
+    :param view_name: The name of the view to be created.
+    :param engine (sqlalchemy.engine.base.Engine): SQLAlchemy database engine.
+    :param end_date (str): The end date for filtering data.
+
+    :return: SQL syntax for creating the specified view.
+    """
+    if view_name.startswith("patentsview_export_pregrant"):
+        base_doc_id = "document_number"
+        exp_doc_id = "pgpub_id"
+        base_schema = "pregrant_publications"
+    elif view_name.startswith("patentsview_export_granted"):
+        base_doc_id = "patent_id"
+        exp_doc_id = "patent_id"
+        base_schema = "patent"
+    else:
+        raise Exception(f"invalid persistent entity view name: `{view_name}`. Ensure the provided name includes both the schema and view name")
+    if view_name.endswith("assignee"):
+        ent_type = "assignee"
+    elif view_name.endswith("inventor"):
+        ent_type = "inventor"
+    else:
+        raise Exception(f"invalid persistent entity view name: `{view_name}`. Ensure the provided name includes both the schema and view name.")
+    inspector = sqla.inspect(engine)
+    fields = [
+        col["name"]
+        for col in inspector.get_columns(
+            table_name=f"persistent_{ent_type}_disambig", schema=base_schema
+        )
+    ]
+    id_fields = [
+        fld
+        for fld in fields
+        if fld.startswith(f"disamb_{ent_type}_id_")
+        and (re.search(r"\d{8}", fld).group(0) <= end_date)
+    ]
+    view_syntax = (
+        f"""
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW {view_name} AS 
+SELECT
+    `{base_schema}`.`persistent_{ent_type}_disambig`.`{base_doc_id}` AS `{exp_doc_id}`,
+    `{base_schema}`.`persistent_{ent_type}_disambig`.`sequence` AS `{ent_type}_sequence`,
+    """ + ",\n    ".join(
+            [
+                f"`{base_schema}`.`persistent_{ent_type}_disambig`.`{field}` AS `{field}`"
+                for field in sorted(id_fields)
+            ]
+        )
+        + f"""
+FROM `{base_schema}`.`persistent_{ent_type}_disambig`
+WHERE `{base_schema}`.`persistent_{ent_type}_disambig`.`version_indicator` <= '{end_date}'
+"""
+    )
+    return view_syntax
 
 
 def update_view_date_ranges(**kwargs):
@@ -140,8 +190,15 @@ def update_view_date_ranges(**kwargs):
     successful_updates = []
     for view in view_creations:
         try:
-            sql = view_creations[view].format(datestring=config["DATES"]["END_DATE"])
             print(f"UPDATING VIEW {view}")
+            if "persistent" in view:
+                sql = create_persistent_view_definition(
+                    view, view_creations[view], engine, config["DATES"]["END_DATE"]
+                )
+            else:
+                sql = view_creations[view].format(
+                    datestring=config["DATES"]["END_DATE"]
+                )
             print(sql)
             engine.execute(sql)
             successful_updates.append(view)
