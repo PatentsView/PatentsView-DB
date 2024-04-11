@@ -11,7 +11,7 @@ from QA.post_processing.ElasticDBTester  import run_elastic_db_qa
 # from QA.post_processing.BulkDownloadsTester import run_bulk_downloads_qa
 
 from updater.callbacks import airflow_task_failure, airflow_task_success
-from updater.create_databases.create_views_for_bulk_downloads import update_view_date_ranges #, update_persistent_view_columns
+from updater.create_databases.create_views_for_bulk_downloads import update_view_date_ranges
 from updater.create_databases.create_and_test_crosswalk import create_outer_patent_publication_crosswalk, qc_crosswalk
 
 
