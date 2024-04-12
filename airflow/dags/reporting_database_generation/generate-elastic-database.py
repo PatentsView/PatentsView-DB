@@ -413,14 +413,14 @@ endpoint_rel_app_text_pgpub = SQLTemplatedPythonOperator(
 elastic_patent_db_qa = PythonOperator(
     task_id='elastic_patent_DB_QA',
     python_callable=run_elastic_db_qa,
-    op_kwargs={'type': 'granted_patent'},  # Pass 'type' as a variable
+    op_kwargs={'db_type': 'granted_patent'},  # Pass 'type' as a variable
     dag=elastic_prep_dag
 )
 
 elastic_pgpubs_db_qa = PythonOperator(
     task_id='elastic_pgpubs_DB_QA',
     python_callable=run_elastic_db_qa,
-    op_kwargs={'type': 'pgpubs'},  # Pass 'type' as a variable
+    op_kwargs={'db_type': 'pgpubs'},  # Pass 'type' as a variable
     dag=elastic_prep_dag
 )
 
