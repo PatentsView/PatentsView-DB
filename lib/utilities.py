@@ -55,6 +55,8 @@ def class_db_specific_config(self, table_config, class_called):
 
 
 def load_table_config(config, db='patent'):
+    print(db)
+    print(config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"])
     root = config["FOLDERS"]["project_root"]
     resources = config["FOLDERS"]["resources_folder"]
     if db == 'patent':
