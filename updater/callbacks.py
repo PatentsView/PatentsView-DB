@@ -10,6 +10,8 @@ def airflow_task_success(context):
             "execution_date": context['task_instance'].execution_date
             })
     header = get_section(context['task_instance'].dag_id, context['task'].task_id)
+    print(f'dag id: {context["task_instance"].dag_id}')
+    print(f'task id: {context["task"].task_id}')
     print(f'this is the header: {header}')
     if header is not None:
         section = "{header} - {dt}".format(header=header, dt=config['DATES']['END_DATE'])
