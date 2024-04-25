@@ -4,11 +4,13 @@ from lib.notifications import send_slack_notification
 
 
 def airflow_task_success(context):
+    print("we are within the airflow task success")
     from lib.configuration import get_current_config
     config = get_current_config(**{
             "execution_date": context['task_instance'].execution_date
             })
     header = get_section(context['task_instance'].dag_id, context['task'].task_id)
+    print(f'this is the header: {header}')
     if header is not None:
         section = "{header} - {dt}".format(header=header, dt=config['DATES']['END_DATE'])
 
