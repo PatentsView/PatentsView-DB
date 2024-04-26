@@ -67,12 +67,15 @@ granted_patent_parser = DAG(
     template_searchpath=templates_searchpath,
 )
 
-# operator_settings = {
-#     'dag': granted_patent_parser,
-#     'on_success_callback': airflow_task_success,
-#     'on_failure_callback': airflow_task_failure,
-#     'on_retry_callback': airflow_task_failure
-# }
+
+
+operator_settings = {
+    'dag': granted_patent_parser,
+    'on_success_callback': airflow_task_success,
+    'on_failure_callback': airflow_task_failure,
+    'on_retry_callback': airflow_task_failure
+}
+
 operator_sequence_groups = {}
 # ##### Start Instance #####
 # instance_starter = PythonOperator(task_id='start_data_collector', python_callable=start_data_collector_instance,
