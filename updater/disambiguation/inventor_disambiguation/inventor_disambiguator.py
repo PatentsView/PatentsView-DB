@@ -31,6 +31,13 @@ def build_coinventor_features(**kwargs):
     pv.disambiguation.inventor.build_coinventor_features_consolidated.generate_coinventor_mentions(config)
 
 
+def build_coperson_features(**kwargs):
+    config = get_disambig_config(schedule='quarterly',
+                                 supplemental_configs=['config/new_consolidated_config.ini'],
+                                 **kwargs)
+    pv.disambiguation.inventor.build_coperson_features.generate_coperson_mentions(config)
+
+
 def build_title_map(**kwargs):
     config = get_disambig_config(schedule='quarterly',
                                  supplemental_configs=['config/new_consolidated_config.ini'],
