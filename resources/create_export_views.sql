@@ -253,11 +253,16 @@ select `patent`.`patent`.`id` AS `patent_id`,
 `patent`.`patent`.`type` AS `patent_type`,
 `patent`.`patent`.`date` AS `patent_date`,
 `patent`.`patent`.`title` AS `patent_title`,
-`patent`.`patent`.`abstract` AS `patent_abstract`,
 `patent`.`patent`.`kind` AS `wipo_kind`,
 `patent`.`patent`.`num_claims` AS `num_claims`,
 `patent`.`patent`.`withdrawn` AS `withdrawn`,
 `patent`.`patent`.`filename` AS `filename` 
+from `patent`.`patent` 
+where `patent`.`patent`.`version_indicator` <= '{{datestring}}';
+
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_patent_abstract` AS 
+select `patent`.`patent`.`id` AS `patent_id`,
+`patent`.`patent`.`abstract` AS `patent_abstract`,
 from `patent`.`patent` 
 where `patent`.`patent`.`version_indicator` <= '{{datestring}}';
 
@@ -677,12 +682,17 @@ select `b`.`document_number` AS `pgpub_id`,
 `a`.`kind` AS `wipo_kind`,
 `b`.`series_code` AS `series_code`,
 `b`.`invention_title` AS `application_title`,
-`b`.`invention_abstract` AS `application_abstract`,
 `b`.`rule_47_flag` AS `rule_47_flag`,
 `b`.`filename` AS `filename` 
 from (`pregrant_publications`.`publication` `a` 
 join `pregrant_publications`.`application` `b` on(`a`.`document_number` = `b`.`document_number`)) 
 where `a`.`version_indicator` <= '{{datestring}}';
+
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_published_application_abstract` AS 
+select `pregrant_publications`.`application`.`document_number` AS `pgpub_id`,
+`pregrant_publications`.`application`.`invention_abstract` AS `application_abstract`,
+from `pregrant_publications`.`application`
+where `pregrant_publications`.`application`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_rel_app_text` AS 
 select `pregrant_publications`.`rel_app_text`.`document_number` AS `pgpub_id`,
