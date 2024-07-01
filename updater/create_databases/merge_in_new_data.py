@@ -289,7 +289,7 @@ def post_merge_weekly_granted(**kwargs):
 def post_merge_quarterly_granted(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     run_id = kwargs.get('run_id')
-    qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
+    qc = MergeTestQuarterly(config)
     qc.runStandardTests()
 
 def post_merge_weekly_pgpubs( **kwargs):
@@ -301,7 +301,7 @@ def post_merge_weekly_pgpubs( **kwargs):
 def post_merge_quarterly_pgpubs(**kwargs):
     config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     run_id = kwargs.get('run_id')
-    qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
+    qc = MergeTestQuarterly(config)
     qc.runStandardTests()
 
 
