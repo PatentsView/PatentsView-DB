@@ -193,7 +193,7 @@ def update_view_date_ranges(**kwargs):
             print(f"UPDATING VIEW {view}")
             if "persistent" in view:
                 sql = create_persistent_view_definition(
-                    view, view_creations[view], engine, config["DATES"]["END_DATE"]
+                    view, engine, config["DATES"]["END_DATE"]
                 )
             else:
                 sql = view_creations[view].format(
