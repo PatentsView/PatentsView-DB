@@ -108,11 +108,11 @@ def cleaning(data):
 #         environment_type = "PROD"
 def run_location_flatfile(**kwargs):
     go_live_path = "/project/go_live"
+    print(f'Go live path is: {go_live_path}')
     config = get_current_config('granted_patent', schedule='quarterly', **{
         "execution_date": kwargs['execution_date']
     })
     print(f'Current config is: {config}')
-    print(f'Go live path is: {go_live_path}')
     engine = create_engine(get_connection_string(config, database='REPORTING_DATABASE'))
     root_engine = create_engine(get_unique_connection_string(config, database="_root" ,connection="APP_DATABASE_SETUP"))
     
