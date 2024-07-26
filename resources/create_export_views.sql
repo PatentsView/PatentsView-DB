@@ -262,7 +262,7 @@ where `patent`.`patent`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_granted`.`g_patent_abstract` AS 
 select `patent`.`patent`.`id` AS `patent_id`,
-`patent`.`patent`.`abstract` AS `patent_abstract`,
+`patent`.`patent`.`abstract` AS `patent_abstract`
 from `patent`.`patent` 
 where `patent`.`patent`.`version_indicator` <= '{{datestring}}';
 
@@ -690,7 +690,7 @@ where `a`.`version_indicator` <= '{{datestring}}';
 
 CREATE OR REPLACE SQL SECURITY INVOKER VIEW `patentsview_export_pregrant`.`pg_published_application_abstract` AS 
 select `pregrant_publications`.`application`.`document_number` AS `pgpub_id`,
-`pregrant_publications`.`application`.`invention_abstract` AS `application_abstract`,
+`pregrant_publications`.`application`.`invention_abstract` AS `application_abstract`
 from `pregrant_publications`.`application`
 where `pregrant_publications`.`application`.`version_indicator` <= '{{datestring}}';
 
