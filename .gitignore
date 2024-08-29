@@ -44,3 +44,4 @@ scratch
 pgpubs_*
 resources/sql.conf
 config.ini
+*.code-workspace

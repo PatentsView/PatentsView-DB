@@ -1,3 +1,29 @@
+"""
+Module Name: inventor_assignee_disambiguation.py
+Description: This module defines tasks and organizes workflows in the Airflow inventor_assignee_disambiguation DAG
+Author: PatentsView
+Date: 2024-07-29
+
+Defines the following tasks are organizes them in the DAG workflow:
+    post_process_location, qc_post_process_location, Inventor_Assignee_Disambiguation_Setup, Assignee_Build_Assignee_Name_Mentions_Canopies,
+    Inventor_Build_Titles, augment_location_fips, archive_location_tables, Inventor_Build_Assignee_Features, Inventor_Build_Inventor_Canopies,
+    QA_Assignee_Name_Mentions_Canopies, Inventor_Build_Co-Inventor_Features, Assignee_Run_Clustering, Inventor_Run_Clustering, archive_inventor_tables,
+    Assignee_Create_UUID_Map, Assignee_Finalize_Results, Inventor_Finalize, Assignee_Upload_Results, archive_assignee_tables, Inventor_Upload_Inventor_Results,
+    Assignee_Archive_Assignee_Results, Inventor_Archive_Inventor_Results, Inventor_update_pregranted_rawinventor, assignee_update_pregranted_rawassignee,
+    Inventor_update_granted_rawinventor, assignee_update_granted_rawassignee, Inventor_precache_inventors, assignee_precache_assignees,
+    Inventor_create_canonical_inventors, assignee_create_canonical_assignees, patent_inventor_gender, pgpubs_inventor_gender, inventor_gender_post_processing,
+    qc_post_process_inventor_pgpubs, assignee_additional_post_processing, qc_post_process_assignee, qc_post_process_inventor, Inventor_create_patent_inventor,
+    Inventor_create_pgpubs_inventor, assignee_create_patent_assignee, qc_post_process_assignee_pgpubs, assignee_create_patent_loc_assignee,
+    Inventor_create_patent_location_inventor, Inventor_create_pgpubs_location_inventor, prepare_granted_persistent_wide_assignee,
+    prepare_granted_persistent_wide_inventor, prepare_pregranted_persistent_wide_inventor, assignee_create_pgpubs_assignee, assignee_create_pgpubs_loc_assignee,
+    create_granted_persistent_wide_assignee, create_granted_persistent_wide_inventor, prepare_pregrant_persistent_wide_assignee,
+    create_pregranted_persistent_wide_inventor, qc_post_process_assignee_patent_phase2, qc_post_process_inventor_patent_phase2,
+    qc_post_process_inventor_pgpubs_phase2, create_pregrant_persistent_wide_assignee, qc_post_process_assignee_pgpubs_phase2, 
+
+
+All methods are inherited from this repo or the PatentsView-Disambiguation repo.
+"""
+
 import os
 from datetime import datetime, timedelta
 
