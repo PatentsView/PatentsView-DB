@@ -193,6 +193,14 @@ SELECT c.uuid,
 from {temp_db}.claims_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
                    on tce.patent_id = c.patent_id and tce.exemplary = c.claim_sequence
+on duplicate key update
+	`uuid` = VALUES(`uuid`),
+	`claim_number` = VALUES(`claim_number`),
+	`claim_text` = VALUES(`claim_text`),
+	`claim_sequence` = VALUES(`claim_sequence`),
+	`dependent` = VALUES(`dependent`),
+	`exemplary` = VALUES(`exemplary`),
+	`version_indicator` = VALUES(`version_indicator`)
                     """
                     },
 
