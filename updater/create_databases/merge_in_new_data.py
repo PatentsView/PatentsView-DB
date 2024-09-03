@@ -171,6 +171,10 @@ def begin_text_merging(**kwargs):
 INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, summary_text, version_indicator)
 SELECT uuid, patent_id, summary_text, version_indicator
 from {temp_db}.brf_sum_text_{year}
+on duplicate key update
+	`uuid` = VALUES(`uuid`),
+	`summary_text` = VALUES(`summary_text`),
+	`version_indicator` = VALUES(`version_indicator`)
                     """
                     },
 
