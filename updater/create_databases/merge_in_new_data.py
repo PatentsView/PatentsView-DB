@@ -217,6 +217,11 @@ from {temp_db}.draw_desc_text_{year}
 INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, description_text, description_length, version_indicator)
 SELECT uuid, patent_id, description_text, char_length(description_text), version_indicator
 from {temp_db}.detail_desc_text_{year}
+on duplicate key update
+	`uuid` = VALUES(`uuid`),
+	`description_text` = VALUES(`description_text`),
+	`description_length` = VALUES(`description_length`),
+	`version_indicator` = VALUES(`version_indicator`)
                               """
                     },
 
