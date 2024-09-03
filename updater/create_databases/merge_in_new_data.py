@@ -57,9 +57,7 @@ where c.TABLE_SCHEMA = '{database}'
   and COLUMN_NAME not in ('created_date', 'updated_date')            
             """.format(database=upload_db, table=table_name))
     field_list = field_list_cursor.fetchall()[0][0]
-    fields = field_list.split('`, `')
-    on_duplicate_key_update_clause = ', '.join([f"`{field}` = VALUES(`{field}`)" for field in fields])
-
+    on_duplicate_key_update_clause = ', '.join([f"`{field.strip('`')}` = VALUES(`{field.strip('`')}`)" for field in field_list.split(', ')])
     table_data_count = engine.execute("SELEcT count(1) from " + upload_db + "." + table_name).fetchall()[0][0]
     with engine.begin() as connection:
         limit = 50000
