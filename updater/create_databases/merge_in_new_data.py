@@ -226,7 +226,14 @@ on duplicate key update
                     },
 
             'detail_desc_length': {
-                    "insert": f"INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(description_text), version_indicator from {temp_db}.detail_desc_text_{year}"
+                    "insert": f"""
+INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) 
+SELECT  patent_id, CHAR_LENGTH(description_text), version_indicator 
+from {temp_db}.detail_desc_text_{year}
+on duplicate key update
+	`detail_desc_length` = VALUES(`detail_desc_length`),
+	`version_indicator` = VALUES(`version_indicator`)
+                            """
                     }
             }
     merge_text_data(text_table_config, config)
