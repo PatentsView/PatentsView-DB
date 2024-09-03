@@ -57,6 +57,9 @@ where c.TABLE_SCHEMA = '{database}'
   and COLUMN_NAME not in ('created_date', 'updated_date')            
             """.format(database=upload_db, table=table_name))
     field_list = field_list_cursor.fetchall()[0][0]
+    fields = field_list.split('`, `')
+    on_duplicate_key_update_clause = ', '.join([f"`{field}` = VALUES(`{field}`)" for field in fields])
+
     table_data_count = engine.execute("SELEcT count(1) from " + upload_db + "." + table_name).fetchall()[0][0]
     with engine.begin() as connection:
         limit = 50000
@@ -73,9 +76,11 @@ SELECT {field_list}
 FROM {upload_database}.{table_name}
 {order_clause}
 limit {limit} offset {offset}
+ON DUPLICATE KEY UPDATE {on_duplicate_key_update_clause}
             """.format(insert_clause=insert_clause, raw_database=raw_db, table_name=table_name, field_list=field_list,
                        upload_database=upload_db,
-                       order_clause=order_by_clause, limit=limit, offset=offset)
+                       order_clause=order_by_clause, limit=limit, offset=offset,
+                       on_duplicate_key_update_clause=on_duplicate_key_update_clause)
             print(insert_table_command, flush=True)
             start = time.time()
 
