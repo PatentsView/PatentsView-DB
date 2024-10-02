@@ -198,7 +198,6 @@ from {temp_db}.claims_{year} c
                    on tce.patent_id = c.patent_id and tce.exemplary = c.claim_sequence
 on duplicate key update
 	`uuid` = VALUES(`uuid`),
-	`claim_number` = VALUES(`claim_number`),
 	`claim_text` = VALUES(`claim_text`),
 	`claim_sequence` = VALUES(`claim_sequence`),
 	`dependent` = VALUES(`dependent`),
