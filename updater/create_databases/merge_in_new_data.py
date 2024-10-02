@@ -199,7 +199,6 @@ from {temp_db}.claims_{year} c
 on duplicate key update
 	`uuid` = VALUES(`uuid`),
 	`claim_text` = VALUES(`claim_text`),
-	`claim_sequence` = VALUES(`claim_sequence`),
 	`dependent` = VALUES(`dependent`),
 	`exemplary` = VALUES(`exemplary`),
 	`version_indicator` = VALUES(`version_indicator`)
