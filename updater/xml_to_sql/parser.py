@@ -339,7 +339,8 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
             dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         try:
-            dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
+            #dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
+            dfs[df].to_sql(df, con=engine, if_exists='replace', index=False)
         except Exception as e:
             log_queue.put({
                     "level":   logging.ERROR,
