@@ -339,22 +339,25 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
             dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         try:
-            #dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
-            dfs[df].to_sql(df, con=engine, if_exists='replace', index=False)
-        except Exception as e:
-            log_queue.put({
-                    "level":   logging.ERROR,
-                    "message": "{xml_file}: Error when writing to database : {error}".format(
-                            xml_file=xml_file_name,
-                            error=pprint.pformat(
-                                    e))
-                    })
+            dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
+            #dfs[df].to_sql(df, con=engine, if_exists='replace', index=False)
+        except:
+            try:
+                dfs[df].to_sql(df, con=engine, if_exists='replace', index=False)
+            except Exception as e:
+                log_queue.put({
+                        "level":   logging.ERROR,
+                        "message": "{xml_file}: Error when writing to database : {error}".format(
+                                xml_file=xml_file_name,
+                                error=pprint.pformat(
+                                        e))
+                        })
 
-            dfs[df].to_csv(
-                    "{folder}/{xml_file}_{entity}.csv".format(folder=text_output_folder, xml_file=xml_file_name,
-                                                              entity=df), sep=",",
-                    quotechar='"', quoting=csv.QUOTE_NONNUMERIC, index=False)
-            raise e
+                dfs[df].to_csv(
+                        "{folder}/{xml_file}_{entity}.csv".format(folder=text_output_folder, xml_file=xml_file_name,
+                                                                entity=df), sep=",",
+                        quotechar='"', quoting=csv.QUOTE_NONNUMERIC, index=False)
+                raise e
     log_queue.put({
             "level":   logging.INFO,
             "message": "XML Document {xml_file} took {duration} seconds to load to SQL".format(
