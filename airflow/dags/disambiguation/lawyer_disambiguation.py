@@ -66,7 +66,7 @@ prepare_rawlawyer_table = PythonOperator(task_id='prepare_rawlawyer_table',
                                          dag=disambiguation,
                                          on_success_callback=airflow_task_success,
                                          on_failure_callback=airflow_task_failure,
-                                         queue='disambiguator')
+                                         queue='data_collector')
 clean_rawlawyer_table = PythonOperator(task_id='clean_rawlawyer_table',
                                        python_callable=clean_rawlawyer,
                                        provide_context=True,
