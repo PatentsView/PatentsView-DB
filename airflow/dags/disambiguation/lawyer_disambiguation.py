@@ -73,14 +73,14 @@ clean_rawlawyer_table = PythonOperator(task_id='clean_rawlawyer_table',
                                        dag=disambiguation,
                                        on_success_callback=airflow_task_success,
                                        on_failure_callback=airflow_task_failure,
-                                       queue='disambiguator')
+                                       queue='data_collector')
 load_clean_rawlawyer_table = PythonOperator(task_id='load_clean_rawlawyer_table',
                                             python_callable=load_clean_rawlawyer,
                                             provide_context=True,
                                             dag=disambiguation,
                                             on_success_callback=airflow_task_success,
                                             on_failure_callback=airflow_task_failure,
-                                            queue='disambiguator')
+                                            queue='data_collector')
 lawyer_disambiguation = PythonOperator(task_id='lawyer_disambiguation',
                                        python_callable=start_lawyer_disambiguation,
                                        provide_context=True,
