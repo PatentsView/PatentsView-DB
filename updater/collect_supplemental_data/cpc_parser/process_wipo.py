@@ -13,10 +13,11 @@ def get_ipc_tech_code_field_map(ipc_tech_file):
     # Read in the CSV file
     ipc_technology_data = pd.read_csv(ipc_tech_file, dtype=str)
     # Remove trailing % (likely wildcard format)
-    cleaned_ipc_tech_data = ipc_technology_data.assign(
-        IPC_Code_stripped=ipc_technology_data.IPC_code.str.replace("%", "").str.replace(' ', ''))
+    ipc_technology_data['IPC_Code_stripped'] = ipc_technology_data['IPC_code'].apply(lambda x: x.split(' ')[0].replace('%','').strip())
+    #cleaned_ipc_tech_data = ipc_technology_data.assign(
+    #    IPC_Code_stripped=ipc_technology_data.IPC_code.str.replace("%", "").str.replace(' ', ''))
     # Select and Rename columns
-    ipc_tech_map_frame = cleaned_ipc_tech_data[[
+    ipc_tech_map_frame = ipc_technology_data[[
         "IPC_Code_stripped", "Field_number"
     ]].rename({
         "IPC_Code_stripped": "IPC_Code"
