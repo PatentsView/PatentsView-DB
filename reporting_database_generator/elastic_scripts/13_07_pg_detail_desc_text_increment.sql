@@ -7,8 +7,8 @@ use `{{elastic_db}}`;
 
 create or replace sql security invoker view `{{elastic_db}}`.pg_detail_desc_text_delta as
 select
-    uuid,
-    document_number,
+    id as uuid,
+    pgpub_id as document_number,
     description_text,
     description_length,
     version_indicator as document_date

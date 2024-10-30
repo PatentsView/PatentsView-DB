@@ -18,6 +18,6 @@ select
 
 
 from
-    `patent_text`.`claim_{{update_year}}` pt
+    `patent_text`.`claims_{{update_year}}` pt
 
 where pt.version_indicator BETWEEN '{{update_start_date}}' and '{{update_end_date}}'

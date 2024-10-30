@@ -7,16 +7,15 @@ use `{{elastic_db}}`;
 
 create or replace sql security invoker view `{{elastic_db}}`.pg_claim_delta as
 select
-    uuid,
-    document_number,
+    id as uuid,
+    pgpub_id as document_number,
     claim_sequence,
     claim_text,
     `dependent` as claim_dependent,
     claim_number,
     version_indicator as document_date
 
-
 from
-    `pgpubs_text`.`claim_{{update_year}}` pt
+    `pgpubs_text`.`claims_{{update_year}}` pt
 
 where pt.version_indicator BETWEEN '{{update_start_date}}' and '{{update_end_date}}'
