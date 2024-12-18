@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_inventor`
     `sequence`               int(11)                                NOT NULL,
     `name_first`             varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `name_last`              varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `gender_code`            varchar(1)  COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
     `city`                   varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `state`                  varchar(20) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
     `country`                varchar(10) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
@@ -24,21 +25,22 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_inventor`
 
 TRUNCATE TABLE `{{elastic_db}}`.`publication_inventor`;
 
-insert into `{{elastic_db}}`.publication_inventor ( inventor_id, document_number, sequence, name_first, name_last
-                                                          , city, state
-                                                          , country, location_id)
+insert into `{{elastic_db}}`.publication_inventor ( inventor_id, document_number, sequence, name_first, name_last, gender_code
+                                                          , city, state, country, location_id)
 
 select pi.inventor_id
      , pi.document_number
      , pi.sequence
      , i.name_first
      , i.name_last
+     , g.gender_flag
      , l.city
      , l.state
      , l.country
      , pi.location_id
 from `{{reporting_db}}`.publication_inventor pi
          join patent.inventor_{{version_indicator}} i on i.id = pi.inventor_id
+         left join gender_attribution.inventor_gender{{version_indicator}} g on pi.inventor_id = g.inventor_id 
          left join patent.location_{{version_indicator}} l on l.location_id = pi.location_id
          join `{{elastic_db}}`.publication p on p.document_number = pi.document_number;
 
