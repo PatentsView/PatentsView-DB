@@ -268,6 +268,7 @@ create table `{{reporting_db}}`.`patent`
   `abstract` text null,
   `title` text null,
   `kind` varchar(10) null,
+  `withdrawn` tinyint(1) not null default 0,
   `num_claims` smallint unsigned null,
   `firstnamed_assignee_id` int unsigned null,
   `firstnamed_assignee_persistent_id` varchar(64) null,
@@ -305,7 +306,7 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 insert into `{{reporting_db}}`.`patent`
 (
   `patent_id`, `type`, `number`, `country`, `date`, `year`,
-  `abstract`, `title`, `kind`, `num_claims`,
+  `abstract`, `title`, `kind`, `withdrawn`, `num_claims`,
   `firstnamed_assignee_id`, `firstnamed_assignee_persistent_id`,
   `firstnamed_assignee_location_id`, `firstnamed_assignee_persistent_location_id`,
   `firstnamed_assignee_city`, `firstnamed_assignee_state`,
@@ -328,7 +329,7 @@ insert into `{{reporting_db}}`.`patent`
 select
   p.`id`, case when ifnull(p.`type`, '') = 'sir' then 'statutory invention registration' else nullif(trim(p.`type`), '') end,
   `number`, nullif(trim(p.`country`), ''), tpd.`date`, year(tpd.`date`),
-  nullif(trim(p.`abstract`), ''), nullif(trim(p.`title`), ''), nullif(trim(p.`kind`), ''), p.`num_claims`,
+  nullif(trim(p.`abstract`), ''), nullif(trim(p.`title`), ''), nullif(trim(p.`kind`), ''), p.`withdrawn`, p.`num_claims`,
   tpfna.`assignee_id`, tpfna.`persistent_assignee_id`, tpfna.`location_id`,
   tpfna.`persistent_location_id`, tpfna.`city`,
   tpfna.`state`, tpfna.`country`, tpfna.`latitude`, tpfna.`longitude`,

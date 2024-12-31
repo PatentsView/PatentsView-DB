@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patents`
     `detail_desc_length`                                    int(10) unsigned DEFAULT NULL,
     `gi_statement`                                          text                                    default null,
     `patent_zero_prefix`                                    varchar(20) COLLATE utf8mb4_unicode_ci,
+    `withdrawn`                                             tinyint(1) NOT NULL DEFAULT 0
     PRIMARY KEY (`patent_id`),
     KEY                                                     `ix_patent_number` (`number`),
     KEY                                                     `ix_patent_title` (`title`(128)),
@@ -53,7 +54,7 @@ insert into `{{elastic_db}}`.patents ( patent_id, type, number, country, date, y
                                                   , uspc_current_mainclass_average_patent_processing_days
                                                   , cpc_current_group_average_patent_processing_days
                                                   , term_extension
-                                                  , detail_desc_length, gi_statement, patent_zero_prefix)
+                                                  , detail_desc_length, gi_statement, patent_zero_prefix, withdrawn)
 select p.patent_id
      , p.type
      , number
@@ -77,6 +78,7 @@ select p.patent_id
      , detail_desc_length
      , gi_statement
      , pe.patent_id_eight_char
+     , p.withdrawn
 from `{{reporting_db}}`.patent p
     left join `{{reporting_db}}`.government_interest gi
 on gi.patent_id = p.patent_id
