@@ -535,7 +535,7 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
         print(year_xml_page)
         r = requests.get(year_xml_page)
         soup = BeautifulSoup(r.content, "html.parser")
-        links = soup.find_all("a", href=re.compile(r"[0-9]{6}(_r\d)?\.zip"))
+        links = soup.find_all("a", href=re.compile(r".*[0-9]{6}(_r\d)?\.zip"))
         idx_counter = 0
         for link in links:
             href = link.attrs['href']
