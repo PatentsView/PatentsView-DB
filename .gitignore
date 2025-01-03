@@ -5,8 +5,9 @@ Assignee_Lawyer_Disambiguation/lib/config.py
 .DS_Store
 venv
 .idea
-docker-compose.yaml
-docker-compose-debug.yaml
+.vscode
+*.yml
+*.yaml
 mydumper/
 Development/config.ini
 airflow/airflow-webserver.pid
@@ -44,3 +45,6 @@ scratch
 pgpubs_*
 resources/sql.conf
 config.ini
+airflow-metadata-*
+patent_db_disk/
+TableToggle.json
