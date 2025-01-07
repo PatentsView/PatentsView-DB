@@ -199,7 +199,7 @@ def consolidate_location_disambiguation_quarterly(config):
     # quarter_start, quarter_end = get_update_range(kwargs['execution_date'])
     print(f"consolidating location disambiguation tables for date range {quarter_start} to {quarter_end}")
     weekly_prefix = config['PATENTSVIEW_DATABASES'][f"{dbtype}_upload_db"]
-    db_list = [db for db in inspector.get_schema_names() if re.fullmatch(f"{weekly_prefix}\\d{{8}}", db) and quarter_start <= db[-8:] < quarter_end]
+    db_list = [db for db in inspector.get_schema_names() if re.fullmatch(f"{weekly_prefix}\\d{{8}}", db) and quarter_start <= db[-8:] <= quarter_end]
     print(f"{len(db_list)} databases identified in range: {db_list}")
     expected_db_count = weekday_count(datetime.strptime(quarter_start, '%Y%m%d').date(), datetime.strptime(quarter_end, '%Y%m%d').date())['Thursday' if dbtype == 'pgpubs' else 'Tuesday']
     if len(db_list) != expected_db_count:
