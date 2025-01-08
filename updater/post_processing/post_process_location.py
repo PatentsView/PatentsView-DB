@@ -202,6 +202,8 @@ def consolidate_location_disambiguation_quarterly(config):
     db_list = [db for db in inspector.get_schema_names() if re.fullmatch(f"{weekly_prefix}\\d{{8}}", db) and quarter_start <= db[-8:] <= quarter_end]
     print(f"{len(db_list)} databases identified in range: {db_list}")
     expected_db_count = weekday_count(datetime.strptime(quarter_start, '%Y%m%d').date(), datetime.strptime(quarter_end, '%Y%m%d').date())['Thursday' if dbtype == 'pgpubs' else 'Tuesday']
+    if dbtype == 'pgpubs':
+        expected_db_count += 1
     if len(db_list) != expected_db_count:
         raise Exception(f"number of weekly DBs does not match expected value:\n{len(db_list)} weekly DBs observed; {expected_db_count} weekly DBs expected.")
 
