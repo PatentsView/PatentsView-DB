@@ -222,6 +222,11 @@ def consolidate_location_disambiguation_quarterly(config):
     engine.execute(quarter_map_create)
 
     for weekly_db in db_list:
+        if weekly_db.endswith(quarter_end) and weekly_db == db_list[-1]:
+            logger.info(f"Skipping database {weekly_db} as it matches the quarter end date.")
+            continue
+
+        logger.info(f"Processing weekly database: {weekly_db}")
         incorporate_week_query = f"""
             INSERT INTO {prod_db}.location_disambiguation_mapping_{quarter_end} 
             (id, location_id, version_indicator)
