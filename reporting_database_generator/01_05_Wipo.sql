@@ -7,7 +7,7 @@
 
 DROP TABLE IF EXISTS `{{reporting_db}}`.`wipo`;
 CREATE TABLE  `{{reporting_db}}`.`wipo` (
-   `patent_id` varchar(20) NOT NULL,
+   `patent_id` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
    `field_id` int(11) DEFAULT NULL,
    `sequence` int(11) unsigned NOT NULL,
    PRIMARY KEY (`patent_id`,`sequence`),
