@@ -354,7 +354,48 @@ from
   left outer join `{{reporting_db}}`.`temp_patent_earliest_application_date` tpead on tpead.`patent_id` = p.`id`
   left outer join `patent`.`us_term_of_grant` ustog on ustog.`patent_id`=p.`id`
   left outer join `patent`.`detail_desc_length` ddl on ddl.`patent_id` = p.`id`
- where  p.version_indicator<='{{version_indicator}}';
+ where  p.version_indicator<='{{version_indicator}}'
+ ON DUPLICATE KEY UPDATE
+        `type` = VALUES(`type`),
+        `number` = VALUES(`number`),
+        `country` = VALUES(`country`),
+        `date` = VALUES(`date`),
+        `year` = VALUES(`year`),
+        `abstract` = VALUES(`abstract`),
+        `title` = VALUES(`title`),
+        `kind` = VALUES(`kind`),
+        `withdrawn` = VALUES(`withdrawn`),
+        `num_claims` = VALUES(`num_claims`),
+        `firstnamed_assignee_id` = VALUES(`firstnamed_assignee_id`),
+        `firstnamed_assignee_persistent_id` = VALUES(`firstnamed_assignee_persistent_id`),
+        `firstnamed_assignee_location_id` = VALUES(`firstnamed_assignee_location_id`),
+        `firstnamed_assignee_persistent_location_id` = VALUES(`firstnamed_assignee_persistent_location_id`),
+        `firstnamed_assignee_city` = VALUES(`firstnamed_assignee_city`),
+        `firstnamed_assignee_state` = VALUES(`firstnamed_assignee_state`),
+        `firstnamed_assignee_country` = VALUES(`firstnamed_assignee_country`),
+        `firstnamed_assignee_latitude` = VALUES(`firstnamed_assignee_latitude`),
+        `firstnamed_assignee_longitude` = VALUES(`firstnamed_assignee_longitude`),
+        `firstnamed_inventor_id` = VALUES(`firstnamed_inventor_id`),
+        `firstnamed_inventor_persistent_id` = VALUES(`firstnamed_inventor_persistent_id`),
+        `firstnamed_inventor_location_id` = VALUES(`firstnamed_inventor_location_id`),
+        `firstnamed_inventor_persistent_location_id` = VALUES(`firstnamed_inventor_persistent_location_id`),
+        `firstnamed_inventor_city` = VALUES(`firstnamed_inventor_city`),
+        `firstnamed_inventor_state` = VALUES(`firstnamed_inventor_state`),
+        `firstnamed_inventor_country` = VALUES(`firstnamed_inventor_country`),
+        `firstnamed_inventor_latitude` = VALUES(`firstnamed_inventor_latitude`),
+        `firstnamed_inventor_longitude` = VALUES(`firstnamed_inventor_longitude`),
+        `num_foreign_documents_cited` = VALUES(`num_foreign_documents_cited`),
+        `num_us_applications_cited` = VALUES(`num_us_applications_cited`),
+        `num_us_patents_cited` = VALUES(`num_us_patents_cited`),
+        `num_total_documents_cited` = VALUES(`num_total_documents_cited`),
+        `num_times_cited_by_us_patents` = VALUES(`num_times_cited_by_us_patents`),
+        `earliest_application_date` = VALUES(`earliest_application_date`),
+        `patent_processing_days` = VALUES(`patent_processing_days`),
+        `uspc_current_mainclass_average_patent_processing_days` = VALUES(`uspc_current_mainclass_average_patent_processing_days`),
+        `cpc_current_group_average_patent_processing_days` = VALUES(`cpc_current_group_average_patent_processing_days`),
+        `term_extension` = VALUES(`term_extension`),
+        `detail_desc_length` = VALUES(`detail_desc_length`);
+
 
 alter table `{{reporting_db}}`.`patent` add index `ix_patent_firstnamed_inventor_location_id` (`firstnamed_inventor_location_id`);
 alter table `{{reporting_db}}`.`patent` add index `ix_patent_number` (`number`);
