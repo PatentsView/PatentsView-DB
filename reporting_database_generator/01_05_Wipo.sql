@@ -15,7 +15,7 @@ CREATE TABLE  `{{reporting_db}}`.`wipo` (
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
  DROP TABLE IF EXISTS `{{reporting_db}}`.`wipo_field`;
 CREATE TABLE `{{reporting_db}}`.`wipo_field` (
-   `id` varchar(3) NOT NULL,
+   `id` varchar(3) NOT NULL DEFAULT '',
    `sector_title` varchar(60) DEFAULT NULL,
    `field_title` varchar(255) DEFAULT NULL,
    PRIMARY KEY (`id`),
