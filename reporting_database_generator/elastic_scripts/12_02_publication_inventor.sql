@@ -40,7 +40,7 @@ select pi.inventor_id
      , pi.location_id
 from `{{reporting_db}}`.publication_inventor pi
          join patent.inventor_{{version_indicator}} i on i.id = pi.inventor_id
-         left join gender_attribution.inventor_gender{{version_indicator}} g on pi.inventor_id = g.inventor_id 
+         left join gender_attribution.inventor_gender_{{version_indicator}} g on pi.inventor_id = g.inventor_id
          left join patent.location_{{version_indicator}} l on l.location_id = pi.location_id
          join `{{elastic_db}}`.publication p on p.document_number = pi.document_number;
 
