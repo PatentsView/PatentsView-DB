@@ -1,5 +1,6 @@
 {% set elastic_db = "elastic_production_patent_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 {% set reporting_db = "PatentsView_" + macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
+{% set version_indicator = macros.ds_format(macros.ds_add(dag_run.data_interval_end | ds, -1), "%Y-%m-%d", "%Y%m%d") %}
 
 use `{{elastic_db}}`;
 
@@ -44,7 +45,7 @@ select pi.inventor_id
 from `{{reporting_db}}`.patent_inventor pi
          join `{{reporting_db}}`.inventor i on i.inventor_id = pi.inventor_id
          join `{{reporting_db}}`.temp_id_mapping_inventor timi on timi.new_inventor_id = i.inventor_id
-         left join gender_attribution.inventor_gender{{version_indicator}} g on pi.inventor_id = g.inventor_id 
+         left join gender_attribution.inventor_gender_{{version_indicator}} g on pi.inventor_id = g.inventor_id
          left join `{{reporting_db}}`.location l on l.location_id = pi.location_id
          left join `{{reporting_db}}`.temp_id_mapping_location timl on timl.new_location_id = l.location_id
          join `{{elastic_db}}`.patents p on p.patent_id = pi.patent_id;
