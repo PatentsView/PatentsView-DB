@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patents`
     `detail_desc_length`                                    int(10) unsigned DEFAULT NULL,
     `gi_statement`                                          text                                    default null,
     `patent_zero_prefix`                                    varchar(20) COLLATE utf8mb4_unicode_ci,
-    `withdrawn`                                             tinyint(1) NOT NULL DEFAULT 0
+    `withdrawn`                                             tinyint(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`patent_id`),
     KEY                                                     `ix_patent_number` (`number`),
     KEY                                                     `ix_patent_title` (`title`(128)),
