@@ -40,8 +40,8 @@ select pi.inventor_id
      , l.state
      , l.country
      , pi.location_id
-     , timi.old_inventor_id
-     , timl.old_location_id
+     , CAST(timi.old_inventor_id AS CHAR(128)) AS persistent_inventor_id,
+    CAST(timl.old_location_id AS CHAR(128)) AS persistent_location_id
 from `{{reporting_db}}`.patent_inventor pi
          join `{{reporting_db}}`.inventor i on i.inventor_id = pi.inventor_id
          join `{{reporting_db}}`.temp_id_mapping_inventor timi on timi.new_inventor_id = i.inventor_id
