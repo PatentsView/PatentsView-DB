@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patent_inventor`
 (
     `inventor_id`            int(10) unsigned                       NOT NULL,
     `persistent_inventor_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `patent_id`              varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `sequence`               int(11)                                NOT NULL,
+    `patent_id`              varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `sequence`               smallint(5) unsigned                    NOT NULL,
     `name_first`             varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `name_last`              varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `gender_code`            varchar(1)  COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
@@ -40,8 +40,8 @@ select pi.inventor_id
      , l.state
      , l.country
      , pi.location_id
-     , CAST(timi.old_inventor_id AS CHAR(128)) AS persistent_inventor_id,
-    CAST(timl.old_location_id AS CHAR(128)) AS persistent_location_id
+     , timi.old_inventor_id AS persistent_inventor_id
+     , timl.old_location_id AS persistent_location_id
 from `{{reporting_db}}`.patent_inventor pi
          join `{{reporting_db}}`.inventor i on i.inventor_id = pi.inventor_id
          join `{{reporting_db}}`.temp_id_mapping_inventor timi on timi.new_inventor_id = i.inventor_id
