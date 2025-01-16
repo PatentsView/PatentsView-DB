@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patent_inventor`
     `city`                   varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `state`                  varchar(256) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
     `country`                varchar(256) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
-    `location_id`            varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `persistent_location_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `location_id`            varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `persistent_location_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     PRIMARY KEY (`patent_id`, `inventor_id`, `sequence`),
     KEY `ix_inventor_name_first` (`name_first`),
     KEY `ix_inventor_name_last` (`name_last`)
