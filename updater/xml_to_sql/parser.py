@@ -328,6 +328,8 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
             'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
     for df in dfs:
+        print("we are printing out dfs now")
+        print(df)
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
@@ -336,6 +338,8 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
             dfs[df] = dfs[df][~narows]
             dfs[df]['gi_statement'] = dfs[df]['gi_statement'].str.strip()
         if df == 'publication':
+            print("inside publication table")
+            print(f'here is the xml file name:{xml_file_name}')
             dfs[df]['filename'] = xml_file_name
         elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
             dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
