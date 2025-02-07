@@ -8,7 +8,7 @@ from airflow.sensors.external_task import ExternalTaskSensor
 from slack_sdk import WebClient
 from updater.callbacks import airflow_task_failure, airflow_task_success
 
-from airflow.dags.granted_patent_parser.patentsview_data_updater import operator_settings
+
 from slack_sdk.errors import SlackApiError
 
 from reporting_database_generator.database import validate_query

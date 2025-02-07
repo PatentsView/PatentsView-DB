@@ -334,12 +334,13 @@ set name_first = null
 where id in (select id from temp_rawassignee_org_fixes_nf)  
         """)
     # Last Name contains Organization
-    engine.execute(
+    engine.execute( 
+        # TODO: update or duplicate function to apply to applicants - also consider additional org keywords
         """
 create table temp_rawassignee_org_fixes_nl (
 SELECT * 
 FROM rawassignee 
-	where name_first is null and name_last is not null and name_last REGEXP 'inc|ltd|technologies|limited|corp|llc|co.'
+	where name_first is null and name_last is not null and name_last REGEXP 'inc|ltd|technologies|limited|corp|llc|co\\.'
 )
         """)
     engine.execute(
@@ -371,7 +372,7 @@ from temp_rawassignee_org_fixes_nl;
 SELECT COUNT(*) FROM rawassignee
 WHERE (name_first IS NULL
 AND name_last IS NOT NULL
-AND name_last REGEXP 'inc|ltd|technologies|limited|corp|llc|co.')
+AND name_last REGEXP 'inc|ltd|technologies|limited|corp|llc|co\\.')
 OR (name_first IS NOT NULL 
 AND name_last IS NULL)
             """

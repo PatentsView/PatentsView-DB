@@ -48,7 +48,7 @@
     ]
 },
   "rawinventor": {
-  "fields": ["name_first", "city", "state"],
+  "fields": ["name_first","name_last", "city", "state"],
   "TestScripts": [
     "pgpubs"
     ]

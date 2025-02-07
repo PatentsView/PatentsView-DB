@@ -41,7 +41,7 @@ def find_cpc_schema_url():
     If there are multiple schema urls, sorting alphabetically ensures that the
     most recent schema is returned.
     """
-    base_url = 'http://www.cooperativepatentclassification.org'
+    base_url = 'https://www.cooperativepatentclassification.org'
     page = urllib.request.urlopen(base_url + '/cpcSchemeAndDefinitions/bulk')
     tree = html.fromstring(page.read())
     potential_links = []
@@ -142,7 +142,7 @@ def download_ipc(destination_folder):
 
 def find_ipc_url():
     """ Find the url of the CPC to IPC concordance in text format """
-    base_url = 'http://www.cooperativepatentclassification.org'
+    base_url = 'https://www.cooperativepatentclassification.org'
     page = urllib.request.urlopen(base_url + '/cpcConcordances')
     tree = html.fromstring(page.read())
 
@@ -171,7 +171,7 @@ def find_ipc_url():
 ############################################
 
 def find_cpc_schema_url_test():
-    expected_url = 'http://www.cooperativepatentclassification.org/cpc/interleaved/CPCSchemeXML201808.zip'
+    expected_url = 'https://www.cooperativepatentclassification.org/cpc/interleaved/CPCSchemeXML201808.zip'
     assert (find_cpc_schema_url() == expected_url)
 
 
@@ -183,7 +183,7 @@ def find_cpc_grant_and_pgpub_urls_test():
 
 
 def find_ipc_url_test():
-    expected_url = 'http://www.cooperativepatentclassification.org/cpcConcordances/CPCtoIPCtxtMay2018.txt'
+    expected_url = 'https://www.cooperativepatentclassification.org/cpcConcordances/CPCtoIPCtxtMay2018.txt'
     assert (find_ipc_url() == expected_url)
 
 
@@ -215,6 +215,7 @@ if __name__ == '__main__':
     # collect_cpc_data(**{
     #     "execution_date": datetime.date(2021, 12, 30)
     # })
-    post_download(**{
-        "execution_date": datetime.date(2021, 12, 30)
-    })
+    # post_download(**{
+    #     "execution_date": datetime.date(2021, 12, 30)
+    # })
+    find_cpc_schema_url()

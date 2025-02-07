@@ -55,6 +55,8 @@ def class_db_specific_config(self, table_config, class_called):
 
 
 def load_table_config(config, db='patent'):
+    print(db)
+    print(config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"])
     root = config["FOLDERS"]["project_root"]
     resources = config["FOLDERS"]["resources_folder"]
     if db == 'patent':
@@ -95,7 +97,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.entity_table = 'rawassignee'
         self.entity_id = 'uuid'
         self.disambiguated_id = 'assignee_id'
-        self.disambiguated_table = 'assignee'
+        self.disambiguated_table = 'assignee_'+ config['DATES']["END_DATE"]
         self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
         self.aggregator = 'main.organization'
         self.category = ""
@@ -533,7 +535,7 @@ def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
         print(year_xml_page)
         r = requests.get(year_xml_page)
         soup = BeautifulSoup(r.content, "html.parser")
-        links = soup.find_all("a", href=re.compile(r"[0-9]{6}(_r\d)?\.zip"))
+        links = soup.find_all("a", href=re.compile(r".*[0-9]{6}(_r\d)?\.zip"))
         idx_counter = 0
         for link in links:
             href = link.attrs['href']

@@ -328,6 +328,8 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
             'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
     for df in dfs:
+        print("we are printing out dfs now")
+        print(df)
         cols = list(dfs[df].columns)
         cols.remove(foreign_key_config["field_name"])
         dfs[df] = dfs[df].dropna(subset=cols, how='all')
@@ -335,25 +337,33 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
             narows = dfs[df]['gi_statement'].str.contains(pat='not applicable', case=False)
             dfs[df] = dfs[df][~narows]
             dfs[df]['gi_statement'] = dfs[df]['gi_statement'].str.strip()
+        if df == 'publication':
+            print("inside publication table")
+            print(f'here is the xml file name:{xml_file_name}')
+            dfs[df]['filename'] = xml_file_name
         elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
             dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
         try:
             dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
-        except Exception as e:
-            log_queue.put({
-                    "level":   logging.ERROR,
-                    "message": "{xml_file}: Error when writing to database : {error}".format(
-                            xml_file=xml_file_name,
-                            error=pprint.pformat(
-                                    e))
-                    })
+            #dfs[df].to_sql(df, con=engine, if_exists='replace', index=False)
+        except:
+            try:
+                dfs[df].to_sql(df, con=engine, if_exists='replace', index=False)
+            except Exception as e:
+                log_queue.put({
+                        "level":   logging.ERROR,
+                        "message": "{xml_file}: Error when writing to database : {error}".format(
+                                xml_file=xml_file_name,
+                                error=pprint.pformat(
+                                        e))
+                        })
 
-            dfs[df].to_csv(
-                    "{folder}/{xml_file}_{entity}.csv".format(folder=text_output_folder, xml_file=xml_file_name,
-                                                              entity=df), sep=",",
-                    quotechar='"', quoting=csv.QUOTE_NONNUMERIC, index=False)
-            raise e
+                dfs[df].to_csv(
+                        "{folder}/{xml_file}_{entity}.csv".format(folder=text_output_folder, xml_file=xml_file_name,
+                                                                entity=df), sep=",",
+                        quotechar='"', quoting=csv.QUOTE_NONNUMERIC, index=False)
+                raise e
     log_queue.put({
             "level":   logging.INFO,
             "message": "XML Document {xml_file} took {duration} seconds to load to SQL".format(

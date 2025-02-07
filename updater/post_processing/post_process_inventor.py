@@ -305,6 +305,10 @@ def post_process_inventor_gender(**kwargs):
     q_list = []
     engine = create_engine(get_connection_string(config, 'RAW_DB'))
     # Takes ~21 minutes
+    q00 = f"""
+    DROP TABLE IF EXISTS gender_attribution.inventor_gender_{end_date}
+    """
+    q_list.append(q00)
     q0 = f"""
 create table gender_attribution.inventor_gender_{end_date}
 select inventor_id
@@ -379,8 +383,9 @@ where total_count = 0 and gender_flag is null"""
 alter table gender_attribution.inventor_gender_{end_date} 
 add KEY `inventor_id` (`inventor_id`)"""
     q_list.append(q12)
-    q13 = f"alter table gender_attribution.rawinventor_gender_{end_date} add index patent_id (patent_id)"
-    q_list.append(q13)
+
+    # q13 = f"alter table gender_attribution.inventor_gender_{end_date} add index patent_id (patent_id)"
+    # q_list.append(q13)
     for q in q_list:
         print(q)
         engine.execute(q)

@@ -108,16 +108,19 @@ def cleaning(data):
 #         environment_type = "PROD"
 def run_location_flatfile(**kwargs):
     go_live_path = "/project/go_live"
+    print(f'Go live path is: {go_live_path}')
     config = get_current_config('granted_patent', schedule='quarterly', **{
         "execution_date": kwargs['execution_date']
     })
+    print(f'Current config is: {config}')
     engine = create_engine(get_connection_string(config, database='REPORTING_DATABASE'))
     root_engine = create_engine(get_unique_connection_string(config, database="_root" ,connection="APP_DATABASE_SETUP"))
-
+    
     start_end = pd.read_sql("select `key`, `value` from config where `key` in ('webtool_location_start_year', 'webtool_location_end_year')", con=root_engine)
     start = list(start_end[start_end['key'] =='webtool_location_start_year']['value'])[0]
     end = list(start_end[start_end['key'] =='webtool_location_end_year']['value'])[0]
-
+    print(f'Start is: {start}')
+    print(f'End is: {end}')
     locdata = set_dataframe(start, end, engine)
     locdata1 = cleaning(locdata)
 
@@ -146,6 +149,7 @@ def run_location_flatfile(**kwargs):
     ranked = ranked.drop("index", axis=1)
     payload1 = ranked[:1000]
     payload2 = ranked[1000:]
+    print('Writing payload flat files.')
     payload1.to_csv(go_live_path + "/location_data_payload1.csv", sep=" ", header=False, encoding="utf-8", index=False)
     payload2.to_csv(go_live_path + "/location_data_payload2.csv", sep=" ", header=False, encoding="utf-8", index=False)
 

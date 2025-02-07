@@ -62,15 +62,20 @@ granted_patent_parser = DAG(
     default_args=default_args,
     description='Download and process granted patent data and corresponding classifications data',
     start_date=datetime(2022, 9, 27, hour=5, minute=0, second=0, tzinfo=local_tz),
-    schedule_interval=timedelta(weeks=1), catchup=True,
+    schedule_interval=timedelta(weeks=1),
+    catchup=True,
     template_searchpath=templates_searchpath,
 )
+
+
+
 operator_settings = {
     'dag': granted_patent_parser,
     'on_success_callback': airflow_task_success,
     'on_failure_callback': airflow_task_failure,
     'on_retry_callback': airflow_task_failure
 }
+
 operator_sequence_groups = {}
 # ##### Start Instance #####
 # instance_starter = PythonOperator(task_id='start_data_collector', python_callable=start_data_collector_instance,
@@ -80,40 +85,65 @@ backup_data = PythonOperator(task_id='backup_oldest_database'
                              , python_callable=run_database_archive
                              , op_kwargs={'type': 'granted_patent'}
                              , queue= 'mydumper'
-                             , **operator_settings)
+                             , on_success_callback = airflow_task_success
+                             , on_failure_callback = airflow_task_failure
+                             , on_retry_callback = airflow_task_failure)
 ###### Download & Parse #######
 download_xml_operator = PythonOperator(task_id='download_xml', python_callable=bulk_download,
-                                       **operator_settings)
+                                       dag=granted_patent_parser,
+                                       on_success_callback=airflow_task_success,
+                                       on_failure_callback=airflow_task_failure,
+                                       on_retry_callback=airflow_task_failure)
 upload_setup_operator = PythonOperator(task_id='upload_database_setup', python_callable=begin_database_setup,
-                                       **operator_settings)
+                                       dag=granted_patent_parser,
+                                       on_success_callback=airflow_task_success,
+                                       on_failure_callback=airflow_task_failure,
+                                       on_retry_callback=airflow_task_failure)
 
 process_xml_operator = PythonOperator(task_id='process_xml',
                                       python_callable=preprocess_xml,
-                                      **operator_settings, pool='high_memory_pool')
+                                      dag=granted_patent_parser,
+                                      on_success_callback=airflow_task_success,
+                                      on_failure_callback=airflow_task_failure,
+                                      on_retry_callback=airflow_task_failure
+                                      , pool='high_memory_pool')
 
 parse_xml_operator = PythonOperator(task_id='parse_xml',
                                     python_callable=patent_parser,
-                                    **operator_settings, pool='high_memory_pool')
+                                    dag=granted_patent_parser,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure,
+                                    on_retry_callback=airflow_task_failure,
+                                    pool='high_memory_pool')
 
 #### Database Load ####
 qc_temp_database_operator = PythonOperator(task_id='qc_upload_database_setup',
                                            python_callable=qc_database_granted,
-                                           **operator_settings)
+                                           dag=granted_patent_parser,
+                                           on_success_callback=airflow_task_success,
+                                           on_failure_callback=airflow_task_failure,
+                                           on_retry_callback=airflow_task_failure)
 
 upload_new_operator = PythonOperator(task_id='upload_current', python_callable=upload_current_data,
-                                     **operator_settings
+                                     dag=granted_patent_parser,
+                                     on_success_callback=airflow_task_success,
+                                     on_failure_callback=airflow_task_failure,
+                                     on_retry_callback=airflow_task_failure
                                      )
 upload_trigger_operator = SQLTemplatedPythonOperator(
     task_id='create_uuid_triggers',
     provide_context=True,
     python_callable=validate_and_execute,
+    dag=granted_patent_parser,
+    on_success_callback=airflow_task_success,
+    on_failure_callback=airflow_task_failure,
+    on_retry_callback=airflow_task_failure,
     op_kwargs={
         'filename': 'granted_patent_database',
         "schema_only": False,
         "section": get_section('granted_patent_updater', 'fix_patent_ids-upload'),
 
     },
-    dag=granted_patent_parser,
     templates_dict={
         'source_sql': 'granted_patent_database.sql'
     },
@@ -122,42 +152,70 @@ upload_trigger_operator = SQLTemplatedPythonOperator(
         'database': 'upload_',
         'add_suffix': True
     }
-#     ,
-# on_success_callback=airflow_task_success,
-# on_failure_callback=airflow_task_failure
 )
 patent_sql_operator = PythonOperator(task_id='parse_xml_to_sql', python_callable=patent_sql_parser,
-                                     **operator_settings
+                                     dag=granted_patent_parser,
+                                     on_success_callback=airflow_task_success,
+                                     on_failure_callback=airflow_task_failure,
+                                     on_retry_callback=airflow_task_failure
                                      )
 qc_upload_operator = PythonOperator(task_id='qc_upload_new', python_callable=post_upload_granted,
-                                    **operator_settings
+                                    dag=granted_patent_parser,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure,
+                                    on_retry_callback=airflow_task_failure
                                     )
 ### new OSM ElasticSearch geocoding
 OSM_geocode_operator = PythonOperator(task_id='geocode_rawlocations', python_callable=geocode_by_osm,
-                                      **operator_settings, pool = 'elastic_search_pool'
+                                      dag=granted_patent_parser,
+                                      on_success_callback=airflow_task_success,
+                                      on_failure_callback=airflow_task_failure,
+                                      on_retry_callback=airflow_task_failure,
+                                      pool = 'elastic_search_pool'
                                       )
 
 ### Location_ID generation
 loc_disambiguation = PythonOperator(task_id='loc_disambiguation', python_callable=run_location_disambiguation, op_kwargs={'dbtype': 'granted_patent'},
-                                    **operator_settings)
+                                    dag=granted_patent_parser,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure,
+                                    on_retry_callback=airflow_task_failure)
 
 qc_loc_disambiguation = PythonOperator(task_id='qc_loc_disambiguation'
                                        , python_callable=run_location_disambiguation_tests
                                        , op_kwargs={'dbtype': 'granted_patent'}
-                                       , **operator_settings)
+                                       , dag=granted_patent_parser,
+                                      on_success_callback=airflow_task_success,
+                                      on_failure_callback=airflow_task_failure,
+                                      on_retry_callback=airflow_task_failure)
 
 ### GI Processing
 gi_NER = PythonOperator(task_id='gi_NER', python_callable=begin_NER_processing,
-                        **operator_settings)
+                        dag=granted_patent_parser,
+                        on_success_callback=airflow_task_success,
+                        on_failure_callback=airflow_task_failure,
+                        on_retry_callback=airflow_task_failure)
 gi_postprocess_NER = PythonOperator(task_id='postprocess_NER', python_callable=process_ner_to_manual,
-                                    **operator_settings)
+                                    dag=granted_patent_parser,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure,
+                                    on_retry_callback=airflow_task_failure)
 manual_simulation_operator = PythonOperator(task_id='simulate_manual_task', python_callable=simulate_manual,
-                                            **operator_settings)
+                                            dag=granted_patent_parser,
+                                            on_success_callback=airflow_task_success,
+                                            on_failure_callback=airflow_task_failure,
+                                            on_retry_callback=airflow_task_failure)
 
 post_manual_operator = PythonOperator(task_id='post_manual', python_callable=process_post_manual,
-                                      **operator_settings)
+                                      dag=granted_patent_parser,
+                                      on_success_callback=airflow_task_success,
+                                      on_failure_callback=airflow_task_failure,
+                                      on_retry_callback=airflow_task_failure)
 gi_qc_operator = PythonOperator(task_id='GI_QC', python_callable=qc_gi,
-                                **operator_settings)
+                                dag=granted_patent_parser,
+                                on_success_callback=airflow_task_success,
+                                on_failure_callback=airflow_task_failure,
+                                on_retry_callback=airflow_task_failure)
 
 ### Long Text FIelds Parsing
 table_creation_operator = SQLTemplatedPythonOperator(
@@ -165,6 +223,9 @@ table_creation_operator = SQLTemplatedPythonOperator(
     provide_context=True,
     python_callable=validate_and_execute,
     dag=granted_patent_parser,
+  on_success_callback=airflow_task_success,
+  on_failure_callback=airflow_task_failure,
+  on_retry_callback=airflow_task_failure,
     op_kwargs={
         'filename': 'text_tables',
         "schema_only": False,
@@ -190,6 +251,9 @@ upload_table_creation_operator = SQLTemplatedPythonOperator(
 
     },
     dag=granted_patent_parser,
+    on_success_callback=airflow_task_success,
+    on_failure_callback=airflow_task_failure,
+    on_retry_callback=airflow_task_failure,
     templates_dict={
         'source_sql': 'text_tables.sql'
     },
@@ -208,13 +272,19 @@ upload_table_creation_operator = SQLTemplatedPythonOperator(
 
 parse_text_data_operator = PythonOperator(task_id='parse_text_data',
                                           python_callable=begin_text_parsing,
-                                          **operator_settings)
+                                          dag=granted_patent_parser,
+                                          on_success_callback=airflow_task_success,
+                                          on_failure_callback=airflow_task_failure,
+                                          on_retry_callback=airflow_task_failure)
 
 patent_id_fix_operator = SQLTemplatedPythonOperator(
     task_id='fix_patent_ids-upload',
     provide_context=True,
     python_callable=validate_and_execute,
     dag=granted_patent_parser,
+    on_success_callback=airflow_task_success,
+    on_failure_callback=airflow_task_failure,
+    on_retry_callback=airflow_task_failure,
     op_kwargs={
         'filename': 'patent_id_fix_text',
         "schema_only": False,
@@ -232,48 +302,66 @@ patent_id_fix_operator = SQLTemplatedPythonOperator(
 
 qc_parse_text_operator = PythonOperator(task_id='qc_parse_text_data',
                                         python_callable=post_text_parsing_granted,
-                                        **operator_settings)
+                                        dag=granted_patent_parser,
+                                        on_success_callback=airflow_task_success,
+                                        on_failure_callback=airflow_task_failure,
+                                        on_retry_callback=airflow_task_failure)
 
 #### merge in newly parsed data
 integrity_check_operator = PythonOperator(task_id='check_prod_integrity',
                                           python_callable=check_patent_prod_integrity,
-                                          **operator_settings
+                                          dag=granted_patent_parser,
+                                          on_success_callback=airflow_task_success,
+                                          on_failure_callback=airflow_task_failure,
+                                          on_retry_callback=airflow_task_failure,
                                           )
 
 merge_new_operator = PythonOperator(task_id='merge_db',
                                     python_callable=begin_merging,
-                                    **operator_settings
-                                    # ,
-                                    # on_success_callback=airflow_task_success,
-                                    # on_failure_callback=airflow_task_failure
+                                    dag=granted_patent_parser,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure,
+                                    on_retry_callback=airflow_task_failure
                                     )
 
 qc_merge_operator = PythonOperator(task_id='qc_merge_db',
                                    python_callable=post_merge_weekly_granted,
-                                   **operator_settings
+                                   dag=granted_patent_parser,
+                                   on_success_callback=airflow_task_success,
+                                   on_failure_callback=airflow_task_failure,
+                                   on_retry_callback=airflow_task_failure
                                    )
 
 ## Merge Text Data
 merge_text_operator = PythonOperator(task_id='merge_text_db',
                                      python_callable=begin_text_merging,
-                                     **operator_settings
+                                     dag=granted_patent_parser,
+                                     on_success_callback=airflow_task_success,
+                                     on_failure_callback=airflow_task_failure,
+                                     on_retry_callback=airflow_task_failure
                                      )
 
 qc_text_merge_operator = PythonOperator(task_id='qc_merge_text_db',
                                         python_callable=post_text_merge_granted,
                                         depends_on_past=True,
-                                        **operator_settings
+                                        dag=granted_patent_parser,
+                                        on_success_callback=airflow_task_success,
+                                        on_failure_callback=airflow_task_failure,
+                                        on_retry_callback=airflow_task_failure
                                         )
 
 ## Withdrawn Patents
 withdrawn_operator = PythonOperator(task_id='withdrawn_processor', python_callable=process_withdrawn,
-                                    **operator_settings)
+                                    dag=granted_patent_parser,
+                                    on_success_callback=airflow_task_success,
+                                    on_failure_callback=airflow_task_failure,
+                                    on_retry_callback=airflow_task_failure)
 
 qc_withdrawn_operator = PythonOperator(task_id='qc_withdrawn_processor', python_callable=post_withdrawn,
-                                       **operator_settings
-                                       # ,
-                                       # on_success_callback=airflow_task_success,
-                                       # on_failure_callback=airflow_task_failure
+                                       dag=granted_patent_parser,
+                                       on_success_callback=airflow_task_success,
+                                       on_failure_callback=airflow_task_failure,
+                                       on_retry_callback=airflow_task_failure
                                        )
 
 operator_sequence_groups['xml_sequence'] = [download_xml_operator, process_xml_operator,

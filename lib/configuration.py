@@ -34,14 +34,40 @@ def set_config(config, type='granted_patent'):
 
 def get_section(dag_id, task_id):
     section_lookup = {
-            'granted_patent_updater':       {
-                    "merge_db":           "Granted Patent - Data Processing",
-                    "merge_text_db":      "Granted Patent - Data Processing",
-                    "parse_xml":          "Granted Patent - XML Parsing",
-                    "qc_parse_text_data": "Granted Patent - XML Parsing (QC)",
-                    "qc_upload_new":      "Granted Patent - Data Processing (QC)",
-                    "GI_QC":              "Granted Patent - GI Processing (QC)"
-                    },
+            'granted_patent_updater': {
+                    "backup_oldest_database": "Granted Patent - Database Backup",
+                    "download_xml": "Granted Patent - XML Download",
+                    "upload_database_setup": "Granted Patent - Database Upload Setup",
+                    "process_xml": "Granted Patent - XML Processing",
+                    "parse_xml": "Granted Patent - XML Parsing",
+                    "parse_xml_to_sql": "Granted Patent - XML to SQL Parsing",
+                    "qc_upload_database_setup": "Granted Patent - QC Database Upload Setup",
+                    "upload_current": "Granted Patent - Current Data Upload",
+                    "create_uuid_triggers": "Granted Patent - UUID Trigger Creation",
+                    "parse_xml_to_sql": "Granted Patent - XML to SQL Parsing",
+                    "parse_xml_to_sql": "Granted Patent - XML to SQL Parsing",
+                    "qc_upload_new": "Granted Patent - Data Upload (QC)",
+                    "geocode_rawlocations": "Granted Patent - Geocoding Raw Locations",
+                    "loc_disambiguation": "Granted Patent - Location Disambiguation",
+                    "qc_loc_disambiguation": "Granted Patent - Location Disambiguation (QC)",
+                    "gi_NER": "Granted Patent - GI Processing - Named Entity Recognition",
+                    "postprocess_NER": "Granted Patent - GI Processing - NER Postprocessing",
+                    "simulate_manual_task": "Granted Patent - GI Processing - Manual Task Simulation",
+                    "post_manual": "Granted Patent - GI Processing - Post Manual Processing",
+                    "GI_QC": "Granted Patent - GI Processing (QC)",
+                    "create_text_yearly_tables": "Granted Patent - Text Data Processing - Yearly Table Creation",
+                    "create_text_yearly_tables-upload": "Granted Patent - Text Data Processing - Yearly Table Upload",
+                    "parse_text_data": "Granted Patent - Text Data Processing - Parsing",
+                    "fix_patent_ids-upload": "Granted Patent - Fix Patent IDs Upload",
+                    "qc_parse_text_data": "Granted Patent - Text Data Processing - Parsing (QC)",
+                    "check_prod_integrity": "Granted Patent - Production Data Integrity Check",
+                    "merge_db": "Granted Patent - Data Merging",
+                    "qc_merge_db": "Granted Patent - Data Merging (QC)",
+                    "merge_text_db": "Granted Patent - Text Data Merging",
+                    "qc_merge_text_db": "Granted Patent - Text Data Merging (QC)",
+                    "withdrawn_processor": "Granted Patent - Withdrawn Patents Processing",
+                    "qc_withdrawn_processor": "Granted Patent - Withdrawn Patents Processing (QC)"
+            },
             'pregrant_publication_updater': {
                     "create_pgpubs_database": "PGPUBS Parser - Database Setup",
                     "drop_database":          "PGPUBS Parser - Database Setup",
@@ -281,6 +307,7 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'pgpubs_text'
 
     if type == 'pgpubs':
+        config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
         config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_pgpub_'+ end_date.strftime('%Y%m%d')
         config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_pgpub'
     config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(

@@ -11,12 +11,13 @@ from lib.configuration import get_config, get_connection_string, get_current_con
 
 def get_ipc_tech_code_field_map(ipc_tech_file):
     # Read in the CSV file
-    ipc_technology_data = pd.read_csv(ipc_tech_file)
+    ipc_technology_data = pd.read_csv(ipc_tech_file, dtype=str)
     # Remove trailing % (likely wildcard format)
-    cleaned_ipc_tech_data = ipc_technology_data.assign(
-        IPC_Code_stripped=ipc_technology_data.IPC_code.str.replace("%", "").str.replace(' ', ''))
+    ipc_technology_data['IPC_Code_stripped'] = ipc_technology_data['IPC_code'].apply(lambda x: x.split(' ')[0].replace('%','').strip())
+    #cleaned_ipc_tech_data = ipc_technology_data.assign(
+    #    IPC_Code_stripped=ipc_technology_data.IPC_code.str.replace("%", "").str.replace(' ', ''))
     # Select and Rename columns
-    ipc_tech_map_frame = cleaned_ipc_tech_data[[
+    ipc_tech_map_frame = ipc_technology_data[[
         "IPC_Code_stripped", "Field_number"
     ]].rename({
         "IPC_Code_stripped": "IPC_Code"
@@ -31,7 +32,8 @@ def get_ipc_cpc_ipc_concordance_map(concordance_file):
     print(concordance_file)
     cpc_ipc_concordance_data = pd.read_csv(concordance_file,
                                            header=None,
-                                           sep="\t")
+                                           sep="\t",
+                                           dtype=str)
     cpc_ipc_concordance_data.columns = [
         'cpc_code', 'unknown_column_1', 'ipc_code', 'unknown_column_2',
         'unknown_column_3'
