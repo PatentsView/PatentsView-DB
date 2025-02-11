@@ -619,7 +619,7 @@ def test_aws_credentials():
 
     # From the response that contains the assumed role, get the temporary credentials
     credentials = assumed_role_object['Credentials']
-
+    print(credentials)
 
 def rds_free_space(identifier):
     test_aws_credentials()
