@@ -610,11 +610,63 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
     return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 
+def get_imds_v2_token():
+    """Retrieve an IMDSv2 token required for metadata access."""
+    token_url = "http://169.254.169.254/latest/api/token"
+    headers = {"X-aws-ec2-metadata-token-ttl-seconds": "21600"}  # Token valid for 6 hours
+
+    response = requests.put(token_url, headers=headers)
+    if response.status_code != 200:
+        raise Exception(f"Failed to retrieve IMDSv2 token: {response.text}")
+
+    return response.text
+
+
+def get_instance_iam_role(token):
+    """Retrieve the IAM role name assigned to the EC2 instance."""
+    metadata_url = "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
+
+    response = requests.get(metadata_url, headers={"X-aws-ec2-metadata-token": token})
+    if response.status_code != 200:
+        raise Exception(f"Failed to retrieve IAM role name: {response.text}")
+
+    return response.text.strip()  # Remove any trailing whitespace
+
+
+def get_aws_credentials():
+    """Retrieve temporary AWS credentials from IMDSv2."""
+    token = get_imds_v2_token()
+    role_name = get_instance_iam_role(token)
+
+    credentials_url = f"http://169.254.169.254/latest/meta-data/iam/security-credentials/{role_name}"
+    response = requests.get(credentials_url, headers={"X-aws-ec2-metadata-token": token})
+
+    if response.status_code != 200:
+        raise Exception(f"Failed to retrieve AWS credentials: {response.text}")
+
+    credentials = response.json()
+    return {
+        "aws_access_key_id": credentials["AccessKeyId"],
+        "aws_secret_access_key": credentials["SecretAccessKey"],
+        "aws_session_token": credentials["Token"]
+    }
+
+
+def get_cloudwatch_client():
+    """Initialize and return a CloudWatch client using the retrieved credentials."""
+    aws_credentials = get_aws_credentials()
+
+    return boto3.client(
+        'cloudwatch',
+        region_name='us-east-1',
+        aws_access_key_id=aws_credentials["aws_access_key_id"],
+        aws_secret_access_key=aws_credentials["aws_secret_access_key"],
+        aws_session_token=aws_credentials["aws_session_token"]
+    )
 def rds_free_space(config, identifier):
-    # cloudwatch = boto3.client('cloudwatch', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
-    #                           aws_secret_access_key=config['AWS']['SECRET_KEY'],
-    #                           region_name='us-east-1')
-    cloudwatch = boto3.client('cloudwatch', region_name='us-east-1')
+    """Retrieve free storage space for an RDS instance using CloudWatch metrics."""
+    cloudwatch = get_cloudwatch_client()
+
     from datetime import datetime, timedelta
     response = cloudwatch.get_metric_data(
         MetricDataQueries=[
