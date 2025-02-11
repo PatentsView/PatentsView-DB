@@ -610,56 +610,59 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
     return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 
-import boto3
-import requests
-import time
-from datetime import datetime, timedelta
-from statistics import mean
-
+IMDSV2_TIMEOUT = 3  # Timeout for IMDSv2 requests to prevent hanging
 def get_imds_v2_token():
-    """Retrieve an IMDSv2 token required for metadata access."""
+    """Retrieve an IMDSv2 token required for metadata access with a timeout."""
     print(f"[{datetime.now()}] Fetching IMDSv2 token...")
     start = time.time()
 
-    token_url = "http://169.254.169.254/latest/api/token"
-    headers = {"X-aws-ec2-metadata-token-ttl-seconds": "21600"}  # Token valid for 6 hours
-
-    response = requests.put(token_url, headers=headers)
-    if response.status_code != 200:
-        raise Exception(f"Failed to retrieve IMDSv2 token: {response.text}")
+    try:
+        token_url = "http://169.254.169.254/latest/api/token"
+        headers = {"X-aws-ec2-metadata-token-ttl-seconds": "21600"}  # Token valid for 6 hours
+        response = requests.put(token_url, headers=headers, timeout=IMDSV2_TIMEOUT)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"Failed to retrieve IMDSv2 token: {e}")
 
     print(f"[{datetime.now()}] IMDSv2 token retrieved in {time.time() - start:.2f} seconds")
     return response.text
 
 
 def get_instance_iam_role(token):
-    """Retrieve the IAM role name assigned to the EC2 instance."""
+    """Retrieve the IAM role name assigned to the EC2 instance with a timeout."""
     print(f"[{datetime.now()}] Fetching IAM role name...")
     start = time.time()
 
-    metadata_url = "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
-    response = requests.get(metadata_url, headers={"X-aws-ec2-metadata-token": token})
-    if response.status_code != 200:
-        raise Exception(f"Failed to retrieve IAM role name: {response.text}")
+    try:
+        metadata_url = "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
+        response = requests.get(metadata_url, headers={"X-aws-ec2-metadata-token": token}, timeout=IMDSV2_TIMEOUT)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"Failed to retrieve IAM role name: {e}")
 
     role_name = response.text.strip()
+
+    if not role_name:
+        raise Exception(f"[{datetime.now()}] No IAM role found. Ensure an IAM role is attached to your EC2 instance.")
+
     print(f"[{datetime.now()}] IAM role name '{role_name}' retrieved in {time.time() - start:.2f} seconds")
     return role_name
 
 
 def get_aws_credentials():
-    """Retrieve temporary AWS credentials from IMDSv2."""
+    """Retrieve temporary AWS credentials from IMDSv2 with a timeout."""
     print(f"[{datetime.now()}] Fetching AWS credentials...")
     start = time.time()
 
     token = get_imds_v2_token()
     role_name = get_instance_iam_role(token)
 
-    credentials_url = f"http://169.254.169.254/latest/meta-data/iam/security-credentials/{role_name}"
-    response = requests.get(credentials_url, headers={"X-aws-ec2-metadata-token": token})
-
-    if response.status_code != 200:
-        raise Exception(f"Failed to retrieve AWS credentials: {response.text}")
+    try:
+        credentials_url = f"http://169.254.169.254/latest/meta-data/iam/security-credentials/{role_name}"
+        response = requests.get(credentials_url, headers={"X-aws-ec2-metadata-token": token}, timeout=IMDSV2_TIMEOUT)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"Failed to retrieve AWS credentials: {e}")
 
     credentials = response.json()
 
@@ -676,14 +679,12 @@ def get_cloudwatch_client():
     print(f"[{datetime.now()}] Initializing CloudWatch client...")
     start = time.time()
 
-    aws_credentials = get_aws_credentials()
-    client = boto3.client(
-        'cloudwatch',
-        region_name='us-east-1',
-        aws_access_key_id=aws_credentials["aws_access_key_id"],
-        aws_secret_access_key=aws_credentials["aws_secret_access_key"],
-        aws_session_token=aws_credentials["aws_session_token"]
-    )
+    try:
+        # Instead of manually setting credentials, use boto3's built-in credential resolution
+        session = boto3.Session()
+        client = session.client('cloudwatch', region_name='us-east-1')
+    except Exception as e:
+        raise Exception(f"Failed to initialize CloudWatch client: {e}")
 
     print(f"[{datetime.now()}] CloudWatch client initialized in {time.time() - start:.2f} seconds")
     return client
@@ -696,34 +697,37 @@ def rds_free_space(identifier):
 
     cloudwatch = get_cloudwatch_client()
 
-    response = cloudwatch.get_metric_data(
-        MetricDataQueries=[
-            {
-                'Id': 'fetching_FreeStorageSpace',
-                'MetricStat': {
-                    'Metric': {
-                        'Namespace': 'AWS/RDS',
-                        'MetricName': 'FreeStorageSpace',
-                        'Dimensions': [
-                            {
-                                "Name": "DBInstanceIdentifier",
-                                "Value": identifier
-                            }
-                        ]
-                    },
-                    'Period': 300,
-                    'Stat': 'Minimum'
+    try:
+        response = cloudwatch.get_metric_data(
+            MetricDataQueries=[
+                {
+                    'Id': 'fetching_FreeStorageSpace',
+                    'MetricStat': {
+                        'Metric': {
+                            'Namespace': 'AWS/RDS',
+                            'MetricName': 'FreeStorageSpace',
+                            'Dimensions': [
+                                {
+                                    "Name": "DBInstanceIdentifier",
+                                    "Value": identifier
+                                }
+                            ]
+                        },
+                        'Period': 300,
+                        'Stat': 'Minimum'
+                    }
                 }
-            }
-        ],
-        StartTime=(datetime.now() - timedelta(seconds=300 * 3)).timestamp(),
-        EndTime=datetime.now().timestamp(),
-        ScanBy='TimestampDescending'
-    )
+            ],
+            StartTime=(datetime.now() - timedelta(seconds=300 * 3)).timestamp(),
+            EndTime=datetime.now().timestamp(),
+            ScanBy='TimestampDescending'
+        )
+    except Exception as e:
+        raise Exception(f"CloudWatch API call failed: {e}")
 
     print(f"[{datetime.now()}] CloudWatch API call completed in {time.time() - start:.2f} seconds")
 
-    values = response['MetricDataResults'][0]['Values']
+    values = response['MetricDataResults'][0]['Values'] if 'MetricDataResults' in response else []
     if not values:
         print(f"[{datetime.now()}] No CloudWatch data found for RDS '{identifier}'.")
         return None
@@ -731,7 +735,6 @@ def rds_free_space(identifier):
     result = mean(values)
     print(f"[{datetime.now()}] RDS Free Storage Space: {result} bytes")
     return result
-
 
 
 def get_host_name(local=True):
