@@ -610,38 +610,11 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
     return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 def test_aws_credentials():
-    session = boto3.Session()
+    session = boto3.Session(profile_name='svc_generator')
     credentials = session.get_credentials()
     print(credentials)
-    # assumed_role_object = sts_client.assume_role(
-    #     RoleArn="arn:aws:ec2:us-east-1:743040338427:instance/i-0846cd80ded9be3a1",
-    #     RoleSessionName="AssumeRoleSession1"
-    # )
 
-    # From the response that contains the assumed role, get the temporary credentials
-    # credentials = assumed_role_object['Credentials']
-    # print(credentials)
-iam = boto3.resource("iam")
-from botocore.exceptions import ClientError
-
-def get_role(role_name):
-    """
-    Gets a role by name.
-
-    :param role_name: The name of the role to retrieve.
-    :return: The specified role.
-    """
-    try:
-        role = iam.Role(role_name)
-        role.load()  # calls GetRole to load attributes
-        print(f"Got role with arn %s. {role.arn}")
-    except ClientError:
-        print(f"Couldn't get role named %s.{role_name}")
-        raise
-    else:
-        return role
 def rds_free_space(identifier):
-    get_role('svc_generator')
     test_aws_credentials()
     # Boto3 automatically picks up IAM role credentials
     cloudwatch = boto3.client('cloudwatch', region_name='us-east-1')
