@@ -621,8 +621,27 @@ def test_aws_credentials():
     # From the response that contains the assumed role, get the temporary credentials
     # credentials = assumed_role_object['Credentials']
     # print(credentials)
+iam = boto3.resource("iam")
+from botocore.exceptions import ClientError
 
+def get_role(role_name):
+    """
+    Gets a role by name.
+
+    :param role_name: The name of the role to retrieve.
+    :return: The specified role.
+    """
+    try:
+        role = iam.Role(role_name)
+        role.load()  # calls GetRole to load attributes
+        print(f"Got role with arn %s. {role.arn}")
+    except ClientError:
+        print(f"Couldn't get role named %s.{role_name}")
+        raise
+    else:
+        return role
 def rds_free_space(identifier):
+    get_role('svc_generator')
     test_aws_credentials()
     # Boto3 automatically picks up IAM role credentials
     cloudwatch = boto3.client('cloudwatch', region_name='us-east-1')
