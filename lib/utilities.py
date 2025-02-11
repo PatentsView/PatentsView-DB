@@ -650,44 +650,60 @@ def get_instance_iam_role(token):
 
 
 def get_aws_credentials():
-    """Retrieve temporary AWS credentials from IMDSv2 with a timeout."""
-    print(f"[{datetime.now()}] Fetching AWS credentials...")
-    start = time.time()
-
-    token = get_imds_v2_token()
-    role_name = get_instance_iam_role(token)
+    """Retrieve AWS credentials inside a Docker container using IMDSv2."""
+    print(f"[{datetime.now()}] Fetching AWS credentials from IMDSv2 inside Docker...")
 
     try:
-        credentials_url = f"http://169.254.169.254/latest/meta-data/iam/security-credentials/{role_name}"
-        response = requests.get(credentials_url, headers={"X-aws-ec2-metadata-token": token}, timeout=IMDSV2_TIMEOUT)
-        response.raise_for_status()
+        token_url = "http://169.254.169.254/latest/api/token"
+        headers = {"X-aws-ec2-metadata-token-ttl-seconds": "21600"}
+
+        # Get IMDSv2 token
+        token_response = requests.put(token_url, headers=headers, timeout=3)
+        token_response.raise_for_status()
+        token = token_response.text
+
+        # Get IAM role name
+        role_url = "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
+        role_response = requests.get(role_url, headers={"X-aws-ec2-metadata-token": token}, timeout=3)
+        role_response.raise_for_status()
+        role_name = role_response.text.strip()
+
+        # Get temporary credentials
+        creds_url = f"http://169.254.169.254/latest/meta-data/iam/security-credentials/{role_name}"
+        creds_response = requests.get(creds_url, headers={"X-aws-ec2-metadata-token": token}, timeout=3)
+        creds_response.raise_for_status()
+        credentials = creds_response.json()
+
+        os.environ["AWS_ACCESS_KEY_ID"] = credentials["AccessKeyId"]
+        os.environ["AWS_SECRET_ACCESS_KEY"] = credentials["SecretAccessKey"]
+        os.environ["AWS_SESSION_TOKEN"] = credentials["Token"]
+
+        print(f"[{datetime.now()}] AWS credentials retrieved successfully inside Docker!")
+
+        return {
+            "aws_access_key_id": credentials["AccessKeyId"],
+            "aws_secret_access_key": credentials["SecretAccessKey"],
+            "aws_session_token": credentials["Token"]
+        }
+
     except requests.exceptions.RequestException as e:
-        raise Exception(f"Failed to retrieve AWS credentials: {e}")
-
-    credentials = response.json()
-
-    print(f"[{datetime.now()}] AWS credentials retrieved in {time.time() - start:.2f} seconds")
-    return {
-        "aws_access_key_id": credentials["AccessKeyId"],
-        "aws_secret_access_key": credentials["SecretAccessKey"],
-        "aws_session_token": credentials["Token"]
-    }
+        raise Exception(f"Failed to retrieve AWS credentials inside Docker: {e}")
 
 
 def get_cloudwatch_client():
-    """Initialize and return a CloudWatch client using the retrieved credentials."""
-    print(f"[{datetime.now()}] Initializing CloudWatch client...")
-    start = time.time()
+    """Initialize CloudWatch client using manually retrieved credentials inside Docker."""
+    print(f"[{datetime.now()}] Initializing CloudWatch client inside Docker...")
 
-    try:
-        # Instead of manually setting credentials, use boto3's built-in credential resolution
-        session = boto3.Session()
-        client = session.client('cloudwatch', region_name='us-east-1')
-    except Exception as e:
-        raise Exception(f"Failed to initialize CloudWatch client: {e}")
+    aws_credentials = get_aws_credentials()
 
-    print(f"[{datetime.now()}] CloudWatch client initialized in {time.time() - start:.2f} seconds")
-    return client
+    return boto3.client(
+        'cloudwatch',
+        region_name='us-east-1',
+        aws_access_key_id=aws_credentials["aws_access_key_id"],
+        aws_secret_access_key=aws_credentials["aws_secret_access_key"],
+        aws_session_token=aws_credentials["aws_session_token"]
+    )
+
 
 
 def rds_free_space(identifier):
