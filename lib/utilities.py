@@ -610,16 +610,17 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
     return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 def test_aws_credentials():
-    sts_client = boto3.client('sts')
-
-    assumed_role_object = sts_client.assume_role(
-        RoleArn="arn:aws:ec2:us-east-1:743040338427:instance/i-0846cd80ded9be3a1",
-        RoleSessionName="AssumeRoleSession1"
-    )
+    session = boto3.Session()
+    credentials = session.get_credentials()
+    print(credentials)
+    # assumed_role_object = sts_client.assume_role(
+    #     RoleArn="arn:aws:ec2:us-east-1:743040338427:instance/i-0846cd80ded9be3a1",
+    #     RoleSessionName="AssumeRoleSession1"
+    # )
 
     # From the response that contains the assumed role, get the temporary credentials
-    credentials = assumed_role_object['Credentials']
-    print(credentials)
+    # credentials = assumed_role_object['Credentials']
+    # print(credentials)
 
 def rds_free_space(identifier):
     test_aws_credentials()
