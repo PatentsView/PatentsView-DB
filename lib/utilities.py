@@ -610,9 +610,10 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
     return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 def test_aws_credentials():
-    sts = boto3.client("sts")
-    identity = sts.get_caller_identity()
-    print(f"AWS IAM ROLE:{identity}")
+        session = boto3.Session()
+        sts_client = session.client('sts')
+        identity = sts_client.get_caller_identity()
+        print(identity)
 
 def rds_free_space(identifier):
     test_aws_credentials()
