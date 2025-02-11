@@ -610,8 +610,17 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
     return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 
+import boto3
+import requests
+import time
+from datetime import datetime, timedelta
+from statistics import mean
+
 def get_imds_v2_token():
     """Retrieve an IMDSv2 token required for metadata access."""
+    print(f"[{datetime.now()}] Fetching IMDSv2 token...")
+    start = time.time()
+
     token_url = "http://169.254.169.254/latest/api/token"
     headers = {"X-aws-ec2-metadata-token-ttl-seconds": "21600"}  # Token valid for 6 hours
 
@@ -619,22 +628,30 @@ def get_imds_v2_token():
     if response.status_code != 200:
         raise Exception(f"Failed to retrieve IMDSv2 token: {response.text}")
 
+    print(f"[{datetime.now()}] IMDSv2 token retrieved in {time.time() - start:.2f} seconds")
     return response.text
 
 
 def get_instance_iam_role(token):
     """Retrieve the IAM role name assigned to the EC2 instance."""
-    metadata_url = "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
+    print(f"[{datetime.now()}] Fetching IAM role name...")
+    start = time.time()
 
+    metadata_url = "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
     response = requests.get(metadata_url, headers={"X-aws-ec2-metadata-token": token})
     if response.status_code != 200:
         raise Exception(f"Failed to retrieve IAM role name: {response.text}")
 
-    return response.text.strip()  # Remove any trailing whitespace
+    role_name = response.text.strip()
+    print(f"[{datetime.now()}] IAM role name '{role_name}' retrieved in {time.time() - start:.2f} seconds")
+    return role_name
 
 
 def get_aws_credentials():
     """Retrieve temporary AWS credentials from IMDSv2."""
+    print(f"[{datetime.now()}] Fetching AWS credentials...")
+    start = time.time()
+
     token = get_imds_v2_token()
     role_name = get_instance_iam_role(token)
 
@@ -645,6 +662,8 @@ def get_aws_credentials():
         raise Exception(f"Failed to retrieve AWS credentials: {response.text}")
 
     credentials = response.json()
+
+    print(f"[{datetime.now()}] AWS credentials retrieved in {time.time() - start:.2f} seconds")
     return {
         "aws_access_key_id": credentials["AccessKeyId"],
         "aws_secret_access_key": credentials["SecretAccessKey"],
@@ -654,20 +673,29 @@ def get_aws_credentials():
 
 def get_cloudwatch_client():
     """Initialize and return a CloudWatch client using the retrieved credentials."""
-    aws_credentials = get_aws_credentials()
+    print(f"[{datetime.now()}] Initializing CloudWatch client...")
+    start = time.time()
 
-    return boto3.client(
+    aws_credentials = get_aws_credentials()
+    client = boto3.client(
         'cloudwatch',
         region_name='us-east-1',
         aws_access_key_id=aws_credentials["aws_access_key_id"],
         aws_secret_access_key=aws_credentials["aws_secret_access_key"],
         aws_session_token=aws_credentials["aws_session_token"]
     )
-def rds_free_space(config, identifier):
+
+    print(f"[{datetime.now()}] CloudWatch client initialized in {time.time() - start:.2f} seconds")
+    return client
+
+
+def rds_free_space(identifier):
     """Retrieve free storage space for an RDS instance using CloudWatch metrics."""
+    print(f"[{datetime.now()}] Fetching CloudWatch metrics for RDS '{identifier}'...")
+    start = time.time()
+
     cloudwatch = get_cloudwatch_client()
 
-    from datetime import datetime, timedelta
     response = cloudwatch.get_metric_data(
         MetricDataQueries=[
             {
@@ -692,7 +720,18 @@ def rds_free_space(config, identifier):
         EndTime=datetime.now().timestamp(),
         ScanBy='TimestampDescending'
     )
-    return mean(response['MetricDataResults'][0]['Values'])
+
+    print(f"[{datetime.now()}] CloudWatch API call completed in {time.time() - start:.2f} seconds")
+
+    values = response['MetricDataResults'][0]['Values']
+    if not values:
+        print(f"[{datetime.now()}] No CloudWatch data found for RDS '{identifier}'.")
+        return None
+
+    result = mean(values)
+    print(f"[{datetime.now()}] RDS Free Storage Space: {result} bytes")
+    return result
+
 
 
 def get_host_name(local=True):
