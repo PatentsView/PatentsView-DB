@@ -707,14 +707,22 @@ def get_cloudwatch_client():
 
 
 def check_aws_credentials():
-    """Check if Airflow DAG can retrieve AWS credentials"""
-    print(f"[{datetime.now()}] Checking AWS credentials...")
+    """Check if IAM credentials from EC2 metadata are being used."""
+    print(f"Accessing AWS credentials...")
 
+    # Log the current environment variables
+    print(f"AWS Access Key ID: {os.getenv('AWS_ACCESS_KEY_ID')}")
+    print(f"AWS Secret Access Key: {os.getenv('AWS_SECRET_ACCESS_KEY')}")
+
+    # Use Boto3 to check credentials
     session = boto3.Session()
-    client = session.client("sts")
-    identity = client.get_caller_identity()
+    client = session.client('sts')
 
-    print(f"AWS Identity: {identity}")
+    try:
+        identity = client.get_caller_identity()
+        print(f"Successfully accessed AWS: {identity}")
+    except Exception as e:
+        print(f"Error accessing AWS credentials: {str(e)}")
 
 
 def rds_free_space(identifier):
