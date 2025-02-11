@@ -691,18 +691,19 @@ def get_aws_credentials():
 
 
 def get_cloudwatch_client():
-    """Initialize CloudWatch client using manually retrieved credentials inside Docker."""
-    print(f"[{datetime.now()}] Initializing CloudWatch client inside Docker...")
+    """Use AWS-managed credentials instead of fetching them manually."""
+    print(f"[{datetime.now()}] Initializing CloudWatch client...")
 
-    aws_credentials = get_aws_credentials()
+    try:
+        # Use default Boto3 session (automatically detects IAM role credentials)
+        session = boto3.Session()
+        client = session.client("cloudwatch", region_name="us-east-1")
 
-    return boto3.client(
-        'cloudwatch',
-        region_name='us-east-1',
-        aws_access_key_id=aws_credentials["aws_access_key_id"],
-        aws_secret_access_key=aws_credentials["aws_secret_access_key"],
-        aws_session_token=aws_credentials["aws_session_token"]
-    )
+    except Exception as e:
+        raise Exception(f"Failed to initialize CloudWatch client: {e}")
+
+    print(f"[{datetime.now()}] CloudWatch client initialized successfully.")
+    return client
 
 
 
