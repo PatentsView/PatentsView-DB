@@ -706,10 +706,21 @@ def get_cloudwatch_client():
     return client
 
 
+def check_aws_credentials():
+    """Check if Airflow DAG can retrieve AWS credentials"""
+    print(f"[{datetime.now()}] Checking AWS credentials...")
+
+    session = boto3.Session()
+    client = session.client("sts")
+    identity = client.get_caller_identity()
+
+    print(f"AWS Identity: {identity}")
+
 
 def rds_free_space(identifier):
     """Retrieve free storage space for an RDS instance using CloudWatch metrics."""
     print(f"[{datetime.now()}] Fetching CloudWatch metrics for RDS '{identifier}'...")
+    check_aws_credentials()
     start = time.time()
 
     cloudwatch = get_cloudwatch_client()
