@@ -609,7 +609,7 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
         response = ec2.stop_instances(InstanceIds=[instance_id])
     return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
-def test_aws_credentials():
+def create_aws_boto3_session():
     try:
         # Create a boto3 session (automatically uses IAM role if running in EC2)
         session = boto3.Session()
@@ -630,21 +630,47 @@ def test_aws_credentials():
         return None
 
 def rds_free_space(identifier):
-    test_aws_credentials()
-    # Boto3 automatically picks up IAM role credentials
-    cloudwatch = boto3.client('cloudwatch', region_name='us-east-1')
+    """
+    Retrieve the FreeStorageSpace metric for an RDS instance.
+    Args:
+        identifier (str): The RDS instance identifier.
+    Returns:
+        dict: CloudWatch response containing storage space data.
+    """
+    session = create_aws_boto3_session()
+    if not session:
+        print("Failed to retrieve AWS credentials.")
+        return None
 
-    response = cloudwatch.get_metric_statistics(
-        Namespace='AWS/RDS',
-        MetricName='FreeStorageSpace',
-        Dimensions=[{'Name': 'DBInstanceIdentifier', 'Value': identifier}],
-        StartTime=datetime.utcnow() - timedelta(minutes=5),
-        EndTime=datetime.utcnow(),
-        Period=300,
-        Statistics=['Average']
+    # Create CloudWatch client using the returned session
+    cloudwatch = session.client('cloudwatch', region_name='us-east-1')
+
+    from datetime import datetime, timedelta
+    response = cloudwatch.get_metric_data(
+        MetricDataQueries=[
+            {
+                'Id': 'fetching_FreeStorageSpace',
+                'MetricStat': {
+                    'Metric': {
+                        'Namespace': 'AWS/RDS',
+                        'MetricName': 'FreeStorageSpace',
+                        'Dimensions': [
+                            {
+                                "Name": "DBInstanceIdentifier",
+                                "Value": identifier
+                            }
+                        ]
+                    },
+                    'Period': 300,
+                    'Stat': 'Minimum'
+                }
+            }
+        ],
+        StartTime=(datetime.now() - timedelta(seconds=300 * 3)).timestamp(),
+        EndTime=datetime.now().timestamp(),
+        ScanBy='TimestampDescending'
     )
-
-    return response
+    return mean(response['MetricDataResults'][0]['Values'])
 
 
 def get_host_name(local=True):
