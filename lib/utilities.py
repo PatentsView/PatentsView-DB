@@ -610,9 +610,24 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
     return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 def test_aws_credentials():
-    session = boto3.Session(profile_name='svc_generator')
-    credentials = session.get_credentials()
-    print(credentials)
+    try:
+        # Create a boto3 session (automatically uses IAM role if running in EC2)
+        session = boto3.Session()
+
+        # Get credentials
+        credentials = session.get_credentials()
+        creds_dict = {
+            "Access Key": credentials.access_key,
+            "Secret Key": credentials.secret_key,
+            "Token": credentials.token
+        }
+
+        print("AWS Credentials Retrieved Successfully:")
+        print(creds_dict)
+        return creds_dict
+    except Exception as e:
+        print(f"Error retrieving AWS credentials: {e}")
+        return None
 
 def rds_free_space(identifier):
     test_aws_credentials()
