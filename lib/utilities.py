@@ -609,24 +609,19 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
         response = ec2.stop_instances(InstanceIds=[instance_id])
     return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
+
 def create_aws_boto3_session():
+    """
+    Creates and returns a boto3 session.
+    If running in EC2, it will use the instance's IAM role.
+    """
     try:
-        # Create a boto3 session (automatically uses IAM role if running in EC2)
+        # Create a boto3 session
         session = boto3.Session()
-
-        # Get credentials
-        credentials = session.get_credentials()
-        creds_dict = {
-            "Access Key": credentials.access_key,
-            "Secret Key": credentials.secret_key,
-            "Token": credentials.token
-        }
-
-        print("AWS Credentials Retrieved Successfully:")
-        print(creds_dict)
-        return creds_dict
+        print("AWS Session Created Successfully")
+        return session
     except Exception as e:
-        print(f"Error retrieving AWS credentials: {e}")
+        print(f"Error creating AWS session: {e}")
         return None
 
 def rds_free_space(identifier):
