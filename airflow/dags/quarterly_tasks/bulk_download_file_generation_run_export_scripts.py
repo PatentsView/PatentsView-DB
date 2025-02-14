@@ -37,7 +37,7 @@ def verify_directory_contents(**kwargs):
     print("Directory contents:")
     for f in os.listdir('.'):
         print(f)
-    config_dir = "PatentsView-Downloads/config_jsons"
+    config_dir = config_dir
     print(f"Attempting to change into: {config_dir}")
 
     # Change directory for THIS task’s process
