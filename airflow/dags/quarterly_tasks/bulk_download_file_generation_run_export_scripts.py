@@ -72,7 +72,7 @@ with DAG(
         default_args=default_args,
         # start_date=datetime(2025, 1, 1),
         start_date=days_ago(1),
-        schedule_interval="*/5 * * * *",
+        schedule_interval='@daily',
         catchup=True,
         template_searchpath="/project/bulk_download_file_generation/"
 ) as dag:
