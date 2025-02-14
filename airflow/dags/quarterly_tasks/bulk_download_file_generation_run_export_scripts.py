@@ -33,6 +33,9 @@ default_args = {
 def verify_directory_contents(**kwargs):
     print(f'this is the projecthome: {project_home}')
     print(f"Current directory: {os.getcwd()}")
+    print("Directory contents:")
+    for f in os.listdir('.'):
+        print(f)
     config_dir = "PatentsView-Downloads/config_jsons"
     print(f"Attempting to change into: {config_dir}")
 
