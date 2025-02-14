@@ -1,0 +1,217 @@
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
+from datetime import datetime, timedelta
+import math
+import os
+
+# ----------- Configuration and Defaults -----------
+json_files = [
+    "export_view_config_granted",
+    "export_text_tables_granted",
+    "export_view_config_pregrant",
+    "export_text_tables_pregrant"
+]
+
+config_dir = "PatentsView-Downloads/config_jsons"
+
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'email': ['contact@patentsview.org'],
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 0,
+    'retry_delay': timedelta(minutes=5),
+    'concurrency': 40,
+    'queue': 'disambiguation'
+}
+
+
+# Example: a function to check directory contents
+def verify_directory_contents(**kwargs):
+    config_dir = "PatentsView-Downloads/config_jsons"
+    print(f"Attempting to change into: {config_dir}")
+
+    # Change directory for THIS task’s process
+    os.chdir(config_dir)
+
+    print(f"Current directory: {os.getcwd()}")
+    print("Directory contents:")
+    for f in os.listdir('.'):
+        print(f)
+
+def get_relevant_year(**context):
+    """
+    If the execution_date is Jan/Feb/Mar, use the previous year.
+    Otherwise, use the current year.
+    """
+    execution_date = context['execution_date']
+    if execution_date.month in [1, 2, 3]:
+        return execution_date.year - 1
+    else:
+        return execution_date.year
+
+
+def get_quarter_end_str(**context):
+    """
+    Returns 'YYYY0331', 'YYYY0630', 'YYYY0930', or 'YYYY1231'
+    based on the execution_date's quarter.
+    """
+    ex = context['execution_date']
+    quarter = math.ceil(ex.month / 3.0)
+    quarter_end_days = {1: "0331", 2: "0630", 3: "0930", 4: "1231"}
+    return f"{ex.year}{quarter_end_days[quarter]}"
+
+
+with DAG(
+        dag_id="Bulk_Download_Run_Export_Scripts",
+        default_args=default_args,
+        start_date=datetime(2025, 4, 1),
+        schedule_interval='@quarterly',
+        catchup=False
+) as dag:
+
+    test_change_directory = PythonOperator(
+        task_id='verify_directory_contents',
+        python_callable=verify_directory_contents
+    )
+
+    # # 1) Get relevant year
+    # get_year = PythonOperator(
+    #     task_id='get_year',
+    #     python_callable=get_relevant_year
+    # )
+    #
+    # # 2) Copy each JSON file to a _temp.json file
+    # copy_json_tasks = []
+    # for file_name in json_files:
+    #     copy_task = BashOperator(
+    #         task_id=f"copy_{file_name}_json",
+    #         bash_command=f"""
+    #             cd {config_dir} && \
+    #             cp {file_name}.json {file_name}_temp.json
+    #         """
+    #     )
+    #     copy_json_tasks.append(copy_task)
+    #
+    # # 3) Update text_tables files with the relevant year
+    # text_table_files = ["export_text_tables_granted", "export_text_tables_pregrant"]
+    # update_text_tables_tasks = []
+    # for file_name in text_table_files:
+    #     update_task = BashOperator(
+    #         task_id=f"update_{file_name}_json",
+    #         bash_command="""
+    #             cd {{ params.config_dir }} && \
+    #             sed -i 's/_xxxx/_{{ ti.xcom_pull(task_ids="get_year") }}/g' {{ params.file_name }}_temp.json
+    #         """,
+    #         params={
+    #             'config_dir': config_dir,
+    #             'file_name': file_name
+    #         }
+    #     )
+    #     update_text_tables_tasks.append(update_task)
+    #
+    # # 4) Get the "quarter end" date for the -t parameter (YYYYMMDD format)
+    # get_quarter_end_date = PythonOperator(
+    #     task_id='get_quarter_end_date',
+    #     python_callable=get_quarter_end_str
+    # )
+    #
+    # # 5) Four separate tasks calling generate_bulk_downloads.py
+    # generate_granted_text_tables = BashOperator(
+    #     task_id="generate_granted_text_tables",
+    #     bash_command="""
+    #         cd {{ params.config_dir }} && \
+    #         python generate_bulk_downloads.py \
+    #             -d tab_export_settings.ini \
+    #             -c cred.ini \
+    #             -t {{ ti.xcom_pull(task_ids='get_quarter_end_date') }} \
+    #             -e 1 -o 0 \
+    #             -s config_json/export_text_tables_granted_temp.json \
+    #             -g patent \
+    #             -i 0
+    #     """,
+    #     params={'config_dir': config_dir},
+    # )
+    #
+    # generate_granted_view_config = BashOperator(
+    #     task_id="generate_granted_view_config",
+    #     bash_command="""
+    #         cd {{ params.config_dir }} && \
+    #         python generate_bulk_downloads.py \
+    #             -d tab_export_settings.ini \
+    #             -c cred.ini \
+    #             -t {{ ti.xcom_pull(task_ids='get_quarter_end_date') }} \
+    #             -e 1 -o 0 \
+    #             -s config_json/export_view_config_granted_temp.json \
+    #             -g patent \
+    #             -i 0
+    #     """,
+    #     params={'config_dir': config_dir},
+    # )
+    #
+    # generate_pregrant_text_tables = BashOperator(
+    #     task_id="generate_pregrant_text_tables",
+    #     bash_command="""
+    #         cd {{ params.config_dir }} && \
+    #         python generate_bulk_downloads.py \
+    #             -d tab_export_settings.ini \
+    #             -c cred.ini \
+    #             -t {{ ti.xcom_pull(task_ids='get_quarter_end_date') }} \
+    #             -e 1 -o 0 \
+    #             -s config_json/export_text_tables_pregrant_temp.json \
+    #             -g pregrant \
+    #             -i 0
+    #     """,
+    #     params={'config_dir': config_dir},
+    # )
+    #
+    # generate_pregrant_view_config = BashOperator(
+    #     task_id="generate_pregrant_view_config",
+    #     bash_command="""
+    #         cd {{ params.config_dir }} && \
+    #         python generate_bulk_downloads.py \
+    #             -d tab_export_settings.ini \
+    #             -c cred.ini \
+    #             -t {{ ti.xcom_pull(task_ids='get_quarter_end_date') }} \
+    #             -e 1 -o 0 \
+    #             -s config_json/export_view_config_pregrant_temp.json \
+    #             -g pregrant \
+    #             -i 0
+    #     """,
+    #     params={'config_dir': config_dir},
+    # )
+    #
+    # # =====================
+    # #  LINEAR DEPENDENCIES
+    # # =====================
+    #
+    # # Step 1: get_year
+    # # Step 2: copy_json_tasks (one after the other)
+    # # Step 3: update_text_tables_tasks (one after the other)
+    # # Step 4: get_quarter_end_date
+    # # Step 5: four generate tasks, one after another
+    #
+    # # 1) get_year goes first
+    # chain_head = get_year
+    #
+    # # 2) chain all copy tasks one by one
+    # for copy_task in copy_json_tasks:
+    #     chain_head >> copy_task
+    #     chain_head = copy_task
+    #
+    # # 3) chain update_text_tables one by one
+    # for update_task in update_text_tables_tasks:
+    #     chain_head >> update_task
+    #     chain_head = update_task
+    #
+    # # 4) chain get_quarter_end_date
+    # chain_head >> get_quarter_end_date
+    # chain_head = get_quarter_end_date
+    #
+    # # 5) chain the four generate tasks in sequence
+    # chain_head >> generate_granted_text_tables
+    # generate_granted_text_tables >> generate_granted_view_config
+    # generate_granted_view_config >> generate_pregrant_text_tables
+    # generate_pregrant_text_tables >> generate_pregrant_view_config
