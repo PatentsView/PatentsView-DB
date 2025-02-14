@@ -32,21 +32,26 @@ default_args = {
 
 # Example: a function to check directory contents
 def verify_directory_contents(**kwargs):
-    print(f'this is the projecthome: {project_home}')
+    project_home = os.getenv("PROJECT_HOME", os.getcwd())  # Default to current directory if PROJECT_HOME is not set
+    print(f"This is the project home: {project_home}")
     print(f"Current directory: {os.getcwd()}")
     print("Directory contents:")
     for f in os.listdir('.'):
         print(f)
-    config_dir = config_dir
+
+    # Change directory one level up (parent directory)
+    config_dir = os.path.abspath(os.path.join(os.getcwd(), ".."))  # Explicitly move up one directory
     print(f"Attempting to change into: {config_dir}")
 
-    # Change directory for THIS task’s process
-    os.chdir(config_dir)
+    try:
+        os.chdir(config_dir)
+        print(f"Successfully changed directory to: {os.getcwd()}")
+        print("Directory contents:")
+        for f in os.listdir('.'):
+            print(f)
+    except Exception as e:
+        print(f"Error changing directory: {e}")
 
-    print(f"Current directory: {os.getcwd()}")
-    print("Directory contents:")
-    for f in os.listdir('.'):
-        print(f)
 
 def get_relevant_year(**context):
     """
