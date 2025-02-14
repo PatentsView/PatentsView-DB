@@ -2,6 +2,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
+from airflow.utils.dates import days_ago
 import math
 import os
 
@@ -67,8 +68,10 @@ def get_quarter_end_str(**context):
 with DAG(
         dag_id="Bulk_Download_Run_Export_Scripts",
         default_args=default_args,
-        start_date=datetime(2025, 1, 1),
-        schedule_interval='@quarterly',
+        # start_date=datetime(2025, 1, 1),
+        start_date=days_ago(1),
+        schedule_interval=None,
+        #schedule_interval='@quarterly',
         catchup=False
 ) as dag:
 
