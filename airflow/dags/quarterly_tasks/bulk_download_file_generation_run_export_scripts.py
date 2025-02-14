@@ -24,8 +24,7 @@ default_args = {
     'email_on_retry': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
-    'concurrency': 40,
-    'queue': 'data_collector'
+    'concurrency': 40
 }
 
 
