@@ -25,7 +25,7 @@ default_args = {
     'retries': 0,
     'retry_delay': timedelta(minutes=1),
     'concurrency': 40,
-    'queue': 'disambiguation'
+    'queue': 'disambiguator'
 }
 
 
