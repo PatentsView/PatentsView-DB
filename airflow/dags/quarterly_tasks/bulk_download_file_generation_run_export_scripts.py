@@ -14,7 +14,8 @@ json_files = [
     "export_text_tables_pregrant"
 ]
 project_home = os.environ['PACKAGE_HOME']
-config_dir = "PatentsView-Downloads/config_jsons"
+config_dir = ".."
+# config_dir = "../PatentsView-Downloads/config_jsons"
 
 default_args = {
     'owner': 'airflow',
