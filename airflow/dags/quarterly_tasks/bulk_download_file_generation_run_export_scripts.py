@@ -25,13 +25,14 @@ default_args = {
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
     'concurrency': 40,
-    'queue': 'data_collector'
+    'queue': 'disambiguation'
 }
 
 
 # Example: a function to check directory contents
 def verify_directory_contents(**kwargs):
     print(f'this is the projecthome: {project_home}')
+    print(f"Current directory: {os.getcwd()}")
     config_dir = "PatentsView-Downloads/config_jsons"
     print(f"Attempting to change into: {config_dir}")
 
