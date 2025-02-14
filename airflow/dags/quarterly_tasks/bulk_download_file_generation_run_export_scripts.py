@@ -13,7 +13,7 @@ json_files = [
     "export_view_config_pregrant",
     "export_text_tables_pregrant"
 ]
-
+project_home = os.environ['PACKAGE_HOME']
 config_dir = "PatentsView-Downloads/config_jsons"
 
 default_args = {
@@ -25,12 +25,13 @@ default_args = {
     'retries': 0,
     'retry_delay': timedelta(minutes=5),
     'concurrency': 40,
-    'queue': 'admin'
+    'queue': 'data_collector'
 }
 
 
 # Example: a function to check directory contents
 def verify_directory_contents(**kwargs):
+    print(f'this is the projecthome: {project_home}')
     config_dir = "PatentsView-Downloads/config_jsons"
     print(f"Attempting to change into: {config_dir}")
 
