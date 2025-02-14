@@ -70,7 +70,6 @@ with DAG(
         default_args=default_args,
         # start_date=datetime(2025, 1, 1),
         start_date=days_ago(1),
-        schedule_interval=None,
         #schedule_interval='@quarterly',
         catchup=False
 ) as dag:
