@@ -40,7 +40,7 @@ def verify_directory_contents(**kwargs):
         print(f)
 
     # Change directory one level up (parent directory)
-    config_dir = os.path.abspath(os.path.join(os.getcwd(), ".."))  # Explicitly move up one directory
+    config_dir = os.path.abspath(os.path.join(os.getcwd(), "..", ""))  # Explicitly move up one directory
     print(f"Attempting to change into: {config_dir}")
 
     try:
