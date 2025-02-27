@@ -13,6 +13,10 @@ json_files = [
     "export_view_config_pregrant",
     "export_text_tables_pregrant"
 ]
+
+text_table_files = ["export_text_tables_granted",
+                    "export_text_tables_pregrant"
+]
 project_home = os.environ['PACKAGE_HOME']
 PV_Downloads_dir = os.getenv("PROJECT_HOME", os.path.join(os.getcwd(), "..", "PatentsView-Downloads"))
 
@@ -83,11 +87,6 @@ def create_copy_json_tasks(json_files, config_dir):
     :return: List of BashOperator tasks
     """
     copy_json_tasks = []
-    os.chdir(config_dir)
-    print(f"This is the project home: {config_dir}")
-    print("Directory contents:")
-    for f in sorted(os.listdir('.')):
-        print(f)
     for file_name in json_files:
         copy_task = BashOperator(
             task_id=f"copy_{file_name}_json",
@@ -99,6 +98,33 @@ def create_copy_json_tasks(json_files, config_dir):
         copy_json_tasks.append(copy_task)
 
     return copy_json_tasks
+
+def create_update_text_table_tasks(text_table_files, config_dir, **context):
+    """
+    Creates a list of BashOperator tasks to update text table JSON files.
+
+    :param text_table_files: List of JSON file names (without .json extension)
+    :param config_dir: Directory where JSON files are located
+    :return: List of BashOperator tasks
+    """
+    update_text_tables_tasks = []
+    year = get_relevant_year(**context)
+    print(f"this is the year: {year}")
+    for file_name in text_table_files:
+        update_task = BashOperator(
+            task_id=f"update_{file_name}_json",
+            bash_command=f"""
+                cd {config_dir} && \
+                sed -i 's/_xxxx/_{year}/g' {file_name}_temp_25.json
+            """,
+            params={
+                'config_dir': config_dir,
+                'file_name': file_name
+            }
+        )
+        update_text_tables_tasks.append(update_task)
+
+    return update_text_tables_tasks
 
 
 with DAG(
@@ -127,31 +153,14 @@ with DAG(
     # 2) Copy each JSON file to a _temp.json file
     copy_json_tasks = create_copy_json_tasks(json_files, config_dir = os.path.join(PV_Downloads_dir, "config_json"))
 
-    #
-    # # 3) Update text_tables files with the relevant year
-    # text_table_files = ["export_text_tables_granted", "export_text_tables_pregrant"]
-    # update_text_tables_tasks = []
-    # for file_name in text_table_files:
-    #     update_task = BashOperator(
-    #         task_id=f"update_{file_name}_json",
-    #         bash_command="""
-    #             cd {{ params.config_dir }} && \
-    #             sed -i 's/_xxxx/_{{ ti.xcom_pull(task_ids="get_year") }}/g' {{ params.file_name }}_temp.json
-    #         """,
-    #         params={
-    #             'config_dir': config_dir,
-    #             'file_name': file_name
-    #         }
-    #     )
-    #     update_text_tables_tasks.append(update_task)
-    #
+
     # 4) Get the "quarter end" date for the -t parameter (YYYYMMDD format)
     get_quarter_end_date = PythonOperator(
         task_id='get_quarter_end_date',
         python_callable=get_quarter_end_str
     )
 
-    test_change_directory >> get_year >> get_quarter_end_date >> copy_json_tasks
+    test_change_directory >> get_year >> get_quarter_end_date >> copy_json_tasks >> create_update_text_table_tasks(text_table_files, config_dir = os.path.join(PV_Downloads_dir, "config_json"))
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
     # generate_granted_text_tables = BashOperator(
