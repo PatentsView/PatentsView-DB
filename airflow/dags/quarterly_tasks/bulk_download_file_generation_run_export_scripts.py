@@ -120,7 +120,7 @@ with DAG(
 
 
     # 2) Copy each JSON file to a _temp.json file
-    copy_json_tasks = create_copy_json_tasks(json_files, config_dir = os.getenv(PV_Downloads_dir, "config_json"))
+    copy_json_tasks = create_copy_json_tasks(json_files, config_dir = os.path.join(PV_Downloads_dir, "config_json"))
 
     #
     # # 3) Update text_tables files with the relevant year
