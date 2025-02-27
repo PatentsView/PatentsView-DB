@@ -97,19 +97,17 @@ def create_copy_json_tasks(json_files, config_dir):
 
     return copy_json_tasks
 
-
-def create_update_text_table_tasks(**context):
+def create_update_text_table_tasks(text_table_files, config_dir):
     """
-    Creates BashOperator tasks for updating text table JSON files.
+    Creates a list of BashOperator tasks to update text table JSON files.
+
+    :param text_table_files: List of JSON file names (without .json extension)
+    :param config_dir: Directory where JSON files are located
+    :return: List of BashOperator tasks
     """
-    ti = context['ti']
-    year = ti.xcom_pull(task_ids='get_year')  # Retrieve the year from XCom
-
-    if not year:
-        raise ValueError("Failed to retrieve the year from XCom.")
-
-    config_dir = os.path.join(PV_Downloads_dir, "config_json")
-
+    update_text_tables_tasks = []
+    year = '2025'
+    print(f"this is the year: {year}")
     for file_name in text_table_files:
         update_task = BashOperator(
             task_id=f"update_{file_name}_json",
@@ -122,9 +120,9 @@ def create_update_text_table_tasks(**context):
                 'file_name': file_name
             }
         )
-        # Instead of returning, we use `update_task.set_upstream(get_quarter_end_date)`
-        update_task.set_upstream(get_quarter_end_date)  # Ensures execution order
+        update_text_tables_tasks.append(update_task)
 
+    return update_text_tables_tasks
 
 
 with DAG(
@@ -158,15 +156,10 @@ with DAG(
         task_id='get_quarter_end_date',
         python_callable=get_quarter_end_str
     )
-    # 5)
-    generate_update_tasks = PythonOperator(
-        task_id="generate_update_text_table_tasks",
-        python_callable=create_update_text_table_tasks,
-        provide_context=True
-    )
 
-    test_change_directory >> get_year >> get_quarter_end_date >> copy_json_tasks >> generate_update_tasks
+    update_text_tables = create_update_text_table_tasks(text_table_files, config_dir=os.path.join(PV_Downloads_dir, "config_json"))
 
+    test_change_directory >> get_year >> get_quarter_end_date >> copy_json_tasks >> update_text_tables
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
     # generate_granted_text_tables = BashOperator(
