@@ -88,7 +88,7 @@ def create_copy_json_tasks(json_files, config_dir):
         copy_task = BashOperator(
             task_id=f"copy_{file_name}_json",
             bash_command=f"""
-                cp {file_name}.json {file_name}_temp_2.json
+                cp {file_name}.json {file_name}_temp_25.json
             """
         )
         copy_json_tasks.append(copy_task)
