@@ -55,15 +55,13 @@ def verify_directory_contents(**kwargs):
 
 
 def get_relevant_year(**context):
-    """
-    If the execution_date is Jan/Feb/Mar, use the previous year.
-    Otherwise, use the current year.
-    """
-    execution_date = context['execution_date']
+    execution_date = context['ds']
+    execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
     if execution_date.month in [1, 2, 3]:
         return execution_date.year - 1
     else:
         return execution_date.year
+
 
 
 def get_quarter_end_str(**context):
@@ -102,14 +100,12 @@ def create_copy_json_tasks(json_files, config_dir):
 def create_update_text_table_tasks(text_table_files, config_dir, **context):
     """
     Creates a list of BashOperator tasks to update text table JSON files.
-
-    :param text_table_files: List of JSON file names (without .json extension)
-    :param config_dir: Directory where JSON files are located
-    :return: List of BashOperator tasks
     """
+    year = context['ti'].xcom_pull(task_ids='get_year')  # Pull from XCom
+    if not year:
+        raise ValueError("Failed to retrieve the year from XCom.")
+
     update_text_tables_tasks = []
-    year = get_relevant_year(**context)
-    print(f"this is the year: {year}")
     for file_name in text_table_files:
         update_task = BashOperator(
             task_id=f"update_{file_name}_json",
@@ -125,6 +121,7 @@ def create_update_text_table_tasks(text_table_files, config_dir, **context):
         update_text_tables_tasks.append(update_task)
 
     return update_text_tables_tasks
+
 
 
 with DAG(
@@ -145,10 +142,9 @@ with DAG(
     # 1) Get relevant year
     get_year = PythonOperator(
         task_id='get_year',
-        python_callable=get_relevant_year
+        python_callable=get_relevant_year,
+        provide_context=True  # Ensure it gets the execution context
     )
-
-
 
     # 2) Copy each JSON file to a _temp.json file
     copy_json_tasks = create_copy_json_tasks(json_files, config_dir = os.path.join(PV_Downloads_dir, "config_json"))
@@ -159,8 +155,11 @@ with DAG(
         task_id='get_quarter_end_date',
         python_callable=get_quarter_end_str
     )
+    # 5)
+    update_text_tables_tasks = create_update_text_table_tasks(text_table_files,
+                                                              config_dir=os.path.join(PV_Downloads_dir, "config_json"))
 
-    test_change_directory >> get_year >> get_quarter_end_date >> copy_json_tasks >> create_update_text_table_tasks(text_table_files, config_dir = os.path.join(PV_Downloads_dir, "config_json"))
+    test_change_directory >> get_year >> get_quarter_end_date >> copy_json_tasks >> update_text_tables_tasks
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
     # generate_granted_text_tables = BashOperator(
