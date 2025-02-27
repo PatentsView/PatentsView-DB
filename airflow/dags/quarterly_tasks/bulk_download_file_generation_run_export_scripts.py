@@ -161,13 +161,15 @@ with DAG(
 
     from airflow.models.baseoperator import chain, cross_downstream
 
-    # Ensure all copy_json_tasks run before any update_text_tables task starts
+    # Chain initial dependencies
     chain(
         test_change_directory,
         get_year,
-        get_quarter_end_date
+        get_quarter_end_date,  # Ensures get_quarter_end_date runs before copy_json_tasks
+        *copy_json_tasks  # Unpacks and runs all copy_json_tasks in parallel
     )
 
+    # Ensure all copy_json_tasks finish before update_text_tables starts
     cross_downstream(copy_json_tasks, update_text_tables)
 
     #
