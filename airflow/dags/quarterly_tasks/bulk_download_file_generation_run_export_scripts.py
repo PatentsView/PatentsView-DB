@@ -14,8 +14,8 @@ json_files = [
     "export_text_tables_pregrant"
 ]
 project_home = os.environ['PACKAGE_HOME']
-# config_dir = ".."
-PV_Downloads_dir = os.getenv("PROJECT_HOME", (os.getcwd(),"..", "PatentsView-Downloads"))
+PV_Downloads_dir = os.getenv("PROJECT_HOME", os.path.join(os.getcwd(), "..", "PatentsView-Downloads"))
+
 
 default_args = {
     'owner': 'airflow',
