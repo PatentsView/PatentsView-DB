@@ -97,15 +97,20 @@ def create_copy_json_tasks(json_files, config_dir):
 
     return copy_json_tasks
 
-def create_update_text_table_tasks(text_table_files, config_dir, **context):
+
+def create_update_text_table_tasks(**context):
     """
     Creates a list of BashOperator tasks to update text table JSON files.
     """
-    year = context['ti'].xcom_pull(task_ids='get_year')  # Pull from XCom
+    ti = context['ti']
+    year = ti.xcom_pull(task_ids='get_year')  # Retrieve the year from XCom
+
     if not year:
         raise ValueError("Failed to retrieve the year from XCom.")
 
+    config_dir = os.path.join(PV_Downloads_dir, "config_json")
     update_text_tables_tasks = []
+
     for file_name in text_table_files:
         update_task = BashOperator(
             task_id=f"update_{file_name}_json",
@@ -120,8 +125,7 @@ def create_update_text_table_tasks(text_table_files, config_dir, **context):
         )
         update_text_tables_tasks.append(update_task)
 
-    return update_text_tables_tasks
-
+    return update_text_tables_tasks  # This won't work directly in Airflow but keeps it structured
 
 
 with DAG(
@@ -156,10 +160,14 @@ with DAG(
         python_callable=get_quarter_end_str
     )
     # 5)
-    update_text_tables_tasks = create_update_text_table_tasks(text_table_files,
-                                                              config_dir=os.path.join(PV_Downloads_dir, "config_json"))
+    generate_update_tasks = PythonOperator(
+        task_id="generate_update_text_table_tasks",
+        python_callable=create_update_text_table_tasks,
+        provide_context=True
+    )
 
-    test_change_directory >> get_year >> get_quarter_end_date >> copy_json_tasks >> update_text_tables_tasks
+    test_change_directory >> get_year >> get_quarter_end_date >> copy_json_tasks >> generate_update_tasks
+
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
     # generate_granted_text_tables = BashOperator(
