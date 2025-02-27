@@ -100,7 +100,7 @@ def create_copy_json_tasks(json_files, config_dir):
 
 def create_update_text_table_tasks(**context):
     """
-    Creates a list of BashOperator tasks to update text table JSON files.
+    Creates BashOperator tasks for updating text table JSON files.
     """
     ti = context['ti']
     year = ti.xcom_pull(task_ids='get_year')  # Retrieve the year from XCom
@@ -109,7 +109,6 @@ def create_update_text_table_tasks(**context):
         raise ValueError("Failed to retrieve the year from XCom.")
 
     config_dir = os.path.join(PV_Downloads_dir, "config_json")
-    update_text_tables_tasks = []
 
     for file_name in text_table_files:
         update_task = BashOperator(
@@ -123,9 +122,9 @@ def create_update_text_table_tasks(**context):
                 'file_name': file_name
             }
         )
-        update_text_tables_tasks.append(update_task)
+        # Instead of returning, we use `update_task.set_upstream(get_quarter_end_date)`
+        update_task.set_upstream(get_quarter_end_date)  # Ensures execution order
 
-    return update_text_tables_tasks  # This won't work directly in Airflow but keeps it structured
 
 
 with DAG(
