@@ -84,6 +84,10 @@ def create_copy_json_tasks(json_files, config_dir):
     """
     copy_json_tasks = []
     os.chdir(config_dir)
+    print(f"This is the project home: {config_dir}")
+    print("Directory contents:")
+    for f in sorted(os.listdir('.')):
+        print(f)
     for file_name in json_files:
         copy_task = BashOperator(
             task_id=f"copy_{file_name}_json",
