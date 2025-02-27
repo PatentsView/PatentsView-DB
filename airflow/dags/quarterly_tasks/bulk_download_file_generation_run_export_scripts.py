@@ -127,11 +127,13 @@ with DAG(
     #     )
     #     update_text_tables_tasks.append(update_task)
     #
-    # # 4) Get the "quarter end" date for the -t parameter (YYYYMMDD format)
-    # get_quarter_end_date = PythonOperator(
-    #     task_id='get_quarter_end_date',
-    #     python_callable=get_quarter_end_str
-    # )
+    # 4) Get the "quarter end" date for the -t parameter (YYYYMMDD format)
+    get_quarter_end_date = PythonOperator(
+        task_id='get_quarter_end_date',
+        python_callable=get_quarter_end_str
+    )
+
+    test_change_directory >> get_year >> get_quarter_end_date
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
     # generate_granted_text_tables = BashOperator(
