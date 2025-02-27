@@ -47,7 +47,7 @@ def verify_directory_contents(**kwargs):
         os.chdir(config_dir)
         print(f"Successfully changed directory to: {os.getcwd()}")
         print("Directory contents:")
-        for f in os.listdir('.'):
+        for f in sorted(os.listdir('.')):
             print(f)
     except Exception as e:
         print(f"Error changing directory: {e}")
