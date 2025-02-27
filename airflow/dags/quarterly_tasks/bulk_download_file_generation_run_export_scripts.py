@@ -35,9 +35,6 @@ def verify_directory_contents(**kwargs):
     project_home = os.getenv("PROJECT_HOME", os.getcwd())  # Default to current directory if PROJECT_HOME is not set
     print(f"This is the project home: {project_home}")
     print(f"Current directory: {os.getcwd()}")
-    print("Directory contents:")
-    for f in os.listdir('.'):
-        print(f)
 
     # Change directory one level up (parent directory)
     config_dir = os.path.join(project_home,"..", "PatentsView-Downloads")  # Explicitly move up one directory
@@ -91,11 +88,15 @@ with DAG(
         python_callable=verify_directory_contents
     )
 
-    # # 1) Get relevant year
-    # get_year = PythonOperator(
-    #     task_id='get_year',
-    #     python_callable=get_relevant_year
-    # )
+    # 1) Get relevant year
+    get_year = PythonOperator(
+        task_id='get_year',
+        python_callable=get_relevant_year
+    )
+
+    # Set task dependencies
+    test_change_directory >> get_year
+
     #
     # # 2) Copy each JSON file to a _temp.json file
     # copy_json_tasks = []
