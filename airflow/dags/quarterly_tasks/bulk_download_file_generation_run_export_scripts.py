@@ -26,7 +26,7 @@ default_args = {
     'retries': 0,
     'retry_delay': timedelta(minutes=1),
     'concurrency': 40,
-    'queue': 'admin'
+    'queue': 'disambiguator'
 }
 
 
@@ -40,7 +40,7 @@ def verify_directory_contents(**kwargs):
         print(f)
 
     # Change directory one level up (parent directory)
-    config_dir = os.path.join(project_home, "..", "..", "..")  # Explicitly move up one directory
+    config_dir = os.path.join(project_home, "scripts")  # Explicitly move up one directory
     print(f"Attempting to change into: {config_dir}")
 
     try:
