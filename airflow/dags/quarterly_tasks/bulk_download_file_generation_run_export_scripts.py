@@ -159,16 +159,16 @@ with DAG(
 
     update_text_tables = create_update_text_table_tasks(text_table_files, config_dir=os.path.join(PV_Downloads_dir, "config_json"))
 
-    from airflow.models.baseoperator import chain
+    from airflow.models.baseoperator import chain, cross_downstream
 
-    # Chain the dependencies correctly
+    # Ensure all copy_json_tasks run before any update_text_tables task starts
     chain(
         test_change_directory,
         get_year,
-        get_quarter_end_date,
-        *copy_json_tasks,  # Unpack the list of tasks
-        *update_text_tables  # Unpack the list of tasks
+        get_quarter_end_date
     )
+
+    cross_downstream(copy_json_tasks, update_text_tables)
 
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
