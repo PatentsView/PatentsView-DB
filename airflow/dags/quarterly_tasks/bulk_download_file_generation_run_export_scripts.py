@@ -152,16 +152,21 @@ def create_update_view_config_tasks(view_config_files, config_dir):
     for task_id, file_name in view_config_files.items():  # Use keys as task IDs
         update_task = BashOperator(
             task_id=task_id,  # Use the existing key as the task_id
-            bash_command=(
-                f"cd {config_dir} && "
-                f"for prefix in 'disamb_assignee_id_' 'disamb_inventor_id_'; do "
-                f"    new_entry=\"\\\"${{prefix}}{quarter_end_date}\\\"\"; "
-                f"    if ! grep -q $new_entry {file_name}_temp_25.json; then "
-                f"        sed -i '/\"${{prefix}}[0-9]{{8}}\"/ {{s/$/,\\n        '\"$new_entry\"'/;}}' {file_name}_temp_25.json; "
-                f"    fi; "
-                f"done"
-            ),
-        params={
+            bash_command=f"""
+                cd {config_dir}
+                for prefix in 'disamb_assignee_id_' 'disamb_inventor_id_'; do
+                    new_entry="\\\"${{prefix}}{quarter_end_date}\\\""
+                    if ! grep -q $new_entry {file_name}_temp_25.json; then
+                        sed -i '/"'"${{prefix}}"'[0-9]{{8}}"/ {
+                            :loop
+                            N
+                            /\\n\\s*]/!b loop
+                            s/\\n\\s*]/,\\n        '"$new_entry"'\\n    ]/
+                        }' {file_name}_temp_25.json
+                    fi
+                done
+            """,
+            params={
                 'config_dir': config_dir,
                 'file_name': file_name
             }
