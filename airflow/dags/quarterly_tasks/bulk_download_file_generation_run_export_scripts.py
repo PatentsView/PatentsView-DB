@@ -32,10 +32,6 @@ text_table_files = {
     "update_copy_export_text_tables_pregrant_json": "export_text_tables_pregrant",
 }
 
-view_config__files = {
-    "update_copy_export_view_config_granted_json": "export_view_config_granted",
-    "update_copy_export_view_config_pregrant_json": "eexport_view_config_pregrant",
-}
 project_home = os.environ['PACKAGE_HOME']
 PV_Downloads_dir = os.getenv("PROJECT_HOME", os.path.join(os.getcwd(), "..", "PatentsView-Downloads"))
 
@@ -133,8 +129,8 @@ def create_update_text_table_tasks(text_table_files, config_dir):
 
 
 view_config_files = {
-    "update_copy_export_view_config_granted_json": "export_view_config_granted",
-    "update_copy_export_view_config_pregrant_json": "export_view_config_pregrant",
+    "update_copy_export_view_config_granted_json": "export_view_config_granted.json",
+    "update_copy_export_view_config_pregrant_json": "export_view_config_pregrant.json",
 }
 
 from airflow.operators.bash import BashOperator
@@ -151,6 +147,7 @@ def create_update_view_config_tasks(view_config_files, config_dir):
     update_view_config_tasks = {}  # Store tasks in a dictionary
     quarter_end_date = '20250331'
     previous_quarter_end_date = '20241231'
+    print(f"this is the config dir: {config_dir}")
 
     # Loop through the view_config_files to create tasks for each file
     for task_id, file_name in view_config_files.items():
