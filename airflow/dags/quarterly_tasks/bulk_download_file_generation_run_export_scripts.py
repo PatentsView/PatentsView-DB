@@ -152,16 +152,14 @@ def create_update_view_config_tasks(view_config__files, config_dir):
     for task_id, file_name in view_config__files.items():  # Use keys as task IDs
         update_task = BashOperator(
             task_id=task_id,  # Use the existing key as the task_id
-            bash_command=f"""
-                cd {config_dir} && \
-                existing_prefixes=$(grep -oE '"disamb_[a-zA-Z_]+_' {file_name}_temp_25.json | sort -u | tr -d '"') && \
-                
-                for prefix in $existing_prefixes; do \
-                    new_entry="\"${prefix}{quarter_end_date}\""; \
-                    sed -i "/\"${prefix}[0-9]\{8\}\"/ {s/$/,\\n        $new_entry/; b}; \$a\\
-                        $new_entry" {file_name}_temp_25.json; \
-                done
-            """,
+            bash_command=(
+                f"cd {config_dir} && "
+                f"existing_prefixes=$(grep -oE '\"disamb_[a-zA-Z_]+_' {file_name}_temp_25.json | sort -u | tr -d '\"') && "
+                "for prefix in $existing_prefixes; do "
+                f"    new_entry=\"${{prefix}}{quarter_end_date}\"; "
+                f"    sed -i '/\"${{prefix}}[0-9]{{8}}\"/ {{s/$/,\\n        $new_entry/; b}}; $a\\\n        $new_entry' {file_name}_temp_25.json; "
+                "done"
+            ),
         params={
                 'config_dir': config_dir,
                 'file_name': file_name
