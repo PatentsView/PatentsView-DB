@@ -99,22 +99,34 @@ def create_copy_json_tasks(json_files, config_dir):
 
 def create_update_text_table_tasks(text_table_files, config_dir):
     """
-    Creates a dictionary of BashOperator tasks for updating text table JSON files.
-    :return: Dictionary of {task_id: BashOperator}
+    Creates a dictionary of BashOperator tasks to update text table JSON files.
+
+    :param text_table_files: List of JSON file names (without .json extension)
+    :param config_dir: Directory where JSON files are located
+    :return: Dictionary of {task_id: BashOperator task}
     """
-    update_text_tables_tasks = {}
+    update_text_tables_tasks = {}  # Use a dictionary instead of a list
+    year = '2025'
+    print(f"This is the year: {year}")
+
     for file_name in text_table_files:
-        task_id = f"update_{file_name}_json"
+        task_id = f"update_{file_name}_json"  # Task name
         update_task = BashOperator(
             task_id=task_id,
             bash_command=f"""
                 cd {config_dir} && \
-                sed -i 's/_xxxx/2025/g' {file_name}_temp_25.json
-            """
+                sed -i 's/_xxxx/_{year}/g' {file_name}_temp_25.json
+            """,
+            params={
+                'config_dir': config_dir,
+                'file_name': file_name
+            }
         )
-        update_text_tables_tasks[task_id] = update_task  # ✅ Store in dictionary
+        update_text_tables_tasks[task_id] = update_task  # Store task in dictionary
 
-    return update_text_tables_tasks  # ✅ Return dictionary instead of list
+    return update_text_tables_tasks  # Return dictionary instead of list
+
+
 
 
 
@@ -151,14 +163,18 @@ with DAG(
         python_callable=get_quarter_end_str
     )
 
-    update_text_tables = create_update_text_table_tasks(text_table_files, config_dir=os.path.join(PV_Downloads_dir, "config_json"))
-
+    # Generate update text table tasks
+    config_dir = os.path.join(PV_Downloads_dir, "config_json")
+    update_text_tables = create_update_text_table_tasks(text_table_files, config_dir)
 
     test_change_directory >> get_year >> get_quarter_end_date
+
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_text_tables_pregrant_json"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables[
+        "update_export_text_tables_granted_json"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables[
+        "update_export_text_tables_pregrant_json"]
 
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
