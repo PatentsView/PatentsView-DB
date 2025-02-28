@@ -154,28 +154,29 @@ def create_update_view_config_tasks(view_config_files, config_dir):
         # Construct the bash script to be executed
         bash_command = f"""
         # Define the quarter end dates
-        previous_quarter_end_date="{previous_quarter_end_date}"
-        quarter_end_date="{quarter_end_date}"
-
+        previous_quarter_end_date="20241231"
+        quarter_end_date="20250331"
+        
         # Loop through both identifiers
         for prefix in "disamb_assignee_id_" "disamb_inventor_id_"; do
             # Construct the new entry to be added
-            new_entry="\"${{prefix}}${{quarter_end_date}}\""
-
+            new_entry="\"${prefix}${quarter_end_date}\""
+            
             # Check if the new entry already exists in the file
-            if ! grep -q "$new_entry" "{config_dir}/{file_name}"; then
+            if ! grep -q "$new_entry" "$json_file"; then
                 # Find the line containing the previous quarter end date (e.g., 20241231)
-                last_quarter_entry=$(grep -n "\"${{prefix}}${{previous_quarter_end_date}}\"" "{config_dir}/{file_name}")
-
+                last_quarter_entry=$(grep -n "\"${prefix}${previous_quarter_end_date}\"" "$json_file")
+                
                 if [ ! -z "$last_quarter_entry" ]; then
                     # Extract the line number of the last quarter entry
                     last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1)
-
-                    # Insert a comma if it's not already present after the last entry
-                    sed -i "${{last_quarter_line_number}}s/\([[:space:]]*\)$/,\\            $new_entry/" "{config_dir}/{file_name}"
+        
+                    # Insert a comma and new entry if it's not already present after the last entry
+                    sed -i "${last_quarter_line_number}s/\([[:space:]]*\)$/,$(echo -e '\n            '$new_entry)/" "$json_file"
                 fi
             fi
         done
+
         """
 
         # Add the BashOperator task to the dictionary
