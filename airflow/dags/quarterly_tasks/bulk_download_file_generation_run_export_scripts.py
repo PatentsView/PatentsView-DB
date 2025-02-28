@@ -175,6 +175,9 @@ def create_update_view_config_tasks(view_config_files, config_dir):
 
                         # Add the new entry after the last quarter entry, properly indented and wrapped in quotes
                         sed -i "${{last_quarter_line_number}}s/\\$/\\n             \"${{new_entry}}\"/" "{config_dir}/{file_name}"
+                        
+                        # Now, add quotes around the new entry using sed
+                        sed -i 's/\\(.*${{new_entry}}\\)/"\\1"/g' "{config_dir}/{file_name}"
                     fi
                 fi
             done
