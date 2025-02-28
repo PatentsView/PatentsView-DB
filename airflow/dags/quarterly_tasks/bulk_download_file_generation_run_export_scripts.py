@@ -172,7 +172,7 @@ def create_update_view_config_tasks(view_config_files, config_dir):
                     last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1)
 
                     # Insert a comma if it's not already present after the last entry
-                    sed -i "${{last_quarter_line_number}}s/\\([[:space:]]*\\)$/,\n            $new_entry/" "{config_dir}/{file_name}"
+                    sed -i "${{last_quarter_line_number}}s/\([[:space:]]*\)$/,\\            $new_entry/" "{config_dir}/{file_name}"
                 fi
             fi
         done
