@@ -203,7 +203,7 @@ def create_bulk_download_tasks(date: str, directory: str):
         "config_json/export_view_config_granted_temp_25.json", "patent"),
         "bulk_download_generation_text_tables_granted": (
         "config_json/export_text_tables_granted_temp_25.json", "patent"),
-        "bulk_download_generation_view_config_pregrant": (
+        "bulk_download_generation_export_view_config_pregrant": (
         "config_json/export_view_config_pregrant_temp_25.json", "pregrant"),
         "bulk_download_generation_text_tables_pregrant": (
         "config_json/export_text_tables_pregrant_temp_25.json", "pregrant")
@@ -307,7 +307,7 @@ with DAG(
 
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"] >> bulk_download_tasks["bulk_download_generation_export_view_config_granted"]
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"] >> bulk_download_tasks["bulk_download_generation_export_view_config_pregrant"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"] >> bulk_download_tasks["bbulk_download_generation_text_tables_granted"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"] >> bulk_download_tasks["bulk_download_generation_text_tables_granted"]
     get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_text_tables_pregrant_json"] >> bulk_download_tasks["bulk_download_generation_text_tables_pregrant"]
 
     # Assuming update_view_config contains the relevant tasks:
