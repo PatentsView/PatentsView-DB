@@ -99,30 +99,23 @@ def create_copy_json_tasks(json_files, config_dir):
 
 def create_update_text_table_tasks(text_table_files, config_dir):
     """
-    Creates a list of BashOperator tasks to update text table JSON files.
-
-    :param text_table_files: List of JSON file names (without .json extension)
-    :param config_dir: Directory where JSON files are located
-    :return: List of BashOperator tasks
+    Creates a dictionary of BashOperator tasks for updating text table JSON files.
+    :return: Dictionary of {task_id: BashOperator}
     """
-    update_text_tables_tasks = []
-    year = '2025'
-    print(f"this is the year: {year}")
+    update_text_tables_tasks = {}
     for file_name in text_table_files:
+        task_id = f"update_{file_name}_json"
         update_task = BashOperator(
-            task_id=f"update_{file_name}_json",
+            task_id=task_id,
             bash_command=f"""
                 cd {config_dir} && \
-                sed -i 's/_xxxx/_{year}/g' {file_name}_temp_25.json
-            """,
-            params={
-                'config_dir': config_dir,
-                'file_name': file_name
-            }
+                sed -i 's/_xxxx/2025/g' {file_name}_temp_25.json
+            """
         )
-        update_text_tables_tasks.append(update_task)
+        update_text_tables_tasks[task_id] = update_task  # ✅ Store in dictionary
 
-    return update_text_tables_tasks
+    return update_text_tables_tasks  # ✅ Return dictionary instead of list
+
 
 
 with DAG(
