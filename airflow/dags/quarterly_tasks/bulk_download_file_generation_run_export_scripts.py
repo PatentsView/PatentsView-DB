@@ -318,8 +318,8 @@ with DAG(
 
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"] >> bulk_download_tasks["bulk_download_generation_export_view_config_granted"]
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"] >> bulk_download_tasks["bulk_download_generation_export_view_config_pregrant"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_export_text_tables_granted_json"] >> bulk_download_tasks["bulk_download_generation_text_tables_granted"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_export_text_tables_pregrant_json"] >> bulk_download_tasks["bulk_download_generation_text_tables_pregrant"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"] >> bulk_download_tasks["bulk_download_generation_export_text_tables_granted"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_text_tables_pregrant_json"] >> bulk_download_tasks["bulk_download_generation_export_text_tables_pregrant"]
 
     # Assuming update_view_config contains the relevant tasks:
     # update_column_tasks_to_link = [
