@@ -1,26 +1,13 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
+from airflow.models.baseoperator import chain, cross_downstream
 from datetime import datetime, timedelta
 from airflow.utils.dates import days_ago
 import math
 import os
 
 # ----------- Configuration and Defaults -----------
-json_files = [
-    "export_view_config_granted",
-    "export_text_tables_granted",
-    "export_view_config_pregrant",
-    "export_text_tables_pregrant"
-]
-
-text_table_files = ["export_text_tables_granted",
-                    "export_text_tables_pregrant"
-]
-project_home = os.environ['PACKAGE_HOME']
-PV_Downloads_dir = os.getenv("PROJECT_HOME", os.path.join(os.getcwd(), "..", "PatentsView-Downloads"))
-
-
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -32,6 +19,20 @@ default_args = {
     'concurrency': 40,
     'queue': 'disambiguator'
 }
+
+json_files = {
+    "copy_export_view_config_granted_json": "export_view_config_granted",
+    "copy_export_view_config_pregrant_json": "export_view_config_pregrant",
+    "copy_export_text_tables_granted_json": "export_text_tables_granted",
+    "copy_export_text_tables_pregrant_json": "export_text_tables_pregrant",
+}
+
+text_table_files = {
+    "update_copy_export_text_tables_granted_json": "export_text_tables_granted",
+    "update_copy_export_text_tables_pregrant_json": "export_text_tables_pregrant",
+}
+project_home = os.environ['PACKAGE_HOME']
+PV_Downloads_dir = os.getenv("PROJECT_HOME", os.path.join(os.getcwd(), "..", "PatentsView-Downloads"))
 
 
 # Example: a function to check directory contents
@@ -78,23 +79,22 @@ def get_quarter_end_str(**context):
 
 def create_copy_json_tasks(json_files, config_dir):
     """
-    Creates a list of BashOperator tasks to copy JSON files to _temp.json files.
+    Creates a dictionary of BashOperator tasks with their actual task names.
 
-    :param json_files: List of JSON file names (without .json extension)
-    :param config_dir: Directory where JSON files are located
-    :return: List of BashOperator tasks
+    :param json_files: Dictionary where keys are task IDs and values are JSON file names.
+    :param config_dir: Directory where JSON files are located.
+    :return: Dictionary of task_id -> BashOperator task
     """
-    copy_json_tasks = []
-    for file_name in json_files:
+    copy_json_tasks = {}
+    for task_id, file_name in json_files.items():
         copy_task = BashOperator(
-            task_id=f"copy_{file_name}_json",
+            task_id=task_id,
             bash_command=f"""
                 cd {config_dir} && \
                 cp {file_name}.json {file_name}_temp_25.json
             """
         )
-        copy_json_tasks.append(copy_task)
-
+        copy_json_tasks[task_id] = copy_task
     return copy_json_tasks
 
 def create_update_text_table_tasks(text_table_files, config_dir):
@@ -135,6 +135,7 @@ with DAG(
         template_searchpath="/project/bulk_download_file_generation/"
 ) as dag:
 
+    # 0) Verify directory contents
     test_change_directory = PythonOperator(
         task_id='verify_directory_contents',
         python_callable=verify_directory_contents
@@ -159,18 +160,12 @@ with DAG(
 
     update_text_tables = create_update_text_table_tasks(text_table_files, config_dir=os.path.join(PV_Downloads_dir, "config_json"))
 
-    from airflow.models.baseoperator import chain, cross_downstream
 
-    # Chain initial dependencies
-    chain(
-        test_change_directory,
-        get_year,
-        get_quarter_end_date,  # Ensures get_quarter_end_date runs before copy_json_tasks
-        *copy_json_tasks  # Unpacks and runs all copy_json_tasks in parallel
-    )
-
-    # Ensure all copy_json_tasks finish before update_text_tables starts
-    cross_downstream(copy_json_tasks, update_text_tables)
+    test_change_directory >> get_year >> get_quarter_end_date >> copy_json_tasks
+    get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_text_tables_pregrant_json"]
 
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
