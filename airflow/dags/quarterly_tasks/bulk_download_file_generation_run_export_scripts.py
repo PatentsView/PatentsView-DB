@@ -137,6 +137,8 @@ view_config_files = {
     "update_copy_export_view_config_pregrant_json": "export_view_config_pregrant",
 }
 
+from airflow.operators.bash import BashOperator
+
 
 def create_update_view_config_tasks(view_config_files, config_dir):
     """
@@ -151,36 +153,31 @@ def create_update_view_config_tasks(view_config_files, config_dir):
     previous_quarter_end_date = '20241231'
 
     for task_id, file_name in view_config_files.items():  # Use keys as task IDs
-        bash_command = (
-            "cd {config_dir} && "
-            "# Loop through both identifiers\n"
-            "for prefix in 'disamb_assignee_id_' 'disamb_inventor_id_'; do\n"
-            "    # Construct the new entry to be added\n"
-            "    new_entry='\"${{prefix}}{quarter_end_date}\"';\n"
-            "    # Check if the new entry already exists in the file\n"
-            "    if ! grep -q \"$new_entry\" {file_name}_temp_25.json; then\n"
-            "        # Find the line containing the previous quarter end date (e.g., {previous_quarter_end_date})\n"
-            "        last_quarter_entry=$(grep -n '\"${{prefix}}{previous_quarter_end_date}\"' {file_name}_temp_25.json);\n"
-            "        if [ ! -z \"$last_quarter_entry\" ]; then\n"
-            "            # Extract the line number of the last quarter entry\n"
-            "            last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1);\n"
-            "            # Insert a comma if it's not already present after the last entry\n"
-            "            sed -i '${last_quarter_line_number}s/\\([[:space:]]*\\)$/,\\n            $new_entry/' {file_name}_temp_25.json;\n"
-            "        fi;\n"
-            "    fi;\n"
-            "done"
-        )
+        bash_command = f"""
+        cd {config_dir} && 
+        for prefix in 'disamb_assignee_id_' 'disamb_inventor_id_'; do
+            new_entry="\"${{prefix}}{quarter_end_date}\""
 
-        # Create the task
-        update_task = BashOperator(
-            task_id=task_id,  # Use the existing key as the task_id
-            bash_command=bash_command.format(config_dir=config_dir, file_name=file_name,
-                                             quarter_end_date=quarter_end_date,
-                                             previous_quarter_end_date=previous_quarter_end_date)
-        )
+            # Check if the new entry already exists in the file
+            if ! grep -q "$new_entry" {file_name}_temp_25.json; then
+                # Find the line containing the previous quarter end date (e.g. 20241231)
+                last_quarter_entry=$(grep -n "\"${{prefix}}{previous_quarter_end_date}\"" {file_name}_temp_25.json)
 
-        # Add the task to the dictionary
-        update_view_config_tasks[task_id] = update_task
+                if [ ! -z "$last_quarter_entry" ]; then
+                    # Extract the line number of the last quarter entry
+                    last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1)
+
+                    # Insert a comma if it's not already present after the last entry
+                    sed -i "${{last_quarter_line_number}}s/\([[:space:]]*\)$/,\n            $new_entry/" {file_name}_temp_25.json
+                fi
+            fi
+        done
+        """
+
+        update_view_config_tasks[task_id] = BashOperator(
+            task_id=task_id,
+            bash_command=bash_command
+        )
 
     return update_view_config_tasks
 
