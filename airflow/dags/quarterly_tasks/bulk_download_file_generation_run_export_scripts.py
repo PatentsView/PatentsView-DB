@@ -191,6 +191,60 @@ def create_update_view_config_tasks(view_config_files, config_dir):
     return update_view_config_tasks
 
 
+def create_bulk_download_tasks(date: str, directory: str):
+    """
+    Creates a dictionary of tasks for bulk download generation.
+
+    :param date: The date parameter (-t) for the script (e.g., '20240331').
+    :param directory: The directory to change to before executing the commands.
+    :return: Dictionary of {task_id: subprocess task}
+    """
+    generate_bulk_download_runs = {
+        "bulk_download_generation_export_view_config_granted": {"config_json/export_view_config_granted_temp_25.json",
+                                                                "patent"},
+        "bulk_download_generation_text_tables_granted": {"config_json/export_text_tables_granted_temp_25.json",
+                                                         "patent"},
+        "bulk_download_generation_view_config_pregrant": {"config_json/export_view_config_pregrant_temp_25.json",
+                                                          "pregrant"},
+        "bulk_download_generation_text_tables_pregrant": {"config_json/export_text_tables_pregrant_temp_25.json",
+                                                          "pregrant"}
+    }
+
+    tasks = {}
+    original_dir = os.getcwd()
+    os.chdir(directory)
+
+    try:
+        for task_id, (export_config, grant_type) in generate_bulk_download_runs.items():
+            command = [
+                "python", "generate_bulk_downloads.py",
+                "-d", "tab_export_settings.ini",
+                "-c", "cred.ini",
+                "-t", date,
+                "-e", "1",
+                "-o", "0",
+                "-s", export_config,
+                "-g", grant_type,
+                "-i", "0"
+            ]
+
+            try:
+                result = subprocess.run(command, capture_output=True, text=True, check=True)
+                tasks[task_id] = {
+                    "status": "success",
+                    "output": result.stdout
+                }
+            except subprocess.CalledProcessError as e:
+                tasks[task_id] = {
+                    "status": "error",
+                    "output": e.stderr
+                }
+    finally:
+        os.chdir(original_dir)
+
+    return tasks
+
+
 # Define a function to perform the git operations# Define a function to perform the git operations
 def git_operations(directory: str, files: list, commit_message: str):
     # Change the working directory to the specified directory
@@ -242,7 +296,10 @@ with DAG(
     # Generate update text table tasks
     config_dir = os.path.join(PV_Downloads_dir, "config_json")
     update_text_tables = create_update_text_table_tasks(text_table_files, config_dir)
-    update_view_config = create_update_view_config_tasks(view_config_files, config_dir)
+    # update_view_config = create_update_view_config_tasks(view_config_files, config_dir)
+
+    #  >> update_view_config["update_copy_export_view_config_granted_json"]
+    # >> update_view_config["update_copy_export_view_config_pregrant_json"]
 
     # List of files to be added, committed, and pushed
     files_to_commit = ['export_view_config_granted_temp_25.json', 'export_view_config_pregrant_temp_25.json']  # Example list
@@ -255,12 +312,15 @@ with DAG(
     #     op_args=[config_dir, files_to_commit, commit_message],
     # )
 
+    bulk_download_tasks = create_bulk_download_tasks(date = "20241231", directory = PV_Downloads_dir)
+
+
     test_change_directory >> get_year >> get_quarter_end_date
 
-    get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"] >> update_view_config["update_copy_export_view_config_granted_json"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"] >> update_view_config["update_copy_export_view_config_pregrant_json"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_text_tables_pregrant_json"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"] >> bulk_download_tasks["bulk_download_generation_export_view_config_granted"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"] >> bulk_download_tasks["bulk_download_generation_export_view_config_pregrant"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"] >> bulk_download_tasks["bbulk_download_generation_text_tables_granted"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_text_tables_pregrant_json"] >> bulk_download_tasks["bulk_download_generation_text_tables_pregrant"]
 
     # Assuming update_view_config contains the relevant tasks:
     # update_column_tasks_to_link = [
