@@ -77,42 +77,21 @@ def get_quarter_end_str(**context):
     return f"{ex.year}{quarter_end_days[quarter]}"
 
 
-def create_copy_json_tasks(json_files, config_dir):
-    """
-    Creates a dictionary of BashOperator tasks with their actual task names.
-
-    :param json_files: Dictionary where keys are task IDs and values are JSON file names.
-    :param config_dir: Directory where JSON files are located.
-    :return: Dictionary of task_id -> BashOperator task
-    """
-    copy_json_tasks = {}
-    for task_id, file_name in json_files.items():
-        copy_task = BashOperator(
-            task_id=task_id,
-            bash_command=f"""
-                cd {config_dir} && \
-                cp {file_name}.json {file_name}_temp_25.json
-            """
-        )
-        copy_json_tasks[task_id] = copy_task
-    return copy_json_tasks
-
 def create_update_text_table_tasks(text_table_files, config_dir):
     """
     Creates a dictionary of BashOperator tasks to update text table JSON files.
 
-    :param text_table_files: List of JSON file names (without .json extension)
-    :param config_dir: Directory where JSON files are located
+    :param text_table_files: Dictionary mapping task IDs to JSON file names.
+    :param config_dir: Directory where JSON files are located.
     :return: Dictionary of {task_id: BashOperator task}
     """
-    update_text_tables_tasks = {}  # Use a dictionary instead of a list
+    update_text_tables_tasks = {}  # Store tasks in a dictionary
     year = '2025'
     print(f"This is the year: {year}")
 
-    for file_name in text_table_files:
-        task_id = f"update_{file_name}_json"  # Task name
+    for task_id, file_name in text_table_files.items():  # Use keys as task IDs
         update_task = BashOperator(
-            task_id=task_id,
+            task_id=task_id,  # Use the existing key as the task_id
             bash_command=f"""
                 cd {config_dir} && \
                 sed -i 's/_xxxx/_{year}/g' {file_name}_temp_25.json
@@ -124,7 +103,8 @@ def create_update_text_table_tasks(text_table_files, config_dir):
         )
         update_text_tables_tasks[task_id] = update_task  # Store task in dictionary
 
-    return update_text_tables_tasks  # Return dictionary instead of list
+    return update_text_tables_tasks  # ✅ Correct return type
+
 
 
 
@@ -171,10 +151,8 @@ with DAG(
 
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables[
-        "update_copy_export_text_tables_granted_json"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables[
-        "update_copy_export_text_tables_pregrant_json"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_text_tables_pregrant_json"]
 
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
