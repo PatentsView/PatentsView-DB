@@ -156,27 +156,26 @@ def create_update_view_config_tasks(view_config_files, config_dir):
         # Define the quarter end dates
         previous_quarter_end_date="20241231"
         quarter_end_date="20250331"
-        
+
         # Loop through both identifiers
         for prefix in "disamb_assignee_id_" "disamb_inventor_id_"; do
             # Construct the new entry to be added
-            new_entry="\"${prefix}${quarter_end_date}\""
-            
+            new_entry="\"${{prefix}}${{quarter_end_date}}\""
+
             # Check if the new entry already exists in the file
-            if ! grep -q "$new_entry" "$json_file"; then
+            if ! grep -q "$new_entry" "{config_dir}/{file_name}"; then
                 # Find the line containing the previous quarter end date (e.g., 20241231)
-                last_quarter_entry=$(grep -n "\"${prefix}${previous_quarter_end_date}\"" "$json_file")
-                
+                last_quarter_entry=$(grep -n "\"${{prefix}}${{previous_quarter_end_date}}\"" "{config_dir}/{file_name}")
+
                 if [ ! -z "$last_quarter_entry" ]; then
                     # Extract the line number of the last quarter entry
                     last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1)
-        
+
                     # Insert a comma and new entry if it's not already present after the last entry
-                    sed -i "${last_quarter_line_number}s/\([[:space:]]*\)$/,$(echo -e '\n            '$new_entry)/" "$json_file"
+                    sed -i "${{last_quarter_line_number}}s/\([[:space:]]*\)$/,$(echo -e '\\n            '$new_entry)/" "{config_dir}/{file_name}"
                 fi
             fi
         done
-
         """
 
         # Add the BashOperator task to the dictionary
