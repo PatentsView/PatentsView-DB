@@ -31,6 +31,11 @@ text_table_files = {
     "update_copy_export_text_tables_granted_json": "export_text_tables_granted",
     "update_copy_export_text_tables_pregrant_json": "export_text_tables_pregrant",
 }
+
+view_config__files = {
+    "update_copy_export_view_config_granted_json": "export_view_config_granted",
+    "update_copy_export_view_config_pregrant_json": "eexport_view_config_pregrant",
+}
 project_home = os.environ['PACKAGE_HOME']
 PV_Downloads_dir = os.getenv("PROJECT_HOME", os.path.join(os.getcwd(), "..", "PatentsView-Downloads"))
 
@@ -127,6 +132,45 @@ def create_update_text_table_tasks(text_table_files, config_dir):
 
 
 
+view_config_files = {
+    "update_copy_export_view_config_granted_json": "export_view_config_granted",
+    "update_copy_export_view_config_pregrant_json": "eexport_view_config_pregrant",
+}
+
+def create_update_view_config_tasks(view_config__files, config_dir):
+    """
+    Creates a dictionary of BashOperator tasks to update text table JSON files.
+
+    :param view_config__files: Dictionary mapping task IDs to JSON file names.
+    :param config_dir: Directory where JSON files are located.
+    :return: Dictionary of {task_id: BashOperator task}
+    """
+    update_view_config_tasks = {}  # Store tasks in a dictionary
+    quarter_end_date = '03312025'
+    print(f"This is the year: {quarter_end_date}")
+
+    for task_id, file_name in view_config__files.items():  # Use keys as task IDs
+        update_task = BashOperator(
+            task_id=task_id,  # Use the existing key as the task_id
+            bash_command=f"""
+                            cd {config_dir} && \\
+                            # Extract keys with _YYYYMMDD pattern and check if the new date is missing
+                            existing_keys=$(grep -oE '"[a-zA-Z0-9_]+_[0-9]{{8}}"' {file_name}_temp_25.json | sort -u) && \\
+                            if ! echo "$existing_keys" | grep -q "_{quarter_end_date}"; then \\
+                                for key in $existing_keys; do \\
+                                    new_key=$(echo $key | sed "s/[0-9]\\{{8\\}}$/{quarter_end_date}/"); \\
+                                    sed -i "/$key/ s/$/, $new_key/" {file_name}_temp_25.json; \\
+                                done; \\
+                            fi
+                        """,
+            params={
+                'config_dir': config_dir,
+                'file_name': file_name
+            }
+        )
+        update_view_config_tasks[task_id] = update_task  # Store task in dictionary
+
+    return update_view_config_tasks  # ✅ Correct return type
 
 with DAG(
         dag_id="Bulk_Download_Run_Export_Scripts",
@@ -164,11 +208,12 @@ with DAG(
     # Generate update text table tasks
     config_dir = os.path.join(PV_Downloads_dir, "config_json")
     update_text_tables = create_update_text_table_tasks(text_table_files, config_dir)
+    update_view_config = create_update_view_config_tasks(view_config_files, config_dir)
 
     test_change_directory >> get_year >> get_quarter_end_date
 
-    get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"]
-    get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"] >> update_view_config["update_copy_export_view_config_granted_json"]
+    get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"] >> update_view_config["update_copy_export_view_config_pregrant_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_text_tables_pregrant_json"]
 
