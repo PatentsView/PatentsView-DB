@@ -174,12 +174,8 @@ def create_update_view_config_tasks(view_config_files, config_dir):
                     # Insert a comma and new entry on a new line, properly indented
                     sed -i "${{last_quarter_line_number}}s/\([[:space:]]*\)$/,/" "{config_dir}/{file_name}" && \
                     sed -i "${{last_quarter_line_number}}s/\$/|/" "{config_dir}/{file_name}" && \
-                    sed -i "${{last_quarter_line_number}}s/\$/\\n$new_entry/" "{config_dir}/{file_name}" && \
+                    sed -i "${{last_quarter_line_number}}s/\$/\\n          $new_entry/" "{config_dir}/{file_name}" && \
                     sed -i "${{last_quarter_line_number}}s/|/\n/" "{config_dir}/{file_name}"
-
-
-
-
                 fi
             fi
         done
