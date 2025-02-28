@@ -158,7 +158,7 @@ def create_update_view_config_tasks(view_config_files, config_dir):
                 # Loop through both identifiers
                 for prefix in "disamb_assignee_id_" "disamb_inventor_id_"; do
                     # Construct the new entry to be added with quotes
-                    new_entry="\"${{prefix}}${{quarter_end_date}}\""
+                    new_entry="\"${prefix}${quarter_end_date}\""
 
                     # Check if the new entry already exists in the file
                     if ! grep -q "$new_entry" "{config_dir}/{file_name}"; then
@@ -173,7 +173,7 @@ def create_update_view_config_tasks(view_config_files, config_dir):
                             sed -i "${{last_quarter_line_number}}s/\\([[:space:]]*\\)$/,/" "{config_dir}/{file_name}" && \
 
                             # Add the new entry after the last quarter entry, properly indented and wrapped in quotes
-                            sed -i "${{last_quarter_line_number}}s/\$/\\n             \"${new_entry}\"/" "{config_dir}/{file_name}"
+                            sed -i "${{last_quarter_line_number}}s/\$/\\n             $new_entry/" "{config_dir}/{file_name}"
                         fi
                     fi
                 done
