@@ -152,20 +152,20 @@ def create_update_view_config_tasks(view_config__files, config_dir):
     for task_id, file_name in view_config__files.items():  # Use keys as task IDs
         update_task = BashOperator(
             task_id=task_id,  # Use the existing key as the task_id
-            bash_command=f"""
-                           cd {config_dir} && \
-                            # Extract unique prefixes that follow disamb_[a-zA-Z_]*_YYYYMMDD pattern
-                            existing_prefixes=$(grep -oE '"disamb_[a-zA-Z_]+_' {file_name}_temp_25.json | sort -u | tr -d '"') && \
-                            
-                            # Loop through each unique prefix and add the missing quarter_end_date dynamically
-                            for prefix in $existing_prefixes; do \
-                                new_entry="\"${prefix}{quarter_end_date}\""; \
-                                if ! grep -q "$new_entry" {file_name}_temp_25.json; then \
-                                    sed -i "/\"${prefix}[0-9]\{8\}\"/ s/$/,\\n    $new_entry/" {file_name}_temp_25.json; \
-                                fi; \
-                            done
-                        """,
-            params={
+            bash_command=(
+                    "cd {config_dir} && "
+                    "# Extract unique prefixes that follow disamb_[a-zA-Z_]*_YYYYMMDD pattern\n"
+                    "existing_prefixes=$(grep -oE '\"disamb_[a-zA-Z_]+_' {file_name}_temp_25.json | sort -u | tr -d '\"') && \n"
+
+                    "# Loop through each unique prefix and add the missing quarter_end_date dynamically\n"
+                    "for prefix in $existing_prefixes; do \n"
+                    "    new_entry=\"${prefix}" + quarter_end_date + "\"; \n"
+                                                                     "    if ! grep -q \"$new_entry\" {file_name}_temp_25.json; then \n"
+                                                                     "        sed -i \"/\\\"${prefix}[0-9]{8}\\\"/ s/$/,\\n    $new_entry/\" {file_name}_temp_25.json; \n"
+                                                                     "    fi; \n"
+                                                                     "done"
+            ),
+        params={
                 'config_dir': config_dir,
                 'file_name': file_name
             }
