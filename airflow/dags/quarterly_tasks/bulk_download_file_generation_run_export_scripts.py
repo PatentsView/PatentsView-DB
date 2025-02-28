@@ -137,6 +137,7 @@ view_config_files = {
     "update_copy_export_view_config_pregrant_json": "export_view_config_pregrant",
 }
 
+
 def create_update_view_config_tasks(view_config_files, config_dir):
     """
     Creates a dictionary of BashOperator tasks to update text table JSON files.
@@ -147,33 +148,40 @@ def create_update_view_config_tasks(view_config_files, config_dir):
     """
     update_view_config_tasks = {}  # Store tasks in a dictionary
     quarter_end_date = '20250331'
-    print(f"This is the year: {quarter_end_date}")
+    previous_quarter_end_date = '20241231'
 
     for task_id, file_name in view_config_files.items():  # Use keys as task IDs
         update_task = BashOperator(
             task_id=task_id,  # Use the existing key as the task_id
-            bash_command=f"""
-                cd {config_dir}
-                for prefix in 'disamb_assignee_id_' 'disamb_inventor_id_'; do
-                    new_entry="\\\"${{prefix}}{quarter_end_date}\\\""
-                    if ! grep -q $new_entry {file_name}_temp_25.json; then
-                        sed -i '/"'"${{prefix}}"'[0-9]{{8}}"/ {
-                            :loop
-                            N
-                            /\\n\\s*]/!b loop
-                            s/\\n\\s*]/,\\n        '"$new_entry"'\\n    ]/
-                        }' {file_name}_temp_25.json
-                    fi
-                done
-            """,
+            bash_command=(
+                f"cd {config_dir} && "
+                f"# Loop through both identifiers\n"
+                f"for prefix in 'disamb_assignee_id_' 'disamb_inventor_id_'; do "
+                f"    # Construct the new entry to be added\n"
+                f"    new_entry='\"${{prefix}}{quarter_end_date}\"'; "
+                f"    # Check if the new entry already exists in the file\n"
+                f"    if ! grep -q \"$new_entry\" {file_name}_temp_25.json; then "
+                f"        # Find the line containing the previous quarter end date (e.g., {previous_quarter_end_date})\n"
+                f"        last_quarter_entry=$(grep -n '\"${{prefix}}{previous_quarter_end_date}\"' {file_name}_temp_25.json); "
+                f"        if [ ! -z \"$last_quarter_entry\" ]; then "
+                f"            # Extract the line number of the last quarter entry\n"
+                f"            last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1); "
+                f"            # Insert a comma if it's not already present after the last entry\n"
+                f"            sed -i '${{last_quarter_line_number}}s/\\([[:space:]]*\\)$/,\\n            $new_entry/' {file_name}_temp_25.json; "
+                f"        fi; "
+                f"    fi; "
+                f"done"
+            ),
             params={
                 'config_dir': config_dir,
                 'file_name': file_name
             }
         )
-        update_view_config_tasks[task_id] = update_task  # Store task in dictionary
+        # Add the task to the dictionary
+        update_view_config_tasks[task_id] = update_task
 
-    return update_view_config_tasks  # ✅ Correct return type
+    return update_view_config_tasks
+
 
 with DAG(
         dag_id="Bulk_Download_Run_Export_Scripts",
