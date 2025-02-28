@@ -134,7 +134,7 @@ def create_update_text_table_tasks(text_table_files, config_dir):
 
 view_config_files = {
     "update_copy_export_view_config_granted_json": "export_view_config_granted",
-    "update_copy_export_view_config_pregrant_json": "eexport_view_config_pregrant",
+    "update_copy_export_view_config_pregrant_json": "export_view_config_pregrant",
 }
 
 def create_update_view_config_tasks(view_config__files, config_dir):
@@ -146,7 +146,7 @@ def create_update_view_config_tasks(view_config__files, config_dir):
     :return: Dictionary of {task_id: BashOperator task}
     """
     update_view_config_tasks = {}  # Store tasks in a dictionary
-    quarter_end_date = '03312025'
+    quarter_end_date = '20250331'
     print(f"This is the year: {quarter_end_date}")
 
     for task_id, file_name in view_config__files.items():  # Use keys as task IDs
@@ -154,14 +154,16 @@ def create_update_view_config_tasks(view_config__files, config_dir):
             task_id=task_id,  # Use the existing key as the task_id
             bash_command=f"""
                             cd {config_dir} && \\
-                            # Extract keys with _YYYYMMDD pattern and check if the new date is missing
-                            existing_keys=$(grep -oE '"[a-zA-Z0-9_]+_[0-9]{{8}}"' {file_name}_temp_25.json | sort -u) && \\
-                            if ! echo "$existing_keys" | grep -q "_{quarter_end_date}"; then \\
-                                for key in $existing_keys; do \\
-                                    new_key=$(echo $key | sed "s/[0-9]\\{{8\\}}$/{quarter_end_date}/"); \\
-                                    sed -i "/$key/ s/$/, $new_key/" {file_name}_temp_25.json; \\
-                                done; \\
-                            fi
+                            # Extract unique prefixes that follow disamb_[a-zA-Z_]*_YYYYMMDD pattern
+                            existing_prefixes=$(grep -oE '"disamb_[a-zA-Z_]+_' {file_name}_temp_25.json | sort -u) && \\
+
+                            # Loop through each unique prefix and add the missing quarter_end_date dynamically
+                            for prefix in $existing_prefixes; do \\
+                                new_entry=\\"$prefix{quarter_end_date}\\"; \\
+                                if ! grep -q "$new_entry" {file_name}_temp_25.json; then \\
+                                    sed -i "/$prefix[0-9]\\{{8\\}}\"/ s/$/,\\n    $new_entry/" {file_name}_temp_25.json; \\
+                                fi; \\
+                            done
                         """,
             params={
                 'config_dir': config_dir,
