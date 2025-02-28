@@ -130,8 +130,8 @@ def create_update_text_table_tasks(text_table_files, config_dir):
 
 
 view_config_files = {
-    "update_copy_export_view_config_granted_json": "export_view_config_granted.json",
-    "update_copy_export_view_config_pregrant_json": "export_view_config_pregrant.json",
+    "update_copy_export_view_config_granted_json": "export_view_config_granted_temp_25.json",
+    "update_copy_export_view_config_pregrant_json": "export_view_config_pregrant_temp_25.json",
 }
 
 def create_update_view_config_tasks(view_config_files, config_dir):
@@ -247,11 +247,11 @@ with DAG(
     commit_message = "From Airflow: Updating quarterly columns for new Data Update"  # Example commit message
 
     # Define the PythonOperator task
-    git_task = PythonOperator(
-        task_id='git_operations_task',
-        python_callable=git_operations,
-        op_args=[config_dir, files_to_commit, commit_message],
-    )
+    # git_task = PythonOperator(
+    #     task_id='git_operations_task',
+    #     python_callable=git_operations,
+    #     op_args=[config_dir, files_to_commit, commit_message],
+    # )
 
     test_change_directory >> get_year >> get_quarter_end_date
 
