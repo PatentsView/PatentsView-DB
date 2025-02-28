@@ -172,9 +172,9 @@ with DAG(
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables[
-        "update_export_text_tables_granted_json"]
+        "update_copy_export_text_tables_granted_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables[
-        "update_export_text_tables_pregrant_json"]
+        "update_copy_export_text_tables_pregrant_json"]
 
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
