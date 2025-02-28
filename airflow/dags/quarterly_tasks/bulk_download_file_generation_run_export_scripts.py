@@ -137,6 +137,7 @@ view_config_files = {
     "update_copy_export_view_config_pregrant_json": "export_view_config_pregrant",
 }
 
+
 def create_update_view_config_tasks(view_config_files, config_dir):
     """
     Creates a dictionary of BashOperator tasks to update text table JSON files.
