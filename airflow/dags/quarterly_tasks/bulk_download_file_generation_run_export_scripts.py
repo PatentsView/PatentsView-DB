@@ -151,33 +151,32 @@ def create_update_view_config_tasks(view_config_files, config_dir):
     for task_id, file_name in view_config_files.items():
         # Construct the bash script to be executed
         bash_command = f"""
-        # Define the quarter end dates
-        previous_quarter_end_date="{previous_quarter_end_date}"
-        quarter_end_date="{quarter_end_date}"
+                # Define the quarter end dates
+                previous_quarter_end_date="{previous_quarter_end_date}"
+                quarter_end_date="{quarter_end_date}"
 
-        # Loop through both identifiers
-        for prefix in "disamb_assignee_id_" "disamb_inventor_id_"; do
-            # Construct the new entry to be added
-            new_entry="\"${{prefix}}${{quarter_end_date}}\""
+                # Loop through both identifiers
+                for prefix in "disamb_assignee_id_" "disamb_inventor_id_"; do
+                    # Construct the new entry to be added with quotes
+                    new_entry="\"${{prefix}}${{quarter_end_date}}\""
 
-            # Check if the new entry already exists in the file
-            if ! grep -q "$new_entry" "{config_dir}/{file_name}"; then
-                # Find the line containing the previous quarter end date (e.g., 20241231)
-                last_quarter_entry=$(grep -n "\"${{prefix}}${{previous_quarter_end_date}}\"" "{config_dir}/{file_name}")
+                    # Check if the new entry already exists in the file
+                    if ! grep -q "$new_entry" "{config_dir}/{file_name}"; then
+                        # Find the line containing the previous quarter end date (e.g., 20241231)
+                        last_quarter_entry=$(grep -n "\"${{prefix}}${{previous_quarter_end_date}}\"" "{config_dir}/{file_name}")
 
-                if [ ! -z "$last_quarter_entry" ]; then
-                    # Extract the line number of the last quarter entry
-                    last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1)
+                        if [ ! -z "$last_quarter_entry" ]; then
+                            # Extract the line number of the last quarter entry
+                            last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1)
 
-                    # Insert a comma and new entry on a new line, properly indented
-                    # Insert a comma before the new entry if necessary
-                    sed -i "${{last_quarter_line_number}}s/\\([[:space:]]*\\)$/,/" "{config_dir}/{file_name}" && \
+                            # Insert a comma before the new entry if necessary
+                            sed -i "${{last_quarter_line_number}}s/\\([[:space:]]*\\)$/,/" "{config_dir}/{file_name}" && \
 
-                    # Add the new entry after the last quarter entry, properly indented and on a new line
-                    sed -i "${{last_quarter_line_number}}s/\$/\\n             new_entry="\"${{prefix}}${{quarter_end_date}}\""
-                fi
-            fi
-        done
+                            # Add the new entry after the last quarter entry, properly indented and wrapped in quotes
+                            sed -i "${{last_quarter_line_number}}s/\$/\\n             $new_entry/" "{config_dir}/{file_name}"
+                        fi
+                    fi
+                done
         """
         # Add the BashOperator task to the dictionary
         update_view_config_tasks[task_id] = BashOperator(
