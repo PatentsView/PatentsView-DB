@@ -171,8 +171,9 @@ def create_update_view_config_tasks(view_config_files, config_dir):
                     # Extract the line number of the last quarter entry
                     last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1)
 
-                    # Insert a comma and new entry if it's not already present after the last entry
-                    sed -i "${{last_quarter_line_number}}s/\([[:space:]]*\)$/,$(echo -e '\\n            '$new_entry)/" "{config_dir}/{file_name}"
+                    # Insert a comma and new entry on a new line, properly indented
+                    sed -i "${{last_quarter_line_number}}s/\\([[:space:]]*\\)$/,\\
+                    $new_entry/" "{config_dir}/{file_name}"
                 fi
             fi
         done
