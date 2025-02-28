@@ -164,7 +164,7 @@ def create_update_view_config_tasks(view_config__files, config_dir):
                         sed -i "/\\\"${{prefix}}[0-9]{{8}}\\\"/ s/$/,\\n    $new_entry/" {file_name}_temp_25.json; \
                     fi; \
                 done
-            """
+            """,
         params={
                 'config_dir': config_dir,
                 'file_name': file_name
