@@ -77,6 +77,26 @@ def get_quarter_end_str(**context):
     return f"{ex.year}{quarter_end_days[quarter]}"
 
 
+def create_copy_json_tasks(json_files, config_dir):
+    """
+    Creates a dictionary of BashOperator tasks with their actual task names.
+
+    :param json_files: Dictionary where keys are task IDs and values are JSON file names.
+    :param config_dir: Directory where JSON files are located.
+    :return: Dictionary of task_id -> BashOperator task
+    """
+    copy_json_tasks = {}
+    for task_id, file_name in json_files.items():
+        copy_task = BashOperator(
+            task_id=task_id,
+            bash_command=f"""
+                cd {config_dir} && \
+                cp {file_name}.json {file_name}_temp_25.json
+            """
+        )
+        copy_json_tasks[task_id] = copy_task
+    return copy_json_tasks
+
 def create_update_text_table_tasks(text_table_files, config_dir):
     """
     Creates a dictionary of BashOperator tasks to update text table JSON files.
@@ -104,8 +124,6 @@ def create_update_text_table_tasks(text_table_files, config_dir):
         update_text_tables_tasks[task_id] = update_task  # Store task in dictionary
 
     return update_text_tables_tasks  # ✅ Correct return type
-
-
 
 
 
