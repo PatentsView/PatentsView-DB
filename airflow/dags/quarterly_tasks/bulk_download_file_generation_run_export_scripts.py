@@ -161,7 +161,7 @@ with DAG(
     update_text_tables = create_update_text_table_tasks(text_table_files, config_dir=os.path.join(PV_Downloads_dir, "config_json"))
 
 
-    test_change_directory >> get_year >> get_quarter_end_date >> copy_json_tasks
+    test_change_directory >> get_year >> get_quarter_end_date
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"]
