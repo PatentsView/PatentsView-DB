@@ -152,8 +152,8 @@ def create_update_view_config_tasks(view_config_files, config_dir):
         # Construct the bash script to be executed
         bash_command = f"""
         # Define the quarter end dates
-        previous_quarter_end_date="20241231"
-        quarter_end_date="20250331"
+        previous_quarter_end_date="{previous_quarter_end_date}"
+        quarter_end_date="{quarter_end_date}"
 
         # Loop through both identifiers
         for prefix in "disamb_assignee_id_" "disamb_inventor_id_"; do
@@ -170,16 +170,15 @@ def create_update_view_config_tasks(view_config_files, config_dir):
                     last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1)
 
                     # Insert a comma and new entry on a new line, properly indented
-                    # Insert a comma if necessary
-                    sed -i "${{last_quarter_line_number}}s/\([[:space:]]*\)$/,/" "{config_dir}/{file_name}" && \
-        
+                    # Insert a comma before the new entry if necessary
+                    sed -i "${{last_quarter_line_number}}s/\\([[:space:]]*\\)$/,/" "{config_dir}/{file_name}" && \
+
                     # Add the new entry after the last quarter entry, properly indented and on a new line
                     sed -i "${{last_quarter_line_number}}s/\$/\\n          $new_entry/" "{config_dir}/{file_name}"
                 fi
             fi
         done
         """
-
         # Add the BashOperator task to the dictionary
         update_view_config_tasks[task_id] = BashOperator(
             task_id=task_id,
