@@ -153,16 +153,16 @@ def create_update_view_config_tasks(view_config__files, config_dir):
         update_task = BashOperator(
             task_id=task_id,  # Use the existing key as the task_id
             bash_command=f"""
-                            cd {config_dir} && \\
+                           cd {config_dir} && \
                             # Extract unique prefixes that follow disamb_[a-zA-Z_]*_YYYYMMDD pattern
-                            existing_prefixes=$(grep -oE '"disamb_[a-zA-Z_]+_' {file_name}_temp_25.json | sort -u) && \\
-
+                            existing_prefixes=$(grep -oE '"disamb_[a-zA-Z_]+_' {file_name}_temp_25.json | sort -u | tr -d '"') && \
+                            
                             # Loop through each unique prefix and add the missing quarter_end_date dynamically
-                            for prefix in $existing_prefixes; do \\
-                                new_entry=\\"$prefix{quarter_end_date}\\"; \\
-                                if ! grep -q "$new_entry" {file_name}_temp_25.json; then \\
-                                    sed -i "/$prefix[0-9]\\{{8\\}}\"/ s/$/,\\n    $new_entry/" {file_name}_temp_25.json; \\
-                                fi; \\
+                            for prefix in $existing_prefixes; do \
+                                new_entry="\"${prefix}{quarter_end_date}\""; \
+                                if ! grep -q "$new_entry" {file_name}_temp_25.json; then \
+                                    sed -i "/\"${prefix}[0-9]\{8\}\"/ s/$/,\\n    $new_entry/" {file_name}_temp_25.json; \
+                                fi; \
                             done
                         """,
             params={
