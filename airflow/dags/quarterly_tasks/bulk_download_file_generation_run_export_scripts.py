@@ -134,9 +134,6 @@ view_config_files = {
     "update_copy_export_view_config_pregrant_json": "export_view_config_pregrant.json",
 }
 
-from airflow.operators.bash import BashOperator
-from airflow.utils.dates import days_ago
-
 def create_update_view_config_tasks(view_config_files, config_dir):
     """
     Creates a dictionary of BashOperator tasks to update text table JSON files.
@@ -173,10 +170,11 @@ def create_update_view_config_tasks(view_config_files, config_dir):
                     last_quarter_line_number=$(echo $last_quarter_entry | cut -d: -f1)
 
                     # Insert a comma and new entry on a new line, properly indented
+                    # Insert a comma if necessary
                     sed -i "${{last_quarter_line_number}}s/\([[:space:]]*\)$/,/" "{config_dir}/{file_name}" && \
-                    sed -i "${{last_quarter_line_number}}s/\$/|/" "{config_dir}/{file_name}" && \
-                    sed -i "${{last_quarter_line_number}}s/\$/\\n          $new_entry/" "{config_dir}/{file_name}" && \
-                    sed -i "${{last_quarter_line_number}}s/|//" "{config_dir}/{file_name}"
+        
+                    # Add the new entry after the last quarter entry, properly indented and on a new line
+                    sed -i "${{last_quarter_line_number}}s/\$/\\n          $new_entry/" "{config_dir}/{file_name}"
                 fi
             fi
         done
@@ -263,16 +261,16 @@ with DAG(
     get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_text_tables_pregrant_json"]
 
     # Assuming update_view_config contains the relevant tasks:
-    update_column_tasks_to_link = [
-        update_view_config["update_copy_export_view_config_granted_json"],
-        update_view_config["update_copy_export_view_config_pregrant_json"],
-        update_text_tables["update_copy_export_text_tables_granted_json"],
-        update_text_tables["update_copy_export_text_tables_pregrant_json"]
-    ]
-
-    # Link each task to git_task
-    for task in update_column_tasks_to_link:
-        task >> git_task
+    # update_column_tasks_to_link = [
+    #     update_view_config["update_copy_export_view_config_granted_json"],
+    #     update_view_config["update_copy_export_view_config_pregrant_json"],
+    #     update_text_tables["update_copy_export_text_tables_granted_json"],
+    #     update_text_tables["update_copy_export_text_tables_pregrant_json"]
+    # ]
+    #
+    # # Link each task to git_task
+    # for task in update_column_tasks_to_link:
+    #     task >> git_task
 
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
