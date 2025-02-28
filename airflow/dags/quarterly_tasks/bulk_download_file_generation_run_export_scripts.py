@@ -197,6 +197,9 @@ import os
 import os
 from airflow.operators.bash import BashOperator
 
+import os
+from airflow.operators.bash import BashOperator
+
 
 def create_bulk_download_tasks(date: str, directory: str):
     """
@@ -207,14 +210,14 @@ def create_bulk_download_tasks(date: str, directory: str):
     :return: Dictionary of {task_id: BashOperator task}
     """
     generate_bulk_download_runs = {
-        "bulk_download_generation_export_view_config_granted": (
-        "config_json/export_view_config_granted_temp_25.json", "patent"),
-        "bulk_download_generation_text_tables_granted": (
-        "config_json/export_text_tables_granted_temp_25.json", "patent"),
-        "bulk_download_generation_view_config_pregrant": (
-        "config_json/export_view_config_pregrant_temp_25.json", "pregrant"),
-        "bulk_download_generation_text_tables_pregrant": (
-        "config_json/export_text_tables_pregrant_temp_25.json", "pregrant")
+        "bulk_download_generation_export_view_config_granted": ["config_json/export_view_config_granted_temp_25.json",
+                                                                "patent"],
+        "bulk_download_generation_text_tables_granted": ["config_json/export_text_tables_granted_temp_25.json",
+                                                         "patent"],
+        "bulk_download_generation_view_config_pregrant": ["config_json/export_view_config_pregrant_temp_25.json",
+                                                          "pregrant"],
+        "bulk_download_generation_text_tables_pregrant": ["config_json/export_text_tables_pregrant_temp_25.json",
+                                                          "pregrant"]
     }
 
     tasks = {}
