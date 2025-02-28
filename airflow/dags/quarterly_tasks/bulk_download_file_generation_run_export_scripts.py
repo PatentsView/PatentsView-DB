@@ -5,6 +5,7 @@ from airflow.models.baseoperator import chain, cross_downstream
 from datetime import datetime, timedelta
 from airflow.utils.dates import days_ago
 import math
+import subprocess
 import os
 
 # ----------- Configuration and Defaults -----------
@@ -190,6 +191,20 @@ def create_update_view_config_tasks(view_config_files, config_dir):
     return update_view_config_tasks
 
 
+# Define a function to perform the git operations# Define a function to perform the git operations
+def git_operations(directory: str, files: list, commit_message: str):
+    # Change the working directory to the specified directory
+    os.chdir(directory)
+
+    # Step 1: Git add
+    for file in files:
+        subprocess.run(["git", "add", file], check=True)
+
+    # Step 2: Git commit with the provided message
+    subprocess.run(["git", "commit", "-m", commit_message], check=True)
+
+    # Step 3: Git push
+    subprocess.run(["git", "push"], check=True)
 
 with DAG(
         dag_id="Bulk_Download_Run_Export_Scripts",
@@ -229,12 +244,35 @@ with DAG(
     update_text_tables = create_update_text_table_tasks(text_table_files, config_dir)
     update_view_config = create_update_view_config_tasks(view_config_files, config_dir)
 
+    # List of files to be added, committed, and pushed
+    files_to_commit = ['export_view_config_granted_temp_25.json', 'export_view_config_pregrant_temp_25.json']  # Example list
+    commit_message = "From Airflow: Updating quarterly columns for new Data Update"  # Example commit message
+
+    # Define the PythonOperator task
+    git_task = PythonOperator(
+        task_id='git_operations_task',
+        python_callable=git_operations,
+        op_args=[config_dir, files_to_commit, commit_message],
+    )
+
     test_change_directory >> get_year >> get_quarter_end_date
 
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_granted_json"] >> update_view_config["update_copy_export_view_config_granted_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_view_config_pregrant_json"] >> update_view_config["update_copy_export_view_config_pregrant_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_granted_json"] >> update_text_tables["update_copy_export_text_tables_granted_json"]
     get_quarter_end_date >> copy_json_tasks["copy_export_text_tables_pregrant_json"] >> update_text_tables["update_copy_export_text_tables_pregrant_json"]
+
+    # Assuming update_view_config contains the relevant tasks:
+    update_column_tasks_to_link = [
+        update_view_config["update_copy_export_view_config_granted_json"],
+        update_view_config["update_copy_export_view_config_pregrant_json"],
+        update_text_tables["update_copy_export_text_tables_granted_json"],
+        update_text_tables["update_copy_export_text_tables_pregrant_json"]
+    ]
+
+    # Link each task to git_task
+    for task in update_column_tasks_to_link:
+        task >> git_task
 
     #
     # # 5) Four separate tasks calling generate_bulk_downloads.py
