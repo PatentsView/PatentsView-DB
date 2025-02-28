@@ -137,11 +137,11 @@ view_config_files = {
     "update_copy_export_view_config_pregrant_json": "export_view_config_pregrant",
 }
 
-def create_update_view_config_tasks(view_config__files, config_dir):
+def create_update_view_config_tasks(view_config_files, config_dir):
     """
     Creates a dictionary of BashOperator tasks to update text table JSON files.
 
-    :param view_config__files: Dictionary mapping task IDs to JSON file names.
+    :param view_config_files: Dictionary mapping task IDs to JSON file names.
     :param config_dir: Directory where JSON files are located.
     :return: Dictionary of {task_id: BashOperator task}
     """
@@ -149,16 +149,17 @@ def create_update_view_config_tasks(view_config__files, config_dir):
     quarter_end_date = '20250331'
     print(f"This is the year: {quarter_end_date}")
 
-    for task_id, file_name in view_config__files.items():  # Use keys as task IDs
+    for task_id, file_name in view_config_files.items():  # Use keys as task IDs
         update_task = BashOperator(
             task_id=task_id,  # Use the existing key as the task_id
             bash_command=(
                 f"cd {config_dir} && "
-                f"existing_prefixes=$(grep -oE '\"disamb_[a-zA-Z_]+_' {file_name}_temp_25.json | sort -u | tr -d '\"') && "
-                "for prefix in $existing_prefixes; do "
-                f"    new_entry=\"${{prefix}}{quarter_end_date}\"; "
-                f"    sed -i '/\"${{prefix}}[0-9]{{8}}\"/ {{s/$/,\\n        $new_entry/; b}}; $a\\\n        $new_entry' {file_name}_temp_25.json; "
-                "done"
+                f"for prefix in 'disamb_assignee_id_' 'disamb_inventor_id_'; do "
+                f"    new_entry=\"\\\"${{prefix}}{quarter_end_date}\\\"\"; "
+                f"    if ! grep -q $new_entry {file_name}_temp_25.json; then "
+                f"        sed -i '/\"${{prefix}}[0-9]{{8}}\"/ {{s/$/,\\n        '\"$new_entry\"'/;}}' {file_name}_temp_25.json; "
+                f"    fi; "
+                f"done"
             ),
         params={
                 'config_dir': config_dir,
