@@ -194,14 +194,17 @@ def create_update_view_config_tasks(view_config_files, config_dir):
 import subprocess
 import os
 
+import os
+from airflow.operators.bash import BashOperator
+
 
 def create_bulk_download_tasks(date: str, directory: str):
     """
-    Creates a dictionary of tasks for bulk download generation.
+    Creates a dictionary of Airflow BashOperator tasks for bulk download generation.
 
     :param date: The date parameter (-t) for the script (e.g., '20240331').
     :param directory: The directory to change to before executing the commands.
-    :return: Dictionary of {task_id: subprocess task}
+    :return: Dictionary of {task_id: BashOperator task}
     """
     generate_bulk_download_runs = {
         "bulk_download_generation_export_view_config_granted": (
@@ -215,53 +218,25 @@ def create_bulk_download_tasks(date: str, directory: str):
     }
 
     tasks = {}
-    original_dir = os.getcwd()
-    os.chdir(directory)
 
-    try:
-        for task_id, (export_config, grant_type) in generate_bulk_download_runs.items():
-            command = [
-                "python", "generate_bulk_downloads.py",
-                "-d", "tab_export_settings.ini",
-                "-c", "cred.ini",
-                "-t", date,
-                "-e", "1",
-                "-o", "0",
-                "-s", export_config,
-                "-g", grant_type,
-                "-i", "0"
-            ]
+    for task_id, (export_config, grant_type) in generate_bulk_download_runs.items():
+        command = f"""
+            cd {directory} && \
+            python generate_bulk_downloads.py \
+            -d tab_export_settings.ini \
+            -c cred.ini \
+            -t {date} \
+            -e 1 \
+            -o 0 \
+            -s {export_config} \
+            -g {grant_type} \
+            -i 0
+        """
 
-            print(f"Starting task: {task_id}")
-
-            process = subprocess.Popen(
-                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-            )
-
-            log_file = f"{task_id}_log.txt"
-            with open(log_file, "w") as log:
-                for line in process.stdout:
-                    print(line, end="")  # Print output in real-time
-                    log.write(line)  # Save to log file
-
-            process.wait()  # Ensure process completes before moving to the next task
-
-            if process.returncode == 0:
-                tasks[task_id] = {
-                    "status": "success",
-                    "log_file": log_file
-                }
-            else:
-                error_message = process.stderr.read()
-                print(f"Error in task {task_id}: {error_message}")
-                tasks[task_id] = {
-                    "status": "error",
-                    "log_file": log_file,
-                    "error_message": error_message
-                }
-
-    finally:
-        os.chdir(original_dir)
+        tasks[task_id] = BashOperator(
+            task_id=task_id,
+            bash_command=command
+        )
 
     return tasks
 
