@@ -13,7 +13,7 @@ import zipfile
 from queue import Queue
 from statistics import mean
 import pandas as pd
-import time
+from time import time
 import boto3
 import requests
 from bs4 import BeautifulSoup
