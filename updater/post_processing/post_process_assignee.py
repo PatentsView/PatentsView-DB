@@ -806,14 +806,14 @@ limit 25;
 
 
 def additional_post_processing_assignee(**kwargs):
-    # additional_post_processing(**kwargs)
-    # ##No real improvement can be made in runtime
-    # additional_post_processing_update_queries(**kwargs)
-    # ##No real improvement can be made in runtime
-    # precache_assignees(**kwargs)
-    # ##No real improvement can be made in runtime
-    # create_canonical_assignees(**kwargs)
-    ##No improvement can be made in runtime
+    additional_post_processing(**kwargs)
+    ##No real improvement can be made in runtime
+    additional_post_processing_update_queries(**kwargs)
+    ##No real improvement can be made in runtime
+    precache_assignees(**kwargs)
+    ##No real improvement can be made in runtime
+    create_canonical_assignees(**kwargs)
+    #No improvement can be made in runtime
     check_largest_clusters(**kwargs)
 
 def post_process_qc(**kwargs):
