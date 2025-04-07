@@ -799,20 +799,20 @@ limit 25;
     """
     df = pd.read_sql(cluster_query, con=engine)
     print(df)
-    if df['records'][0] > 200000:
+    if df['records'][0] > 300000:
         raise Exception(f"ASSIGNEE DISAMBIGUATION OVER-CLUSTERED")
     if df['records'][0] < 50000:
         raise Exception(f"ASSIGNEE DISAMBIGUATION UNDER-CLUSTERED")
 
 
 def additional_post_processing_assignee(**kwargs):
-    additional_post_processing(**kwargs)
-    ##No real improvement can be made in runtime
-    additional_post_processing_update_queries(**kwargs)
-    ##No real improvement can be made in runtime
-    precache_assignees(**kwargs)
-    ##No real improvement can be made in runtime
-    create_canonical_assignees(**kwargs)
+    # additional_post_processing(**kwargs)
+    # ##No real improvement can be made in runtime
+    # additional_post_processing_update_queries(**kwargs)
+    # ##No real improvement can be made in runtime
+    # precache_assignees(**kwargs)
+    # ##No real improvement can be made in runtime
+    # create_canonical_assignees(**kwargs)
     ##No improvement can be made in runtime
     check_largest_clusters(**kwargs)
 
