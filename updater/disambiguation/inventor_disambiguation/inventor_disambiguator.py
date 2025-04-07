@@ -5,7 +5,7 @@ import pv
 from lib.configuration import get_disambig_config
 from lib.utilities import archive_folder, add_index_new_disambiguation_table
 from pv.disambiguation.util.config_util import prepare_config
-
+from pv.disambiguation.inventor.run_clustering import run_clustering
 
 def setup_inventor_assignee_disambiguation(**kwargs):
     config = get_disambig_config(schedule='quarterly',
