@@ -100,26 +100,34 @@ def find_cpc_grant_and_pgpub_urls():
     """
     Retrieve the latest CPC MCF links for both Grant and PGPub from their
     respective USPTO bulk data directories within the past 2 weeks.
+    This version parses the visible file name text from <a> elements,
+    not the href attributes, since href is just '#'.
     """
 
-    # Use datetime consistently
+    # Use a 2-week date range
     end_date = datetime.date.today()
     start_date = end_date - datetime.timedelta(days=14)
 
     formatted_start = start_date.strftime("%Y-%m-%d")
     formatted_end = end_date.strftime("%Y-%m-%d")
 
-    # URLs with date filtering
-    base_url_grant = f'https://data.uspto.gov/bulkdata/datasets/CPCMCPT?fileDataFromDate={formatted_start}&fileDataToDate={formatted_end}'
-    base_url_pgpub = f'https://data.uspto.gov/bulkdata/datasets/cpcmcapp?fileDataFromDate={formatted_start}&fileDataToDate={formatted_end}'
+    # Base page URLs with date filters (for HTML display, not downloads)
+    display_url_grant = f'https://data.uspto.gov/bulkdata/datasets/CPCMCPT?fileDataFromDate={formatted_start}&fileDataToDate={formatted_end}'
+    display_url_pgpub = f'https://data.uspto.gov/bulkdata/datasets/cpcmcapp?fileDataFromDate={formatted_start}&fileDataToDate={formatted_end}'
+
+    # Base download URL to prefix the file names
+    base_download_url_grant = "https://data.uspto.gov/bulkdata/datasets/CPCMCPT/"
+    base_download_url_pgpub = "https://data.uspto.gov/bulkdata/datasets/cpcmcapp/"
 
     print("[DEBUG] Date Range:", formatted_start, "to", formatted_end)
 
-    print("[DEBUG] Fetching grant page from:", base_url_grant)
-    page_grant = urllib.request.urlopen(base_url_grant)
+    # -------- GRANT FILES --------
+    print("[DEBUG] Fetching grant page from:", display_url_grant)
+    page_grant = urllib.request.urlopen(display_url_grant)
     tree_grant = html.fromstring(page_grant.read())
-    grant_links = tree_grant.xpath('//a/@href')
-    print(f"[DEBUG] Found {len(grant_links)} total links on grant page")
+
+    grant_links = tree_grant.xpath('//a/text()')
+    print(f"[DEBUG] Found {len(grant_links)} total file names on grant page")
 
     potential_grant_links = [
         link for link in grant_links
@@ -130,16 +138,18 @@ def find_cpc_grant_and_pgpub_urls():
         print("   →", l)
 
     if not potential_grant_links:
-        raise ValueError(f"No grant links found at: {base_url_grant}")
+        raise ValueError(f"No matching grant links found at: {display_url_grant}")
 
-    latest_grant_link = "https://data.uspto.gov/bulkdata/datasets/CPCMCPT/" + sorted(potential_grant_links)[-1]
+    latest_grant_link = base_download_url_grant + sorted(potential_grant_links)[-1]
     print("[DEBUG] Latest grant file selected:", latest_grant_link)
 
-    print("[DEBUG] Fetching pgpub page from:", base_url_pgpub)
-    page_pgpub = urllib.request.urlopen(base_url_pgpub)
+    # -------- PGPUB FILES --------
+    print("[DEBUG] Fetching pgpub page from:", display_url_pgpub)
+    page_pgpub = urllib.request.urlopen(display_url_pgpub)
     tree_pgpub = html.fromstring(page_pgpub.read())
-    pgpub_links = tree_pgpub.xpath('//a/@href')
-    print(f"[DEBUG] Found {len(pgpub_links)} total links on pgpub page")
+
+    pgpub_links = tree_pgpub.xpath('//a/text()')
+    print(f"[DEBUG] Found {len(pgpub_links)} total file names on pgpub page")
 
     potential_pgpub_links = [
         link for link in pgpub_links
@@ -150,9 +160,9 @@ def find_cpc_grant_and_pgpub_urls():
         print("   →", l)
 
     if not potential_pgpub_links:
-        raise ValueError(f"No pgpub links found at: {base_url_pgpub}")
+        raise ValueError(f"No matching pgpub links found at: {display_url_pgpub}")
 
-    latest_pgpub_link = "https://data.uspto.gov/bulkdata/datasets/cpcmcapp/" + sorted(potential_pgpub_links)[-1]
+    latest_pgpub_link = base_download_url_pgpub + sorted(potential_pgpub_links)[-1]
     print("[DEBUG] Latest pgpub file selected:", latest_pgpub_link)
 
     return latest_grant_link, latest_pgpub_link
