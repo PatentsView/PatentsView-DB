@@ -105,7 +105,8 @@ def find_cpc_grant_and_pgpub_urls():
     If there are multiple urls, sorting alphabetically ensures that the
     most recent version is returned.
     """
-    base_url = 'https://bulkdata.uspto.gov/data/patent/classification/cpc/'
+    base_url_grant = 'https://data.uspto.gov/bulkdata/datasets/CPCMCPT'
+    base_url_pgpub = 'https://data.uspto.gov/bulkdata/datasets/cpcmcapp'
     page = urllib.request.urlopen(base_url)
     tree = html.fromstring(page.read())
 
@@ -121,8 +122,8 @@ def find_cpc_grant_and_pgpub_urls():
 
     # Since zip files are formatted Filename_YYYY-MM-DD.zip,
     # the last sorted url corresponds to the latest version
-    latest_grant_link = base_url + sorted(potential_grant_links)[-1]
-    latest_pgpub_link = base_url + sorted(potential_pgpub_links)[-1]
+    latest_grant_link = base_url_grant + sorted(potential_grant_links)[-1]
+    latest_pgpub_link = base_url_pgpub + sorted(potential_pgpub_links)[-1]
 
     return latest_grant_link, latest_pgpub_link
 
