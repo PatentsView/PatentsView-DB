@@ -246,7 +246,7 @@ def collect_cpc_data(**kwargs):
     if not os.path.exists(pgpubs_destination_folder):
         os.makedirs(pgpubs_destination_folder)
     download_cpc_schema(upload_destination_folder)  # <1 min
-    download_cpc_grant_and_pgpub_classifications(upload_destination_folder, pgpubs_destination_folder)  # few minutes
+    #download_cpc_grant_and_pgpub_classifications(upload_destination_folder, pgpubs_destination_folder)  # few minutes
     download_ipc(upload_destination_folder)  # <1 min
     download_ipc(pgpubs_destination_folder)
 
