@@ -99,12 +99,21 @@ def download_cpc_grant_and_pgpub_classifications(granted_cpc_folder, pgpubs_cpc_
 def find_cpc_grant_and_pgpub_urls():
     """
     Retrieve the latest CPC MCF links for both Grant and PGPub from their
-    respective USPTO bulk data directories.
+    respective USPTO bulk data directories within the past 2 weeks.
     """
 
-    # Define source directories
-    base_url_grant = 'https://data.uspto.gov/bulkdata/datasets/CPCMCPT/'
-    base_url_pgpub = 'https://data.uspto.gov/bulkdata/datasets/cpcmcapp/'
+    # Set date range: past 14 days
+    end_date = date.today()
+    start_date = end_date - timedelta(days=14)
+
+    formatted_start = start_date.strftime("%Y-%m-%d")
+    formatted_end = end_date.strftime("%Y-%m-%d")
+
+    # Define source URLs with 2-week date filters
+    base_url_grant = f'https://data.uspto.gov/bulkdata/datasets/CPCMCPT?fileDataFromDate={formatted_start}&fileDataToDate={formatted_end}'
+    base_url_pgpub = f'https://data.uspto.gov/bulkdata/datasets/cpcmcapp?fileDataFromDate={formatted_start}&fileDataToDate={formatted_end}'
+
+    print("[DEBUG] Date Range:", formatted_start, "to", formatted_end)
 
     print("[DEBUG] Fetching grant page from:", base_url_grant)
     page_grant = urllib.request.urlopen(base_url_grant)
@@ -123,7 +132,7 @@ def find_cpc_grant_and_pgpub_urls():
     if not potential_grant_links:
         raise ValueError(f"No grant links found at: {base_url_grant}")
 
-    latest_grant_link = base_url_grant + sorted(potential_grant_links)[-1]
+    latest_grant_link = "https://data.uspto.gov/bulkdata/datasets/CPCMCPT/" + sorted(potential_grant_links)[-1]
     print("[DEBUG] Latest grant file selected:", latest_grant_link)
 
     print("[DEBUG] Fetching pgpub page from:", base_url_pgpub)
@@ -143,7 +152,7 @@ def find_cpc_grant_and_pgpub_urls():
     if not potential_pgpub_links:
         raise ValueError(f"No pgpub links found at: {base_url_pgpub}")
 
-    latest_pgpub_link = base_url_pgpub + sorted(potential_pgpub_links)[-1]
+    latest_pgpub_link = "https://data.uspto.gov/bulkdata/datasets/cpcmcapp/" + sorted(potential_pgpub_links)[-1]
     print("[DEBUG] Latest pgpub file selected:", latest_pgpub_link)
 
     return latest_grant_link, latest_pgpub_link
