@@ -125,6 +125,8 @@ def find_cpc_grant_and_pgpub_urls():
     latest_grant_link = base_url_grant + sorted(potential_grant_links)[-1]
     latest_pgpub_link = base_url_pgpub + sorted(potential_pgpub_links)[-1]
 
+    print(f'latest_grant_link: {latest_grant_link}')
+    print(f'latest_pgpub_link: {latest_pgpub_link}')
     return latest_grant_link, latest_pgpub_link
 
 
