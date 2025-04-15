@@ -9,9 +9,6 @@ from lib.configuration import get_config, get_current_config
 from lib.utilities import download
 
 
-import urllib.request
-from lxml import html
-
 def find_cpc_grant_and_pgpub_urls():
     """
     Retrieve the latest CPC MCF links for both Grant and PGPub from their
@@ -22,36 +19,45 @@ def find_cpc_grant_and_pgpub_urls():
     base_url_grant = 'https://data.uspto.gov/bulkdata/datasets/CPCMCPT/'
     base_url_pgpub = 'https://data.uspto.gov/bulkdata/datasets/cpcmcapp/'
 
-    # --- Fetch Grant files ---
+    print("[DEBUG] Fetching grant page from:", base_url_grant)
     page_grant = urllib.request.urlopen(base_url_grant)
     tree_grant = html.fromstring(page_grant.read())
+    grant_links = tree_grant.xpath('//a/@href')
+    print(f"[DEBUG] Found {len(grant_links)} total links on grant page")
 
     potential_grant_links = [
-        link for link in tree_grant.xpath('//a/@href')
+        link for link in grant_links
         if link.startswith("US_Grant_CPC_MCF_XML") and link.endswith(".zip")
     ]
+    print(f"[DEBUG] Filtered {len(potential_grant_links)} matching grant .zip files:")
+    for l in potential_grant_links:
+        print("   →", l)
 
     if not potential_grant_links:
         raise ValueError(f"No grant links found at: {base_url_grant}")
 
     latest_grant_link = base_url_grant + sorted(potential_grant_links)[-1]
+    print("[DEBUG] Latest grant file selected:", latest_grant_link)
 
-    # --- Fetch PGPub files ---
+    print("[DEBUG] Fetching pgpub page from:", base_url_pgpub)
     page_pgpub = urllib.request.urlopen(base_url_pgpub)
     tree_pgpub = html.fromstring(page_pgpub.read())
+    pgpub_links = tree_pgpub.xpath('//a/@href')
+    print(f"[DEBUG] Found {len(pgpub_links)} total links on pgpub page")
 
     potential_pgpub_links = [
-        link for link in tree_pgpub.xpath('//a/@href')
+        link for link in pgpub_links
         if link.startswith("US_PGPub_CPC_MCF_Text") and link.endswith(".zip")
     ]
+    print(f"[DEBUG] Filtered {len(potential_pgpub_links)} matching pgpub .zip files:")
+    for l in potential_pgpub_links:
+        print("   →", l)
 
     if not potential_pgpub_links:
         raise ValueError(f"No pgpub links found at: {base_url_pgpub}")
 
     latest_pgpub_link = base_url_pgpub + sorted(potential_pgpub_links)[-1]
-
-    print(f'[DEBUG] latest_grant_link: {latest_grant_link}')
-    print(f'[DEBUG] latest_pgpub_link: {latest_pgpub_link}')
+    print("[DEBUG] Latest pgpub file selected:", latest_pgpub_link)
 
     return latest_grant_link, latest_pgpub_link
 
