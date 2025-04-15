@@ -9,27 +9,52 @@ from lib.configuration import get_config, get_current_config
 from lib.utilities import download
 
 
-def download_cpc_schema(destination_folder):
-    """ Download and extract the most recent CPC Schema """
+import urllib.request
+from lxml import html
 
-    # Find the correct CPC Schema url
-    cpc_schema_url = find_cpc_schema_url()
-    cpc_schema_zip_filepath = os.path.join(destination_folder,
-                                           "CPC_Schema.zip")
-    print(cpc_schema_url)
-    # Download the CPC Schema zip file
-    print("Destination: {}".format(cpc_schema_zip_filepath))
-    download(url=cpc_schema_url, filepath=cpc_schema_zip_filepath)
+def find_cpc_grant_and_pgpub_urls():
+    """
+    Retrieve the latest CPC MCF links for both Grant and PGPub from their
+    respective USPTO bulk data directories.
+    """
 
-    # Unzip the zip file
-    print("Extracting contents to: {}".format(destination_folder))
-    z = zipfile.ZipFile(cpc_schema_zip_filepath)
-    z.extractall(destination_folder)
-    z.close()
+    # Define source directories
+    base_url_grant = 'https://data.uspto.gov/bulkdata/datasets/CPCMCPT/'
+    base_url_pgpub = 'https://data.uspto.gov/bulkdata/datasets/cpcmcapp/'
 
-    # Remove the original zip file
-    print("Removing: {}".format(cpc_schema_zip_filepath))
-    os.remove(cpc_schema_zip_filepath)
+    # --- Fetch Grant files ---
+    page_grant = urllib.request.urlopen(base_url_grant)
+    tree_grant = html.fromstring(page_grant.read())
+
+    potential_grant_links = [
+        link for link in tree_grant.xpath('//a/@href')
+        if link.startswith("US_Grant_CPC_MCF_XML") and link.endswith(".zip")
+    ]
+
+    if not potential_grant_links:
+        raise ValueError(f"No grant links found at: {base_url_grant}")
+
+    latest_grant_link = base_url_grant + sorted(potential_grant_links)[-1]
+
+    # --- Fetch PGPub files ---
+    page_pgpub = urllib.request.urlopen(base_url_pgpub)
+    tree_pgpub = html.fromstring(page_pgpub.read())
+
+    potential_pgpub_links = [
+        link for link in tree_pgpub.xpath('//a/@href')
+        if link.startswith("US_PGPub_CPC_MCF_Text") and link.endswith(".zip")
+    ]
+
+    if not potential_pgpub_links:
+        raise ValueError(f"No pgpub links found at: {base_url_pgpub}")
+
+    latest_pgpub_link = base_url_pgpub + sorted(potential_pgpub_links)[-1]
+
+    print(f'[DEBUG] latest_grant_link: {latest_grant_link}')
+    print(f'[DEBUG] latest_pgpub_link: {latest_pgpub_link}')
+
+    return latest_grant_link, latest_pgpub_link
+
 
 
 def find_cpc_schema_url():
