@@ -9,58 +9,27 @@ from lib.configuration import get_config, get_current_config
 from lib.utilities import download
 
 
-def find_cpc_grant_and_pgpub_urls():
-    """
-    Retrieve the latest CPC MCF links for both Grant and PGPub from their
-    respective USPTO bulk data directories.
-    """
+def download_cpc_schema(destination_folder):
+    """ Download and extract the most recent CPC Schema """
 
-    # Define source directories
-    base_url_grant = 'https://data.uspto.gov/bulkdata/datasets/CPCMCPT/'
-    base_url_pgpub = 'https://data.uspto.gov/bulkdata/datasets/cpcmcapp/'
+    # Find the correct CPC Schema url
+    cpc_schema_url = find_cpc_schema_url()
+    cpc_schema_zip_filepath = os.path.join(destination_folder,
+                                           "CPC_Schema.zip")
+    print(cpc_schema_url)
+    # Download the CPC Schema zip file
+    print("Destination: {}".format(cpc_schema_zip_filepath))
+    download(url=cpc_schema_url, filepath=cpc_schema_zip_filepath)
 
-    print("[DEBUG] Fetching grant page from:", base_url_grant)
-    page_grant = urllib.request.urlopen(base_url_grant)
-    tree_grant = html.fromstring(page_grant.read())
-    grant_links = tree_grant.xpath('//a/@href')
-    print(f"[DEBUG] Found {len(grant_links)} total links on grant page")
+    # Unzip the zip file
+    print("Extracting contents to: {}".format(destination_folder))
+    z = zipfile.ZipFile(cpc_schema_zip_filepath)
+    z.extractall(destination_folder)
+    z.close()
 
-    potential_grant_links = [
-        link for link in grant_links
-        if link.startswith("US_Grant_CPC_MCF_XML") and link.endswith(".zip")
-    ]
-    print(f"[DEBUG] Filtered {len(potential_grant_links)} matching grant .zip files:")
-    for l in potential_grant_links:
-        print("   →", l)
-
-    if not potential_grant_links:
-        raise ValueError(f"No grant links found at: {base_url_grant}")
-
-    latest_grant_link = base_url_grant + sorted(potential_grant_links)[-1]
-    print("[DEBUG] Latest grant file selected:", latest_grant_link)
-
-    print("[DEBUG] Fetching pgpub page from:", base_url_pgpub)
-    page_pgpub = urllib.request.urlopen(base_url_pgpub)
-    tree_pgpub = html.fromstring(page_pgpub.read())
-    pgpub_links = tree_pgpub.xpath('//a/@href')
-    print(f"[DEBUG] Found {len(pgpub_links)} total links on pgpub page")
-
-    potential_pgpub_links = [
-        link for link in pgpub_links
-        if link.startswith("US_PGPub_CPC_MCF_Text") and link.endswith(".zip")
-    ]
-    print(f"[DEBUG] Filtered {len(potential_pgpub_links)} matching pgpub .zip files:")
-    for l in potential_pgpub_links:
-        print("   →", l)
-
-    if not potential_pgpub_links:
-        raise ValueError(f"No pgpub links found at: {base_url_pgpub}")
-
-    latest_pgpub_link = base_url_pgpub + sorted(potential_pgpub_links)[-1]
-    print("[DEBUG] Latest pgpub file selected:", latest_pgpub_link)
-
-    return latest_grant_link, latest_pgpub_link
-
+    # Remove the original zip file
+    print("Removing: {}".format(cpc_schema_zip_filepath))
+    os.remove(cpc_schema_zip_filepath)
 
 
 def find_cpc_schema_url():
@@ -129,35 +98,54 @@ def download_cpc_grant_and_pgpub_classifications(granted_cpc_folder, pgpubs_cpc_
 
 def find_cpc_grant_and_pgpub_urls():
     """
-    Search the CPC Bulk Data Storage System for the most recent CPC MCF .
-    This method is necessary because the MCF zip file may change names, and
-    multiple versions of the MCF file may be listed on the webpage.
-
-    If there are multiple urls, sorting alphabetically ensures that the
-    most recent version is returned.
+    Retrieve the latest CPC MCF links for both Grant and PGPub from their
+    respective USPTO bulk data directories.
     """
-    base_url_grant = 'https://data.uspto.gov/bulkdata/datasets/CPCMCPT'
-    base_url_pgpub = 'https://data.uspto.gov/bulkdata/datasets/cpcmcapp'
-    page = urllib.request.urlopen(base_url)
-    tree = html.fromstring(page.read())
 
-    potential_grant_links = []
-    potential_pgpub_links = []
-    for link in tree.xpath('//a/@href'):
-        if (link.startswith("US_Grant_CPC_MCF_XML")
-                and link.endswith(".zip")):
-            potential_grant_links.append(link)
-        elif (link.startswith("US_PGPub_CPC_MCF_Text")
-              and link.endswith(".zip")):
-            potential_pgpub_links.append(link)
+    # Define source directories
+    base_url_grant = 'https://data.uspto.gov/bulkdata/datasets/CPCMCPT/'
+    base_url_pgpub = 'https://data.uspto.gov/bulkdata/datasets/cpcmcapp/'
 
-    # Since zip files are formatted Filename_YYYY-MM-DD.zip,
-    # the last sorted url corresponds to the latest version
+    print("[DEBUG] Fetching grant page from:", base_url_grant)
+    page_grant = urllib.request.urlopen(base_url_grant)
+    tree_grant = html.fromstring(page_grant.read())
+    grant_links = tree_grant.xpath('//a/@href')
+    print(f"[DEBUG] Found {len(grant_links)} total links on grant page")
+
+    potential_grant_links = [
+        link for link in grant_links
+        if link.startswith("US_Grant_CPC_MCF_XML") and link.endswith(".zip")
+    ]
+    print(f"[DEBUG] Filtered {len(potential_grant_links)} matching grant .zip files:")
+    for l in potential_grant_links:
+        print("   →", l)
+
+    if not potential_grant_links:
+        raise ValueError(f"No grant links found at: {base_url_grant}")
+
     latest_grant_link = base_url_grant + sorted(potential_grant_links)[-1]
-    latest_pgpub_link = base_url_pgpub + sorted(potential_pgpub_links)[-1]
+    print("[DEBUG] Latest grant file selected:", latest_grant_link)
 
-    print(f'latest_grant_link: {latest_grant_link}')
-    print(f'latest_pgpub_link: {latest_pgpub_link}')
+    print("[DEBUG] Fetching pgpub page from:", base_url_pgpub)
+    page_pgpub = urllib.request.urlopen(base_url_pgpub)
+    tree_pgpub = html.fromstring(page_pgpub.read())
+    pgpub_links = tree_pgpub.xpath('//a/@href')
+    print(f"[DEBUG] Found {len(pgpub_links)} total links on pgpub page")
+
+    potential_pgpub_links = [
+        link for link in pgpub_links
+        if link.startswith("US_PGPub_CPC_MCF_Text") and link.endswith(".zip")
+    ]
+    print(f"[DEBUG] Filtered {len(potential_pgpub_links)} matching pgpub .zip files:")
+    for l in potential_pgpub_links:
+        print("   →", l)
+
+    if not potential_pgpub_links:
+        raise ValueError(f"No pgpub links found at: {base_url_pgpub}")
+
+    latest_pgpub_link = base_url_pgpub + sorted(potential_pgpub_links)[-1]
+    print("[DEBUG] Latest pgpub file selected:", latest_pgpub_link)
+
     return latest_grant_link, latest_pgpub_link
 
 
