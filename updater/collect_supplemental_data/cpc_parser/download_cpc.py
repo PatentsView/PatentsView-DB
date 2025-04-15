@@ -102,14 +102,14 @@ def find_cpc_grant_and_pgpub_urls():
     respective USPTO bulk data directories within the past 2 weeks.
     """
 
-    # Set date range: past 14 days
-    end_date = date.today()
-    start_date = end_date - timedelta(days=14)
+    # Use datetime consistently
+    end_date = datetime.date.today()
+    start_date = end_date - datetime.timedelta(days=14)
 
     formatted_start = start_date.strftime("%Y-%m-%d")
     formatted_end = end_date.strftime("%Y-%m-%d")
 
-    # Define source URLs with 2-week date filters
+    # URLs with date filtering
     base_url_grant = f'https://data.uspto.gov/bulkdata/datasets/CPCMCPT?fileDataFromDate={formatted_start}&fileDataToDate={formatted_end}'
     base_url_pgpub = f'https://data.uspto.gov/bulkdata/datasets/cpcmcapp?fileDataFromDate={formatted_start}&fileDataToDate={formatted_end}'
 
