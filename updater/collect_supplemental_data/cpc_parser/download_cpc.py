@@ -3,6 +3,7 @@ import urllib
 import zipfile
 import os
 from lxml import html
+import re
 
 from QA.collect_supplemental_data.cpc_parser.CPCDownloadTest import CPCDownloadTest
 from lib.configuration import get_config, get_current_config
@@ -98,71 +99,76 @@ def download_cpc_grant_and_pgpub_classifications(granted_cpc_folder, pgpubs_cpc_
 
 def find_cpc_grant_and_pgpub_urls():
     """
-    Retrieve the latest CPC MCF links for both Grant and PGPub from their
-    respective USPTO bulk data directories within the past 2 weeks.
-    This version parses the visible file name text from <a> elements,
-    not the href attributes, since href is just '#'.
+    Scrape unfiltered grant and pgpub directories and filter files
+    from the last 14 days based on the date embedded in filenames.
     """
 
-    # Use a 2-week date range
-    end_date = datetime.date.today()
-    start_date = end_date - datetime.timedelta(days=14)
+    # 2-week window
+    today = datetime.date.today()
+    two_weeks_ago = today - datetime.timedelta(days=14)
 
-    formatted_start = start_date.strftime("%Y-%m-%d")
-    formatted_end = end_date.strftime("%Y-%m-%d")
+    # Unfiltered base URLs
+    base_url_grant = 'https://data.uspto.gov/bulkdata/datasets/CPCMCPT/'
+    base_url_pgpub = 'https://data.uspto.gov/bulkdata/datasets/cpcmcapp/'
 
-    # Base page URLs with date filters (for HTML display, not downloads)
-    display_url_grant = f'https://data.uspto.gov/bulkdata/datasets/CPCMCPT?fileDataFromDate={formatted_start}&fileDataToDate={formatted_end}'
-    display_url_pgpub = f'https://data.uspto.gov/bulkdata/datasets/cpcmcapp?fileDataFromDate={formatted_start}&fileDataToDate={formatted_end}'
-
-    # Base download URL to prefix the file names
-    base_download_url_grant = "https://data.uspto.gov/bulkdata/datasets/CPCMCPT/"
-    base_download_url_pgpub = "https://data.uspto.gov/bulkdata/datasets/cpcmcapp/"
-
-    print("[DEBUG] Date Range:", formatted_start, "to", formatted_end)
+    def extract_date_from_filename(filename):
+        match = re.search(r'_(\d{4}-\d{2}-\d{2})\.zip$', filename)
+        if match:
+            return datetime.datetime.strptime(match.group(1), "%Y-%m-%d").date()
+        return None
 
     # -------- GRANT FILES --------
-    print("[DEBUG] Fetching grant page from:", display_url_grant)
-    page_grant = urllib.request.urlopen(display_url_grant)
+    print("[DEBUG] Fetching grant page from:", base_url_grant)
+    page_grant = urllib.request.urlopen(base_url_grant)
     tree_grant = html.fromstring(page_grant.read())
-
     grant_links = tree_grant.xpath('//a/text()')
-    print(f"[DEBUG] Found {len(grant_links)} total file names on grant page")
 
     potential_grant_links = [
         link for link in grant_links
         if link.startswith("US_Grant_CPC_MCF_XML") and link.endswith(".zip")
     ]
-    print(f"[DEBUG] Filtered {len(potential_grant_links)} matching grant .zip files:")
-    for l in potential_grant_links:
+
+    recent_grant_links = [
+        link for link in potential_grant_links
+        if extract_date_from_filename(link) and extract_date_from_filename(link) >= two_weeks_ago
+    ]
+
+    print(f"[DEBUG] Found {len(grant_links)} grant file names total")
+    print(f"[DEBUG] Filtered {len(recent_grant_links)} grant files from the last 2 weeks:")
+    for l in recent_grant_links:
         print("   →", l)
 
-    if not potential_grant_links:
-        raise ValueError(f"No matching grant links found at: {display_url_grant}")
+    if not recent_grant_links:
+        raise ValueError(f"No recent grant links found at: {base_url_grant}")
 
-    latest_grant_link = base_download_url_grant + sorted(potential_grant_links)[-1]
+    latest_grant_link = base_url_grant + sorted(recent_grant_links)[-1]
     print("[DEBUG] Latest grant file selected:", latest_grant_link)
 
     # -------- PGPUB FILES --------
-    print("[DEBUG] Fetching pgpub page from:", display_url_pgpub)
-    page_pgpub = urllib.request.urlopen(display_url_pgpub)
+    print("[DEBUG] Fetching pgpub page from:", base_url_pgpub)
+    page_pgpub = urllib.request.urlopen(base_url_pgpub)
     tree_pgpub = html.fromstring(page_pgpub.read())
-
     pgpub_links = tree_pgpub.xpath('//a/text()')
-    print(f"[DEBUG] Found {len(pgpub_links)} total file names on pgpub page")
 
     potential_pgpub_links = [
         link for link in pgpub_links
         if link.startswith("US_PGPub_CPC_MCF_Text") and link.endswith(".zip")
     ]
-    print(f"[DEBUG] Filtered {len(potential_pgpub_links)} matching pgpub .zip files:")
-    for l in potential_pgpub_links:
+
+    recent_pgpub_links = [
+        link for link in potential_pgpub_links
+        if extract_date_from_filename(link) and extract_date_from_filename(link) >= two_weeks_ago
+    ]
+
+    print(f"[DEBUG] Found {len(pgpub_links)} pgpub file names total")
+    print(f"[DEBUG] Filtered {len(recent_pgpub_links)} pgpub files from the last 2 weeks:")
+    for l in recent_pgpub_links:
         print("   →", l)
 
-    if not potential_pgpub_links:
-        raise ValueError(f"No matching pgpub links found at: {display_url_pgpub}")
+    if not recent_pgpub_links:
+        raise ValueError(f"No recent pgpub links found at: {base_url_pgpub}")
 
-    latest_pgpub_link = base_download_url_pgpub + sorted(potential_pgpub_links)[-1]
+    latest_pgpub_link = base_url_pgpub + sorted(recent_pgpub_links)[-1]
     print("[DEBUG] Latest pgpub file selected:", latest_pgpub_link)
 
     return latest_grant_link, latest_pgpub_link
