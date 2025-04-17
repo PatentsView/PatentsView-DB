@@ -49,7 +49,7 @@ select p.id
           when a.rule_47_flag = '1' then TRUE
           when a.rule_47_flag = 'true' then TRUE
           else FALSE
-          end a.rule_47_flag
+          end as rule_47_flag
 from `{{reporting_db}}`.publication p
     left join `{{reporting_db}}`.application a
 on a.document_number = p.document_number;
