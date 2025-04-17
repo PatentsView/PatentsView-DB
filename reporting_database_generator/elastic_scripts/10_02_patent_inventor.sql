@@ -35,7 +35,7 @@ select pi.inventor_id
      , pi.sequence
      , i.name_first
      , i.name_last
-     , i.gender_flag
+     , i.gender_code
      , l.city
      , l.state
      , l.country
