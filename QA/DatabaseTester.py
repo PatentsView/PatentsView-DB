@@ -359,6 +359,9 @@ f"HERE CHAR_LENGTH(`{field}`) != CHAR_LENGTH(TRIM(`{field}`))"
                 current_db_query = "SELECT DATABASE();"
                 current_db = self.query_runner(current_db_query, single_value_return=True)
                 print(f"Connected to database: {current_db}")
+                index_query = f"SHOW INDEXES FROM {db}.{table}"
+                results = self.query_runner(index_query)
+                print(f"SHOW INDEXES result for {db}.{table}: {results}")
                 logger.info(index_query)
                 raise Exception(f"{self.database_section}.{table} has no indexes")
             self.qa_data['DataMonitor_indexcount'].append(
