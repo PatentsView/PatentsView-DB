@@ -525,6 +525,7 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
         if xml_template_setting_prefix == "granted_patent"
         else config["FOLDERS"]["pgpubs_bulk_xml_location"]
     )
+
     print(f"[DEBUG] Download folder: {download_folder}")
     from datetime import datetime
 

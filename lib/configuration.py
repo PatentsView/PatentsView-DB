@@ -260,40 +260,24 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
 
 
 def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
-    """
-    Update config file start and end date to first and last day of the supplied week
-    :param supplemental_configs:
-    :param type: XML type
-    :type cfg: object
-    :type yr: int
-    :type mth: int
-    :type day: int
-    :param yr: Year for start and end date
-    :param mth: Month for start and end date
-    :param day: Day for start and end date
-    :param cfg: config to update
-    :return: updated config
-    """
-
     config = get_config()
-    config_prefix = "upload_"
+    config_prefix = "upload_" if type == 'granted_patent' else 'pgpubs_'
 
-    if type == 'pgpubs':
-        config_prefix = 'pgpubs_'
     execution_date: DateTime = kwargs['execution_date']
     print(f"""
     generating config with parameters: 
     type: {type}
     schedule: {schedule}
     execution date: {execution_date.strftime('%Y-%m-%d')}""")
+
+    # Date range logic
     if schedule == 'weekly':
-        current_week_start = datetime.timedelta(days=1)
-        current_week_end = datetime.timedelta(days=7)
-        start_date = (execution_date + current_week_start)
-        end_date = (execution_date + current_week_end)
+        start_date = execution_date + datetime.timedelta(days=1)
+        end_date = execution_date + datetime.timedelta(days=7)
     else:
         from lib.is_it_update_time import get_update_range_full_quarter
         start_date, end_date = get_update_range_full_quarter(execution_date)
+
     temp_date = end_date.strftime('%Y%m%d')
 
     config['DATES'] = {
@@ -301,46 +285,58 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
         "END_DATE": end_date.strftime('%Y%m%d'),
         "END_DATE_DASH": end_date
     }
-    prefixed_string = "{prfx}{date}".format(prfx=config_prefix, date=temp_date)
-    config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"] = prefixed_string
-    config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'pregrant_publications'
-    config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'pgpubs_text'
 
-    if type == 'pgpubs':
-        config['FOLDERS']["pgpubs_bulk_xml_location"] = "/app-volume/pgpubs/xml_files/"
-        config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_pgpub_'+ end_date.strftime('%Y%m%d')
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_pgpub'
+    prefixed_string = f"{config_prefix}{temp_date}"
+
+    # Set working folder (base)
     config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(
         prefix=prefixed_string,
         data_root=config['FOLDERS']['data_root'])
+
+    # Conditional configs
     if type == 'granted_patent':
         config['FOLDERS']['granted_patent_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
             working_folder=config['FOLDERS']['WORKING_FOLDER'])
         config['FOLDERS']['long_text_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
             working_folder=config['FOLDERS']['WORKING_FOLDER'])
-        config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'patent'
-        config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'patent_text'
-        config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_patent_' + end_date.strftime('%Y%m%d')
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_patent'
 
-    latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
-    latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
+        config['PATENTSVIEW_DATABASES'].update({
+            "TEMP_UPLOAD_DB": prefixed_string,
+            "PROD_DB": 'patent',
+            "TEXT_DB": 'patent_text',
+            "REPORTING_DATABASE": f"PatentsView_{temp_date}",
+            "ELASTICSEARCH_DB": f"elastic_production_patent_{temp_date}",
+            "ELASTICSEARCH_DB_TYPE": "elasticsearch_patent"
+        })
 
-    # === Add USPTO API config for XML download ===
-    if type == 'granted_patent':
         config['USPTO_LINKS'] = {
             "product_identifier": "PTGRXML",
-            "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"  # or hardcode for now if needed
+            "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"
         }
+
     elif type == 'pgpubs':
+        config['FOLDERS']["pgpubs_bulk_xml_location"] = "/app-volume/pgpubs/xml_files/"  # Or make dynamic if desired
+
+        config['PATENTSVIEW_DATABASES'].update({
+            "TEMP_UPLOAD_DB": prefixed_string,
+            "PROD_DB": 'pregrant_publications',
+            "TEXT_DB": 'pgpubs_text',
+            "REPORTING_DATABASE": f"PatentsView_{temp_date}",
+            "ELASTICSEARCH_DB": f"elastic_production_pgpub_{temp_date}",
+            "ELASTICSEARCH_DB_TYPE": "elasticsearch_pgpub"
+        })
+
         config['USPTO_LINKS'] = {
             "product_identifier": "APPXML",
             "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"
         }
 
+    # Add derived values if needed later
+    latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
+    latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
+
     return config
+
 
 
 def get_es(config):
