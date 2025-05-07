@@ -306,19 +306,13 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'pregrant_publications'
     config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'pgpubs_text'
 
+    if type == 'pgpubs':
+        config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
+        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_pgpub_'+ end_date.strftime('%Y%m%d')
+        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_pgpub'
     config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(
         prefix=prefixed_string,
         data_root=config['FOLDERS']['data_root'])
-
-    # ✅ Then, use WORKING_FOLDER to construct the correct path
-    if type == 'pgpubs':
-        config['FOLDERS']["pgpubs_bulk_xml_location"] = '{working_folder}/raw_data/'.format(
-            working_folder=config['FOLDERS']['WORKING_FOLDER']
-        )
-        config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_pgpub_' + end_date.strftime('%Y%m%d')
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_pgpub'
-
     if type == 'granted_patent':
         config['FOLDERS']['granted_patent_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
             working_folder=config['FOLDERS']['WORKING_FOLDER'])
