@@ -327,6 +327,18 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
     latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
 
+    # === Add USPTO API config for XML download ===
+    if type == 'granted_patent':
+        config['USPTO_LINKS'] = {
+            "product_identifier": "PTGRXML",
+            "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"  # or hardcode for now if needed
+        }
+    elif type == 'pgpubs':
+        config['USPTO_LINKS'] = {
+            "product_identifier": "APPXML",
+            "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"
+        }
+
     return config
 
 

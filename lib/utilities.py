@@ -510,91 +510,172 @@ def save_zip_file(url, name, path, counter=0, log_queue=None):
     print(f"{path} contains {os.listdir(path)}")
 
 
-def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
-    xml_template_setting = "{prefix}_bulk_xml_template".format(prefix=xml_template_setting_prefix)
-    xml_download_setting = "{prefix}_bulk_xml_location".format(prefix=xml_template_setting_prefix)
-    xml_path_template = config["USPTO_LINKS"][xml_template_setting]
+def download_xml_files(config):
+
+    product_id = config["USPTO_LINKS"]["product_identifier"]  # e.g., "PGPUBS"
+    api_key = config["USPTO_LINKS"]["api_key"]
+    download_folder = config["FOLDERS"]["pgpubs_bulk_xml_location"]
+
     start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
     end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-    start_year = int(start_date.strftime('%Y'))
-    end_year = int(end_date.strftime('%Y'))
     parallelism = int(config["PARALLELISM"]["parallelism"])
+
     if parallelism > 1:
         manager = mp.Manager()
         log_queue = manager.Queue()
     else:
         log_queue = Queue()
+
     print(f"Start date: {config['DATES']['START_DATE']}")
     print(f"End date: {config['DATES']['END_DATE']}")
-    files_to_download = []
 
-    #starting one year early to check for revisions to old files (particularly important at the start of a new calendar year) - should add negligible time to typical runs
-    for year in range(start_year - 1, end_year + 1): 
-        year_xml_page = xml_path_template.format(year=year)
-        print(year_xml_page)
-        r = requests.get(year_xml_page)
-        soup = BeautifulSoup(r.content, "html.parser")
-        links = soup.find_all("a", href=re.compile(r".*[0-9]{6}(_r\d)?\.zip"))
-        idx_counter = 0
-        for link in links:
-            href = link.attrs['href']
-            href_match = re.match(r".*([0-9]{6})(_r\d)?\.zip", href)
-            if href_match is not None:
-                file_datestring = href_match.group(1)
-                file_date = datetime.datetime.strptime(file_datestring, '%y%m%d')
-                if end_date >= file_date >= start_date:
-                    # should apply to original and revised versions
-                    files_to_download.append(
-                        (xml_path_template.format(year=year) + href, href, config["FOLDERS"][xml_download_setting],
-                         idx_counter, log_queue))
-                idx_counter += 1
-                if (href_match.group(2) is not None) and (file_date < start_date): # has a revision suffix and past date
-                    # check if the file has already been downloaded to the matching folder
-                    old_download_path = config["FOLDERS"][xml_download_setting].replace(config['DATES']['END_DATE'], f"20{file_datestring}") #path uses YYYY, file uses YY
-                    downloaded_files = os.listdir(old_download_path)
-                    matching_files = [f for f in downloaded_files if re.match(f'i?p[ag]{file_datestring}', f)]
-                    if (len(matching_files) == 0): # no files downloaded for week matching revised file
-                        revised_file_message = f"""
-revized XML file available for download: {href}
-no files identified as downloaded for {file_datestring} in directory {old_download_path}."""
-                        send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
-                    elif(href[:-4] > max(matching_files)[:-4]): # more recent file than is downloaded for week matching revised file
-                        # if the file has not already been downloaded to the matching folder, send slack message indicating unparsed revision
-                        revised_file_message = f"""
-revized XML file available for download: {href}
-latest version downloaded for {file_datestring} in {old_download_path}: {max(matching_files)}"""
-                        send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
+    files_to_download = []
+    current_date = start_date
+
+    while current_date <= end_date:
+        current_date_str = current_date.strftime('%Y-%m-%d')
+
+        headers = {
+            "X-API-KEY": api_key,
+            "accept": "application/json"
+        }
+        params = {
+            "fileDataFromDate": current_date_str,
+            "fileDataToDate": current_date_str
+        }
+
+        url = f"https://api.uspto.gov/api/v1/datasets/products/{product_id}"
+        try:
+            r = requests.get(url, headers=headers, params=params)
+            r.raise_for_status()
+            data = r.json()
+
+            file_bag = data.get("bulkDataProductBag", [])[0].get("productFileBag", {}).get("fileDataBag", [])
+            for idx, file_info in enumerate(file_bag):
+                filename = file_info["fileName"]
+                file_url = file_info["fileDownloadURI"]
+                files_to_download.append(
+                    (file_url, filename, download_folder, idx, log_queue)
+                )
+
+        except Exception as e:
+            print(f"[ERROR] Fetching metadata for {current_date_str}: {e}")
+
+        current_date += datetime.timedelta(days=1)
+
+    # === Start downloader pool
     watcher = None
     pool = None
     if parallelism > 1:
         pool = mp.Pool(parallelism)
         watcher = pool.apply_async(log_writer, (log_queue,))
 
+    print(f"{len(files_to_download)} files found to download: {[f[1] for f in files_to_download]}")
+
     p_list = []
-    idx_counter = 0
-    print(f"{len(files_to_download)} files found to download: {[_file[1] for _file in files_to_download]}")
     for file_to_download in files_to_download:
         if parallelism > 1:
             p = pool.apply_async(save_zip_file, file_to_download)
             p_list.append(p)
         else:
             save_zip_file(*file_to_download)
-        idx_counter += 1
-    if parallelism > 1:
-        idx_counter = 0
-        for t in p_list:
-            print(t)
-            t.get()
 
-    idx_counter += 1
-    log_queue.put({
-        "level": None,
-        "message": "kill"
-    })
     if parallelism > 1:
+        for p in p_list:
+            p.get()
+
+        log_queue.put({"level": None, "message": "kill"})
         watcher.get()
         pool.close()
         pool.join()
+
+
+
+# def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
+#     xml_template_setting = "{prefix}_bulk_xml_template".format(prefix=xml_template_setting_prefix)
+#     xml_download_setting = "{prefix}_bulk_xml_location".format(prefix=xml_template_setting_prefix)
+#     xml_path_template = config["USPTO_LINKS"][xml_template_setting]
+#     start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
+#     end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+#     start_year = int(start_date.strftime('%Y'))
+#     end_year = int(end_date.strftime('%Y'))
+#     parallelism = int(config["PARALLELISM"]["parallelism"])
+#     if parallelism > 1:
+#         manager = mp.Manager()
+#         log_queue = manager.Queue()
+#     else:
+#         log_queue = Queue()
+#     print(f"Start date: {config['DATES']['START_DATE']}")
+#     print(f"End date: {config['DATES']['END_DATE']}")
+#     files_to_download = []
+#
+#     #starting one year early to check for revisions to old files (particularly important at the start of a new calendar year) - should add negligible time to typical runs
+#     for year in range(start_year - 1, end_year + 1):
+#         year_xml_page = xml_path_template.format(year=year)
+#         print(year_xml_page)
+#         r = requests.get(year_xml_page)
+#         soup = BeautifulSoup(r.content, "html.parser")
+#         links = soup.find_all("a", href=re.compile(r".*[0-9]{6}(_r\d)?\.zip"))
+#         idx_counter = 0
+#         for link in links:
+#             href = link.attrs['href']
+#             href_match = re.match(r".*([0-9]{6})(_r\d)?\.zip", href)
+#             if href_match is not None:
+#                 file_datestring = href_match.group(1)
+#                 file_date = datetime.datetime.strptime(file_datestring, '%y%m%d')
+#                 if end_date >= file_date >= start_date:
+#                     # should apply to original and revised versions
+#                     files_to_download.append(
+#                         (xml_path_template.format(year=year) + href, href, config["FOLDERS"][xml_download_setting],
+#                          idx_counter, log_queue))
+#                 idx_counter += 1
+#                 if (href_match.group(2) is not None) and (file_date < start_date): # has a revision suffix and past date
+#                     # check if the file has already been downloaded to the matching folder
+#                     old_download_path = config["FOLDERS"][xml_download_setting].replace(config['DATES']['END_DATE'], f"20{file_datestring}") #path uses YYYY, file uses YY
+#                     downloaded_files = os.listdir(old_download_path)
+#                     matching_files = [f for f in downloaded_files if re.match(f'i?p[ag]{file_datestring}', f)]
+#                     if (len(matching_files) == 0): # no files downloaded for week matching revised file
+#                         revised_file_message = f"""
+# revized XML file available for download: {href}
+# no files identified as downloaded for {file_datestring} in directory {old_download_path}."""
+#                         send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
+#                     elif(href[:-4] > max(matching_files)[:-4]): # more recent file than is downloaded for week matching revised file
+#                         # if the file has not already been downloaded to the matching folder, send slack message indicating unparsed revision
+#                         revised_file_message = f"""
+# revized XML file available for download: {href}
+# latest version downloaded for {file_datestring} in {old_download_path}: {max(matching_files)}"""
+#                         send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
+#     watcher = None
+#     pool = None
+#     if parallelism > 1:
+#         pool = mp.Pool(parallelism)
+#         watcher = pool.apply_async(log_writer, (log_queue,))
+#
+#     p_list = []
+#     idx_counter = 0
+#     print(f"{len(files_to_download)} files found to download: {[_file[1] for _file in files_to_download]}")
+#     for file_to_download in files_to_download:
+#         if parallelism > 1:
+#             p = pool.apply_async(save_zip_file, file_to_download)
+#             p_list.append(p)
+#         else:
+#             save_zip_file(*file_to_download)
+#         idx_counter += 1
+#     if parallelism > 1:
+#         idx_counter = 0
+#         for t in p_list:
+#             print(t)
+#             t.get()
+#
+#     idx_counter += 1
+#     log_queue.put({
+#         "level": None,
+#         "message": "kill"
+#     })
+#     if parallelism > 1:
+#         watcher.get()
+#         pool.close()
+#         pool.join()
 
 
 def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
