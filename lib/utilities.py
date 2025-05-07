@@ -520,6 +520,7 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
 
     product_id = config["USPTO_LINKS"]["product_identifier"]
     api_key = config["USPTO_LINKS"]["api_key"]
+    print(xml_template_setting_prefix)
     download_folder = (
         config["FOLDERS"]["granted_patent_bulk_xml_location"]
         if xml_template_setting_prefix == "granted_patent"
