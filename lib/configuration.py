@@ -307,6 +307,8 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
     config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'pgpubs_text'
 
     if type == 'pgpubs':
+        config['FOLDERS']["pgpubs_bulk_xml_location"] = '{working_folder}/raw_data/'.format(
+            working_folder=config['FOLDERS']['WORKING_FOLDER'])
         config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
         config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_pgpub_'+ end_date.strftime('%Y%m%d')
         config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_pgpub'

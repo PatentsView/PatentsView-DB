@@ -517,6 +517,7 @@ def save_zip_file(url, name, path, counter=0, log_queue=None, api_key=None):
 
 
 def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
+
     product_id = config["USPTO_LINKS"]["product_identifier"]
     api_key = config["USPTO_LINKS"]["api_key"]
     download_folder = (
@@ -524,7 +525,7 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
         if xml_template_setting_prefix == "granted_patent"
         else config["FOLDERS"]["pgpubs_bulk_xml_location"]
     )
-
+    print(f"[DEBUG] Download folder: {download_folder}")
     from datetime import datetime
 
     execution_dt = config["DATES"]["END_DATE_DASH"]
