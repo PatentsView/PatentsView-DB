@@ -634,7 +634,7 @@ def delete_xml_file(filename):
 
 def begin_parsing(**kwargs):
     config = get_current_config(type='pgpubs', **kwargs)
-    download_xml_files(config)
+    download_xml_files(config, xml_template_setting_prefix='pgpubs')
     queue_parsers(config, 'pgpubs')
 
 
