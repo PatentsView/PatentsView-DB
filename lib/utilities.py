@@ -525,9 +525,15 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
         else config["FOLDERS"]["pgpubs_bulk_xml_location"]
     )
 
+    from datetime import datetime
+
     execution_dt = config["DATES"]["END_DATE_DASH"]
     print(f'this is the execution date: {execution_dt}')
     print(f'this is the type of the execution date: {type(execution_dt)}')
+
+    if isinstance(execution_dt, str):
+        execution_dt = datetime.fromisoformat(execution_dt)
+
     execution_date_str = execution_dt.strftime("%Y-%m-%d")
 
     headers = {"X-API-KEY": api_key, "accept": "application/json"}
