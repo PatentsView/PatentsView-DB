@@ -482,30 +482,35 @@ def log_writer(log_queue, log_prefix="uspto_parser"):
         logger.log(message_data["level"], message_data["message"])
 
 
-def save_zip_file(url, name, path, counter=0, log_queue=None):
+def save_zip_file(url, name, path, counter=0, log_queue=None, api_key=None):
     os.makedirs(path, exist_ok=True)
-    with requests.get(url, stream=True) as downloader:
+    headers = {"X-API-KEY": api_key} if api_key else {}
+
+    # Stream download the ZIP file
+    with requests.get(url, headers=headers, stream=True) as downloader:
         downloader.raise_for_status()
-        with open(path + name, 'wb') as f:
+        zip_path = os.path.join(path, name)
+        with open(zip_path, 'wb') as f:
             for chunk in downloader.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
 
-    with zipfile.ZipFile(path + name, 'r') as zip_ref:
-        zipinfo = zip_ref.infolist()
-        for _file in zipinfo:
+    # Extract and rename if revised
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        for zip_info in zip_ref.infolist():
             z_nm, z_ext = os.path.splitext(name)
-            f_nm, f_ext = os.path.splitext(_file.filename)
-            if re.match(f"{f_nm}_r\d",z_nm):
-                # revision file - can't be renamed inside the zip archive, so will extract to a temporary location and rename
-                os.mkdir(f"{path}/tmp")
-                zip_ref.extract(_file.filename, f"{path}/tmp")
-                os.rename(f"{path}/tmp/{_file.filename}",f"{path}/{z_nm}{f_ext}")
-                os.rmdir(f"{path}/tmp")
+            f_nm, f_ext = os.path.splitext(zip_info.filename)
+            if re.match(f"{f_nm}_r\\d", z_nm):
+                tmp_dir = os.path.join(path, "tmp")
+                os.makedirs(tmp_dir, exist_ok=True)
+                zip_ref.extract(zip_info.filename, tmp_dir)
+                os.rename(os.path.join(tmp_dir, zip_info.filename), os.path.join(path, f"{z_nm}{f_ext}"))
+                os.rmdir(tmp_dir)
             else:
-                zip_ref.extract(_file.filename, path)
+                zip_ref.extract(zip_info.filename, path)
 
-    os.remove(path + name)
+    os.remove(zip_path)
+
     print(f"{name} downloaded and extracted to {path}")
     print(f"{path} contains {os.listdir(path)}")
 
