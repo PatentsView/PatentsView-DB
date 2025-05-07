@@ -510,7 +510,7 @@ def save_zip_file(url, name, path, counter=0, log_queue=None):
     print(f"{path} contains {os.listdir(path)}")
 
 
-def download_xml_files(config):
+def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
 
     product_id = config["USPTO_LINKS"]["product_identifier"]  # e.g., "PGPUBS"
     api_key = config["USPTO_LINKS"]["api_key"]
