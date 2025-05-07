@@ -515,84 +515,66 @@ def save_zip_file(url, name, path, counter=0, log_queue=None, api_key=None):
     print(f"{path} contains {os.listdir(path)}")
 
 
-def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
-
-    product_id = config["USPTO_LINKS"]["product_identifier"]  # e.g., "PGPUBS"
+def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
+    product_id = config["USPTO_LINKS"]["product_identifier"]
     api_key = config["USPTO_LINKS"]["api_key"]
-    download_folder = config["FOLDERS"]["pgpubs_bulk_xml_location"]
+    download_folder = config["FOLDERS"]["granted_patent_bulk_xml_location"] if xml_template_setting_prefix == "granted_patent" else config["FOLDERS"]["pgpubs_bulk_xml_location"]
 
-    start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
-    end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+    execution_dt = config['DATES']['END_DATE_DASH']  # e.g. 2025-04-22 09:00:00
+    execution_date = execution_dt.date().strftime("%Y-%m-%d")
+
     parallelism = int(config["PARALLELISM"]["parallelism"])
+    log_queue = mp.Manager().Queue() if parallelism > 1 else Queue()
 
-    if parallelism > 1:
-        manager = mp.Manager()
-        log_queue = manager.Queue()
-    else:
-        log_queue = Queue()
+    print(f"Execution date: {execution_date}")
 
-    print(f"Start date: {config['DATES']['START_DATE']}")
-    print(f"End date: {config['DATES']['END_DATE']}")
+    # Skip if not the correct weekday
+    required_weekday = 1 if product_id == "PTGRXML" else 3  # Tuesday or Thursday
+    if execution_dt.weekday() != required_weekday:
+        print(f"Skipping download — execution_date {execution_dt.date()} is not a release day (weekday {required_weekday})")
+        return
+
+    headers = {"X-API-KEY": api_key, "accept": "application/json"}
+    params = {
+        "fileDataFromDate": execution_date,
+        "fileDataToDate": execution_date
+    }
+    url = f"https://api.uspto.gov/api/v1/datasets/products/{product_id}"
 
     files_to_download = []
-    current_date = start_date
 
-    while current_date <= end_date:
-        current_date_str = current_date.strftime('%Y-%m-%d')
+    try:
+        r = requests.get(url, headers=headers, params=params)
+        r.raise_for_status()
+        data = r.json()
+        file_bag = data.get("bulkDataProductBag", [])[0].get("productFileBag", {}).get("fileDataBag", [])
 
-        headers = {
-            "X-API-KEY": api_key,
-            "accept": "application/json"
-        }
-        params = {
-            "fileDataFromDate": current_date_str,
-            "fileDataToDate": current_date_str
-        }
+        for idx, file_info in enumerate(file_bag):
+            filename = file_info["fileName"]
+            file_url = file_info["fileDownloadURI"]
+            files_to_download.append((file_url, filename, download_folder, idx, log_queue, api_key))
 
-        url = f"https://api.uspto.gov/api/v1/datasets/products/{product_id}"
-        try:
-            r = requests.get(url, headers=headers, params=params)
-            r.raise_for_status()
-            data = r.json()
-
-            file_bag = data.get("bulkDataProductBag", [])[0].get("productFileBag", {}).get("fileDataBag", [])
-            for idx, file_info in enumerate(file_bag):
-                filename = file_info["fileName"]
-                file_url = file_info["fileDownloadURI"]
-                files_to_download.append(
-                    (file_url, filename, download_folder, idx, log_queue)
-                )
-
-        except Exception as e:
-            print(f"[ERROR] Fetching metadata for {current_date_str}: {e}")
-
-        current_date += datetime.timedelta(days=1)
-
-    # === Start downloader pool
-    watcher = None
-    pool = None
-    if parallelism > 1:
-        pool = mp.Pool(parallelism)
-        watcher = pool.apply_async(log_writer, (log_queue,))
+    except Exception as e:
+        print(f"[ERROR] Fetching metadata for {execution_date}: {e}")
+        return
 
     print(f"{len(files_to_download)} files found to download: {[f[1] for f in files_to_download]}")
 
-    p_list = []
-    for file_to_download in files_to_download:
-        if parallelism > 1:
-            p = pool.apply_async(save_zip_file, file_to_download)
-            p_list.append(p)
-        else:
-            save_zip_file(*file_to_download)
-
+    # Download files
     if parallelism > 1:
+        pool = mp.Pool(parallelism)
+        watcher = pool.apply_async(log_writer, (log_queue,))
+        p_list = [pool.apply_async(save_zip_file, args=job) for job in files_to_download]
         for p in p_list:
             p.get()
-
         log_queue.put({"level": None, "message": "kill"})
         watcher.get()
         pool.close()
         pool.join()
+    else:
+        for job in files_to_download:
+            save_zip_file(*job)
+
 
 
 
