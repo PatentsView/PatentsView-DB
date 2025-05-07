@@ -330,8 +330,8 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
         }
 
     # Add derived values if needed later
-    latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
-    latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
+    # latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
+    # latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
 
     return config
 

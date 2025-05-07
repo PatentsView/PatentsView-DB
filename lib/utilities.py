@@ -523,7 +523,7 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
     download_folder = (
         config["FOLDERS"]["granted_patent_bulk_xml_location"]
         if xml_template_setting_prefix == "granted_patent"
-        else config['FOLDERS']["WORKING_FOLDER"]
+        else config['FOLDERS']["pgpubs_bulk_xml_location"]
     )
 
     print(f"[DEBUG] Download folder: {download_folder}")
