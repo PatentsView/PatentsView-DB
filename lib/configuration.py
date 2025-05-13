@@ -288,6 +288,11 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
 
     prefixed_string = f"{config_prefix}{temp_date}"
 
+    config['FOLDERS']['WORKING_FOLDER'] = "{data_root}/{prefix}".format(
+        prefix=prefixed_string,
+        data_root=config['FOLDERS']['data_root']
+    )
+
     # Conditional configs
     if type == 'granted_patent':
         config['FOLDERS']['granted_patent_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
@@ -319,10 +324,6 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
             "ELASTICSEARCH_DB": f"elastic_production_pgpub_{temp_date}",
             "ELASTICSEARCH_DB_TYPE": "elasticsearch_pgpub"
         })
-
-        config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(
-            prefix=prefixed_string,
-            data_root=config['FOLDERS']['data_root'])
 
         config['USPTO_LINKS'] = {
             "product_identifier": "APPXML",
