@@ -562,6 +562,8 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
 
         for idx, file_info in enumerate(file_bag):
             filename = file_info["fileName"]
+            if not filename.endswith(".zip"):
+                continue
             file_url = file_info["fileDownloadURI"]
             files_to_download.append(
                 (file_url, filename, download_folder, idx, log_queue, api_key)
