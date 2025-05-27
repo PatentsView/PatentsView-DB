@@ -514,31 +514,7 @@ def save_zip_file(url, name, path, counter=0, log_queue=None, api_key=None):
 
     print(f"{name} downloaded and extracted to {path}")
     print(f"{path} contains {os.listdir(path)}")
-
-
-def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
-
-    product_id = config["USPTO_LINKS"]["product_identifier"]
-    api_key = config["USPTO_LINKS"]["api_key"]
-    print(xml_template_setting_prefix)
-    download_folder = (
-        config["FOLDERS"]["granted_patent_bulk_xml_location"]
-        if xml_template_setting_prefix == "granted_patent"
-        else config['FOLDERS']["pgpubs_bulk_xml_location"]
-    )
-
-    print(f"[DEBUG] Download folder: {download_folder}")
-    from datetime import datetime
-
-    execution_dt = config["DATES"]["END_DATE_DASH"]
-    print(f'this is the execution date: {execution_dt}')
-    print(f'this is the type of the execution date: {type(execution_dt)}')
-
-    if isinstance(execution_dt, str):
-        execution_dt = datetime.fromisoformat(execution_dt)
-
-    execution_date_str = execution_dt.strftime("%Y-%m-%d")
-
+def get_files_to_download(product_id, api_key, execution_date_str, download_folder, log_queue):
     headers = {"X-API-KEY": api_key, "accept": "application/json"}
     params = {
         "fileDataFromDate": execution_date_str,
@@ -546,8 +522,6 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
     }
     url = f"https://api.uspto.gov/api/v1/datasets/products/{product_id}"
 
-    parallelism = int(config["PARALLELISM"]["parallelism"])
-    log_queue = multiprocessing.Manager().Queue() if parallelism > 1 else Queue()
     files_to_download = []
 
     try:
@@ -571,11 +545,49 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
 
     except Exception as e:
         print(f"[ERROR] Fetching metadata for {execution_date_str}: {e}")
-        return
+        return []
 
     print(
         f"{len(files_to_download)} files found to download: {[f[1] for f in files_to_download]}"
     )
+
+    return files_to_download
+
+
+
+def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
+    from datetime import datetime
+
+    product_id = config["USPTO_LINKS"]["product_identifier"]
+    api_key = config["USPTO_LINKS"]["api_key"]
+    print(xml_template_setting_prefix)
+
+    download_folder = (
+        config["FOLDERS"]["granted_patent_bulk_xml_location"]
+        if xml_template_setting_prefix == "granted_patent"
+        else config['FOLDERS']["pgpubs_bulk_xml_location"]
+    )
+
+    print(f"[DEBUG] Download folder: {download_folder}")
+
+    execution_dt = config["DATES"]["END_DATE_DASH"]
+    print(f'this is the execution date: {execution_dt}')
+    print(f'this is the type of the execution date: {type(execution_dt)}')
+
+    if isinstance(execution_dt, str):
+        execution_dt = datetime.fromisoformat(execution_dt)
+
+    execution_date_str = execution_dt.strftime("%Y-%m-%d")
+
+    parallelism = int(config["PARALLELISM"]["parallelism"])
+    log_queue = multiprocessing.Manager().Queue() if parallelism > 1 else Queue()
+
+    files_to_download = get_files_to_download(
+        product_id, api_key, execution_date_str, download_folder, log_queue
+    )
+
+    if not files_to_download:
+        return
 
     if parallelism > 1:
         pool = multiprocessing.Pool(parallelism)
@@ -590,6 +602,8 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
     else:
         for job in files_to_download:
             save_zip_file(*job)
+
+
 
 
 
