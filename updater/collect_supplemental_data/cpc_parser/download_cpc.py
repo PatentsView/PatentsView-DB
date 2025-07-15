@@ -43,9 +43,16 @@ def find_cpc_schema_url():
     most recent schema is returned.
     """
     base_url = 'https://www.cooperativepatentclassification.org'
-    page = urllib.request.urlopen(base_url + '/cpcSchemeAndDefinitions/bulk')
+    
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
+    }
+    req = urllib.request.Request(base_url + '/cpcSchemeAndDefinitions/bulk', headers=headers)
+    page = urllib.request.urlopen(req)
+
     tree = html.fromstring(page.read())
     potential_links = []
+    
     for link in tree.xpath('//a/@href'):
         if (link.endswith(".zip") and (link.split('/')[-1].startswith("CPCSchemeXML"))):
             if not link.startswith("http"):
