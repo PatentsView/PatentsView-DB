@@ -218,8 +218,15 @@ def download_ipc(destination_folder):
 
 def find_ipc_url():
     """ Find the url of the CPC to IPC concordance in text format """
+
     base_url = 'https://www.cooperativepatentclassification.org'
-    page = urllib.request.urlopen(base_url + '/cpcConcordances')
+    
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
+    }
+    req = urllib.request.Request(base_url + '/cpcConcordances', headers=headers)
+    page = urllib.request.urlopen(req)
+
     tree = html.fromstring(page.read())
 
     potential_links = []
