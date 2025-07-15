@@ -170,12 +170,17 @@ def get_usreldocs(patent):
                     sequence +=1
                     usreldoc_list.append(data)
                 else:
+                    print(f"Sub item tag: {sub_item.tag}")
                     for partial_doc in sub_item:
                         data = defaultdict(lambda: None)
                         data['doc-type'] = doc_type
                         data['relation'] = partial_doc.tag
-                        for field in partial_doc.find('document-id'):
-                            data[field.tag] = field.text
+
+                        fields = partial_doc.find('document-id')
+                        if fields is not None:
+                            for field in partial_doc.find('document-id'):
+                                data[field.tag] = field.text
+                    
                         data['sequence'] = sequence
                         sequence +=1
                         status = partial_doc.find('parent-status')

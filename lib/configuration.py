@@ -309,10 +309,10 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
             "ELASTICSEARCH_DB_TYPE": "elasticsearch_patent"
         })
 
-        config['USPTO_LINKS'] = {
-            "product_identifier": "PTGRXML",
-            "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"
-        }
+        if schedule == 'weekly':
+            product_identifier = "PTGRXML"
+        else:
+            product_identifier = "CPCMCPT"
 
     elif type == 'pgpubs':
 
@@ -325,11 +325,15 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
             "ELASTICSEARCH_DB_TYPE": "elasticsearch_pgpub"
         })
 
-        config['USPTO_LINKS'] = {
-            "product_identifier": "APPXML",
-            "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"
-        }
-
+        if schedule == 'weekly':
+            product_identifier = "APPXML"
+        else:
+            product_identifier = "CPCMCAPP"
+            
+    config['USPTO_LINKS'] = {
+        "product_identifier": product_identifier,
+        "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"
+    }
     # Add derived values if needed later
     # latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
     # latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)

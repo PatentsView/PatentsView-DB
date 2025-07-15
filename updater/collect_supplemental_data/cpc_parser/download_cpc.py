@@ -7,7 +7,7 @@ import re
 
 from QA.collect_supplemental_data.cpc_parser.CPCDownloadTest import CPCDownloadTest
 from lib.configuration import get_config, get_current_config
-from lib.utilities import download
+from lib.utilities import download, get_files_to_download
 
 
 def download_cpc_schema(destination_folder):
@@ -61,12 +61,22 @@ def find_cpc_schema_url():
     return sorted(potential_links, key=lambda lnk: lnk.split('/')[-1])[-1]
 
 
-def download_cpc_grant_and_pgpub_classifications(granted_cpc_folder, pgpubs_cpc_folder):
+def download_cpc_grant_and_pgpub_classifications(
+        granted_cpc_folder, 
+        pgpubs_cpc_folder, 
+        api_key,
+        granted_product_identifier="CPCMCPT",
+        pgpubs_product_identifier="CPCMCAPP"
+    ):
     """
     Download and extract the most recent CPC Master Classification Files (MCF)
     """
     # Find the correct CPC Grant and PGPub MCF urls
-    cpc_grant_mcf_url, cpc_pgpub_mcf_url = find_cpc_grant_and_pgpub_urls()
+    cpc_grant_mcf_url, cpc_pgpub_mcf_url = find_cpc_grant_and_pgpub_urls(
+        api_key, 
+        granted_product_identifier, 
+        pgpubs_product_identifier
+    )
     cpc_grant_zip_filepath = os.path.join(granted_cpc_folder, 'CPC_grant_mcf.zip')
     cpc_pgpub_zip_filepath = os.path.join(pgpubs_cpc_folder, 'CPC_pgpub_mcf.zip')
 
@@ -76,7 +86,7 @@ def download_cpc_grant_and_pgpub_classifications(granted_cpc_folder, pgpubs_cpc_
 
         # Download the files
         print("Destination: {}".format(filepath))
-        download(url=url, filepath=filepath)
+        download(url=url, filepath=filepath, api_key=api_key)
 
         # Rename and unzip zip files
         # Zip files contain a single folder with many subfiles. We just want
@@ -97,19 +107,18 @@ def download_cpc_grant_and_pgpub_classifications(granted_cpc_folder, pgpubs_cpc_
         # os.remove(filepath)
 
 
-def find_cpc_grant_and_pgpub_urls():
+def find_cpc_grant_and_pgpub_urls(
+        api_key, 
+        granted_product_identifier="CPCMCPT", 
+        pgpubs_product_identifier="CPCMCAPP"
+    ):
     """
     Scrape unfiltered grant and pgpub directories and filter files
     from the last 14 days based on the date embedded in filenames.
     """
-
     # 2-week window
     today = datetime.date.today()
     two_weeks_ago = today - datetime.timedelta(days=14)
-
-    # Unfiltered base URLs
-    base_url_grant = 'https://data.uspto.gov/bulkdata/datasets/CPCMCPT/'
-    base_url_pgpub = 'https://data.uspto.gov/bulkdata/datasets/cpcmcapp/'
 
     def extract_date_from_filename(filename):
         match = re.search(r'_(\d{4}-\d{2}-\d{2})\.zip$', filename)
@@ -118,14 +127,17 @@ def find_cpc_grant_and_pgpub_urls():
         return None
 
     # -------- GRANT FILES --------
-    print("[DEBUG] Fetching grant page from:", base_url_grant)
-    page_grant = urllib.request.urlopen(base_url_grant)
-    tree_grant = html.fromstring(page_grant.read())
-    grant_links = tree_grant.xpath('//a/text()')
+    print("[DEBUG] Fetching grant page")
+
+    grant_links = get_files_to_download(
+        product_id=granted_product_identifier,
+        api_key=api_key,
+        files_only=True,
+    )
 
     potential_grant_links = [
-        link for link in grant_links
-        if link.startswith("US_Grant_CPC_MCF_XML") and link.endswith(".zip")
+        link[0] for link in grant_links
+        if link[1].startswith("US_Grant_CPC_MCF_XML") and link[1].endswith(".zip")
     ]
 
     recent_grant_links = [
@@ -139,20 +151,23 @@ def find_cpc_grant_and_pgpub_urls():
         print("   →", l)
 
     if not recent_grant_links:
-        raise ValueError(f"No recent grant links found at: {base_url_grant}")
+        raise ValueError(f"No recent grant links found")
 
-    latest_grant_link = base_url_grant + sorted(recent_grant_links)[-1]
+    latest_grant_link = sorted(recent_grant_links)[-1]
     print("[DEBUG] Latest grant file selected:", latest_grant_link)
 
     # -------- PGPUB FILES --------
-    print("[DEBUG] Fetching pgpub page from:", base_url_pgpub)
-    page_pgpub = urllib.request.urlopen(base_url_pgpub)
-    tree_pgpub = html.fromstring(page_pgpub.read())
-    pgpub_links = tree_pgpub.xpath('//a/text()')
+    print("[DEBUG] Fetching pgpub page")
+
+    pgpub_links = get_files_to_download(
+        product_id=pgpubs_product_identifier,
+        api_key=api_key,
+        files_only=True,
+    )
 
     potential_pgpub_links = [
-        link for link in pgpub_links
-        if link.startswith("US_PGPub_CPC_MCF_Text") and link.endswith(".zip")
+        link[0] for link in pgpub_links
+        if link[1].startswith("US_PGPub_CPC_MCF_Text") and link[1].endswith(".zip")
     ]
 
     recent_pgpub_links = [
@@ -166,9 +181,9 @@ def find_cpc_grant_and_pgpub_urls():
         print("   →", l)
 
     if not recent_pgpub_links:
-        raise ValueError(f"No recent pgpub links found at: {base_url_pgpub}")
+        raise ValueError(f"No recent pgpub links found")
 
-    latest_pgpub_link = base_url_pgpub + sorted(recent_pgpub_links)[-1]
+    latest_pgpub_link = sorted(recent_pgpub_links)[-1]
     print("[DEBUG] Latest pgpub file selected:", latest_pgpub_link)
 
     return latest_grant_link, latest_pgpub_link
@@ -241,12 +256,23 @@ def collect_cpc_data(**kwargs):
     pgpubs_config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     pgpubs_destination_folder = '{}/{}'.format(pgpubs_config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
 
+    api_key = config["USPTO_LINKS"]["api_key"]
+    granted_product_identifier = config["USPTO_LINKS"]["product_identifier"]
+    pgpubs_product_identifier = pgpubs_config["USPTO_LINKS"]["product_identifier"]
+
     if not os.path.exists(upload_destination_folder):
         os.makedirs(upload_destination_folder)
     if not os.path.exists(pgpubs_destination_folder):
         os.makedirs(pgpubs_destination_folder)
     download_cpc_schema(upload_destination_folder)  # <1 min
-    #download_cpc_grant_and_pgpub_classifications(upload_destination_folder, pgpubs_destination_folder)  # few minutes
+    download_cpc_grant_and_pgpub_classifications(
+        upload_destination_folder, 
+        pgpubs_destination_folder, 
+        api_key,
+        granted_product_identifier,
+        pgpubs_product_identifier
+
+    )  # few minutes
     download_ipc(upload_destination_folder)  # <1 min
     download_ipc(pgpubs_destination_folder)
 

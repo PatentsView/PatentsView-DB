@@ -351,12 +351,13 @@ def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def download(url, filepath):
+def download(url, filepath, api_key=None):
     """ Download data from a URL with a handy progress bar """
 
     print("Downloading: {}".format(url))
-    r = requests.get(url, stream=True)
 
+    headers = {"X-API-KEY": api_key}
+    r = requests.get(url, headers=headers, stream=True)
     content_length = r.headers.get('content-length')
     if not content_length:
         print("\tNo Content Length Attached. Attempting download without progress bar.")
@@ -514,20 +515,27 @@ def save_zip_file(url, name, path, counter=0, log_queue=None, api_key=None):
 
     print(f"{name} downloaded and extracted to {path}")
     print(f"{path} contains {os.listdir(path)}")
-def get_files_to_download(product_id, api_key, execution_date_str, download_folder, log_queue):
-    headers = {"X-API-KEY": api_key, "accept": "application/json"}
-    params = {
-        "fileDataFromDate": execution_date_str,
-        "fileDataToDate": execution_date_str,
-    }
-    url = f"https://api.uspto.gov/api/v1/datasets/products/{product_id}"
 
+
+def get_files_to_download(product_id, api_key, execution_date_str = None, download_folder = None, log_queue = None, files_only=False):
+    headers = {"X-API-KEY": api_key, "accept": "application/json"}
+
+    if execution_date_str is None:
+        params = {}
+    else:
+        params = {
+            "fileDataFromDate": execution_date_str,
+            "fileDataToDate": execution_date_str,
+        }
+    url = f"https://api.uspto.gov/api/v1/datasets/products/{product_id}"
+    
     files_to_download = []
 
     try:
         r = requests.get(url, headers=headers, params=params)
         r.raise_for_status()
         data = r.json()
+        print(data)
         file_bag = (
             data.get("bulkDataProductBag", [])[0]
             .get("productFileBag", {})
@@ -539,9 +547,15 @@ def get_files_to_download(product_id, api_key, execution_date_str, download_fold
             if not filename.endswith(".zip"):
                 continue
             file_url = file_info["fileDownloadURI"]
-            files_to_download.append(
-                (file_url, filename, download_folder, idx, log_queue, api_key)
-            )
+            if files_only:
+                # If only URLs are needed, return them directly
+                files_to_download.append(
+                    (file_url, filename)
+                )
+            else:
+                files_to_download.append(
+                    (file_url, filename, download_folder, idx, log_queue, api_key)
+                )
 
     except Exception as e:
         print(f"[ERROR] Fetching metadata for {execution_date_str}: {e}")
