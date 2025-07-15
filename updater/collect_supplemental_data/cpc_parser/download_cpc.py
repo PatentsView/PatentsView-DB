@@ -4,6 +4,7 @@ import zipfile
 import os
 from lxml import html
 import re
+from time import sleep
 
 from QA.collect_supplemental_data.cpc_parser.CPCDownloadTest import CPCDownloadTest
 from lib.configuration import get_config, get_current_config
@@ -52,7 +53,7 @@ def find_cpc_schema_url():
 
     tree = html.fromstring(page.read())
     potential_links = []
-    
+
     for link in tree.xpath('//a/@href'):
         if (link.endswith(".zip") and (link.split('/')[-1].startswith("CPCSchemeXML"))):
             if not link.startswith("http"):
@@ -109,6 +110,7 @@ def download_cpc_grant_and_pgpub_classifications(
             z.extract(text_file, path=output_folder)
         z.close()
 
+        sleep(10) # Sleep to avoid rate limiting issues with the API
         # Remove the original zip file
         # print("Removing: {}".format(filepath))
         # os.remove(filepath)
@@ -163,6 +165,9 @@ def find_cpc_grant_and_pgpub_urls(
     latest_grant_link = sorted(recent_grant_links)[-1]
     print("[DEBUG] Latest grant file selected:", latest_grant_link)
 
+    # Sleep to avoid rate limiting issues with the API
+    sleep(10)
+
     # -------- PGPUB FILES --------
     print("[DEBUG] Fetching pgpub page")
 
@@ -192,6 +197,8 @@ def find_cpc_grant_and_pgpub_urls(
 
     latest_pgpub_link = sorted(recent_pgpub_links)[-1]
     print("[DEBUG] Latest pgpub file selected:", latest_pgpub_link)
+
+    sleep(10)
 
     return latest_grant_link, latest_pgpub_link
 
