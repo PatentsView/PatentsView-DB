@@ -232,6 +232,9 @@ def process_and_upload_cpc_current(db='granted_patent', **kwargs):
     cpc_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_input')
     cpc_output_folder = '{}/{}'.format(config['FOLDERS']['WORKING_FOLDER'], 'cpc_output')
 
+    os.makedirs(cpc_output_folder, exist_ok=True)
+    print(f"Made sure output folder {cpc_output_folder} exists")
+
     if db == 'granted_patent':
         file_name = "CPC_grant_mcf"
     else:

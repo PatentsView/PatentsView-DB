@@ -354,7 +354,14 @@ f"HERE CHAR_LENGTH(`{field}`) != CHAR_LENGTH(TRIM(`{field}`))"
             print({db})
             index_query = f"""select count(*) from information_schema.statistics where table_name = '{table}' and table_schema = '{db}'"""
             count_value = self.query_runner(index_query, single_value_return=True)
-            if count_value == 0:
+            print(f"Index count: {count_value} ({type(count_value)})")
+            if int(count_value) == 0:
+                current_db_query = "SELECT DATABASE();"
+                current_db = self.query_runner(current_db_query, single_value_return=True)
+                print(f"Connected to database: {current_db}")
+                host_check_query = "SELECT @@hostname;"
+                hostname = self.query_runner(host_check_query, single_value_return=True)
+                print(f"Airflow is connected to MySQL host: {hostname}")
                 logger.info(index_query)
                 raise Exception(f"{self.database_section}.{table} has no indexes")
             self.qa_data['DataMonitor_indexcount'].append(

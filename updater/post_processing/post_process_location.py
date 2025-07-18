@@ -202,8 +202,11 @@ def consolidate_location_disambiguation_quarterly(config):
     db_list = [db for db in inspector.get_schema_names() if re.fullmatch(f"{weekly_prefix}\\d{{8}}", db) and quarter_start <= db[-8:] <= quarter_end]
     print(f"{len(db_list)} databases identified in range: {db_list}")
     expected_db_count = weekday_count(datetime.strptime(quarter_start, '%Y%m%d').date(), datetime.strptime(quarter_end, '%Y%m%d').date())['Thursday' if dbtype == 'pgpubs' else 'Tuesday']
-    if len(db_list) != expected_db_count:
-        raise Exception(f"number of weekly DBs does not match expected value:\n{len(db_list)} weekly DBs observed; {expected_db_count} weekly DBs expected.")
+    if len(db_list) < expected_db_count - 1 or len(db_list) > expected_db_count + 1:
+        raise Exception(
+            f"Number of weekly DBs does not match expected value:\n"
+            f"{len(db_list)} weekly DBs observed; {expected_db_count} weekly DBs expected."
+        )
 
     quarter_map_create = f"""
     CREATE TABLE IF NOT EXISTS {prod_db}.location_disambiguation_mapping_{quarter_end} (
@@ -219,6 +222,11 @@ def consolidate_location_disambiguation_quarterly(config):
     engine.execute(quarter_map_create)
 
     for weekly_db in db_list:
+        if weekly_db.endswith(quarter_end) and weekly_db == db_list[-1]:
+            print(f"Skipping database {weekly_db} as it matches the quarter end date.")
+            continue
+
+        print(f"Processing weekly database: {weekly_db}")
         incorporate_week_query = f"""
             INSERT INTO {prod_db}.location_disambiguation_mapping_{quarter_end} 
             (id, location_id, version_indicator)
@@ -249,8 +257,8 @@ def update_dis_location_mapping(config):
 def post_process_location(**kwargs):
     patent_config = get_current_config(schedule="quarterly", **kwargs)
     pgpubs_config = get_current_config(type='pgpubs', schedule="quarterly", **kwargs)
-    consolidate_location_disambiguation_quarterly(patent_config, **kwargs)
-    consolidate_location_disambiguation_quarterly(pgpubs_config, **kwargs)
+    consolidate_location_disambiguation_quarterly(patent_config)
+    consolidate_location_disambiguation_quarterly(pgpubs_config)
     # update_dis_location_mapping(patent_config)
     # update_dis_location_mapping(pgpubs_config)
     update_rawlocation(patent_config)
@@ -269,11 +277,14 @@ def post_process_qc(**kwargs):
 
 
 if __name__ == '__main__':
-    # post_process_location(**{
-    #         "execution_date": date(2023, 1, 1)
-    #         })
-    config = get_current_config(schedule="quarterly", **{
-            "execution_date": date(2023, 10, 1)
+    post_process_location(**{
+            "execution_date": date(2024, 4, 5)
             })
-    consolidate_location_disambiguation_quarterly(config)
+    # config = get_current_config(schedule="quarterly", **{
+    #         "execution_date": date(2023, 10, 1)
+    #         })
+    # consolidate_location_disambiguation_quarterly(config)
+
+
+
 

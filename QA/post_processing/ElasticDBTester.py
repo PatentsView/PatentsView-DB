@@ -24,5 +24,6 @@ if __name__ == '__main__':
 
     config = get_current_config('pgpubs', schedule='quarterly', **{"execution_date": datetime.date(2023, 12, 31)})
     print(config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"])
+    print(config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"])
     qc = ElasticDBTester(config)
     qc.runReportingTests()

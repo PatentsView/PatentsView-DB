@@ -14,7 +14,6 @@ from queue import Queue
 from statistics import mean
 import pandas as pd
 from time import time
-
 import boto3
 import requests
 from bs4 import BeautifulSoup
@@ -23,6 +22,7 @@ from sqlalchemy import create_engine
 from lib.xml_helpers import process_date
 from lib.notifications import send_slack_notification
 from lib.configuration import get_connection_string, get_current_config
+import multiprocessing
 
 
 def with_keys(d, keys):
@@ -55,6 +55,8 @@ def class_db_specific_config(self, table_config, class_called):
 
 
 def load_table_config(config, db='patent'):
+    print(db)
+    print(config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"])
     root = config["FOLDERS"]["project_root"]
     resources = config["FOLDERS"]["resources_folder"]
     if db == 'patent':
@@ -95,7 +97,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.entity_table = 'rawassignee'
         self.entity_id = 'uuid'
         self.disambiguated_id = 'assignee_id'
-        self.disambiguated_table = 'assignee'
+        self.disambiguated_table = 'assignee_'+ config['DATES']["END_DATE"]
         self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
         self.aggregator = 'main.organization'
         self.category = ""
@@ -349,12 +351,13 @@ def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def download(url, filepath):
+def download(url, filepath, api_key=None):
     """ Download data from a URL with a handy progress bar """
 
     print("Downloading: {}".format(url))
-    r = requests.get(url, stream=True)
 
+    headers = {"X-API-KEY": api_key}
+    r = requests.get(url, headers=headers, stream=True)
     content_length = r.headers.get('content-length')
     if not content_length:
         print("\tNo Content Length Attached. Attempting download without progress bar.")
@@ -481,119 +484,230 @@ def log_writer(log_queue, log_prefix="uspto_parser"):
         logger.log(message_data["level"], message_data["message"])
 
 
-def save_zip_file(url, name, path, counter=0, log_queue=None):
+def save_zip_file(url, name, path, counter=0, log_queue=None, api_key=None):
     os.makedirs(path, exist_ok=True)
-    with requests.get(url, stream=True) as downloader:
+    headers = {"X-API-KEY": api_key} if api_key else {}
+
+    # Stream download the ZIP file
+    with requests.get(url, headers=headers, stream=True) as downloader:
         downloader.raise_for_status()
-        with open(path + name, 'wb') as f:
+        zip_path = os.path.join(path, name)
+        with open(zip_path, 'wb') as f:
             for chunk in downloader.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
 
-    with zipfile.ZipFile(path + name, 'r') as zip_ref:
-        zipinfo = zip_ref.infolist()
-        for _file in zipinfo:
+    # Extract and rename if revised
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        for zip_info in zip_ref.infolist():
             z_nm, z_ext = os.path.splitext(name)
-            f_nm, f_ext = os.path.splitext(_file.filename)
-            if re.match(f"{f_nm}_r\d",z_nm):
-                # revision file - can't be renamed inside the zip archive, so will extract to a temporary location and rename
-                os.mkdir(f"{path}/tmp")
-                zip_ref.extract(_file.filename, f"{path}/tmp")
-                os.rename(f"{path}/tmp/{_file.filename}",f"{path}/{z_nm}{f_ext}")
-                os.rmdir(f"{path}/tmp")
+            f_nm, f_ext = os.path.splitext(zip_info.filename)
+            if re.match(f"{f_nm}_r\\d", z_nm):
+                tmp_dir = os.path.join(path, "tmp")
+                os.makedirs(tmp_dir, exist_ok=True)
+                zip_ref.extract(zip_info.filename, tmp_dir)
+                os.rename(os.path.join(tmp_dir, zip_info.filename), os.path.join(path, f"{z_nm}{f_ext}"))
+                os.rmdir(tmp_dir)
             else:
-                zip_ref.extract(_file.filename, path)
+                zip_ref.extract(zip_info.filename, path)
 
-    os.remove(path + name)
+    os.remove(zip_path)
+
     print(f"{name} downloaded and extracted to {path}")
     print(f"{path} contains {os.listdir(path)}")
 
 
-def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
-    xml_template_setting = "{prefix}_bulk_xml_template".format(prefix=xml_template_setting_prefix)
-    xml_download_setting = "{prefix}_bulk_xml_location".format(prefix=xml_template_setting_prefix)
-    xml_path_template = config["USPTO_LINKS"][xml_template_setting]
-    start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
-    end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
-    start_year = int(start_date.strftime('%Y'))
-    end_year = int(end_date.strftime('%Y'))
-    parallelism = int(config["PARALLELISM"]["parallelism"])
-    if parallelism > 1:
-        manager = mp.Manager()
-        log_queue = manager.Queue()
+def get_files_to_download(product_id, api_key, execution_date_str = None, download_folder = None, log_queue = None, files_only=False):
+    headers = {"X-API-KEY": api_key, "accept": "application/json"}
+
+    if execution_date_str is None:
+        params = {}
     else:
-        log_queue = Queue()
-    print(f"Start date: {config['DATES']['START_DATE']}")
-    print(f"End date: {config['DATES']['END_DATE']}")
+        params = {
+            "fileDataFromDate": execution_date_str,
+            "fileDataToDate": execution_date_str,
+        }
+    url = f"https://api.uspto.gov/api/v1/datasets/products/{product_id}"
+    
     files_to_download = []
 
-    #starting one year early to check for revisions to old files (particularly important at the start of a new calendar year) - should add negligible time to typical runs
-    for year in range(start_year - 1, end_year + 1): 
-        year_xml_page = xml_path_template.format(year=year)
-        print(year_xml_page)
-        r = requests.get(year_xml_page)
-        soup = BeautifulSoup(r.content, "html.parser")
-        links = soup.find_all("a", href=re.compile(r"[0-9]{6}(_r\d)?\.zip"))
-        idx_counter = 0
-        for link in links:
-            href = link.attrs['href']
-            href_match = re.match(r".*([0-9]{6})(_r\d)?\.zip", href)
-            if href_match is not None:
-                file_datestring = href_match.group(1)
-                file_date = datetime.datetime.strptime(file_datestring, '%y%m%d')
-                if end_date >= file_date >= start_date:
-                    # should apply to original and revised versions
-                    files_to_download.append(
-                        (xml_path_template.format(year=year) + href, href, config["FOLDERS"][xml_download_setting],
-                         idx_counter, log_queue))
-                idx_counter += 1
-                if (href_match.group(2) is not None) and (file_date < start_date): # has a revision suffix and past date
-                    # check if the file has already been downloaded to the matching folder
-                    old_download_path = config["FOLDERS"][xml_download_setting].replace(config['DATES']['END_DATE'], f"20{file_datestring}") #path uses YYYY, file uses YY
-                    downloaded_files = os.listdir(old_download_path)
-                    matching_files = [f for f in downloaded_files if re.match(f'i?p[ag]{file_datestring}', f)]
-                    if (len(matching_files) == 0): # no files downloaded for week matching revised file
-                        revised_file_message = f"""
-revized XML file available for download: {href}
-no files identified as downloaded for {file_datestring} in directory {old_download_path}."""
-                        send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
-                    elif(href[:-4] > max(matching_files)[:-4]): # more recent file than is downloaded for week matching revised file
-                        # if the file has not already been downloaded to the matching folder, send slack message indicating unparsed revision
-                        revised_file_message = f"""
-revized XML file available for download: {href}
-latest version downloaded for {file_datestring} in {old_download_path}: {max(matching_files)}"""
-                        send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
-    watcher = None
-    pool = None
+    try:
+        r = requests.get(url, headers=headers, params=params)
+        r.raise_for_status()
+        data = r.json()
+        print(data)
+        file_bag = (
+            data.get("bulkDataProductBag", [])[0]
+            .get("productFileBag", {})
+            .get("fileDataBag", [])
+        )
+
+        for idx, file_info in enumerate(file_bag):
+            filename = file_info["fileName"]
+            if not filename.endswith(".zip"):
+                continue
+            file_url = file_info["fileDownloadURI"]
+            if files_only:
+                # If only URLs are needed, return them directly
+                files_to_download.append(
+                    (file_url, filename)
+                )
+            else:
+                files_to_download.append(
+                    (file_url, filename, download_folder, idx, log_queue, api_key)
+                )
+
+    except Exception as e:
+        print(f"[ERROR] Fetching metadata for {execution_date_str}: {e}")
+        return []
+
+    print(
+        f"{len(files_to_download)} files found to download: {[f[1] for f in files_to_download]}"
+    )
+
+    return files_to_download
+
+
+
+def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
+    from datetime import datetime
+
+    product_id = config["USPTO_LINKS"]["product_identifier"]
+    api_key = config["USPTO_LINKS"]["api_key"]
+    print(xml_template_setting_prefix)
+
+    download_folder = (
+        config["FOLDERS"]["granted_patent_bulk_xml_location"]
+        if xml_template_setting_prefix == "granted_patent"
+        else config['FOLDERS']["pgpubs_bulk_xml_location"]
+    )
+
+    print(f"[DEBUG] Download folder: {download_folder}")
+
+    execution_dt = config["DATES"]["END_DATE_DASH"]
+    print(f'this is the execution date: {execution_dt}')
+    print(f'this is the type of the execution date: {type(execution_dt)}')
+
+    if isinstance(execution_dt, str):
+        execution_dt = datetime.fromisoformat(execution_dt)
+
+    execution_date_str = execution_dt.strftime("%Y-%m-%d")
+
+    parallelism = int(config["PARALLELISM"]["parallelism"])
+    log_queue = multiprocessing.Manager().Queue() if parallelism > 1 else Queue()
+
+    files_to_download = get_files_to_download(
+        product_id, api_key, execution_date_str, download_folder, log_queue
+    )
+
+    if not files_to_download:
+        return
+
     if parallelism > 1:
-        pool = mp.Pool(parallelism)
+        pool = multiprocessing.Pool(parallelism)
         watcher = pool.apply_async(log_writer, (log_queue,))
-
-    p_list = []
-    idx_counter = 0
-    print(f"{len(files_to_download)} files found to download: {[_file[1] for _file in files_to_download]}")
-    for file_to_download in files_to_download:
-        if parallelism > 1:
-            p = pool.apply_async(save_zip_file, file_to_download)
-            p_list.append(p)
-        else:
-            save_zip_file(*file_to_download)
-        idx_counter += 1
-    if parallelism > 1:
-        idx_counter = 0
-        for t in p_list:
-            print(t)
-            t.get()
-
-    idx_counter += 1
-    log_queue.put({
-        "level": None,
-        "message": "kill"
-    })
-    if parallelism > 1:
+        p_list = [pool.apply_async(save_zip_file, args=job) for job in files_to_download]
+        for p in p_list:
+            p.get()
+        log_queue.put({"level": None, "message": "kill"})
         watcher.get()
         pool.close()
         pool.join()
+    else:
+        for job in files_to_download:
+            save_zip_file(*job)
+
+
+
+
+
+
+
+# def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
+#     xml_template_setting = "{prefix}_bulk_xml_template".format(prefix=xml_template_setting_prefix)
+#     xml_download_setting = "{prefix}_bulk_xml_location".format(prefix=xml_template_setting_prefix)
+#     xml_path_template = config["USPTO_LINKS"][xml_template_setting]
+#     start_date = datetime.datetime.strptime(config['DATES']['START_DATE'], '%Y%m%d')
+#     end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+#     start_year = int(start_date.strftime('%Y'))
+#     end_year = int(end_date.strftime('%Y'))
+#     parallelism = int(config["PARALLELISM"]["parallelism"])
+#     if parallelism > 1:
+#         manager = mp.Manager()
+#         log_queue = manager.Queue()
+#     else:
+#         log_queue = Queue()
+#     print(f"Start date: {config['DATES']['START_DATE']}")
+#     print(f"End date: {config['DATES']['END_DATE']}")
+#     files_to_download = []
+#
+#     #starting one year early to check for revisions to old files (particularly important at the start of a new calendar year) - should add negligible time to typical runs
+#     for year in range(start_year - 1, end_year + 1):
+#         year_xml_page = xml_path_template.format(year=year)
+#         print(year_xml_page)
+#         r = requests.get(year_xml_page)
+#         soup = BeautifulSoup(r.content, "html.parser")
+#         links = soup.find_all("a", href=re.compile(r".*[0-9]{6}(_r\d)?\.zip"))
+#         idx_counter = 0
+#         for link in links:
+#             href = link.attrs['href']
+#             href_match = re.match(r".*([0-9]{6})(_r\d)?\.zip", href)
+#             if href_match is not None:
+#                 file_datestring = href_match.group(1)
+#                 file_date = datetime.datetime.strptime(file_datestring, '%y%m%d')
+#                 if end_date >= file_date >= start_date:
+#                     # should apply to original and revised versions
+#                     files_to_download.append(
+#                         (xml_path_template.format(year=year) + href, href, config["FOLDERS"][xml_download_setting],
+#                          idx_counter, log_queue))
+#                 idx_counter += 1
+#                 if (href_match.group(2) is not None) and (file_date < start_date): # has a revision suffix and past date
+#                     # check if the file has already been downloaded to the matching folder
+#                     old_download_path = config["FOLDERS"][xml_download_setting].replace(config['DATES']['END_DATE'], f"20{file_datestring}") #path uses YYYY, file uses YY
+#                     downloaded_files = os.listdir(old_download_path)
+#                     matching_files = [f for f in downloaded_files if re.match(f'i?p[ag]{file_datestring}', f)]
+#                     if (len(matching_files) == 0): # no files downloaded for week matching revised file
+#                         revised_file_message = f"""
+# revized XML file available for download: {href}
+# no files identified as downloaded for {file_datestring} in directory {old_download_path}."""
+#                         send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
+#                     elif(href[:-4] > max(matching_files)[:-4]): # more recent file than is downloaded for week matching revised file
+#                         # if the file has not already been downloaded to the matching folder, send slack message indicating unparsed revision
+#                         revised_file_message = f"""
+# revized XML file available for download: {href}
+# latest version downloaded for {file_datestring} in {old_download_path}: {max(matching_files)}"""
+#                         send_slack_notification(message=revised_file_message, config=config, section="UNPARSED REVISED FILE NOTICE", level='warning')
+#     watcher = None
+#     pool = None
+#     if parallelism > 1:
+#         pool = mp.Pool(parallelism)
+#         watcher = pool.apply_async(log_writer, (log_queue,))
+#
+#     p_list = []
+#     idx_counter = 0
+#     print(f"{len(files_to_download)} files found to download: {[_file[1] for _file in files_to_download]}")
+#     for file_to_download in files_to_download:
+#         if parallelism > 1:
+#             p = pool.apply_async(save_zip_file, file_to_download)
+#             p_list.append(p)
+#         else:
+#             save_zip_file(*file_to_download)
+#         idx_counter += 1
+#     if parallelism > 1:
+#         idx_counter = 0
+#         for t in p_list:
+#             print(t)
+#             t.get()
+#
+#     idx_counter += 1
+#     log_queue.put({
+#         "level": None,
+#         "message": "kill"
+#     })
+#     if parallelism > 1:
+#         watcher.get()
+#         pool.close()
+#         pool.join()
 
 
 def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
@@ -608,10 +722,35 @@ def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
     return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 
-def rds_free_space(config, identifier):
-    cloudwatch = boto3.client('cloudwatch', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
-                              aws_secret_access_key=config['AWS']['SECRET_KEY'],
-                              region_name='us-east-1')
+def create_aws_boto3_session():
+    """
+    Creates and returns a boto3 session.
+    If running in EC2, it will use the instance's IAM role.
+    """
+    try:
+        # Create a boto3 session
+        session = boto3.Session()
+        print("AWS Session Created Successfully")
+        return session
+    except Exception as e:
+        print(f"Error creating AWS session: {e}")
+        return None
+
+def rds_free_space(identifier):
+    """
+    Retrieve the FreeStorageSpace metric for an RDS instance.
+    Args:
+        identifier (str): The RDS instance identifier.
+    Returns:
+        dict: CloudWatch response containing storage space data.
+    """
+    session = create_aws_boto3_session()
+    if not session:
+        print("Failed to retrieve AWS credentials.")
+        return None
+
+    # Create CloudWatch client using the returned session
+    cloudwatch = session.client('cloudwatch', region_name='us-east-1')
 
     from datetime import datetime, timedelta
     response = cloudwatch.get_metric_data(

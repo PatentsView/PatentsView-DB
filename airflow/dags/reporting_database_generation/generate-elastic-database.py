@@ -1,25 +1,22 @@
-import configparser
 import os
 from datetime import datetime, timedelta
 
 from airflow.operators.python import PythonOperator
-from slack_sdk import WebClient
 from airflow import DAG
 from reporting_database_generator.database import validate_query
-from airflow.operators.dummy_operator import DummyOperator
-from airflow.utils.trigger_rule import TriggerRule
-from lib.utilities import chain_operators
+
+from lib.configuration import get_current_config, get_today_dict
 
 from QA.post_processing.ElasticDBTester  import run_elastic_db_qa
+# from QA.post_processing.BulkDownloadsTester import run_bulk_downloads_qa
 
-# project_home = os.environ['PACKAGE_HOME']
-# config = configparser.ConfigParser()
-# config.read(project_home + '/config.ini')
+from updater.callbacks import airflow_task_failure, airflow_task_success
+from updater.create_databases.create_views_for_bulk_downloads import update_view_date_ranges
+from updater.create_databases.create_and_test_crosswalk import create_outer_patent_publication_crosswalk, qc_crosswalk
 
 
 class SQLTemplatedPythonOperator(PythonOperator):
     template_ext = ('.sql',)
-
 
 default_args = {
     'owner': 'airflow',
@@ -36,13 +33,25 @@ default_args = {
     # 'end_date': datetime(2016, 1, 1),
 }
 
+project_home = os.environ['PACKAGE_HOME']
+templates_searchpath = "{home}/resources".format(home=project_home)
+config = get_current_config(type='granted_patent', supplemental_configs=None, **get_today_dict())
+
 # REPORTING DB
 
-elastic_prep_dag = DAG("elastic_data_preparation_quarterly"
+elastic_prep_dag = DAG(dag_id="elastic_data_preparation_quarterly"
                        , default_args=default_args
                        , start_date=datetime(2023, 1, 1)
                        , schedule_interval='@quarterly'
-                       , template_searchpath="/project/reporting_database_generator/elastic_scripts/")
+                       , template_searchpath="/project/reporting_database_generator/elastic_scripts/"
+                       , catchup=False)
+
+operator_settings = {
+    'dag': elastic_prep_dag,
+    'on_success_callback': airflow_task_success,
+    'on_failure_callback': airflow_task_failure,
+    'on_retry_callback': airflow_task_failure
+}
 
 
 db_creation = SQLTemplatedPythonOperator(
@@ -413,16 +422,38 @@ endpoint_rel_app_text_pgpub = SQLTemplatedPythonOperator(
 elastic_patent_db_qa = PythonOperator(
     task_id='elastic_patent_DB_QA',
     python_callable=run_elastic_db_qa,
-    op_kwargs={'type': 'granted_patent'},  # Pass 'type' as a variable
+    op_kwargs={'db_type': 'granted_patent'},  # Pass 'type' as a variable
     dag=elastic_prep_dag
 )
 
 elastic_pgpubs_db_qa = PythonOperator(
     task_id='elastic_pgpubs_DB_QA',
     python_callable=run_elastic_db_qa,
-    op_kwargs={'type': 'pgpubs'},  # Pass 'type' as a variable
+    op_kwargs={'db_type': 'pgpubs'},  # Pass 'type' as a variable
     dag=elastic_prep_dag
 )
+
+# crosswalk and download view operators
+generate_crosswalk_task = PythonOperator(task_id='generate_pat_pub_crosswalk',
+                                            python_callable = create_outer_patent_publication_crosswalk,
+                                            **operator_settings)
+
+qc_crosswalk_task = PythonOperator(task_id='qc_pat_pub_crosswalk',
+                                            python_callable = qc_crosswalk,
+                                            **operator_settings)
+
+update_max_vi = PythonOperator(task_id='update_bulk_downloads_views', 
+                        python_callable=update_view_date_ranges,
+                        **operator_settings)
+
+# require future completion
+# qa_granted_bulk_downloads = PythonOperator(task_id='qa_granted_bulk_downloads', 
+#                         python_callable=run_bulk_downloads_qa,
+#                         **operator_settings)
+
+# qa_pgpubs_bulk_downloads = PythonOperator(task_id='qa_pgpubs_bulk_downloads', 
+#                         python_callable=run_pgpubs_bulk_downloads_qa,
+#                         **operator_settings)
 
 
 
@@ -470,3 +501,11 @@ for operator in operator_sequence_groups['first_step']:
  
 elastic_pgpubs_db_qa.set_upstream(elastic_patent_db_qa)
 
+# elastic tasks with crosswalk dependencies
+endpoint_patent_views.set_upstream(generate_crosswalk_task)
+endpoint_publications_publication_views.set_upstream(generate_crosswalk_task)
+
+qc_crosswalk_task.set_upstream(generate_crosswalk_task)
+update_max_vi.set_upstream(qc_crosswalk_task)
+# qa_granted_bulk_downloads.set_upstream(update_max_vi)
+# qa_pgpubs_bulk_downloads.set_upstream(update_max_vi)

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication_cpc_at_issue`
     `cpc_subclass` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `cpc_group`    varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `cpc_type`     varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `action_date`  date                                   DEFAULT NULL
+    `action_date`  date                                   DEFAULT NULL,
     PRIMARY KEY (`document_number`, `sequence`),
     KEY            `ix_cpc_current_subsection_id` (`cpc_class`),
     KEY            `ix_cpc_current_group_id` (`cpc_subclass`),

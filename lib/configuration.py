@@ -34,14 +34,40 @@ def set_config(config, type='granted_patent'):
 
 def get_section(dag_id, task_id):
     section_lookup = {
-            'granted_patent_updater':       {
-                    "merge_db":           "Granted Patent - Data Processing",
-                    "merge_text_db":      "Granted Patent - Data Processing",
-                    "parse_xml":          "Granted Patent - XML Parsing",
-                    "qc_parse_text_data": "Granted Patent - XML Parsing (QC)",
-                    "qc_upload_new":      "Granted Patent - Data Processing (QC)",
-                    "GI_QC":              "Granted Patent - GI Processing (QC)"
-                    },
+            'granted_patent_updater': {
+                    "backup_oldest_database": "Granted Patent - Database Backup",
+                    "download_xml": "Granted Patent - XML Download",
+                    "upload_database_setup": "Granted Patent - Database Upload Setup",
+                    "process_xml": "Granted Patent - XML Processing",
+                    "parse_xml": "Granted Patent - XML Parsing",
+                    "parse_xml_to_sql": "Granted Patent - XML to SQL Parsing",
+                    "qc_upload_database_setup": "Granted Patent - QC Database Upload Setup",
+                    "upload_current": "Granted Patent - Current Data Upload",
+                    "create_uuid_triggers": "Granted Patent - UUID Trigger Creation",
+                    "parse_xml_to_sql": "Granted Patent - XML to SQL Parsing",
+                    "parse_xml_to_sql": "Granted Patent - XML to SQL Parsing",
+                    "qc_upload_new": "Granted Patent - Data Upload (QC)",
+                    "geocode_rawlocations": "Granted Patent - Geocoding Raw Locations",
+                    "loc_disambiguation": "Granted Patent - Location Disambiguation",
+                    "qc_loc_disambiguation": "Granted Patent - Location Disambiguation (QC)",
+                    "gi_NER": "Granted Patent - GI Processing - Named Entity Recognition",
+                    "postprocess_NER": "Granted Patent - GI Processing - NER Postprocessing",
+                    "simulate_manual_task": "Granted Patent - GI Processing - Manual Task Simulation",
+                    "post_manual": "Granted Patent - GI Processing - Post Manual Processing",
+                    "GI_QC": "Granted Patent - GI Processing (QC)",
+                    "create_text_yearly_tables": "Granted Patent - Text Data Processing - Yearly Table Creation",
+                    "create_text_yearly_tables-upload": "Granted Patent - Text Data Processing - Yearly Table Upload",
+                    "parse_text_data": "Granted Patent - Text Data Processing - Parsing",
+                    "fix_patent_ids-upload": "Granted Patent - Fix Patent IDs Upload",
+                    "qc_parse_text_data": "Granted Patent - Text Data Processing - Parsing (QC)",
+                    "check_prod_integrity": "Granted Patent - Production Data Integrity Check",
+                    "merge_db": "Granted Patent - Data Merging",
+                    "qc_merge_db": "Granted Patent - Data Merging (QC)",
+                    "merge_text_db": "Granted Patent - Text Data Merging",
+                    "qc_merge_text_db": "Granted Patent - Text Data Merging (QC)",
+                    "withdrawn_processor": "Granted Patent - Withdrawn Patents Processing",
+                    "qc_withdrawn_processor": "Granted Patent - Withdrawn Patents Processing (QC)"
+            },
             'pregrant_publication_updater': {
                     "create_pgpubs_database": "PGPUBS Parser - Database Setup",
                     "drop_database":          "PGPUBS Parser - Database Setup",
@@ -234,73 +260,87 @@ def get_disambig_config(schedule='quarterly', supplemental_configs=None, **kwarg
 
 
 def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
-    """
-    Update config file start and end date to first and last day of the supplied week
-    :param supplemental_configs:
-    :param type: XML type
-    :type cfg: object
-    :type yr: int
-    :type mth: int
-    :type day: int
-    :param yr: Year for start and end date
-    :param mth: Month for start and end date
-    :param day: Day for start and end date
-    :param cfg: config to update
-    :return: updated config
-    """
-
     config = get_config()
-    config_prefix = "upload_"
+    config_prefix = "upload_" if type == 'granted_patent' else 'pgpubs_'
 
-    if type == 'pgpubs':
-        config_prefix = 'pgpubs_'
     execution_date: DateTime = kwargs['execution_date']
     print(f"""
     generating config with parameters: 
     type: {type}
     schedule: {schedule}
     execution date: {execution_date.strftime('%Y-%m-%d')}""")
+
+    # Date range logic
     if schedule == 'weekly':
-        current_week_start = datetime.timedelta(days=1)
-        current_week_end = datetime.timedelta(days=7)
-        start_date = (execution_date + current_week_start)
-        end_date = (execution_date + current_week_end)
+        start_date = execution_date + datetime.timedelta(days=1)
+        end_date = execution_date + datetime.timedelta(days=7)
     else:
         from lib.is_it_update_time import get_update_range_full_quarter
         start_date, end_date = get_update_range_full_quarter(execution_date)
+
     temp_date = end_date.strftime('%Y%m%d')
+
+    config['USPTO_LINKS'] = {
+        "product_identifier": '',
+        "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"
+    }
 
     config['DATES'] = {
         "START_DATE": start_date.strftime('%Y%m%d'),
         "END_DATE": end_date.strftime('%Y%m%d'),
         "END_DATE_DASH": end_date
     }
-    prefixed_string = "{prfx}{date}".format(prfx=config_prefix, date=temp_date)
-    config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"] = prefixed_string
-    config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'pregrant_publications'
-    config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'pgpubs_text'
 
-    if type == 'pgpubs':
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_pgpub_'+ end_date.strftime('%Y%m%d')
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_pgpub'
-    config['FOLDERS']["WORKING_FOLDER"] = "{data_root}/{prefix}".format(
+    prefixed_string = f"{config_prefix}{temp_date}"
+
+    config['FOLDERS']['WORKING_FOLDER'] = "{data_root}/{prefix}".format(
         prefix=prefixed_string,
-        data_root=config['FOLDERS']['data_root'])
+        data_root=config['FOLDERS']['data_root']
+    )
+
+    # Conditional configs
     if type == 'granted_patent':
         config['FOLDERS']['granted_patent_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
             working_folder=config['FOLDERS']['WORKING_FOLDER'])
         config['FOLDERS']['long_text_bulk_xml_location'] = '{working_folder}/raw_data/'.format(
             working_folder=config['FOLDERS']['WORKING_FOLDER'])
-        config['PATENTSVIEW_DATABASES']["PROD_DB"] = 'patent'
-        config['PATENTSVIEW_DATABASES']["TEXT_DB"] = 'patent_text'
-        config['PATENTSVIEW_DATABASES']["REPORTING_DATABASE"] = 'PatentsView_' + end_date.strftime('%Y%m%d')
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB"] = 'elastic_production_patent_' + end_date.strftime('%Y%m%d')
-        config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"] = 'elasticsearch_patent'
 
-    latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
-    latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
+        config['PATENTSVIEW_DATABASES'].update({
+            "TEMP_UPLOAD_DB": prefixed_string,
+            "PROD_DB": 'patent',
+            "TEXT_DB": 'patent_text',
+            "REPORTING_DATABASE": f"PatentsView_{temp_date}",
+            "ELASTICSEARCH_DB": f"elastic_production_patent_{temp_date}",
+            "ELASTICSEARCH_DB_TYPE": "elasticsearch_patent"
+        })
+
+        if schedule == 'weekly':
+            config['USPTO_LINKS']['product_identifier'] = "PTGRXML"
+        else:
+            config['USPTO_LINKS']['product_identifier'] = "CPCMCPT"
+
+    elif type == 'pgpubs':
+
+        config['PATENTSVIEW_DATABASES'].update({
+            "TEMP_UPLOAD_DB": prefixed_string,
+            "PROD_DB": 'pregrant_publications',
+            "TEXT_DB": 'pgpubs_text',
+            "REPORTING_DATABASE": f"PatentsView_{temp_date}",
+            "ELASTICSEARCH_DB": f"elastic_production_pgpub_{temp_date}",
+            "ELASTICSEARCH_DB_TYPE": "elasticsearch_pgpub"
+        })
+
+        if schedule == 'weekly':
+            config['USPTO_LINKS']['product_identifier'] = "APPXML"
+        else:
+            config['USPTO_LINKS']['product_identifier'] = "CPCMCAPP"
+            
+    # Add derived values if needed later
+    # latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
+    # latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
 
     return config
+
 
 
 def get_es(config):
