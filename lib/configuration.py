@@ -280,6 +280,11 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
 
     temp_date = end_date.strftime('%Y%m%d')
 
+    config['USPTO_LINKS'] = {
+        "product_identifier": '',
+        "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"
+    }
+
     config['DATES'] = {
         "START_DATE": start_date.strftime('%Y%m%d'),
         "END_DATE": end_date.strftime('%Y%m%d'),
@@ -310,9 +315,9 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
         })
 
         if schedule == 'weekly':
-            product_identifier = "PTGRXML"
+            config['USPTO_LINKS']['product_identifier'] = "PTGRXML"
         else:
-            product_identifier = "CPCMCPT"
+            config['USPTO_LINKS']['product_identifier'] = "CPCMCPT"
 
     elif type == 'pgpubs':
 
@@ -326,14 +331,10 @@ def get_current_config(type='granted_patent', schedule='weekly', **kwargs):
         })
 
         if schedule == 'weekly':
-            product_identifier = "APPXML"
+            config['USPTO_LINKS']['product_identifier'] = "APPXML"
         else:
-            product_identifier = "CPCMCAPP"
+            config['USPTO_LINKS']['product_identifier'] = "CPCMCAPP"
             
-    config['USPTO_LINKS'] = {
-        "product_identifier": product_identifier,
-        "api_key": "ezzsrohkwygurbbvmbnurdtdjztiqu"
-    }
     # Add derived values if needed later
     # latest_thursday = get_today_dict(type='pgpubs', from_date=end_date)
     # latest_tuesday = get_today_dict(type='granted_patent', from_date=end_date)
