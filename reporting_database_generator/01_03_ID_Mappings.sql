@@ -168,12 +168,10 @@ create table `{{reporting_db}}`.`temp_id_mapping_location`
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-insert into
-  `{{reporting_db}}`.`temp_id_mapping_location` (`old_location_id`,`old_location_id_transformed`)
-select
-      `id`,concat(latitude,'|',longitude)
-from
-  `patent`.`location` where latitude is not null;
+insert into `{{reporting_db}}`.`temp_id_mapping_location` (`old_location_id`,`old_location_id_transformed`)
+select `id`,concat(latitude,'|',longitude) as char character set utf8mb4) collate utf8mb4_unicode_ci
+from `patent`.`location`
+where latitude is not null;
 
 
 
