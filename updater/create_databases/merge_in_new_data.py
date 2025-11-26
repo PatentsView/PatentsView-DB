@@ -57,6 +57,7 @@ where c.TABLE_SCHEMA = '{database}'
   and COLUMN_NAME not in ('created_date', 'updated_date')            
             """.format(database=upload_db, table=table_name))
     field_list = field_list_cursor.fetchall()[0][0]
+    on_duplicate_key_update_clause = ', '.join([f"`{field.strip('`')}` = VALUES(`{field.strip('`')}`)" for field in field_list.split(', ')])
     table_data_count = engine.execute("SELEcT count(1) from " + upload_db + "." + table_name).fetchall()[0][0]
     with engine.begin() as connection:
         limit = 50000
@@ -73,9 +74,11 @@ SELECT {field_list}
 FROM {upload_database}.{table_name}
 {order_clause}
 limit {limit} offset {offset}
+ON DUPLICATE KEY UPDATE {on_duplicate_key_update_clause}
             """.format(insert_clause=insert_clause, raw_database=raw_db, table_name=table_name, field_list=field_list,
                        upload_database=upload_db,
-                       order_clause=order_by_clause, limit=limit, offset=offset)
+                       order_clause=order_by_clause, limit=limit, offset=offset,
+                       on_duplicate_key_update_clause=on_duplicate_key_update_clause)
             print(insert_table_command, flush=True)
             start = time.time()
 
@@ -171,6 +174,10 @@ def begin_text_merging(**kwargs):
 INSERT INTO {text_db}.brf_sum_text_{year}(uuid, patent_id, summary_text, version_indicator)
 SELECT uuid, patent_id, summary_text, version_indicator
 from {temp_db}.brf_sum_text_{year}
+on duplicate key update
+	`uuid` = VALUES(`uuid`),
+	`summary_text` = VALUES(`summary_text`),
+	`version_indicator` = VALUES(`version_indicator`)
                     """
                     },
 
@@ -189,6 +196,12 @@ SELECT c.uuid,
 from {temp_db}.claims_{year} c
          left join {temp_db}.temp_normalized_claim_exemplary tce
                    on tce.patent_id = c.patent_id and tce.exemplary = c.claim_sequence
+on duplicate key update
+	`uuid` = VALUES(`uuid`),
+	`claim_text` = VALUES(`claim_text`),
+	`dependent` = VALUES(`dependent`),
+	`exemplary` = VALUES(`exemplary`),
+	`version_indicator` = VALUES(`version_indicator`)
                     """
                     },
 
@@ -205,11 +218,23 @@ from {temp_db}.draw_desc_text_{year}
 INSERT INTO {text_db}.detail_desc_text_{year}(uuid, patent_id, description_text, description_length, version_indicator)
 SELECT uuid, patent_id, description_text, char_length(description_text), version_indicator
 from {temp_db}.detail_desc_text_{year}
+on duplicate key update
+	`uuid` = VALUES(`uuid`),
+	`description_text` = VALUES(`description_text`),
+	`description_length` = VALUES(`description_length`),
+	`version_indicator` = VALUES(`version_indicator`)
                               """
                     },
 
             'detail_desc_length': {
-                    "insert": f"INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) SELECT  patent_id, CHAR_LENGTH(description_text), version_indicator from {temp_db}.detail_desc_text_{year}"
+                    "insert": f"""
+INSERT INTO {raw_db}.detail_desc_length( patent_id, detail_desc_length, version_indicator) 
+SELECT  patent_id, CHAR_LENGTH(description_text), version_indicator 
+from {temp_db}.detail_desc_text_{year}
+on duplicate key update
+	`detail_desc_length` = VALUES(`detail_desc_length`),
+	`version_indicator` = VALUES(`version_indicator`)
+                            """
                     }
             }
     merge_text_data(text_table_config, config)
@@ -289,7 +314,7 @@ def post_merge_weekly_granted(**kwargs):
 def post_merge_quarterly_granted(**kwargs):
     config = get_current_config('granted_patent', schedule='quarterly', **kwargs)
     run_id = kwargs.get('run_id')
-    qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
+    qc = MergeTestQuarterly(config)
     qc.runStandardTests()
 
 def post_merge_weekly_pgpubs( **kwargs):
@@ -301,7 +326,7 @@ def post_merge_weekly_pgpubs( **kwargs):
 def post_merge_quarterly_pgpubs(**kwargs):
     config = get_current_config('pgpubs', schedule='quarterly', **kwargs)
     run_id = kwargs.get('run_id')
-    qc = MergeTestQuarterly(config, run_id=kwargs['run_id'])
+    qc = MergeTestQuarterly(config)
     qc.runStandardTests()
 
 

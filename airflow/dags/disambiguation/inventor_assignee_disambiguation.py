@@ -533,19 +533,19 @@ post_process_location_operator = PythonOperator(task_id='post_process_location',
                                                 python_callable=post_process_location,
                                                 dag=disambiguation,
                                                 on_success_callback=airflow_task_success,
-                                                on_failure_callback=airflow_task_failure, queue='admin', pool='default_pool')
+                                                on_failure_callback=airflow_task_failure, queue='data_collector')
 # UPDATED
 qc_post_process_location_operator = PythonOperator(task_id='qc_post_process_location',
                                                    python_callable=post_process_qc,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
-                                                   on_failure_callback=airflow_task_failure, queue='admin',  pool='default_pool')
+                                                   on_failure_callback=airflow_task_failure, queue='data_collector')
 
 loc_fips_operator = PythonOperator(task_id='augment_location_fips',
                                                    python_callable=augment_location_fips,
                                                    dag=disambiguation,
                                                    on_success_callback=airflow_task_success,
-                                                   on_failure_callback=airflow_task_failure, queue='admin',  pool='default_pool')
+                                                   on_failure_callback=airflow_task_failure, queue='data_collector')
 
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
 # mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm

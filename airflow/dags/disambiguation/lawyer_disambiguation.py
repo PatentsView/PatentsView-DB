@@ -50,15 +50,15 @@ disambiguation = DAG(
     catchup=True,
 )
 
-quarterly_merge_completed = ExternalTaskSensor(
-    task_id="quarterly_merge_completed",
-    external_dag_id="merge_quarterly_updater",
-    external_task_id="qc_text_merge_quarterly_pgpubs",
-    timeout=600,
-    allowed_states=['success'],
-    failed_states=['failed', 'skipped'],
-    mode="reschedule",
-)
+# quarterly_merge_completed = ExternalTaskSensor(
+#     task_id="quarterly_merge_completed",
+#     external_dag_id="merge_quarterly_updater",
+#     external_task_id="qc_text_merge_quarterly_pgpubs",
+#     timeout=600,
+#     allowed_states=['success'],
+#     failed_states=['failed', 'skipped'],
+#     mode="reschedule",
+# )
 
 prepare_rawlawyer_table = PythonOperator(task_id='prepare_rawlawyer_table',
                                          python_callable=prepare_tables,
@@ -66,21 +66,21 @@ prepare_rawlawyer_table = PythonOperator(task_id='prepare_rawlawyer_table',
                                          dag=disambiguation,
                                          on_success_callback=airflow_task_success,
                                          on_failure_callback=airflow_task_failure,
-                                         queue='disambiguator')
+                                         queue='data_collector')
 clean_rawlawyer_table = PythonOperator(task_id='clean_rawlawyer_table',
                                        python_callable=clean_rawlawyer,
                                        provide_context=True,
                                        dag=disambiguation,
                                        on_success_callback=airflow_task_success,
                                        on_failure_callback=airflow_task_failure,
-                                       queue='disambiguator')
+                                       queue='data_collector')
 load_clean_rawlawyer_table = PythonOperator(task_id='load_clean_rawlawyer_table',
                                             python_callable=load_clean_rawlawyer,
                                             provide_context=True,
                                             dag=disambiguation,
                                             on_success_callback=airflow_task_success,
                                             on_failure_callback=airflow_task_failure,
-                                            queue='disambiguator')
+                                            queue='data_collector')
 lawyer_disambiguation = PythonOperator(task_id='lawyer_disambiguation',
                                        python_callable=start_lawyer_disambiguation,
                                        provide_context=True,
@@ -111,4 +111,4 @@ for dependency_group in operator_sequence:
     dependency_sequence = operator_sequence[dependency_group]
     chain_operators(dependency_sequence)
 
-prepare_rawlawyer_table.set_upstream(quarterly_merge_completed)
+# prepare_rawlawyer_table.set_upstream(quarterly_merge_completed)

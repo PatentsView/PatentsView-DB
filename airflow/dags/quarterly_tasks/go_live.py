@@ -90,6 +90,6 @@ data_viz_relationship_ff = PythonOperator(
 
 PVSupport.set_upstream(qa_production_data)
 web_tools.set_upstream(qa_production_data)
-data_viz_comparison_ff.set_upstream(qa_production_data)
+data_viz_comparison_ff.set_upstream(web_tools)
 data_viz_location_ff.set_upstream(qa_production_data)
 data_viz_relationship_ff.set_upstream(qa_production_data)

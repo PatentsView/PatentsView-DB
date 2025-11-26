@@ -148,7 +148,6 @@ ON DUPLICATE KEY UPDATE
 
 INSERT INTO pregrant_publications.rawassignee (id, document_number, `sequence`, name_first, name_last, `organization`, type, rawlocation_id, city, state, country, filename, version_indicator) SELECT id, document_number, sequence, name_first, name_last, organization, type, rawlocation_id, city, state, country, filename,version_indicator FROM `{{source_database}}`.rawassignee
 ON DUPLICATE KEY UPDATE
-    `sequence` = VALUES(`sequence`),
     `name_first` = VALUES(`name_first`),
     `name_last` = VALUES(`name_last`),
     `organization` = VALUES(`organization`),
@@ -165,7 +164,6 @@ INSERT INTO pregrant_publications.rawinventor (id, document_number, name_first, 
 ON DUPLICATE KEY UPDATE
     `name_first` = VALUES(`name_first`),
     `name_last` = VALUES(`name_last`),
-    `sequence` = VALUES(`sequence`),
     `designation` = VALUES(`designation`),
     `deceased` = VALUES(`deceased`),
     `rawlocation_id` = VALUES(`rawlocation_id`),

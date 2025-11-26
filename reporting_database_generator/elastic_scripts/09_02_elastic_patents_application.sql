@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`patent_application`
     `country`        varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `date`           date                                   DEFAULT NULL,
     `series_code`    varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `rule_47_flag`   varchar(8) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
+    `rule_47_flag`   boolean DEFAULT NULL,
     PRIMARY KEY (`application_id`, `patent_id`),
     KEY              `ix_application_number` (`number`),
     KEY              `ix_application_patent_id` (`patent_id`)
@@ -38,8 +38,9 @@ from `{{reporting_db}}`.application a
          join patent.application pa on pa.patent_id = a.patent_id
          join (select patent_id
                     , case
-                          when max(rule_47) = '0' then 'FALSE'
-                          when max(rule_47) = '1' then 'TRUE'
-                          else max(rule_47) end rule_47_flag
+                          when max(rule_47) = '1' then TRUE
+                          when max(rule_47) = 'true' then TRUE
+                          else FALSE
+                          end rule_47_flag
                from patent.rawinventor ri
                group by patent_id) x on x.patent_id = a.patent_id;

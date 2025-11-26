@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `{{elastic_db}}`.`publication`
     `title`                                                 text COLLATE utf8mb4_unicode_ci         DEFAULT NULL,
     `kind`                                                  varchar(10) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
     `series_code`                                           varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `rule_47_flag`                                          varchar(5) NOT NULL,
+    `rule_47_flag`                                          boolean DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY                                                     `ix_publication_number` (`document_number`),
     KEY                                                     `ix_publication_application_number` (`application_number`),
@@ -45,7 +45,11 @@ select p.id
      , a.invention_title
      , p.kind
      , a.series_code
-     , a.rule_47_flag
+     , case
+          when a.rule_47_flag = '1' then TRUE
+          when a.rule_47_flag = 'true' then TRUE
+          else FALSE
+          end as rule_47_flag
 from `{{reporting_db}}`.publication p
     left join `{{reporting_db}}`.application a
 on a.document_number = p.document_number;

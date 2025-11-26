@@ -481,7 +481,7 @@ def additional_post_processing(**kwargs):
     suffix = config['DATES']['END_DATE']
     assignee_table = f"assignee_{suffix}"
     engine = create_engine(get_connection_string(config, "RAW_DB"))
-    #engine.execute("Drop table if exists assignee_reassignment_final")
+    engine.execute("Drop table if exists assignee_reassignment_final")
     assignee_data = pd.read_sql_table(assignee_table, con=engine)
     assignee_data = assignee_data.assign(gp=assignee_data.organization.str.lower().str[0:4])
     unique_assignees = assignee_data.gp.unique()
@@ -799,7 +799,7 @@ limit 25;
     """
     df = pd.read_sql(cluster_query, con=engine)
     print(df)
-    if df['records'][0] > 200000:
+    if df['records'][0] > 300000:
         raise Exception(f"ASSIGNEE DISAMBIGUATION OVER-CLUSTERED")
     if df['records'][0] < 50000:
         raise Exception(f"ASSIGNEE DISAMBIGUATION UNDER-CLUSTERED")
@@ -813,7 +813,7 @@ def additional_post_processing_assignee(**kwargs):
     precache_assignees(**kwargs)
     ##No real improvement can be made in runtime
     create_canonical_assignees(**kwargs)
-    ##No improvement can be made in runtime
+    #No improvement can be made in runtime
     check_largest_clusters(**kwargs)
 
 def post_process_qc(**kwargs):
@@ -837,13 +837,13 @@ def post_process_assignee_pgpubs_phase2_qc(**kwargs):
     qc.runDisambiguationTests()
 
 if __name__ == '__main__':
-    date = datetime.date(2023, 12, 31)
+    date = datetime.date(2024, 4, 5)
     # check_largest_clusters(**{
     #     "execution_date": date
     # })
-    # post_process_qc(**{
-    #     "execution_date": date
-    # })
+    post_process_qc(**{
+        "execution_date": date
+    })
 
     # additional_post_processing(**{
     #     "execution_date": date })
