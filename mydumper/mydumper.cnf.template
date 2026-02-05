@@ -1,0 +1,12 @@
+[mydumper]
+host = 
+user = 
+password = 
+port = 
+
+[myloader]
+host =
+user =
+password =
+port =
+protocol=

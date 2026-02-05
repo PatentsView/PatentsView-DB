@@ -122,12 +122,12 @@ def find_cpc_grant_and_pgpub_urls(
         pgpubs_product_identifier="CPCMCAPP"
     ):
     """
-    Scrape unfiltered grant and pgpub directories and filter files
-    from the last 14 days based on the date embedded in filenames.
+    Scrape unfiltered grant and pgpub directories and filter out
+    files from earlier months.
     """
     # 2-week window
     today = datetime.date.today()
-    two_weeks_ago = today - datetime.timedelta(days=14)
+    first_day_of_month = datetime.date(today.year, today.month, 1)
 
     def extract_date_from_filename(filename):
         match = re.search(r'_(\d{4}-\d{2}-\d{2})\.zip$', filename)
@@ -151,11 +151,11 @@ def find_cpc_grant_and_pgpub_urls(
 
     recent_grant_links = [
         link for link in potential_grant_links
-        if extract_date_from_filename(link) and extract_date_from_filename(link) >= two_weeks_ago
+        if extract_date_from_filename(link) and extract_date_from_filename(link) == first_day_of_month
     ]
 
     print(f"[DEBUG] Found {len(grant_links)} grant file names total")
-    print(f"[DEBUG] Filtered {len(recent_grant_links)} grant files from the last 2 weeks:")
+    print(f"[DEBUG] Filtered {len(recent_grant_links)} grant files from this month:")
     for l in recent_grant_links:
         print("   →", l)
 
@@ -184,11 +184,11 @@ def find_cpc_grant_and_pgpub_urls(
 
     recent_pgpub_links = [
         link for link in potential_pgpub_links
-        if extract_date_from_filename(link) and extract_date_from_filename(link) >= two_weeks_ago
+        if extract_date_from_filename(link) and extract_date_from_filename(link) == first_day_of_month
     ]
 
     print(f"[DEBUG] Found {len(pgpub_links)} pgpub file names total")
-    print(f"[DEBUG] Filtered {len(recent_pgpub_links)} pgpub files from the last 2 weeks:")
+    print(f"[DEBUG] Filtered {len(recent_pgpub_links)} pgpub files from this month:")
     for l in recent_pgpub_links:
         print("   →", l)
 
