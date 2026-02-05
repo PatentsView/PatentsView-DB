@@ -8,8 +8,10 @@ venv
 .vscode
 *.yml
 *.yaml
-mydumper/
+mydumper/*
+!mydumper/mydumper.cnf.template
 Development/config.ini
+airflow/airflow.cfg
 airflow/airflow-webserver.pid
 airflow/airflow.db
 airflow/lawyer.pickle
@@ -18,6 +20,8 @@ airflow/logs/scheduler/2019-01-16/update-db.py.log
 airflow/logs/scheduler/latest
 airflow-metadata-db-disk
 airflow/unittests.cfg
+airflow/webserver_config.py
+airflow_pipeline_env.sh
 Development/dev_config.ini
 Assignee_Lawyer_Disambiguation/lib/alchemy/alchemy_config.ini
 airflow-metadata-db-disk/*
