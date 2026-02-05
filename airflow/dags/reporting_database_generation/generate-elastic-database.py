@@ -419,6 +419,107 @@ endpoint_rel_app_text_pgpub = SQLTemplatedPythonOperator(
     }
 )
 
+# ----- Added tasks for text exports -----
+# ----- Patent Text Exports -----
+endpoint_brf_sum_text_patent = SQLTemplatedPythonOperator(
+    task_id='brf_sum_text_patent_Endpoint',
+    python_callable=validate_query.validate_and_execute,
+    dag=elastic_prep_dag,
+    op_kwargs={
+        'filename': '13_01_g_brf_sum_text_increment.sql'
+    },
+    templates_dict={
+        'source_sql': '13_01_g_brf_sum_text_increment.sql'
+    }
+)
+
+endpoint_claim_patent = SQLTemplatedPythonOperator(
+    task_id='Claim_patent_Endpoint',
+    python_callable=validate_query.validate_and_execute,
+    dag=elastic_prep_dag,
+    op_kwargs={
+        'filename': '13_02_g_claim_increment.sql'
+    },
+    templates_dict={
+        'source_sql': '13_02_g_claim_increment.sql'
+    }
+)
+
+endpoint_detail_desc_text_patent = SQLTemplatedPythonOperator(
+    task_id='detail_desc_text_patent_Endpoint',
+    python_callable=validate_query.validate_and_execute,
+    dag=elastic_prep_dag,
+    op_kwargs={
+        'filename': '13_03_g_detail_desc_text_increment.sql'
+    },
+    templates_dict={
+        'source_sql': '13_03_g_detail_desc_text_increment.sql'
+    }
+)
+
+endpoint_draw_desc_text_patent = SQLTemplatedPythonOperator(
+    task_id='draw_desc_text_patent_Endpoint',
+    python_callable=validate_query.validate_and_execute,
+    dag=elastic_prep_dag,
+    op_kwargs={
+        'filename': '13_04_g_draw_desc_text_increment.sql'
+    },
+    templates_dict={
+        'source_sql': '13_04_g_draw_desc_text_increment.sql'
+    }
+)
+
+# ----- Pregrant Text Exports -----
+endpoint_brf_sum_text_pgpub = SQLTemplatedPythonOperator(
+    task_id='brf_sum_text_pgpub_Endpoint',
+    python_callable=validate_query.validate_and_execute,
+    dag=elastic_prep_dag,
+    op_kwargs={
+        'filename': '13_05_pg_brf_sum_text_increment.sql'
+    },
+    templates_dict={
+        'source_sql': '13_05_pg_brf_sum_text_increment.sql'
+    }
+)
+
+endpoint_claim_pgpub = SQLTemplatedPythonOperator(
+    task_id='Claim_pgpub_Endpoint',
+    python_callable=validate_query.validate_and_execute,
+    dag=elastic_prep_dag,
+    op_kwargs={
+        'filename': '13_06_pg_claim_increment.sql'
+    },
+    templates_dict={
+        'source_sql': '13_06_pg_claim_increment.sql'
+    }
+)
+
+endpoint_detail_desc_text_pgpub = SQLTemplatedPythonOperator(
+    task_id='detail_desc_text_pgpub_Endpoint',
+    python_callable=validate_query.validate_and_execute,
+    dag=elastic_prep_dag,
+    op_kwargs={
+        'filename': '13_07_pg_detail_desc_text_increment.sql'
+    },
+    templates_dict={
+        'source_sql': '13_07_pg_detail_desc_text_increment.sql'
+    }
+)
+
+endpoint_draw_desc_text_pgpub = SQLTemplatedPythonOperator(
+    task_id='draw_desc_text_pgpub_Endpoint',
+    python_callable=validate_query.validate_and_execute,
+    dag=elastic_prep_dag,
+    op_kwargs={
+        'filename': '13_08_pg_draw_desc_text_increment.sql'
+    },
+    templates_dict={
+        'source_sql': '13_08_pg_draw_desc_text_increment.sql'
+    }
+)
+
+# ----- QA Tasks -----
+
 elastic_patent_db_qa = PythonOperator(
     task_id='elastic_patent_DB_QA',
     python_callable=run_elastic_db_qa,

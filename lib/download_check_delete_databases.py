@@ -1,5 +1,4 @@
 import subprocess
-import mysql.connector
 import datetime
 from lib.configuration import get_connection_string, get_current_config, get_unique_connection_string
 import pymysql

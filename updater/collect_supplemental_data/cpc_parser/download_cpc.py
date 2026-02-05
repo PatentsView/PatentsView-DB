@@ -154,7 +154,7 @@ def find_cpc_grant_and_pgpub_urls(
     ]
 
     print(f"[DEBUG] Found {len(grant_links)} grant file names total")
-    print(f"[DEBUG] Filtered {len(recent_grant_links)} grant files from the last 2 weeks:")
+    print(f"[DEBUG] Filtered {len(recent_grant_links)} grant files from this month:")
     for l in recent_grant_links:
         print("   →", l)
 
@@ -187,7 +187,7 @@ def find_cpc_grant_and_pgpub_urls(
     ]
 
     print(f"[DEBUG] Found {len(pgpub_links)} pgpub file names total")
-    print(f"[DEBUG] Filtered {len(recent_pgpub_links)} pgpub files from the last 2 weeks:")
+    print(f"[DEBUG] Filtered {len(recent_pgpub_links)} pgpub files from this month:")
     for l in recent_pgpub_links:
         print("   →", l)
 
