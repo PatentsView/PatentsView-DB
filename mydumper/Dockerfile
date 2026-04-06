@@ -1,18 +1,27 @@
-# Use an official Debian image as the base
-FROM debian:bullseye
+FROM patentsview/airflow:0.5
 
-# Install mydumper and libmariadb3 using package manager
-RUN apt-get update && \
-    apt-get install -y libmariadb-dev && apt-get install -y libmariadb3 && apt-get install -y libmariadb-dev-compat
+USER root
 
-# Use the mysqlboy/docker-mydumper image as a base
-FROM mydumper/mydumper:latest
+# Disable MySQL APT repo (it’s causing GPG failures), then install mydumper.
+# If mydumper isn't in bullseye main, fall back to bullseye-backports.
+RUN set -eux; \
+    # Comment out any MySQL repo entries (or remove the files if you prefer)
+    if ls /etc/apt/sources.list.d/*mysql* >/dev/null 2>&1; then \
+        sed -i 's/^[[:space:]]*deb /# deb /' /etc/apt/sources.list.d/*mysql* || true; \
+    fi; \
+    apt-get update; \
+    (apt-get install -y --no-install-recommends mydumper \
+     || (echo "deb http://deb.debian.org/debian bullseye-backports main" > /etc/apt/sources.list.d/backports.list \
+         && apt-get update \
+         && apt-get -y -t bullseye-backports install --no-install-recommends mydumper)); \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy mydumper configuration
-COPY mydumper.cnf /etc/
+# Copy config (optional)
+COPY mydumper.cnf /etc/mydumper.cnf
 
-# Set the command to run when the container starts
-#CMD ["mydumper", "-c", "/etc/mydumper.cnf"]
-#CMD ["mydumper", "--version"]
-#CMD ["mydumper"]
-CMD ["echo", "Container started without running mydumper"]
+# Drop back to runtime user
+USER airflow
+
+# (Optional) keep this as a quick sanity check at runtime; your compose command overrides it anyway
+CMD ["mydumper", "--version"]
+
