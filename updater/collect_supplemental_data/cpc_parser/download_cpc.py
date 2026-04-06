@@ -125,7 +125,6 @@ def find_cpc_grant_and_pgpub_urls(
     Scrape unfiltered grant and pgpub directories and filter out
     files from earlier months.
     """
-    # 2-week window
     today = datetime.date.today()
     first_day_of_month = datetime.date(today.year, today.month, 1)
 
