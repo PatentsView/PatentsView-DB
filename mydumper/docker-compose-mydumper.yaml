@@ -1,4 +1,3 @@
-version: '3'
 services:
   mydumper_service:
     build:
@@ -10,7 +9,7 @@ services:
      - S3_ENDPOINT_URL
      - S3_BUCKET
     volumes:
-     - {LOCAL_PATH}:/DatabaseBackups
-     - {LOCAL_PATH}:/project
-    command:
-      - mydumper
+     - /home/ec2-user/PipelineData/DatabaseBackups:/DatabaseBackups
+     - /home/ec2-user/PatentsView-DB:/project
+     - ./mydumper.cnf:/etc/mydumper.cnf
+    command: mydumper --verbose=3
