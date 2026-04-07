@@ -1,14 +1,33 @@
+x-mydumper-common: &mydumper-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  environment:
+    - S3_ACCESS_KEY_ID
+    - S3_SECRET_ACCESS_KEY
+    - S3_ENDPOINT_URL
+    - S3_BUCKET
+
 services:
   mydumper_service:
+    <<: *mydumper-common
+    profiles: ["Pipeline-Worker", "Disambiguation-Worker"]
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      - S3_ACCESS_KEY_ID
-      - S3_SECRET_ACCESS_KEY
-      - S3_ENDPOINT_URL
-      - S3_BUCKET
     volumes:
       - /PatentDataVolume/DatabaseBackups:/DatabaseBackups
       - /airflow/PatentsView-DB:/project
     command: mydumper --host=$MYSQL_HOST --user=$MYSQL_USER --password=$MYSQL_PASSWORD
+
+  mydumper_service_generalpurpose:
+    <<: *mydumper-common
+    profiles: ["General-Purpose"]
+    build:
+      context: .
+      dockerfile: Dockerfile.General-Purpose
+    volumes:
+      - /home/ec2-user/PipelineData/DatabaseBackups:/DatabaseBackups
+      - /home/ec2-user/PatentsView-DB:/project
+      - ./mydumper.cnf:/etc/mydumper.cnf
+    command: mydumper --verbose=3

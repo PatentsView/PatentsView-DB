@@ -1,4 +1,5 @@
 FROM patentsview/airflow:0.5
+
 USER root
 
 # Add MySQL repo key into a keyring and (re)declare the source with signed-by
@@ -19,5 +20,3 @@ RUN set -eux; \
 
 COPY mydumper.cnf /etc/mydumper.cnf
 USER airflow
-CMD ["mydumper", "--version"]
-
