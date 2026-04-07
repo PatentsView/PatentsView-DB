@@ -32,93 +32,128 @@ def with_keys(d, keys):
 def class_db_specific_config(self, table_config, class_called):
     keep_tables = []
     for i in table_config.keys():
-        if class_called == 'DatabaseTester':
-            if "UploadTest" in table_config[i]['TestScripts']:
+        if class_called == "DatabaseTester":
+            if "UploadTest" in table_config[i]["TestScripts"]:
                 keep_tables.append(i)
-        elif class_called == 'ElasticDBTester':
+        elif class_called == "ElasticDBTester":
             keep_tables.append(i)
         else:
-            if class_called in table_config[i]['TestScripts']:
+            if class_called in table_config[i]["TestScripts"]:
                 keep_tables.append(i)
     self.table_config = with_keys(table_config, keep_tables)
-    if class_called[:4] == 'Text':
+    if class_called[:4] == "Text":
         pass
     else:
         if "PostProcessing" in str(self):
             tables_list = list(self.table_config.keys())
             quarter_date = self.end_date.strftime("%Y%m%d")
             for table in tables_list:
-                if table in ['assignee', "assignee_disambiguation_mapping", 'location', "location_disambiguation_mapping", 'inventor',  "inventor_disambiguation_mapping", "inventor_gender", "rawinventor_gender", "rawinventor_gender_agg"]:
-                    self.table_config[f'{table}_{quarter_date}'] = self.table_config.pop(f'{table}')
+                if table in [
+                    "assignee",
+                    "assignee_disambiguation_mapping",
+                    "location",
+                    "location_disambiguation_mapping",
+                    "inventor",
+                    "inventor_disambiguation_mapping",
+                    "inventor_gender",
+                    "rawinventor_gender",
+                    "rawinventor_gender_agg",
+                ]:
+                    self.table_config[f"{table}_{quarter_date}"] = (
+                        self.table_config.pop(f"{table}")
+                    )
         print(f"The following list of tables are run for {class_called}:")
         print(self.table_config.keys())
 
 
-def load_table_config(config, db='patent'):
+def load_table_config(config, db="patent"):
     print(db)
     print(config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"])
     root = config["FOLDERS"]["project_root"]
     resources = config["FOLDERS"]["resources_folder"]
-    if db == 'patent':
+    if db == "patent":
         config_file = f"{root}/{resources}/{config['FILES']['table_config_granted']}"
-    elif db == 'pgpubs':
+    elif db == "pgpubs":
         config_file = f"{root}/{resources}/{config['FILES']['table_config_pgpubs']}"
-    elif db == 'patent_text' or db[:6] == 'upload':
-        config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_granted"]}'
-    elif db == 'pgpubs_text' or db[:6] == 'pgpubs':
-        config_file = f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'
+    elif db == "patent_text" or db[:6] == "upload":
+        config_file = (
+            f'{root}/{resources}/{config["FILES"]["table_config_text_granted"]}'
+        )
+    elif db == "pgpubs_text" or db[:6] == "pgpubs":
+        config_file = (
+            f'{root}/{resources}/{config["FILES"]["table_config_text_pgpubs"]}'
+        )
     elif db == config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]:
-        config_file = f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'
+        config_file = (
+            f'{root}/{resources}/{config["FILES"]["table_config_reporting_db"]}'
+        )
     elif db == "gender_attribution":
-        config_file = f'{root}/{resources}/{config["FILES"]["table_config_inventor_gender"]}'
-    elif db == 'bulk_exp_granted':
-        config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'
-    elif db == 'bulk_exp_pgpubs':
-        config_file = f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'
-    elif db == 'elasticsearch_patent':
-        config_file = f'{root}/{resources}/{config["FILES"]["table_config_elasticsearch_patent"]}'
-    elif db == 'elasticsearch_pgpub':
-        config_file = f'{root}/{resources}/{config["FILES"]["table_config_elasticsearch_pgpub"]}'
+        config_file = (
+            f'{root}/{resources}/{config["FILES"]["table_config_inventor_gender"]}'
+        )
+    elif db == "bulk_exp_granted":
+        config_file = (
+            f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_granted"]}'
+        )
+    elif db == "bulk_exp_pgpubs":
+        config_file = (
+            f'{root}/{resources}/{config["FILES"]["table_config_bulk_exp_pgpubs"]}'
+        )
+    elif db == "elasticsearch_patent":
+        config_file = (
+            f'{root}/{resources}/{config["FILES"]["table_config_elasticsearch_patent"]}'
+        )
+    elif db == "elasticsearch_pgpub":
+        config_file = (
+            f'{root}/{resources}/{config["FILES"]["table_config_elasticsearch_pgpub"]}'
+        )
 
     print(f"reading table config from {config_file}")
+    config_file = config_file.replace("/project/", "")
     with open(config_file) as file:
         table_config = json.load(file)
     return table_config
 
 
 def get_relevant_attributes(self, class_called, database_section, config):
-    print(f"assigning class variables based on class {class_called} and database section {database_section}.")
-    if (class_called == "AssigneePostProcessingQC") or (class_called == "AssigneePostProcessingQCPhase2") :
+    print(
+        f"assigning class variables based on class {class_called} and database section {database_section}."
+    )
+    if (class_called == "AssigneePostProcessingQC") or (
+        class_called == "AssigneePostProcessingQCPhase2"
+    ):
         self.database_section = database_section
-        if self.database_section == 'patent':
-            self.table_config = load_table_config(config, db='patent')
+        if self.database_section == "patent":
+            self.table_config = load_table_config(config, db="patent")
         else:
-            self.table_config = load_table_config(config, db='pgpubs')
-        self.entity_table = 'rawassignee'
-        self.entity_id = 'uuid'
-        self.disambiguated_id = 'assignee_id'
-        self.disambiguated_table = 'assignee_'+ config['DATES']["END_DATE"]
-        self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
-        self.aggregator = 'main.organization'
+            self.table_config = load_table_config(config, db="pgpubs")
+        self.entity_table = "rawassignee"
+        self.entity_id = "uuid"
+        self.disambiguated_id = "assignee_id"
+        self.disambiguated_table = "assignee_" + config["DATES"]["END_DATE"]
+        self.disambiguated_data_fields = ["name_last", "name_first", "organization"]
+        self.aggregator = "main.organization"
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
         self.f_key = ""
         self.exclusion_list = []
-    elif (class_called == "InventorGenderPostProcessingQC"):
-        self.table_config = load_table_config(config, db='gender_attribution')
+    elif class_called == "InventorGenderPostProcessingQC":
+        self.table_config = load_table_config(config, db="gender_attribution")
 
-    elif (class_called == "InventorPostProcessingQC") or (class_called == "InventorPostProcessingQCPhase2") :
+    elif (class_called == "InventorPostProcessingQC") or (
+        class_called == "InventorPostProcessingQCPhase2"
+    ):
         self.database_section = database_section
-        if self.database_section == 'patent':
-            self.table_config = load_table_config(config, db='patent')
+        if self.database_section == "patent":
+            self.table_config = load_table_config(config, db="patent")
         else:
-            self.table_config = load_table_config(config, db='pgpubs')
-        self.entity_table = 'rawinventor'
-        self.entity_id = 'uuid'
-        self.disambiguated_id = 'inventor_id'
-        self.disambiguated_table = 'inventor'
-        self.disambiguated_data_fields = ['name_last', 'name_first', 'organization']
+            self.table_config = load_table_config(config, db="pgpubs")
+        self.entity_table = "rawinventor"
+        self.entity_id = "uuid"
+        self.disambiguated_id = "inventor_id"
+        self.disambiguated_table = "inventor"
+        self.disambiguated_data_fields = ["name_last", "name_first", "organization"]
         # self.patent_exclusion_list.extend(['assignee', 'persistent_assignee_disambig'])
         # self.add_persistent_table_to_config(database_section)
         self.category = ""
@@ -131,14 +166,24 @@ def get_relevant_attributes(self, class_called, database_section, config):
 
     elif class_called == "LawyerPostProcessingQC":
         self.database_section = database_section
-        self.table_config = load_table_config(config, db='patent')
-        self.entity_table = 'rawlawyer'
-        self.entity_id = 'uuid'
-        self.disambiguated_id = 'lawyer_id'
-        self.disambiguated_table = 'lawyer'
-        self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
+        self.table_config = load_table_config(config, db="patent")
+        self.entity_table = "rawlawyer"
+        self.entity_id = "uuid"
+        self.disambiguated_id = "lawyer_id"
+        self.disambiguated_table = "lawyer"
+        self.disambiguated_data_fields = [
+            "name_last",
+            "name_first",
+            "organization",
+            "country",
+        ]
         self.aggregator = 'case when main.organization is null then concat(main.name_last,", ",main.name_first) else main.organization end'
-        self.disambiguated_data_fields = ['name_last', 'name_first', "organization", "country"]
+        self.disambiguated_data_fields = [
+            "name_last",
+            "name_first",
+            "organization",
+            "country",
+        ]
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
@@ -146,13 +191,13 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.exclusion_list = []
 
     elif class_called == "LocationPostProcessingQC":
-        self.table_config = load_table_config(config, db='patent')
-        self.disambiguated_data_fields = ['city', 'state', 'country']
+        self.table_config = load_table_config(config, db="patent")
+        self.disambiguated_data_fields = ["city", "state", "country"]
         self.aggregator = "concat(main.city, ', ', main.state, ',', main.country)"
-        self.entity_table = 'rawlocation'
-        self.entity_id = 'id'
-        self.disambiguated_id = 'location_id'
-        self.disambiguated_table = 'location'
+        self.entity_table = "rawlocation"
+        self.entity_id = "id"
+        self.disambiguated_id = "location_id"
+        self.disambiguated_table = "location"
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
@@ -160,7 +205,7 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.exclusion_list = []
 
     elif class_called == "CPCTest":
-        self.table_config = load_table_config(config, db='patent')
+        self.table_config = load_table_config(config, db="patent")
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
@@ -168,7 +213,9 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.exclusion_list = []
 
     elif class_called == "ReportingDBTester" or class_called == "ProdDBTester":
-        self.table_config = load_table_config(config, db = config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]) #db should be parameterized later, not hard-coded
+        self.table_config = load_table_config(
+            config, db=config["PATENTSVIEW_DATABASES"]["REPORTING_DATABASE"]
+        )  # db should be parameterized later, not hard-coded
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
@@ -176,7 +223,9 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.exclusion_list = []
 
     elif class_called == "ElasticDBTester":
-        self.table_config = load_table_config(config, db = config['PATENTSVIEW_DATABASES']["ELASTICSEARCH_DB_TYPE"]) #db should be parameterized later, not hard-coded
+        self.table_config = load_table_config(
+            config, db=config["PATENTSVIEW_DATABASES"]["ELASTICSEARCH_DB_TYPE"]
+        )  # db should be parameterized later, not hard-coded
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
@@ -184,94 +233,106 @@ def get_relevant_attributes(self, class_called, database_section, config):
         self.exclusion_list = []
 
     elif database_section == "patent" or (
-            database_section[:6] == 'upload' and class_called[:6] in ('Upload','GovtIn', 'MergeT')):
-        self.exclusion_list = ['assignee',
-                               'cpc_group',
-                               'cpc_subgroup',
-                               'cpc_subsection',
-                               'government_organization',
-                               'inventor',
-                               'lawyer',
-                               'location',
-                               'location_assignee',
-                               'location_inventor',
-                               'location_nber_subcategory',
-                               'mainclass',
-                               'nber_category',
-                               'nber_subcategory',
-                               'rawlocation',
-                               'subclass',
-                               'usapplicationcitation',
-                               'uspatentcitation',
-                               'wipo_field']
-        self.central_entity = 'patent'
-        self.category = 'type'
-        self.table_config = load_table_config(config, db='patent')
+        database_section[:6] == "upload"
+        and class_called[:6] in ("Upload", "GovtIn", "MergeT")
+    ):
+        self.exclusion_list = [
+            "assignee",
+            "cpc_group",
+            "cpc_subgroup",
+            "cpc_subsection",
+            "government_organization",
+            "inventor",
+            "lawyer",
+            "location",
+            "location_assignee",
+            "location_inventor",
+            "location_nber_subcategory",
+            "mainclass",
+            "nber_category",
+            "nber_subcategory",
+            "rawlocation",
+            "subclass",
+            "usapplicationcitation",
+            "uspatentcitation",
+            "wipo_field",
+        ]
+        self.central_entity = "patent"
+        self.category = "type"
+        self.table_config = load_table_config(config, db="patent")
         self.p_key = "id"
         self.f_key = "patent_id"
 
     elif (database_section == "pregrant_publications") or (
-            database_section[:6] == 'pgpubs' and class_called[:6] in ('Upload','GovtIn', 'MergeT')):
+        database_section[:6] == "pgpubs"
+        and class_called[:6] in ("Upload", "GovtIn", "MergeT")
+    ):
         # TABLES WITHOUT DOCUMENT_NUMBER ARE EXCLUDED FROM THE TABLE CONFIG
         self.central_entity = "publication"
-        self.category = 'kind'
-        self.exclusion_list = ['assignee',
-                               'clean_rawlocation',
-                               'government_organization',
-                               'inventor',
-                               'location_assignee',
-                               'location_inventor',
-                               'rawlocation',
-                               'rawlocation_geos_missed',
-                               'rawlocation_lat_lon']
-        self.table_config = load_table_config(config, db='pgpubs')
+        self.category = "kind"
+        self.exclusion_list = [
+            "assignee",
+            "clean_rawlocation",
+            "government_organization",
+            "inventor",
+            "location_assignee",
+            "location_inventor",
+            "rawlocation",
+            "rawlocation_geos_missed",
+            "rawlocation_lat_lon",
+        ]
+        self.table_config = load_table_config(config, db="pgpubs")
         self.p_key = "document_number"
         self.f_key = "document_number"
 
-    elif class_called[:4] == 'Text':
+    elif class_called[:4] == "Text":
         self.category = ""
         self.central_entity = ""
         self.p_key = ""
         self.f_key = ""
         self.exclusion_list = []
-        if database_section[:6] == 'upload' or database_section == 'patent_text':
+        if database_section[:6] == "upload" or database_section == "patent_text":
             self.table_config = load_table_config(config, db=database_section)
-        elif database_section[:6] == 'pgpubs' or database_section == 'pgpubs_text':
+        elif database_section[:6] == "pgpubs" or database_section == "pgpubs_text":
             self.table_config = load_table_config(config, db=database_section)
         else:
             raise NotImplementedError
 
-    elif class_called[:19] == 'BulkDownloadsTester':
-        if 'granted' in database_section:
-            self.table_config = load_table_config(config, db='bulk_exp_granted')
+    elif class_called[:19] == "BulkDownloadsTester":
+        if "granted" in database_section:
+            self.table_config = load_table_config(config, db="bulk_exp_granted")
             self.central_entity = "patent"
             self.p_key = "patent_id"
             self.f_key = "patent_id"
         else:
-            self.table_config = load_table_config(config, db='bulk_exp_pgpubs')
+            self.table_config = load_table_config(config, db="bulk_exp_pgpubs")
             self.central_entity = "publication"
             self.p_key = "pgpub_id"
             self.f_key = "pgpub_id"
-        
+
         self.category = ""
         self.exclusion_list = []
 
     else:
         raise NotImplementedError
 
+
 def update_to_granular_version_indicator(table, db):
     from lib.configuration import get_current_config, get_connection_string
-    config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
-    cstr = get_connection_string(config, 'PROD_DB')
+
+    config = get_current_config(
+        type=db, **{"execution_date": datetime.date(2000, 1, 1)}
+    )
+    cstr = get_connection_string(config, "PROD_DB")
     engine = create_engine(cstr)
-    if db == 'granted_patent':
-        id = 'id'
-        fk = 'patent_id'
-        fact_table = 'patent'
+    if db == "granted_patent":
+        id = "id"
+        fk = "patent_id"
+        fact_table = "patent"
     else:
-        id = 'document_number'
-        fk = 'document_number'
-        fact_table = 'publications'
+        id = "document_number"
+        fk = "document_number"
+        fact_table = "publications"
     query = f"""
 update {table} update_table 
 	inner join {fact_table} p on update_table.{fk}=p.{id}
@@ -282,6 +343,7 @@ set update_table.version_indicator=p.version_indicator
     engine.execute(query)
     query_end_time = time()
     print("This query took:", query_end_time - query_start_time, "seconds")
+
 
 # Moved from AssigneePostProcessing - unused for now
 def add_persistent_table_to_config(self, database_section):
@@ -300,11 +362,11 @@ def add_persistent_table_to_config(self, database_section):
     with self.connection.cursor() as crsr:
         crsr.execute(columns_query)
         column_data = pd.DataFrame.from_records(
-            crsr.fetchall(),
-            columns=['column', 'data_type', 'null_allowed', 'category'])
+            crsr.fetchall(), columns=["column", "data_type", "null_allowed", "category"]
+        )
         table_config = {
-            'persistent_assignee_disambig': {
-                'fields': column_data.set_index('column').to_dict(orient='index')
+            "persistent_assignee_disambig": {
+                "fields": column_data.set_index("column").to_dict(orient="index")
             }
         }
         self.table_config.update(table_config)
@@ -312,18 +374,19 @@ def add_persistent_table_to_config(self, database_section):
 
 def trim_whitespace(config):
     from lib.configuration import get_connection_string
-    cstr = get_connection_string(config, 'TEMP_UPLOAD_DB')
-    db_type = config['PATENTSVIEW_DATABASES']["TEMP_UPLOAD_DB"][:6]
+
+    cstr = get_connection_string(config, "TEMP_UPLOAD_DB")
+    db_type = config["PATENTSVIEW_DATABASES"]["TEMP_UPLOAD_DB"][:6]
     engine = create_engine(cstr)
     print("REMOVING WHITESPACE WHERE IT EXISTS")
-    project_home = os.environ['PACKAGE_HOME']
-    resources_file = "{root}/{resources}/columns_for_whitespace_trim.json".format(root=project_home,
-                                                                                  resources=config["FOLDERS"][
-                                                                                      "resources_folder"])
+    project_home = os.environ["PACKAGE_HOME"]
+    resources_file = "{root}/{resources}/columns_for_whitespace_trim.json".format(
+        root=project_home, resources=config["FOLDERS"]["resources_folder"]
+    )
     cols_tables_whitespace = json.load(open(resources_file))
     for table in cols_tables_whitespace.keys():
         if db_type in cols_tables_whitespace[table]["TestScripts"]:
-            for column in cols_tables_whitespace[table]['fields']:
+            for column in cols_tables_whitespace[table]["fields"]:
                 trim_whitespace_query = f"""
                 update {table}
                 set `{column}`= TRIM(`{column}`)
@@ -335,7 +398,7 @@ def trim_whitespace(config):
 
 def xstr(s):
     if s is None:
-        return ''
+        return ""
     return str(s)
 
 
@@ -348,23 +411,26 @@ def weekday_count(start_date, end_date):
 
 
 def id_generator(size=25, chars=string.ascii_lowercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
+    return "".join(random.choice(chars) for _ in range(size))
 
 
 def download(url, filepath, api_key=None):
-    """ Download data from a URL with a handy progress bar """
+    """Download data from a URL with a handy progress bar"""
 
     print("Downloading: {}".format(url))
 
     headers = {"X-API-KEY": api_key}
     r = requests.get(url, headers=headers, stream=True)
-    content_length = r.headers.get('content-length')
+    content_length = r.headers.get("content-length")
     if not content_length:
         print("\tNo Content Length Attached. Attempting download without progress bar.")
         chunker = r.iter_content(chunk_size=1024)
     else:
-        chunker = progress.bar(r.iter_content(chunk_size=1024), expected_size=(int(content_length) / 1024) + 1)
-    with open(filepath, 'wb') as f:
+        chunker = progress.bar(
+            r.iter_content(chunk_size=1024),
+            expected_size=(int(content_length) / 1024) + 1,
+        )
+    with open(filepath, "wb") as f:
         for chunk in chunker:
             if chunk:
                 f.write(chunk)
@@ -372,26 +438,29 @@ def download(url, filepath, api_key=None):
 
 
 def chunks(l, n):
-    '''Yield successive n-sized chunks from l. Useful for multi-processing'''
+    """Yield successive n-sized chunks from l. Useful for multi-processing"""
     chunk_list = []
     for i in range(0, len(l), n):
-        chunk_list.append(l[i:i + n])
+        chunk_list.append(l[i : i + n])
 
     return chunk_list
 
 
 def better_title(text):
     title = " ".join(
-        [item if item not in ["Of", "The", "For", "And", "On"] else item.lower() for item in
-         str(text).title().split()])
-    return re.sub('[' + string.punctuation + ']', '', title)
+        [
+            item if item not in ["Of", "The", "For", "And", "On"] else item.lower()
+            for item in str(text).title().split()
+        ]
+    )
+    return re.sub("[" + string.punctuation + "]", "", title)
 
 
 def write_csv(rows, outputdir, filename):
-    """ Write a list of lists to a csv file """
+    """Write a list of lists to a csv file"""
     print(outputdir)
     print(os.path.join(outputdir, filename))
-    writer = csv.writer(open(os.path.join(outputdir, filename), 'w', encoding='utf-8'))
+    writer = csv.writer(open(os.path.join(outputdir, filename), "w", encoding="utf-8"))
     writer.writerows(rows)
 
 
@@ -433,40 +502,46 @@ def write_csv(rows, outputdir, filename):
 
 
 def mp_csv_writer(write_queue, target_file, header):
-    with open(target_file, 'w', newline='') as writefile:
-        filtered_writer = csv.writer(writefile,
-                                     delimiter=',',
-                                     quotechar='"',
-                                     quoting=csv.QUOTE_NONNUMERIC)
+    with open(target_file, "w", newline="") as writefile:
+        filtered_writer = csv.writer(
+            writefile, delimiter=",", quotechar='"', quoting=csv.QUOTE_NONNUMERIC
+        )
         filtered_writer.writerow(header)
         while 1:
             message_data = write_queue.get()
             if len(message_data) != len(header):
                 # "kill" is the special message to stop listening for messages
-                if message_data[0] == 'kill':
+                if message_data[0] == "kill":
                     break
                 else:
                     print(message_data)
-                    raise Exception("Header and data length don't match :{header}/{data_ln}".format(header=len(header),
-                                                                                                    data_ln=len(
-                                                                                                        message_data)))
+                    raise Exception(
+                        "Header and data length don't match :{header}/{data_ln}".format(
+                            header=len(header), data_ln=len(message_data)
+                        )
+                    )
             filtered_writer.writerow(message_data)
 
 
 def log_writer(log_queue, log_prefix="uspto_parser"):
-    '''listens for messages on the q, writes to file. '''
-    home_folder = os.environ['PACKAGE_HOME']
+    """listens for messages on the q, writes to file."""
+    home_folder = os.environ["PACKAGE_HOME"]
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
     EXPANED_LOGFILE = datetime.datetime.now().strftime(
-        '{home_folder}/logs/{prefix}_expanded_log_%Y%m%d_%H%M%S.log'.format(home_folder=home_folder,
-                                                                            prefix=log_prefix))
+        "{home_folder}/logs/{prefix}_expanded_log_%Y%m%d_%H%M%S.log".format(
+            home_folder=home_folder, prefix=log_prefix
+        )
+    )
     expanded_filehandler = logging.FileHandler(EXPANED_LOGFILE)
     expanded_filehandler.setLevel(logging.DEBUG)
 
     BASIC_LOGFILE = datetime.datetime.now().strftime(
-        '{home_folder}/logs/{prefix}_log_%Y%m%d_%H%M%S.log'.format(home_folder=home_folder, prefix=log_prefix))
+        "{home_folder}/logs/{prefix}_log_%Y%m%d_%H%M%S.log".format(
+            home_folder=home_folder, prefix=log_prefix
+        )
+    )
     filehandler = logging.FileHandler(BASIC_LOGFILE)
     filehandler.setLevel(logging.INFO)
 
@@ -478,7 +553,7 @@ def log_writer(log_queue, log_prefix="uspto_parser"):
     logger.addHandler(ch)
     while 1:
         message_data = log_queue.get()
-        if message_data["message"] == 'kill':
+        if message_data["message"] == "kill":
             logger.info("Kill Signal received. Exiting")
             break
         logger.log(message_data["level"], message_data["message"])
@@ -492,13 +567,13 @@ def save_zip_file(url, name, path, counter=0, log_queue=None, api_key=None):
     with requests.get(url, headers=headers, stream=True) as downloader:
         downloader.raise_for_status()
         zip_path = os.path.join(path, name)
-        with open(zip_path, 'wb') as f:
+        with open(zip_path, "wb") as f:
             for chunk in downloader.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
 
     # Extract and rename if revised
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
         for zip_info in zip_ref.infolist():
             z_nm, z_ext = os.path.splitext(name)
             f_nm, f_ext = os.path.splitext(zip_info.filename)
@@ -506,7 +581,10 @@ def save_zip_file(url, name, path, counter=0, log_queue=None, api_key=None):
                 tmp_dir = os.path.join(path, "tmp")
                 os.makedirs(tmp_dir, exist_ok=True)
                 zip_ref.extract(zip_info.filename, tmp_dir)
-                os.rename(os.path.join(tmp_dir, zip_info.filename), os.path.join(path, f"{z_nm}{f_ext}"))
+                os.rename(
+                    os.path.join(tmp_dir, zip_info.filename),
+                    os.path.join(path, f"{z_nm}{f_ext}"),
+                )
                 os.rmdir(tmp_dir)
             else:
                 zip_ref.extract(zip_info.filename, path)
@@ -517,7 +595,14 @@ def save_zip_file(url, name, path, counter=0, log_queue=None, api_key=None):
     print(f"{path} contains {os.listdir(path)}")
 
 
-def get_files_to_download(product_id, api_key, execution_date_str = None, download_folder = None, log_queue = None, files_only=False):
+def get_files_to_download(
+    product_id,
+    api_key,
+    execution_date_str=None,
+    download_folder=None,
+    log_queue=None,
+    files_only=False,
+):
     headers = {"X-API-KEY": api_key, "accept": "application/json"}
 
     if execution_date_str is None:
@@ -528,7 +613,7 @@ def get_files_to_download(product_id, api_key, execution_date_str = None, downlo
             "fileDataToDate": execution_date_str,
         }
     url = f"https://api.uspto.gov/api/v1/datasets/products/{product_id}"
-    
+
     files_to_download = []
 
     try:
@@ -549,9 +634,7 @@ def get_files_to_download(product_id, api_key, execution_date_str = None, downlo
             file_url = file_info["fileDownloadURI"]
             if files_only:
                 # If only URLs are needed, return them directly
-                files_to_download.append(
-                    (file_url, filename)
-                )
+                files_to_download.append((file_url, filename))
             else:
                 files_to_download.append(
                     (file_url, filename, download_folder, idx, log_queue, api_key)
@@ -568,8 +651,7 @@ def get_files_to_download(product_id, api_key, execution_date_str = None, downlo
     return files_to_download
 
 
-
-def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
+def download_xml_files(config, xml_template_setting_prefix="granted_patent"):
     from datetime import datetime
 
     product_id = config["USPTO_LINKS"]["product_identifier"]
@@ -579,14 +661,14 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
     download_folder = (
         config["FOLDERS"]["granted_patent_bulk_xml_location"]
         if xml_template_setting_prefix == "granted_patent"
-        else config['FOLDERS']["pgpubs_bulk_xml_location"]
+        else config["FOLDERS"]["pgpubs_bulk_xml_location"]
     )
 
     print(f"[DEBUG] Download folder: {download_folder}")
 
     execution_dt = config["DATES"]["END_DATE_DASH"]
-    print(f'this is the execution date: {execution_dt}')
-    print(f'this is the type of the execution date: {type(execution_dt)}')
+    print(f"this is the execution date: {execution_dt}")
+    print(f"this is the type of the execution date: {type(execution_dt)}")
 
     if isinstance(execution_dt, str):
         execution_dt = datetime.fromisoformat(execution_dt)
@@ -606,7 +688,9 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
     if parallelism > 1:
         pool = multiprocessing.Pool(parallelism)
         watcher = pool.apply_async(log_writer, (log_queue,))
-        p_list = [pool.apply_async(save_zip_file, args=job) for job in files_to_download]
+        p_list = [
+            pool.apply_async(save_zip_file, args=job) for job in files_to_download
+        ]
         for p in p_list:
             p.get()
         log_queue.put({"level": None, "message": "kill"})
@@ -616,11 +700,6 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
     else:
         for job in files_to_download:
             save_zip_file(*job)
-
-
-
-
-
 
 
 # def download_xml_files(config, xml_template_setting_prefix='pgpubs'):
@@ -710,16 +789,19 @@ def download_xml_files(config, xml_template_setting_prefix='granted_patent'):
 #         pool.join()
 
 
-def manage_ec2_instance(config, button='ON', identifier='xml_collector'):
-    instance_id = config['AWS_WORKER'][identifier]
-    ec2 = boto3.client('ec2', aws_access_key_id=config['AWS']['ACCESS_KEY_ID'],
-                       aws_secret_access_key=config['AWS']['SECRET_KEY'],
-                       region_name='us-east-1')
-    if button == 'ON':
+def manage_ec2_instance(config, button="ON", identifier="xml_collector"):
+    instance_id = config["AWS_WORKER"][identifier]
+    ec2 = boto3.client(
+        "ec2",
+        aws_access_key_id=config["AWS"]["ACCESS_KEY_ID"],
+        aws_secret_access_key=config["AWS"]["SECRET_KEY"],
+        region_name="us-east-1",
+    )
+    if button == "ON":
         response = ec2.start_instances(InstanceIds=[instance_id])
     else:
         response = ec2.stop_instances(InstanceIds=[instance_id])
-    return response['ResponseMetadata']['HTTPStatusCode'] == 200
+    return response["ResponseMetadata"]["HTTPStatusCode"] == 200
 
 
 def create_aws_boto3_session():
@@ -736,6 +818,7 @@ def create_aws_boto3_session():
         print(f"Error creating AWS session: {e}")
         return None
 
+
 def rds_free_space(identifier):
     """
     Retrieve the FreeStorageSpace metric for an RDS instance.
@@ -750,45 +833,46 @@ def rds_free_space(identifier):
         return None
 
     # Create CloudWatch client using the returned session
-    cloudwatch = session.client('cloudwatch', region_name='us-east-1')
+    cloudwatch = session.client("cloudwatch", region_name="us-east-1")
 
     from datetime import datetime, timedelta
+
     response = cloudwatch.get_metric_data(
         MetricDataQueries=[
             {
-                'Id': 'fetching_FreeStorageSpace',
-                'MetricStat': {
-                    'Metric': {
-                        'Namespace': 'AWS/RDS',
-                        'MetricName': 'FreeStorageSpace',
-                        'Dimensions': [
-                            {
-                                "Name": "DBInstanceIdentifier",
-                                "Value": identifier
-                            }
-                        ]
+                "Id": "fetching_FreeStorageSpace",
+                "MetricStat": {
+                    "Metric": {
+                        "Namespace": "AWS/RDS",
+                        "MetricName": "FreeStorageSpace",
+                        "Dimensions": [
+                            {"Name": "DBInstanceIdentifier", "Value": identifier}
+                        ],
                     },
-                    'Period': 300,
-                    'Stat': 'Minimum'
-                }
+                    "Period": 300,
+                    "Stat": "Minimum",
+                },
             }
         ],
         StartTime=(datetime.now() - timedelta(seconds=300 * 3)).timestamp(),
         EndTime=datetime.now().timestamp(),
-        ScanBy='TimestampDescending'
+        ScanBy="TimestampDescending",
     )
-    return mean(response['MetricDataResults'][0]['Values'])
+    return mean(response["MetricDataResults"][0]["Values"])
 
 
 def get_host_name(local=True):
     import requests
     from requests.exceptions import ConnectionError
     from airflow.utils import net
+
     try:
-        host_key = 'local-hostname'
+        host_key = "local-hostname"
         if not local:
-            host_key = 'public-hostname'
-        r = requests.get("http://169.254.169.254/latest/meta-data/{hkey}".format(hkey=host_key))
+            host_key = "public-hostname"
+        r = requests.get(
+            "http://169.254.169.254/latest/meta-data/{hkey}".format(hkey=host_key)
+        )
         return r.text
     except ConnectionError:
         return net.get_host_ip_address()
@@ -813,50 +897,64 @@ def archive_folder(source_folder, targets: list):
         print(file_name)
         shutil.copy(os.path.join(source_folder, file_name), targets[-1])
 
+
 def add_index_new_disambiguation_table(connection, table_name):
     from mysql.connector.errors import ProgrammingError
+
     g_cursor = connection.cursor()
-    index_query = 'alter table {table_name} add primary key (uuid)'.format(
-        table_name=table_name)
+    index_query = "alter table {table_name} add primary key (uuid)".format(
+        table_name=table_name
+    )
     print(index_query)
     try:
         g_cursor.execute(index_query)
     except ProgrammingError as e:
         from mysql.connector import errorcode
+
         if not e.errno == errorcode.ER_MULTIPLE_PRI_KEY:
             raise
 
+
 def link_view_to_new_disambiguation_table(connection, table_name, disambiguation_type):
     from mysql.connector.errors import ProgrammingError
+
     g_cursor = connection.cursor()
-    index_query = 'alter table {table_name} add primary key (uuid)'.format(
-        table_name=table_name)
+    index_query = "alter table {table_name} add primary key (uuid)".format(
+        table_name=table_name
+    )
     print(index_query)
     replace_view_query = """
         CREATE OR REPLACE SQL SECURITY INVOKER VIEW {dtype}_disambiguation_mapping as SELECT uuid,{dtype}_id from {table_name}
-        """.format(table_name=table_name, dtype=disambiguation_type)
+        """.format(
+        table_name=table_name, dtype=disambiguation_type
+    )
     try:
         g_cursor.execute(index_query)
     except ProgrammingError as e:
         from mysql.connector import errorcode
+
         if not e.errno == errorcode.ER_MULTIPLE_PRI_KEY:
             raise
     print(replace_view_query)
     g_cursor.execute(replace_view_query)
 
+
 def update_to_granular_version_indicator(table, db):
     from lib.configuration import get_current_config, get_connection_string
-    config = get_current_config(type=db, **{"execution_date": datetime.date(2000, 1, 1)})
-    cstr = get_connection_string(config, 'PROD_DB')
+
+    config = get_current_config(
+        type=db, **{"execution_date": datetime.date(2000, 1, 1)}
+    )
+    cstr = get_connection_string(config, "PROD_DB")
     engine = create_engine(cstr)
-    if db == 'granted_patent':
-        id = 'id'
-        fk = 'patent_id'
-        fact_table = 'patent'
+    if db == "granted_patent":
+        id = "id"
+        fk = "patent_id"
+        fact_table = "patent"
     else:
-        id = 'document_number'
-        fk = 'document_number'
-        fact_table = 'publication'
+        id = "document_number"
+        fk = "document_number"
+        fact_table = "publication"
     query = f"""
 update {table} update_table 
 	inner join {fact_table} p on update_table.{fk}=p.{id}
@@ -868,11 +966,13 @@ set update_table.version_indicator=p.version_indicator
     query_end_time = time()
     print("This query took:", query_end_time - query_start_time, "seconds")
 
+
 def update_version_indicator(table, db, **kwargs):
     from lib.configuration import get_current_config, get_connection_string
+
     config = get_current_config(type=db, schedule="quarterly", **kwargs)
-    ed = process_date(config['DATES']["end_date"], as_string=True)
-    cstr = get_connection_string(config, 'PROD_DB')
+    ed = process_date(config["DATES"]["end_date"], as_string=True)
+    cstr = get_connection_string(config, "PROD_DB")
     engine = create_engine(cstr)
     query = f"""
 update {table} update_table 
@@ -888,5 +988,8 @@ set update_table.version_indicator={ed}
 if __name__ == "__main__":
     # update_to_granular_version_indicator('uspc_current', 'granted_patent')
     print("HI")
-    config = get_current_config("granted_patent", schedule='quarterly',  **{"execution_date": datetime.date(2022, 6, 30)})
-
+    config = get_current_config(
+        "granted_patent",
+        schedule="quarterly",
+        **{"execution_date": datetime.date(2022, 6, 30)},
+    )

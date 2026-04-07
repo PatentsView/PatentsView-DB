@@ -1,0 +1,6 @@
+cp 20211230/patent/download/g_inventor_disambiguated.tsv /pv_export_volume/output/20211230_g_inventor_disambiguated.tsv
+
+
+awk -F'\t' 'NR==1 || $6=="" || $6=="\"\""' 20220929_g_inventor_disambiguated.tsv > 20220929_output.tsv
+
+wc -l 20220929_output.tsv
