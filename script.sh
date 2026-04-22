@@ -1,0 +1,1 @@
+python3 updater/xml_to_sql/export_pgpub_draw_desc_tsv.py --xml-dir /PatentDataVolume/PGPUBSData/pgpubs/xml_files --output-dir output --years 2005 2006 2007 --filename-start ipa050106.xml --filename-end ipa071227.xml
