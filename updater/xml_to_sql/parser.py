@@ -299,9 +299,22 @@ def process_publication_document(patent_app_document, patent_config):
             # This is the start of the path from which the multiple values will exists
             # i.e. /inventors can contain multiple /inventor tags within it
             entity_root_path = table['entity_root_path']
+            if table.get('table_name') == 'draw_desc_text':
+                # Normalize draw description parsing across wrapped and unwrapped XML.
+                entity_elements = []
+                for description_element in patent_app_document.findall('description'):
+                    has_drawings_section = any(
+                        'description' in child.attrib
+                        and child.attrib['description'] == 'Brief Description of Drawings'
+                        for child in description_element.getchildren()
+                    )
+                    if has_drawings_section:
+                        entity_elements.append(description_element)
+            else:
+                entity_elements = patent_app_document.findall(entity_root_path)
             sequence = 1
             # extract all data necessary
-            for entity_element in patent_app_document.findall(entity_root_path):
+            for entity_element in entity_elements:
                 if entity_element.tag in table.get('skip_tags',[]): continue # if any specified skippable child elements, skip them
                 table_rows.append(extract_table_data(table, entity_element, document_number, sequence,
                                                      patent_config['foreign_key_config']))
