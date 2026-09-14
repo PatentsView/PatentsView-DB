@@ -85,6 +85,12 @@ class ParserTest:
         return pd.DataFrame(shapes)
 
     def test_aws_rds_space(self):
+        from lib.duckdb_sink import skip_infra_qc
+        if skip_infra_qc(self.update_config):
+            # Local run: no prod RDS instance to measure. Guards the production
+            # RDS volume during upload, so it is meaningless off-container.
+            logger.info("skip_infra_qc: skipping RDS free-space check")
+            return
         free_space_in_bytes = rds_free_space(
             self.update_config['PATENTSVIEW_DATABASES']['identifier']  # Pass only the identifier
         )

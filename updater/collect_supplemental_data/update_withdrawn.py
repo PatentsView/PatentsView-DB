@@ -9,6 +9,7 @@ from QA.collect_supplemental_data.WithdrawnTest import WithdrawnTest
 from lib import xml_helpers
 from lib.configuration import get_connection_string, get_current_config
 from lib.utilities import download
+from lib.duckdb_sink import sink_enabled, append_dataframe, execute_sql, export_parquet
 
 
 def download_withdrawn_patent_numbers(destination_folder):
@@ -47,7 +48,8 @@ def download_withdrawn_patent_numbers(destination_folder):
 
 
 def load_withdrawn(update_config):
-    engine = create_engine(get_connection_string(update_config, "TEMP_UPLOAD_DB"))
+    engine = None if sink_enabled(update_config) else create_engine(
+        get_connection_string(update_config, "TEMP_UPLOAD_DB"))
     withdrawn_folder = '{}/withdrawn'.format(update_config['FOLDERS']['WORKING_FOLDER'])
 
     withdrawn_file = '{}/withdrawn.txt'.format(withdrawn_folder)
@@ -58,10 +60,27 @@ def load_withdrawn(update_config):
                 withdrawn_patents.append(xml_helpers.process_patent_numbers(line.strip('\n')))
     withdrawn_patents_frame = pd.DataFrame(withdrawn_patents)
     withdrawn_patents_frame.columns = ['patent_id']
+    if sink_enabled(update_config):
+        # if_exists='replace' -> drop first so re-runs stay idempotent
+        execute_sql(update_config, ['DROP TABLE IF EXISTS "withdrawn_patents"'])
+        append_dataframe(update_config, "withdrawn_patents", withdrawn_patents_frame)
+        return
     withdrawn_patents_frame.to_sql(con=engine, name="withdrawn_patents", if_exists='replace', index=False)
 
 
 def update_withdrawn(update_config):
+    if sink_enabled(update_config):
+        # In production this flags rows in the full production `patent` table.
+        # Locally the only `patent` table is this week's parsed data, so the
+        # flag is applied there (i.e. withdrawn patents issued this week).
+        execute_sql(update_config, ["""
+            UPDATE "patent"
+            SET "withdrawn" = '1'
+            WHERE "id" IN (SELECT "patent_id" FROM "withdrawn_patents")
+        """])
+        written = export_parquet(update_config, tables=['withdrawn_patents', 'patent'])
+        print("refreshed parquet for {}".format(sorted(written)))
+        return
     # JOIN without index; Expected to be fast regardless
     update_query = """
 UPDATE patent p join `{temp_upload_db}`.`withdrawn_patents` twp on twp.patent_id = p.id set p.withdrawn = 1;

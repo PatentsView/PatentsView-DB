@@ -10,26 +10,49 @@ from sqlalchemy import create_engine
 from QA.create_databases.UploadTest import UploadTest
 from lib.configuration import get_connection_string, get_required_tables, get_current_config
 from lib.utilities import load_table_config, class_db_specific_config
+from lib.duckdb_sink import sink_enabled, append_csv, execute_sql, export_parquet, parquet_dir
 
-def upload_table(table_name, filepath, connection_string, version_indicator):
+def upload_table(table_name, filepath, connection_string, version_indicator, config=None):
+    if table_name in ['mainclass', 'subclass']:
+        table_name = "temp_" + table_name
+    if config is not None and sink_enabled(config):
+        append_csv(config, table_name, filepath, version_indicator=version_indicator)
+        return
     engine = create_engine(connection_string)
     data = pd.read_csv(filepath, delimiter='\t', index_col=False, keep_default_na=False, na_values=['','NULL','null'])
     data = data.assign(version_indicator=version_indicator)
-    if table_name in ['mainclass', 'subclass']:
-        table_name = "temp_" + table_name
     data.to_sql(name=table_name, con=engine, if_exists='append', index=False)
     engine.dispose()
 
 
-def upload_from_timestamp_folder(timestamp_folder, connection_string, version_indicator):
+def upload_from_timestamp_folder(timestamp_folder, connection_string, version_indicator, config=None):
     for table_file in os.listdir(timestamp_folder):
         if table_file not in ['error_counts.csv', 'error_data.csv']:
             table_name = table_file.replace('.csv', '')
             table_file_full_path = "{source_root}/{filename}".format(source_root=timestamp_folder, filename=table_file)
-            upload_table(table_name, table_file_full_path, connection_string, version_indicator)
+            upload_table(table_name, table_file_full_path, connection_string, version_indicator, config=config)
 
 
-def consolidate_cpc_classes(connection_string):
+def consolidate_cpc_classes(connection_string, config=None):
+    """
+    Fold temp_mainclass/temp_subclass into mainclass/subclass, deduplicating.
+    MySQL uses INSERT IGNORE against a UNIQUE key on id; DuckDB has no such
+    constraint here, so the dedupe is expressed explicitly.
+    """
+    if config is not None and sink_enabled(config):
+        statements = []
+        for table_name in ['mainclass', 'subclass']:
+            statements.append(
+                'CREATE TABLE IF NOT EXISTS "{t}" ("id" VARCHAR, "version_indicator" VARCHAR)'.format(
+                    t=table_name))
+            statements.append("""
+                INSERT INTO "{t}" ("id", "version_indicator")
+                SELECT "id", "version_indicator"
+                FROM (SELECT DISTINCT "id", "version_indicator" FROM "temp_{t}") src
+                WHERE src."id" NOT IN (SELECT "id" FROM "{t}" WHERE "id" IS NOT NULL)
+            """.format(t=table_name))
+        execute_sql(config, statements)
+        return
     for table_name in ['mainclass', 'subclass']:
         engine = create_engine(connection_string)
         insert_statement = "INSERT IGNORE INTO {table_name} (id, version_indicator) SELECT id, version_indicator from temp_{table_name};".format(
@@ -88,7 +111,8 @@ def setup_database(update_config, drop=True, cpc_only=False):
 
 def generate_timestamp_uploads(update_config):
     working_folder = update_config['FOLDERS']['WORKING_FOLDER']
-    connection_string = get_connection_string(update_config, "TEMP_UPLOAD_DB")
+    connection_string = None if sink_enabled(update_config) else get_connection_string(
+        update_config, "TEMP_UPLOAD_DB")
     parsed_data_folder = "{working_folder}/{parsed_folder}".format(working_folder=working_folder,
                                                                    parsed_folder="parsed_data")
     print(f"checking for parsed data in {parsed_data_folder}...")
@@ -100,7 +124,8 @@ def generate_timestamp_uploads(update_config):
                                                                         folder_name=latest_parse_folder)
     print(f"beginning upload of data from {timestamp_folder_full_path}...")
     upload_from_timestamp_folder(timestamp_folder_full_path, connection_string,
-                                    version_indicator=update_config['DATES']['END_DATE'])
+                                    version_indicator=update_config['DATES']['END_DATE'],
+                                    config=update_config)
 
 
 def begin_database_setup(dbtype='granted_patent' , **kwargs):
@@ -110,6 +135,12 @@ def begin_database_setup(dbtype='granted_patent' , **kwargs):
 
 
 def begin_upload(update_config):
+    if sink_enabled(update_config):
+        generate_timestamp_uploads(update_config)
+        consolidate_cpc_classes(None, config=update_config)
+        written = export_parquet(update_config)
+        print("wrote {} parquet files to {}".format(len(written), parquet_dir(update_config)))
+        return
     connection_string = get_connection_string(update_config, "TEMP_UPLOAD_DB")
     generate_timestamp_uploads(update_config)
     consolidate_cpc_classes(connection_string)

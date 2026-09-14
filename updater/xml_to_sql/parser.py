@@ -18,6 +18,7 @@ from sqlalchemy import create_engine
 from lib.configuration import get_current_config
 from lib.utilities import download_xml_files
 from lib.utilities import log_writer
+from lib.duckdb_sink import sink_enabled, append_dataframe, connect as sink_connect
 
 newline_tags = ["p", "heading", "br"]
 
@@ -337,8 +338,15 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
     port = '{}'.format(config['DATABASE_SETUP']['PORT'])
 
     text_output_folder = config['FOLDERS']['TEXT_OUTPUT_FOLDER']
-    engine = create_engine(
-            'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
+    use_sink = sink_enabled(config)
+    engine = None
+    sink_con = None
+    if use_sink:
+        # Local runs: accumulate in DuckDB instead of the upload_ MySQL database.
+        sink_con = sink_connect(config)
+    else:
+        engine = create_engine(
+                'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4'.format(user, password, host, port, database))
 
     for df in dfs:
         print("we are printing out dfs now")
@@ -357,6 +365,9 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
         elif df in ('claims','brf_sum_text','detail_desc_text','draw_desc_text') and foreign_key_config["field_name"] == 'document_number':
             dfs[df].rename(columns={'document_number':'pgpub_id'}, inplace=True)
         dfs[df]['version_indicator'] = config['DATES']['END_DATE']
+        if use_sink:
+            append_dataframe(config, df, dfs[df], con=sink_con)
+            continue
         try:
             dfs[df].to_sql(df, con=engine, if_exists='append', index=False)
             #dfs[df].to_sql(df, con=engine, if_exists='replace', index=False)
@@ -377,6 +388,8 @@ def load_df_to_sql(dfs, xml_file_name, config, log_queue, foreign_key_config):
                                                                 entity=df), sep=",",
                         quotechar='"', quoting=csv.QUOTE_NONNUMERIC, index=False)
                 raise e
+    if sink_con is not None:
+        sink_con.close()
     log_queue.put({
             "level":   logging.INFO,
             "message": "XML Document {xml_file} took {duration} seconds to load to SQL".format(

@@ -51,3 +51,10 @@ airflow-metadata-*
 patent_db_disk/
 TableToggle.json
 Z_Frame_job-*.csv
+
+# uv virtualenv for local (no-docker) runs. uv also writes .venv/.gitignore,
+# but declare it here so the venv is ignored even if that file is lost.
+.venv/
+
+# VS Code multi-root workspace files
+*.code-workspace

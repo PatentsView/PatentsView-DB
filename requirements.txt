@@ -41,3 +41,4 @@ xlrd
 er-evaluation
 pv-evaluation
 mysql-connector-python==9.1.0
+duckdb

@@ -21,6 +21,10 @@ def send_slack_notification(message, config, section="DB Update", level="info"):
 
     # Connect to slack
     slack_token = config["SLACK"]["API_TOKEN"]
+    if not slack_token:
+        # No token configured (e.g. local runs): log instead of posting.
+        logger.info("[slack:%s] %s - %s", level, section, message)
+        return None
     slack_client = WebClient(slack_token)
     slack_channel = config["SLACK"]["CHANNEL"]
     client = WebClient(token=slack_token)
@@ -38,4 +42,5 @@ def send_slack_notification(message, config, section="DB Update", level="info"):
     )
     except SlackApiError as e:
         print(e)
+        return None
     return response.status_code

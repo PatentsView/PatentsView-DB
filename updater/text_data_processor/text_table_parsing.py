@@ -5,6 +5,8 @@ import sys
 from QA.create_databases.TextTest import TextUploadTest, TextMergeTest, TextQuarterlyMergeTest
 
 from lib.configuration import get_current_config
+from lib.duckdb_sink import (sink_enabled, export_parquet, parquet_dir,
+                             apply_uuid_triggers, list_tables)
 def add_text_table_suffx(config, database_date):
     parsing_file_setting = "{prefix}_parsing_config_template_file".format(prefix='long_text')
     parsing_config_file = config["XML_PARSING"][parsing_file_setting]
@@ -22,12 +24,22 @@ def add_text_table_suffx(config, database_date):
 
 def begin_text_parsing(**kwargs):
     config = get_current_config('granted_patent', **kwargs)
-    add_text_table_suffx(config,
-                         database_date=datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d'))
+    end_date = datetime.datetime.strptime(config['DATES']['END_DATE'], '%Y%m%d')
+    add_text_table_suffx(config, database_date=end_date)
     project_home = os.environ['PACKAGE_HOME']
     sys.path.append(project_home + '/updater/text_parser/')
     from updater.xml_to_sql.parser import queue_parsers
     queue_parsers(config, type='long_text')
+    if sink_enabled(config):
+        year = int(end_date.strftime('%Y'))
+        text_tables = ['brf_sum_text_{}'.format(year), 'claims_{}'.format(year),
+                       'claim_exemplary_{}'.format(year),
+                       'detail_desc_text_{}'.format(year), 'draw_desc_text_{}'.format(year)]
+        # stands in for the trigger-installing create_text_yearly_tables tasks
+        apply_uuid_triggers(config, text_tables)
+        written = export_parquet(config, tables=[t for t in text_tables
+                                                 if t in list_tables(config)])
+        print("wrote {} text parquet files to {}".format(len(written), parquet_dir(config)))
 
 
 def post_text_parsing_granted(**kwargs):
